@@ -699,7 +699,7 @@ $(document).ready(function(){
 
                             </div-->
 						   <uGroup:objectPostToGroupsWrapper 
-										model="[canPullResource:canPullResource, 'observationInstance':speciesInstance]" />
+										model="[canPullResource:canPullResource, 'objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                            <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">

@@ -381,17 +381,18 @@ class UserGroupTagLib {
 	
 	def objectPostToGroups = {attrs, body->
 		def model = attrs.model
-		model.isBulkPull = (params.action == 'show')?false:true
-		model.onlyExpertGroups = (model.isBulkPull || params.controller == 'species')?true:false
-		if(model.canPullResource == null){
-			model.canPullResource = userGroupService.getResourcePullPermission(params, model.isBulkPull)
-		}
 		if(model.canPullResource){
+			model.onlyExpertGroups = userGroupService.getExpertGroupsOnly(model.isBulkPull, params)
 			out << render(template:"/common/objectPostToGroupsTemplate", model:model);
 		}
 	}
 	
 	def objectPostToGroupsWrapper = {attrs, body->
+		def model = attrs.model
+		model.isBulkPull = (params.action == 'show')?false:true
+		if(model.canPullResource == null){
+			model.canPullResource = userGroupService.getResourcePullPermission(params, model.isBulkPull)
+		}
 		out << render(template:"/common/objectPostToGroupsWrapperTemplate", model:attrs.model);
 	}
 	

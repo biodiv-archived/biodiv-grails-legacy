@@ -1,4 +1,4 @@
-<g:if test="${canPullResource || observationInstance}">
+<g:if test="${canPullResource}">
 	<div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
 		<g:if test="${observationInstance}">
 			<uGroup:resourceInGroups
@@ -6,6 +6,6 @@
 		</g:if>
 		
 		<uGroup:objectPostToGroups
-				model="['objectType':objectType, userGroup:params.userGroup, canPullResource:canPullResource, 'observationInstance':observationInstance]" />
+				model="['objectType':objectType, userGroup:params.userGroup, canPullResource:canPullResource, isBulkPull:isBulkPull, 'observationInstance':observationInstance]" />
 	</div>
 </g:if>

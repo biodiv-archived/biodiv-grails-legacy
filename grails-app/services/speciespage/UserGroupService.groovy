@@ -46,6 +46,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
 import species.participation.UserToken;
 import species.utils.ImageUtils;
@@ -1282,7 +1283,7 @@ class UserGroupService {
 		if(groupCount == 0){
 			return false
 		}
-		if(!isBulkPull && !(params.controller == 'species')){
+		if(!getExpertGroupsOnly(isBulkPull, params)){
 			return true
 		}
 		//if user is founder or expert in any group then retruing true permission for bulk upload
@@ -1290,6 +1291,10 @@ class UserGroupService {
 		return currUser.fetchIsFounderOrExpert()
 	}
 	
+	def boolean getExpertGroupsOnly(boolean isBulkPull, params){
+		//resource like species or bulk post can be done only by expert or founder in his group only  
+		return (isBulkPull || params.controller == 'species')
+	}
 	
 	private class ResourceUpdate {
 		private static final log = LogFactory.getLog(this);
@@ -1324,7 +1329,7 @@ class UserGroupService {
 				allObvs = newList
 			}
 			
-			log.debug "======= All Resouces " +  allObvs.size()
+			log.debug "======= All Resources " +  allObvs.size()
 			log.debug "========All Groups " + groups
 			def afDescriptionList = []
 			groups.each { UserGroup ug ->
@@ -1346,12 +1351,12 @@ class UserGroupService {
 						status.setRollbackOnly()
 						e.printStackTrace()
 					}
-					if(!ug.hasErrors()){
-						//adding feed for each resource with isShowable = false flag
-						log.debug "============= calling af...."
-						def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
-						if(af) afDescriptionList << activityFeedService.getContextInfo(af).activityTitle
-					}
+				}
+				if(!ug.hasErrors()){
+					//adding feed for each resource with isShowable = false flag
+					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
+					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					if(af) afDescriptionList << activityFeedService.getContextInfo(af).activityTitle
 				}
 			}
 			return afDescriptionList.join(". ")

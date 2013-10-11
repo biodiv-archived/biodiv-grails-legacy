@@ -69,7 +69,11 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 	var pullType = (isBulkPull) ? 'bulk' : 'single'
 	var selectionType = $('.post-to-groups .select-all').hasClass('active') ? 'selectAll' : 'reset'
 	var objectIds = (selectionType === 'selectAll') ?  rejectedObjects : selectedObjects
-	var filterUrl = window.location.href	
+	var filterUrl = window.location.href
+	if(pullType !== 'single'){
+		$(".alertMsg").removeClass('alert alert-error').removeClass('alert alert-success').addClass('alert alert-info').html("Processing...");
+		$("html, body").animate({ scrollTop: 0 });
+	}
 	$.ajax({
  		url: url,
  		type: 'POST',
@@ -80,12 +84,10 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 				if(pullType === 'single'){
 					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
 				}else{
-					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-					$("html, body").animate({ scrollTop: 0 });
+					$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-success').html(data.msg);
 				}
 			}else{
-				$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
-				$("html, body").animate({ scrollTop: 0 });
+				$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-error').html(data.msg);
 			}
 			updateFeeds();
 			return false;
