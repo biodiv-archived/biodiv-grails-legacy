@@ -146,11 +146,12 @@ class DocumentController {
 		if (documentInstance) {
 			try {
 				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
-				documentInstance.delete(flush: true)
+				documentInstance.delete(flush: true, failOnError:true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 				redirect(action: "browser")
 			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
+			catch (Exception e) {
+				log.debug e.printStackTrace()
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 				redirect(action: "show", id: params.id)
 			}
