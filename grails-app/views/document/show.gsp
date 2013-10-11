@@ -140,12 +140,12 @@
 
 			</g:if>
 			<uGroup:objectPostToGroupsWrapper 
-                        model="['observationInstance':documentInstance]" />
-                        
+                           	model="[canPullResource:canPullResource, 'objectType':documentInstance.class.canonicalName, 'observationInstance':documentInstance]" />
+ 
                         <g:render template="/common/showFeaturedTemplate" model="['observationInstance':documentInstance]"/>
                         <uGroup:featureUserGroups model="['observationInstance':documentInstance]"/>
 
-			<div class="union-comment">
+						<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>

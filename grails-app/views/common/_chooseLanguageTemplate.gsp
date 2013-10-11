@@ -19,7 +19,7 @@
 /*#addObservation .combobox-container .add-on {
 	height:36px;
 }*/
-.caret {
+.combobox-container .caret {
 	vertical-align: middle;
 }
 </style>

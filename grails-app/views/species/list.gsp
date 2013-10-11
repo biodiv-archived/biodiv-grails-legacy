@@ -38,7 +38,7 @@
 						<sUser:isAdmin>
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
 						</sUser:isAdmin>
-						<uGroup:objectPostToGroups model="['objectType':Species.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
+						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
 						<div class="observations_list_wrapper" style="top: 0px;">
 							<s:showSpeciesList/>
 						</div>

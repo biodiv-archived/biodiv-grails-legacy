@@ -1557,7 +1557,7 @@ class ObservationService extends AbstractObjectService {
 				mailSubject = feedInstance.activityDescrption
 				bodyView = "/emailtemplates/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				templateMap["actionObject"] = 'usergroup'
+				templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
 				//templateMap['message'] = activityFeedService.getContextInfo(feedInstance, [:])
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))
@@ -1673,7 +1673,7 @@ class ObservationService extends AbstractObjectService {
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0 && Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-                            				bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						}
 						from grailsApplication.config.grails.mail.default.from
 						//replyTo replyTo
