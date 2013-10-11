@@ -108,13 +108,13 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </td>
 </tr>
 <tr>
-<td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="http://indiabiodiversity.org/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="${grailsApplication.config.speciesPortal.app.siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
+    <td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="${grailsApplication.config.grails.serverURL}/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="${grailsApplication.config.speciesPortal.app.siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
 </tr>
 <tr>
 <td class="w580" style="width: 580px; height: 10px; background-color: white;"></td>
 </tr>
 <tr align="center">
-<td class="w640" bgcolor="#ffffff" height="30" width="640"><a href="http://indiabiodiversity.org/observation/list"><img src="${resource(dir:'images', file:'picturebanner.png',absolute:'true')}" alt="" style="border: 0px solid ; width: 600px; height: 101px;"></a></td>
+    <td class="w640" bgcolor="#ffffff" height="30" width="640"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'picturebanner.png',absolute:'true')}" alt="" style="border: 0px solid ; width: 600px; height: 101px;"></a></td>
 </tr>
 <tr id="simple-content-row">
 <td class="w640" bgcolor="#ffffff" width="640">
@@ -148,11 +148,11 @@ following modules: </div>
 <tbody>
 <tr>
 <td class="w580" style="width: 580px; vertical-align: bottom;">
-<p class="article-title" align="left"><big><a href="http://indiabiodiversity.org/observation/list"><span style="font-weight: bold;">Observations</span></a></big></p>
+    <p class="article-title" align="left"><big><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><span style="font-weight: bold;">Observations</span></a></big></p>
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" width="15"><a href="http://indiabiodiversity.org/observation/list"><img src="${resource(dir:'images', file:'observations_cr.png',absolute:'true' )}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Observations" hspace="5"></a></td>
+<td class="w30" width="15"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'observations_cr.png',absolute:'true' )}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Observations" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -170,11 +170,11 @@ filters. </div>
 </tr>
 <tr>
 <td class="w580" style="width: 580px; vertical-align: bottom;">
-<p class="article-title" align="left"><a style="font-weight: bold;" href="http://indiabiodiversity.org/map"><big>Maps</big></a></p>
+    <p class="article-title" align="left"><a style="font-weight: bold;" href="${uGroup.createLink(controller:'map', absolute:true)}"><big>Maps</big></a></p>
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" height="5" width="15"><a href="http://indiabiodiversity.org/map"><img src="${resource(dir:'images', file:'maps_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Maps" hspace="5"></a></td>
+    <td class="w30" height="5" width="15"><a href="${uGroup.createLink(controller:'map', absolute:true)}"><img src="${resource(dir:'images', file:'maps_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Maps" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -199,11 +199,11 @@ embed it on your own web page. </div>
 <tbody>
 <tr>
 <td class="w580" width="580">
-<p class="article-title" align="left"><a href="http://indiabiodiversity.org/checklist/list"><span style="font-weight: bold;"><big>Checklists</big></span></a></p>
+    <p class="article-title" align="left"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><span style="font-weight: bold;"><big>Checklists</big></span></a></p>
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" width="15"><a href="http://indiabiodiversity.org/checklist/list"><img src="${resource(dir:'images', file:'checklists_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Checklists" hspace="5"></a></td>
+    <td class="w30" width="15"><a href="${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'checklists_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Checklists" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -221,11 +221,11 @@ copy of a checklist that interests you in more than one format. </div>
 </tr>
 <tr>
 <td class="w580" width="580">
-<p class="article-title" align="left"><small><big><a style="font-weight: bold;" href="http://indiabiodiversity.org/species/list"><big>Species</big></a></big></small></p>
+    <p class="article-title" align="left"><small><big><a style="font-weight: bold;" href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><big>Species</big></a></big></small></p>
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" height="5" width="15"><a href="http://indiabiodiversity.org/species/list"><img src="${resource(dir:'images', file:'species_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Species" hspace="5"></a></td>
+    <td class="w30" height="5" width="15"><a href="${uGroup.createLink(controller:'species', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'species_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Species" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -242,11 +242,11 @@ web. </div>
 </tr>
 <tr>
 <td class="w580" width="580">
-<p class="article-title" align="left"><small><big><a href="http://indiabiodiversity.org/group/list"><span style="font-weight: bold;"><big>Groups</big></span></a></big></small></p>
+    <p class="article-title" align="left"><small><big><a href="${uGroup.createLink(controller:'group', action:'list', absolute:true)}"><span style="font-weight: bold;"><big>Groups</big></span></a></big></small></p>
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" width="15"><a href="http://indiabiodiversity.org/group/list"><img src="${resource(dir:'images', file:'groups_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Groups" hspace="5"></a></td>
+    <td class="w30" width="15"><a href="${uGroup.createLink(controller:'group', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'groups_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Groups" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
