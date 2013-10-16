@@ -167,12 +167,10 @@ beans = {
     projectSearchService(speciespage.search.ProjectSearchService) {
         solrServer = ref('projectSolrServer');
     }
-
     documentSearchService(speciespage.search.DocumentSearchService) {
         solrServer = ref('documentSolrServer');
     }
-
-    usersSearchService(speciespage.search.SUserSearchService) {
+    SUserSearchService(speciespage.search.SUserSearchService) {
         solrServer = ref('usersSolrServer');
     }
 

@@ -33,7 +33,7 @@ class SpeciesSearchService {
 	
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
-	static int BATCH_SIZE = 50;
+	static int BATCH_SIZE = 20;
 	
 	def sessionFactory;
 
@@ -61,7 +61,8 @@ class SpeciesSearchService {
 	
 	@Transactional(readOnly = true)
 	def listSpecies(id, params) {
-			return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
+			//return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
+			return Species.findAllByIdGreaterThan(id, params);
 	}
 
 	private void cleanUpGorm() {

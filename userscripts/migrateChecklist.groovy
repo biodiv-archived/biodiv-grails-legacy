@@ -15,6 +15,7 @@ import content.eml.Document
 import species.groups.UserGroup
 import grails.converters.JSON
 import species.auth.*;
+import groovy.util.Eval;
 
 def addDrupalId(){
 	def checklistUtilService = ctx.getBean("checklistUtilService");
@@ -45,19 +46,6 @@ def updateGeoPrivacy(){
 	}
 }
 
-def addUserRegistrationFeed(){
-	def checklistUtilService = ctx.getBean("checklistUtilService");
-	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
-	m.autoTimestamp = false
-	
-	SUser.withTransaction(){
-		SUser.list().each { user ->
-			println user 
-			checklistUtilService.addActivityFeed(user, user, user, ActivityFeedService.USER_REGISTERED, user.dateCreated);
-		}
-	}
-	m.autoTimestamp = true
-}
 
-addUserRegistrationFeed()
-println "================ done "
+
+

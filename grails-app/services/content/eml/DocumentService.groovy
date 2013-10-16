@@ -26,7 +26,6 @@ import species.sourcehandler.XMLConverter
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
-import content.eml.Coverage;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
@@ -36,10 +35,9 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 class DocumentService {
 
 	static transactional = false
-	def userGroupService;
 	def documentSearchService
 	def grailsApplication
-	def userGroupsService
+	def userGroupService
 	def dataSource
 
 	Document createDocument(params) {
@@ -53,29 +51,23 @@ class DocumentService {
 
 
 	def updateDocument(document, params) {
-
+		params.remove('latitude')
+		params.remove('longitude')
 		document.properties = params
-		document.coverage = document.coverage ?: new Coverage()
-		document.coverage.placeName = params.placeName
-		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
-		document.coverage.locationAccuracy = params.location_accuracy
-		
-		//document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-//		if(params.latitude) 
-//    		document.coverage.latitude = params.latitude.toFloat()
-//        if(params.longitude)
-//    		document.coverage.longitude = params.longitude.toFloat()
-		//document.coverage.geoPrivacy = params.geo_privacy
+		document.group = null
+		document.habitat = null
+		//document.latitude = document.latitude ?:0.0
+		//document.longitude = document.longitude ?:0.0
+		document.placeName = params.placeName
+		document.reverseGeocodedName = params.reverse_geocoded_name
+		document.locationAccuracy = params.location_accuracy
 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-//		if(params.latitude && params.longitude) {
-//			document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-//		} else 
 		if(params.areas) {
 			WKTReader wkt = new WKTReader(geometryFactory);
 			try {
 				Geometry geom = wkt.read(params.areas);
-				document.coverage.topology = geom;
+				document.topology = geom;
 			} catch(ParseException e) {
 				log.error "Error parsing polygon wkt : ${params.areas}"
 			}
@@ -84,40 +76,19 @@ class DocumentService {
 		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
 		//document.license = License.findByName(License.LicenseType(params.licenseName))
 
-		if(params.description) {
-			def description = params.description.trim()
-			if(description)
-				document.description =description
-			else
-				document.description = null
-		}
-
-		if(params.contributors) {
-			def contributors = params.contributors.trim()
-			if(contributors)
-				document.contributors =contributors
-			else
-				document.contributors = null
-		}
-
-		if(params.attribution) {
-			def attribution = params.attribution.trim()
-			if(attribution)
-				document.attribution = attribution
-			else
-				document.attribution = null
-		}
-
-
-		document.coverage.speciesGroups = []
+		document.notes = params.description? params.description.trim() :null
+		document.contributors = params.contributors? params.contributors.trim() :null
+		document.attribution = params.attribution? params.attribution.trim() :null
+		
+		document.speciesGroups = []
 		params.speciesGroup.each {key, value ->
 			log.debug "Value: "+ value
-			document.coverage.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
+			document.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
 		}
 
-		document.coverage.habitats  = []
+		document.habitats  = []
 		params.habitat.each {key, value ->
-			document.coverage.addToHabitats(Habitat.read(value.toLong()));
+			document.addToHabitats(Habitat.read(value.toLong()));
 		}
 	}
 
@@ -125,8 +96,7 @@ class DocumentService {
 	def setUserGroups(Document documentInstance, List userGroupIds) {
 		if(!documentInstance) return
 
-			def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
-		println docInUserGroups;
+		def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  docInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			println 'removing document from usergroups'
@@ -162,7 +132,7 @@ class DocumentService {
 			}
 
 			if(params."${docId}.description") {
-				documentInstance.description = params."${docId}.description"
+				documentInstance.notes = params."${docId}.description"
 			}
 
 			if(params."${docId}.contributors") {
@@ -233,7 +203,7 @@ class DocumentService {
 	 * @param params
 	 * @return
 	 */
-	def search(params) {
+	def search(params, noLimit=false) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 		def queryParams = [:]
@@ -270,7 +240,9 @@ class DocumentService {
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
 		def max = Math.min(params.max ? params.int('max') : 12, 100)
-		paramsList.add('rows', max);
+		if(!noLimit){
+			paramsList.add('rows', max);
+		}
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(isValidSortParam(sort)) {
@@ -332,7 +304,7 @@ class DocumentService {
 	}
 
 	private boolean isValidSortParam(String sortParam) {
-		if(sortParam.equalsIgnoreCase('dateCreated'))
+		if(sortParam.equalsIgnoreCase('createdOn'))
 			return true;
 		return false;
 	}
@@ -358,25 +330,29 @@ class DocumentService {
 	 * @param offset
 	 * @return
 	 */
-	Map getFilteredDocuments(params, max, offset) {
+	Map getFilteredDocuments(params, max, offset, noLimit = false) {
+		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
 		if(!params.aq){
-			return getDocsFromDB(params, max, offset)
+			res.putAll(getDocsFromDB(params, max, offset, noLimit))
+		}else{
+			//returning docs from solr search
+			res.putAll(search(params, noLimit))
 		}
-		//returning docs from solr search
-		return search(params)
+		return res
 	}
 	
-	private getDocsFromDB(params, max, offset){
+	private getDocsFromDB(params, max, offset, noLimit){
 		def queryParts = getDocumentsFilterQuery(params)
 		String query = queryParts.query;
 
 
 		query += queryParts.filterQuery + queryParts.orderByClause
-		if(max != -1)
-			queryParts.queryParams["max"] = max
-		if(offset != -1)
-			queryParts.queryParams["offset"] = offset
-
+		if(!noLimit){
+			if(max != -1)
+				queryParts.queryParams["max"] = max
+			if(offset != -1)
+				queryParts.queryParams["offset"] = offset
+		}
 
 		log.debug "Document Query "+ query + "  params " + queryParts.queryParams
 		def documentInstanceList = Document.executeQuery(query, queryParts.queryParams)
@@ -415,7 +391,7 @@ class DocumentService {
 			}
 		}
 		
-		def sortBy = params.sort ? params.sort : "lastUpdated "
+		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}

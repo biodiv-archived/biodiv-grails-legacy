@@ -11,7 +11,8 @@ import species.participation.ActivityFeed
 import speciespage.UserGroupService
 import species.auth.SUser
 import species.groups.UserGroup
-
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
+import content.eml.*;
 /*
 def feedService = ctx.getBean("activityFeedService");
 def userGroupService = ctx.getBean("userGroupService");
@@ -176,8 +177,82 @@ def addFeedForObvCreate(){
 	}
 }
 
+def addUserRegistrationFeed(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
+	m.autoTimestamp = false
+	
+	SUser.withTransaction(){
+		SUser.list().each { user ->
+			println user
+			checklistUtilService.addActivityFeed(user, user, user, ActivityFeedService.USER_REGISTERED, user.dateCreated);
+		}
+	}
+	m.autoTimestamp = true
+}
+
+
+def addDocumentPostFeed(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
+	def desc = "Posted document to group"
+	m.autoTimestamp = false
+	Document.withTransaction(){
+		Document.list().each { doc ->
+			println doc
+			doc.userGroups.each { ug ->
+				checklistUtilService.addActivityFeed(doc, ug, doc.author, ActivityFeedService.RESOURCE_POSTED_ON_GROUP, new Date(doc.createdOn.getTime() + 2) , desc);
+			}
+		}
+	}
+	m.autoTimestamp = true
+}
+
+
+
+def migrateCoverageToDoc(){
+	Document.withTransaction(){
+		Document.list().each { Document doc ->
+			println "=================================="
+			println doc
+			def cov = doc.coverage
+			if(cov){
+				println "========== got coverage properties  "
+				doc.placeName    = cov.placeName
+				doc.reverseGeocodedName   = cov.reverseGeocodedName
+				doc.latitude    = cov.latitude
+				doc.longitude  = cov.longitude
+				doc.topology    = cov.topology
+				doc.geoPrivacy    = cov.geoPrivacy
+				if(cov.habitats){
+					cov.habitats.each { 
+						doc.addToHabitats(it)
+					}
+				}
+				if(cov.speciesGroups){
+					cov.speciesGroups.each {
+						doc.addToSpeciesGroups(it)
+					}
+				}
+				if(!doc.save(flush:true)){
+					doc.errors.allErrors.each { println  it }
+				}
+			}
+			println "=================================="
+		}
+	}
+}
+
+
+
+//migrateCoverageToDoc()
+//addDocumentPostFeed()
+
+
+//addUserRegistrationFeed()
+
 //addFeedForObvCreate()
-correctObvActivityOrder()
+//correctObvActivityOrder()
 //migrate()
 
 /*

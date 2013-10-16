@@ -29,17 +29,10 @@ class CommentService {
 			c.lastUpdated = params.lastUpdated;
 		}
 
-
 		if(!c.save(flush:true)){
 			c.errors.allErrors.each { log.error it }
 			return ['success': false]
 		}else{
-			try {
-				def commentHolderType = getDomainObject(params.commentHolderType, params.commentHolderId)
-				commentHolderType.onAddComment(c)
-			}catch (MissingMethodException e) {
-				//e.printStackTrace();
-			}
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 			def feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
 			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);

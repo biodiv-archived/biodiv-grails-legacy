@@ -2,6 +2,8 @@ package species.participation
 
 import grails.converters.JSON
 import grails.plugins.springsecurity.Secured
+import species.participation.Follow
+import species.auth.SUser
 
 class ActivityFeedController {
 
@@ -55,9 +57,8 @@ class ActivityFeedController {
 	def follow = {
 		log.debug params
 		def author = springSecurityService.currentUser;
-		def domainObj = activityFeedService.getDomainObject(params.className, params.id)
-		def msg
-		
+		def domainObj = activityFeedService.getDomainObject(params.className, params.id);
+        def msg
 		if(params.follow.toBoolean()){
 			Follow.addFollower(domainObj, author)
 			msg = "Followed..."
@@ -68,8 +69,6 @@ class ActivityFeedController {
 			Follow.deleteFollower(domainObj, author)
 			msg = "Unfollowed..."
 		}
-		
-		
 		def r = [status:'success']
 		r['msg']= msg 
 		render r as JSON

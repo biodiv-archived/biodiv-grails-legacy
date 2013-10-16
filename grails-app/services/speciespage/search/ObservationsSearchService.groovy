@@ -151,6 +151,7 @@ class ObservationsSearchService {
                     if(solrServer instanceof ConcurrentUpdateSolrServer) {
                         solrServer.blockUntilFinished();
                     }
+                    println "======SOLR SERVER===="
                     solrServer.commit();
                     log.info "Finished committing to observations solr core"
                 }
@@ -171,7 +172,7 @@ class ObservationsSearchService {
 		
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 		doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
-		def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };  
+		def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
 		distRecoVotes.each { vote ->
 			doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
 			doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name);

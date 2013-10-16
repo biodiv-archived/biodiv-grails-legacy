@@ -1,13 +1,23 @@
 package species.participation
 
+import species.participation.Observation
 import species.auth.SUser
 
-class ObservationFlag {
+class Flag {
 	
 	def activityFeedService
+    
+    SUser author
+    long objectId
+    String objectType
+    Date createdOn = new Date();
+    String notes;
+
+    static belongsTo = [author:SUser];
+ 
 	
 	public enum FlagType {
-		OBV_INAPPROPRIATE("Inappropriate observation"),
+		DETAILS_INAPPROPRIATE("Inappropriate details"),
 		LOCATION_INAPPROPRIATE("Inappropriate location")
 		
 		private String value;
@@ -17,7 +27,7 @@ class ObservationFlag {
 		}
 		
 		static list() {
-			return [OBV_INAPPROPRIATE, LOCATION_INAPPROPRIATE];
+			return [DETAILS_INAPPROPRIATE, LOCATION_INAPPROPRIATE];
 		}
 		
 		String value() {
@@ -26,24 +36,20 @@ class ObservationFlag {
 	}
     
 	static constraints = {
-		author(unique:['observation'])
+		author(unique:['objectId','objectType'])
 		notes nullable:true, blank: true
 		flag nullable:false
 		notes (size:0..400)
     }
 	
 	static mapping = {
-		version : false;
+        version : false;
 		notes type:'text';
 	}
 
 	
-	Date createdOn = new Date();
-	String notes;
 	FlagType flag;
-	
-	static belongsTo = [author:SUser, observation:Observation]
-	
+		
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}

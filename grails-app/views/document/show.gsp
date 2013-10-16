@@ -5,14 +5,12 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'document', action:'show', id:documentInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${documentInstance.title}"/>
-<g:set var="description" value="${Utils.stripHTML(documentInstance.description?:'') }" />
+<g:set var="description" value="${Utils.stripHTML(documentInstance.notes?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
 <r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
-	<div class="span12">
-
-
+	<div class="span12"> 
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
 				<div class="main_heading" style="margin-left: 0px;">
@@ -60,15 +58,18 @@
 
                 <div class="span12" style="margin-left:0px">
                     <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                    model="['instance':documentInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, 'hideFollow':true]" />
+                    model="['instance':documentInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':false, 'hideDownload':true, 'hideFollow':false]" />
                 </div>
 
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
+                    <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
+                    
+                                        
+                    
 			<g:if
-				test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
+				test="${documentInstance?.speciesGroups || documentInstance?.habitats || documentInstance?.placeName }">
 
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" href="#coverageInfo"
@@ -76,13 +77,13 @@
 					<div id="coverageInfo" class="speciesField collapse in">
 						<table>
 
-							<g:if test="${documentInstance.coverage?.speciesGroups}">
+							<g:if test="${documentInstance?.speciesGroups}">
 
 
 								<tr>
 									<td class="prop"><span class="grid_3 name">Species Groups</span></td>
 									<td class="linktext"><g:each
-											in="${documentInstance?.coverage?.speciesGroups}"
+											in="${documentInstance.speciesGroups}"
 											var="speciesGroup">
 											<button
 												class="btn species_groups_sprites ${speciesGroup.iconClass()} active"
@@ -94,12 +95,12 @@
 
 
 
-							<g:if test="${documentInstance.coverage?.habitats}">
+							<g:if test="${documentInstance?.habitats}">
 								<tr>
 									<td class="prop"><span class="grid_3 name">Habitats</span></td>
 
 									<td class="linktext"><g:each
-											in="${documentInstance.coverage?.habitats}" var="habitat">
+											in="${documentInstance.habitats}" var="habitat">
 											<button
 												class="btn habitats_sprites ${habitat.iconClass()} active"
 												id="${"habitat_" + habitat.id}" value="${habitat.id}"
@@ -110,18 +111,18 @@
 								</tr>
 							</g:if>
 
-							<g:if test="${documentInstance.coverage?.placeName || documentInstance.coverage.reverseGeocodedName}">
+							<g:if test="${documentInstance?.placeName || documentInstance?.reverseGeocodedName}">
 								<tr>
 
                                                                     <td class="prop"><span class="grid_3 name">
                                                                             Place</span></td>
                                                                     <td>
                                                                         
-                                                                        <g:if test="${documentInstance.coverage.placeName}">
-                                                                        <g:set var="location" value="${documentInstance.coverage.placeName}"/>
+                                                                        <g:if test="${documentInstance?.placeName}">
+                                                                        <g:set var="location" value="${documentInstance.placeName}"/>
                                                                         </g:if>
                                                                         <g:else>
-                                                                        <g:set var="location" value="${documentInstance.coverage.reverseGeocodedName}"/>
+                                                                        <g:set var="location" value="${documentInstance.reverseGeocodedName}"/>
                                                                         </g:else>
 
                                                                         <div class="value ellipsis multiline" title="${location}">
@@ -136,13 +137,20 @@
 				</div>
 
 			</g:if>
+			<uGroup:objectPostToGroupsWrapper 
+                           	model="[canPullResource:canPullResource, 'objectType':documentInstance.class.canonicalName, 'observationInstance':documentInstance]" />
+ 
+                        <g:render template="/common/showFeaturedTemplate" model="['observationInstance':documentInstance]"/>
+                        <uGroup:featureUserGroups model="['observationInstance':documentInstance]"/>
 
-			<div class="union-comment">
+						<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>
 		</div>
-		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
+                <div class="span4">
+                <g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
+                                </div>
 
 	</div>
 

@@ -75,12 +75,13 @@
 
 			</div>
                         <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
-                            <obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />
+                            <obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup, canPullResource:canPullResource]"  />
                         </div>
                         <div class="span4" style="position:relative;top:20px">
-                 <div class="sidebar_section" style="clear:both;overflow:hidden;display:none;">
-                 	<uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName, userGroup:params.userGroup]"/>
-                 </div>       
+                 
+                 <uGroup:objectPostToGroupsWrapper 
+						model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName]" />
+                        
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
                     <h5>Species Distribution</h5>

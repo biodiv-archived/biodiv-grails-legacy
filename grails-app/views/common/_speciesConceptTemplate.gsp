@@ -87,7 +87,7 @@
                                                                                     <h5>Related Observations</h5>
                                                                                     <div class="tile" style="clear: both">
                                                                                         <obv:showRelatedStory
-                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupInstance':userGroupInstance]" />
                                                                                     </div>
                                                                                 </div>
                                        
@@ -96,7 +96,8 @@
 									<g:elseif test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
 										<g:if test="${category.value.get('speciesFieldInstance')}">
 										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
-										<%def references = speciesInstance.fields.collect{it.references};
+                                                                                <%
+                                                                                def references = speciesInstance.fields.collect{it.references};
 										Map refs = new LinkedHashMap();
 										references.each(){
 											if(it) {
@@ -104,23 +105,23 @@
 													refs.put(it?.url?.trim()?:it?.title, it)
 												}
 											}
-										};
+                                                                                };
 
                                                                                 //printing only if references are not available.. using description
 										if(category.value.get('speciesFieldInstance')[0]?.description && !category.value.get('speciesFieldInstance')[0]?.references) {
 											category.value.get('speciesFieldInstance')[0]?.description?.replaceAll(/<.*?>/, '\n').split('\n').each() {
 												if(it) {
-												if(it.startsWith("http://")) {
-													refs.put(it, new Reference(url:it));
-												} else {
-													refs.put(it, new Reference(title:it));
-												}
+                                                                                                    if(it.startsWith("http://")) {
+                                                                                                            refs.put(it, new Reference(url:it));
+                                                                                                    } else {
+                                                                                                            refs.put(it, new Reference(title:it));
+                                                                                                    }
 												}
 											}
 										}
 										references = refs.values();
 										%>
-										<g:if test="${references }">
+										<g:if test="${references}">
 											<ol class="references" style="list-style:disc;list-style-type:decimal">
 												<g:each in="${references}" var="r">
 													<li class="linktext"><g:if test="${r.url}">

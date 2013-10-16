@@ -1,5 +1,6 @@
 package species
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
@@ -11,12 +12,14 @@ import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.Utils;
+import species.participation.Featured;
 
 class UserGroupTagLib {
 	static namespace = "uGroup";
 
 	def springSecurityService
 	def userGroupService;
+    def activityFeedService;
 
 	def userGroups = { attrs, body ->
 		def userInstance = attrs.model?.userInstance
@@ -152,6 +155,13 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/showGroupListTemplate", model:attrs.model);
 	}
 
+    def featureUserGroups = {attrs, body->
+        def featResult = getListToFeatureIn(attrs.model.observationInstance.id, attrs.model.observationInstance.class.getCanonicalName())
+		if(featResult.size() > 0){
+            out << render(template:"/common/featureUserGroupsTemplate", model:['observationInstance':attrs.model.observationInstance, 'featResult': featResult]);
+        }
+    }
+
 	def showUserGroupFilterMessage = {attrs, body->
 		out << render(template:"/common/userGroup/showUserGroupFilterMsgTemplate", model:attrs.model);
 	}
@@ -202,9 +212,63 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/sidebarTemplate", model:attrs.model);
 	}
 
+    Set getObjectsUserGroups(long id, String type) {
+        def object = activityFeedService.getDomainObject(type,id);
+        def f = object.findAllWhere(id: id);
+        return f[0].userGroups
+    }
+
+    List getFeaturedUserGroups(long id, String type) {
+        def f = Featured.findAllWhere(objectId: id, objectType: type);
+        List ug = f.collect{it.userGroup}
+        return ug
+
+    }
+    List getAuthorityUserGroups() {
+        def user = springSecurityService.getCurrentUser();
+		List authorityUG = []
+        if(user == null){
+            return authorityUG
+        }
+        def userGroups = userGroupService.getUserGroups(user);
+        
+        userGroups.each { ugroup ->
+            if(ugroup.isFounder(user) || ugroup.isExpert(user)){
+                authorityUG.add(ugroup)
+            }
+            
+        }
+        return authorityUG
+    }
+    
+    Map getListToFeatureIn(id, type) {
+        def result = [:]
+       	def ug = getFeaturedUserGroups(id, type)
+        def objUserGroup = getObjectsUserGroups(id, type)
+        def authorityUG = getAuthorityUserGroups();
+        def allowedUserGroups = objUserGroup.intersect(authorityUG)
+        def fUserGroups = allowedUserGroups.intersect(ug)
+        allowedUserGroups.removeAll(fUserGroups);
+        fUserGroups.each {
+            result[it] = true;
+        } 
+		allowedUserGroups.each {
+			result[it] = false;
+		}
+        if(SpringSecurityUtils.ifAllGranted("Role_Admin")){
+            def ibpGroup =  new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName);
+            if(ug.contains(null)) {
+                result[ibpGroup] = true;
+            }
+            else {
+                result[ibpGroup] = false;
+            }
+        }
+        return result;
+    } 
 	def getCurrentUserUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
-		def userGroups = userGroupService.getUserGroups(user);
+		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
@@ -220,6 +284,14 @@ class UserGroupTagLib {
 		}
 		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
 	}
+    
+    
+    def markFeaturedUserGroups = {attrs, body ->
+        if(attrs.model.featResult) {
+		    out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:attrs.model.featResult]);
+	    }
+    }
+    
 
 	def getCurrentUserUserGroupsSidebar = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
@@ -374,10 +446,30 @@ class UserGroupTagLib {
 	}
 	
 	def objectPost = {attrs, body->
-		out << render(template:"/common/objectPostTemplate", model:attrs.model);
+		if(attrs.model.canPullResource){
+			out << render(template:"/common/objectPostTemplate", model:attrs.model);
+		}
 	}
 	
 	def objectPostToGroups = {attrs, body->
-		out << render(template:"/common/objectPostToGroupsTemplate", model:attrs.model);
+		def model = attrs.model
+		if(model.canPullResource){
+			model.onlyExpertGroups = userGroupService.getExpertGroupsOnly(model.isBulkPull, params)
+			out << render(template:"/common/objectPostToGroupsTemplate", model:model);
+		}
 	}
+	
+	def objectPostToGroupsWrapper = {attrs, body->
+		def model = attrs.model
+		model.isBulkPull = (params.action == 'show')?false:true
+		if(model.canPullResource == null){
+			model.canPullResource = userGroupService.getResourcePullPermission(params, model.isBulkPull)
+		}
+		out << render(template:"/common/objectPostToGroupsWrapperTemplate", model:attrs.model);
+	}
+	
+	def resourceInGroups = {attrs, body->
+		out << render(template:"/common/resourceInGroupsTemplate", model:attrs.model);
+	}
+	
 }

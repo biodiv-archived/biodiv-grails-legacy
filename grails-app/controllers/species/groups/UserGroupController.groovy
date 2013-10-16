@@ -422,6 +422,7 @@ class UserGroupController {
 	}
 	
 	def getUserGroupObservationsList(params) {
+        log.debug "+++++++++++++++++"+params
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
@@ -441,6 +442,7 @@ class UserGroupController {
 		
 
 		if(params.append?.toBoolean()) {
+            println "==============MODEL OBJ===============" + model.observationInstanceList.collect {it.id}
 			session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
 		} else {
 			session[userGroupInstance.webaddress+"obv_ids_list_params"] = params.clone();
@@ -970,7 +972,8 @@ class UserGroupController {
    def bulkPost = {
 	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
-	   r['msg'] = "${message(code:r.remove('msgCode'))}" 
+	   r['resourceGroupHtml'] =  (params.pullType == 'single') ? g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':r.remove('resourceObj')]):null;
+	   r['msg'] = "${message(code:r.remove('msgCode'))}"
 	   render r as JSON
    }
    /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1065,7 +1068,7 @@ class UserGroupController {
 			   to user.email
                		   bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 			   //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com","balachandert@gmail.com"
-			   from conf.ui.notification.emailFrom
+			   from grailsApplication.config.grails.mail.default.from
 			   subject mailSubject
 			   html body.toString()
 			}

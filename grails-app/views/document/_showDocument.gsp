@@ -36,11 +36,11 @@
 	</div>
 
 	<g:if
-		test="${documentInstance?.description && documentInstance?.description.trim() != ''}">
+		test="${documentInstance?.notes && documentInstance?.notes.trim() != ''}">
 		<div class="prop">
 			<span class="name">Description</span>
 			<div class="notes_view linktext value">
-				${documentInstance?.description}
+				${documentInstance?.notes}
 			</div>
 		</div>
 	</g:if>

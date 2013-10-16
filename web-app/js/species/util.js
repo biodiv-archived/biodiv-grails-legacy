@@ -3,6 +3,8 @@
  */
 var serverTimeDiff = null;
 var alwaysRelativeTime = false;
+var is_touch_device = ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch;
+
 $(function() {
 	var spt = $('span.mailme');
 	var at = /\(at\)/;
