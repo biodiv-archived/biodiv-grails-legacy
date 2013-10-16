@@ -55,7 +55,7 @@ function initialize(element, drawable){
     isMapViewLoaded=true;
     
     pointIcon = M.AwesomeMarkers.icon({
-        icon: 'ok', 
+        icon: undefined, 
         color: 'blue'
     });
     checklistIcon = M.AwesomeMarkers.icon({
@@ -63,7 +63,7 @@ function initialize(element, drawable){
         color: 'green'
     });
     geoPrivacyPointIcon = M.AwesomeMarkers.icon({
-        icon: 'ok', 
+        icon: undefined, 
         color: 'purple'
     });
     geoPrivacyChecklistIcon = M.AwesomeMarkers.icon({

@@ -24,7 +24,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 	def springSecurityService
 	def mailService
-	def usersSearchService
+	def SUserSearchService
 	private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -160,13 +160,14 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
 
-				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 					try {
 						mailService.sendMail {
 							to user.email
-	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+				            if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+	                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+                            }
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
-							from conf.ui.notification.emailFrom
+							from grailsApplication.config.grails.mail.default.from
 							subject mailSubject
 							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
 						}
@@ -174,7 +175,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					}catch(all)  {
 					    log.error all.getMessage()
 					}
-				}
+				
 
 				return;
 			case USER_DELETED:
@@ -289,7 +290,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		def responseHeader
 		long noOfResults = 0
 		if(paramsList)  {
-			def queryResult = usersSearchService.search(paramsList);
+			def queryResult = SUserSearchService.search(paramsList);
 
 			Iterator it = queryResult.getResults().listIterator();
 

@@ -87,7 +87,11 @@ grails.project.dependency.resolution = {
         //}
 
         compile 'org.imgscalr:imgscalr-lib:4.2'
+		compile 'org.apache.sanselan:sanselan:0.97-incubator'
+        compile 'jmimemagic:jmimemagic:0.1.2'
         
+        
+        //compile 'net.sf.jtidy:jtidy:r938'
 
     }
     plugins { 
@@ -98,12 +102,12 @@ grails.project.dependency.resolution = {
     } 
 
     grails.war.resources = { stagingDir ->
-        for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j']) {
+        /*for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j']) {
             delete {
                 fileset dir: "$stagingDir/WEB-INF/lib/",
                 includes: "$name*.jar"
             }
-        }
+        }*/
         //        delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
     }
 }

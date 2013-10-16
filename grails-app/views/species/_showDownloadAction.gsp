@@ -5,6 +5,11 @@
 		data-toggle="dropdown" href="#"> <i class=" icon-download-alt"></i>
 		Download
 	</a>
+        <a id="feature-action"
+		class="btn ${(params.action=='show')?'btn-link':''} dropdown-toggle"
+		data-toggle="dropdown" href="#"> <i class=" icon-download-alt"></i>
+		Feature
+	</a>
 
 	<div id="download-options" class="popup-form" style="display: none">
 		<form id="download-form">

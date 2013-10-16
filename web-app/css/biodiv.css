@@ -1,3 +1,8 @@
+/**
+ * All common style rules for biodiv application
+ * Any specific rules have to go into ${grailsApplication.config.speciesPortal.app.siteCode}.css
+ */
+
 body { /*     background-color: #ffffff; */
 	/*     background-image: url('../images/header.png'); */
 	/*background-color: #ffffff;*/
@@ -94,9 +99,10 @@ h6 {
 	font-size: 0.9em;
 }
 
-.list_view .snippet {
-	padding: 5px;
-	/* width: 630px;          */
+.snippet {
+	overflow: hidden;
+	position: relative;
+	border-radius: 5px;
 }
 
 .thumbnails>li {
@@ -107,9 +113,6 @@ h6 {
 .snippet.tablet {
 	width: 150px;
 	height: 200px;
-	overflow: hidden;
-	position: relative;
-	border-radius: 5px;
 }
 
 .snippet.tablet .figure {
@@ -269,6 +272,7 @@ div.errors {
 	color: #cc0000;
 	word-wrap: break-word;
 }
+
 
 .bold_dropdown img {
 	width: 30px;
@@ -556,7 +560,7 @@ ul#recoSummary {
 
 .observation_location {
 	background-color: #FFFFFF;
-	padding: 10px;
+	/*padding: 10px;*/
 	box-shadow: 1px 1px 3px #5e5e5e inset;
 }
 
@@ -626,7 +630,7 @@ ul#recoSummary {
 .map_wrapper {
 	border-radius: 5px;
 	border-top-left-radius: 0;
-	margin-bottom: 40px;
+/*	margin-bottom: 40px;*/
 }
 
 #map_view_bttn {
@@ -803,6 +807,15 @@ ul#recoSummary {
 .observation_links {
 	margin-top: 5px;
 	float: right;
+}
+
+#carousel_featureBy>.observation_links {
+margin-top: 0px;
+float: none;
+top: 189px;
+position: absolute;
+right: 0;
+z-index:1;
 }
 
 .comments-box {
@@ -1010,6 +1023,7 @@ input,button,select,textarea {
 .icon-red {
 	background-image: url(../bootstrap/img/glyphicons-halflings-red.png);
 }
+
 .icon-gray {
 	background-image: url(../bootstrap/img/glyphicons-halflings-gray.png);
 }
@@ -1347,6 +1361,10 @@ span.cke_skin_kama {
 	margin-right: 16px;
 }
 /*USER GROUP END*/
+.page-header .sci_name{
+	font-style: normal;
+}
+
 .sci_name {
 	font-style: italic;
 }
@@ -1860,10 +1878,6 @@ li#userOrEmail-new {
 	clear: both;
 }
 
-.header_group .jcarousel-skin-ie7 img {
-	height : 65%;
-}
-
 .icon-group {
 	background-image: url('../images/glyphicons_043_group.png');
 	background-position:0 0;
@@ -1924,7 +1938,9 @@ li#userOrEmail-new {
 
 .jcarousel-skin-ie7 .jcarousel-item  .thumbnail {
 	padding:0px;
-	background-color : #000;
+}
+.jcarousel-item .snippet {
+    border-radius:0px;
 }
 
 .jcarousel-item .snippet.tablet .caption {
@@ -1935,35 +1951,91 @@ li#userOrEmail-new {
 .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
 	padding:0px;
 	border:0px;
-	max-width:75px;
-	max-height:75px;
-/* 	max-width:210px; */
+        max-width:150px;
+        max-height:150px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
-	max-width:75px;
-	max-height:75px;
+        max-width:150px;
+        max-height:150px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item {
-	width:75px;
-	height:75px;
+	height:150px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
-	width:75px;
-	height:75px;
+	width:150px;
+	height:150px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
-	height:75px;
-	width:75px;
+	width:150px;
+	height:150px;
 }
 
-.jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-	height:75px;
+.jcarousel-skin-ie7 .jcarousel-item-horizontal, .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+	height:150px;
+        width:150px;
+}
+.jcarousel-skin-ie7 .jcarousel-item-vertical, .jcarousel-skin-ie7 .jcarousel-clip-vertical {
+        width:100%;
+        height:150px;
 }
 
+.jcarousel-skin-ie7 .jcarousel-container-vertical {
+        width:100%;
+        height:150px;
+        padding: 40px 0px;
+}
+
+/*
+.icon-chevron-up {
+    margin-top: -4px;
+    margin-left: 463px;
+    background-image: url(../bootstrap/img/glyphicons-halflings.png);
+}
+
+.icon-chevron-down {
+    margin-top: -4px;
+    margin-left: 463px;
+    background-image: url(../bootstrap/img/glyphicons-halflings.png);
+}
+*/
+
+.jcarousel-next-disabled-vertical, .jcarousel-prev-disabled-vertical {
+  /* IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+
+  /* IE 5-7 */
+  filter: alpha(opacity=50);
+
+  /* Netscape */
+  -moz-opacity: 0.5;
+
+  /* Safari 1.x */
+  -khtml-opacity: 0.5;
+    
+    opacity: .5;
+}
+
+.jcarousel-skin-ie7 .jcarousel-prev-vertical, .jcarousel-skin-ie7 .jcarousel-next-vertical {
+    position: absolute;
+    bottom:inherit;
+    left: inherit;
+    width: 100%;
+    height: 21px;
+    cursor: pointer;
+    background: #4088b8;
+    text-align:center;
+}
+.jcarousel-skin-ie7 .jcarousel-prev-vertical i, .jcarousel-skin-ie7 .jcarousel-next-vertical i{
+    top:2px;
+    position:absolute;
+}
+.jcarousel-skin-ie7 .jcarousel-prev-vertical {
+    top:19px;
+}
 
 .feedParentContext {
 	background-color: white;
@@ -2106,9 +2178,10 @@ div.noOfRatings {
 }
 
 .jcarousel-item .checklist_th {
-    background-color:#ffffff
+    background-color:#ffffff;
+    border-radius:0;
 }
-.jcarousel-item .checklist_th .figure{
+.jcarousel-item .checklist_th .figure {
     opacity: 0.5;
     filter: alpha(opacity = 50);      
 }
@@ -2189,7 +2262,9 @@ div.noOfRatings {
 .icon-group-gray:hover {
         background-image: url('../images/glyphicons_043_group_white.png');
 } 
-
+.resource_in_groups .sidebar_section {
+	margin-bottom: 0px;
+}
 /* .selectable { */
 /*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
 /*     background-color: transparent; */

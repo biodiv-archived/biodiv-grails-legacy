@@ -1,5 +1,3 @@
-<sec:ifLoggedIn>
-	<div class="selectable" onclick="updateObjSelection(${objectInstance.id}, $(this));return true;">
-		<label class="checkbox"><input type="checkbox"></label>
-	</div>
-</sec:ifLoggedIn>
+<div class="selectable pull-right" onclick="updateObjSelection(${objectInstance.id}, $(this));return true;">
+	<label class="checkbox"><input type="checkbox"></label>
+</div>

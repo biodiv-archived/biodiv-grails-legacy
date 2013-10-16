@@ -40,6 +40,7 @@ class SUserController extends UserController {
 	def saltSource;
     def dataSource;
     def chartService;
+    def SUserSearchService;
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -112,6 +113,8 @@ class SUserController extends UserController {
 		}
 
 		addRoles(user)
+        log.debug "Publishing User on SOLR" + user
+        SUserSearchService.publishSearchIndex(user, true)
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 		redirect action: edit, id: user.id
 	}
@@ -207,6 +210,9 @@ class SUserController extends UserController {
 			}
 
 			userCache.removeUserFromCache user[usernameFieldName]
+            log.debug "Publishing User on SOLR" + user
+            SUserSearchService.publishSearchIndex(user, true)
+
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroupWebaddress':params.webaddress))
 			//redirect action: show, id: user.id
@@ -549,6 +555,7 @@ class SUserController extends UserController {
 
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
+                log.debug "Assigning role : ${key}" 
 				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
 			}
 		}

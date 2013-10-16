@@ -40,9 +40,12 @@
 								</g:if> <g:else>
 									<img class="img-polaroid" style="opacity:0.7;"
 										title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}"
-										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"></img>
+										src="${createLinkTo(dir: '', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"></img>
 								</g:else> </a>
 						</div>
+						
+						<uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+						
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}" style="display:block;">
 							<span class="species_story ellipsis multiline sci_name"
@@ -61,7 +64,6 @@
 
 		</div>
 	</div>
-	<% params['isGalleryUpdate'] = false; %>
 	<div class="paginateButtons centered">
 		<p:paginate controller="species" action="list"
 			total="${instanceTotal}" userGroup="${userGroup}"
@@ -71,7 +73,7 @@
 	<div class="paginateButtons centered">
 		<p:paginateOnAlphabet controller="species" action="list"
 			total="${instanceTotal}" userGroup="${userGroup }" params="${params}"
-			userGroupWebaddress="${userGroupWebaddress}" />
+			userGroupWebaddress="${userGroupWebaddress}"/>
 
 	</div>
 

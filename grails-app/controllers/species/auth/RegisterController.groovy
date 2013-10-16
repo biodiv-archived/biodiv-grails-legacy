@@ -26,7 +26,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	def jcaptchaService;
 	def activityFeedService;
 	//def recaptchaService;	
-	
+    def grailsApplication
+
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
@@ -216,7 +217,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		try {
 			mailService.sendMail {
 				to user.email
-				from conf.ui.forgotPassword.emailFrom
+				from grailsApplication.config.grails.mail.default.from
 				subject conf.ui.forgotPassword.emailSubject
 				html body.toString()
 			}
@@ -308,7 +309,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]?.decodeHTML()
 		def registrationCode = RegistrationCode.findByUsername(username)
 		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
-		sendVerificationMail(username,username,url,request)
+        SUser user = SUser.findByEmail(username);
+		sendVerificationMail(user.name, username, url, request)
 	}
 
 	protected void sendVerificationMail(String username, String email, String url, request)  {
@@ -327,7 +329,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		try {
 			mailService.sendMail {
 				to email
-				from conf.ui.register.emailFrom
+				from grailsApplication.config.grails.mail.default.from
 				subject sub.toString()
 				html body.toString()
 			}

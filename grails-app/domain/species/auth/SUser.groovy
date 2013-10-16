@@ -9,9 +9,10 @@ import species.Resource.ResourceType;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.participation.Observation;
-import species.participation.ObservationFlag;
+import species.participation.Flag;
 import species.participation.RecommendationVote;
 import species.participation.curation.UnCuratedVotes;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.ImageType;
 import species.Habitat;
 import species.groups.SpeciesGroup;
@@ -48,7 +49,7 @@ class SUser {
 	boolean allowIdentifactionMail = true;
 
 
-	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
+	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 
@@ -144,15 +145,27 @@ class SUser {
 		}
 	}
 
-	Set<UserGroup> getUserGroups() {
+	Set<UserGroup> getUserGroups(onlyExpertGroups=false) {
 		def orderedByName = [
 			compare:{ a,b ->
 				a.name<=>b.name }
 		] as Comparator
 
 		def userGroups = new TreeSet(orderedByName)
-
-		def uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
+		def uGroups
+		if(onlyExpertGroups){
+			uGroups = UserGroupMemberRole.createCriteria().list{
+				and{
+					eq('sUser', this)
+					or{
+						eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()))
+						eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()))
+					}
+				}
+			}.collect {it.userGroup}
+		}else{
+			uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
+		}
 		uGroups.each {
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
 				userGroups.add(it)
@@ -164,6 +177,18 @@ class SUser {
 
 	boolean isUserGroupMember(UserGroup userGroup) {
 		return UserGroupMemberRole.countBySUserAndUserGroup(this, userGroup) ?: 0
+	}
+	
+	boolean fetchIsFounderOrExpert(){
+		return UserGroupMemberRole.createCriteria().count {
+			and{
+				eq('sUser', this)
+				or{
+					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()))
+					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()))
+				}
+			}
+		} > 0
 	}
 
 	@Override

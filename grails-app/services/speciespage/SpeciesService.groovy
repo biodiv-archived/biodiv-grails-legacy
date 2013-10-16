@@ -16,6 +16,7 @@ import species.Species
 import species.SpeciesField;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
+import species.groups.SpeciesGroup;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -33,6 +34,7 @@ import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
+import species.groups.UserGroup;
 
 class SpeciesService {
 
@@ -48,8 +50,8 @@ class SpeciesService {
 	def speciesSearchService;
 	def namesIndexerService;
 	def observationService;
-	def springSecurityService
-
+	def springSecurityService;
+	
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
 
@@ -64,7 +66,7 @@ class SpeciesService {
 		return result;
 	}
 
-	def search(params) {
+	def search(params, noLimt) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 		def queryParams = [:]
@@ -156,7 +158,9 @@ class SpeciesService {
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
 		def max = Math.min(params.max ? params.int('max') : 12, 100)
-		paramsList.add('rows', max);
+		if(!noLimt){
+			paramsList.add('rows', max);
+		}
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(isValidSortParam(sort)) {
@@ -390,19 +394,20 @@ class SpeciesService {
 
 	def export(params, dl){
 		log.debug(params)
-		def speciesInstanceList = getSpeciesList(params, dl)
+		String action = new URL(dl.filterUrl).getPath().split("/")[2]
+		def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
 		log.debug " Species total $speciesInstanceList.size "
 		return exportSpeciesData(speciesInstanceList, null)
 	}
 
 
 
-	def getSpeciesList(params, dl){
-		String action = new URL(dl.filterUrl).getPath().split("/")[2]
-		//getting result from solr
-		def speciesInstanceList = search(params).speciesInstanceList
-
-		return speciesInstanceList
+	def getSpeciesList(params, String action, noLimit = false){
+		if("search".equalsIgnoreCase(action)){
+			return search(params, noLimit)
+		}else{
+			return _getSpeciesList(params, noLimit)
+		}
 	}
 	
 	/**
@@ -417,6 +422,107 @@ class SpeciesService {
 	 */
 	def exportSpeciesData(List<Species> species, String directory) {
 		return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+	}
+	
+	private _getSpeciesList(params, noLimit) {
+		//cache "taxonomy_results"
+		params.startsWith = params.startsWith?:"A-Z"
+		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
+		def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
+		params.sGroup = params.sGroup ?: allGroup.id+""
+		params.max = Math.min(params.max ? params.int('max') : 42, 100);
+		params.offset = params.offset ? params.int('offset') : 0
+		params.sort = params.sort?:"percentOfInfo"
+		if(params.sort.equals('lastrevised')) {
+			params.sort = 'lastUpdated'
+		} else if(params.sort.equals('percentofinfo')) {
+			params.sort = 'percentOfInfo'
+		}
+		params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
+
+		log.debug params
+		def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
+
+		int count = 0;
+		if (params.startsWith && params.sGroup) {
+			String query, countQuery;
+			String filterQuery = " where s.id is not null " //dummy statement
+			String countFilterQuery = " where s.id is not null " //dummy statement
+			def queryParams = [:]
+			
+			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s ";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+				} else {
+					query = "select s from Species s "
+					filterQuery += " and s.title like '<i>${params.startsWith}%' ";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+					countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
+				}
+			} else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s, TaxonomyDefinition t " 
+					filterQuery += " and s.taxonConcept = t and t.group.id  is null "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
+				} else {
+					query = "select s from Species s, TaxonomyDefinition t "
+					filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
+				}
+			} else {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s, TaxonomyDefinition t "
+					filterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup) "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+					
+				} else {
+					query = "select s from Species s, TaxonomyDefinition t "
+					filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+				}
+				queryParams.sGroup  = groupIds
+			}
+
+			
+			if(params.webaddress) {
+				def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
+				if(userGroupInstance){
+					queryParams['userGroup'] = userGroupInstance
+					query += " join s.userGroups userGroup "
+					filterQuery += " and userGroup=:userGroup "
+					countQuery += " join s.userGroups userGroup "
+					countFilterQuery += " and userGroup=:userGroup "
+				}
+			}
+			
+			query += filterQuery + " order by s.${params.sort} ${params.order}"
+			countQuery += countFilterQuery + " group by s.percentOfInfo"
+			
+			
+			def rs = Species.executeQuery(countQuery, queryParams);
+			if(!noLimit){
+				queryParams.max  = params.max
+				queryParams.offset = params.offset
+			}
+			
+			def speciesInstanceList = Species.executeQuery(query, queryParams);
+			def speciesCountWithContent = 0;
+
+			for(c in rs) {
+				count += c[1];
+				if (c[0] >0)
+					speciesCountWithContent += c[1];
+			}
+			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress]
+		} else {
+			//Not being used for now
+			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
+		}
 	}
 
 }

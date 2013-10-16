@@ -3,6 +3,9 @@ package species.participation
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
 
+import content.eml.Document;
+
+import species.Species;
 import species.auth.SUser
 import species.groups.UserGroup;
 import species.participation.ActivityFeedService
@@ -265,6 +268,8 @@ class ActivityFeed {
 		def m = [:]
 		m[Observation.class.getCanonicalName()] = getObvIds(groups)
 		m[UserGroup.class.getCanonicalName()] = groups.collect{ it.id}
+		m[Species.class.getCanonicalName()] = getSpeciesIds(groups)
+		m[Document.class.getCanonicalName()] = getDocIds(groups)
 		return m
 	}
 	
@@ -275,6 +280,23 @@ class ActivityFeed {
 		}
 		return obvIds
 	}
+	
+	private static getSpeciesIds(groups){
+		def obvIds = []
+		groups.each{ it ->
+			obvIds.addAll(it.species.collect{it.id})
+		}
+		return obvIds
+	}
+	
+	private static getDocIds(groups){
+		def obvIds = []
+		groups.each{ it ->
+			obvIds.addAll(it.documents.collect{it.id})
+		}
+		return obvIds
+	}
+	
 	
 	private static getDate(String timeIn){
 		if(!timeIn){

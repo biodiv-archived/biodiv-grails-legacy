@@ -12,18 +12,20 @@ import species.groups.SpeciesGroup;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 import species.participation.Follow;
+import species.groups.UserGroup;
 import groovy.sql.Sql;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import species.participation.Flag;
 
 class Species implements Rateable {
-
 	String title; 
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 
-	Date updatedOn;
+	int flagCount = 0;
+    Date updatedOn;
 	Date createdOn = new Date();
 	Date dateCreated;
 	Date lastUpdated;
@@ -43,7 +45,11 @@ class Species implements Rateable {
 		indianDistributionEntities:GeographicEntity, 
 		indianEndemicityEntities:GeographicEntity, 
 		taxonomyRegistry:TaxonomyRegistry, 
-		resources:Resource];
+		resources:Resource,
+		userGroups:UserGroup];
+
+
+	static belongsTo = [UserGroup]
 
 	static constraints = {
 		guid(blank: false, unique: true);
@@ -102,11 +108,20 @@ class Species implements Rateable {
         }
     }
 
+    List fetchAllFlags(){
+		return Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+	}
+
+    String fetchSpeciesCall(){
+		return this.title;
+	}
+
+
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
 		resources.each {
 			if(it?.type == species.Resource.ResourceType.ICON) {
-				icons.add(it);
+                icons.add(it);
 			}
 		}
 		return icons;
@@ -122,7 +137,7 @@ class Species implements Rateable {
 		return res;
 	}
 	
-	String findSummary() {
+	String notes() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
 			field.concept.equalsIgnoreCase(fieldsConfig.OVERVIEW) && field.category.equalsIgnoreCase(fieldsConfig.SUMMARY)

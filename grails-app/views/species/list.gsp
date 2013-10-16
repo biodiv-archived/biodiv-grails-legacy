@@ -17,9 +17,14 @@
 
 </head>
 <body>
+
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
-		<uGroup:rightSidebar/>
+                    <uGroup:rightSidebar/>
+                    <obv:showRelatedStory
+            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+            <h5>Browse Species</h5>
+
 		<div class="tabbable" style="margin-left:0px;clear:both;">
 			<ul class="nav nav-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
@@ -33,9 +38,10 @@
 						<s:speciesFilter></s:speciesFilter>
 						<sUser:isAdmin>
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
-						</sUser:isAdmin> 
+						</sUser:isAdmin>
+						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
 						<div class="observations_list_wrapper" style="top: 0px;">
-							<s:showSpeciesList></s:showSpeciesList>
+							<s:showSpeciesList/>
 						</div>
 				</div>
 				<div id="contribute" class="tab-pane">

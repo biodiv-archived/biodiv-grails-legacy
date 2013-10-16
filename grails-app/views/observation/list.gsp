@@ -15,9 +15,27 @@
 <body>
 
 	<div class="span12">
-		<obv:showSubmenuTemplate model="['entityName':title]" />
-		<uGroup:rightSidebar/>
-		<obv:showObservationsListWrapper />
+            <obv:showSubmenuTemplate/>
+
+            <div class="page-header clearfix">
+                <div style="width:100%;">
+                    <div class="main_heading" style="margin-left:0px;">
+
+                        <h1>Observations</h1>
+
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+
+
+
+            <uGroup:rightSidebar/>
+            <obv:showRelatedStory
+            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+
+            <h5>Browse Observations</h5>
+            <obv:showObservationsListWrapper />
 	</div>
 
 	<g:javascript>

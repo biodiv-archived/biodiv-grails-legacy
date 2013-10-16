@@ -1,5 +1,7 @@
 var itemLoadCallback = function(carousel, state) {
-	carousel.last = carousel.last?carousel.last:3;
+        console.log("ITEM LOAD CALL BACK");
+        
+        carousel.last = carousel.last?carousel.last:3;
 	var params = {
 		"limit" : carousel.last - carousel.first,
 		"offset" :carousel.first,
@@ -7,7 +9,10 @@ var itemLoadCallback = function(carousel, state) {
 		"filterPropertyValue": carousel.options.filterPropertyValue,
 		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
 	}
-	
+        
+        if(params.limit == 0)
+            params.limit = 3;
+
 	if (state == 'prev'){
 		return;
 	}
@@ -20,17 +25,21 @@ var itemLoadCallback = function(carousel, state) {
 		
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
+
+
 	});
 	// jqxhr.error(function() { alert("error"); });
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
-	$(".jcarousel-item").css('width', window.params.carousel.maxWidth);
+     console.log("ITEM ADD CALL BACK");
+                    console.log(carousel);
+
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
 		if (!carousel.has(actualIndex)) {
-			var item = carousel.add(actualIndex, getItemHTML(carousel, items[i]));
+			var item = carousel.add(actualIndex, carousel.options.getItemHTML(carousel, items[i]));
 			resizeImage(item);
 		}
 	}
@@ -46,79 +55,50 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 			carousel.size(data["count"]);
 		}
 	}	
-	$(".jcarousel-item").css('width', window.params.carousel.maxWidth);
+	$(".jcarousel-item-horizontal").css('width', window.params.carousel.maxWidth);
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
+        
+                /*            
+        $(".jcarousel-item").popover({ 
+            title: function() {
+                return $(this).find('img').attr('title')
+            },
+            content: function() {
+                return $(this).find(".caption").html()
+            },
+            trigger:(is_touch_device ? "click" : "hover"),
+            html:true,
+            container:'body'
+        });
+        */
 	
 }
 
 function resizeImage(item) {
-
-	var ele = item.find('img');
-	var maxHeight=window.params.carousel.maxHeight;
-	var maxWidth=window.params.carousel.maxWidth;
+    var ele = item.find('img');
+    var maxHeight=window.params.carousel.maxHeight;
+    var maxWidth=item.hasClass('.jcarousel-item-horizontal') ? window.params.carousel.maxWidth : '100%';
     var width = ele.width();    // Current image width
     var height = ele.height();  // Current image height
-//     console.log(maxHeight+" "+maxWidth+" "+height+" "+width);
     if(height > maxHeight){
-    	item.css('height', maxHeight);
+        item.css('height', maxHeight);
     } 
-    
+
     if(width == 0) {
-    	width = maxWidth;
+        width = maxWidth;
     }
-    
+
     if(width > maxWidth) {
-    	ele.css('position','absolute').css('left',(0-(Math.abs(maxWidth-width)/2)));
+        ele.css('position','absolute').css('left',(0-(Math.abs(maxWidth-width)/2)));
     }
-    
-    
-   	item.css('width', Math.min(maxWidth, width)).css('overflow', 'hidden');
-   	
-	/*
-	 var maxWidth = 75; // Max width for the image
-        var maxHeight = 75;    // Max height for the image
-        var ratio = 0;  // Used for aspect ratio
-        var width = $(this).width();    // Current image width
-        var height = $(this).height();  // Current image height
-        
-
-        // Check if current height is larger than max
-        if(height > maxHeight){
-            ratio = maxHeight / height; // get ratio for scaling image
-            $(this).css("height", maxHeight);   // Set new height
-            $(this).css("width", width * ratio);    // Scale width based on ratio
-            width = width * ratio;    // Reset width to match scaled image
-            height = maxHeight;
-        }
-        console.log(width+"  "+height);
-        // Check if the current width is larger than the max
-        if(width > maxWidth){
-            ratio = maxWidth / width;   // get ratio for scaling image
-            $(this).css("width", maxWidth); // Set new width
-            $(this).css("height", maxHeight);  // Scale height based on ratio
-            width = maxWidth;
-            height = maxHeight    // Reset height to match scaled image
-        }
-        
-        console.log(width+"  "+height);
-        $(this).css("margin-left", (maxWidth - width)/2);
-        $(this).css("margin-top", (maxHeight - height)/2);*/
-
+    item.css('width', Math.min(maxWidth, width)).css('overflow', 'hidden');
 }
 
-var getItemHTML = function(carousel, item) {
-	var paramsString = "";
-	if(carousel.options.filterProperty === "speciesName"){
-		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
-	}
-	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
-	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
-};
-
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
+         console.log("RELOAD CAROUSEL");
+
 	carousel.options.filterProperty = fitlerProperty;
 	carousel.options.filterPropertyValue = filterPropertyValue;
 	var visibleOffset = carousel.last - carousel.first;
@@ -129,7 +109,38 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 }
 
 var itemAfterLoadCallback = function(carousel, state) {
+         console.log("ITEM AFTER LOAD CALL BACK");
+
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
+}
+
+var setupCallback = function(carousel) {
+    //$("#carousel_featureBy").find('ul.jcarousel-list').css({"overflow" : "visible"}); 
+}
+
+
+
+var getSnippetHTML = function(carousel, item) {
+	var paramsString = "";
+	if(carousel.options.filterProperty === "speciesName"){
+		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
+	}
+	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
+
+	var notes = item.notes?item.notes:''
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet'+'"><div class="figure span2 observation_story_image"><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'span10'+'"><h5 class="popover-title"><b>Featured :</b> '+item.imageTitle+' <small>on '+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</small></h5>'+notes+'</div></div></div>';;
+};
+
+var getSnippetTabletHTML = function(carousel, item) {
+	var paramsString = "";
+	if(carousel.options.filterProperty === "speciesName"){
+		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
+	}
+	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
+
+	var notes = item.notes?item.notes:''
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
+
 }
