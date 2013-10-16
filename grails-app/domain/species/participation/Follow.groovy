@@ -3,23 +3,15 @@ package species.participation
 import grails.converters.JSON;
 import species.auth.SUser;
 
-class Follow {
+class Follow extends AbstractAction {
 	
-    SUser author
-    long objectId
-    String objectType
-
-    static belongsTo = [author:SUser];
 
 		
 	static constraints = {
 		objectType(unique:['objectId', 'author'])
 	}
-	static mapping = {
-		version : false;
-    }
-	
-	static boolean fetchIsFollowing(object, SUser author) {
+		
+    static boolean fetchIsFollowing(object, SUser author) {
 		if(!author){
 			return false
 		}
@@ -35,12 +27,10 @@ class Follow {
 	}
 	
 	static SUser addFollower(object, SUser author,boolean flushImmidiatly=true){
-        println "add FOLLOWER STARTING ___________"
 
 		if(!fetchIsFollowing(object, author)){
             String objectType = object.class.getCanonicalName()
             Long objectId = object.id
-            println "============== DATA FOR DB ==========================="
             println objectType
             println objectId
             println author
