@@ -16,24 +16,20 @@ import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.Utils;
 
 
-class Featured {
+class Featured extends AbstractAction {
     
     def springSecurityService
 	def userGroupService;
     def activityFeedService;
 
-    SUser author
-    long objectId
-    String objectType
-    Date createdOn = new Date();
 	String notes;
     UserGroup userGroup;
 
-    static belongsTo = [author:SUser];
 
     static constraints = {
         author(unique: ['objectId', 'objectType', 'userGroup'])
         userGroup nullable:true
+        createdOn nullable:false
         notes nullable:true, blank: true
         notes (size:0..400)
     }

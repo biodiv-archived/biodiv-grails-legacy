@@ -3,23 +3,21 @@ package species.participation
 import species.auth.SUser
 import species.participation.Observation
 
-class Property {
+abstract class AbstractAction {
     
     SUser author
     long objectId
     String objectType
     Date createdOn = new Date();
-	String notes;
 
     static belongsTo = [author:SUser];
  
     static mapping = {
-        tablePerHierarchy true
+        version : false;
+        tablePerHierarchy false
     }
 
     static constraints = {
-        notes nullable:true, blank: true
-        notes (size:0..400)
-
+        createdOn nullable:true
     }
 }

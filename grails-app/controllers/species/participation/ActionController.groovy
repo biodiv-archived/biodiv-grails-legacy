@@ -110,7 +110,7 @@ class ActionController {
                         def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
                         println "====================="
                         searchIndex(params.type,obv)
-                        Follow.addFollower(obv, params.author)
+                        //Follow.addFollower(obv, params.author)
                         observationService.sendNotificationMail(act.activityType, obv, null, null, act)
                     }catch (Exception e) {
                         e.printStackTrace()
@@ -183,7 +183,6 @@ class ActionController {
 
 	@Secured(['ROLE_USER'])
 	def flagIt = { 
-       	println "=====PATH == " + grailsApplication.config.speciesPortal.resources.rootDir
         log.debug params;
 		params.author = springSecurityService.currentUser;
 		def obv = activityFeedService.getDomainObject(params.type,params.id);     //GEt object instance ??
@@ -197,13 +196,13 @@ class ActionController {
                     FlagInstance.errors.allErrors.each { println it }
 			        return null
 		        }
-
+                def activityNotes = FlagInstance.flag.value() + ( FlagInstance.notes ? " \n" + FlagInstance.notes : "")
                 obv.flagCount++
 				obv.save(flush:true)
-				activityFeedService.addActivityFeed(obv, FlagInstance, FlagInstance.author, activityFeedService.OBSERVATION_FLAGGED); //add activity
+				activityFeedService.addActivityFeed(obv, FlagInstance, FlagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); //add activity
                 searchIndex(params.type,obv)				
 				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress) //???
-				flash.message = "${message(code: 'flag.added', default: 'Observation flag added')}"
+				flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'flag.error', default: 'Error during addition of flag')}"   ///change message
@@ -233,16 +232,13 @@ class ActionController {
 			return
 		}
 		try {
+            def activityNotes = FlagInstance.flag.value() + ( FlagInstance.notes ? " \n" + FlagInstance.notes : "")
+            activityFeedService.addActivityFeed(obv, FlagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
 			FlagInstance.delete(flush: true);
-            
-            println "=FLAG COUNT=== " +	obv.flagCount	
-            obv.flagCount--;
 			obv.save(flush:true)
-            println "=FLAG COUNT=== " +	obv.flagCount
 			searchIndex(params.type,obv);    //observation ke liye only
             def message = [:]
             message['flagCount'] = obv.flagCount 
-            println "=FLAG COUNT=== " + message['flagCount']
 			render message as JSON;
 			return;
 		}catch (Exception e) {
