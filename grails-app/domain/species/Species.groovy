@@ -24,7 +24,6 @@ class Species implements Rateable {
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 
-	int flagCount = 0;
     Date updatedOn;
 	Date createdOn = new Date();
 	Date dateCreated;

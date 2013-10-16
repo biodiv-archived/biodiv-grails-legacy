@@ -10,10 +10,10 @@ import java.util.*;
 def migrateFeedForFlag() {
     def s = ctx.getBean("activityFeedService")
     def flagObj
-    def f = ActivityFeed.FindAllWhere(activityType:"Observation flagged")
+    def f = ActivityFeed.findAllWhere(activityType:"Observation flagged")
     ActivityFeed.withTransaction() {
         f.each{ act ->
-
+            println act
             flagObj = s.getDomainObject(act.activityHolderType, act.activityHolderId)
             def activityNotes = flagObj.flag.value() + ( flagObj.notes ? " \n" + flagObj.notes : "")
             act.activityDescrption = activityNotes
@@ -30,8 +30,8 @@ def migrateFeedForFlag() {
 //After migration drop table and remove observationflag.groovy
 
 def migrateFlag() {
-    Flag.withTransaction{
-        Flag.list.each { f ->
+    Flag.withTransaction(){
+        Flag.list().each { f ->
             f.objectId = f.observation.id
             f.objectType = f.observation.class.getCanonicalName()
             if(!f.save(flush:true)) {
@@ -42,12 +42,19 @@ def migrateFlag() {
 }
 
 
-migrateFlag()
+//migrateFlag()
 migrateFeedForFlag()
+
+println "=========== done"
 
 //SQL COMMANDS
 //ALTER TABLE follow RENAME COLUMN user_id TO author_id;
 //ALTER TABLE observation_flag RENAME TO flag;
 //UPDATE activity_feed SET activity_holder_type = 'species.participation.Flag' WHERE activity_holder_type = 'species.participation.ObservationFlag'
+// update flag set flag = 'DETAILS_INAPPROPRIATE'  where flag = 'OBV_INAPPROPRIATE';
+// update flag set object_id = 0;
 
 
+//after all migration script
+//update activity_feed set last_updated = date_created;
+//alter table flag drop COLUMN observation_id ;
