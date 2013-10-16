@@ -71,6 +71,7 @@ class UserGroupService {
 	def sessionFactory
 	def activityFeedService;
 	def speciesService;
+	def SUserService;
 	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -1279,10 +1280,16 @@ class UserGroupService {
 		}
 		
 		SUser currUser = springSecurityService.currentUser;
+		//returning true for user with admin role
+		if(SUserService.isAdmin(currUser?.id)){
+			return true
+		}
+		
 		int groupCount = UserGroupMemberRole.countBySUser(currUser)
 		if(groupCount == 0){
 			return false
 		}
+		
 		if(!getExpertGroupsOnly(isBulkPull, params)){
 			return true
 		}
