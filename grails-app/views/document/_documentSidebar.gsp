@@ -2,9 +2,12 @@
 <%@ page import="content.eml.Document"%>
 
 
-<div id="project-sidebar">
+<div id="project-sidebar" class="span4">
+    <g:if test="${params.action == browser}">
+    <uGroup:objectPostToGroupsWrapper 
+			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
 
-
+                        </g:if>
 	<div class="sidebar_section">
             <h5>Document Manager <sup>Beta</sup></h5>
 
@@ -28,7 +31,7 @@
 		test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 
 
-		<ul class="nav nav-tabs sidebar" id="project-menus"">
+		<ul class="nav nav-tabs sidebar" id="project-menus">
 			<li><a href="/project/list">Western Ghats CEPF Projects</a></li>
 			<li><a href="/document/browser">Browse Documents</a></li>
 

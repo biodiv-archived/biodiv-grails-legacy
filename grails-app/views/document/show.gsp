@@ -10,9 +10,7 @@
 <r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
-	<div class="span12">
-
-
+	<div class="span12"> 
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
 				<div class="main_heading" style="margin-left: 0px;">

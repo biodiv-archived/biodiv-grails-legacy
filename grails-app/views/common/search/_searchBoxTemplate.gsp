@@ -46,7 +46,7 @@ $(document).ready(function() {
 		'dropDownIconUrl' : "${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
-		'carousel':{maxHeight:75, maxWidth:75},
+		'carousel':{maxHeight:150, maxWidth:150},
                 'imagesPath': "${resource(dir:'images', absolute:true)}",
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",

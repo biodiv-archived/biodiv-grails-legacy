@@ -23,7 +23,9 @@
 	<div class="span12">
 		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Documents']" />
 		<uGroup:rightSidebar/>
-		
+                <obv:showRelatedStory
+                    model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+	
 
 		<div class="document-list span8 right-shadow-box" style="margin:0;">
 			<g:render template="/document/search" model="['params':params]" />
@@ -33,11 +35,7 @@
 			<g:render template="/document/documentListTemplate" />
 		</div>
 		
-		<div class="span4">
-		<uGroup:objectPostToGroupsWrapper 
-			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
-      	</div>
-      	<g:render template="/document/documentSidebar" />
+		      	<g:render template="/document/documentSidebar" />
 	</div>
 
 </body>

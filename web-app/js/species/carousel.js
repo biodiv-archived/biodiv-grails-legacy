@@ -39,7 +39,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
 		if (!carousel.has(actualIndex)) {
-                    console.log(items[i])
 			var item = carousel.add(actualIndex, carousel.options.getItemHTML(carousel, items[i]));
 			resizeImage(item);
 		}
@@ -60,7 +59,8 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
-                    
+        
+                /*            
         $(".jcarousel-item").popover({ 
             title: function() {
                 return $(this).find('img').attr('title')
@@ -72,13 +72,14 @@ var itemAddCallback = function(carousel, first, last, data, state) {
             html:true,
             container:'body'
         });
+        */
 	
 }
 
 function resizeImage(item) {
     var ele = item.find('img');
     var maxHeight=window.params.carousel.maxHeight;
-    var maxWidth=window.params.carousel.maxWidth;
+    var maxWidth=item.hasClass('.jcarousel-item-horizontal') ? window.params.carousel.maxWidth : '100%';
     var width = ele.width();    // Current image width
     var height = ele.height();  // Current image height
     if(height > maxHeight){
@@ -129,9 +130,7 @@ var getSnippetHTML = function(carousel, item) {
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 
 	var notes = item.notes?item.notes:''
-        //console.log("NOTES");
-        console.log(item.imageTitle);
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet'+'"><div class="figure span2 observation_story_image"><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'span10'+'"><h5 class="popover-title"><b>Featured :</b> '+item.imageTitle+' <small>on '+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</small></h5>'+notes+'</div></div></div>';;
 };
 
 var getSnippetTabletHTML = function(carousel, item) {
@@ -142,8 +141,6 @@ var getSnippetTabletHTML = function(carousel, item) {
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 
 	var notes = item.notes?item.notes:''
-        //console.log("NOTES");
-        console.log(item.imageTitle);
 	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
 
 }

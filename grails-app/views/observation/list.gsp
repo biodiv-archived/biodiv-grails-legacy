@@ -17,24 +17,25 @@
 	<div class="span12">
             <obv:showSubmenuTemplate/>
 
-				<div class="page-header clearfix">
-                                    <div style="width:100%;">
-                                        <div class="main_heading" style="margin-left:0px;">
-                                            <obv:showRelatedStory
-                                                model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+            <div class="page-header clearfix">
+                <div style="width:100%;">
+                    <div class="main_heading" style="margin-left:0px;">
+
+                        <h1>Observations</h1>
+
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
 
 
-                            <h1>Observations</h1>
 
-                                        </div>
-                                    </div>
-                                    <div style="clear:both;"></div>
-                               </div>
-                               
+            <uGroup:rightSidebar/>
+            <obv:showRelatedStory
+            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 
-
-		<uGroup:rightSidebar/>
-		<obv:showObservationsListWrapper />
+            <h5>Browse Observations</h5>
+            <obv:showObservationsListWrapper />
 	</div>
 
 	<g:javascript>

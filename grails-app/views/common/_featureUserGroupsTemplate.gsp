@@ -10,9 +10,7 @@
 
 <div id = "featureIn" class="feature-user-groups">
          
-    	<a href="#" onclick="$(this).next('.show-user-groups').toggle(300);return false;">
-	    		<h5>Feature Item in Groups<span class="caret" style="margin-top: 8px;margin-left: 5px"></span></h5>
-        </a>
+	    		<h5 onclick="$(this).next('.show-user-groups').slideToggle(150);return false;">Feature Item in Groups<span class="caret" style="margin-top: 8px;margin-left: 5px"></span></h5>
         <div class="show-user-groups" >
             	<hr/>
 

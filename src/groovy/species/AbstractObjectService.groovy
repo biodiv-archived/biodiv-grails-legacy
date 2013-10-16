@@ -62,15 +62,22 @@ class AbstractObjectService {
 				item.notes = param['observation'].notes()
 			} else {
 				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
-				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize()+" on "+param['observation'].fromDate.format('dd/MM/yyyy');
+				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize() + (param['observation'].fromDate ?  (" on " +  param['observation'].fromDate.format('dd/MM/yyyy')) : "");
 				item.notes = desc;				
 			}
+            
             if(param['featuredNotes'] ==  null) {
             }
             else {
+                String n = item.notes;
                 item.notes = param['featuredNotes']
+                if(n)
+                    item.notes += "<h6>${item.type.capitalize()} Notes</h6>" + n
             }
-            
+           
+            if(param['featuredOn']) {
+                item.featuredOn = param['featuredOn'].getTime();
+            }
 			urlList << item;
 		}
 		return urlList
@@ -177,10 +184,10 @@ class AbstractObjectService {
         def i = 0;
         observations.each {
             if(featured.notes[i] == null){
-                result.add([ 'observation':it, 'title': it.fetchSpeciesCall() ]);
+                result.add([ 'observation':it, 'title': it.fetchSpeciesCall(),  'featuredOn':featured.createdOn[i] ]);
             }
             else{
-                result.add([ 'observation':it, 'title': it.fetchSpeciesCall(), 'featuredNotes': featured.notes[i] ]);
+                result.add([ 'observation':it, 'title': it.fetchSpeciesCall(), 'featuredOn':featured.createdOn[i], 'featuredNotes': featured.notes[i] ]);
             }
             i = i + 1;
         }

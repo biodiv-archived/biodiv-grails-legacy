@@ -18,12 +18,24 @@ $(document).ready(function() {
             getItemHTML:getSnippetHTML
         </g:if>
         <g:else>
-            scroll:3,
+            scroll:1,
+            visible:2,
             getItemHTML:getSnippetTabletHTML,
             horizontal:true
         </g:else>
     });
+    $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
+        $(this).children().addClass('icon-gray');    
+    }, function(){
+        $(this).children().removeClass('icon-gray');    
+    });
 
+    $(".jcarousel-next-vertical").append("<i class='icon-chevron-down'></i>").hover(function(){
+        $(this).children().addClass('icon-gray');    
+    }, function(){
+        $(this).children().removeClass('icon-gray');    
+    });
+    
 });
 </r:script>
 

@@ -1126,10 +1126,6 @@ ul.thumbwrap .license_options li:hover {
 	font-weight: bold;
 }
 
-.observation_links {
-	padding: 10px;
-}
-
 .info-message {
 	text-overflow: ellipsis;
 	white-space: nowrap;

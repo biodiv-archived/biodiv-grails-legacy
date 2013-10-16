@@ -48,6 +48,7 @@ class Species implements Rateable {
 		resources:Resource,
 		userGroups:UserGroup];
 
+
 	static belongsTo = [UserGroup]
 
 	static constraints = {

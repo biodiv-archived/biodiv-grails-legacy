@@ -183,7 +183,8 @@ class ActionController {
 
 	@Secured(['ROLE_USER'])
 	def flagIt = { 
-       	log.debug params;
+       	println "=====PATH == " + grailsApplication.config.speciesPortal.resources.rootDir
+        log.debug params;
 		params.author = springSecurityService.currentUser;
 		def obv = activityFeedService.getDomainObject(params.type,params.id);     //GEt object instance ??
 		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());    //flag nikalne ki function observationservice mein hai ??
