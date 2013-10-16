@@ -114,8 +114,9 @@ def speciesUploadService = ctx.getBean("speciesUploadService");
 //speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/grasses_of_palni_hills.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/grasses_of_palni_hills_mapping.xlsx", 0, 0, 0, 0,-1,grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/grasses_of_palni_hills");
 
 //speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/orchids/Orchids of Bhutan.xls", grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/orchids/orchids_Bhutan_mapping.xlsx", 0, 0, 0, 0,1,grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/orchids/images");
-speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/dbgurung/inprocess/plantdb.xls", grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/dbgurung/inprocess/plantdb_mapping.xlsx", 0, 0, 0, 0,1,grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/dbgurung/plantdb/cms.cnr.edu.bt/plantdb/upload");
-
+//speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/dbgurung/inprocess/plantdb.xls", grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/dbgurung/inprocess/plantdb_mapping.xlsx", 0, 0, 0, 0,1,grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/dbgurung/plantdb/cms.cnr.edu.bt/plantdb/upload");
+speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/ara/inprocess/family_Cactaceae-Carlemmaniaceae_data.xls", grailsApplication.config.speciesPortal.data.rootDir+"/bbpdata/species/ara/inprocess/family_Cactaceae-Carlemmaniaceae_mapping.xlsx", 0, 0, 0, 0,-1);
+/*
 converter = new XMLConverter();
 noChange  = 0;
 change = 0;
@@ -216,4 +217,4 @@ def updateLicense() {
 //updateLicense();
 //def speciesService = ctx.getBean("speciesService");
 //println speciesService.export([query:'id:[0 TO 40000]', rows:40000], [source:'Species', downloadType:'ZIP', filterUrl:'http://indiabiodiversity.localhost.org/species/list?query=id:[0 TO 40000]']);
-
+*/

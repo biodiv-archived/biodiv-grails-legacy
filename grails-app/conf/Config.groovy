@@ -335,8 +335,8 @@ speciesPortal {
 
 		COMMON_NAME = "Common Name"
 		SYNONYMS = "Synonyms"
-		INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Indian Distribution Geographic Entity"
-		INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY = "Indian Endemicity Geographic Entity"
+		INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Local Distribution Geographic Entity"
+		INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY = "Local Endemicity Geographic Entity"
 		GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Global Distribution Geographic Entity"
 		GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY = "Global Endemicity Geographic Entity"
 		TAXONOMIC_HIERARCHY = "Taxonomy Hierarchy"
