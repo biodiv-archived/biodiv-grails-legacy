@@ -25,6 +25,7 @@ class ActivityFeedService {
 	static final String OBSERVATION_CREATED = "Observation created"
 	static final String OBSERVATION_UPDATED = "Observation updated"
 	static final String OBSERVATION_FLAGGED = "Flagged"
+	static final String REMOVED_FLAG = "Flag removed"
 	static final String OBSERVATION_FLAG_DELETED = "Flag deleted"
 	static final String OBSERVATION_DELETED = "Deleted observation"
 	
@@ -255,8 +256,12 @@ class ActivityFeedService {
 				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
-				activityTitle = OBSERVATION_FLAGGED
-				text = activityDomainObj.flag.value() + ( activityDomainObj.notes ? " \n" + activityDomainObj.notes : "")
+				activityTitle = getResType(activityRootObj).capitalize() + " flagged"
+				text = feedInstance.activityDescrption
+				break
+            case REMOVED_FLAG:
+				activityTitle = getResType(activityRootObj).capitalize() + " flag removed" 
+				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
 				activityTitle = OBSERVATION_UPDATED
@@ -446,17 +451,23 @@ class ActivityFeedService {
 		desc +=  isPost ? " to group" : " from group"
 		return desc
 	}
-
-    def getDescriptionForFeature(r, ug, isFeature) {
-		def desc = isFeature ? "Featured" : "Unfeatured"
+    
+    def getResType(r) {
+        def desc = ""
         switch(r.class.canonicalName){
 			case Checklists.class.canonicalName:
-				desc += " checklist"
+				desc += "checklist"
 				break
 			default:
-				desc += " " + r.class.simpleName.toLowerCase()
+				desc += r.class.simpleName.toLowerCase()
 				break
 		}
+        return desc
+    }
+    def getDescriptionForFeature(r, ug, isFeature)  {
+		def desc = isFeature ? "Featured " : "Unfeatured "
+        String temp = getResType(r)
+        desc+= temp
         if(ug == null) {
             return desc
         }
