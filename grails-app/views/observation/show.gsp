@@ -157,7 +157,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 							<div id="seeMoreMessage" class="message"></div>
 							<div id="seeMore" class="btn btn-mini">Show all</div>
 						</div>
-						<div class="input-append">
+						<div class="input-append" style="width:100%;">
 							<g:hasErrors bean="${recommendationInstance}">
 								<div class="errors">
 									<g:renderErrors bean="${recommendationInstance}" as="list" />
@@ -191,8 +191,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 					<uGroup:objectPostToGroupsWrapper 
 										model="[canPullResource:canPullResource, 'observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]" />
 
-                                        <g:render template="/common/showFeaturedTemplate" model="['observationInstance':observationInstance]"/>
-                                        <uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>
+                                        <g:render template="/common/featureWrapperTemplate" model="['observationInstance':observationInstance]"/>
 
 					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />

@@ -1,8 +1,6 @@
 function feature(objectId, objectType, url) {
-    console.log("feature function called");
-    var featureNotes = document.getElementById("notes").value;
-    console.log(featureNotes);
-    userGroup = getSelectedUserGroups($("#featureIn"));
+        var featureNotes = $("#featureNotes").val();
+        userGroup = getSelectedUserGroups($("#featureIn"));
 	if(userGroup.length === 0){
 		alert('Please select at least one group')
 		return; 
@@ -29,7 +27,6 @@ function feature(objectId, objectType, url) {
 }
 
 function unfeature(objectId, objectType, url) {
-	console.log("unfeature function called");
         userGroup = getSelectedUserGroups($("#featureIn"));
 	if(userGroup.length === 0){
 		alert('Please select at least one group')

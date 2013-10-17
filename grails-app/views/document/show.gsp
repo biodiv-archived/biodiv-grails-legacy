@@ -139,9 +139,8 @@
 			</g:if>
 			<uGroup:objectPostToGroupsWrapper 
                            	model="[canPullResource:canPullResource, 'objectType':documentInstance.class.canonicalName, 'observationInstance':documentInstance]" />
- 
-                        <g:render template="/common/showFeaturedTemplate" model="['observationInstance':documentInstance]"/>
-                        <uGroup:featureUserGroups model="['observationInstance':documentInstance]"/>
+                        
+                        <g:render template="/common/featureWrapperTemplate" model="['observationInstance':documentInstance]"/>
 
 						<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />

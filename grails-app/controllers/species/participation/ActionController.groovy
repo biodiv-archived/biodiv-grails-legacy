@@ -187,19 +187,19 @@ class ActionController {
 		params.author = springSecurityService.currentUser;
 		def obv = activityFeedService.getDomainObject(params.type,params.id);     //GEt object instance ??
 		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());    //flag nikalne ki function observationservice mein hai ??
-		def FlagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);
-		if (!FlagInstance) {
+		def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);
+		if (!flagInstance) {
 			try {
-				FlagInstance = new Flag(objectId: params.id.toLong(),objectType: params.type, author: params.author, flag:flag, notes:params.notes)
-				FlagInstance.save(flush: true)
-				if(!FlagInstance.save(flush:true)){
-                    FlagInstance.errors.allErrors.each { println it }
+				flagInstance = new Flag(objectId: params.id.toLong(),objectType: params.type, author: params.author, flag:flag, notes:params.notes)
+				flagInstance.save(flush: true)
+				if(!flagInstance.save(flush:true)){
+                    flagInstance.errors.allErrors.each { println it }
 			        return null
 		        }
-                def activityNotes = FlagInstance.flag.value() + ( FlagInstance.notes ? " \n" + FlagInstance.notes : "")
+                def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
                 obv.flagCount++
 				obv.save(flush:true)
-				activityFeedService.addActivityFeed(obv, FlagInstance, FlagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); //add activity
+				activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); //add activity
                 searchIndex(params.type,obv)				
 				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress) //???
 				flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
@@ -214,7 +214,9 @@ class ActionController {
         def r = ["success":true]
         def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
         def flagListUsersHTML = g.render(template:"/common/observation/flagListUsersTemplate" ,model:['observationInstance':observationInstance])
-	    
+	    def msg = "Flagged..."
+        r['msg'] = msg
+
         r['flagListUsersHTML'] = flagListUsersHTML
 	    render r as JSON
 	}
@@ -223,18 +225,18 @@ class ActionController {
 	def deleteFlag  = {
 		log.debug params;
         params.author = springSecurityService.currentUser;
-		def FlagInstance = Flag.findWhere(id: params.id.toLong());  //kaun si kiski id hai???
-		def obv = activityFeedService.getDomainObject(FlagInstance.objectType,FlagInstance.objectId);    ///observation nikali hai...species bhi ho sakta hai
+		def flagInstance = Flag.findWhere(id: params.id.toLong());  //kaun si kiski id hai???
+		def obv = activityFeedService.getDomainObject(flagInstance.objectType, flagInstance.objectId);    ///observation nikali hai...species bhi ho sakta hai
         
 
-		if(!FlagInstance){
+		if(!flagInstance){
 			render obv.flagCount;
 			return
 		}
 		try {
-            def activityNotes = FlagInstance.flag.value() + ( FlagInstance.notes ? " \n" + FlagInstance.notes : "")
-            activityFeedService.addActivityFeed(obv, FlagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
-			FlagInstance.delete(flush: true);
+            def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
+            activityFeedService.addActivityFeed(obv, flagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
+			flagInstance.delete(flush: true);
 			obv.save(flush:true)
 			searchIndex(params.type,obv);    //observation ke liye only
             def message = [:]

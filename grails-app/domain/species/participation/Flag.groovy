@@ -10,7 +10,7 @@ class Flag extends AbstractAction {
     String notes;
 
  
-static belongsTo = [author:SUser, observation:Observation]
+//static belongsTo = [author:SUser, observation:Observation]
 	
 	public enum FlagType {
 		DETAILS_INAPPROPRIATE("Inappropriate details"),
