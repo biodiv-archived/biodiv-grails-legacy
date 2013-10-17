@@ -6,7 +6,7 @@
 	<div class="paginateButtons centered">
 		<p:paginate controller="document" action="browser"
 			total="${instanceTotal}" userGroup="${userGroup}"
-			userGroupWebaddress="${params.webaddress}" params="${params}"
+			userGroupWebaddress="${params.webaddress}" params="${activeFilters}"
 			max="${queryParams.max }" maxsteps="12" />
 	</div>
 
