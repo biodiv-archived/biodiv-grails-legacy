@@ -39,6 +39,7 @@ class DocumentService {
 	def grailsApplication
 	def userGroupService
 	def dataSource
+    def sessionFactory
 
 	Document createDocument(params) {
 
@@ -347,15 +348,27 @@ class DocumentService {
 
 
 		query += queryParts.filterQuery + queryParts.orderByClause
-		if(!noLimit){
-			if(max != -1)
-				queryParts.queryParams["max"] = max
-			if(offset != -1)
-				queryParts.queryParams["offset"] = offset
-		}
 
 		log.debug "Document Query "+ query + "  params " + queryParts.queryParams
-		def documentInstanceList = Document.executeQuery(query, queryParts.queryParams)
+
+        def hqlQuery = sessionFactory.currentSession.createQuery(query)
+        /*if(params.bounds && boundGeometry) {
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+        }*/ 
+
+		if(!noLimit){
+            if(max > -1){
+                hqlQuery.setMaxResults(max);
+                queryParts.queryParams["max"] = max
+            }
+            if(offset > -1) {
+                hqlQuery.setFirstResult(offset);
+                queryParts.queryParams["offset"] = offset
+            }
+        }
+
+        hqlQuery.setProperties(queryParts.queryParams);
+		def documentInstanceList = hqlQuery.list();
 
 		return [documentInstanceList:documentInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
@@ -371,6 +384,14 @@ class DocumentService {
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
+        
+        if(params.featureBy == "true"){
+			query = "select document from Document document,  Featured feat "
+			filterQuery += " and document.id = feat.objectId and feat.objectType = :featType "
+            queryParams["featureBy"] = params.featureBy
+            queryParams["featType"] = Document.class.getCanonicalName();
+            activeFilters["featureBy"] = params.featureBy
+		}
 
 		if(params.tag){
 			query = "select document from Document document,  TagLink tagLink "
