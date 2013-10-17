@@ -77,7 +77,6 @@ class ObservationsSearchService {
 		log.info "Initializing publishing to observations search index : "+obvs.size();
 
 		//def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];
@@ -85,63 +84,9 @@ class ObservationsSearchService {
 
 		obvs.each { obv ->
 			log.debug "Reading Observation : "+obv.id;
-			if(!obv.isDeleted) {
-				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, obv.id.toString());
-				addNameToDoc(obv, doc);
-	
-				doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
-				doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
-				doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
-				
-				doc.addField(searchFieldsConfig.FROM_DATE, obv.fromDate);
-				doc.addField(searchFieldsConfig.TO_DATE, obv.toDate);
-				
-				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
-				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
-				doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
-				if(obv.notes) {
-					doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
-				}
-				
-				doc.addField(searchFieldsConfig.SGROUP, obv.group.id);			
-				doc.addField(searchFieldsConfig.HABITAT, obv.habitat.id);
-				doc.addField(searchFieldsConfig.LOCATION, obv.placeName);
-				doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
-				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
-
-                def topology = obv.topology;
-                doc.addField(searchFieldsConfig.LATLONG, obv.latitude+","+obv.longitude);
-                
-                WKTWriter wkt = new WKTWriter();
-                try {
-                    String geomStr = wkt.write(obv.topology);
-                    doc.addField(searchFieldsConfig.TOPOLOGY, geomStr);
-                } catch(Exception e) {
-                    log.error "Error writing polygon wkt : ${observationInstance}"
-                }
-				
-				doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
-				doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
-				doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
-				//boolean geoPrivacy = false;
-				//String locationAccuracy;
-				obv.tags.each { tag ->
-					doc.addField(searchFieldsConfig.TAG, tag);
-				}
-				
-				obv.userGroups.each { userGroup ->
-					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
-				}
-				
-				addChecklistData(obv, doc)
-				
-				docs.add(doc);
-			}
+            List ds = getSolrDocument(obv);
+            docs.addAll(ds);
 		}
-
-		//log.debug docs;
 
         if(docs) {
             try {
@@ -162,13 +107,76 @@ class ObservationsSearchService {
         }
 	}
 
+    /**
+    */
+    private List<SolrInputDocument> getSolrDocument(Observation obv) {
+		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        List docs = [];
+        if(!obv.isDeleted) {
+            SolrInputDocument doc = new SolrInputDocument();
+            doc.addField(searchFieldsConfig.ID, obv.id.toString());
+            addNameToDoc(obv, doc);
+
+            doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
+            doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
+
+            doc.addField(searchFieldsConfig.FROM_DATE, obv.fromDate);
+            doc.addField(searchFieldsConfig.TO_DATE, obv.toDate);
+
+            doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
+            doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
+            doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
+            if(obv.notes) {
+                doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
+            }
+
+            doc.addField(searchFieldsConfig.SGROUP, obv.group.id);			
+            doc.addField(searchFieldsConfig.HABITAT, obv.habitat.id);
+            doc.addField(searchFieldsConfig.LOCATION, obv.placeName);
+            doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
+            doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
+
+            def topology = obv.topology;
+            doc.addField(searchFieldsConfig.LATLONG, obv.latitude+","+obv.longitude);
+
+            WKTWriter wkt = new WKTWriter();
+            try {
+                String geomStr = wkt.write(obv.topology);
+                doc.addField(searchFieldsConfig.TOPOLOGY, geomStr);
+            } catch(Exception e) {
+                log.error "Error writing polygon wkt : ${observationInstance}"
+            }
+
+            doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
+            doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
+            doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
+            //boolean geoPrivacy = false;
+            //String locationAccuracy;
+            obv.tags.each { tag ->
+                doc.addField(searchFieldsConfig.TAG, tag);
+            }
+
+            obv.userGroups.each { userGroup ->
+                doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+                doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+            }
+
+            def checklistObvs = addChecklistData(obv, doc)
+
+            docs.add(doc);
+            docs.addAll(checklistObvs);
+        }
+        return docs
+
+    }
+
 	/**
 	 * 
 	 * @param doc
 	 * @param name
 	 */
 	private void addNameToDoc(Observation obv, SolrInputDocument doc) {
-		
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 		doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
 		def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
@@ -181,8 +189,8 @@ class ObservationsSearchService {
 	}
 
 	
-	private addChecklistData(Observation obv, SolrInputDocument doc){
-		if(!obv.isChecklist) return
+	private List<SolrInputDocument> addChecklistData(Observation obv, SolrInputDocument doc){
+		if(!obv.isChecklist) return []
 		
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 		def chk = obv 
@@ -200,10 +208,6 @@ class ObservationsSearchService {
 			doc.addField(searchFieldsConfig.ATTRIBUTION, s.name);
 		}
 		
-		chk.observations.each { row ->
-			addNameToDoc(row, doc)
-		}
-		
 		chk.states.each { s->
 			doc.addField(searchFieldsConfig.LOCATION, s);
 		}
@@ -214,6 +218,13 @@ class ObservationsSearchService {
 			doc.addField(searchFieldsConfig.LOCATION, s);
 		}
 			
+        def docs = [];
+		chk.observations.each { row ->
+			addNameToDoc(row, doc)
+            def d = getSolrDocument(Observation.read(row.id));
+            docs.addAll(d);
+		}
+	    return docs;
 	}
 	
 	/**
