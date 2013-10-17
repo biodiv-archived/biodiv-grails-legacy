@@ -779,6 +779,7 @@ class ObservationService extends AbstractObjectService {
 		def activeFilters = [:]
 
 		def query = "select "
+
         if(params.fetchField) {
             query += " obv.id as id,"
             params.fetchField.split(",").each { fetchField ->
@@ -793,9 +794,26 @@ class ObservationService extends AbstractObjectService {
         query += " from Observation obv "
 		//def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
-        def userGroupQuery = " ", tagQuery = '';
+        def userGroupQuery = " ", tagQuery = '', featureQuery = '';
 		def filterQuery = " where obv.isDeleted = :isDeleted "
+        
+        if(params.featureBy == "true" ) {
+            featureQuery = ", Featured feat "
+            query += featureQuery;
+            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType "
+            queryParams["featureBy"] = params.featureBy
+            queryParams["featType"] = Observation.class.getCanonicalName();
+            activeFilters["featureBy"] = params.featureBy
+        }
+       if(params.featureBy == "false") {
+            featureQuery = ", Featured feat "
+            query += featureQuery;
+            filterQuery += " and obv.id != feat.objectId and feat.objectType = :featType "
+            queryParams["featureBy"] = params.featureBy
+            queryParams["featType"] = Observation.class.getCanonicalName();
 
+        }
+ 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
 			def groupId = getSpeciesGroupIds(params.sGroup)
@@ -831,8 +849,8 @@ class ObservationService extends AbstractObjectService {
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
 			activeFilters["tag"] = params.tag
 		}
-
-		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+    
+        		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
 			filterQuery += " and obv.habitat.id = :habitat "
 			queryParams["habitat"] = params.habitat
 			activeFilters["habitat"] = params.habitat
@@ -890,12 +908,12 @@ class ObservationService extends AbstractObjectService {
 		} 
 
 		
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
-		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.maxVotedReco is not null ";
+		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
+		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+ " and obv.maxVotedReco is not null ";
 				
 		filterQuery += " and obv.isShowable = true ";
 
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+ " and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
 		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
 			filterQuery += " and obv.isChecklist = true "
@@ -904,8 +922,8 @@ class ObservationService extends AbstractObjectService {
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
-		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
-		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
+		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery + " and obv.isChecklist = true "
+		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 		
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 

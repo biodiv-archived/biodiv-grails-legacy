@@ -442,8 +442,11 @@ class UserGroupController {
 		
 
 		if(params.append?.toBoolean()) {
-            println "==============MODEL OBJ===============" + model.observationInstanceList.collect {it.id}
-			session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
+            def groupObvList = session[userGroupInstance.webaddress+"obv_ids_list"]
+            if(!groupObvList){
+                session[userGroupInstance.webaddress+"obv_ids_list"] = []
+            }
+			    session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
 		} else {
 			session[userGroupInstance.webaddress+"obv_ids_list_params"] = params.clone();
 			session[userGroupInstance.webaddress+"obv_ids_list"] = model.observationInstanceList.collect {it.id};
