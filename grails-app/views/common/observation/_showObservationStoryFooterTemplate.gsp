@@ -39,8 +39,12 @@
                 title="${observationInstance.license.name}"/>
             </div>
         </g:if>
+        
     </g:if>
-
+    <g:if test="${!hidePost}">
+    	<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+    </g:if>	
+	
     <g:if test="${!showDetails}">
         <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
     </g:if>
