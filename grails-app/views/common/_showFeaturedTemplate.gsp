@@ -6,10 +6,9 @@
     <g:set var="featuredInGroups" value="${Featured.isFeaturedIn(observationInstance)}">
     </g:set>
     <g:if test="${featuredInGroups}">
-    <div class="sidebar_section ">
         <h5>Featured in Groups</h5>
         <div class="featured-groups-name">
-            <ul class="tile" style="list-style: none; padding-left: 10px;">
+            <ul class="tile" style="list-style: none;background:transparent; ">
                 <g:each in="${featuredInGroups}" var="groupInfo">
                 <%
                 def ug
@@ -26,6 +25,5 @@
                 </g:each> 
             </ul>
         </div>
-    </div>
     </g:if>
 </div>

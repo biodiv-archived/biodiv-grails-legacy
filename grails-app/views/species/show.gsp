@@ -704,9 +704,8 @@ $(document).ready(function(){
                                 </div-->
                                 <uGroup:objectPostToGroupsWrapper 
 				    model="[canPullResource:canPullResource, 'objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
-
-                                <g:render template="/common/showFeaturedTemplate" model="['observationInstance':speciesInstance]"/>
-                                <uGroup:featureUserGroups model="['observationInstance':speciesInstance]"/>
+                                    
+                                <g:render template="/common/featureWrapperTemplate" model="['observationInstance':speciesInstance]"/>
 			    <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">

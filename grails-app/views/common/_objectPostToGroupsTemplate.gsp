@@ -8,7 +8,7 @@
 			       		<a class="reset" href="#" title="Reset" onclick='updateListSelection($(this));return false;'>Reset</a>
 			       	</div>
 			   	</g:if>
-			   	<div id="userGroups" name="userGroups" style="list-style:none;clear:both;margin:10px 0;">
+			   	<div id="userGroups" class="userGroups">
 	               <uGroup:getCurrentUserUserGroups model="[observationInstance:observationInstance, onlyExpertGroups:onlyExpertGroups]"/>
 	           	</div>
 	        </div>
