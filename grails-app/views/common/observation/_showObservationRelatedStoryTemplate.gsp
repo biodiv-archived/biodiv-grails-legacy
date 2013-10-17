@@ -69,5 +69,5 @@ $(document).ready(function() {
 </div>
 
 <div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
-	No observations
+    No ${controller}
 </div>

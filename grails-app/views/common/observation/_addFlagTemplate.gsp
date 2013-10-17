@@ -29,7 +29,7 @@
 					</g:else>
 				</g:each>
 				<br/>
-				<textarea class="comment-textbox" placeholder="Tell Why??" name="notes"></textarea>
+				<textarea id ="flagNotes" class="comment-textbox" placeholder="Tell Why??" name="notes"></textarea>
 <%--				<input type="text" name="notes" placeholder="Any other reason"></input><br />--%>
 				<input class="btn btn-danger pull-right" type="submit" value="Flag"/>
 				<div id="flag-close" class="popup-form-close" value="close">
@@ -74,10 +74,8 @@ function removeFlag(flagId, flagComponent){
 		data:{"id":flagId},
 		
                 success: function(data){
-                    console.log("zero count")
 
                     if(parseInt(data.flagCount) == 0){
-                        console.log("zero count inside")
                         $("#flagHeadings").hide();
 			$("#flag-action>i").removeClass("icon-red");
 			}

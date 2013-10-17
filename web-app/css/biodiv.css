@@ -473,12 +473,19 @@ div.errors {
 	padding: 10px;
 }
 
-textarea#notes {
-	max-width: 100%;
-	min-width: 100%;
+textarea#featureNotes {
 	width: 100%;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
 }
 
+.userGroups{
+    list-style:none;
+    clear:both;
+    margin:10px;
+
+}
 .section .section-item {
 	padding: 10px;
 }

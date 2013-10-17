@@ -1,8 +1,6 @@
 function flag(objectId, objectType, url) {
-	console.log("FLAG function called");
-	var flagNotes = $('.comment-textbox').value;
+	var flagNotes = document.getElementById("flagNotes").value;
 	var flagType = $('input[name=obvFlag]:checked', '#flag-form').val()
-	console.log(flagType);
 	$.ajax({
 	 		url: url,
 	 		type: 'POST',
@@ -12,6 +10,8 @@ function flag(objectId, objectType, url) {
 				if(data.success){
                                         $(".flag-list-users").replaceWith(data.flagListUsersHTML);
                                         $("#flag-action>i").addClass("icon-red");
+                                        $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				        $("html, body").animate({ scrollTop: 0 });
 				}else{
 					alert("FAILED MESSAGE");
 				}
