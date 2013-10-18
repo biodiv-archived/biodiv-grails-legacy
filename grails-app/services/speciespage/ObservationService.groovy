@@ -1725,17 +1725,17 @@ class ObservationService {
 	}
 	
 	private List getUserForEmail(observation){
-		if(!observation instanceof UserGroup){
+		if(!observation.instanceOf(UserGroup)){
 			return Follow.getFollowers(observation)
+		}else{
+			//XXX for user only sending founders and current user as list members list is too large have to decide on this
+			List userList = observation.getFounders(100, 0)
+			def currUser = springSecurityService.currentUser
+			if(!userList.contains(currUser)){
+				userList << currUser
+			}
+			return userList
 		}
-		
-		//XXX for user only sending founders and current user as list members list is too large have to decide on this
-		List userList = observation.getFounders(100, 0)
-		def currUser = springSecurityService.currentUser
-		if(!userList.contains(currUser)){
-			userList << currUser
-		}
-		return userList
 	}
 	
 	private SUser getOwner(observation) {
