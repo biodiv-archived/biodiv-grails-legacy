@@ -1146,7 +1146,7 @@ class ObservationService {
             }
 
             String query = paramsList.get('q')
-            query += " AND isshowable:true ";
+            query += " AND "+searchFieldsConfig.IS_SHOWABLE+":true ";
             paramsList.remove('q');
             paramsList.add('q', query);
 
@@ -1942,7 +1942,7 @@ class ObservationService {
             paramsList.add('facet.offset', offset);
             paramsList.add('facet.mincount', "1");
 
-            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+			paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
 
             paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
             paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", max);
