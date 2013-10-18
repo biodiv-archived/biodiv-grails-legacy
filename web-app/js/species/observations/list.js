@@ -226,7 +226,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $("#removeQueryFilter").live('click', function(){
+    $(".removeQueryFilter").live('click', function(){
         var removeParam = undefined;
         if($($(this).attr('data-target').replace('.','\\.')).length != 0)
         $($(this).attr('data-target').replace('.','\\.')).val('')

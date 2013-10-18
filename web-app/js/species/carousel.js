@@ -1,6 +1,4 @@
 var itemLoadCallback = function(carousel, state) {
-        console.log("ITEM LOAD CALL BACK");
-        
         carousel.last = carousel.last?carousel.last:3;
 	var params = {
 		"limit" : carousel.last - carousel.first,
@@ -32,9 +30,6 @@ var itemLoadCallback = function(carousel, state) {
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
-     console.log("ITEM ADD CALL BACK");
-                    console.log(carousel);
-
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
