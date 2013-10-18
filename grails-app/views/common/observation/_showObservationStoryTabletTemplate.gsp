@@ -10,5 +10,5 @@
 
 </div-->
 
-<obv:showFooter model="['observationInstance':observationInstance, 'showDetails':false, 'showLike':false]"/>
+<obv:showFooter model="['observationInstance':observationInstance, 'showDetails':false, 'showLike':false, 'hidePost':true]"/>
 

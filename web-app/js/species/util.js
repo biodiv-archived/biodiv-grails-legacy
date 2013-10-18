@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 var serverTimeDiff = null;
 var alwaysRelativeTime = false;
 var is_touch_device = ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch;
@@ -138,5 +139,29 @@ function loadGoogleMapsAPI(callback) {
         }
     //}
 }
+
+var isVisualizationLibLoaded = false;
+function loadGoogleVisualizationAPI(callback) {
+    if(!isVisualizationLibLoaded) {
+        google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
+            isVisualizationLibLoaded = true;
+            callback();
+        }});
+    } else {
+        callback();
+    }
+}
+
+if (typeof String.prototype.startsWith != 'function') {
+    // see below for better implementation!
+    String.prototype.startsWith = function (str){
+        return this.indexOf(str) == 0;
+    };
+}
+
+function stringTrim(s){
+    return $.trim(s);
+}
+
 
 

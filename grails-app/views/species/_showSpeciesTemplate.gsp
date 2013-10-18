@@ -92,6 +92,7 @@
                     <div class="footer-item">
                         <obv:like model="['resource':speciesInstance]"/>
                     </div>
+                    <uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
                 </div>
 
 

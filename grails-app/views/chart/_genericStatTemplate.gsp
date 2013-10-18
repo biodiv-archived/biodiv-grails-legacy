@@ -27,7 +27,7 @@
         </g:if>
         <g:else>
             <div class="alert alert-info">
-                No ${title}
+                No data!! 
             </div>
         </g:else>
 		

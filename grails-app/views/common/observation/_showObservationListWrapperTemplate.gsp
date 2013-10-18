@@ -96,8 +96,9 @@
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
 				</div>
-                                <div id="obvPerGroupChart" class="sidebar_section" style="clear:both;overflow:hidden;">
-                                    <chart:showStats model="['title':'Species Groups', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:300, height:270, 'hideTable':true, dynamicLoading:true]"/>
+                                <div class="sidebar_section" style="clear:both;overflow:hidden;">
+                                    <h5> Species Groups </h5>
+                                    <div id="speciesGroupCountList"></div>
                                 </div>
                                 <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
                                 

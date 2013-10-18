@@ -6,13 +6,9 @@ L.Control.FullScreen = L.Control.extend({
 	},
 	
 	onAdd: function (map) {
-		// Do nothing if we can't
-		if (!fullScreenApi.supportsFullScreen)
-			return map.zoomControl ? map.zoomControl._container : L.DomUtil.create('div', '');
-		
 		var className = 'leaflet-control-zoom-fullscreen', container;
 		
-		if(map.zoomControl && !this.options.forceSeparateButton) {
+		if (map.zoomControl && !this.options.forceSeparateButton) {
 			container = map.zoomControl._container;
 		} else {
 			container = L.DomUtil.create('div', 'leaflet-bar');
@@ -48,26 +44,35 @@ L.Control.FullScreen = L.Control.extend({
 	
 	toogleFullScreen: function () {
 		this._exitFired = false;
-		if (fullScreenApi.supportsFullScreen){
-			var container = this._container;
-			if(fullScreenApi.isFullScreen(container)){
+		var container = this._container;
+		if (this._isFullscreen) {
+			if (fullScreenApi.supportsFullScreen) {
 				fullScreenApi.cancelFullScreen(container);
-				this.invalidateSize();
-				this.fire('exitFullscreen');
-				this._exitFired = true;
+			} else {
+				L.DomUtil.removeClass(container, 'leaflet-pseudo-fullscreen');
 			}
-			else {
+			this.invalidateSize();
+			this.fire('exitFullscreen');
+			this._exitFired = true;
+			this._isFullscreen = false;
+		}
+		else {
+			if (fullScreenApi.supportsFullScreen) {
 				fullScreenApi.requestFullScreen(container);
-				this.invalidateSize();
-				this.fire('enterFullscreen');
+			} else {
+				L.DomUtil.addClass(container, 'leaflet-pseudo-fullscreen');
 			}
+			this.invalidateSize();
+			this.fire('enterFullscreen');
+			this._isFullscreen = true;
 		}
 	},
 	
 	_handleEscKey: function () {
-		if(!fullScreenApi.isFullScreen(this) && !this._exitFired){
+		if (!fullScreenApi.isFullScreen(this) && !this._exitFired) {
 			this.fire('exitFullscreen');
 			this._exitFired = true;
+			this._isFullscreen = false;
 		}
 	}
 });
@@ -135,7 +140,7 @@ source : http://johndyer.name/native-fullscreen-javascript-api-plus-jquery-plugi
 			}
 		}
 		fullScreenApi.requestFullScreen = function(el) {
-			return (this.prefix === '') ? el.requestFullscreen() : el[this.prefix + 'RequestFullScreen']();
+			return (this.prefix === '') ? el.requestFullscreen() : el[this.prefix + 'RequestFullScreen'](Element.ALLOW_KEYBOARD_INPUT);
 		}
 		fullScreenApi.cancelFullScreen = function(el) {
 			return (this.prefix === '') ? document.exitFullscreen() : document[this.prefix + 'CancelFullScreen']();
