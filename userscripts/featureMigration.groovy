@@ -42,19 +42,23 @@ def migrateFlag() {
 }
 
 
-//migrateFlag()
-migrateFeedForFlag()
+migrateFlag()
+//migrateFeedForFlag()
 
 println "=========== done"
 
 //SQL COMMANDS
 //ALTER TABLE follow RENAME COLUMN user_id TO author_id;
+//UPDATE activity_feed SET activity_holder_type = 'species.participation.Flag' WHERE activity_holder_type = 'species.participation.ObservationFlag';
 //ALTER TABLE observation_flag RENAME TO flag;
-//UPDATE activity_feed SET activity_holder_type = 'species.participation.Flag' WHERE activity_holder_type = 'species.participation.ObservationFlag'
-// update flag set flag = 'DETAILS_INAPPROPRIATE'  where flag = 'OBV_INAPPROPRIATE';
-// update flag set object_id = 0;
+//update flag set flag = 'DETAILS_INAPPROPRIATE'  where flag = 'OBV_INAPPROPRIATE';
+
+//update flag set object_id = 0;
 
 
 //after all migration script
 //update activity_feed set last_updated = date_created;
 //alter table flag drop COLUMN observation_id ;
+//ALTER TABLE flag ALTER COLUMN object_id SET NOT NULL; ALTER TABLE flag ALTER COLUMN object_type SET NOT NULL; ALTER TABLE flag ADD CONSTRAINT flag_object_id_object_type UNIQUE (object_id, object_type, author_id);
+//update document set flag_count = 0;
+
