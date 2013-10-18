@@ -385,7 +385,7 @@ class ObservationService {
 	}
     
     private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset) {
-        def observations = Observation.withCriteria (offset:offset?:0) {
+		def observations = Observation.withCriteria () {
             projections {
                 groupProperty('sourceId')
                 groupProperty('isShowable')
@@ -397,11 +397,12 @@ class ObservationService {
             }
             order("isShowable", "desc")
             if(limit >= 0) maxResults(limit)
+			firstResult (offset?:0)
         }
         
         def result = [];
         observations.each {
-            def obv = Observation.get(it[0])
+			def obv = Observation.get(it[0])
             result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
         }
 
