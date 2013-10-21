@@ -220,8 +220,9 @@ class ObservationsSearchService {
 			
         def docs = [];
 		chk.observations.each { row ->
-			addNameToDoc(row, doc)
+			//addNameToDoc(row, doc)
             def d = getSolrDocument(Observation.read(row.id));
+            d[0].addField(searchFieldsConfig.TITLE, chk.title);
             docs.addAll(d);
 		}
 	    return docs;
