@@ -1146,7 +1146,7 @@ class ObservationService {
             }
 
             String query = paramsList.get('q')
-            query += " AND "+searchFieldsConfig.IS_SHOWABLE+":true ";
+            query += ((query != "")? " AND ": " ") + searchFieldsConfig.IS_SHOWABLE+":true ";
             paramsList.remove('q');
             paramsList.add('q', query);
 
@@ -1200,8 +1200,8 @@ class ObservationService {
 		
 		String aq = "";
 		int i=0;
+		
 		if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
-			
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -1941,9 +1941,11 @@ class ObservationService {
             paramsList.add('facet', "true");
             paramsList.add('facet.offset', offset);
             paramsList.add('facet.mincount', "1");
-
-			paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
-
+			
+			if(params.isChecklistOnly != null){
+				paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
+			}
+			
             paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
             paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", max);
             def qR = observationsSearchService.search(paramsList);
