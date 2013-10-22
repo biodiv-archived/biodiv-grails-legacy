@@ -79,7 +79,8 @@ class SpeciesService {
 
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof GrailsParameterMap) {
+		
+		if(params.aq instanceof GrailsParameterMap  || params.aq instanceof Map) {
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;

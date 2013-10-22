@@ -1218,8 +1218,8 @@ class ObservationService {
 		
 		String aq = "";
 		int i=0;
+		
 		if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
-			
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -2074,20 +2074,25 @@ class ObservationService {
     def getObservationFeatures(Observation obv) {
 		String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+obv.topology.toText()+"', t.topology)order by t.type" ;
         log.debug query;
-		def sql =  Sql.newInstance(dataSource);
-        //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
-		def features = [:]
+        def features = [:]
+        try {
+            def sql =  Sql.newInstance(dataSource);
+            //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
 
-		sql.rows(query).each {
-            switch (it.getProperty("type")) {
-                case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
-                case "138" : features['Soil'] = it.getProperty("feature");break;
-                case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
-                case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
-                case "136" : features['Tahsil'] = it.getProperty("feature");break;
-            }
-	 	};
-        sql.close();
+            sql.rows(query).each {
+                switch (it.getProperty("type")) {
+                    case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
+                    case "138" : features['Soil'] = it.getProperty("feature");break;
+                    case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
+                    case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
+                    case "136" : features['Tahsil'] = it.getProperty("feature");break;
+                }
+            };
+            sql.close();
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+        }
         return features
     } 
 

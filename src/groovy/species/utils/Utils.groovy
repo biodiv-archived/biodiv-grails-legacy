@@ -401,7 +401,30 @@ class Utils {
 				map[key] = URLDecoder.decode(value)
 		    }
 		}
-		return map
+		
+		//converting a.b.c = 10 to a:[b:[c:10]] 
+		def retMap = [:]
+		map.each{k, v ->
+			def arr = k.split("\\.")
+			def lookupMap = retMap
+			int count = 1
+			arr.each { ele ->
+				if(lookupMap.get(ele) == null){
+					if(count < (arr.length)){
+						lookupMap[ele] = [:]
+						lookupMap = lookupMap.get(ele)
+					}else{
+						lookupMap[ele] = v
+					}
+				}else{
+					lookupMap = lookupMap.get(ele)
+				}
+				count++
+			}
+		   
+		}
+		println "Returned url map" + retMap
+		return retMap
 	}
 	
 }
