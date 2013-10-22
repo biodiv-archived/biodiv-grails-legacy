@@ -36,6 +36,7 @@ class ObservationsSearchService {
 	def grailsApplication
 	
 	SolrServer solrServer;
+    def sessionFactory;
 	
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
@@ -59,9 +60,25 @@ class ObservationsSearchService {
 			publishSearchIndex(observations, true);
 			observations.clear();
 			offset += limit;
+            cleanUpGorm()
 		}
 		
 		log.info "Time taken to publish observations search index is ${System.currentTimeMillis()-startTime}(msec)";
+	}
+
+	private void cleanUpGorm() {
+
+		def hibSession = sessionFactory?.getCurrentSession();
+
+		if(hibSession) {
+			log.debug "Flushing and clearing session"
+			try {
+				hibSession.flush()
+			} catch(e) {
+				e.printStackTrace()
+			}
+			hibSession.clear()
+		}
 	}
 
 	def publishSearchIndex(Observation obv, boolean commit) {

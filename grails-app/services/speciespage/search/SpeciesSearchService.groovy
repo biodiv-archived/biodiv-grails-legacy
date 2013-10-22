@@ -73,7 +73,7 @@ class SpeciesSearchService {
 			log.debug "Flushing and clearing session"
 			try {
 				hibSession.flush()
-			} catch(ConstraintViolationException e) {
+			} catch(e) {
 				e.printStackTrace()
 			}
 			hibSession.clear()
