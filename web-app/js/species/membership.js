@@ -231,7 +231,7 @@ function loadYoutube(youtube_container) {
 		var youtube_video_id = $(this).find('span.videoId').text();
 		if(youtube_video_id) {
 			var iframe_url = "http://www.youtube.com/embed/" + youtube_video_id + "?autoplay=1";
-		    $(preview).html("<iframe width='480' height='295' src='" + iframe_url + "' frameborder='0' allowfullscreen></iframe>");
+		    $(preview).html("<iframe width='385' height='300' src='" + iframe_url + "' frameborder='0' allowfullscreen></iframe>");
 		    $(preview).css("float", "none");
 		    return false;
 		}

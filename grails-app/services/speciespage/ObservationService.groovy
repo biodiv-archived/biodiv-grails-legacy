@@ -939,11 +939,15 @@ class ObservationService {
 			activeFilters["bounds"] = params.bounds
 		} 
 
-		
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
-		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.maxVotedReco is not null ";
+		String checklistObvCond = ""
+		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
+            checklistObvCond = " and obv.isShowable=false "
+        }
 
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
+		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
+
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
 		filterQuery += " and obv.isShowable = true ";
 
@@ -1128,7 +1132,7 @@ class ObservationService {
 		List<Observation> instanceList = new ArrayList<Observation>();
 		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
-		long noOfResults = 0;
+		long noOfResults = 0, isShowableCount = 0;
 		long checklistCount = 0
         List distinctRecoList = [];
         def speciesGroupCountList = [];
@@ -1136,27 +1140,35 @@ class ObservationService {
             //Facets
             def speciesGroups;
             paramsList.add('facet', "true");
-            params["facet.offset"] = params["facet.offset"] ?: 0;
-            paramsList.add('facet.offset', params["facet.offset"]);
             paramsList.add('facet.mincount', "1");
 //            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
 
 		    if(!params.loadMore?.toBoolean()){
                 paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
+                params["facet.offset"] = params["facet.offset"] ?: 0;
+                paramsList.add('facet.'+searchFieldsConfig.IS_CHECKLIST+'.offset', params["facet.offset"]);
+
+                paramsList.add('facet.field', searchFieldsConfig.IS_SHOWABLE);
             }
 
-            String query = paramsList.get('q')
-            query += ((query != "")? " AND ": " ") + searchFieldsConfig.IS_SHOWABLE+":true ";
-            paramsList.remove('q');
-            paramsList.add('q', query);
+            paramsList.add('facet.field', searchFieldsConfig.SOURCE_ID);
+            if(offset > -1)
+                paramsList.add('f.'+searchFieldsConfig.SOURCE_ID+'.facet.offset', offset);
+            if(max > -1)
+                paramsList.add('f.'+searchFieldsConfig.SOURCE_ID+'.facet.limit', max);
+
+            //String query = paramsList.get('q')
+            //query += " AND "+searchFieldsConfig.IS_SHOWABLE+":true ";
+            //paramsList.remove('q');
+            //paramsList.add('q', query);
 
 			def queryResponse = observationsSearchService.search(paramsList);
-			Iterator iter = queryResponse.getResults().listIterator();
-			while(iter.hasNext()) {
-				def doc = iter.next();
-				def instance = Observation.read(Long.parseLong(doc.getFieldValue("id")+""));
+
+            List sourceIdFacets = queryResponse.getFacetField(searchFieldsConfig.SOURCE_ID).getValues()
+			sourceIdFacets.each {
+				def instance = Observation.read(Long.parseLong(it.getName()+""));
 				if(instance) {
-					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
+					totalObservationIdList.add(Long.parseLong(it.getName()+""));
 					instanceList.add(instance);
 				}
 			}
@@ -1167,10 +1179,16 @@ class ObservationService {
                     if(it.getName() == 'true')
                         checklistCount = it.getCount()
                 }
+
+                List isShowableFacets = queryResponse.getFacetField(searchFieldsConfig.IS_SHOWABLE).getValues()
+                isShowableFacets.each {
+                    if(it.getName() == 'true')
+                        noOfResults = it.getCount()
+                }
+
             }
 
 			responseHeader = queryResponse?.responseHeader;
-			noOfResults = queryResponse.getResults().getNumFound()
 
 		}
 		/*if(responseHeader?.params?.q == "*:*") {
@@ -1189,7 +1207,7 @@ class ObservationService {
 		def queryParams = [isDeleted : false, isShowable:true]
 		
 		def activeFilters = [:]
-		
+	 	
 		
 		NamedList paramsList = new NamedList();
 
@@ -1325,8 +1343,8 @@ class ObservationService {
 			activeFilters["user"] = params.user.toLong()
 		}
 
-		if(params.name && (params.name != grailsApplication.config.speciesPortal.group.ALL)) {
-			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.name);
+		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)) {
+			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.speciesName);
 			queryParams["name"] = params.name
 			activeFilters["name"] = params.name
 		}
@@ -1941,11 +1959,20 @@ class ObservationService {
             paramsList.add('facet', "true");
             paramsList.add('facet.offset', offset);
             paramsList.add('facet.mincount', "1");
-			
-			if(params.isChecklistOnly != null){
-				paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
-			}
-			
+
+		    if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()) {
+                //for checklist only condition ... getting all unique species from checklists
+                //removing earlier added condition to filter for only checklists
+        		for (Iterator iterator = paramsList.iterator(); iterator.hasNext();) {
+		        	Map.Entry paramEntry = (Map.Entry) iterator.next();
+			        if(paramEntry.getValue().equals(searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean()))
+                        paramEntry.setValue(searchFieldsConfig.IS_CHECKLIST+":false");
+                }
+			    paramsList.add('fq', searchFieldsConfig.IS_SHOWABLE+":false");
+            } else {
+			    paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":false");
+            }
+
             paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
             paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", max);
             def qR = observationsSearchService.search(paramsList);
@@ -1973,13 +2000,13 @@ class ObservationService {
 
         if(params.bounds && boundGeometry) {
             speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-        } 
+         } 
         
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
 		return [speciesGroupCountList:speciesGroupCountList];
 
-    }
+    } 
 
     /**
     */ 
@@ -1994,7 +2021,18 @@ class ObservationService {
             params["facet.offset"] = params["facet.offset"] ?: 0;
             paramsList.add('facet.offset', params["facet.offset"]);
             paramsList.add('facet.mincount', "1");
-            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+		    if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()) {
+                //for checklist only condition ... getting all unique species from checklists
+                //removing earlier added condition to filter for only checklists
+        		for (Iterator iterator = paramsList.iterator(); iterator.hasNext();) {
+		        	Map.Entry paramEntry = (Map.Entry) iterator.next();
+			        if(paramEntry.getValue().equals(searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean()))
+                        paramEntry.setValue(searchFieldsConfig.IS_CHECKLIST+":false");
+                }
+			    paramsList.add('fq', searchFieldsConfig.IS_SHOWABLE+":false");
+            } else { 
+                paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+            }
 
             paramsList.add('facet.field', searchFieldsConfig.SGROUP);
             //paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
@@ -2036,22 +2074,27 @@ class ObservationService {
     def getObservationFeatures(Observation obv) {
 		String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+obv.topology.toText()+"', t.topology)order by t.type" ;
         log.debug query;
-		def sql =  Sql.newInstance(dataSource);
-        //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
-		def features = [:]
+        def features = [:]
+        try {
+            def sql =  Sql.newInstance(dataSource);
+            //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
 
-		sql.rows(query).each {
-            switch (it.getProperty("type")) {
-                case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
-                case "138" : features['Soil'] = it.getProperty("feature");break;
-                case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
-                case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
-                case "136" : features['Tahsil'] = it.getProperty("feature");break;
-            }
-		};
-        sql.close();
+            sql.rows(query).each {
+                switch (it.getProperty("type")) {
+                    case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
+                    case "138" : features['Soil'] = it.getProperty("feature");break;
+                    case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
+                    case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
+                    case "136" : features['Tahsil'] = it.getProperty("feature");break;
+                }
+            };
+            sql.close();
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+        }
         return features
-    }
+    } 
 
     /**
     * Get map occurences within specified bounds
