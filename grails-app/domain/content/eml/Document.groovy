@@ -141,7 +141,7 @@ class Document extends Metadata implements Taggable, Rateable {
 		updateLatLong()
 	}
 	
-	def fetchList(params, max, offset, noLimit=false){
-		return documentService.getFilteredDocuments(params, max, offset, noLimit)
+	def fetchList(params, max, offset){
+		return documentService.getFilteredDocuments(params, max, offset)
 	}
 }

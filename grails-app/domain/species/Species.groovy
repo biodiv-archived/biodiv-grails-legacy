@@ -32,6 +32,7 @@ class Species implements Rateable {
 	def springSecurityService;
 	def dataSource
 	def activityFeedService
+	def speciesService;
 	
 	private static final log = LogFactory.getLog(this);
 	
@@ -181,6 +182,10 @@ class Species implements Rateable {
 	
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
+	}
+	
+	def fetchList(params, action){
+		return speciesService.getSpeciesList(params, action)
 	}
 	
 }

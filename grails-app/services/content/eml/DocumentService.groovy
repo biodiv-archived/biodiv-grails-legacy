@@ -203,7 +203,7 @@ class DocumentService {
 	 * @param params
 	 * @return
 	 */
-	def search(params, noLimit=false) {
+	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 		def queryParams = [:]
@@ -235,14 +235,13 @@ class DocumentService {
 			params.query = aq;
 		}
 
-		def offset = params.offset ? params.long('offset') : 0
+		def offset = params.offset ? params.offset.toLong().longValue() : 0
 
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
-		if(!noLimit){
-			paramsList.add('rows', max);
-		}
+		def max = Math.min(params.max ? params.max.toInteger().intValue() : 12, 100)
+		paramsList.add('rows', max);
+		
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(isValidSortParam(sort)) {
@@ -330,29 +329,27 @@ class DocumentService {
 	 * @param offset
 	 * @return
 	 */
-	Map getFilteredDocuments(params, max, offset, noLimit = false) {
+	Map getFilteredDocuments(params, max, offset) {
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
 		if(!params.aq){
-			res.putAll(getDocsFromDB(params, max, offset, noLimit))
+			res.putAll(getDocsFromDB(params, max, offset))
 		}else{
 			//returning docs from solr search
-			res.putAll(search(params, noLimit))
+			res.putAll(search(params))
 		}
 		return res
 	}
 	
-	private getDocsFromDB(params, max, offset, noLimit){
+	private getDocsFromDB(params, max, offset){
 		def queryParts = getDocumentsFilterQuery(params)
 		String query = queryParts.query;
 
 
 		query += queryParts.filterQuery + queryParts.orderByClause
-		if(!noLimit){
-			if(max != -1)
-				queryParts.queryParams["max"] = max
-			if(offset != -1)
-				queryParts.queryParams["offset"] = offset
-		}
+		if(max != -1)
+			queryParts.queryParams["max"] = max
+		if(offset != -1)
+			queryParts.queryParams["offset"] = offset
 
 		log.debug "Document Query "+ query + "  params " + queryParts.queryParams
 		def documentInstanceList = Document.executeQuery(query, queryParts.queryParams)

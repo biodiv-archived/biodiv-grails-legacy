@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 import species.Habitat;
 import species.Resource;
+import species.ResourceFetcher
 import species.Resource.ResourceType;
 import species.Species;
 import species.auth.Role;
@@ -1242,20 +1243,16 @@ class UserGroupService {
 			String objectType = params.objectType
 			String groupRes = ""
 			String functionString = ""
-			String listFunction
 			switch (objectType) {
 				case Observation.class.getCanonicalName():
-					listFunction = 'getObservationListForPost'
 					groupRes += 'observations'
 					functionString += (submitType == 'post')? 'addToObservations' : 'removeFromObservations'
 					break
 				case Species.class.getCanonicalName():
-					listFunction = 'getSpeciesListForPost'
 					groupRes += 'species'
 					functionString += (submitType == 'post')? 'addToSpecies' : 'removeFromSpecies'
 					break
 				case Document.class.getCanonicalName():
-					listFunction = 'getDocumentListForPost'
 					groupRes += 'documents'
 					functionString += (submitType == 'post')? 'addToDocuments' : 'removeFromDocuments'
 					break
@@ -1263,7 +1260,7 @@ class UserGroupService {
 					break
 			}
 			
-			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, listFunction, groupRes, functionString)
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, groupRes, functionString)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 		}catch (Exception e) {
@@ -1306,67 +1303,51 @@ class UserGroupService {
 	private class ResourceUpdate {
 		private static final log = LogFactory.getLog(this);
 		
-		def getObservationListForPost(params){
-			def filterUrl = new URL(params.filterUrl)
-			def paramsMap = Utils.getQueryMap(filterUrl)
-			String action = filterUrl.getPath().split("/")[2]
-			return observationService.getObservationList(paramsMap, action)
-		}
-		
-		def getSpeciesListForPost(params){
-			def filterUrl = new URL(params.filterUrl)
-			def paramsMap = Utils.getQueryMap(filterUrl)
-			paramsMap.offset = 0
-			String action = filterUrl.getPath().split("/")[2]
-			return speciesService.getSpeciesList(paramsMap, action, true).speciesInstanceList
-		}
-		
-		def getDocumentListForPost(params){
-			def filterUrl = new URL(params.filterUrl)
-			def paramsMap = Utils.getQueryMap(filterUrl)
-			paramsMap.offset = 0
-			return new Document().fetchList(paramsMap, -1, -1, true).documentInstanceList
-		}
-		
-		
-		def String updateResourceOnGroup(params, groups, allObvs, listFunction, groupRes, updateFunction){
+		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
+			ResourceFetcher rf
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-				List newList = Eval.xy(this, params, 'x.' + listFunction + '(y)')
+				rf = new ResourceFetcher(params.objectType, params.filterUrl)
+				List newList = rf.getAllResult()
 				newList.removeAll(allObvs)
 				allObvs = newList
 			}
 			
 			log.debug "======= All Resources " +  allObvs.size()
 			log.debug "========All Groups " + groups
+			
 			def afDescriptionList = []
 			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
-				UserGroup.withTransaction(){  status ->
-					if(params.submitType == 'post'){
-						obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
-					}else{
-						obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
-					}
-					log.debug params.submitType + "== for group ==== ====== " + ug + "  resources size " +  obvs.size() 
-					obvs.each { obv ->
-						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
-					}
-					try{
-						ug.save(flush:true, failOnError:true)
-					}catch(Exception e){
-						ug.errors.allErrors.each { log.debug it }
-						status.setRollbackOnly()
-						e.printStackTrace()
-					}
-				}
+				postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
 				if(!ug.hasErrors()){
-					//adding feed for each resource with isShowable = false flag
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
 					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
 				}
 			}
 			return afDescriptionList.join(" ")
+		}
+		
+		
+		private postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
+			UserGroup.withTransaction(){  status ->
+				if(submitType == 'post'){
+					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
+				}else{
+					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+				}
+				log.debug submitType + "== for group ==== ====== " + ug + "  resources size " +  obvs.size()
+				obvs.each { obv ->
+					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+				}
+				try{
+					ug.save(flush:true, failOnError:true)
+				}catch(Exception e){
+					ug.errors.allErrors.each { log.debug it }
+					status.setRollbackOnly()
+					e.printStackTrace()
+				}
+			}
 		}
 		
 		private String getStatusMsg(af, resoruceClassName, remainingCount, submitType, userGroup){

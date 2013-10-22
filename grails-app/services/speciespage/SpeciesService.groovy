@@ -52,7 +52,6 @@ class SpeciesService {
 	def observationService;
 	def springSecurityService;
 	
-	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
 
 	def nameTerms(params) {
@@ -66,7 +65,7 @@ class SpeciesService {
 		return result;
 	}
 
-	def search(params, noLimt) {
+	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 		def queryParams = [:]
@@ -154,14 +153,12 @@ class SpeciesService {
 			params.query = aq;
 		}
 
-		def offset = params.offset ? params.long('offset') : 0
+		def offset = params.offset ? params.offset.toLong().longValue() : 0
 
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
-		if(!noLimt){
-			paramsList.add('rows', max);
-		}
+		def max = Math.min(params.max ? params.max.toInteger().intValue(): 12, 100)
+		paramsList.add('rows', max)
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(isValidSortParam(sort)) {
@@ -403,11 +400,11 @@ class SpeciesService {
 
 
 
-	def getSpeciesList(params, String action, noLimit = false){
+	def getSpeciesList(params, String action){
 		if("search".equalsIgnoreCase(action)){
-			return search(params, noLimit)
+			return search(params)
 		}else{
-			return _getSpeciesList(params, noLimit)
+			return _getSpeciesList(params)
 		}
 	}
 	
@@ -425,14 +422,14 @@ class SpeciesService {
 		return DwCAExporter.getInstance().exportSpeciesData(species, directory)
 	}
 	
-	private _getSpeciesList(params, noLimit) {
+	private _getSpeciesList(params) {
 		//cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A-Z"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 		params.sGroup = params.sGroup ?: allGroup.id+""
-		params.max = Math.min(params.max ? params.int('max') : 42, 100);
-		params.offset = params.offset ? params.int('offset') : 0
+		params.max = Math.min(params.max ?  params.max.toInteger().intValue() : 42, 100);
+		params.offset = params.offset ?  params.offset.toInteger().intValue() : 0
 		params.sort = params.sort?:"percentOfInfo"
 		if(params.sort.equals('lastrevised')) {
 			params.sort = 'lastUpdated'
@@ -506,10 +503,8 @@ class SpeciesService {
 			
 			
 			def rs = Species.executeQuery(countQuery, queryParams);
-			if(!noLimit){
-				queryParams.max  = params.max
-				queryParams.offset = params.offset
-			}
+			queryParams.max  = params.max
+			queryParams.offset = params.offset
 			
 			def speciesInstanceList = Species.executeQuery(query, queryParams);
 			def speciesCountWithContent = 0;

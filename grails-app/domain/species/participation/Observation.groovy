@@ -501,4 +501,8 @@ class Observation extends Metadata implements Taggable, Rateable {
     def getObservationFeatures() {
         return observationService.getObservationFeatures(this);
     }
+	
+	def fetchList(filterUrl, max, offset){
+		return observationService.getObservationList(filterUrl, max, offset)
+	}
 }

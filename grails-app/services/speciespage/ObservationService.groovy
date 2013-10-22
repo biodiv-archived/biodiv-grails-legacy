@@ -2080,25 +2080,27 @@ class ObservationService {
 	/*
 	 * used for download and post in bulk
 	 */
-	def getObservationList(params, String action){
+	def getObservationList(URL filterUrl, max, offset){
+		def paramsMap = Utils.getQueryMap(filterUrl)
+		String action = filterUrl.getPath().split("/")[2]
 		if("search".equalsIgnoreCase(action)){
 			//getting result from solr
-			def idList = getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
+			def idList = getFilteredObservationsFromSearch(paramsMap, max, offset, false).totalObservationIdList
 			def res = []
 			idList.each { obvId ->
 				res.add(Observation.read(obvId))
 			}
 			return res
-		}else if(params.webaddress){
-			def userGroupInstance =	userGroupService.get(params.webaddress)
+		}else if(paramsMap.webaddress){
+			def userGroupInstance =	userGroupService.get(paramsMap.webaddress)
 			if (!userGroupInstance){
-				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
+				log.error "user group not found for id  $paramsMap.id  and webaddress $paramsMap.webaddress"
 				return []
 			}
-			return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
+			return userGroupService.getUserGroupObservations(userGroupInstance, paramsMap, max, offset).observationInstanceList;
 		}
 		else{
-			return getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
+			return getFilteredObservations(paramsMap, max, offset, false).observationInstanceList
 			
 		}
 	}
