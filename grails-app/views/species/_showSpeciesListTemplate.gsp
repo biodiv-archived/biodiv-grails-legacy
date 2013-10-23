@@ -29,7 +29,7 @@
 					<div class="snippet tablet">
                                                 <div class="figure">
 							<a
-								href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
+								href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroupInstance])}">
 
 
 								<g:if test="${thumbnailPath }">
@@ -47,7 +47,7 @@
 						<uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
 						
 						<a
-							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}" style="display:block;">
+							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroupInstance])}" style="display:block;">
 							<span class="species_story ellipsis multiline sci_name"
 							style="display: block;height:6=50px;" title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}">${speciesInstance.taxonConcept.name.trim()}</span> </a>
 						<div class="poor_species_content" style="display: none;">No

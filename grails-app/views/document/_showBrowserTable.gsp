@@ -19,7 +19,7 @@
 			<tr class="mainContent ${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>
 					<a
-						href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, 'userGroupWebaddress':params?.webaddress)}'>
+						href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, userGroup:userGroupInstance)}'>
 						${documentInstance.title}
 					</a>
 				</td>
@@ -31,7 +31,7 @@
 				</td>
 				<g:if test="${canPullResource}">
 					<td>
-						<uGroup:objectPost model="['objectInstance':documentInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+						<uGroup:objectPost model="['objectInstance':documentInstance, canPullResource:canPullResource]" />
 					</td>
 				</g:if>
 			</tr>
