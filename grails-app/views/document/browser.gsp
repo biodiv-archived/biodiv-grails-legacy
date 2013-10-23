@@ -30,7 +30,7 @@
 			
 			<obv:showObservationFilterMessage />
 			
-			<g:render template="/document/documentListTemplate" />
+                        <g:render template="/document/documentListTemplate" model="['userGroupInstance':userGroupInstance]"/>
 		</div>
 		
 		<div class="span4">

@@ -821,6 +821,7 @@ class UserGroupService {
 		//println attrs
 		String url = "";
 
+        if(attrs.userGroupInstance) attrs.userGroup = attrs.userGroupInstance
 		if(attrs.userGroup && attrs.userGroup.id) {
 			attrs.webaddress = attrs.userGroup.webaddress
 			String base = attrs.remove('base')
