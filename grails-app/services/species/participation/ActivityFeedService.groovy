@@ -419,18 +419,7 @@ class ActivityFeedService {
 			println k
 			println v
 			if(loopVar > 0) desc += " and"
-			desc += " " + v 
-			switch(k){
-				case Checklists.class.canonicalName:
-					desc += " checklist" + ((v > 1) ? "s" : "")
-					break
-				case Species.class.canonicalName:
-					desc += " species" 
-					break
-				default:
-					desc += " " + k.split("\\.")[-1] + ((v > 1) ? "s" : "")
-					break
-			}
+			desc += " " + v + " " + getResourceDisplayName(k, v)
 			loopVar++
 		}
 		desc +=  isPost ? " to group" : " from group"
@@ -438,56 +427,65 @@ class ActivityFeedService {
 	}
 	
 	
-	private String getDescriptionForResourcePull(r, isPost){
-		def desc = isPost ? "Posted" : "Removed"
-		switch(r.class.canonicalName){
-			case Checklists.class.canonicalName:
-				desc += " checklist"
-				break
-			default:
-				desc += " " + r.class.simpleName.toLowerCase()
-				break
-		}
-		desc +=  isPost ? " to group" : " from group"
-		return desc
-	}
-    
+    private String getDescriptionForResourcePull(r, isPost){
+        def desc = isPost ? "Posted" : "Removed"
+        desc += " " + getResourceDisplayName(r.class.canonicalName)
+        desc +=  isPost ? " to group" : " from group"
+        return desc
+    }
+
+    /**
+     * returns resource name based on count to be displayed on email and msgs
+     */
+    def getResourceDisplayName(String canonicalName, int count = 0 ){
+        String res = ""
+        switch(canonicalName){
+            case Checklists.class.canonicalName:
+            res = "checklist" + ((count > 1) ? "s" : "")
+            break
+            case Species.class.canonicalName:
+            res = "species"
+            break
+            default:
+            res = canonicalName.toLowerCase().split("\\.")[-1] + ((count > 1) ? "s" : "")
+            break
+        }
+        return res 
+    }	
+
+
     def getResType(r) {
         def desc = ""
         switch(r.class.canonicalName){
-			case Checklists.class.canonicalName:
-				desc += "checklist"
-				break
-			default:
-				desc += r.class.simpleName.toLowerCase()
-				break
-		}
+            case Checklists.class.canonicalName:
+            desc += "checklist"
+            break
+            default:
+            desc += r.class.simpleName.toLowerCase()
+            break
+        }
         return desc
     }
     def getDescriptionForFeature(r, ug, isFeature)  {
-		def desc = isFeature ? "Featured " : "Unfeatured "
+        def desc = isFeature ? "Featured " : "Removed featured "
         String temp = getResType(r)
         desc+= temp
         if(ug == null) {
             return desc
         }
-		desc +=  isFeature ? " to group" : " from group"
-		return desc
+        desc +=  isFeature ? " to group" : " from group"
+        return desc
 
-    
+
     }
-
+/*
     def getMailSubject(r, isFeature) {
         def desc = ""
-        switch(r.class.canonicalName){
-			case Checklists.class.canonicalName:
-				desc += " checklist"
-				break
-			default:
-				desc += " " + r.class.simpleName
-				break
-		}
-        desc += isFeature ? " featured" : " unfeatured"
-		return desc
-    }
+        desc += isFeature ? "Featured " : "Removed featured "
+        String temp = getResType(r)
+        desc+= temp
+        return desc
+     }*/
+
 }
+

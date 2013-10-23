@@ -18,6 +18,16 @@
 		<g:each in="${documentInstanceList}" status="i" var="documentInstance">
 			<tr class="mainContent ${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>
+<span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="
+    display: block;
+    z-index: 1000;
+    position: absolute;
+    width: 50px; 
+    height: 50px; 
+    ">
+</span>
+
+
 					<a
 						href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, 'userGroupWebaddress':params?.webaddress)}'>
 						${documentInstance.title}

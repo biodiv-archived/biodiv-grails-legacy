@@ -1363,10 +1363,19 @@ class UserGroupService {
 					//adding feed for each resource with isShowable = false flag
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
 					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
-					if(af) afDescriptionList << activityFeedService.getContextInfo(af).activityTitle
+					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
 				}
 			}
-			return afDescriptionList.join(". ")
+			return afDescriptionList.join(" ")
+		}
+		
+		private String getStatusMsg(af, resoruceClassName, remainingCount, submitType, userGroup){
+			String msg = af ? (activityFeedService.getContextInfo(af).activityTitle) : ("No " + activityFeedService.getResourceDisplayName(resoruceClassName) +  ((submitType == 'post') ? " posted to group ": " removed from group ") + activityFeedService.getUserGroupHyperLink(userGroup)) 
+			if(remainingCount > 0){
+				msg += ( ", " + remainingCount + " were " ) + ((submitType == 'post') ? "already part of this group" : "not part of this group")
+			}
+			msg += "."
+			return msg 
 		}
 	}
 

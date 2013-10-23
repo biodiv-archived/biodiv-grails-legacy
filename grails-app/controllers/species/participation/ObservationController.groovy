@@ -111,11 +111,11 @@ class ObservationController extends AbstractObjectController {
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			 }
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-	        def chartModel = model.speciesGroupCountList
+/*	        def chartModel = model.speciesGroupCountList
             chartModel['width'] = 300;
             chartModel['height'] = 270;
-
-            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
+*/
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
@@ -190,7 +190,7 @@ class ObservationController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
 	def flagDeleted = {
-        Featured.deleteFeatureOnObv(Observation.get(params.id.toLong()))
+        
 		def result = observationService.delete(params)
 		flash.message = result.message
 		redirect (url:result.url)
@@ -1025,11 +1025,11 @@ class ObservationController extends AbstractObjectController {
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			}
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-			def chartModel = model.speciesGroupCountList
+/*			def chartModel = model.speciesGroupCountList
             chartModel['width'] = 300;
             chartModel['height'] = 270;
-
-            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
+*/
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
@@ -1173,6 +1173,8 @@ class ObservationController extends AbstractObjectController {
         render locations as JSON
     }
 
+    /**
+    */
     def distinctReco = {
         log.debug params
         def max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -1191,7 +1193,7 @@ class ObservationController extends AbstractObjectController {
                 
             } else {
                 def message = "";
-                if(params.offset > 0) {
+                if(params.offset  > 0) {
                     message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
                 } else {
                     message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
@@ -1200,6 +1202,36 @@ class ObservationController extends AbstractObjectController {
             }
 
         } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+        }
+        render result as JSON
+    }
+
+    /**
+    */
+    def speciesGroupCount = {
+        log.debug params
+        Map result = [:];
+        try {
+            def speciesGroupCountListResult;
+		    if(params.actionType == 'search') {
+                speciesGroupCountListResult = observationService.getSpeciesGroupCountFromSearch(params);
+            } else {
+                speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
+            }
+
+            if(speciesGroupCountListResult.speciesGroupCountList.size() > 0) {
+                result = ['speciesGroupCountList':speciesGroupCountListResult.speciesGroupCountList, status:'success', msg:'success']
+                
+            } else {
+                def message = g.message(code: 'speciesGroup.count.zero.message', default:'No data');
+                result = [msg:message]
+            }
+
+        } catch(e) {
+            e.printStackTrace();
             log.error e.getMessage();
             result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
         }

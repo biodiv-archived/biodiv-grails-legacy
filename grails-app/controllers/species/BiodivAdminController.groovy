@@ -96,6 +96,7 @@ class BiodivAdminController {
 
 	def reloadObservationsSearchIndex = {
 		try {
+			observationsSearchService.deleteIndex();
 			observationsSearchService.publishSearchIndex();
 			flash.message = "Successfully created observations search index"
 		} catch(e) {

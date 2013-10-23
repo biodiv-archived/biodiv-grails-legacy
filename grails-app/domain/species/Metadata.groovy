@@ -34,6 +34,8 @@ abstract class Metadata {
     Date createdOn = new Date();
 	Date lastRevised = createdOn;
 
+    def grailsApplication
+
     //TODO: Contributions and Attributions
 
     static constraints = {
@@ -109,4 +111,9 @@ abstract class Metadata {
 			}
 		}
 	}
+
+	SpeciesGroup fetchSpeciesGroup() {
+		return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
+
 }

@@ -58,3 +58,5 @@ println "=========== done"
 //after all migration script
 //update activity_feed set last_updated = date_created;
 //alter table flag drop COLUMN observation_id ;
+//ALTER TABLE activity_feed ALTER COLUMN activity_descrption TYPE varchar(400);
+//update document set flag_count = 0;

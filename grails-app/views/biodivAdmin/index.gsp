@@ -1,7 +1,9 @@
 <html>
 <head>
 <g:set var="title" value="Admin Console"/>
-<g:render template="/common/titleTemplate" model="['title':title]"/>
+<meta name="layout" content="main" />
+<title>${title}</title>
+<r:require modules="core" />
 </head>
 <body>
 	<div class="container_16">

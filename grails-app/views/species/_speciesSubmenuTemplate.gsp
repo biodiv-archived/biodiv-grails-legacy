@@ -1,6 +1,9 @@
+<g:if test="${speciesInstance}">
+<g:set var="featureCount" value="${speciesInstance.featureCount}"/>
+</g:if>
 
 <g:if test="${entityName}">
-	<div class="page-header">
+<div class="page-header">
 		<s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]"/>		
 	</div>
 </g:if>

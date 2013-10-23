@@ -7,6 +7,7 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.Resource"%>
 <%@page import="speciespage.ChartService"%>
+<%@page import="species.participation.Featured"%>
 
 <html>
 <head>
@@ -68,9 +69,15 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 <body>
 	
 			<div class="observation  span12">
-				<obv:showSubmenuTemplate/>
+                            <obv:showSubmenuTemplate/>
+                            
+                        <g:if test="${observationInstance}">
+                            <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                            </g:if>
+                            <span class="badge ${observationInstance.group.iconClass()} ${(featureCount>0) ? 'featured':''}" >
+                            </span>
 
-				<div class="page-header clearfix">
+                        <div class="page-header clearfix ">
                                     <div style="width:100%;">
                                         <div class="main_heading" style="margin-left:0px;">
                                             <div class="pull-right">
@@ -352,10 +359,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
 		            		updateFeeds();
 		            		setFollowButton();
-		            		showRecoUpdateStatus(data.msg, data.status);
+		            		showUpdateStatus(data.msg, data.status);
 		            	}
 	            	} else {
-         				showRecoUpdateStatus(data.msg, data.status);
+         				showUpdateStatus(data.msg, data.status);
          			}
          			$("#addRecommendation")[0].reset();
          			$("#canName").val("");
@@ -363,7 +370,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
 	            	//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+	            	var successHandler = this.success, errorHandler = showUpdateStatus;
 	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 				} 
 	     	});

@@ -1,5 +1,5 @@
 	<div class="post-to-groups" >
-	  	<h5 onclick="$(this).next('.post-main-content').slideToggle(150);return false;">Post to User Groups<span class="caret" style="margin-top: 8px;margin-left:5px;"></span></h5>
+	  	<h5 class="pull-right" onclick="$(this).next('.post-main-content').slideToggle(150);return false;">Post to User Groups<span class="caret" style="margin-top: 8px;margin-left:5px;"></span></h5>
 	  	<div class="post-main-content" style="display:none;" >
 	       <div>
 	       		<g:if test="${isBulkPull}">

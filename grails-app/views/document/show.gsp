@@ -10,7 +10,12 @@
 <r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
-	<div class="span12"> 
+    <div class="span12">
+        <g:if test="${documentInstance}">
+        <g:set var="featureCount" value="${documentInstance.featureCount}"/>
+        </g:if>
+        <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" >
+            </span>
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
 				<div class="main_heading" style="margin-left: 0px;">

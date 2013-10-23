@@ -255,7 +255,7 @@ class UserGroupTagLib {
 		allowedUserGroups.each {
 			result[it] = false;
 		}
-        if(SpringSecurityUtils.ifAllGranted("Role_Admin")){
+        if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")){
             def ibpGroup =  new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName);
             if(ug.contains(null)) {
                 result[ibpGroup] = true;

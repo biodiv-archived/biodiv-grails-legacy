@@ -90,22 +90,22 @@ function initControls() {
     }).addTo(map);
 
     map.on('enterFullscreen', function(){
-        if(searchMarker) {
+/*        if(searchMarker) {
             console.log("enterFullscreen : panning to ");
             console.log(searchMarker.getLatLng());
-            map.panTo(searchMarker.getLatLng());
+//            map.panTo(searchMarker.getLatLng());
         }
         else resetMap()
-    });
+*/    });
 
     map.on('exitFullscreen', function(){
-        if(searchMarker) {
+/*        if(searchMarker) {
             map.panTo(searchMarker.getLatLng());
+            console.log("exitFullscreen : panning to ")
             console.log(searchMarker.getLatLng());
-            console.log("enterFullscreen : panning to "+searchMarker)
         }
         else resetMap();
-    });
+*/    });
 
 }
 
