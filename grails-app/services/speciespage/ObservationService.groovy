@@ -233,11 +233,7 @@ class ObservationService extends AbstractObjectService {
         } else if(params.filterProperty == "speciesGroup"){
             relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
         } else if(params.filterProperty == "featureBy") {
-            Long ugId;
-            if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
-                def userGroupController = new UserGroupController();
-                ugId = userGroupController.findInstance(params.userGroup, params.webaddress)?.id;
-            }
+            Long ugId = getUserGroup(params)?.id;
             relatedObv = getFeaturedObject(ugId, max, offset, params.controller)
         } else if(params.filterProperty == "user"){
             relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
@@ -827,10 +823,7 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.userGroup || params.webaddress) {
-            if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
-                def userGroupController = new UserGroupController();
-                params.userGroup = userGroupController.findInstance(params.userGroup, params.webaddress);
-            }
+            params.userGroup = getUserGroup(params);
             log.debug "Filtering from usergourp : ${params.usergroup}"
             userGroupQuery = " join obv.userGroups userGroup "
             query += userGroupQuery
@@ -1405,7 +1398,9 @@ class ObservationService extends AbstractObjectService {
         def messageCode, url, label = Utils.getTitleCase(params.controller)
         def messageArgs = [label, params.id]
         def observationInstance = Observation.get(params.id.toLong())
-        if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
+        if (observationInstance) {
+            boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
+            if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
             def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
             try {
                 observationInstance.isDeleted = true;
@@ -1419,6 +1414,7 @@ class ObservationService extends AbstractObjectService {
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 messageCode = 'default.not.deleted.message'
                 url = generateLink(params.controller, 'show', [id: params.id])
+            }
             }
         }
         else {
@@ -1482,10 +1478,16 @@ class ObservationService extends AbstractObjectService {
 
 
                 case OBSERVATION_FLAGGED :
-                mailSubject = "Observation flagged"
+                mailSubject = activityFeedService.getResType(obv).capitalize() + " flagged"
                 bodyView = "/emailtemplates/addObservation"
                 toUsers.add(getOwner(obv))
-                templateMap["message"] = " flagged your observation shown below:"
+                if(obv?.getClass() == Observation) {
+                    templateMap["actionObject"] = 'obvSnippet'
+                }
+                else {
+                    templateMap["actionObject"] = 'usergroup'
+                }
+                templateMap["message"] = " flagged your " + activityFeedService.getResType(obv)
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 break
 
@@ -1606,7 +1608,7 @@ class ObservationService extends AbstractObjectService {
                 else { 
                     a = false
                 }
-                mailSubject = activityFeedService.getMailSubject(obv, a)
+                mailSubject = activityFeedService.getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 def ug = activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
@@ -1618,12 +1620,12 @@ class ObservationService extends AbstractObjectService {
                     groupName = activityFeedService.getUserGroupHyperLink(ug)
                 }
                 //templateMap["groupNameWithlink"] = groupName
+                templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + (a ? " in : " : " from : ") + groupName
+                
                 if(obv?.getClass() == Observation) {
                     templateMap["actionObject"] = 'obvSnippet'
-                    templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + " shown below in : " + groupName
                 }
                 else {
-                    templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + " in " + groupName
                     templateMap["actionObject"] = 'usergroup'
                 }
                 toUsers.addAll(getParticipants(obv))
@@ -2098,4 +2100,13 @@ class ObservationService extends AbstractObjectService {
 
         }
     }
+
+    def getUserGroup(params) {
+        if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
+            def userGroupController = new UserGroupController();
+            return userGroupController.findInstance(params.userGroup, params.webaddress);
+        }
+        return null;
+    }
+
 }

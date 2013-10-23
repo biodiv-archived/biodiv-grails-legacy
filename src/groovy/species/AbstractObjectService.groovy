@@ -72,7 +72,7 @@ class AbstractObjectService {
                 String n = item.notes;
                 item.notes = param['featuredNotes']
                 if(n)
-                    item.notes += "<h6>${item.type.capitalize()} Notes</h6>" + n
+                    item.notes += "<p>"+ n +"</p>" 
             }
            
             if(param['featuredOn']) {

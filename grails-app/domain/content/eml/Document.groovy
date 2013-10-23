@@ -23,7 +23,6 @@ import species.participation.Featured;
  */
 class Document extends Metadata implements Taggable, Rateable {
 	
-	def grailsApplication
 	def activityFeedService
     def springSecurityService;
 	def documentService
@@ -48,7 +47,7 @@ class Document extends Metadata implements Taggable, Rateable {
 
 	DocumentType type
     int flagCount = 0;
-
+    int featureCount = 0;
 	String title
 	SUser author;
 	
@@ -96,7 +95,7 @@ class Document extends Metadata implements Taggable, Rateable {
 		notes nullable:true
 		doi nullable:true
 		license nullable:true
-		
+    	featureCount nullable:false
 		agreeTerms nullable:true
 		
 		//coverage related extended from metadata

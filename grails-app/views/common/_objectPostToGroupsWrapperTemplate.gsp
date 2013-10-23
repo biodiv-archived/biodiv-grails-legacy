@@ -6,6 +6,11 @@
 		</g:if>
 		
 		<uGroup:objectPostToGroups
-				model="['objectType':objectType, userGroup:params.userGroup, canPullResource:canPullResource, isBulkPull:isBulkPull, 'observationInstance':observationInstance]" />
+                model="['objectType':objectType, userGroup:params.userGroup, canPullResource:canPullResource, isBulkPull:isBulkPull, 'observationInstance':observationInstance]" />
+                
+                <g:if test="${observationInstance}">
+                    <uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>
+                </g:if>
+
 	</div>
 </g:if>

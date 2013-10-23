@@ -5,11 +5,19 @@ def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.reso
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
-<div class="snippet tablet">
+
+<g:if test="${observationInstance}">
+    <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+</g:if>
+<div class="snippet tablet ">
+    <span class="badge ${observationInstance.group.iconClass()} ${(featureCount>0) ? 'featured':''}" >
+                </span>
+
     <div class="figure"
         title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
                 <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
-			<g:if
+                
+                <g:if
 				test="${imagePath}">
 				<img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
 					src="${imagePath}" />

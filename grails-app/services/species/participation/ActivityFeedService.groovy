@@ -467,7 +467,7 @@ class ActivityFeedService {
         return desc
     }
     def getDescriptionForFeature(r, ug, isFeature)  {
-        def desc = isFeature ? "Featured " : "Unfeatured "
+        def desc = isFeature ? "Featured " : "Removed featured "
         String temp = getResType(r)
         desc+= temp
         if(ug == null) {
@@ -478,18 +478,14 @@ class ActivityFeedService {
 
 
     }
-
+/*
     def getMailSubject(r, isFeature) {
         def desc = ""
-        switch(r.class.canonicalName){
-            case Checklists.class.canonicalName:
-            desc += " checklist"
-            break
-            default:
-            desc += " " + r.class.simpleName
-            break
-        }
-        desc += isFeature ? " featured" : " unfeatured"
+        desc += isFeature ? "Featured " : "Removed featured "
+        String temp = getResType(r)
+        desc+= temp
         return desc
-    }
+     }*/
+
 }
+

@@ -190,7 +190,7 @@ class ObservationController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
 	def flagDeleted = {
-        Featured.deleteFeatureOnObv(Observation.get(params.id.toLong()))
+        
 		def result = observationService.delete(params)
 		flash.message = result.message
 		redirect (url:result.url)

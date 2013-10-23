@@ -19,7 +19,7 @@
                 ug = groupInfo.userGroup    
                 }
                 %>
-                <li class="pull-left checkbox" title ="Why Featured : ${groupInfo.notes}" class=""><uGroup:showUserGroupSignature
+                <li class="pull-left checkbox" ><uGroup:showUserGroupSignature
                 model="[ 'userGroup':ug]" /></li>
 
                 </g:each> 

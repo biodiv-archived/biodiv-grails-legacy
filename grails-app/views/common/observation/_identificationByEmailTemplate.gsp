@@ -116,14 +116,14 @@ $(function() {
                         data:{sourcePageUrl : window.location.href, source:"${source}", 'sourceController':'${params.controller}', 'sourceAction':'${params.action}'},
 			resetForm: true,
 			success: function(data, statusText, xhr, form) {
-				//showRecoUpdateStatus('Email sent to respective person', 'success');
+				//showUpdateStatus('Email sent to respective person', 'success');
             	return false;
             },
             error:function (xhr, ajaxOptions, thrownError){
             	//successHandler is used when ajax login succedes
-            	var successHandler = this.success;//, errorHandler = showRecoUpdateStatus;
+            	var successHandler = this.success;//, errorHandler = showUpdateStatus;
             	handleError(xhr, ajaxOptions, thrownError, successHandler, function() { return false;});
-            	//showRecoUpdateStatus('Error while sending email', 'error');
+            	//showUpdateStatus('Error while sending email', 'error');
             	return false;
 			} 
      	});

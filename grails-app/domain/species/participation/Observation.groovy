@@ -26,7 +26,6 @@ import speciespage.ObservationService;
 class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
-	def grailsApplication;
 	def commentService;
 	def activityFeedService;
 	def springSecurityService;
@@ -63,7 +62,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 	long visitCount = 0;
 	boolean isDeleted = false;
 	int flagCount = 0;
-	String searchText;
+	int featureCount = 0;
+    String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 	
@@ -93,6 +93,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
+        featureCount nullable:false
 		latitude nullable: false
 		longitude nullable:false
 		topology nullable:false

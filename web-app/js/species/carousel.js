@@ -1,6 +1,4 @@
 var itemLoadCallback = function(carousel, state) {
-        console.log("ITEM LOAD CALL BACK");
-        
         carousel.last = carousel.last?carousel.last:3;
 	var params = {
 		"limit" : carousel.last - carousel.first,
@@ -9,32 +7,23 @@ var itemLoadCallback = function(carousel, state) {
 		"filterPropertyValue": carousel.options.filterPropertyValue,
 		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
 	}
-        
         if(params.limit == 0)
             params.limit = 3;
 
 	if (state == 'prev'){
 		return;
 	}
-	
 	params.offset = carousel.first -1;
-		
 	if(carousel.last == carousel.options.size){
 		params.limit = carousel.last;
 	}
-		
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
-
-
 	});
 	// jqxhr.error(function() { alert("error"); });
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
-     console.log("ITEM ADD CALL BACK");
-                    console.log(carousel);
-
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
@@ -97,8 +86,6 @@ function resizeImage(item) {
 }
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
-         console.log("RELOAD CAROUSEL");
-
 	carousel.options.filterProperty = fitlerProperty;
 	carousel.options.filterPropertyValue = filterPropertyValue;
 	var visibleOffset = carousel.last - carousel.first;
@@ -109,8 +96,6 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 }
 
 var itemAfterLoadCallback = function(carousel, state) {
-         console.log("ITEM AFTER LOAD CALL BACK");
-
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
@@ -119,9 +104,6 @@ var itemAfterLoadCallback = function(carousel, state) {
 var setupCallback = function(carousel) {
     //$("#carousel_featureBy").find('ul.jcarousel-list').css({"overflow" : "visible"}); 
 }
-
-
-
 var getSnippetHTML = function(carousel, item) {
 	var paramsString = "";
 	if(carousel.options.filterProperty === "speciesName"){

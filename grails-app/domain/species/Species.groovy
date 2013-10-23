@@ -25,6 +25,7 @@ class Species implements Rateable {
 	Resource reprImage;
 	Float percentOfInfo; 
     Date updatedOn;
+    int featureCount = 0;
 	Date createdOn = new Date();
 	Date dateCreated;
 	Date lastUpdated;
@@ -55,6 +56,7 @@ class Species implements Rateable {
 		reprImage(nullable:true);
 		percentOfInfo(nullable:true);
 		updatedOn(nullable:true);
+        featureCount nullable:false;
 	}
 
 	static mapping = {
@@ -149,7 +151,8 @@ class Species implements Rateable {
 		}
 		return f?.description;
 	}
-	
+
+
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
 	}

@@ -26,8 +26,15 @@
 					<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 					<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.NORMAL, null)%>
 
-					<div class="snippet tablet">
-                                                <div class="figure">
+                                        <div class="snippet tablet">
+                                            <g:if test="${speciesInstance}">
+                                            <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
+                                            </g:if>
+                                            <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" >
+                                                </span>
+ 
+                                            <div class="figure">
+                                                
 							<a
 								href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 
