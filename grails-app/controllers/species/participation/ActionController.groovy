@@ -163,13 +163,15 @@ class ActionController {
                                 if(status) msg = "Successfully updated notes for the featued ${obv.class.simpleName}"
                             }
                             else{
-                                if(!featuredInstance.delete(flush:true)){
-                                    featuredInstance.errors.allErrors.each { log.error it }
-                                } else {
-                                    featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
-                                    status = saveActMail(params, featuredInstance, obv, ug)
-                                    if(status) msg = "Successfully featued ${obv.class.simpleName} again and updated notes given previously"
+                                try{
+                                    featuredInstance.delete(flush:true, failOnError:true)
+                                }catch (Exception e) {
+                                    e.printStackTrace()
                                 }
+                                featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
+                                status = saveActMail(params, featuredInstance, obv, ug)
+                                if(status) msg = "Successfully featued ${obv.class.simpleName} again and updated notes given previously"
+
                             }
                         }
                     }catch (Exception e) {
