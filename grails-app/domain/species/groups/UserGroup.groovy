@@ -158,6 +158,14 @@ class UserGroup implements Taggable {
 			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
 		}
 	}
+	
+	def getExperts(int max, long offset) {
+		UserGroupMemberRole.withTransaction {
+			def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
+		}
+	}
+
 
 	void setFounders(List<SUser> founders) {
 		founders.add(springSecurityService.currentUser);
@@ -209,9 +217,30 @@ class UserGroup implements Taggable {
 		}
 	}
 
+	void setExperts(List<SUser> members) {
+		if(members) {
+			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+			members.each { member ->
+				userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+			}
+		}
+	}
+
+	
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+		}
+		return false;
+	}
+	
+	boolean addExpert(SUser member) {
+		if(member) {
+			if(isMember(member)){
+				deleteMember(member)	
+			}
+			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
 		}
 		return false;
@@ -238,6 +267,11 @@ class UserGroup implements Taggable {
 
 	def getMembersCount() {
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		return UserGroupMemberRole.countByUserGroupAndRole(this, memberRole);
+	}
+
+	def getExpertsCount() {
+		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 		return UserGroupMemberRole.countByUserGroupAndRole(this, memberRole);
 	}
 

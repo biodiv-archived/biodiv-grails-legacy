@@ -118,6 +118,9 @@ class UserGroupService {
 
 			List founders = Utils.getUsersList(params.founderUserIds);
 			setUserGroupFounders(userGroup, founders, params.founderMsg, params.domain);
+			
+			List experts = Utils.getUsersList(params.expertUserIds);
+			setUserGroupExperts(userGroup, experts, params.expertMsg, params.domain);
 			params.founders = founders;
 		}
 	}
@@ -683,6 +686,58 @@ class UserGroupService {
 			}
 		}
 	}
+	
+	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
+	def setUserGroupExperts(userGroupInstance, experts, expertsMsg, domain) {
+		//experts.add(springSecurityService.currentUser);
+		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+		def groupExperts = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, expertRole).collect {it.sUser};
+		def commons = experts.intersect(groupExperts);
+		groupExperts.removeAll(commons);
+		experts.removeAll(commons);
+
+		sendExpertInvitation(userGroupInstance, experts, expertsMsg, domain);
+
+		if(groupExperts) {
+			groupExperts.each { expert ->
+				//deletes as expert
+				userGroupInstance.deleteMember (expert);
+				//adds as member
+				userGroupInstance.addMember(expert);
+			}
+		}
+	}
+
+	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
+	void sendExpertInvitation(userGroupInstance, experts, expertsMsg, domain) {
+
+		log.debug "Sending invitation to ${experts}"
+
+		String usernameFieldName = 'name'
+
+		experts.each { expert ->
+			if(expert instanceof SUser && expert?.id == springSecurityService.currentUser.id) {
+				userGroupInstance.addExpert(expert);
+			} else {
+				String expertEmail, name, userId;
+				if(expert instanceof String) {
+					expertEmail = expert
+					name = expert.substring(0, expert.indexOf("@"));
+					userId = 'register'
+				} else {
+					expertEmail = expert.email;
+					name = expert."$usernameFieldName".capitalize()
+					userId = expert.id.toString()
+				}
+
+				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
+				userToken.save(flush: true)
+				emailConfirmationService.sendConfirmation(expertEmail,
+						"Invitation to join as an expert for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/expertInvitation'], userToken.token);
+			}
+		}
+	}
+
 
 	@PreAuthorize("hasPermission(#userGroupInstance, write)")
 	void sendMemberInvitation(userGroupInstance, members, domain) {

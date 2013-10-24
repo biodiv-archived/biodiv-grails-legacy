@@ -400,4 +400,8 @@ class UserGroupTagLib {
 		out << render(template:"/common/resourceInGroupsTemplate", model:attrs.model);
 	}
 	
+	def inviteExpert = {attrs, body->
+		out << render(template:"/common/userGroup/inviteExpertTemplate", model:attrs.model);
+	}
+	
 }

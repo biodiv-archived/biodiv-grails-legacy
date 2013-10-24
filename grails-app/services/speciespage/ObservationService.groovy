@@ -1749,6 +1749,7 @@ class ObservationService {
 		}else{
 			//XXX for user only sending founders and current user as list members list is too large have to decide on this
 			List userList = observation.getFounders(100, 0)
+			userList.addAll(observation.getExperts(100, 0)) 
 			def currUser = springSecurityService.currentUser
 			if(!userList.contains(currUser)){
 				userList << currUser

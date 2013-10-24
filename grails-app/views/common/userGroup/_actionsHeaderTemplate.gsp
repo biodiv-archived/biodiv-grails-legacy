@@ -1,5 +1,7 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 	<g:if test="${canEditUserGroup}">
+		<uGroup:inviteExpert model="['userGroupInstance':userGroupInstance, 'isExpertOrFounder':isExpertOrFounder]"/>
+					
 		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
 				default="Invite Friends" /> </a>
@@ -24,9 +26,11 @@
 			</div>
 			<div class="modal-footer">
 				<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-				<a href="#" id="invite" class="btn btn-primary">Invite</a>
+				<a href="#" id="inviteMemberButton" class="btn btn-primary">Invite</a>
 			</div>
 		</div>
+		
+		
 	</g:if>
 	<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
 	<div class="modal hide fade in" id="leaveUsModalDialog" tabindex="-1" role="dialog" aria-labelledby="leaveUsModalDialogLabel" >

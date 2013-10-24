@@ -1,4 +1,4 @@
-<g:if test="${canPullResource}">
+<g:if test="${observationInstance || canPullResource}">
 	<div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
 		<g:if test="${observationInstance}">
 			<uGroup:resourceInGroups

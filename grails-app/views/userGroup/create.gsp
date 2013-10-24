@@ -106,7 +106,7 @@ max-width: 100%;
 			
 			
 			<g:set var="founders_autofillUsersId" value="id1" />
-			<g:set var="members_autofillUsersId" value="id2" />
+			<g:set var="experts_autofillUsersId" value="id2" />
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
 				<input type="hidden" name="id" value="${userGroupInstance?.id}"/>
@@ -230,7 +230,7 @@ max-width: 100%;
 				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Founders</h3>
+						<h3>Administration</h3>
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'founders', 'error')}">
 							<label for="founders" class="control-label"><g:message
@@ -243,17 +243,16 @@ max-width: 100%;
 							</div>
 						</div>
 
-						<!-- div
-							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'members', 'error')}">
-							<label for="members" class="control-label"><g:message
-									code="userGroup.members.label" default="Invite Members" /> </label>
+						<div
+							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'experts', 'error')}">
+							<label for="experts" class="control-label"><g:message
+									code="userGroup.experts.label" default="Invite Moderators" /> </label>
 							<div class="controls  textbox">
-								<div class="create_tags section-item">
-									<sUser:selectUsers model="['id':members_autofillUsersId]"/>
-									<input type="hidden" name="memberUserIds" id="memberUserIds" />
-								</div>
+									<sUser:selectUsers model="['id':experts_autofillUsersId]"/>
+									<input type="hidden" name="expertUserIds" id="expertUserIds" />
+									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" >You are invited to be a moderator for the group. Please click on the link to accept being an expert for this group</textarea>
 							</div>
-						</div-->
+						</div>
 					</div>
 				</div>
 
@@ -469,20 +468,21 @@ $(document).ready(function() {
 		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
 	});
 	
+	var experts_autofillUsersComp = $("#userAndEmailList_${experts_autofillUsersId}").autofillUsers({
+		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
+	});
+	
 	<g:if test="${userGroupInstance.isAttached() }">
 			<g:each in="${userGroupInstance.getFounders(userGroupInstance.getFoundersCount()+1, 0)}" var="user">
-		founders_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
-	</g:each>
-		</g:if>
+				founders_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
+			</g:each>
+			<g:each in="${userGroupInstance.getExperts(userGroupInstance.getExpertsCount()+1, 0)}" var="user">
+				experts_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
+			</g:each>
+	</g:if>
 
-		<%--	var members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}").autofillUsers({--%>
-<%--		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'--%>
-<%--	});--%>
-		<%--	--%>
-		<%--	<g:each in="${userGroupInstance?.getMembers()}" var="user">--%>
-		<%--		members_autofillUsersComp[0].addUserId('item':{{'userId':'${user.id}', 'value':'${user.name}'}});--%>
-		<%--	</g:each>--%>
-		<%--	--%>
+			
+			
 		
 	function getSelectedGroup() {
 	    var grp = []; 
@@ -506,7 +506,7 @@ $(document).ready(function() {
 	
 	$("#createGroupSubmit").click(function(){
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
-		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
+		$('#expertUserIds').val(experts_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		/*var tags = $("#tags").tagit("tags");
        	$.each(tags, function(index){
        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this.label);
