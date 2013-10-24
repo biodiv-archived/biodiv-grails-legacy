@@ -18,7 +18,7 @@
             </g:if>
         </g:if>
 
-        <li class="pull-left checkbox ${featured?'featured':''}" title ="${featured? 'Why featured : ' + featuredNotes : ''}">
+        <li class="pull-left checkbox ${featured?'featured':''}" data-title ="${featured? 'Featured : ' :''}" data-content="${featured? featuredNotes :''}">
         <uGroup:showUserGroupSignature
         model="[ 'userGroup':userGroup]" />
         </li>
@@ -26,4 +26,5 @@
     </ul>
     </g:if>
 </div>
+
 

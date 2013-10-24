@@ -83,6 +83,25 @@ class ActionController {
         return true
     }
 
+    def inGroups= {
+        log.debug params;
+        boolean status = false;
+        def r = [:]
+
+        def obv = activityFeedService.getDomainObject(params.type,params.id); 
+        
+        def resourceGroupHtml = ""
+
+        if(obv) {
+            resourceGroupHtml =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance': obv]);
+            status = 'success';
+        }
+        r["status"] = status?'success':'error'
+        r["resourceGroupHtml"] = resourceGroupHtml
+        render r as JSON
+
+    }
+
     @Secured(['ROLE_USER'])
     def featureIt = {  
         log.debug params;
@@ -97,7 +116,7 @@ class ActionController {
         def ugParam = params['userGroup']
         def resourceGroupHtml
 
-        if(ugParam != null && obv) {
+        if(ugParam != null && params.notes && obv) {
             
             List splitGroups = [];
             println "0000"
@@ -163,13 +182,15 @@ class ActionController {
                                 if(status) msg = "Successfully updated notes for the featued ${obv.class.simpleName}"
                             }
                             else{
-                                if(!featuredInstance.delete(flush:true)){
-                                    featuredInstance.errors.allErrors.each { log.error it }
-                                } else {
-                                    featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
-                                    status = saveActMail(params, featuredInstance, obv, ug)
-                                    if(status) msg = "Successfully featued ${obv.class.simpleName} again and updated notes given previously"
+                                try{
+                                    featuredInstance.delete(flush:true, failOnError:true)
+                                }catch (Exception e) {
+                                    e.printStackTrace()
                                 }
+                                featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
+                                status = saveActMail(params, featuredInstance, obv, ug)
+                                if(status) msg = "Successfully featued ${obv.class.simpleName} again and updated notes given previously"
+
                             }
                         }
                     }catch (Exception e) {
@@ -185,9 +206,10 @@ class ActionController {
                 msg = "Error while featuring the ${obv.class.simpleName}. ${msg}"
 
             //freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':obv])
-            resourceGroupHtml =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance': obv]);
          }
 
+        if(obv)
+            resourceGroupHtml =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance': obv]);
         r["status"] = status?'success':'error'
         r['msg'] = msg
         r["resourceGroupHtml"] = resourceGroupHtml

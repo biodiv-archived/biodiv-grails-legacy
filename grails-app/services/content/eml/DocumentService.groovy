@@ -40,6 +40,7 @@ class DocumentService {
 	def userGroupService
 	def dataSource
     def sessionFactory
+    def observationService
 
 	Document createDocument(params) {
 
@@ -359,7 +360,6 @@ class DocumentService {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
         }*/ 
 
-		if(!noLimit){
             if(max > -1){
                 hqlQuery.setMaxResults(max);
                 queryParts.queryParams["max"] = max
@@ -368,7 +368,6 @@ class DocumentService {
                 hqlQuery.setFirstResult(offset);
                 queryParts.queryParams["offset"] = offset
             }
-        }
 
         hqlQuery.setProperties(queryParts.queryParams);
 		def documentInstanceList = hqlQuery.list();
@@ -382,7 +381,6 @@ class DocumentService {
 	 * @return
 	 */
 	def getDocumentsFilterQuery(params) {
-
 		def query = "select document from Document document "
 		def queryParams = [:]
 		def activeFilters = [:]
@@ -391,6 +389,15 @@ class DocumentService {
         if(params.featureBy == "true"){
 			query = "select document from Document document,  Featured feat "
 			filterQuery += " and document.id = feat.objectId and feat.objectType = :featType "
+            params.userGroup = observationService.getUserGroup(params);
+            if(params.userGroup == null) {
+                filterQuery += "and feat.userGroup is null"
+            }
+            else {
+                filterQuery += "and feat.userGroup.id =:userGroupId"
+                queryParams["userGroupId"] = params.userGroup?.id
+            }
+            
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Document.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy

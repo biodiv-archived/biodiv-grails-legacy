@@ -60,9 +60,10 @@ class AbstractObjectService {
 			}
 			if(param['observation'].notes()) {
 				item.notes = param['observation'].notes()
-			} else {
+			} else { 
+                String link = "/" + getTargetController(param['observation'].author) + "/show/"+ param['observation'].author.id
 				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
-				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize() + (param['observation'].fromDate ?  (" on " +  param['observation'].fromDate.format('dd/MM/yyyy')) : "");
+				String desc = "- "+ location +" by <a href='"+link+"'>"+param['observation'].author.name.capitalize() +"</a>" + (param['observation'].fromDate ?  (" on " +  param['observation'].fromDate.format('dd/MM/yyyy')) : "");
 				item.notes = desc;				
 			}
             
@@ -140,28 +141,21 @@ class AbstractObjectService {
         def count;
         if(ugId == null) {
             def queryParams = ["type": type]
-            def countQuery = "select count(distinct feat.objectId) from Featured feat where feat.userGroup.id is null and feat.objectType = :type "
+            def countQuery = "select count(*) from Featured feat where feat.userGroup.id is null and feat.objectType = :type "
             log.debug "CountQuery:"+ countQuery + "params: "+queryParams
-            
             count = Featured.executeQuery(countQuery, queryParams)
-            
             queryParams["max"] = limit
             queryParams["offset"] = offset
-            def query = "select min(feat.id) from Featured feat where feat.userGroup.id is null and feat.objectType = :type group by feat.objectId "
-            def orderByClause = "order by max(feat.createdOn) desc"
+            def query = "from Featured feat where feat.userGroup.id is null and feat.objectType = :type "
+            def orderByClause = "order by feat.createdOn desc"
             query += orderByClause
-            
             log.debug "FeaturedQuery:"+ query + "params: "+queryParams
-
-            def featured_id = Featured.executeQuery(query, queryParams);
-            featured_id.each{
-                featured.add(Featured.read(it))
-            }
+            featured = Featured.executeQuery(query, queryParams);
         }
         else{
             def queryParams = ["ugId": ugId]
             queryParams["type"] = type
-            def countQuery = "select count(distinct feat.objectId) from Featured feat where feat.userGroup.id = :ugId and feat.objectType = :type "
+            def countQuery = "select count(*) from Featured feat where feat.userGroup.id = :ugId and feat.objectType = :type "
             log.debug "CountQuery:"+ countQuery + "params: "+queryParams
             count = Featured.executeQuery(countQuery, queryParams)
             queryParams["max"] = limit
