@@ -144,7 +144,7 @@ function membership_actions() {
 			clearForm: true,
 			resetForm: true,
 			type: 'POST',
-			
+			data:{message:$('#inviteMemberMsg').val()},
 			success: function(data, statusText, xhr, form) {
 				if(data.statusComplete) {
 					$('#inviteMembersDialog').modal('hide');
@@ -173,7 +173,7 @@ function membership_actions() {
 			clearForm: true,
 			resetForm: true,
 			type: 'POST',
-			
+			data:{message:$('#inviteModeratorMsg').val()},
 			success: function(data, statusText, xhr, form) {
 				if(data.statusComplete) {
 					$('#inviteExpertsDialog').modal('hide');

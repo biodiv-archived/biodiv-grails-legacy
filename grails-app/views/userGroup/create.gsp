@@ -250,7 +250,7 @@ max-width: 100%;
 							<div class="controls  textbox">
 									<sUser:selectUsers model="['id':experts_autofillUsersId]"/>
 									<input type="hidden" name="expertUserIds" id="expertUserIds" />
-									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" >You are invited to be a moderator for the group. Please click on the link to accept being an expert for this group</textarea>
+									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" >You are invited to be a moderator for the group. Please click on the link to accept being an moderator for this group</textarea>
 							</div>
 						</div>
 					</div>

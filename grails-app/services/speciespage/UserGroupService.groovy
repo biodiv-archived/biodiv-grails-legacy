@@ -733,14 +733,14 @@ class UserGroupService {
 				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(expertEmail,
-						"Invitation to join as an expert for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/expertInvitation'], userToken.token);
+						"Invitation to join as moderator for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/expertInvitation'], userToken.token);
 			}
 		}
 	}
 
 
 	@PreAuthorize("hasPermission(#userGroupInstance, write)")
-	void sendMemberInvitation(userGroupInstance, members, domain) {
+	void sendMemberInvitation(userGroupInstance, members, domain, message=null) {
 		//find if the invited members are already part of the group and ignore sending invitation to them
 		//def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
@@ -764,7 +764,7 @@ class UserGroupService {
 			def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 			userToken.save(flush: true)
 			emailConfirmationService.sendConfirmation(memberEmail,
-					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, memberMsg:message, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 		}
 	}
 

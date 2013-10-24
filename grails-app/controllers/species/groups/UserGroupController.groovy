@@ -524,7 +524,7 @@ class UserGroupController {
 			}
 
 			int membersCount = members.size();
-			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request));
+			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request), params.message);
 			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
@@ -558,7 +558,7 @@ class UserGroupController {
 			groupExperts.addAll(groupFounders)
 			members.removeAll(groupExperts);
 			
-			userGroupService.sendExpertInvitation(userGroupInstance, members, "", Utils.getDomainName(request));
+			userGroupService.sendExpertInvitation(userGroupInstance, members, params.message, Utils.getDomainName(request));
 			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();

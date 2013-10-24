@@ -1,6 +1,6 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 	<g:if test="${canEditUserGroup}">
-		<uGroup:inviteExpert model="['userGroupInstance':userGroupInstance, 'isExpertOrFounder':isExpertOrFounder]"/>
+		<uGroup:inviteExpert model="['userGroupInstance':userGroupInstance, 'isExpertOrFounder':isExpertOrFounder, 'experts_autofillUsersId':experts_autofillUsersId]"/>
 					
 		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
@@ -21,6 +21,7 @@
 						style="background-color: #F2F2F2;">
 						<sUser:selectUsers model="['id':members_autofillUsersId]" />
 						<input type="hidden" name="memberUserIds" id="memberUserIds" />
+						<textarea id="inviteMemberMsg" class="comment-textbox" placeholder="Please write the note to invite member."></textarea>
 					</form>
 				</div>
 			</div>

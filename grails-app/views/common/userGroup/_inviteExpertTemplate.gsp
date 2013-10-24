@@ -7,7 +7,7 @@
 		aria-hidden="true">
 		<div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-			<h3 id="inviteExpertsModalLabel">Invite experts</h3>
+			<h3 id="inviteExpertsModalLabel">Invite moderators</h3>
 		</div>
 		<div class="modal-body">
 			<p>Send an invitation to invite moderators to join and
@@ -18,6 +18,7 @@
 					style="background-color: #F2F2F2;">
 					<sUser:selectUsers model="['id':experts_autofillUsersId]" />
 					<input type="hidden" name="expertUserIds" id="expertUserIds" />
+					<textarea id="inviteModeratorMsg" class="comment-textbox" placeholder="Please write the note to invite moderator."></textarea>
 				</form>
 			</div>
 		</div>
