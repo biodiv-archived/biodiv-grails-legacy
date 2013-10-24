@@ -88,7 +88,7 @@ class Document extends Metadata implements Taggable, Rateable {
 			val || obj.uFile
 		},nullable:true
 		contributors nullable:true
-		attribution nullable:true	
+		attribution  nullable:true	
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
 		author nullable:true
@@ -111,6 +111,7 @@ class Document extends Metadata implements Taggable, Rateable {
 	
 	static mapping = {
 		notes type:"text"
+		attribution type:"text"
 	}
 
      List fetchAllFlags(){
@@ -174,7 +175,7 @@ class Document extends Metadata implements Taggable, Rateable {
 		updateLatLong()
 	}
 	
-	def fetchList(params, max, offset, noLimit=false){
-		return documentService.getFilteredDocuments(params, max, offset, noLimit)
+	def fetchList(params, max, offset){
+		return documentService.getFilteredDocuments(params, max, offset)
 	}
 }
