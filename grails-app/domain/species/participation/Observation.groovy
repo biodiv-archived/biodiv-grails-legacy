@@ -335,10 +335,21 @@ class Observation extends Metadata implements Taggable, Rateable {
 		checklistAnnotations = m as JSON
 	}
 	
-	String fetchSpeciesCall(){
-		return maxVotedReco ? maxVotedReco.name : "Unknown"
+	String fetchFormattedSpeciesCall() {
+        if(!maxVotedReco) return "Unknown"
+
+        if(maxVotedReco.taxonConcept) //sciname from clean list
+            return maxVotedReco.taxonConcept.italicisedForm
+        else if(maxVotedReco.isScientificName) //sciname from dirty list
+            return '<i>'+maxVotedReco.name+'</i>'
+        else //common name
+		    return maxVotedReco.name
 	}
 	
+	String fetchSpeciesCall() {
+        return maxVotedReco ? maxVotedReco.name : "Unknown"
+    }
+
 	String title() {
 		String title = fetchSpeciesCall() 
 		if(!title || title.equalsIgnoreCase('Unknown')) {
@@ -509,4 +520,8 @@ String notes() {
     def getObservationFeatures() {
         return observationService.getObservationFeatures(this);
     }
+	
+	def fetchList(filterUrl, max, offset){
+		return observationService.getObservationList(filterUrl, max, offset)
+	}
 }

@@ -556,6 +556,4 @@ class SpeciesService {
         //return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
         //}
     }
-
-
 }

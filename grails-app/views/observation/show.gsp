@@ -218,12 +218,12 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                         <div class="tile" style="clear: both">
                                             <div class="title">Other observations of the same species</div>
                                             <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
                                         </div>
                                         <div class="tile">
                                             <div class="title">Observations nearby</div>
                                             <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
                                         </div>
                                         
                                     </div>

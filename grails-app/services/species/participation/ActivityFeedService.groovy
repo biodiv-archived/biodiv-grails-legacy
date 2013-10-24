@@ -142,7 +142,6 @@ class ActivityFeedService {
 		
 		//updating time stamp on object after addition of activity
 		try {
-			log.debug "updating timestamp"
 			rootHolder.onAddActivity(af, flushImmidiatly)
 		}catch (Exception e) {
 			//e.printStackTrace();

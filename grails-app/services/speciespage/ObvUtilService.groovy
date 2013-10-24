@@ -18,7 +18,7 @@ import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 import species.utils.ImageType;
 import species.utils.ImageUtils
-
+import species.ResourceFetcher;
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
@@ -84,8 +84,7 @@ class ObvUtilService {
 	
 	def export(params, dl){
 		log.debug(params)
-		String action = new URL(dl.filterUrl).getPath().split("/")[2]
-		def observationInstanceList = observationService.getObservationList(params, action)
+		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl).getAllResult()
 		log.debug " Obv total $observationInstanceList.size " 
 		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}
