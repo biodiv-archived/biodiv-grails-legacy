@@ -811,7 +811,6 @@ class ObservationService extends AbstractObjectService {
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Observation.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy
-            println "======QUERY PARAMS ======= " + queryParams
         }
         if(params.featureBy == "false") {
             featureQuery = ", Featured feat "
@@ -2157,9 +2156,16 @@ class ObservationService extends AbstractObjectService {
     }
 
     def getUserGroup(params) {
-        if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
+
+        if(params.userGroup && params.userGroup.instanceOf(UserGroup)) {
+            return params.userGroup
+        }
+
+        if(params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress) {
             def userGroupController = new UserGroupController();
             return userGroupController.findInstance(params.userGroup, params.webaddress);
         }
+
         return null;
     }
+}

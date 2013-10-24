@@ -56,7 +56,7 @@ $(document).ready(function() {
 					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:elseif>
-			<g:else>
+                        <g:else>
 				<a class="btn btn-mini"
 					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>

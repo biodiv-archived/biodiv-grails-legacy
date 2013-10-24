@@ -156,9 +156,10 @@ class Species implements Rateable {
 
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
-	}
-	
-	//TODO:remove this function after getting icons for all groups
+	}	
+
+    
+    //TODO:remove this function after getting icons for all groups
 	Resource fetchSpeciesGroupIcon(ImageType type) {
 		SpeciesGroup group = fetchSpeciesGroup();
 		return group.icon(type);
