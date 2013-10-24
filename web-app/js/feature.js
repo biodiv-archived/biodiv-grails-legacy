@@ -33,10 +33,7 @@ function feature(submitType, objectId, objectType, url) {
                 $(".resource_in_groups li.featured").popover();
                 */
                 $(".resource_in_groups li.featured").popover({ 
-                    title: function() {
-                        return $(this).attr('title')
-                    },
-                    //trigger:(is_touch_device ? "click" : "hover"),
+                    trigger:(is_touch_device ? "click" : "hover"),
                 });
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));
             } else {
@@ -48,4 +45,27 @@ function feature(submitType, objectId, objectType, url) {
                 handleError(xhr, ajaxOptions, error, successHandler, errorHandler);
             }
     });
+}
+
+function loadObjectInGroups() {
+    $.ajax({
+        url: window.params.action.inGroupsUrl,
+        type: 'GET',
+        dataType: "json",
+        data:{'id':objectId, 'type':objectType},
+        success: function(data) {
+            if(data.status == 'success'){
+                $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
+                $(".resource_in_groups li.featured").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                });
+                showUpdateStatus(data.msg, data.status, $("#featureMsg"));
+            } else {
+                showUpdateStatus(data.msg, data.status, $("#featureMsg"));
+            }
+            }, error: function(xhr, ajaxOptions, error) {
+                console.log(error);
+            }
+    });
+
 }
