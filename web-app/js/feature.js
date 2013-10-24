@@ -29,6 +29,15 @@ function feature(submitType, objectId, objectType, url) {
                     $(".badge").removeClass("featured")
                 }
                 $('.show-user-groups').slideToggle("slow");
+                /*
+                $(".resource_in_groups li.featured").popover();
+                */
+                $(".resource_in_groups li.featured").popover({ 
+                    title: function() {
+                        return $(this).attr('title')
+                    },
+                    //trigger:(is_touch_device ? "click" : "hover"),
+                });
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));
             } else {
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));

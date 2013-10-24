@@ -792,14 +792,25 @@ class ObservationService extends AbstractObjectService {
 
         def userGroupQuery = " ", tagQuery = '', featureQuery = '';
         def filterQuery = " where obv.isDeleted = :isDeleted "
+        
+        if(params.featureBy == "true" || params.userGroup || params.webaddress){
+            params.userGroup = getUserGroup(params);
+        }
 
         if(params.featureBy == "true" ) {
             featureQuery = ", Featured feat "
             query += featureQuery;
-            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType "
+            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType and "
+            if(params.userGroup == null) {
+                filterQuery += "feat.userGroup is null "     
+            }else {
+                filterQuery += "feat.userGroup.id = :userGroupId "
+                queryParams["userGroupId"] = params.userGroup?.id
+            }
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Observation.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy
+            println "======QUERY PARAMS ======= " + queryParams
         }
         if(params.featureBy == "false") {
             featureQuery = ", Featured feat "
@@ -823,8 +834,7 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.userGroup || params.webaddress) {
-            params.userGroup = getUserGroup(params);
-            log.debug "Filtering from usergourp : ${params.usergroup}"
+            log.debug "Filtering from usergourp : ${params.userGroup}"
             userGroupQuery = " join obv.userGroups userGroup "
             query += userGroupQuery
             filterQuery += " and userGroup.id =:userGroupId "

@@ -60,9 +60,10 @@ class AbstractObjectService {
 			}
 			if(param['observation'].notes()) {
 				item.notes = param['observation'].notes()
-			} else {
+			} else { 
+                String link = "/" + getTargetController(param['observation'].author) + "/show/"+ param['observation'].author.id
 				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
-				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize() + (param['observation'].fromDate ?  (" on " +  param['observation'].fromDate.format('dd/MM/yyyy')) : "");
+				String desc = "- "+ location +" by <a href='"+link+"'>"+param['observation'].author.name.capitalize() +"</a>" + (param['observation'].fromDate ?  (" on " +  param['observation'].fromDate.format('dd/MM/yyyy')) : "");
 				item.notes = desc;				
 			}
             

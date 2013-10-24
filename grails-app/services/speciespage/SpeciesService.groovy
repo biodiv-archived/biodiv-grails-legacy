@@ -490,11 +490,22 @@ class SpeciesService {
             }
 
             if(params.featureBy == "true" ) {
+                params.userGroup = observationService.getUserGroup(params)
                 def featureQuery = ", Featured feat "
                 query += featureQuery;
-                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
                 countQuery += featureQuery
-                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
+                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType and "
+                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType and "
+                if(params.userGroup == null) {
+                    String str = "feat.userGroup is null "
+                    filterQuery += str
+                    countFilterQuery += str
+                }else {
+                    String str = "feat.userGroup.id = :userGroupId "
+                    filterQuery += str
+                    countFilterQuery += str
+                    queryParams["userGroupId"] = params.userGroup?.id
+                }   
                 queryParams["featureBy"] = params.featureBy
                 queryParams["featType"] = Species.class.getCanonicalName();
             }
