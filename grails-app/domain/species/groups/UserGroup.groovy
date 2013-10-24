@@ -369,5 +369,8 @@ class UserGroup implements Taggable {
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-	
+
+    def getObservationsCount() {
+        return userGroupService.getObservationCountByGroup(this);
+    }
 }

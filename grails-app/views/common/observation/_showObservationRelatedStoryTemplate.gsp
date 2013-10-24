@@ -2,7 +2,7 @@
 $(document).ready(function() {
 	$('#carousel_${id}').jcarousel({
 	    itemLoadCallback : itemLoadCallback,
-            url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
+            url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroupInstance':userGroupInstance)}",
             filterProperty:"${filterProperty}",
             filterPropertyValue:"${filterPropertyValue}",
             carouselDivId:"#carousel_" + "${id}",
@@ -51,17 +51,17 @@ $(document).ready(function() {
 		<div class="observation_links">
 			<g:if test="${observationId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:if>
 			<g:elseif test="${speciesId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:elseif>
 			<g:else>
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show
+					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:else>
 		</div>
