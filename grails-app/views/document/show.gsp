@@ -14,9 +14,10 @@
         <g:if test="${documentInstance}">
         <g:set var="featureCount" value="${documentInstance.featureCount}"/>
         </g:if>
-        <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" >
+        <div class="page-header clearfix" style="position:relative">
+            <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="left:-50px;">
             </span>
-		<div class="page-header clearfix">
+
 			<div style="width: 100%;">
 				<div class="main_heading" style="margin-left: 0px;">
 					<sUser:ifOwns model="['user':documentInstance.author]">

@@ -28,13 +28,14 @@ function feature(submitType, objectId, objectType, url) {
                 if($(".resource_in_groups li.featured").size() === 0) {
                     $(".badge").removeClass("featured")
                 }
-                $('.show-user-groups').slideToggle("slow");
+                //$('.show-user-groups').slideToggle("slow");
                 /*
                 $(".resource_in_groups li.featured").popover();
                 */
                 $(".resource_in_groups li.featured").popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
                 });
+                $('#myTab a:first').tab('show');
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));
             } else {
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));

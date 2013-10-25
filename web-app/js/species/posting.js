@@ -80,7 +80,8 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 				}else{
 					$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-success').html(data.msg);
 				}
-				$('.post-to-groups .post-main-content').slideToggle(150);
+                                $('#myTab a:first').tab('show');
+				//$('.post-to-groups .post-main-content').slideToggle(150);
 			}else{
 				$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-error').html(data.msg);
 			}
