@@ -512,19 +512,17 @@ textarea#featureNotes {
 
 .featured {
     background: url(../images/featured_star.png) no-repeat right top;
-}
-
-.featuredHeader {
-    background: url(../images/featured_icon_left.png) no-repeat left top;
+    width: 35px; 
+    height: 50px;
+    z-index: 1000;
+    position: absolute;
+    background-color: transparent;
+    vertical-align:middle;
+    padding:0px;
 }
 
 .badge {
-    z-index: 1000;
-    position: absolute;
-    width: 20px; 
-    height: 50px;
-    background-color: transparent;
-    vertical-align:middle;
+    padding:0px;
 }
 
 .recommendations {

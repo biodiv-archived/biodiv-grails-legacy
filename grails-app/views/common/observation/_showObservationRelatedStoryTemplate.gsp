@@ -34,7 +34,7 @@ $(document).ready(function() {
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
             <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
                 <li style="float: left; list-style: none;">
-                <g:render template="/${resultController?:controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails]"/>
+                <g:render template="/${resultController?:controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:resultController?:'observation']"/>
                 </li>
             </g:each>
         </ul>
