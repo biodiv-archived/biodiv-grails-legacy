@@ -202,6 +202,7 @@ h6 {
     display:table;
     height:150px;
     width:150px;
+    background-color:white;
 }
 #carousel_featureBy .snippet {
     height:150px;
@@ -512,6 +513,19 @@ textarea#featureNotes {
 }
 .section .section-item {
 	padding: 10px;
+}
+
+.featured_title {
+    font-weight:bold;
+    display:inline-block;
+}
+
+.featured_title span.ellipsis {
+    display:inline-block;
+}
+
+.featured_title small {
+    font-weight:normal;
 }
 
 .featured {
