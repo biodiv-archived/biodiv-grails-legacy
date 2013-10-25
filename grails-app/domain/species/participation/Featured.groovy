@@ -43,12 +43,14 @@ class Featured extends AbstractAction {
         boolean isAdmin = SpringSecurityUtils.ifAllGranted("ROLE_ADMIN") 
 
         if(isAuthor || isAdmin || ug.isFounder(user) || ug.isExpert(user) ) {
-            def f = Featured.findWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
+            def f = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
             if(f!= null){
-                if(!f.delete(flush: true)){
-                    println "Error deleting the featured object when Observation got deleted"
-                    f.errors.allErrors.each { println it }
-                    return null
+                f.each{
+                    if(!it.delete(flush: true)){
+                        println "Error deleting the featured object when Observation got deleted"
+                        f.errors.allErrors.each { println it }
+                        return null
+                    }
                 }
             }
         }

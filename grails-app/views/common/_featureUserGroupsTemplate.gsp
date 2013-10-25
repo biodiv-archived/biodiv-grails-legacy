@@ -1,26 +1,19 @@
 <%@ page import="species.UserGroupTagLib"%>
-<style>
-    .show-user-groups {
-    display: none;
-    }
-</style>
-
 <sec:ifLoggedIn>
 
 <div id = "featureIn" class="feature-user-groups">
 
-    <h5 class="pull-right" onclick="$(this).next('.show-user-groups').slideToggle(150);return false;">Feature Item in Groups<span class="caret" style="margin-top: 8px;margin-left: 5px"></span></h5>
     <div class="show-user-groups" >
 
-        <div id="userGroups" class="userGroups" >
+        <div id="userGroups" class="userGroups" style="margin-bottom: 0px;">
             <uGroup:markFeaturedUserGroups model="['observationInstance':observationInstance,'featResult': featResult]"/>
         </div>
         <form>
             <small id='remainingC'>Remaining characters : 400</small>
-            <textarea placeholder="Why Featuring??" name="featureNotes" id="featureNotes" maxlength="400"></textarea>
+            <textarea style="height:100px;" placeholder="Why Featuring??" name="featureNotes" id="featureNotes" maxlength="400"></textarea>
         </form>  
 
-        <div id="featureMsg" class="alert alert-success"></div>
+        <div id="featureMsg" class="alert alert-success" style="display:none;"></div>
         <a onclick="feature('feature', '${observationInstance.id}', '${observationInstance.class.getCanonicalName()}','${uGroup.createLink(controller:'action', action:'featureIt', userGroup:userGroup)}');return false;" class="btn btn-primary"
             style="float: right; margin-right: 5px;"> Feature </a>
 
