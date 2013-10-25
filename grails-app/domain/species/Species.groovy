@@ -80,7 +80,7 @@ class Species implements Rateable {
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;
 		} else {
-			return null;
+			return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
 		}
 	}
 

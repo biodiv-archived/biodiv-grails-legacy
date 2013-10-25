@@ -523,7 +523,7 @@ $(document).ready(function(){
                                 <div style="background-color:white">
 				
 				<!-- species page icons -->
-				<div style="padding:5px 0px;">
+				<div style="padding:5px 0px;position:relative;">
 					<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 					<div class="observation-icons">		
 						<img class="group_icon species_group_icon"  
