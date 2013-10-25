@@ -1,5 +1,7 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 	<g:if test="${canEditUserGroup}">
+		<uGroup:inviteExpert model="['userGroupInstance':userGroupInstance, 'isExpertOrFounder':isExpertOrFounder, 'experts_autofillUsersId':experts_autofillUsersId]"/>
+					
 		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
 				default="Invite Friends" /> </a>
@@ -11,22 +13,24 @@
 				<h3 id="inviteMembersModalLabel">Invite friends</h3>
 			</div>
 			<div class="modal-body">
-				<p>Send an invitation to invite your friends to join and
-					contribute in this interesting group…</p>
+				<p>Send an invitation to your friends to join and contribute in this group</p>
 				<div>
 					<div id="invite_memberMsg"></div>
 					<form id="inviteMembersForm" method="post"
 						style="background-color: #F2F2F2;">
 						<sUser:selectUsers model="['id':members_autofillUsersId]" />
 						<input type="hidden" name="memberUserIds" id="memberUserIds" />
+						<textarea id="inviteMemberMsg" class="comment-textbox" placeholder="Please write a note to invite member."></textarea>
 					</form>
 				</div>
 			</div>
 			<div class="modal-footer">
 				<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-				<a href="#" id="invite" class="btn btn-primary">Invite</a>
+				<a href="#" id="inviteMemberButton" class="btn btn-primary">Invite</a>
 			</div>
 		</div>
+		
+		
 	</g:if>
 	<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
 	<div class="modal hide fade in" id="leaveUsModalDialog" tabindex="-1" role="dialog" aria-labelledby="leaveUsModalDialogLabel" >

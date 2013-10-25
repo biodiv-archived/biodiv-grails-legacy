@@ -3,6 +3,7 @@
  */
 
 var members_autofillUsersComp;
+var experts_autofillUsersComp ;
 
 function joinAction(me, joinUsUrl) {
 	if(me.hasClass('disabled')) return false;
@@ -58,6 +59,31 @@ function requestMembershipAction(me, requestMembershipUrl) {
 	return false;
 }
 
+function requestModeratorshipAction(me, url) {
+	if($('#requestModerator').hasClass('disabled')) return false;
+	$.ajax({
+    	url: url,
+        method: "POST",
+        dataType: "json",
+        data:{message:$('#requestModeratorMsg').val()},
+        success: function(data) {
+        	$('#requestModerator').html(data.shortMsg).removeClass("btn-success").addClass("disabled");
+    		$('#requestModeratorDialog').modal('hide');
+        	if(data.statusComplete) {
+        		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+        	} else {
+        		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+        	}
+        }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, this.success, function() {
+            	var msg = $.parseJSON(xhr.responseText);
+                $(".alertMsg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
+			});
+        }
+	});
+	return false;
+}
+
 function membership_actions() {
 	$(".joinUs").bind('click', function() {
 		joinAction($(this), window.joinUsUrl);
@@ -65,6 +91,10 @@ function membership_actions() {
 	
 	$(".requestMembership").bind('click', function() {
 		requestMembershipAction($(this), window.requestMembershipUrl);
+	})
+	
+	$("#requestModeratorButton").bind('click', function() {
+		requestModeratorshipAction($(this), window.requestModeratorshipUrl);
 	})
 	
 	$(".leaveUs").bind('click', function() {
@@ -106,7 +136,7 @@ function membership_actions() {
 	})
 	
 	
-	$("#invite").click(function(){
+	$("#inviteMemberButton").click(function(){
 		$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		$('#inviteMembersForm').ajaxSubmit({ 
 			url:window.inviteMembersFormUrl,
@@ -114,7 +144,7 @@ function membership_actions() {
 			clearForm: true,
 			resetForm: true,
 			type: 'POST',
-			
+			data:{message:$('#inviteMemberMsg').val()},
 			success: function(data, statusText, xhr, form) {
 				if(data.statusComplete) {
 					$('#inviteMembersDialog').modal('hide');
@@ -134,11 +164,51 @@ function membership_actions() {
            } 
      	});	
 	});
+	
+	$("#inviteExpertButton").click(function(){
+		$('#expertUserIds').val(experts_autofillUsersComp[0].getEmailAndIdsList().join(","));
+		$('#inviteExpertsForm').ajaxSubmit({ 
+			url:window.inviteExpertsFormUrl,
+			dataType: 'json', 
+			clearForm: true,
+			resetForm: true,
+			type: 'POST',
+			data:{message:$('#inviteModeratorMsg').val()},
+			success: function(data, statusText, xhr, form) {
+				if(data.statusComplete) {
+					$('#inviteExpertsDialog').modal('hide');
+					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				} else {
+					$("#invite_expertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				}
+				$('#inviteExpertsForm')[0].reset()
+			}, error:function (xhr, ajaxOptions, thrownError){
+					//successHandler is used when ajax login succedes
+	            	var successHandler = this.success;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+						var response = $.parseJSON(xhr.responseText);
+						
+				});
+	            $('#inviteExpertsForm')[0].reset()
+           } 
+     	});	
+	});
      	
    	$('#inviteMembersDialog').modal({
 		"show" : false,
 		"backdrop" : "static"
 	});
+   	
+   	$('#inviteExpertsDialog').modal({
+		"show" : false,
+		"backdrop" : "static"
+	});
+   	
+   	$('#requestModeratorDialog').modal({
+		"show" : false,
+		"backdrop" : "static"
+	});
+   	
 	$('#leaveUsModalDialog').modal({
 		"show" : false,
 		"backdrop" : "static"
@@ -166,12 +236,58 @@ function membership_actions() {
 				} 
 	     	});
 	});
+	
+	$('#inviteExperts').click(function(){
+		$.ajax({ 
+         	url:window.isLoggedInUrl,
+			success: function(data, statusText, xhr, form) {
+				if(data === "true"){
+					$('#expertUserIds').val('');
+					$('#userAndEmailList_2').val('');
+					$('ul.userOrEmail-list > li').each(function(){
+						experts_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
+					});
+					$('#inviteExpertsForm')[0].reset()
+					$('#inviteExpertsDialog').modal('show');
+					return false;
+				}else{
+					window.location.href = window.loginUrl+"?spring-security-redirect="+window.location.href;
+				}
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+            	return false;
+			} 
+     	});
+	});
+	
+	$('#requestModerator').click(function(){
+		if($('#requestModerator').hasClass('disabled')) return false;
+		$.ajax({ 
+         	url:window.isLoggedInUrl,
+			success: function(data, statusText, xhr, form) {
+				if(data === "true"){
+					$('#requestModeratorDialog').modal('show');
+					return false;
+				}else{
+					window.location.href = window.loginUrl+"?spring-security-redirect="+window.location.href;
+				}
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+            	return false;
+			} 
+     	});
+	});
+	
 }
 
 //this is called from domain/_headerTemplate
 function init_group_header() {
 	
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
+		usersUrl : window.userTermsUrl
+	});
+	
+	experts_autofillUsersComp = $("#userAndEmailList_"+window.experts_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
 }

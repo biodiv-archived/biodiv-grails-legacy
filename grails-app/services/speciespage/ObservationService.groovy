@@ -1719,25 +1719,26 @@ class ObservationService extends AbstractObjectService {
         } else {
             participants << springSecurityService.currentUser;
         }
-        return participants;
-    }
-
-    private List getUserForEmail(observation){
-        if(!observation instanceof UserGroup){
-            return Follow.getFollowers(observation)
-        }
-
-        //XXX for user only sending founders and current user as list members list is too large have to decide on this
-        List userList = observation.getFounders(100, 0)
-        def currUser = springSecurityService.currentUser
-        if(!userList.contains(currUser)){
-            userList << currUser
-        }
-        return userList
-    }
-
-    private SUser getOwner(observation) {
-        def author = null;
+		return participants;
+	}
+	
+	private List getUserForEmail(observation){
+		if(!observation.instanceOf(UserGroup)){
+			return Follow.getFollowers(observation)
+		}else{
+			//XXX for user only sending founders and current user as list members list is too large have to decide on this
+			List userList = observation.getFounders(100, 0)
+			userList.addAll(observation.getExperts(100, 0)) 
+			def currUser = springSecurityService.currentUser
+			if(!userList.contains(currUser)){
+				userList << currUser
+			}
+			return userList
+		}
+	}
+	
+	private SUser getOwner(observation) {
+		def author = null;
         if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
             if(observation.metaClass.hasProperty(observation, 'author')) {
                 author = observation.author;

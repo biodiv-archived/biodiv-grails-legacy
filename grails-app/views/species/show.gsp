@@ -708,12 +708,10 @@ $(document).ready(function(){
  
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
-                                </div-->
-                                <uGroup:objectPostToGroupsWrapper 
-				    model="[canPullResource:canPullResource, 'objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
-                                    
-                                <g:render template="/common/featureWrapperTemplate" model="['observationInstance':speciesInstance]"/>
-			    <div class="sidebar_section">
+                            </div-->
+			        <uGroup:objectPostToGroupsWrapper 
+				    model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
+                           <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">
                                         <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
