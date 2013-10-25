@@ -59,9 +59,12 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 .nameContainer .combobox-container {
 	left:198px;
 }
-
+ 
 .combobox-container .add-on {
 	right: -91px;
+}
+.observation_story .notes_view {
+    margin-bottom:50px;
 }
 
 </style>
@@ -386,6 +389,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                 });
 
                 preLoadRecos(3, 0, false);
+                //loadObjectInGroups();
+                $(".resource_in_groups li.featured").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                });
                 
         });
 

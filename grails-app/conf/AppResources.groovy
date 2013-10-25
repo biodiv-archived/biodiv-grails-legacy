@@ -269,7 +269,6 @@ modules = {
 		resource url:'/js/species/observations/list.js'
     }
 
-
 	checklist_create {
 		dependsOn 'observations_create, checklist, slickgrid, add_file'
 		

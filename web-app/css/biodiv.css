@@ -185,18 +185,32 @@ h6 {
 }
 
 .thumbnail .observation_story {
-	/*display: table-cell;
-	vertical-align: middle;*/
-        overflow:hidden;
-        margin-left:156px;
-        height:150px;
+    /*display: table-cell;
+    vertical-align: middle;*/
+overflow:hidden;
+margin-left:150px;
+height:140px;
+padding:5px;
+
+}
+
+#carousel_featureBy .observation_story {
+    width:780px;
 }
 
 .thumbnail .observation_story_image {
-        display:table;
-        height:150px;
-        width:150px;
+    display:table;
+    height:150px;
+    width:150px;
 }
+#carousel_featureBy .snippet {
+    height:150px;
+}
+
+.list_view .observation_story {
+    width:470px;
+}
+
 
 .button-bar {
 	margin-top: 10px;
@@ -213,15 +227,12 @@ h6 {
 
 .prop {
 	clear: both;
+	margin-bottom: 3px;
 	/* 	overflow: auto; */
 }
 
 .prop.tablet {
 	font-size: 0.8em;
-}
-
-.prop {
-	margin-bottom: 5px;
 }
 
 .prop .name,.prop .name .label {
@@ -512,10 +523,8 @@ textarea#featureNotes {
     display: block;
     z-index: 1000;
     position: absolute;
-    width: 50px; 
+    width: 20px; 
     height: 50px;
-    background-color:#fff;
-    opacity:0.4;
 }
 
 .recommendations {

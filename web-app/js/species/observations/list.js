@@ -325,10 +325,6 @@ $(document).ready(function(){
     //	last_actions();
     eatCookies();
     $('.observations_list_wrapper').trigger('updatedGallery');
-
-    $('#distinctRecoTableAction').click(loadDistinctRecoList)
-    $('#distinctRecoTableAction').click();
-    loadSpeciesGroupCount();
 });
 
 /**
@@ -615,8 +611,6 @@ function updateListPage(activeTag) {
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
         //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
-        loadSpeciesGroupCount();
-        updateDistinctRecoTable();
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
         reInitializeGroupPost();
@@ -854,7 +848,6 @@ function loadDistinctRecoList() {
 }
 
 function loadSpeciesGroupCount() {
-    console.log('speciesGroup');
     var $me = $(this);
     var target = window.location.pathname + window.location.search;
     var a = $('<a href="'+target+'"></a>');

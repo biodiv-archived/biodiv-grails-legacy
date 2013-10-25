@@ -130,5 +130,9 @@ $(document).ready(function() {
         refreshList(getSelectedBounds());
     });
 
+    $('.observations_list_wrapper').on('updatedGallery', function() {
+        loadSpeciesGroupCount();
+        updateDistinctRecoTable();
+    });
 });
 </g:javascript>

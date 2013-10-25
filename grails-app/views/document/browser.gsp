@@ -24,7 +24,7 @@
 		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Documents']" />
 		<uGroup:rightSidebar/>
                 <obv:showRelatedStory
-                    model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+                    model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 	
 
 		<div class="document-list span8 right-shadow-box" style="margin:0;">

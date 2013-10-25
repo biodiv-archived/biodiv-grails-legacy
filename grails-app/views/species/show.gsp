@@ -350,7 +350,9 @@ $(document).ready(function(){
 	} catch(e) {
   		console.log(e)
 	}  	
-
+        $(".resource_in_groups li.featured").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+        });
 <%--  	//init editables --%>
 <%--$('.myeditable').editable({--%>
 <%--    url: '/post' //this url will not be used for creating new user, it is only for update--%>

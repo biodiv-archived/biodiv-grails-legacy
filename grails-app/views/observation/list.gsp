@@ -15,17 +15,6 @@
         white-space:inherit;
     }
 
-    #carousel_featureBy .snippet {
-        height:150px;
-    }
-
-    .list_view .observation_story {
-        width:470px;
-    }
-
-    #carousel_featureBy .observation_story {
-        width:780px;
-    }
 </style>
 </head>
 <body>

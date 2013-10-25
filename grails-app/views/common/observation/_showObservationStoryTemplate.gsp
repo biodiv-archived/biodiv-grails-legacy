@@ -189,7 +189,7 @@
             <obv:showFooter
                 model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
 
-            <div class="story-footer" style="right:0px;">
+            <div class="story-footer" style="right:3px;">
                 <sUser:showUserTemplate
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
             </div>
