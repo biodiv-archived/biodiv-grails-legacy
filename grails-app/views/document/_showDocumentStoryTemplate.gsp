@@ -9,7 +9,7 @@
         <div style="background-color:whitesmoke;font-weight:bold;"> 
             <div class="featured_title">
                 
-                <g:link url="${uGroup.createLink(controller:'document', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
+                <g:link url="${uGroup.createLink(controller:'document', action:'show', id:documentInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
                 <span class="ellipsis">${documentInstance.title}</span>
                 </g:link>
             </div>
