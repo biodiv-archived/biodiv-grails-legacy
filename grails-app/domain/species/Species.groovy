@@ -29,7 +29,8 @@ class Species implements Rateable {
 	Date createdOn = new Date();
 	Date dateCreated;
 	Date lastUpdated;
-	
+	Habitat habitat;
+
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
@@ -58,6 +59,7 @@ class Species implements Rateable {
 		percentOfInfo(nullable:true);
 		updatedOn(nullable:true);
         featureCount nullable:false;
+        habitat nullable:true;
 	}
 
 	static mapping = {
@@ -153,6 +155,9 @@ class Species implements Rateable {
 		return f?.description;
 	}
 
+    String summary() {
+        return "";
+    }
 
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
