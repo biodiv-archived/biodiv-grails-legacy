@@ -75,7 +75,7 @@
 
 			</div>
                         <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
-                            <obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroupInstance, canPullResource:canPullResource]"  />
+                            <obv:showObservationsList/>
                         </div>
                         <div class="span4" style="position:relative;top:20px">
                  

@@ -73,7 +73,10 @@ abstract class Metadata {
     String notes(){
         return ""
     }
-	
+
+    String summary() {
+        return "";
+    }
 	
 	def onAddComment(comment){
 		//updateTimeStamp()

@@ -45,6 +45,8 @@ class AbstractObjectService {
             item.type = controller
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
+			item.sGroup = param['observation'].group.name
+			item.habitat = param['observation'].habitat.name
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = param['observation'].hasProperty("isChecklist")?param['observation'].isChecklist:false ;
@@ -58,14 +60,11 @@ class AbstractObjectService {
 			if(param.inGroup) {
 				item.inGroup = param.inGroup;
 			}
-			if(param['observation'].notes()) {
+/*			if(param['observation'].notes()) {
 				item.notes = param['observation'].notes()
-			} else { 
-                String link = "/" + getTargetController(param['observation'].author) + "/show/"+ param['observation'].author.id
-				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
-				String desc = "- "+ location +" by <a href='"+link+"'>"+param['observation'].author.name.capitalize() +"</a>" + (param['observation'].fromDate ?  (" on " +  param['observation'].fromDate.format('dd/MM/yyyy')) : "");
-				item.notes = desc;				
-			}
+			} else {
+*/  			item.notes = param['observation'].summary();				
+//			}
             
             if(param['featuredNotes'] ==  null) {
             }

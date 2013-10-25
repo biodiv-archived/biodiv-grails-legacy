@@ -185,10 +185,32 @@ h6 {
 }
 
 .thumbnail .observation_story {
-	display: table-cell;
-	vertical-align: middle;
-        width:100%;
+    /*display: table-cell;
+    vertical-align: middle;*/
+overflow:hidden;
+margin-left:150px;
+height:140px;
+padding:5px;
+
 }
+
+#carousel_featureBy .observation_story {
+    width:780px;
+}
+
+.thumbnail .observation_story_image {
+    display:table;
+    height:150px;
+    width:150px;
+}
+#carousel_featureBy .snippet {
+    height:150px;
+}
+
+.list_view .observation_story {
+    width:470px;
+}
+
 
 .button-bar {
 	margin-top: 10px;
@@ -205,16 +227,12 @@ h6 {
 
 .prop {
 	clear: both;
+	margin-bottom: 3px;
 	/* 	overflow: auto; */
 }
 
 .prop.tablet {
 	font-size: 0.8em;
-}
-
-.prop {
-	margin-bottom: 5px;
-	margin-top: 5px;
 }
 
 .prop .name,.prop .name .label {
@@ -245,8 +263,11 @@ h6 {
 /*  	margin-left: 22px;  */
 /* } */
 .observation-icons {
-	float: right;
-	margin-right: 10px;
+/*	float: right;
+	margin-right: 10px;*/
+        position:absolute;
+        right:0px;
+        top:0px
 }
 
 .list_view.thumbnails {
@@ -546,12 +567,16 @@ ul#recoSummary {
 	padding: 10px;
 }
 
-.observation_story,.species_story {
-	padding: 5px;
-	position: relative;
+.snippet {
+    float:left; 
+    position:relative;
+    overflow:hidden;
 }
 
-.observation .observation_story {
+.observation_story,.species_story {
+	padding: 2px;
+	position: relative;
+        width:100%;
 	background-color: #ffffff;
 }
 
@@ -730,8 +755,6 @@ ul#recoSummary {
 .story-footer {
 	position: absolute;
 	bottom: 5px;
-	font-size: 0.8em;
-	color: #b1b1b1;
 	/* opacity:0.5;        */
 }
 
@@ -739,6 +762,8 @@ ul#recoSummary {
 	float: left;
 	margin: 0 2px;
         z-index:1001; /*leaflet controls had 1000 as z-index. This had to be more than that*/
+	font-size: 0.8em;
+	color: #b1b1b1;
 }
 
 .footer-item i {
@@ -833,14 +858,14 @@ ul#recoSummary {
 	float: right;
 }
 
-#carousel_featureBy>.observation_links {
+/*#carousel_featureBy>.observation_links {
 margin-top: 0px;
 float: none;
-top: 189px;
+top: 153px;
 position: absolute;
 right: 0;
 z-index:1;
-}
+}*/
 
 .comments-box {
 	background-color: #dcdcdc;
@@ -1234,7 +1259,7 @@ span.cke_skin_kama {
 }
 .notes_view { /* clear: both; */
 	background-color: whitesmoke;
-	padding: 10px;
+	/*padding: 10px;*/
         word-wrap:break-word;
 }
 
@@ -2010,7 +2035,8 @@ li#userOrEmail-new {
 .jcarousel-skin-ie7 .jcarousel-container-vertical {
         width:100%;
         height:150px;
-        padding: 40px 0px;
+        padding:0px;
+        margin: 0;
 }
 
 /*
@@ -2050,7 +2076,7 @@ li#userOrEmail-new {
     width: 100%;
     height: 21px;
     cursor: pointer;
-    background: #4088b8;
+    background:transparent;/* #4088b8;*/
     text-align:center;
 }
 .jcarousel-skin-ie7 .jcarousel-prev-vertical i, .jcarousel-skin-ie7 .jcarousel-next-vertical i{
@@ -2058,7 +2084,7 @@ li#userOrEmail-new {
     position:absolute;
 }
 .jcarousel-skin-ie7 .jcarousel-prev-vertical {
-    top:19px;
+    top:-21px;
 }
 
 .feedParentContext {

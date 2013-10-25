@@ -40,7 +40,7 @@
 						<li class="thumbnail" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:else>
 					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, canPullResource:canPullResource]"></obv:showSnippetTablet>
+						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroup, canPullResource:canPullResource]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
@@ -50,7 +50,7 @@
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
 					<li class="thumbnail feedParentContext  clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, canPullResource:canPullResource]"></obv:showSnippet>
+							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroup, canPullResource:canPullResource]"></obv:showSnippet>
 					</li>
 				</g:each>
 			</ul>

@@ -101,8 +101,23 @@ var itemAfterLoadCallback = function(carousel, state) {
 	});
 }
 
+var initCallback = function(carousel, status) {
+     $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
+        $(this).children().addClass('icon-gray');    
+    }, function(){
+        $(this).children().removeClass('icon-gray');    
+    });
+
+    $(".jcarousel-next-vertical").append("<i class='icon-chevron-down'></i>").hover(function(){
+        $(this).children().addClass('icon-gray');    
+    }, function(){
+        $(this).children().removeClass('icon-gray');    
+    });
+
+   
+}
+
 var setupCallback = function(carousel) {
-    //$("#carousel_featureBy").find('ul.jcarousel-list').css({"overflow" : "visible"}); 
 }
 var getSnippetHTML = function(carousel, item) {
 	var paramsString = "";
@@ -112,7 +127,24 @@ var getSnippetHTML = function(carousel, item) {
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 
 	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet'+'"><div class="figure span2 observation_story_image"><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'span10'+'"><h5 class="popover-title"><b>Featured :</b> '+item.imageTitle+' <small>on '+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</small></h5>'+notes+'</div></div></div>';;
+	return '<div class=thumbnail>'+
+                '<div class="'+item.type.replace(' ','_')+'_th snippet'+'">'+
+                    '<span class="badge all_gall_th featured"></span>'+
+                    '<div class="figure pull-left observation_story_image">'+
+                            '<a href='+ item.url + paramsString + '>' + imageTag + '</a>'+
+                    '</div>'+
+                    '<div class="'+'observation_story'+'">'+
+                        '<div class="observation-icons">'+
+                            '<span style="float:right;" class="habitat_icon group_icon habitats_sprites active '+item.habitat.toLowerCase()+'_gall_th" title="'+item.habitat+'"></span>'+
+                            '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>'+
+                        '</div>'+
+                    '<div style="background-color:whitesmoke;font-weight:bold;">'+
+                        '<div class="species_title">'+item.imageTitle+'</div>'+
+                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> by with notes : </small>'+
+                    '</div>'+
+                    '<div class="linktext">'+item.notes+'</div>'+
+                '<div>'+
+            '</div>'
 };
 
 var getSnippetTabletHTML = function(carousel, item) {
