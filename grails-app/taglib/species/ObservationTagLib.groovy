@@ -35,16 +35,11 @@ class ObservationTagLib {
 	}
 
     def showSnippetTablet = {attrs, body->
-		if(attrs.model.observationInstance) {
-			out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
-		}
+		out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
 	}
-
 	
-	def showStory = {attrs, body->
-		if(attrs.model.observationInstance) {
-			out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
-		}
+	def showStory = { attrs, body ->
+		out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
 	}
 	
 	def addFlag= {attrs, body->
@@ -66,13 +61,13 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
+        println attrs.model;
 			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	
 	def showGroupFilter = {attrs, body->
 			out << render(template:"/common/speciesGroupFilterTemplate", model:attrs.model);
 	}
-	
 	
 	def showRating = {attrs, body->
 		if(attrs.model.observationInstance) {
@@ -325,6 +320,18 @@ class ObservationTagLib {
 
         """
         
+    }
+
+    def featured = { attrs, body ->
+        if(attrs.model) {
+            def p = [limit:1, offset:0, filterProperty:'featureBy', controller:params.controller]
+            def related = observationService.getRelatedObservations(p)?.relatedObv
+            if(related) {
+                attrs.model['relatedInstanceList'] = related.observations;
+                attrs.model['relatedInstanceListTotal'] = related.count;
+            }
+        }
+        out << obv.showRelatedStory(attrs, body);
     }
 }
 

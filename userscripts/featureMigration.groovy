@@ -32,6 +32,7 @@ def migrateFeedForFlag() {
 def migrateFlag() {
     Flag.withTransaction(){
         Flag.list().each { f ->
+			println f
             f.objectId = f.observation.id
             f.objectType = f.observation.class.getCanonicalName()
             if(!f.save(flush:true)) {
@@ -42,8 +43,8 @@ def migrateFlag() {
 }
 
 
-migrateFlag()
-//migrateFeedForFlag()
+//migrateFlag()
+migrateFeedForFlag()
 
 println "=========== done"
 
@@ -62,3 +63,5 @@ println "=========== done"
 //ALTER TABLE flag ALTER COLUMN object_id SET NOT NULL; ALTER TABLE flag ALTER COLUMN object_type SET NOT NULL; ALTER TABLE flag ADD CONSTRAINT flag_object_id_object_type UNIQUE (object_id, object_type, author_id);
 //update document set flag_count = 0;
 
+//ALTER TABLE activity_feed ALTER COLUMN activity_descrption TYPE varchar(400);
+//update document set flag_count = 0;

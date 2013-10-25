@@ -1,8 +1,9 @@
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.participation.Featured"%>
 
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'}"
     style="margin-left: 0px;width:${showDetails?'auto':'200px;'}">
-    <div class="snippet tablet "
+    <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 
         <g:if test="${userGroup.id}">
@@ -25,7 +26,7 @@
                 ${userGroup.getAllMembersCount()}
             </div>
             </g:if>
-        </g:if>
+                    </g:if>
 
         <g:else>
         <!-- parentportal-->${userGroup.name}
@@ -43,7 +44,6 @@
             href="${uGroup.createLink(controller:'userGroup', action:'show')}">
             <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:120px'};"
                 title="${userGroup.name}"> ${userGroup.name} </span> </a>
-
         </g:else>
 
 

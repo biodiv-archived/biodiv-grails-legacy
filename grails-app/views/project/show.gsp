@@ -267,7 +267,7 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
-								<g:render template="/document/showDocument"
+								<g:render template="/document/showDocumentSnippetTemplate"
 									model="['documentInstance':proposalFile, 'showDetails':false]" />
 							</g:each>
 						</g:if>
@@ -294,7 +294,7 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.reportFiles}" var="reportFile">
-								<g:render template="/document/showDocument"
+								<g:render template="/document/showDocumentSnippetTemplate"
 									model="['documentInstance':reportFile, 'showDetails':false]" />
 							</g:each>
 						</g:if>
@@ -349,7 +349,7 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.miscFiles}" var="miscFile">
-								<g:render template="/document/showDocument"
+								<g:render template="/document/showDocumentSnippetTemplate"
 									model="['documentInstance':miscFile, 'showDetails':false]" />
 							</g:each>
 						</g:if>

@@ -28,18 +28,12 @@ function updateListSelection(comp){
 		if(confirm('This will select all the resoures from list. Are you sure ?')){
 			$('.post-to-groups .select-all').addClass('active')
 			$('.post-to-groups .reset').removeClass('active')
-			//$('.observations_list .selectable').addClass('selectedItem');
 			$('.mainContentList .selectable input[type="checkbox"]').prop('checked', true);
-			//$('.snippet.tablet .figure .mouseover').removeClass('mouseover').addClass('mouseoverfix');
-			//$('.snippet.tablet .figure .mouseoverfix').show();
 			rejectedObjects = new Array();
 		}
 	}else{
 		$('.post-to-groups .select-all').removeClass('active')
 		$('.post-to-groups .reset').addClass('active')
-		//$('.observations_list .selectable').removeClass('selectedItem');
-		//$('.snippet.tablet .figure .mouseoverfix').removeClass('mouseoverfix').addClass('mouseover');
-		//$('.snippet.tablet .figure .mouseover').hide();
 		$('.mainContentList .selectable input[type="checkbox"]').prop('checked', false);
 	}
 }
@@ -86,6 +80,8 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 				}else{
 					$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-success').html(data.msg);
 				}
+                                $('#myTab a:first').tab('show');
+				//$('.post-to-groups .post-main-content').slideToggle(150);
 			}else{
 				$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-error').html(data.msg);
 			}
@@ -102,9 +98,6 @@ function updateGroupPostSelection(){
 	var comp = $('.post-to-groups .select-all')
 	if(comp && comp.hasClass('active')){
 		$('.mainContentList .selectable input[type="checkbox"]').prop('checked', true);
-		//$('.observations_list .selectable').addClass('selectedItem');
-		//$('.snippet.tablet .figure .mouseover').removeClass('mouseover').addClass('mouseoverfix');
-		//$('.snippet.tablet .figure .mouseoverfix').show();
 	}
 }
 

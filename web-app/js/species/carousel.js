@@ -1,6 +1,4 @@
 var itemLoadCallback = function(carousel, state) {
-        console.log("ITEM LOAD CALL BACK");
-        
         carousel.last = carousel.last?carousel.last:3;
 	var params = {
 		"limit" : carousel.last - carousel.first,
@@ -9,32 +7,23 @@ var itemLoadCallback = function(carousel, state) {
 		"filterPropertyValue": carousel.options.filterPropertyValue,
 		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
 	}
-        
         if(params.limit == 0)
             params.limit = 3;
 
 	if (state == 'prev'){
 		return;
 	}
-	
 	params.offset = carousel.first -1;
-		
 	if(carousel.last == carousel.options.size){
 		params.limit = carousel.last;
 	}
-		
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
-
-
 	});
 	// jqxhr.error(function() { alert("error"); });
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
-     console.log("ITEM ADD CALL BACK");
-                    console.log(carousel);
-
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
@@ -97,8 +86,6 @@ function resizeImage(item) {
 }
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
-         console.log("RELOAD CAROUSEL");
-
 	carousel.options.filterProperty = fitlerProperty;
 	carousel.options.filterPropertyValue = filterPropertyValue;
 	var visibleOffset = carousel.last - carousel.first;
@@ -109,19 +96,29 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 }
 
 var itemAfterLoadCallback = function(carousel, state) {
-         console.log("ITEM AFTER LOAD CALL BACK");
-
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
 }
 
-var setupCallback = function(carousel) {
-    //$("#carousel_featureBy").find('ul.jcarousel-list').css({"overflow" : "visible"}); 
+var initCallback = function(carousel, status) {
+    $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
+        $(this).children().addClass('icon-black');    
+    }, function(){
+        $(this).children().removeClass('icon-black');    
+    });
+
+    $(".jcarousel-next-vertical").append("<i class='icon-chevron-down'></i>").hover(function(){
+        $(this).children().addClass('icon-black');    
+    }, function(){
+        $(this).children().removeClass('icon-black');    
+    });
+
+   
 }
 
-
-
+var setupCallback = function(carousel) {
+}
 var getSnippetHTML = function(carousel, item) {
 	var paramsString = "";
 	if(carousel.options.filterProperty === "speciesName"){
@@ -130,7 +127,24 @@ var getSnippetHTML = function(carousel, item) {
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 
 	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet'+'"><div class="figure span2 observation_story_image"><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'span10'+'"><h5 class="popover-title"><b>Featured :</b> '+item.imageTitle+' <small>on '+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</small></h5>'+notes+'</div></div></div>';;
+	return '<div class=thumbnail>'+
+                '<div class="'+item.type.replace(' ','_')+'_th snippet'+'">'+
+                    '<span class="badge all_gall_th featured"></span>'+
+                    '<div class="figure pull-left observation_story_image">'+
+                            '<a href='+ item.url + paramsString + '>' + imageTag + '</a>'+
+                    '</div>'+
+                    '<div class="'+'observation_story'+'">'+
+                        '<div class="observation-icons">'+
+                            '<span style="float:right;" class="habitat_icon group_icon habitats_sprites active '+item.habitat.toLowerCase()+'_gall_th" title="'+item.habitat+'"></span>'+
+                            '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>'+
+                        '</div>'+
+                    '<div style="background-color:whitesmoke;font-weight:bold;">'+
+                        '<div class="species_title">'+item.imageTitle+'</div>'+
+                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> by with notes : </small>'+
+                    '</div>'+
+                    '<div class="linktext">'+item.notes+'</div>'+
+                '<div>'+
+            '</div>'
 };
 
 var getSnippetTabletHTML = function(carousel, item) {

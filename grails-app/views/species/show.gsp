@@ -350,7 +350,9 @@ $(document).ready(function(){
 	} catch(e) {
   		console.log(e)
 	}  	
-
+        $(".resource_in_groups li.featured").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+        });
 <%--  	//init editables --%>
 <%--$('.myeditable').editable({--%>
 <%--    url: '/post' //this url will not be used for creating new user, it is only for update--%>
@@ -425,8 +427,13 @@ $(document).ready(function(){
 </head>
 
 <body>
+<g:if test="${speciesInstance}">
+<g:set var="featureCount" value="${speciesInstance.featureCount}"/>
+</g:if>
 
 <div class="span12">
+
+
 			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
 			
 			<g:if test="${!speciesInstance.percentOfInfo}">

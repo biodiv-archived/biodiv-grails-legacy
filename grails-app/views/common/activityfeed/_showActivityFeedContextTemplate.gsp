@@ -43,8 +43,7 @@
 			<s:showSnippet model="['speciesInstance':feedParentInstance]" />
 		</g:elseif>
 		<g:elseif test="${feedInstance.rootHolderType ==  Document.class.getCanonicalName()}" >
-			<a href='${uGroup.createLink([action:"show", controller:"document", id:feedParentInstance.id,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}'><b>Document</b></a>
-			<g:render template="/document/showDocument" model="['documentInstance':feedParentInstance]"/>
+			<g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':feedParentInstance]"/>
 		</g:elseif>
 		<g:else>
 			${feedInstance.rootHolderType}

@@ -70,68 +70,159 @@ class ActionController {
 
         }
     } 
-   
-    @Secured(['ROLE_USER'])
-    def featureIt = { 
+
+    private boolean saveActMail(params, Featured featuredInstance , obv, UserGroup ug) {
+        if(!featuredInstance.save(flush:true)){
+            featuredInstance.errors.allErrors.each { log.error it }
+            return false
+        }
+        //NOTE: Putting rootHolder & activity holder Same for IBP group case
+        def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
+        searchIndex(params.type,obv)
+        observationService.sendNotificationMail(act.activityType, obv, null, null, act)
+        return true
+    }
+
+    def inGroups= {
         log.debug params;
-        params.author = springSecurityService.currentUser;
+        boolean status = false;
+        def r = [:]
+
         def obv = activityFeedService.getDomainObject(params.type,params.id); 
+        
+        def resourceGroupHtml = ""
+
+        if(obv) {
+            resourceGroupHtml =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance': obv]);
+            status = 'success';
+        }
+        r["status"] = status?'success':'error'
+        r["resourceGroupHtml"] = resourceGroupHtml
+        render r as JSON
+
+    }
+
+    @Secured(['ROLE_USER'])
+    def featureIt = {  
+        log.debug params;
+        boolean status = false;
+        String msg = '';
+        def r = [:]
+       
+        params.author = springSecurityService.currentUser;
+
+        def obv = activityFeedService.getDomainObject(params.type,params.id); 
+        
         def ugParam = params['userGroup']
-        def ugParamLen = ugParam.length()
-        List splitGroups = ugParam.split(",")
-        if(ugParamLen != 0){
-            if(ugParam[ugParamLen-1] == ',') {
-                splitGroups.add("")
-            }
-        }
-        List groups = splitGroups.collect {
-            if(it == ""){ 
-                null
-            }
-            else { 
-                UserGroup.read(Long.parseLong(it))
-            }
-        }
-        def featuredInstance
-        UserGroup.withTransaction(){
-            groups.each { ug ->
-                featuredInstance = Featured.findWhere(author: params.author,objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
-                 if(!featuredInstance){
-                     try{
-                        featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
-                        featuredInstance.save(flush: true)
-                        if(!featuredInstance.save(flush:true)){
-                            featuredInstance.errors.allErrors.each { log.error it }
-                          }
-                         else{
-                            println featuredInstance.id
-                        }
-                        //NOTE: Putting rootHolder & activity holder Same for IBP group case
-                        def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
-                        println "====================="
-                        searchIndex(params.type,obv)
-                        //Follow.addFollower(obv, params.author)
-                        observationService.sendNotificationMail(act.activityType, obv, null, null, act)
-                    }catch (Exception e) {
-                        e.printStackTrace()
-                     }
+        def resourceGroupHtml
 
-                 }
-                else {
-                    flash.message  = "${message(code: 'featured.already', default:'Already featured')}"
+        if(ugParam != null && params.notes && obv) {
+            
+            List splitGroups = [];
+            println "0000"
+           println ugParam 
+             if(ugParam && ugParam.length() > 0){
+                splitGroups = ugParam.split(",")
+                 println ugParam
+                 if(ugParam[-1] == ',') {//TODO:CHECK THIS
+                     println "adding null"
+                    splitGroups.add("")
                 }
-                 }
-            } 
+                
+            }
+            else {
+                splitGroups.add("")    
+            }
 
-        def r = ["success":true]
-        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':obv])
-        r["freshUGListHTML"] = freshUGListHTML
-	    render r as JSON
+            List groups = splitGroups.collect { (it == '') ? null : UserGroup.read(Long.parseLong(it)) }
+            def featuredInstance;
+            UserGroup.withTransaction() {
+                groups.each { ug ->
+                    println ug
+                   if(ug == null) {
+                       println "0"
+                        if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
+                        }
+                        else {
+                            msg = "You don't have the permission!!"
+                            status = false;
+                            r["status"] = status?'success':'error'
+                            r['msg'] = msg
+                            render r as JSON
+                            return
+                        }
+                    }
+                    else {  
+                        if (ug.isFounder(params.author) || ug.isExpert(params.author)) {
+                        }  
+                        else {
+                             msg = "You don't have the permission!!" 
+                             status = false;
+                             r["status"] = status?'success':'error'
+                             r['msg'] = msg
+                             render r as JSON
+                             return
+                        } 
+                    }
+                     try{
+                        featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
+                        if(!featuredInstance) {
+                            featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
+                            status = saveActMail(params, featuredInstance, obv, ug);
+                            obv.featureCount++
+		                    if(!obv.save(flush:true)) {
+                                obv.errors.allErrors.each { log.error it }
+                            }
+                            if(status) msg = "Successfully featured ${obv.class.simpleName}"
+                        } 
+                        else {
+                            if(featuredInstance.author == params.author){
+                                featuredInstance.notes = params.notes
+                                status = saveActMail(params, featuredInstance, obv, ug) 
+                                if(status) msg = "Successfully updated notes for the featued ${obv.class.simpleName}"
+                            }
+                            else{
+                                try{
+                                    featuredInstance.delete(flush:true, failOnError:true)
+                                }catch (Exception e) {
+                                    e.printStackTrace()
+                                }
+                                featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
+                                status = saveActMail(params, featuredInstance, obv, ug)
+                                if(status) msg = "Successfully featued ${obv.class.simpleName} again and updated notes given previously"
+
+                            }
+                        }
+                    }catch (Exception e) {
+                        status = false;
+                        msg = "Error: ${e.getMessage()}";
+                        e.printStackTrace()
+                        log.error e.getMessage();
+                    }
+                 }
+             } 
+            
+            if(!status)
+                msg = "Error while featuring the ${obv.class.simpleName}. ${msg}"
+
+            //freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':obv])
+         }
+
+        if(obv)
+            resourceGroupHtml =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance': obv]);
+        r["status"] = status?'success':'error'
+        r['msg'] = msg
+        r["resourceGroupHtml"] = resourceGroupHtml
+        render r as JSON
     }
 
     @Secured(['ROLE_USER'])
     def unfeatureIt = {
         log.debug params;
+        boolean status = false;
+        String msg = '';
+        def r = [:]
+
         params.author = springSecurityService.currentUser;
         def obv = activityFeedService.getDomainObject(params.type, params.id);
         def ugParam = params['userGroup']
@@ -143,50 +234,84 @@ class ActionController {
             }
         }
         List groups = splitGroups.collect {
-		     if(it == ""){
+            if(it == ""){
                 null
             }
             else {
                 UserGroup.read(Long.parseLong(it))
             }
-		}
+        }
         def featuredInstance
         UserGroup.withTransaction() {
             groups.each { ug ->
-                featuredInstance = Featured.findWhere(author: params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
+                   if(ug == null) {
+                        if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
+                        }
+                        else {
+                            msg = "You don't have the permission!!"
+                            status =false;
+                            r["status"] = status?'success':'error'
+                            r['msg'] = msg
+                            render r as JSON
+                            return
+                        }
+                    }
+                    else { 
+                        if (ug.isFounder(params.author) || ugroup.isExpert(params.author)) {
+                        } 
+                        else {
+                             msg = "You don't have the permission!!" 
+                             status = false;
+                             r["status"] = status?'success':'error'
+                             r['msg'] = msg
+                             render r as JSON
+                             return
+                        } 
+                    }
+                featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
                 if(!featuredInstance) {
                     return
                 }
                 try {
-                    //featuredInstance.delete(flush: true)
-                        if(!featuredInstance.delete(flush:true)){
-                            featuredInstance.errors.allErrors.each { log.error it }
+                    if(!featuredInstance.delete(flush:true)){
+                        featuredInstance.errors.allErrors.each { log.error it }
+                    }
+                    obv.featureCount--
+                    if(!obv.save(flush:true)) {
+                        obv.errors.allErrors.each { log.error it }
                     }
 
-                    //String actDesc = activityFeedService.getDescriptionForFeature(obv, ug, false) 
-                    //println "======ACT DESC ===== " + actDesc
-                    def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.UNFEATURED, featuredInstance.notes);
+                    def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, params.author, activityFeedService.UNFEATURED, featuredInstance.notes);
                     searchIndex(params.type,obv)
                     observationService.sendNotificationMail(act.activityType, obv, null, null, act)
+                    status = true
+                    if(status) {
+                        msg = "Successfully removed featured ${obv.class.simpleName}"
+                    }
                     return
                 }catch (org.springframework.dao.DataIntegrityViolationException e) {
-				    flash.message = "${message(code: 'featured.delete.error', default: 'Error while unfeaturing')}"
-		        }
+                    status false
+                    if(!status){
+                        msg = "Error while featuring the ${obv.class.simpleName}"                    
+                    }
+                    flash.message = "${message(code: 'featured.delete.error', default: 'Error while unfeaturing')}"
+                }
             }
         }
-        def r = ["success":true]
-        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':obv])
-        r["freshUGListHTML"] = freshUGListHTML
-	    render r as JSON
+        r["status"] = status?'success':'error'
+        r['msg'] = msg
+        def resourceGroupHtml =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance': obv]);
+        r["resourceGroupHtml"] = resourceGroupHtml
+        render r as JSON
 
-    }
+    } 
 
 	@Secured(['ROLE_USER'])
 	def flagIt = { 
         log.debug params;
 		params.author = springSecurityService.currentUser;
-		def obv = activityFeedService.getDomainObject(params.type,params.id);     //GEt object instance ??
-		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());    //flag nikalne ki function observationservice mein hai ??
+		def obv = activityFeedService.getDomainObject(params.type,params.id);     
+		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());    
 		def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);
 		if (!flagInstance) {
 			try {
@@ -199,9 +324,9 @@ class ActionController {
                 def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
                 obv.flagCount++
 				obv.save(flush:true)
-				activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); //add activity
+				def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
                 searchIndex(params.type,obv)				
-				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress) //???
+				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
 				flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -225,7 +350,7 @@ class ActionController {
 	def deleteFlag  = {
 		log.debug params;
         params.author = springSecurityService.currentUser;
-		def flagInstance = Flag.findWhere(id: params.id.toLong());  //kaun si kiski id hai???
+		def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);  //kaun si kiski id hai???
 		def obv = activityFeedService.getDomainObject(flagInstance.objectType, flagInstance.objectId);    ///observation nikali hai...species bhi ho sakta hai
         
 
@@ -237,6 +362,7 @@ class ActionController {
             def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
             activityFeedService.addActivityFeed(obv, flagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
 			flagInstance.delete(flush: true);
+            obv.flagCount--
 			obv.save(flush:true)
 			searchIndex(params.type,obv);    //observation ke liye only
             def message = [:]
@@ -247,7 +373,6 @@ class ActionController {
 			e.printStackTrace();
 			response.setStatus(500);
 			def message = [error: g.message(code: 'flag.error.onDelete', default:'Error on deleting flag')];
-			
             render message as JSON
 		} 
 	}

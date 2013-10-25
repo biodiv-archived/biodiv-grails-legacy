@@ -402,11 +402,11 @@ class SpeciesService {
 
 
 
-    def getSpeciesList(params, String action, noLimit = false){
+    def getSpeciesList(params, String action){
         if("search".equalsIgnoreCase(action)){
-            return search(params, noLimit)
+            return search(params)
         }else{
-            return _getSpeciesList(params, noLimit)
+            return _getSpeciesList(params)
         }
     }
 
@@ -426,7 +426,7 @@ class SpeciesService {
 
     /**
      */
-    def _getSpeciesListQuery(params,noLimit) {
+    def _getSpeciesListQuery(params) {
         params.startsWith = params.startsWith?:"A-Z"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
         def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
@@ -490,11 +490,22 @@ class SpeciesService {
             }
 
             if(params.featureBy == "true" ) {
+                params.userGroup = observationService.getUserGroup(params)
                 def featureQuery = ", Featured feat "
                 query += featureQuery;
-                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
                 countQuery += featureQuery
-                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
+                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType and "
+                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType and "
+                if(params.userGroup == null) {
+                    String str = "feat.userGroup is null "
+                    filterQuery += str
+                    countFilterQuery += str
+                }else {
+                    String str = "feat.userGroup.id = :userGroupId "
+                    filterQuery += str
+                    countFilterQuery += str
+                    queryParams["userGroupId"] = params.userGroup?.id
+                }   
                 queryParams["featureBy"] = params.featureBy
                 queryParams["featType"] = Species.class.getCanonicalName();
             }
@@ -521,22 +532,20 @@ class SpeciesService {
 
     /**
      */
-    private _getSpeciesList(params, noLimit) {
+    private _getSpeciesList(params) {
         //cache "taxonomy_results"
-        def queryParts = _getSpeciesListQuery(params, noLimit)
+        def queryParts = _getSpeciesListQuery(params)
         def hqlQuery = sessionFactory.currentSession.createQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createQuery(queryParts.countQuery)
         def queryParams = queryParts.queryParams
-        if(!noLimit) {
-            if(params.max > -1){
-                hqlQuery.setMaxResults(params.max);
-                queryParams["max"] = params.max
-            }
-            if(params.offset > -1) {
-                hqlQuery.setFirstResult(params.offset);
-                queryParams["offset"] = params.offset
-            } 
+        if(params.max > -1){
+            hqlQuery.setMaxResults(params.max);
+            queryParams["max"] = params.max
         }
+        if(params.offset > -1) {
+            hqlQuery.setFirstResult(params.offset);
+            queryParams["offset"] = params.offset
+        } 
         hqlQuery.setProperties(queryParams);
         hqlCountQuery.setProperties(queryParams);
         //log.debug "Species query :${query}"
@@ -556,6 +565,4 @@ class SpeciesService {
         //return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
         //}
     }
-
-
 }

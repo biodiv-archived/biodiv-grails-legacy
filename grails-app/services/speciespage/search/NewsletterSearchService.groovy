@@ -27,17 +27,7 @@ import species.participation.RecommendationVote.ConfidenceType;
 import utils.Newsletter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
-class NewsletterSearchService {
-
-	static transactional = false
-
-	def grailsApplication
-	
-	SolrServer solrServer;
-	
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	
-	static int BATCH_SIZE = 50;
+class NewsletterSearchService extends AbstractSearchService {
 
 	/**
 	 * 
@@ -61,9 +51,6 @@ class NewsletterSearchService {
 		log.info "Time taken to publish newsletter search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
-	def publishSearchIndex(Newsletter obv, boolean commit) {
-		return publishSearchIndex([obv], commit);
-	}
 	/**
 	 * 
 	 * @param species
@@ -104,80 +91,7 @@ class NewsletterSearchService {
 			
 		}
 
-		//log.debug docs;
-
-		try {
-			solrServer.add(docs);
-			if(commit) {
-				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-                if(solrServer instanceof ConcurrentUpdateSolrServer)
-    				solrServer.blockUntilFinished();
-				solrServer.commit();
-				log.info "Finished committing to newsletters solr core"
-			}
-		} catch(SolrServerException e) {
-			e.printStackTrace();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+        return commitDocs(docs, commit);
 	}
 
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	def search(query) {
-		def params = SolrParams.toSolrParams(query);
-		log.info "Running newsletter search query : "+params
-		return solrServer.query( params );
-	}
-
-	/**
-	* delete requires an immediate commit
-	* @return
-	*/
-   def delete(long id) {
-	   log.info "Deleting newsletter from search index"
-	   solrServer.deleteByQuery("id:${id}");
-	   solrServer.commit();
-   }
-   
-	/**
-	 * 
-	 * @return
-	 */
-	def deleteIndex() {
-		log.info "Deleting newsletter search index"
-		solrServer.deleteByQuery("*:*")
-		solrServer.commit();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	def optimize() {
-		log.info "Optimizing newsletter search index"
-		solrServer.optimize();
-	}
-
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	def terms(query, field, limit) {
-		field = field?:"autocomplete";
-		SolrParams q = new SolrQuery().setQueryType("/terms")
-				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
-				.set(TermsParams.TERMS_LOWER, query)
-				.set(TermsParams.TERMS_LOWER_INCLUSIVE, true)
-				.set(TermsParams.TERMS_REGEXP_STR, query+".*")
-				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
-				.set(TermsParams.TERMS_LIMIT, limit)
-				.set(TermsParams.TERMS_RAW, true);
-		log.info "Running newsletter search query : "+q
-		return solrServer.query( q );
-	}
 }

@@ -17,9 +17,18 @@
 
 		<g:each in="${documentInstanceList}" status="i" var="documentInstance">
 			<tr class="mainContent ${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>
-					<a
-						href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, 'userGroupWebaddress':params?.webaddress)}'>
+                            <td>
+                                <g:if test="${documentInstance}">
+                                <g:set var="featureCount" value="${documentInstance.featureCount}"/>
+                                </g:if>
+
+
+                                <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="position:relative;">
+                                </span>
+
+
+                                <a style="vertical-align:middle;"
+						href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, userGroup:userGroupInstance)}'>
 						${documentInstance.title}
 					</a>
 				</td>
@@ -31,7 +40,7 @@
 				</td>
 				<g:if test="${canPullResource}">
 					<td>
-						<uGroup:objectPost model="['objectInstance':documentInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+						<uGroup:objectPost model="['objectInstance':documentInstance, canPullResource:canPullResource]" />
 					</td>
 				</g:if>
 			</tr>

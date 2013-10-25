@@ -22,7 +22,7 @@
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
                     <uGroup:rightSidebar/>
                     <obv:showRelatedStory
-            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
             <h5>Browse Species</h5>
 
 		<div class="tabbable" style="margin-left:0px;clear:both;">

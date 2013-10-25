@@ -226,7 +226,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $("#removeQueryFilter").live('click', function(){
+    $(".removeQueryFilter").live('click', function(){
         var removeParam = undefined;
         if($($(this).attr('data-target').replace('.','\\.')).length != 0)
         $($(this).attr('data-target').replace('.','\\.')).val('')
@@ -325,50 +325,10 @@ $(document).ready(function(){
     //	last_actions();
     eatCookies();
     $('.observations_list_wrapper').trigger('updatedGallery');
-
-    $('#distinctRecoTableAction').click(function(){
-        var $me = $(this);
-        var target = window.location.pathname + window.location.search;
-        var a = $('<a href="'+target+'"></a>');
-        var url = a.url();
-        var href = url.attr('path');
-        var params = getFilterParameters(url);
-        params['max'] = $(this).data('max');
-        params['offset'] = $(this).data('offset');
-        var $distinctRecoTable = $('#distinctRecoTable');
-        $.ajax({
-            url:window.params.observation.distinctRecoListUrl,
-            dataType: "json",
-            data:params,
-            success: function(data) {
-            	$('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
-                if(data.status === 'success') {
-                	$.each(data.distinctRecoList, function(index, item) {
-                        if(item[1])
-                            $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
-                        else
-                            $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
-                    });
-                    $me.data('offset', data.next);
-                    if(!data.next){
-                    	$me.hide();
-                    }
-                } else {
-                	$me.hide();
-                }
-            }
-        });
-    });
-    $('#distinctRecoTableAction').click();
 });
 
-if (typeof String.prototype.startsWith != 'function') {
-    // see below for better implementation!
-    String.prototype.startsWith = function (str){
-        return this.indexOf(str) == 0;
-    };
-}
-
+/**
+ */
 function eatCookies() {	
     var hashString = window.location.hash.substring(1)
         if ($.cookie("listing") == "list") {
@@ -397,10 +357,6 @@ function eatCookies() {
             $('.list_view_bttn').removeClass('active');
         }
     adjustHeight();
-}
-
-function stringTrim(s){
-    return $.trim(s);
 }
 
 function getSelectedGroup() {
@@ -654,19 +610,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
-        if(data.chartModel) {
-            visualization_data = new google.visualization.DataTable();
-            $.each(data.chartModel.columns, function(index, item) {
-                visualization_data.addColumn( item[0], item[1]);
-            });
-
-            $.each(data.chartModel.data, function(index, item) {
-                visualization_data.addRow(item);
-            });
-            visualization.draw(visualization_data, {legend: 'bottom'});
-        }
         //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
-        updateDistinctRecoTable();
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
         reInitializeGroupPost();
@@ -817,36 +761,6 @@ function updateDistinctRecoTable(){
 	$(me).click();
 }
 
-/*                        function getRandomNumber(){
-                          return ((Math.random() -.5) / 200);
-                          }
-
-                          function jitterCloseMarker(big_map){
-                          var zoomLevel = big_map.getZoom();
-                          if(zoomLevel >= 13){
-                          var markerKeys = [];
-                          var mapBounds = big_map.getBounds()
-                          for (var i = 0; i < markers.length; i++) {
-                          var pos = markers[i].getPosition();
-                          if(mapBounds.contains(pos)){
-                          if($.inArray(pos.toString(), markerKeys) != -1){
-                          markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
-                          }else{
-                          markerKeys.push(pos.toString());
-                          }
-                          }
-                          }
-                          }
-                          }  
-
-
-                          google.maps.event.addListener(big_map, 'zoom_changed', function() {
-                          jitterCloseMarker(big_map);
-
-                          });
-                          var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
-                          */                       
-
 function load_content(params){
     var marker = this
     $.ajax({
@@ -856,29 +770,6 @@ function load_content(params){
         }
     });
 }
-/*
-
-   google.maps.event.addListener(big_map, 'dragend', function() { checkBounds(); });
-
-   function checkBounds() {
-   if (allowedBounds.contains(big_map.getCenter())) return;
-
-   var c = big_map.getCenter(),
-   x = c.lng(),
-   y = c.lat(),
-   maxX = allowedBounds.getNorthEast().lng(),
-   maxY = allowedBounds.getNorthEast().lat(),
-   minX = allowedBounds.getSouthWest().lng(),
-   minY = allowedBounds.getSouthWest().lat();
-
-   if (x < minX) x = minX;
-   if (x > maxX) x = maxX;
-   if (y < minY) y = minY;
-   if (y > maxY) y = maxY;
-
-   big_map.setCenter(new google.maps.LatLng(y, x));
-   }
-   */
 
 function speciesHabitatInterestHandler(event){
     if(!event.data.multiSelect) 
@@ -920,6 +811,83 @@ $(document).ready(function(){
     $(".snippet.tablet .figure").hover(function() {
         $(this).children('.mouseover').toggle('slow')
     });
-
 });
+
+function loadDistinctRecoList() {
+    var $me = $(this);
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    params['max'] = $(this).data('max');
+    params['offset'] = $(this).data('offset');
+    var $distinctRecoTable = $('#distinctRecoTable');
+    $.ajax({
+        url:window.params.observation.distinctRecoListUrl,
+        dataType: "json",
+        data:params,
+        success: function(data) {
+            $('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
+            if(data.status === 'success') {
+                $.each(data.distinctRecoList, function(index, item) {
+                    if(item[1])
+                    $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
+                    else
+                    $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
+                });
+                $me.data('offset', data.next);
+                if(!data.next){
+                    $me.hide();
+                }
+            } else {
+                $me.hide();
+            }
+        }
+    });
+}
+
+function loadSpeciesGroupCount() {
+    var $me = $(this);
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    $.ajax({
+        url:window.params.observation.speciesGroupCountListUrl,
+        dataType: "json",
+        data:params,
+        success: function(data) {
+            if(data.status === 'success') {
+                if(data.speciesGroupCountList) {
+                    loadGoogleVisualizationAPI(function(){
+                        var visualization_data = new google.visualization.DataTable();
+                        $.each(data.speciesGroupCountList.columns, function(index, item) {
+                            visualization_data.addColumn( item[0], item[1]);
+                        });
+
+                        $.each(data.speciesGroupCountList.data, function(index, item) {
+                            visualization_data.addRow(item);
+                        });
+
+                        var columnChart = new google.visualization.ColumnChart(
+                            document.getElementById('speciesGroupCountList'));
+
+                        columnChart.draw(visualization_data,  {
+                            title:"No of observations per species group",
+                            vAxis:{minValue:0, maxValue:5, format: '#'},
+                            legend:{position: 'bottom'},
+                            chartArea:{width:'80%'}
+                        });
+                    })
+                } else {
+                    $("#speciesGroupCountList").html('<div id="relatedObservationMsg_a" class="alert alert-info" style="">No data!!</div>');
+                }
+            } else {
+                $("#speciesGroupCountList").html('<div class="alert alert-error">'+data.msg+'</div>');
+            }
+        }
+    });
+}
     

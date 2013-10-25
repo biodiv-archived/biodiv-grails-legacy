@@ -4,6 +4,12 @@
 <%@ page import="species.Language"%>
 <%@ page import="species.CommonNames"%>
 
+<g:if test="${speciesInstance}">
+<g:set var="featureCount" value="${speciesInstance.featureCount}"/>
+</g:if>
+
+<span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}">
+</span>
 
 	<div class="figure span3 observation_story_image"
 		style="display: table; height: 220px;" title="">
@@ -92,6 +98,7 @@
                     <div class="footer-item">
                         <obv:like model="['resource':speciesInstance]"/>
                     </div>
+                    <uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
                 </div>
 
 

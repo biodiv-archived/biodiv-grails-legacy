@@ -3,11 +3,10 @@
 
 
 <div id="project-sidebar" class="span4">
-    <g:if test="${params.action == browser}">
-    <uGroup:objectPostToGroupsWrapper 
+    <g:if test="${params.action == 'browser'}">
+    	<uGroup:objectPostToGroupsWrapper 
 			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
-
-                        </g:if>
+    </g:if>
 	<div class="sidebar_section">
             <h5>Document Manager <sup>Beta</sup></h5>
 

@@ -10,8 +10,14 @@
 <r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
-	<div class="span12"> 
-		<div class="page-header clearfix">
+    <div class="span12">
+        <g:if test="${documentInstance}">
+        <g:set var="featureCount" value="${documentInstance.featureCount}"/>
+        </g:if>
+        <div class="page-header clearfix" style="position:relative">
+            <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="left:-50px;">
+            </span>
+
 			<div style="width: 100%;">
 				<div class="main_heading" style="margin-left: 0px;">
 					<sUser:ifOwns model="['user':documentInstance.author]">
@@ -64,10 +70,7 @@
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
-                    
-                                        
-                    
+                    <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, showDetails:true]"/>
 			<g:if
 				test="${documentInstance?.speciesGroups || documentInstance?.habitats || documentInstance?.placeName }">
 
@@ -152,6 +155,12 @@
                                 </div>
 
 	</div>
-
+        <r:script>
+            $(document).ready(function(){
+                $(".resource_in_groups li.featured").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                }); 
+            });
+        </r:script>
 </body>
 </html>

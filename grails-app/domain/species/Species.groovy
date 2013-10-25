@@ -25,6 +25,7 @@ class Species implements Rateable {
 	Resource reprImage;
 	Float percentOfInfo; 
     Date updatedOn;
+    int featureCount = 0;
 	Date createdOn = new Date();
 	Date dateCreated;
 	Date lastUpdated;
@@ -33,6 +34,7 @@ class Species implements Rateable {
 	def springSecurityService;
 	def dataSource
 	def activityFeedService
+	def speciesService;
 	
 	private static final log = LogFactory.getLog(this);
 	
@@ -55,6 +57,7 @@ class Species implements Rateable {
 		reprImage(nullable:true);
 		percentOfInfo(nullable:true);
 		updatedOn(nullable:true);
+        featureCount nullable:false;
 	}
 
 	static mapping = {
@@ -149,12 +152,14 @@ class Species implements Rateable {
 		}
 		return f?.description;
 	}
-	
+
+
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
-	}
-	
-	//TODO:remove this function after getting icons for all groups
+	}	
+
+    
+    //TODO:remove this function after getting icons for all groups
 	Resource fetchSpeciesGroupIcon(ImageType type) {
 		SpeciesGroup group = fetchSpeciesGroup();
 		return group.icon(type);
@@ -192,6 +197,10 @@ class Species implements Rateable {
 	
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
+	}
+	
+	def fetchList(params, action){
+		return speciesService.getSpeciesList(params, action)
 	}
 	
 }

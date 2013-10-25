@@ -5,13 +5,18 @@ def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.reso
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
+<g:if test="${observationInstance}">
+    <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+</g:if>
 
-<div style="position:relative;overflow:hidden">
-    <div class="figure span2 observation_story_image" style="display: table;height:220px;" 
+<div class="snippet">
+    <span class="badge ${observationInstance.group.iconClass()} ${(featureCount>0) ? 'featured':''}" >
+            </span>
+    <div class="figure pull-left observation_story_image" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
             <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
-                    >
-                    <div style="${observationInstance.isChecklist?'height:100px;width:100px;':''}position:relative;margin:auto;">
+            >
+                    <div style="position:relative;margin:auto;">
                     <g:if
                             test="${imagePath}">
                             <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
@@ -31,5 +36,5 @@ def obvId = observationInstance.id
             </g:link>
 
     </div>
+    <obv:showStory model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:showDetails, showFeatured:showFeatured]"></obv:showStory>
 </div>
-<obv:showStory model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStory>

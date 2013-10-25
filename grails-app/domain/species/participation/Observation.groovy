@@ -26,7 +26,6 @@ import speciespage.ObservationService;
 class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
-	def grailsApplication;
 	def commentService;
 	def activityFeedService;
 	def springSecurityService;
@@ -63,7 +62,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 	long visitCount = 0;
 	boolean isDeleted = false;
 	int flagCount = 0;
-	String searchText;
+	int featureCount = 0;
+    String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 	
@@ -93,6 +93,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
+        featureCount nullable:false
 		latitude nullable: false
 		longitude nullable:false
 		topology nullable:false
@@ -334,10 +335,21 @@ class Observation extends Metadata implements Taggable, Rateable {
 		checklistAnnotations = m as JSON
 	}
 	
-	String fetchSpeciesCall(){
-		return maxVotedReco ? maxVotedReco.name : "Unknown"
+	String fetchFormattedSpeciesCall() {
+        if(!maxVotedReco) return "Unknown"
+
+        if(maxVotedReco.taxonConcept) //sciname from clean list
+            return maxVotedReco.taxonConcept.italicisedForm
+        else if(maxVotedReco.isScientificName) //sciname from dirty list
+            return '<i>'+maxVotedReco.name+'</i>'
+        else //common name
+		    return maxVotedReco.name
 	}
 	
+	String fetchSpeciesCall() {
+        return maxVotedReco ? maxVotedReco.name : "Unknown"
+    }
+
 	String title() {
 		String title = fetchSpeciesCall() 
 		if(!title || title.equalsIgnoreCase('Unknown')) {
@@ -346,9 +358,16 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return title;
 	}
 
-String notes() {
-    return this.notes
-}
+    String notes() {
+        return this.notes
+    }
+
+    String summary() {
+		String location = "Observed at '" + (this.placeName.trim()?:this.reverseGeocodedName) +"'"
+		String desc = "- "+ location +" by "+this.author.name.capitalize() + (this.fromDate ?  (" on " +  this.fromDate.format('dd/MM/yyyy')) : "");
+	
+        return desc
+    }
 
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
@@ -426,7 +445,6 @@ String notes() {
 	def getOwner() {
 		return author;
 	}
-	
 
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
@@ -508,4 +526,8 @@ String notes() {
     def getObservationFeatures() {
         return observationService.getObservationFeatures(this);
     }
+	
+	def fetchList(filterUrl, max, offset){
+		return observationService.getObservationList(filterUrl, max, offset)
+	}
 }

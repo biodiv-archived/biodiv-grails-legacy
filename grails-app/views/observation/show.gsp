@@ -7,6 +7,7 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.Resource"%>
 <%@page import="speciespage.ChartService"%>
+<%@page import="species.participation.Featured"%>
 
 <html>
 <head>
@@ -58,9 +59,12 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 .nameContainer .combobox-container {
 	left:198px;
 }
-
+ 
 .combobox-container .add-on {
 	right: -91px;
+}
+.observation_story .notes_view {
+    margin-bottom:50px;
 }
 
 </style>
@@ -68,11 +72,18 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 <body>
 	
 			<div class="observation  span12">
-				<obv:showSubmenuTemplate/>
-
-				<div class="page-header clearfix">
+                            <obv:showSubmenuTemplate/>
+                            
+                        <g:if test="${observationInstance}">
+                            <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                            </g:if>
+                            
+                        <div class="page-header clearfix ">
                                     <div style="width:100%;">
-                                        <div class="main_heading" style="margin-left:0px;">
+                                        <div class="main_heading" style="margin-left:0px; position:relative">
+                                            <span class="badge ${observationInstance.group.iconClass()} ${(featureCount>0) ? 'featured':''}" style="left:-50px">
+                                            </span>
+
                                             <div class="pull-right">
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
@@ -211,12 +222,12 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                         <div class="tile" style="clear: both">
                                             <div class="title">Other observations of the same species</div>
                                             <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
                                         </div>
                                         <div class="tile">
                                             <div class="title">Observations nearby</div>
                                             <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
                                         </div>
                                         
                                     </div>
@@ -352,10 +363,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
 		            		updateFeeds();
 		            		setFollowButton();
-		            		showRecoUpdateStatus(data.msg, data.status);
+		            		showUpdateStatus(data.msg, data.status);
 		            	}
 	            	} else {
-         				showRecoUpdateStatus(data.msg, data.status);
+         				showUpdateStatus(data.msg, data.status);
          			}
          			$("#addRecommendation")[0].reset();
          			$("#canName").val("");
@@ -363,7 +374,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
 	            	//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+	            	var successHandler = this.success, errorHandler = showUpdateStatus;
 	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 				} 
 	     	});
@@ -379,6 +390,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                 });
 
                 preLoadRecos(3, 0, false);
+                //loadObjectInGroups();
+                $(".resource_in_groups li.featured").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                });
                 
         });
 

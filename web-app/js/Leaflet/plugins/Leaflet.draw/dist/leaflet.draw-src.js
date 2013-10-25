@@ -11,59 +11,64 @@
  * Leaflet.draw assumes that you have already included the Leaflet library.
  */
 
-L.drawVersion = '0.2.0-dev';
+L.drawVersion = '0.2.2';
 
 L.drawLocal = {
 	draw: {
 		toolbar: {
-			title: 'Cancel drawing',
-			text: 'Cancel',
-			polyline: 'Draw a polyline',
-			polygon: 'Draw a polygon',
-			rectangle: 'Draw a rectangle',
-			circle: 'Draw a circle',
-			marker: 'Draw a marker'
-		},
-		circle: {
-			tooltip: {
-				start: 'Click and drag to draw circle.'
+			actions: {
+				title: 'Cancel drawing',
+				text: 'Cancel'
+			},
+			buttons: {
+				polyline: 'Draw a polyline',
+				polygon: 'Draw a polygon',
+				rectangle: 'Draw a rectangle',
+				circle: 'Draw a circle',
+				marker: 'Draw a marker'
 			}
 		},
-		marker: {
-			tooltip: {
-				start: 'Click map to place marker.'
-			}
-		},
-		polygon: {
-			tooltip: {
-				start: 'Click to start drawing shape.',
-				cont: 'Click to continue drawing shape.',
-				end: 'Click first point to close this shape.'
-			}
-		},
-		polyline: {
-			error: '<strong>Error:</strong> shape edges cannot cross!',
-			tooltip: {
-				start: 'Click to start drawing line.',
-				cont: 'Click to continue drawing line.',
-				end: 'Click last point to finish line.'
-			}
-		},
-		rectangle: {
-			tooltip: {
-				start: 'Click and drag to draw rectangle.'
-			}
-		},
-		simpleshape: {
-			tooltip: {
-				end: 'Release mouse to finish drawing.'
+		handlers: {
+			circle: {
+				tooltip: {
+					start: 'Click and drag to draw circle.'
+				}
+			},
+			marker: {
+				tooltip: {
+					start: 'Click map to place marker.'
+				}
+			},
+			polygon: {
+				tooltip: {
+					start: 'Click to start drawing shape.',
+					cont: 'Click to continue drawing shape.',
+					end: 'Click first point to close this shape.'
+				}
+			},
+			polyline: {
+				error: '<strong>Error:</strong> shape edges cannot cross!',
+				tooltip: {
+					start: 'Click to start drawing line.',
+					cont: 'Click to continue drawing line.',
+					end: 'Click last point to finish line.'
+				}
+			},
+			rectangle: {
+				tooltip: {
+					start: 'Click and drag to draw rectangle.'
+				}
+			},
+			simpleshape: {
+				tooltip: {
+					end: 'Release mouse to finish drawing.'
+				}
 			}
 		}
 	},
 	edit: {
 		toolbar: {
-			edit: {
-				title: 'Edit layers',
+			actions: {
 				save: {
 					title: 'Save changes.',
 					text: 'Save'
@@ -73,14 +78,25 @@ L.drawLocal = {
 					text: 'Cancel'
 				}
 			},
-			remove: {
-				title: 'Delete layers',
-				tooltip: 'Click on a feature to remove'
+			buttons: {
+				edit: 'Edit layers.',
+				editDisabled: 'No layers to edit.',
+				remove: 'Delete layers.',
+				removeDisabled: 'No layers to delete.'
 			}
 		},
-		tooltip: {
-			text: 'Drag handles, or marker to edit feature.',
-			subtext: 'Click cancel to undo changes.'
+		handlers: {
+			edit: {
+				tooltip: {
+					text: 'Drag handles, or marker to edit feature.',
+					subtext: 'Click cancel to undo changes.'
+				}
+			},
+			remove: {
+				tooltip: {
+					text: 'Click on a feature to remove'
+				}
+			}
 		}
 	}
 };
@@ -169,9 +185,9 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	options: {
 		allowIntersection: true,
+		repeatMode: false,
 		drawError: {
 			color: '#b00b00',
-			message: L.drawLocal.draw.polyline.error,
 			timeout: 2500
 		},
 		icon: new L.DivIcon({
@@ -187,10 +203,15 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			fill: false,
 			clickable: true
 		},
+		metric: true, // Whether to use the metric meaurement system or imperial
+		showLength: true, // Whether to display distance in the tooltip
 		zIndexOffset: 2000 // This should be > than the highest z-index any map layers
 	},
 
 	initialize: function (map, options) {
+		// Need to set this here to ensure the correct message is used.
+		this.options.drawError.message = L.drawLocal.draw.handlers.polyline.error;
+
 		// Merge default drawError options with custom options
 		if (options && options.drawError) {
 			options.drawError = L.Util.extend({}, this.options.drawError, options.drawError);
@@ -278,6 +299,9 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 		this._fireCreatedEvent();
 		this.disable();
+		if (this.options.repeatMode) {
+			this.enable();
+		}
 	},
 
 	//Called to verify the shape is valid when the user tries to finish it
@@ -363,11 +387,11 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_updateGuide: function (newPos) {
-		newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
-
 		var markerCount = this._markers.length;
 
 		if (markerCount > 0) {
+			newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
+
 			// draw the guide line
 			this._clearGuides();
 			this._drawGuide(
@@ -439,33 +463,40 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_getTooltipText: function () {
-		var labelText,
-			distance,
-			distanceStr;
+		var showLength = this.options.showLength,
+			labelText, distance, distanceStr;
 
 		if (this._markers.length === 0) {
 			labelText = {
-				text: L.drawLocal.draw.polyline.tooltip.start
+				text: L.drawLocal.draw.handlers.polyline.tooltip.start
 			};
 		} else {
-			// calculate the distance from the last fixed point to the mouse position
-			distance = this._measurementRunningTotal + this._currentLatLng.distanceTo(this._markers[this._markers.length - 1].getLatLng());
-			// show metres when distance is < 1km, then show km
-			distanceStr = distance  > 1000 ? (distance  / 1000).toFixed(2) + ' km' : Math.ceil(distance) + ' m';
+			distanceStr = showLength ? this._getMeasurementString() : '';
 
 			if (this._markers.length === 1) {
 				labelText = {
-					text: L.drawLocal.draw.polyline.tooltip.cont,
+					text: L.drawLocal.draw.handlers.polyline.tooltip.cont,
 					subtext: distanceStr
 				};
 			} else {
 				labelText = {
-					text: L.drawLocal.draw.polyline.tooltip.end,
+					text: L.drawLocal.draw.handlers.polyline.tooltip.end,
 					subtext: distanceStr
 				};
 			}
 		}
 		return labelText;
+	},
+
+	_getMeasurementString: function () {
+		var currentLatLng = this._currentLatLng,
+			previousLatLng = this._markers[this._markers.length - 1].getLatLng(),
+			distance;
+
+		// calculate the distance from the last fixed point to the mouse position
+		distance = this._measurementRunningTotal + currentLatLng.distanceTo(previousLatLng);
+
+		return L.GeometryUtil.readableDistance(distance, this.options.metric);
 	},
 
 	_showErrorTooltip: function () {
@@ -529,6 +560,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	}
 });
 
+
 L.Draw.Polygon = L.Draw.Polyline.extend({
 	statics: {
 		TYPE: 'polygon'
@@ -579,18 +611,28 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 		var text, subtext;
 
 		if (this._markers.length === 0) {
-			text = L.drawLocal.draw.polygon.tooltip.start;
+			text = L.drawLocal.draw.handlers.polygon.tooltip.start;
 		} else if (this._markers.length < 3) {
-			text = L.drawLocal.draw.polygon.tooltip.cont;
+			text = L.drawLocal.draw.handlers.polygon.tooltip.cont;
 		} else {
-			text = L.drawLocal.draw.polygon.tooltip.end;
-			subtext = this._area;
+			text = L.drawLocal.draw.handlers.polygon.tooltip.end;
+			subtext = this._getMeasurementString();
 		}
 
 		return {
 			text: text,
 			subtext: subtext
 		};
+	},
+
+	_getMeasurementString: function () {
+		var area = this._area;
+
+		if (!area) {
+			return null;
+		}
+
+		return L.GeometryUtil.readableArea(area, this.options.metric);
 	},
 
 	_shapeIsValid: function () {
@@ -603,19 +645,9 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 			return;
 		}
 
-		var latLngs = this._poly.getLatLngs(),
-			area = L.PolygonUtil.geodesicArea(latLngs);
+		var latLngs = this._poly.getLatLngs();
 
-		// Convert to most appropriate units
-		if (area > 1000000) {
-			area = (area * 0.000001).toFixed(2) + ' km&sup2;';
-		} else if (area > 10000) {
-			area = (area * 0.0001).toFixed(2) + ' ha';
-		} else {
-			area = area.toFixed(2) + ' m&sup2;';
-		}
-
-		this._area = area;
+		this._area = L.GeometryUtil.geodesicArea(latLngs);
 	},
 
 	_cleanUpShape: function () {
@@ -635,6 +667,16 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 L.SimpleShape = {};
 
 L.Draw.SimpleShape = L.Draw.Feature.extend({
+	options: {
+		repeatMode: false
+	},
+
+	initialize: function (map, options) {
+		this._endLabelText = L.drawLocal.draw.handlers.simpleshape.tooltip.end;
+
+		L.Draw.Feature.prototype.initialize.call(this, map, options);
+	},
+
 	addHooks: function () {
 		L.Draw.Feature.prototype.addHooks.call(this);
 		if (this._map) {
@@ -686,7 +728,7 @@ L.Draw.SimpleShape = L.Draw.Feature.extend({
 
 		this._tooltip.updatePosition(latlng);
 		if (this._isDrawing) {
-			this._tooltip.updateContent({ text: L.drawLocal.draw.simpleshape.tooltip.end });
+			this._tooltip.updateContent({ text: this._endLabelText });
 			this._drawShape(latlng);
 		}
 	},
@@ -697,6 +739,9 @@ L.Draw.SimpleShape = L.Draw.Feature.extend({
 		}
 
 		this.disable();
+		if (this.options.repeatMode) {
+			this.enable();
+		}
 	}
 });
 
@@ -722,9 +767,10 @@ L.Draw.Rectangle = L.Draw.SimpleShape.extend({
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Draw.Rectangle.TYPE;
 
+		this._initialLabelText = L.drawLocal.draw.handlers.rectangle.tooltip.start;
+
 		L.Draw.SimpleShape.prototype.initialize.call(this, map, options);
 	},
-	_initialLabelText: L.drawLocal.draw.rectangle.tooltip.start,
 
 	_drawShape: function (latlng) {
 		if (!this._shape) {
@@ -757,17 +803,19 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 			fillColor: null, //same as color by default
 			fillOpacity: 0.2,
 			clickable: true
-		}
+		},
+		showRadius: true,
+		metric: true // Whether to use the metric meaurement system or imperial
 	},
 
 	initialize: function (map, options) {
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Draw.Circle.TYPE;
 
+		this._initialLabelText = L.drawLocal.draw.handlers.circle.tooltip.start;
+
 		L.Draw.SimpleShape.prototype.initialize.call(this, map, options);
 	},
-
-	_initialLabelText: L.drawLocal.draw.circle.tooltip.start,
 
 	_drawShape: function (latlng) {
 		if (!this._shape) {
@@ -785,6 +833,9 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 
 	_onMouseMove: function (e) {
 		var latlng = e.latlng,
+			metric = this.options.metric,
+			showRadius = this.options.showRadius,
+			useMetric = this.options.metric,
 			radius;
 
 		this._tooltip.updatePosition(latlng);
@@ -795,12 +846,13 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 			radius = this._shape.getRadius().toFixed(1);
 
 			this._tooltip.updateContent({
-				text: 'Release mouse to finish drawing.',
-				subtext: 'Radius: ' + radius + ' m'
+				text: this._endLabelText,
+				subtext: showRadius ? 'Radius: ' + L.GeometryUtil.readableDistance(radius, useMetric) : ''
 			});
 		}
 	}
 });
+
 
 L.Draw.Marker = L.Draw.Feature.extend({
 	statics: {
@@ -809,6 +861,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 
 	options: {
 		icon: new L.Icon.Default(),
+		repeatMode: false,
 		zIndexOffset: 2000 // This should be > than the highest z-index any markers
 	},
 
@@ -823,7 +876,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		L.Draw.Feature.prototype.addHooks.call(this);
 
 		if (this._map) {
-			this._tooltip.updateContent({ text: L.drawLocal.draw.marker.tooltip.start });
+			this._tooltip.updateContent({ text: L.drawLocal.draw.handlers.marker.tooltip.start });
 
 			// Same mouseMarker as in Draw.Polyline
 			if (!this._mouseMarker) {
@@ -892,6 +945,9 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		this._fireCreatedEvent();
 
 		this.disable();
+		if (this.options.repeatMode) {
+			this.enable();
+		}
 	},
 
 	_fireCreatedEvent: function () {
@@ -1295,7 +1351,6 @@ L.Edit.SimpleShape = L.Handler.extend({
 		var marker = e.target;
 		marker.setOpacity(1);
 
-		this._shape.fire('edit');
 		this._fireEdit();
 	},
 
@@ -1307,6 +1362,7 @@ L.Edit.SimpleShape = L.Handler.extend({
 		// Children override
 	}
 });
+
 
 L.Edit = L.Edit || {};
 
@@ -1509,11 +1565,7 @@ L.LatLngUtil = {
 	}
 };
 
-/*
- * L.PolygonUtil contains different utility functions for Polygons.
- */
-
-L.PolygonUtil = {
+L.GeometryUtil = {
 	// Ported from the OpenLayers implementation. See https://github.com/openlayers/openlayers/blob/master/lib/OpenLayers/Geometry/LinearRing.js#L270
 	geodesicArea: function (latLngs) {
 		var pointsCount = latLngs.length,
@@ -1532,6 +1584,53 @@ L.PolygonUtil = {
 		}
 
 		return Math.abs(area);
+	},
+
+	readableArea: function (area, isMetric) {
+		var areaStr;
+
+		if (isMetric) {
+			if (area >= 10000) {
+				areaStr = (area * 0.0001).toFixed(2) + ' ha';
+			} else {
+				areaStr = area.toFixed(2) + ' m&sup2;';
+			}
+		} else {
+			area *= 0.836127; // Square yards in 1 meter
+
+			if (area >= 3097600) { //3097600 square yards in 1 square mile
+				areaStr = (area / 3097600).toFixed(2) + ' mi&sup2;';
+			} else if (area >= 4840) {//48040 square yards in 1 acre
+				areaStr = (area / 4840).toFixed(2) + ' acres';
+			} else {
+				areaStr = Math.ceil(area) + ' yd&sup2;';
+			}
+		}
+
+		return areaStr;
+	},
+
+	readableDistance: function (distance, isMetric) {
+		var distanceStr;
+
+		if (isMetric) {
+			// show metres when distance is < 1km, then show km
+			if (distance > 1000) {
+				distanceStr = (distance  / 1000).toFixed(2) + ' km';
+			} else {
+				distanceStr = Math.ceil(distance) + ' m';
+			}
+		} else {
+			distance *= 1.09361;
+
+			if (distance > 1760) {
+				distanceStr = (distance / 1760).toFixed(2) + ' miles';
+			} else {
+				distanceStr = Math.ceil(distance) + ' yd';
+			}
+		}
+
+		return distanceStr;
 	}
 };
 
@@ -1757,6 +1856,7 @@ L.Control.Draw = L.Control.extend({
 });
 
 L.Map.mergeOptions({
+	drawControlTooltips: true,
 	drawControl: false
 });
 
@@ -1814,7 +1914,7 @@ L.Toolbar = L.Class.extend({
 		this._actionsContainer = null;
 	},
 
-	_initModeHandler: function (handler, container, buttonIndex, classNamePredix) {
+	_initModeHandler: function (handler, container, buttonIndex, classNamePredix, buttonTitle) {
 		var type = handler.type;
 
 		this._modes[type] = {};
@@ -1822,7 +1922,7 @@ L.Toolbar = L.Class.extend({
 		this._modes[type].handler = handler;
 
 		this._modes[type].button = this._createButton({
-			title: this.options[type].title,
+			title: buttonTitle,
 			className: classNamePredix + '-' + type,
 			container: container,
 			callback: this._modes[type].handler.enable,
@@ -1895,9 +1995,7 @@ L.Toolbar = L.Class.extend({
 
 	_createActions: function (buttons) {
 		var container = L.DomUtil.create('ul', 'leaflet-draw-actions'),
-			buttonWidth = 50,
 			l = buttons.length,
-			containerWidth = (l * buttonWidth) + (l - 1), //l - 1 = the borders
 			li, button;
 
 		for (var i = 0; i < l; i++) {
@@ -1916,8 +2014,6 @@ L.Toolbar = L.Class.extend({
 				callback: buttons[i].callback
 			});
 		}
-
-		container.style.width = containerWidth + 'px';
 
 		return container;
 	},
@@ -1960,16 +2056,21 @@ L.Tooltip = L.Class.extend({
 		this._map = map;
 		this._popupPane = map._panes.popupPane;
 
-		this._container = L.DomUtil.create('div', 'leaflet-draw-tooltip', this._popupPane);
+		this._container = map.options.drawControlTooltips ? L.DomUtil.create('div', 'leaflet-draw-tooltip', this._popupPane) : null;
 		this._singleLineLabel = false;
 	},
 
 	dispose: function () {
-		this._popupPane.removeChild(this._container);
-		this._container = null;
+		if (this._container) {
+			this._popupPane.removeChild(this._container);
+			this._container = null;
+		}
 	},
 
 	updateContent: function (labelText) {
+		if (!this._container) {
+			return this;
+		}
 		labelText.subtext = labelText.subtext || '';
 
 		// update the vertical position (only if changed)
@@ -1992,18 +2093,24 @@ L.Tooltip = L.Class.extend({
 	updatePosition: function (latlng) {
 		var pos = this._map.latLngToLayerPoint(latlng);
 
-		L.DomUtil.setPosition(this._container, pos);
+		if (this._container) {
+			L.DomUtil.setPosition(this._container, pos);
+		}
 
 		return this;
 	},
 
 	showAsError: function () {
-		L.DomUtil.addClass(this._container, 'leaflet-error-draw-tooltip');
+		if (this._container) {
+			L.DomUtil.addClass(this._container, 'leaflet-error-draw-tooltip');
+		}
 		return this;
 	},
 
 	removeError: function () {
-		L.DomUtil.removeClass(this._container, 'leaflet-error-draw-tooltip');
+		if (this._container) {
+			L.DomUtil.removeClass(this._container, 'leaflet-error-draw-tooltip');
+		}
 		return this;
 	}
 });
@@ -2011,21 +2118,11 @@ L.Tooltip = L.Class.extend({
 L.DrawToolbar = L.Toolbar.extend({
 
 	options: {
-		polyline: {
-			title: L.drawLocal.draw.toolbar.polyline
-		},
-		polygon: {
-			title: L.drawLocal.draw.toolbar.polygon
-		},
-		rectangle: {
-			title: L.drawLocal.draw.toolbar.rectangle
-		},
-		circle: {
-			title: L.drawLocal.draw.toolbar.circle
-		},
-		marker: {
-			title: L.drawLocal.draw.toolbar.marker
-		}
+		polyline: {},
+		polygon: {},
+		rectangle: {},
+		circle: {},
+		marker: {}
 	},
 
 	initialize: function (options) {
@@ -2054,7 +2151,8 @@ L.DrawToolbar = L.Toolbar.extend({
 				new L.Draw.Polyline(map, this.options.polyline),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.draw.toolbar.buttons.polyline
 			);
 		}
 
@@ -2063,7 +2161,8 @@ L.DrawToolbar = L.Toolbar.extend({
 				new L.Draw.Polygon(map, this.options.polygon),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.draw.toolbar.buttons.polygon
 			);
 		}
 
@@ -2072,7 +2171,8 @@ L.DrawToolbar = L.Toolbar.extend({
 				new L.Draw.Rectangle(map, this.options.rectangle),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.draw.toolbar.buttons.rectangle
 			);
 		}
 
@@ -2081,7 +2181,8 @@ L.DrawToolbar = L.Toolbar.extend({
 				new L.Draw.Circle(map, this.options.circle),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.draw.toolbar.buttons.circle
 			);
 		}
 
@@ -2090,7 +2191,8 @@ L.DrawToolbar = L.Toolbar.extend({
 				new L.Draw.Marker(map, this.options.marker),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.draw.toolbar.buttons.marker
 			);
 		}
 
@@ -2100,8 +2202,8 @@ L.DrawToolbar = L.Toolbar.extend({
 		// Create the actions part of the toolbar
 		this._actionsContainer = this._createActions([
 			{
-				title: L.drawLocal.draw.toolbar.title,
-				text: L.drawLocal.draw.toolbar.text,
+				title: L.drawLocal.draw.toolbar.actions.title,
+				text: L.drawLocal.draw.toolbar.actions.text,
 				callback: this.disable,
 				context: this
 			}
@@ -2132,7 +2234,6 @@ L.DrawToolbar = L.Toolbar.extend({
 L.EditToolbar = L.Toolbar.extend({
 	options: {
 		edit: {
-			title: L.drawLocal.edit.toolbar.edit.title,
 			selectedPathOptions: {
 				color: '#fe57a1', /* Hot pink all the things! */
 				opacity: 0.6,
@@ -2143,20 +2244,22 @@ L.EditToolbar = L.Toolbar.extend({
 				fillOpacity: 0.1
 			}
 		},
-		remove: {
-			title: L.drawLocal.edit.toolbar.remove.title
-		},
+		remove: {},
 		featureGroup: null /* REQUIRED! TODO: perhaps if not set then all layers on the map are selectable? */
 	},
 
 	initialize: function (options) {
 		// Need to set this manually since null is an acceptable value here
-		if (options.edit && typeof options.edit.selectedPathOptions === 'undefined') {
-			options.edit.selectedPathOptions = this.options.edit.selectedPathOptions;
+		if (options.edit) {
+			if (typeof options.edit.selectedPathOptions === 'undefined') {
+				options.edit.selectedPathOptions = this.options.edit.selectedPathOptions;
+			}
+			options.edit = L.extend({}, this.options.edit, options.edit);
 		}
 
-		options.edit = L.extend({}, this.options.edit, options.edit);
-		options.remove = L.extend({}, this.options.remove, options.remove);
+		if (options.remove) {
+			options.remove = L.extend({}, this.options.remove, options.remove);
+		}
 
 		L.Toolbar.prototype.initialize.call(this, options);
 
@@ -2166,7 +2269,8 @@ L.EditToolbar = L.Toolbar.extend({
 	addToolbar: function (map) {
 		var container = L.DomUtil.create('div', 'leaflet-draw-section'),
 			buttonIndex = 0,
-			buttonClassPrefix = 'leaflet-draw-edit';
+			buttonClassPrefix = 'leaflet-draw-edit',
+			featureGroup = this.options.featureGroup;
 
 		this._toolbarContainer = L.DomUtil.create('div', 'leaflet-draw-toolbar leaflet-bar');
 
@@ -2175,23 +2279,25 @@ L.EditToolbar = L.Toolbar.extend({
 		if (this.options.edit) {
 			this._initModeHandler(
 				new L.EditToolbar.Edit(map, {
-					featureGroup: this.options.featureGroup,
+					featureGroup: featureGroup,
 					selectedPathOptions: this.options.edit.selectedPathOptions
 				}),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.edit.toolbar.buttons.edit
 			);
 		}
 
 		if (this.options.remove) {
 			this._initModeHandler(
 				new L.EditToolbar.Delete(map, {
-					featureGroup: this.options.featureGroup
+					featureGroup: featureGroup
 				}),
 				this._toolbarContainer,
 				buttonIndex++,
-				buttonClassPrefix
+				buttonClassPrefix,
+				L.drawLocal.edit.toolbar.buttons.remove
 			);
 		}
 
@@ -2201,14 +2307,14 @@ L.EditToolbar = L.Toolbar.extend({
 		// Create the actions part of the toolbar
 		this._actionsContainer = this._createActions([
 			{
-				title: L.drawLocal.edit.toolbar.edit.save.title,
-				text: L.drawLocal.edit.toolbar.edit.save.text,
+				title: L.drawLocal.edit.toolbar.actions.save.title,
+				text: L.drawLocal.edit.toolbar.actions.save.text,
 				callback: this._save,
 				context: this
 			},
 			{
-				title: L.drawLocal.edit.toolbar.edit.cancel.title,
-				text: L.drawLocal.edit.toolbar.edit.cancel.text,
+				title: L.drawLocal.edit.toolbar.actions.cancel.title,
+				text: L.drawLocal.edit.toolbar.actions.cancel.text,
 				callback: this.disable,
 				context: this
 			}
@@ -2218,7 +2324,17 @@ L.EditToolbar = L.Toolbar.extend({
 		container.appendChild(this._toolbarContainer);
 		container.appendChild(this._actionsContainer);
 
+		this._checkDisabled();
+
+		featureGroup.on('layeradd layerremove', this._checkDisabled, this);
+
 		return container;
+	},
+
+	removeToolbar: function () {
+		L.Toolbar.prototype.removeToolbar.call(this);
+
+		this.options.featureGroup.off('layeradd layerremove', this._checkDisabled, this);
 	},
 
 	disable: function () {
@@ -2232,8 +2348,52 @@ L.EditToolbar = L.Toolbar.extend({
 	_save: function () {
 		this._activeMode.handler.save();
 		this._activeMode.handler.disable();
+	},
+
+	_checkDisabled: function () {
+		var featureGroup = this.options.featureGroup,
+			hasLayers = featureGroup.getLayers().length === 0,
+			button;
+
+		if (this.options.edit) {
+			button = this._modes[L.EditToolbar.Edit.TYPE].button;
+
+			L.DomUtil.toggleClass(button, 'leaflet-disabled');
+
+			button.setAttribute(
+				'title',
+				hasLayers ?
+				L.drawLocal.edit.toolbar.buttons.edit
+				: L.drawLocal.edit.toolbar.buttons.editDisabled
+			);
+		}
+
+		if (this.options.remove) {
+			button = this._modes[L.EditToolbar.Delete.TYPE].button;
+
+			L.DomUtil.toggleClass(button, 'leaflet-disabled');
+
+			button.setAttribute(
+				'title',
+				hasLayers ?
+				L.drawLocal.edit.toolbar.buttons.remove
+				: L.drawLocal.edit.toolbar.buttons.removeDisabled
+			);
+		}
 	}
 });
+
+if (!L.DomUtil.toggleClass) {
+	L.Util.extend(L.DomUtil, {
+		toggleClass: function (el, name) {
+			if (this.hasClass(el, name)) {
+				this.removeClass(el, name);
+			} else {
+				this.addClass(el, name);
+			}
+		}
+	});
+}
 
 L.EditToolbar.Edit = L.Handler.extend({
 	statics: {
@@ -2262,7 +2422,9 @@ L.EditToolbar.Edit = L.Handler.extend({
 	},
 
 	enable: function () {
-		if (this._enabled) { return; }
+		if (this._enabled || !this._hasAvailableLayers()) {
+			return;
+		}
 
 		L.Handler.prototype.enable.call(this);
 
@@ -2271,12 +2433,14 @@ L.EditToolbar.Edit = L.Handler.extend({
 			.on('layerremove', this._disableLayerEdit, this);
 
 		this.fire('enabled', {handler: this.type});
+		this._map.fire('draw:editstart', { handler: this.type });
 	},
 
 	disable: function () {
 		if (!this._enabled) { return; }
 
 		this.fire('disabled', {handler: this.type});
+		this._map.fire('draw:editstop', { handler: this.type });
 
 		this._featureGroup
 			.off('layeradd', this._enableLayerEdit, this)
@@ -2290,7 +2454,10 @@ L.EditToolbar.Edit = L.Handler.extend({
 			this._featureGroup.eachLayer(this._enableLayerEdit, this);
 
 			this._tooltip = new L.Tooltip(this._map);
-			this._tooltip.updateContent({ text: L.drawLocal.edit.tooltip.text, subtext: L.drawLocal.edit.tooltip.subtext });
+			this._tooltip.updateContent({
+				text: L.drawLocal.edit.handlers.edit.tooltip.text,
+				subtext: L.drawLocal.edit.handlers.edit.tooltip.subtext
+			});
 
 			this._map.on('mousemove', this._onMouseMove, this);
 		}
@@ -2367,6 +2534,9 @@ L.EditToolbar.Edit = L.Handler.extend({
 	},
 
 	_toggleMarkerHighlight: function (marker) {
+		if (!marker._icon) {
+			return;
+		}
 		// This is quite naughty, but I don't see another way of doing it. (short of setting a new icon)
 		var icon = marker._icon;
 
@@ -2396,7 +2566,15 @@ L.EditToolbar.Edit = L.Handler.extend({
 
 	_enableLayerEdit: function (e) {
 		var layer = e.layer || e.target || e,
+			isMarker = layer instanceof L.Marker,
 			pathOptions;
+
+		// Don't do anything if this layer is a marker but doesn't have an icon. Markers
+		// should usually have icons. If using Leaflet.draw with Leafler.markercluster there
+		// is a chance that a marker doesn't.
+		if (isMarker && !layer._icon) {
+			return;
+		}
 
 		// Back up this layer (if haven't before)
 		this._backupLayer(layer);
@@ -2405,7 +2583,7 @@ L.EditToolbar.Edit = L.Handler.extend({
 		if (this._selectedPathOptions) {
 			pathOptions = L.Util.extend({}, this._selectedPathOptions);
 
-			if (layer instanceof L.Marker) {
+			if (isMarker) {
 				this._toggleMarkerHighlight(layer);
 			} else {
 				layer.options.previousOptions = layer.options;
@@ -2419,7 +2597,7 @@ L.EditToolbar.Edit = L.Handler.extend({
 			}
 		}
 
-		if (layer instanceof L.Marker) {
+		if (isMarker) {
 			layer.dragging.enable();
 			layer.on('dragend', this._onMarkerDragEnd);
 		} else {
@@ -2458,8 +2636,13 @@ L.EditToolbar.Edit = L.Handler.extend({
 
 	_onMouseMove: function (e) {
 		this._tooltip.updatePosition(e.latlng);
+	},
+
+	_hasAvailableLayers: function () {
+		return this._featureGroup.getLayers().length !== 0;
 	}
 });
+
 
 L.EditToolbar.Delete = L.Handler.extend({
 	statics: {
@@ -2485,7 +2668,9 @@ L.EditToolbar.Delete = L.Handler.extend({
 	},
 
 	enable: function () {
-		if (this._enabled) { return; }
+		if (this._enabled || !this._hasAvailableLayers()) {
+			return;
+		}
 
 		L.Handler.prototype.enable.call(this);
 
@@ -2494,6 +2679,7 @@ L.EditToolbar.Delete = L.Handler.extend({
 			.on('layerremove', this._disableLayerDelete, this);
 
 		this.fire('enabled', { handler: this.type});
+		this._map.fire('draw:editstart', { handler: this.type });
 	},
 
 	disable: function () {
@@ -2506,6 +2692,7 @@ L.EditToolbar.Delete = L.Handler.extend({
 			.off('layerremove', this._disableLayerDelete, this);
 
 		this.fire('disabled', { handler: this.type});
+		this._map.fire('draw:editstop', { handler: this.type });
 	},
 
 	addHooks: function () {
@@ -2514,7 +2701,7 @@ L.EditToolbar.Delete = L.Handler.extend({
 			this._deletedLayers = new L.layerGroup();
 
 			this._tooltip = new L.Tooltip(this._map);
-			this._tooltip.updateContent({ text: L.drawLocal.edit.toolbar.remove.tooltip });
+			this._tooltip.updateContent({ text: L.drawLocal.edit.handlers.remove.tooltip.text });
 
 			this._map.on('mousemove', this._onMouseMove, this);
 		}
@@ -2568,6 +2755,10 @@ L.EditToolbar.Delete = L.Handler.extend({
 
 	_onMouseMove: function (e) {
 		this._tooltip.updatePosition(e.latlng);
+	},
+
+	_hasAvailableLayers: function () {
+		return this._deletableLayers.getLayers().length !== 0;
 	}
 });
 

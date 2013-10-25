@@ -11,22 +11,9 @@ function showRecos(data, textStatus) {
     if($('#carousel_a').length > 0) {
         reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
     }
-    showRecoUpdateStatus(data.msg, data.status);
+    showUpdateStatus(data.msg, data.status);
 }
 
-function showRecoUpdateStatus(msg, type) {
-    if(!msg) return;
-
-    if(type === 'info') {
-        $("#seeMoreMessage").html(msg).show().removeClass().addClass('alert alert-info');
-    } else if(type === 'success') {
-        $("#seeMoreMessage").html(msg).show().removeClass().addClass('alert alert-success');
-    } else if(type === 'error') {
-        $("#seeMoreMessage").html(msg).show().removeClass().addClass('alert alert-error');
-    } else {
-        $("#seeMoreMessage").hide();
-    }
-}
 
 function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     $.ajax({
@@ -40,7 +27,7 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
             $(commentDivId).remove(); 
         }
         // $(".deleteCommentIcon").tooltip('hide');
-        showRecoUpdateStatus(data.success, 'success');
+        showUpdateStatus(data.success, 'success');
     },
 
     statusCode: {
@@ -51,7 +38,7 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     error: function(xhr, status, error) {
         // $(".deleteCommentIcon").tooltip('hide');
         var msg = $.parseJSON(xhr.responseText);
-        showRecoUpdateStatus(msg.error, 'error');
+        showUpdateStatus(msg.error, 'error');
     }
     });
 }
@@ -69,17 +56,17 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
                 preLoadRecos(3, 0, false, obvId, liComponent);
                 updateFeeds();
                 setFollowButton();
-                showRecoUpdateStatus(data.msg, data.status);
+                showUpdateStatus(data.msg, data.status);
             }
         } else {
-            showRecoUpdateStatus(data.msg, data.status);
+            showUpdateStatus(data.msg, data.status);
         }
         return false;
     },
 
     error:function (xhr, ajaxOptions, thrownError){
         //successHandler is used when ajax login succedes
-        var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+        var successHandler = this.success, errorHandler = showUpdateStatus;
         handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
     } 
     });
@@ -95,16 +82,16 @@ function removeRecoVote(obvId, recoId, url){
             preLoadRecos(3, 0, false, obvId);
             updateFeeds();
             setFollowButton();
-            showRecoUpdateStatus(data.msg, data.status);
+            showUpdateStatus(data.msg, data.status);
         } else {
-            showRecoUpdateStatus(data.msg, data.status);
+            showUpdateStatus(data.msg, data.status);
         }
         return false;
     },
 
     error:function (xhr, ajaxOptions, thrownError){
         //successHandler is used when ajax login suceedes
-        var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+        var successHandler = this.success, errorHandler = showUpdateStatus;
         handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
     } 
     });
@@ -133,14 +120,14 @@ function preLoadRecos(max, offset, seeAllClicked) {
     } else {
         $("#seeMore").hide();
     }
-    showRecoUpdateStatus(data.msg, data.status);
+    showUpdateStatus(data.msg, data.status);
             } else {
-                showRecoUpdateStatus(data.msg, data.status);
+                showUpdateStatus(data.msg, data.status);
             }
         }, error: function(xhr, status, error) {
             handleError(xhr, status, error, undefined, function() {
                 var msg = $.parseJSON(xhr.responseText);
-                showRecoUpdateStatus(msg.msg, msg.status);
+                showUpdateStatus(msg.msg, msg.status);
             });
         }
     });

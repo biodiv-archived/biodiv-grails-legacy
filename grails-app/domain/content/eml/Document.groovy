@@ -23,7 +23,6 @@ import species.participation.Featured;
  */
 class Document extends Metadata implements Taggable, Rateable {
 	
-	def grailsApplication
 	def activityFeedService
     def springSecurityService;
 	def documentService
@@ -48,7 +47,7 @@ class Document extends Metadata implements Taggable, Rateable {
 
 	DocumentType type
     int flagCount = 0;
-
+    int featureCount = 0;
 	String title
 	SUser author;
 	
@@ -89,14 +88,14 @@ class Document extends Metadata implements Taggable, Rateable {
 			val || obj.uFile
 		},nullable:true
 		contributors nullable:true
-		attribution nullable:true	
+		attribution  nullable:true	
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
 		author nullable:true
 		notes nullable:true
 		doi nullable:true
 		license nullable:true
-		
+    	featureCount nullable:false
 		agreeTerms nullable:true
 		
 		//coverage related extended from metadata
@@ -112,6 +111,7 @@ class Document extends Metadata implements Taggable, Rateable {
 	
 	static mapping = {
 		notes type:"text"
+		attribution type:"text"
 	}
 
      List fetchAllFlags(){
@@ -157,10 +157,7 @@ class Document extends Metadata implements Taggable, Rateable {
     
     Resource mainImage() {  
 		String reprImage = "Document.png"
-        println "=====PATH MAIN IMAGE = " +  grailsApplication.config.speciesPortal.content.rootDir
 	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
-        println "====== NAME ==== " + name
-
         return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
 
@@ -175,7 +172,7 @@ class Document extends Metadata implements Taggable, Rateable {
 		updateLatLong()
 	}
 	
-	def fetchList(params, max, offset, noLimit=false){
-		return documentService.getFilteredDocuments(params, max, offset, noLimit)
+	def fetchList(params, max, offset){
+		return documentService.getFilteredDocuments(params, max, offset)
 	}
 }

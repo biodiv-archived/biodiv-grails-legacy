@@ -2,6 +2,7 @@
 $(document).ready(function() {
     $('#carousel_${id}').jcarousel({
         itemLoadCallback : itemLoadCallback,
+        initCallback : initCallback,
         setupCallback : setupCallback,
         url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
         filterProperty:"${filterProperty}",
@@ -24,40 +25,35 @@ $(document).ready(function() {
             horizontal:true
         </g:else>
     });
-    $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
-        $(this).children().addClass('icon-gray');    
-    }, function(){
-        $(this).children().removeClass('icon-gray');    
-    });
-
-    $(".jcarousel-next-vertical").append("<i class='icon-chevron-down'></i>").hover(function(){
-        $(this).children().addClass('icon-gray');    
-    }, function(){
-        $(this).children().removeClass('icon-gray');    
-    });
-    
+       
 });
 </r:script>
 
 <div id="carousel_${id}" class="jcarousel-skin-ie7">
-	<ul>
-		<!-- The content will be dynamically loaded in here -->
-	</ul>
+	<ul style="list-style:none; width:100%; margin-left:0px">
+            <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
+            <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
+                <li style="float: left; list-style: none;">
+                <g:render template="/${resultController?:controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:resultController?:'observation']"/>
+                </li>
+            </g:each>
+        </ul>
+
 	<g:if test="${!hideShowAll}">
 		<div class="observation_links">
 			<g:if test="${observationId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:if>
 			<g:elseif test="${speciesId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:elseif>
-			<g:else>
+                        <g:else>
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue?:true, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show
+					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}">Show
 					all</a>
 			</g:else>
 		</div>
@@ -66,8 +62,11 @@ $(document).ready(function() {
 </div>
 <div id="relatedObservationAddButton_${id}" class="alert alert-info" style="display:none;">
 	No observations
-</div>
+    </div>
 
-<div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
-    No data!!
-</div>
+<g:if test="${filterProperty != 'featureBy'}">
+    <div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
+        No data!!
+    </div>
+</g:if>
+

@@ -76,3 +76,40 @@ update activity_feed set activity_descrption = activity_type where activity_type
 update activity_feed set activity_type = 'Posted resource' where activity_type = 'Posted observation to group' or activity_type = 'Posted checklist to group';
 update activity_feed set activity_type = 'Removed resoruce' where activity_type='Removed observation from group' or activity_type = 'Removed checklist from group';
 
+/**
+ * Before Migration script DB changes
+ */
+ALTER TABLE follow RENAME COLUMN user_id TO author_id;
+
+ALTER TABLE observation_flag RENAME TO flag;
+UPDATE activity_feed SET activity_holder_type = 'species.participation.Flag' WHERE activity_holder_type = 'species.participation.ObservationFlag';
+update flag set flag = 'DETAILS_INAPPROPRIATE'  where flag = 'OBV_INAPPROPRIATE';
+
+/**
+ * Updating and dummy script code but no migration
+ */
+alter table activity_feed alter column activity_descrption type varchar(400);
+update flag set object_id = 0;
+update document set flag_count = 0;
+update observation set feature_count = 0;
+update species set feature_count = 0;
+update document set feature_count = 0;
+
+/*
+ * uncomment code in flag static belongsTo = [author:SUser, observation:Observation]
+ * 
+ * run migration script
+ * 
+ * commnet back static belongsTo = [author:SUser, observation:Observation]
+ */
+
+/*
+ * After migration script DB changes unc
+ */
+update activity_feed set last_updated = date_created;
+alter table flag drop COLUMN observation_id ;
+ALTER TABLE activity_feed ALTER COLUMN activity_descrption TYPE varchar(400);
+ALTER TABLE flag ADD CONSTRAINT flag_author_type_id UNIQUE (author_id, object_id, object_type);
+ALTER TABLE flag ALTER COLUMN object_id SET NOT NULL;
+ALTER TABLE flag ALTER COLUMN object_type SET NOT NULL;
+

@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.Species"%>
 <html>
 <head>
 <g:set var="title" value="Species"/>
@@ -15,7 +16,7 @@
 			<div id="searchResults" class="list"
 				style="margin-left: 0px; clear: both;">
 				<s:speciesFilter />
-
+				<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
 				<div class="observations_list_wrapper" style="top: 0px;">
 					<s:searchResults />
 				</div>
