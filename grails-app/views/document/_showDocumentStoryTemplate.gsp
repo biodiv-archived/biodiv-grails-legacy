@@ -7,8 +7,13 @@
     <div>
         <g:if test="${showFeatured}">
         <div style="background-color:whitesmoke;font-weight:bold;"> 
-            <h6>${documentInstance.title}</h6>
-            <small style="font-weight:normal;"> featured on <time class="timeago" datetime="${featuredOn}"></time> by with notes : </small></div>
+            <div class="featured_title">
+                
+                <g:link url="${uGroup.createLink(controller:'document', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
+                <span class="ellipsis">${documentInstance.title}</span>
+                </g:link>
+            </div>
+            <small> featured on <time class="timeago" datetime="${featuredOn}"></time></small></div>
         <div class="linktext">
             ${featuredNotes}
             <p>${documentInstance.summary()}</p>
