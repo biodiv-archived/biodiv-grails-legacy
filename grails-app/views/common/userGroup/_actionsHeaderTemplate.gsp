@@ -13,15 +13,14 @@
 				<h3 id="inviteMembersModalLabel">Invite friends</h3>
 			</div>
 			<div class="modal-body">
-				<p>Send an invitation to invite your friends to join and
-					contribute in this interesting group…</p>
+				<p>Send an invitation to your friends to join and contribute in this group</p>
 				<div>
 					<div id="invite_memberMsg"></div>
 					<form id="inviteMembersForm" method="post"
 						style="background-color: #F2F2F2;">
 						<sUser:selectUsers model="['id':members_autofillUsersId]" />
 						<input type="hidden" name="memberUserIds" id="memberUserIds" />
-						<textarea id="inviteMemberMsg" class="comment-textbox" placeholder="Please write the note to invite member."></textarea>
+						<textarea id="inviteMemberMsg" class="comment-textbox" placeholder="Please write a note to invite member."></textarea>
 					</form>
 				</div>
 			</div>

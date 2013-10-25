@@ -677,7 +677,7 @@ class UserGroupController {
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
 						if(userGroupInstance.addExpert(user)) {
-							flash.message="Successfully added ${user} to this group as an expert"
+							flash.message="Successfully added ${user} to this group as a moderator"
 						}
 						break;
 					default: log.error "No proper role type is specified."

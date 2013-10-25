@@ -78,7 +78,7 @@
     ProxyPassReverse / http://localhost:8080/biodiv
 
 
-    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|experts|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|chart|UFile|project|rateable|rating|document|direction|data|biodivAdmin|recommendation).*
+    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|moderators|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|chart|UFile|project|rateable|rating|document|direction|data|biodivAdmin|recommendation).*
     RewriteRule ^(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv/group/the_western_ghats$1 [P]
     ProxyPassReverse / http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv/group/the_western_ghats
 

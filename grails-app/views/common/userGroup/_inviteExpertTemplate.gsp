@@ -10,15 +10,14 @@
 			<h3 id="inviteExpertsModalLabel">Invite moderators</h3>
 		</div>
 		<div class="modal-body">
-			<p>Send an invitation to invite moderators to join and
-				contribute in this interesting group…</p>
+			<p>Send an invitation to join and moderate this group</p>
 			<div>
 				<div id="invite_expertMsg"></div>
 				<form id="inviteExpertsForm" method="post"
 					style="background-color: #F2F2F2;">
 					<sUser:selectUsers model="['id':experts_autofillUsersId]" />
 					<input type="hidden" name="expertUserIds" id="expertUserIds" />
-					<textarea id="inviteModeratorMsg" class="comment-textbox" placeholder="Please write the note to invite moderator."></textarea>
+					<textarea id="inviteModeratorMsg" class="comment-textbox" placeholder="Please write a note to invite moderator."></textarea>
 				</form>
 			</div>
 		</div>
