@@ -23,7 +23,7 @@
                                 </g:if>
 
 
-                                <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="position:relative;">
+                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;">
                                 </span>
 
 
