@@ -10,6 +10,22 @@
     .map_wrapper {
         margin-bottom: 0px;
     }
+
+    .ellipsis {
+        white-space:inherit;
+    }
+
+    #carousel_featureBy .snippet {
+        height:150px;
+    }
+
+    .list_view .observation_story {
+        width:470px;
+    }
+
+    #carousel_featureBy .observation_story {
+        width:780px;
+    }
 </style>
 </head>
 <body>
@@ -31,10 +47,10 @@
 
 
             <uGroup:rightSidebar/>
-            <obv:showRelatedStory
+            <obv:featured 
             model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 
-            <h5>Browse Observations</h5>
+            <h5 style="margin-top:40px;">Browse Observations</h5>
             <obv:showObservationsListWrapper />
 	</div>
 

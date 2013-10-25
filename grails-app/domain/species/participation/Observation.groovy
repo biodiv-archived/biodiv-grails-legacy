@@ -358,9 +358,16 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return title;
 	}
 
-String notes() {
-    return this.notes
-}
+    String notes() {
+        return this.notes
+    }
+
+    String summary() {
+		String location = "Observed at '" + (this.placeName.trim()?:this.reverseGeocodedName) +"'"
+		String desc = "- "+ location +" by "+this.author.name.capitalize() + (this.fromDate ?  (" on " +  this.fromDate.format('dd/MM/yyyy')) : "");
+	
+        return desc
+    }
 
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
@@ -438,7 +445,6 @@ String notes() {
 	def getOwner() {
 		return author;
 	}
-	
 
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)

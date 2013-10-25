@@ -4,6 +4,11 @@
 <g:set var="title" value="Activity"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="activityfeed,comment"/>
+<style>
+    .thumbnail .observation_story {
+        width:705px;
+    }
+</style>
 </head>
 <body>
 	

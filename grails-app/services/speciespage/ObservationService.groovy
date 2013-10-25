@@ -1446,7 +1446,7 @@ class ObservationService extends AbstractObjectService {
 
     /**
      */
-    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
+    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null) {
         def conf = SpringSecurityUtils.securityConfig
         log.debug "Sending email"
         try {
@@ -1558,35 +1558,6 @@ class ObservationService extends AbstractObjectService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-                //			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
-                //				bodyView = "/emailtemplates/addObservation"
-                //				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
-                //				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                //				templateMap["actionObject"] = 'observation'
-                //				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-                //				toUsers.addAll(getParticipants(obv))
-                //				break
-                //
-                //			case activityFeedService.CHECKLIST_POSTED_ON_GROUP:
-                //				mailSubject = conf.ui.checklistPostedToGroup.emailSubject
-                //				bodyContent = conf.ui.checklistPostedToGroup.emailBody
-                //				templateMap["actionObject"] = 'checklist'
-                //				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-                //				templateMap["actorName"] = feedInstance.author.name
-                //				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-                //				toUsers.addAll(getParticipants(obv))
-                //				break
-                //
-                //			case activityFeedService.CHECKLIST_REMOVED_FROM_GROUP:
-                //				mailSubject = conf.ui.checklistRemovedFromGroup.emailSubject
-                //				bodyContent = conf.ui.checklistRemovedFromGroup.emailBody
-                //				templateMap["actionObject"] = 'checklist'
-                //				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-                //				templateMap["actorName"] = feedInstance.author.name
-                //				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-                //				toUsers.addAll(getParticipants(obv))
-                //				break
-
                 case activityFeedService.COMMENT_ADDED:				
                 bodyView = "/emailtemplates/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -1660,8 +1631,6 @@ class ObservationService extends AbstractObjectService {
                     if(request){
                         templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
                     }
-                    //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-                    //if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
                     log.debug "Sending email to ${toUser}"
                     try{
                         mailService.sendMail {
@@ -2153,3 +2122,4 @@ class ObservationService extends AbstractObjectService {
         }
         return null;
     }
+}

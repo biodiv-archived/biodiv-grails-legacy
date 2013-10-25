@@ -2,6 +2,7 @@
 $(document).ready(function() {
     $('#carousel_${id}').jcarousel({
         itemLoadCallback : itemLoadCallback,
+        initCallback : initCallback,
         setupCallback : setupCallback,
         url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
         filterProperty:"${filterProperty}",
@@ -24,26 +25,20 @@ $(document).ready(function() {
             horizontal:true
         </g:else>
     });
-    $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
-        $(this).children().addClass('icon-gray');    
-    }, function(){
-        $(this).children().removeClass('icon-gray');    
-    });
-
-    $(".jcarousel-next-vertical").append("<i class='icon-chevron-down'></i>").hover(function(){
-        $(this).children().addClass('icon-gray');    
-    }, function(){
-        $(this).children().removeClass('icon-gray');    
-    });
-   
+       
 });
 </r:script>
 
 <div id="carousel_${id}" class="jcarousel-skin-ie7">
 	<ul style="list-style:none; width:100%; margin-left:0px">
-            <!-- The content will be dynamically loaded in here -->
-            <li style="float: left; list-style: none;"><div class="thumbnail"><div class="observation_th snippet"><div class="figure observation_story_image span2"><a href="/observation/show/3"><img class="img-polaroid" src="http://indiabiodiversity.localhost.org/biodiv/observations//2114b786-3e5e-4480-b5ed-58c561f2d06d/627_th1.jpg" title="test1" alt=""></a></div><div class="span10" style= "margin-left:10px;"><h5 class="popover-title"><b>Featured :</b> test1 <small>on Oct 22 2013</small></h5><div style="padding-left:16px; padding-right:16px">dsfgdrgh<p>- Observed at '292/C, Road Number 1, Ashok Nagar, Ranchi, Jharkhand 834002, India' by Rahul Kumar Sinha on 17/10/2013</p></div></div></div></div></li>
-	</ul>
+            <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
+            <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
+                <li style="float: left; list-style: none;">
+                <g:render template="/${resultController?:controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails]"/>
+                </li>
+            </g:each>
+        </ul>
+
 	<g:if test="${!hideShowAll}">
 		<div class="observation_links">
 			<g:if test="${observationId}">
