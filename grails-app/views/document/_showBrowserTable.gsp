@@ -17,18 +17,17 @@
 
 		<g:each in="${documentInstanceList}" status="i" var="documentInstance">
 			<tr class="mainContent ${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>
-<span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="
-    display: block;
-    z-index: 1000;
-    position: absolute;
-    width: 50px; 
-    height: 50px; 
-    ">
-</span>
+                            <td>
+                                <g:if test="${documentInstance}">
+                                <g:set var="featureCount" value="${documentInstance.featureCount}"/>
+                                </g:if>
 
 
-					<a
+                                <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="position:relative;">
+                                </span>
+
+
+                                <a style="vertical-align:middle;"
 						href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, userGroup:userGroupInstance)}'>
 						${documentInstance.title}
 					</a>
