@@ -5,7 +5,7 @@
             <g:if test="${observationInstance}">
             <li class="active"><h5 style="line-height:28px;"><a href="#tab0" data-toggle="tab">Groups</a></h5></li>
             </g:if>
-            <li><a href="#tab1" data-toggle="tab">Post to Groups</a></li>
+            <li id="post-on-list"><a href="#tab1" data-toggle="tab">Post to Groups</a></li>
             <g:if test="${observationInstance}">
             <li><a href="#tab2" data-toggle="tab">Feature in a Group</a></li>
             </g:if>
