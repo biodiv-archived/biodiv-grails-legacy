@@ -168,7 +168,8 @@ h6 {
 
 
 .grid_view.thumbnails {
-	margin-left: 0px;
+	 margin-left: 0px;
+        text-align:left; 
 }
 
 .thumbnail {
@@ -514,15 +515,16 @@ textarea#featureNotes {
     background: url(../images/featured_star.png) no-repeat right top;
     width: 35px; 
     height: 50px;
-    z-index: 1000;
+ }
+
+.badge {
+    padding:0px;
+   z-index: 1000;
     position: absolute;
     background-color: transparent;
     vertical-align:middle;
     padding:0px;
-}
 
-.badge {
-    padding:0px;
 }
 
 .recommendations {

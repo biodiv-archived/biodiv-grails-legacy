@@ -140,7 +140,7 @@ var getSnippetHTML = function(carousel, item) {
                         '</div>'+
                     '<div style="background-color:whitesmoke;font-weight:bold;">'+
                         '<div class="species_title">'+item.imageTitle+'</div>'+
-                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> by with notes : </small>'+
+                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
                     '</div>'+
                     '<div class="linktext">'+item.notes+'</div>'+
                 '<div>'+
