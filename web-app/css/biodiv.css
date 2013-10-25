@@ -187,15 +187,14 @@ h6 {
 .thumbnail .observation_story {
     /*display: table-cell;
     vertical-align: middle;*/
-overflow:hidden;
-margin-left:150px;
-height:140px;
-padding:5px;
-
+    overflow:hidden;
+    margin-left:150px;
+    height:150px;
+    padding:0px;
 }
 
 #carousel_featureBy .observation_story {
-    width:780px;
+    width:790px;
 }
 
 .thumbnail .observation_story_image {

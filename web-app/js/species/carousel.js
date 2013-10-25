@@ -102,16 +102,16 @@ var itemAfterLoadCallback = function(carousel, state) {
 }
 
 var initCallback = function(carousel, status) {
-     $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
-        $(this).children().addClass('icon-gray');    
+    $(".jcarousel-prev-vertical").append("<i class='icon-chevron-up'></i>").hover(function(){
+        $(this).children().addClass('icon-black');    
     }, function(){
-        $(this).children().removeClass('icon-gray');    
+        $(this).children().removeClass('icon-black');    
     });
 
     $(".jcarousel-next-vertical").append("<i class='icon-chevron-down'></i>").hover(function(){
-        $(this).children().addClass('icon-gray');    
+        $(this).children().addClass('icon-black');    
     }, function(){
-        $(this).children().removeClass('icon-gray');    
+        $(this).children().removeClass('icon-black');    
     });
 
    
