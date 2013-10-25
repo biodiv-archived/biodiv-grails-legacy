@@ -8,7 +8,7 @@
 <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
 </g:if>
 
-<span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}">
+<span class="badge ${(featureCount>0) ? 'featured':''}">
 </span>
 
 	<div class="figure span3 observation_story_image"

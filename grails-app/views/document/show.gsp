@@ -15,7 +15,7 @@
         <g:set var="featureCount" value="${documentInstance.featureCount}"/>
         </g:if>
         <div class="page-header clearfix" style="position:relative">
-            <span class="badge ${documentInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" style="left:-50px;">
+            <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px;">
             </span>
 
 			<div style="width: 100%;">

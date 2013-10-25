@@ -46,8 +46,17 @@
 	<g:javascript>
 		$(document).ready(function() {
 			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
-			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
-		});
+                        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+                        $('#myTab a').click(function (e) {
+                            var tab = $(this);
+                            if(tab.parent('li').hasClass('active')){
+                            window.setTimeout(function(){
+                            $(".tab-pane").removeClass('active');
+                            tab.parent('li').removeClass('active');
+                            },1);
+                            }
+                        });
+                });
 	</g:javascript>
 </body>
 </html>
