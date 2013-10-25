@@ -3,6 +3,7 @@
 
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'}"
     style="margin-left: 0px;width:${showDetails?'auto':'200px;'}">
+<span class="badge ${featured?'featured':''}" style="display:inherit;" data-title ="${featured? 'Featured : ' :''}" data-content="${featured? featuredNotes :''}"></span>
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 

@@ -161,7 +161,6 @@ class Document extends Metadata implements Taggable, Rateable {
         return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
 
-	
 	def beforeUpdate(){
 		if(isDirty() && isDirty('topology')){
 			updateLatLong()
@@ -175,4 +174,5 @@ class Document extends Metadata implements Taggable, Rateable {
 	def fetchList(params, max, offset){
 		return documentService.getFilteredDocuments(params, max, offset)
 	}
+
 }

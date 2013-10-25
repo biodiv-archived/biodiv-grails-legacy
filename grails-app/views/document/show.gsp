@@ -148,9 +148,7 @@
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>
 		</div>
-                <div class="span4">
                 <g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
-                                </div>
 
 	</div>
         <r:script>

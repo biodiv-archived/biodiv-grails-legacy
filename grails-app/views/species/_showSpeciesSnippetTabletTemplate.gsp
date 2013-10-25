@@ -1,7 +1,7 @@
 <%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 <%
-def imagePath = mainImage?mainImage.thumbnailUrl(null, !speciesInstance.resource ? '.png' :null): null;
+def imagePath = mainImage?mainImage.thumbnailUrl(null, !speciesInstance.resources ? '.png' :null): null;
 def obvId = speciesInstance.id
 %>
 
@@ -13,7 +13,7 @@ def obvId = speciesInstance.id
                 </span>
 
     <div class="figure"
-        title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
+        title='<g:if test="${obvTitle != null}">${obvTitle.replaceAll("<.*>","")}</g:if>'>
                 <g:link url="${uGroup.createLink(controller:'species', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
                 
                 <g:if

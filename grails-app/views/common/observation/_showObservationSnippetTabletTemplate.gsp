@@ -9,7 +9,7 @@ def obvId = observationInstance.id
 <g:if test="${observationInstance}">
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>
-<div class="snippet tablet ">
+<div class="snippet tablet">
     <span class="badge ${(featureCount>0) ? 'featured':''}" >
                 </span>
 
