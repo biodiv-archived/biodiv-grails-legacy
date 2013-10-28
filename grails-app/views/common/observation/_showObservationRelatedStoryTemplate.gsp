@@ -1,5 +1,6 @@
 <r:script> 
 $(document).ready(function() {
+    <g:if test="${relatedInstanceList}">
     $('#carousel_${id}').jcarousel({
         itemLoadCallback : itemLoadCallback,
         initCallback : initCallback,
@@ -24,12 +25,12 @@ $(document).ready(function() {
             horizontal:true
         </g:else>
     });
-       
+    </g:if>
 });
 </r:script>
 
 <div id="carousel_${id}" class="jcarousel-skin-ie7">
-	<ul style="list-style:none; width:100%; margin-left:0px">
+	<ul style="list-style:none; width:100%; margin-left:0px;">
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
             <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
                 <li style="float: left; list-style: none;">
