@@ -1060,8 +1060,11 @@ class UserGroupController {
 	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
        def resObj = r.remove('resourceObj')
-	   r['resourceGroupHtml'] =  (params.pullType == 'single') ? g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]):null;
-	   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
+	   if(params.pullType == 'single'){
+		   r['resourceGroupHtml'] =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]);
+		   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
+	   }
+	   
        r['msg'] = "${message(code:r.remove('msgCode'))}"
 	   render r as JSON
    }

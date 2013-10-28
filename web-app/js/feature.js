@@ -24,10 +24,10 @@ function feature(submitType, objectId, objectType, url) {
                 $("#remainingC").html("Remaining characters : 400");
                 $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
                 if($(".resource_in_groups li .featured").size() > 0) {
-                    $(".main_heading .badge").addClass("featured")
+                    $(".page-header .badge").addClass("featured")
                 }
                 if($(".resource_in_groups li .featured").size() === 0) {
-                    $(".main_heading .badge").removeClass("featured")
+                    $(".page-header .badge").removeClass("featured")
                 }
                 //$('.show-user-groups').slideToggle("slow");
                 /*

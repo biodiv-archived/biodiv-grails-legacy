@@ -260,12 +260,6 @@ class ActivityFeedService {
 		def activityType = feedInstance.activityType
 		def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
 		def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
-	    println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println activityDomainObj
-        println feedInstance
-        println feedInstance.activityHolderType
-        println feedInstance.activityHolderId
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 		def text = null
 		def activityTitle = null
 		

@@ -512,7 +512,7 @@ textarea#featureNotes {
         -moz-box-sizing: border-box;
         box-sizing: border-box;
 }
-#myTab>.active>a, #myTab>.active>a:hover, #myTab>.active>a:focus {
+#action-tabs>.active>a, #action-tabs>.active>a:hover, #action-tabs>.active>a:focus {
     border:1px solid #6ac9a2;
     border-bottom: 0px solid #6ac9a2;
 }
