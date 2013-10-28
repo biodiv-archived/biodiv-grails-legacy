@@ -27,7 +27,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
 	def commentService;
-	def activityFeedService;
 	def springSecurityService;
     def resourceService;
 	def observationsSearchService;
