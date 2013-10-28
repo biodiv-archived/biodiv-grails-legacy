@@ -22,17 +22,17 @@ function feature(submitType, objectId, objectType, url) {
                 $("#featureNotes").val('')
                 $("#remainingC").html("Remaining characters : 400");
                 $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
-                if($(".resource_in_groups li.featured").size() > 0) {
-                    $(".badge").addClass("featured")
+                if($(".resource_in_groups li .featured").size() > 0) {
+                    $(".main_heading .badge").addClass("featured")
                 }
-                if($(".resource_in_groups li.featured").size() === 0) {
-                    $(".badge").removeClass("featured")
+                if($(".resource_in_groups li .featured").size() === 0) {
+                    $(".main_heading .badge").removeClass("featured")
                 }
                 //$('.show-user-groups').slideToggle("slow");
                 /*
-                $(".resource_in_groups li.featured").popover();
+                $(".resource_in_groups li .featured").popover();
                 */
-                $(".resource_in_groups li.featured").popover({ 
+                $(".resource_in_groups li .featured").popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
                 });
                 $('#myTab a:first').tab('show');
@@ -57,7 +57,7 @@ function loadObjectInGroups() {
         success: function(data) {
             if(data.status == 'success'){
                 $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
-                $(".resource_in_groups li.featured").popover({ 
+                $(".resource_in_groups li .featured").popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
                 });
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));

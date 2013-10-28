@@ -106,7 +106,7 @@ class Species implements Rateable {
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+            results.collect {  r-> instances.find { i -> (r[0] == i.id) r[0].baseUrl= grailsApplication.config.speciesPortal.resources.serverURL} } 
         } else {
             []
         }

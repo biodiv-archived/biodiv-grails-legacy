@@ -10,7 +10,7 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 
 	<div class="">
 		<div class="list">
-			<div class="observations thumbwrap">
+			<div class="observation thumbwrap">
 				<div class="observation">
 					<div>
 						<obv:showObservationFilterMessage
