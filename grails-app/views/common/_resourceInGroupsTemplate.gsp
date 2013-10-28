@@ -18,7 +18,7 @@
             </g:if>
         </g:if>
 
-        <li class="pull-left checkbox" style="padding-bottom:12px;list-style:none;">
+        <li class="pull-left checkbox" data-title ="${featured? 'Featured : ' :''}" data-content="${featured? featuredNotes :''}" style="padding-bottom:12px;list-style:none;">
             <uGroup:showUserGroupSignature model="[ 'userGroup':userGroup, featured:featured, featuredNotes:featuredNotes]" />
         </li>
         </g:each>

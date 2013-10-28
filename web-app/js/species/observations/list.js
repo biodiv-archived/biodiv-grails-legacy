@@ -195,6 +195,9 @@ $(document).ready(function(){
 //		return false;
 //   });
 
+    $(".resource_in_groups li:has('.featured')").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                });
     $("#removeTagFilter").live('click', function(){
         var oldActiveTag = $("li.tagit-choice.active");
         if(oldActiveTag){
