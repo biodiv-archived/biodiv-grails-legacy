@@ -66,7 +66,7 @@ class SpeciesService {
         return result;
     }
 
-    def search(params, noLimt) {
+    def search(params) {
         def result;
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
         def queryParams = [:]
@@ -158,8 +158,7 @@ class SpeciesService {
         paramsList.add('q', Utils.cleanSearchQuery(params.query));
         paramsList.add('start', offset);
         def max = Math.min(params.max ? params.int('max') : 12, 100)
-        if(!noLimt){
-            paramsList.add('rows', max);
+        paramsList.add('rows', max);
         }
         params['sort'] = params['sort']?:"score"
         String sort = params['sort'].toLowerCase();

@@ -17,7 +17,6 @@ var itemLoadCallback = function(carousel, state) {
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
 	});
-	// jqxhr.error(function() { alert("error"); });
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
@@ -48,21 +47,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
-        
-                /*            
-        $(".jcarousel-item").popover({ 
-            title: function() {
-                return $(this).find('img').attr('title')
-            },
-            content: function() {
-                return $(this).find(".caption").html()
-            },
-            trigger:(is_touch_device ? "click" : "hover"),
-            html:true,
-            container:'body'
-        });
-        */
-	
 }
 
 function resizeImage(item) {
@@ -125,6 +109,7 @@ var initCallback = function(carousel, status) {
 }
 
 var setupCallback = function(carousel) {
+    console.log('setup')
 }
 var getSnippetHTML = function(carousel, item) {
 	var paramsString = "";
