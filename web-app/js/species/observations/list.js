@@ -326,7 +326,7 @@ $(document).ready(function(){
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
-                $('.observations_list_wrapper').trigger('updatedGallery');
+                $('.observations_list').trigger('updatedGallery');
             }
         });
 
@@ -336,7 +336,7 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
-    $('.observations_list_wrapper').trigger('updatedGallery');
+    $('.observations_list').trigger('updatedGallery');
 });
 
 /**
@@ -677,14 +677,14 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
-        //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
+        //$('.observation_location').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
         reInitializeGroupPost();
         updateRelativeTime();
         last_actions();
         eatCookies();			
-        $('.observations_list_wrapper').trigger('updatedGallery');
+        $('.observations_list').trigger('updatedGallery');
     }
 }
 
@@ -878,6 +878,7 @@ $(document).ready(function(){
     $(".snippet.tablet .figure").hover(function() {
         $(this).children('.mouseover').toggle('slow')
     });
+    $("#distinctRecoTableAction").click(loadDistinctRecoList);
 });
 
 function loadDistinctRecoList() {
