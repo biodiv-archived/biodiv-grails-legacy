@@ -1,6 +1,6 @@
 <r:script> 
 $(document).ready(function() {
-    <g:if test="${relatedInstanceList}">
+    <g:if test="${relatedInstanceList || filterProperty != 'featureBy'}">
     $('#carousel_${id}').jcarousel({
         itemLoadCallback : itemLoadCallback,
         initCallback : initCallback,
