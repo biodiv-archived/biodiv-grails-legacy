@@ -151,12 +151,5 @@
                 <g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
 
 	</div>
-        <r:script>
-            $(document).ready(function(){
-                $(".resource_in_groups li.featured").popover({ 
-                    trigger:(is_touch_device ? "click" : "hover"),
-                }); 
-            });
-        </r:script>
-</body>
+        </body>
 </html>
