@@ -5,6 +5,11 @@
 <g:set var="title" value="Species"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="species, species_list" />
+<style>
+.thumbnail .observation_story {
+    width: 784px;
+}
+</style>
 </head>
 <body>
 	<div class="span12">
