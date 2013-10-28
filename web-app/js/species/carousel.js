@@ -45,7 +45,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 			carousel.size(data["count"]);
 		}
 	}	
-	$(".jcarousel-item-horizontal").css('width', window.params.carousel.maxWidth);
+	$(".jcarousel-item-horizontal").css('width', '75px');
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
@@ -68,8 +68,8 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 
 function resizeImage(item) {
     var ele = item.find('img');
-    var maxHeight=window.params.carousel.maxHeight;
     var maxWidth=item.hasClass('.jcarousel-item-horizontal') ? window.params.carousel.maxWidth : '100%';
+    var maxHeight=item.hasClass('.jcarousel-item-horizontal') ? '75px':window.params.carousel.maxHeight;
     var width = ele.width();    // Current image width
     var height = ele.height();  // Current image height
     if(height > maxHeight){
