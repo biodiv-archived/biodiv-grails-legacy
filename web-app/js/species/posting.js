@@ -2,7 +2,15 @@ var selectedObjects = new Array();
 var rejectedObjects = new Array();
 
 function updateObjSelection(id, comp){
-	$('.post-to-groups .post-main-content').show(1000);
+        $('#action-tabs a').click(function (e) {
+        var tab = $(this);
+        if(tab.parent('li').hasClass('active')){
+                $("#action-tab-content .tab-pane").removeClass('active');
+                tab.parent('li').removeClass('active');
+        }
+    });
+
+	//$('.post-to-groups .post-main-content').show(1000);
 	//$('.post-to-groups').parent().slideDown(1000);
 	$(comp).parent().removeClass('mouseover').addClass('mouseoverfix');
 	if($(comp).hasClass('selectedItem')){
@@ -78,6 +86,20 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 				if(pullType === 'single'){
 					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
                                         $(".feature-user-groups").replaceWith(data.featureGroupHtml);
+                                        for (var i = 0; i < userGroups.length; i++) {
+                                            var ugId = userGroups[i];
+                                            var ugIdStr = "" + ugId
+                                            selectTickUserGroupsSignature(ugIdStr);
+                                        }
+                                         
+                                        $('#featureNotes').keydown(function(){
+
+                                            if(this.value.length > 400){
+                                                return false;
+                                            }
+                                            $("#remainingC").html("Remaining characters : " +(400 - this.value.length));
+                                        });
+
 				}else{
 					$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-success').html(data.msg);
 				}

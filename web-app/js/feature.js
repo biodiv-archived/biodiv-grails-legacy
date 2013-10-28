@@ -36,7 +36,7 @@ function feature(submitType, objectId, objectType, url) {
                 $(".resource_in_groups li .featured").popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
                 });
-                $('#myTab a:first').tab('show');
+                $('#action-tabs a:first').tab('show');
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));
             } else {
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));

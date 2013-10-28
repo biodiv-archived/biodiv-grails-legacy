@@ -1,7 +1,7 @@
 <g:if test="${observationInstance || canPullResource}">
 <div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
     <div class="tabbable">
-        <ul class="nav nav-tabs" id="myTab">
+        <ul class="nav nav-tabs" id="action-tabs" style="margin:0px;">
             <g:if test="${observationInstance}">
             <li class="active"><h5 style="line-height:28px;"><a href="#tab0" data-toggle="tab">Groups</a></h5></li>
             </g:if>
@@ -11,7 +11,7 @@
             </g:if>
         </ul>
 
-        <div class="tab-content">
+        <div class="tab-content" id="action-tab-content">
             <g:if test="${observationInstance}">
 
             <div class="tab-pane active" id="tab0">

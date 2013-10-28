@@ -38,6 +38,5 @@
 
             <g:render template="/document/documentSidebar" />
         </div>
-
-    </body>
+	    </body>
 </html>
