@@ -58,16 +58,8 @@
 				updateGallery(window.location.pathname + window.location.search, ${params.limit?:40}, 0, undefined, false);
 				return false;
                                 });
-                                $('#myTab a').click(function (e) {
-                            var tab = $(this);
-                            if(tab.parent('li').hasClass('active')){
-                            window.setTimeout(function(){
-                            $(".tab-pane").removeClass('active');
-                            tab.parent('li').removeClass('active');
-                            },1);
-                            }
-                        });
-		});
+
+                                		});
 		
 	</g:javascript>
 	<r:script>

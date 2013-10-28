@@ -213,6 +213,13 @@ $(document).ready(function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
         return false;
     });
+    $('#action-tabs a').click(function (e) {
+        var tab = $(this);
+        if(tab.parent('li').hasClass('active')){
+                $("#action-tab-content .tab-pane").removeClass('active');
+                tab.parent('li').removeClass('active');
+        }
+    });
 
     $("#removeObvFilter").live('click', function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);

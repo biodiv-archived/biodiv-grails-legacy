@@ -2,7 +2,15 @@ var selectedObjects = new Array();
 var rejectedObjects = new Array();
 
 function updateObjSelection(id, comp){
-	$('.post-to-groups .post-main-content').show(1000);
+        $('#action-tabs a').click(function (e) {
+        var tab = $(this);
+        if(tab.parent('li').hasClass('active')){
+                $("#action-tab-content .tab-pane").removeClass('active');
+                tab.parent('li').removeClass('active');
+        }
+    });
+
+	//$('.post-to-groups .post-main-content').show(1000);
 	//$('.post-to-groups').parent().slideDown(1000);
 	$(comp).parent().removeClass('mouseover').addClass('mouseoverfix');
 	if($(comp).hasClass('selectedItem')){
@@ -78,6 +86,68 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 				if(pullType === 'single'){
 					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
                                         $(".feature-user-groups").replaceWith(data.featureGroupHtml);
+                                        $(".userGroups button").click(function(e){
+                                            if($(this).hasClass('active')) {
+                                                //trying to unselect group
+
+                                                //if on obv create page	and one group is coming as parent group		
+                                                if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+                                                    //this group is parent group
+                                                    if($(this).hasClass('create') && ${parentGroupId != ''} && $(this).hasClass('${parentGroupId}')){
+                                                        alert("Can't unselect parent group");
+                                                    }else{
+                                                        //un selecting other group
+                                                        $(this).removeClass('btn-success');
+                                                        $(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                                                    }	
+                                                }else{
+                                                    $(this).removeClass('btn-success');
+                                                    $(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                                                    if($(this).hasClass("single-post")) {
+                                                        $("#groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
+                                            $("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+                                                    } else {
+                                                        if($("#groupsWithSharingAllowed button.active").length == 0) {
+                                                            $("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                //trying to select new group
+
+                                                //if on obv create page and one group is coming as parent group
+                                                if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+                                                    //either current one belongs to exclusive group or parent group is exclusive group
+                                                    if($(this).hasClass("single-post") ||($("#groupsWithSharingNotAllowed button.create").length > 0)){
+                                                        alert("Can't select this group because it will unselect parent group");
+                                                    }else{
+                                                        //parent group is multipost one and this new group is also belong to multi select so selecting it
+                                                        $(this).removeClass('disabled').addClass('btn-success');
+                                                        $(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+                                                    }
+                                                }else{
+                                                    //on obv edit page
+                                                    if($(this).hasClass("single-post")) {
+                                                        $("#groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                                                        $("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                                                        $(this).removeClass('disabled').addClass('btn-success');
+                                                    } else {
+                                                        $("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                                                        $(this).removeClass('disabled').addClass('btn-success');
+                                                    }
+                                                    $(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+                                                }
+                                            }
+                                            e.preventDefault();
+                                        });
+                                        $('#featureNotes').keydown(function(){
+
+                                            if(this.value.length > 400){
+                                                return false;
+                                            }
+                                            $("#remainingC").html("Remaining characters : " +(400 - this.value.length));
+                                        });
+
 				}else{
 					$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-success').html(data.msg);
 				}
