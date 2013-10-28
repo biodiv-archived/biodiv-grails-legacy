@@ -108,7 +108,6 @@ update document set feature_count = 0;
  */
 update activity_feed set last_updated = date_created;
 alter table flag drop COLUMN observation_id ;
-ALTER TABLE activity_feed ALTER COLUMN activity_descrption TYPE varchar(400);
 ALTER TABLE flag ADD CONSTRAINT flag_author_type_id UNIQUE (author_id, object_id, object_type);
 ALTER TABLE flag ALTER COLUMN object_id SET NOT NULL;
 ALTER TABLE flag ALTER COLUMN object_type SET NOT NULL;
