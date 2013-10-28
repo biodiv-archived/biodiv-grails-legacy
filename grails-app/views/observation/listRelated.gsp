@@ -13,6 +13,11 @@
 .observations_list {
 	top: 0;
 }
+
+.thumbnail .observation_story {
+    width: 784px;
+}
+
 </style>
 </head>
 <body>

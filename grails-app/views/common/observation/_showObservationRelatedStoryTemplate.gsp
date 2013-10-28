@@ -39,7 +39,7 @@ $(document).ready(function() {
             </g:each>
         </ul>
 
-	<g:if test="${!hideShowAll}">
+	<g:if test="${!hideShowAll && (relatedInstanceList||filterProperty != 'featureBy')}">
 		<div class="observation_links">
 			<g:if test="${observationId}">
 				<a class="btn btn-mini"
