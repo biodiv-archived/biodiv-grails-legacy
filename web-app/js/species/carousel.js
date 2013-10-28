@@ -1,19 +1,16 @@
 var itemLoadCallback = function(carousel, state) {
         carousel.last = carousel.last?carousel.last:3;
 	var params = {
-		"limit" : carousel.last - carousel.first,
+		"limit" : carousel.options.scroll,
 		"offset" :carousel.first,
 		"filterProperty": carousel.options.filterProperty,
 		"filterPropertyValue": carousel.options.filterPropertyValue,
 		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
 	}
-        if(params.limit == 0)
-            params.limit = 3;
-
 	if (state == 'prev'){
 		return;
 	}
-	params.offset = carousel.first -1;
+	params.offset = carousel.first - 1;
 	if(carousel.last == carousel.options.size){
 		params.limit = carousel.last;
 	}
