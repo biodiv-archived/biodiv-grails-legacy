@@ -561,11 +561,13 @@ textarea#featureNotes {
     background: url(../images/featured_star.png) no-repeat right top;
     width: 35px; 
     height: 50px;
+    left:0px;
+    top:0px;
  }
 
 .badge {
     padding:0px;
-   z-index: 1000;
+    z-index: 1000;
     position: absolute;
     background-color: transparent;
     vertical-align:middle;
