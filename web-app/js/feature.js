@@ -24,11 +24,9 @@ function feature(submitType, objectId, objectType, url) {
                 $("#remainingC").html("Remaining characters : 400");
                 $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
                 if($(".resource_in_groups li.featured").size() > 0) {
-                    console.log("badge must have been added");
                     $(".badge").addClass("featured")
                 }
                 if($(".resource_in_groups li.featured").size() === 0) {
-                    console.log("badge removed");
                     $(".badge").removeClass("featured")
                 }
                 //$('.show-user-groups').slideToggle("slow");
