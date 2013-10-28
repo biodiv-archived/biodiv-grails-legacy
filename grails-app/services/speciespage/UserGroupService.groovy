@@ -56,6 +56,7 @@ import utils.Newsletter;
 import content.eml.Document
 import content.Project
 import species.participation.Checklists
+import species.participation.Featured
 
 class UserGroupService {
 
@@ -1368,14 +1369,14 @@ class UserGroupService {
 				allObvs = newList
 			}
 			
-			log.debug "======= All Resources " +  allObvs.size()
-			log.debug "========All Groups " + groups
+			log.debug " All Resources " +  allObvs.size()
+			log.debug " All Groups " + groups
 			
 			def afDescriptionList = []
 			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
-				postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
-				if(!ug.hasErrors()){
+				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
+				if(success){
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
 					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
@@ -1385,14 +1386,19 @@ class UserGroupService {
 		}
 		
 		
-		private postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
+		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
 			UserGroup.withTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
 					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+					obvs = getFeatureSafeList(ug, obvs)
 				}
-				log.debug submitType + "== for group ==== ====== " + ug + "  resources size " +  obvs.size()
+				if(obvs.isEmpty()){
+					log.debug "Nothing to update because of permissoin or not part of group"
+					return false
+				}
+				log.debug submitType + " for group " + ug + "  resources size " +  obvs.size()
 				obvs.each { obv ->
 					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
 				}
@@ -1402,8 +1408,9 @@ class UserGroupService {
 					ug.errors.allErrors.each { log.debug it }
 					status.setRollbackOnly()
 					e.printStackTrace()
-				}
+				} 
 			}
+			return !ug.hasErrors()
 		}
 		
 		private String getStatusMsg(af, resoruceClassName, remainingCount, submitType, userGroup){
@@ -1413,6 +1420,25 @@ class UserGroupService {
 			}
 			msg += "."
 			return msg 
+		}
+		
+		private List getFeatureSafeList(ug, obvs){
+			SUser currUser = springSecurityService.currentUser;
+			//if admin or founder or expert then can un post any featured resource
+			if(SUserService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
+				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
+				return obvs
+			}
+			
+			def newObvs = []
+			obvs.each { obv ->
+				if(( obv.metaClass.hasProperty(obv, 'author') && (obv.author == currUser)) || !Featured.isFeaturedAnyWhere(obv)){
+					newObvs << obv
+					log.debug "User is author or obv is not featured in any group " + currUser
+				}
+			}
+			println "new obv  " + newObvs
+			return newObvs
 		}
 	}
 
