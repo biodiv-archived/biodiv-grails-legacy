@@ -64,23 +64,6 @@
 					<a
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
-
-					<%--						<div class="prop">--%>
-					<%--							<span class="name">Member since </span> <span class="value">--%>
-					<%--							<sUser:showDate --%>
-					<%--								model="['SUserInstance':user, 'propertyName':'dateCreated']" />--%>
-					<%--							</span>--%>
-					<%--						</div>--%>
-					<%----%>
-					<%----%>
-					<%--						<div class="prop">--%>
-					<%--							<span class="name">Last visited </span> <span class="value">--%>
-					<%--							<sUser:showDate --%>
-					<%--								model="['SUserInstance':user, 'propertyName':'lastLoginDate']" />--%>
-					<%--							</span>--%>
-					<%--						</div>--%>
-					<%--					--%>
-
 					<div class="prop">
 						<span class="name"><i class="icon-time"></i>Member since </span>
 						<div class="value">
@@ -100,11 +83,9 @@
 						</div>
 					</g:if>
 				</div>
-
-
-
-				
-				<sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+                                <div style="width:660px;float:left;">
+                                    <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+                                </div>
 				
 			</div>
 			<%
