@@ -28,21 +28,8 @@
 .super-section  {
     background-color:white;
 }
-
-.section h6, expertice h6 {
-    border-bottom: 1px solid #CDCDCD;
-    margin-bottom: 5px;
-    padding-botton:3px;
-}
-.map_wrapper {
-padding: 0px;
-border-radius: 0px;
-border-top-left-radius: 0;
-margin-bottom: 0px;
-}
-
-h6 .btn-link, h5 .btn-link {
-    font-size:10px;
+.thumbnail .observation_story {
+    width: 715px;
 }
 </style>
 </head>
