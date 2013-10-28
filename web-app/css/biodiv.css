@@ -2043,36 +2043,60 @@ li#userOrEmail-new {
 	height:0px;
 	padding:0px;
 }
+.jcarousel-skin-ie7 .jcarousel-item-horizontal  .thumbnail .img-polaroid {
+	padding:0px;
+	border:0px;
+        max-width:75px;
+        max-height:75px;
+}
 
-.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
+.jcarousel-skin-ie7 .jcarousel-item-horizontal  .thumbnail .figure a {
+        max-width:75px;
+        max-height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item-horizontal {
+	height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item-horizontal .snippet.tablet {
+	width:75px;
+	height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item-horizontal .snippet.tablet .figure {
+	width:75px;
+	height:75px;
+}
+.jcarousel-skin-ie7 .jcarousel-item-vertical  .thumbnail .img-polaroid {
 	padding:0px;
 	border:0px;
         max-width:150px;
         max-height:150px;
 }
 
-.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
+.jcarousel-skin-ie7 .jcarousel-item-vertical  .thumbnail .figure a {
         max-width:150px;
         max-height:150px;
 }
 
-.jcarousel-skin-ie7 .jcarousel-item {
+.jcarousel-skin-ie7 .jcarousel-item-vertical {
 	height:150px;
 }
 
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
+.jcarousel-skin-ie7 .jcarousel-item-vertical .snippet.tablet {
 	width:150px;
 	height:150px;
 }
 
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
+.jcarousel-skin-ie7 .jcarousel-item-vertical .snippet.tablet .figure {
 	width:150px;
 	height:150px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item-horizontal, .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-	height:150px;
-        width:150px;
+	height:75px;
+        width:75px;
 }
 .jcarousel-skin-ie7 .jcarousel-item-vertical {
         width:100%;

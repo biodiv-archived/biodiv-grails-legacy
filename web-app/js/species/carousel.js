@@ -18,6 +18,7 @@ var itemLoadCallback = function(carousel, state) {
 		params.limit = carousel.last;
 	}
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
+            console.log(carousel.options.url)
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
 	});
 	// jqxhr.error(function() { alert("error"); });
@@ -44,7 +45,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 			carousel.size(data["count"]);
 		}
 	}	
-	$(".jcarousel-item-horizontal").css('width', window.params.carousel.maxWidth);
+	$(".jcarousel-item-horizontal").css('width', '75px');
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
@@ -67,8 +68,8 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 
 function resizeImage(item) {
     var ele = item.find('img');
-    var maxHeight=window.params.carousel.maxHeight;
     var maxWidth=item.hasClass('.jcarousel-item-horizontal') ? window.params.carousel.maxWidth : '100%';
+    var maxHeight=item.hasClass('.jcarousel-item-horizontal') ? '75px':window.params.carousel.maxHeight;
     var width = ele.width();    // Current image width
     var height = ele.height();  // Current image height
     if(height > maxHeight){
@@ -157,6 +158,7 @@ var getSnippetHTML = function(carousel, item) {
 };
 
 var getSnippetTabletHTML = function(carousel, item) {
+    console.log(item);
 	var paramsString = "";
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
