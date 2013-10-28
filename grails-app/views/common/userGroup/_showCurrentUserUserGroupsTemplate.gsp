@@ -41,10 +41,10 @@ def parentGroupId = ''
 						<button type="button"
 							class="btn input-prepend ${checked?'active btn-success ' + obvActionMarkerClass + ' ' + parentGroupId :''} single-post"
 							value="${userGroup.key.id}"
-							style="padding: 0px; height: 52px; border-radius: 6px;">
+							style="padding: 0px; height: 42px; border-radius: 6px;">
 
 
-							<span class="add-on" style="height: 40px; margin-right: -5px;">
+							<span class="add-on" style="height: 32px; margin-right: -5px;">
 								<i class="icon-ok signature ${checked? 'icon-black':'icon-white'}"></i> </span>
 
 							<div style="display: inline-block">

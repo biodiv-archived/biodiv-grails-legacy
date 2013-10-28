@@ -77,6 +77,7 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 			if(data.success){
 				if(pullType === 'single'){
 					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
+                                        $(".feature-user-groups").replaceWith(data.featureGroupHtml);
 				}else{
 					$(".alertMsg").removeClass('alert alert-info').addClass('alert alert-success').html(data.msg);
 				}

@@ -127,24 +127,33 @@ var getSnippetHTML = function(carousel, item) {
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 
 	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail>'+
+        //TODO:split this into separate methods so that figure badge story parts can be build independently
+	var eleHTML = '<div class=thumbnail>'+
                 '<div class="'+item.type.replace(' ','_')+'_th snippet'+'">'+
-                    '<span class="badge all_gall_th featured"></span>'+
+                    '<span class="badge featured"> </span>'+
                     '<div class="figure pull-left observation_story_image">'+
                             '<a href='+ item.url + paramsString + '>' + imageTag + '</a>'+
                     '</div>'+
                     '<div class="'+'observation_story'+'">'+
-                        '<div class="observation-icons">'+
-                            '<span style="float:right;" class="habitat_icon group_icon habitats_sprites active '+item.habitat.toLowerCase()+'_gall_th" title="'+item.habitat+'"></span>'+
-                            '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>'+
+                        '<div class="observation-icons">'
+
+        eleHTML +=       (item.habitat)?
+                            '<span style="float:right;" class="habitat_icon group_icon habitats_sprites active '+item.habitat.toLowerCase()+'_gall_th" title="'+item.habitat+'"></span>':''
+        eleHTML +=       (item.sGroup)?
+                            '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>':''
+
+        eleHTML +=       '</div>'+
+                    '<div class="featured_title ellipsis">'
+
+        eleHTML +=      '<div class="heading">'+
+                            '<a href='+ item.url + paramsString + '><span class="ellipsis">'+item.imageTitle + '</span></a>'+
                         '</div>'+
-                    '<div style="background-color:whitesmoke;font-weight:bold;">'+
-                        '<div class="species_title">'+item.imageTitle+'</div>'+
-                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
+                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+new Date(item.featuredOn)+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
                     '</div>'+
-                    '<div class="linktext">'+item.notes+'</div>'+
+                    '<div class="featured_notes linktext">'+item.notes+'</div>'+
                 '<div>'+
-            '</div>'
+            '</div></div>'
+        return eleHTML;
 };
 
 var getSnippetTabletHTML = function(carousel, item) {

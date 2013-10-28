@@ -160,6 +160,9 @@ class UserGroupTagLib {
 		if(featResult.size() > 0){
             out << render(template:"/common/featureUserGroupsTemplate", model:['observationInstance':attrs.model.observationInstance, 'featResult': featResult]);
         }
+        else {
+            out << render(template:"/common/blankFeatureUserGroupsTemplate");
+        }
     }
 
 	def showUserGroupFilterMessage = {attrs, body->

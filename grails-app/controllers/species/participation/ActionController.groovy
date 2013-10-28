@@ -117,18 +117,13 @@ class ActionController {
         def resourceGroupHtml
 
         if(ugParam != null && params.notes && obv) {
-            
             List splitGroups = [];
-            println "0000"
            println ugParam 
              if(ugParam && ugParam.length() > 0){
                 splitGroups = ugParam.split(",")
-                 println ugParam
                  if(ugParam[-1] == ',') {//TODO:CHECK THIS
-                     println "adding null"
                     splitGroups.add("")
                 }
-                
             }
             else {
                 splitGroups.add("")    
@@ -140,7 +135,6 @@ class ActionController {
                 groups.each { ug ->
                     println ug
                    if(ug == null) {
-                       println "0"
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }
                         else {
@@ -178,6 +172,7 @@ class ActionController {
                         else {
                             if(featuredInstance.author == params.author){
                                 featuredInstance.notes = params.notes
+                                featuredInstance.createdOn = new Date()
                                 status = saveActMail(params, featuredInstance, obv, ug) 
                                 if(status) msg = "Successfully updated notes for the featued ${obv.class.simpleName}"
                             }

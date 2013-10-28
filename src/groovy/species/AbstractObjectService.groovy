@@ -45,8 +45,11 @@ class AbstractObjectService {
             item.type = controller
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
-			item.sGroup = param['observation'].fetchSpeciesGroup().name
-			item.habitat = param['observation'].habitat?.name
+            def sGroup = param['observation'].fetchSpeciesGroup()
+            if(sGroup)
+			    item.sGroup = sGroup.name
+            if(param['observation'].habitat)
+			    item.habitat = param['observation'].habitat?.name
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = param['observation'].hasProperty("isChecklist")?param['observation'].isChecklist:false ;

@@ -8,15 +8,16 @@ def obvId = speciesInstance.id
 <g:if test="${speciesInstance}">
     <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
 </g:if>
-<div class="snippet tablet ">
+<div class="snippet">
     <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" >
                 </span>
 
-    <div class="figure"
+    <div class="figure pull-left observation_story_image"
         title='<g:if test="${obvTitle != null}">${obvTitle.replaceAll("<.*>","")}</g:if>'>
-                <g:link url="${uGroup.createLink(controller:'species', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup) }" name="g${pos}">
+                <g:link url="${uGroup.createLink(controller:'species', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
                 
-                <g:if test="${imagePath}">
+                <g:if
+				test="${imagePath}">
 				<img class="img-polaroid" src="${imagePath}" />
 			</g:if>
 			<g:else>
@@ -26,8 +27,6 @@ def obvId = speciesInstance.id
 			</g:else>
 		</g:link>
 	</div>
-	<div class="caption" >
-            <g:render template="/species/showSpeciesStoryTabletTemplate" model="['speciesInstance':speciesInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"/>
+            <g:render template="/species/showSpeciesStoryTemplate" model="['speciesInstance':speciesInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, featuredNotes:featuredNotes, featuredOn:featuredOn, showFeatured:showFeatured, showDetails:showDetails ]"/>
             <uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
-	</div>
 </div>

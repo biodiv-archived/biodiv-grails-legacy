@@ -39,11 +39,15 @@
         <div>
 
             <g:if test="${showFeatured}">
-            <div style="background-color:whitesmoke;font-weight:bold;"> 
-                <obv:showSpeciesName
-                model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'isListView':!showDetails]" />
-                <small style="font-weight:normal;"> featured on <time class="timeago" datetime="${featuredOn}"></time> by with notes : </small></div>
-                <div class="linktext">
+            <div class="featured_title ellipsis"> 
+                <div class="heading">
+                    <g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                        <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
+                    </g:link>
+                </div>
+                <small> featured on <time class="timeago" datetime="${featuredOn}"></time></small>
+            </div>
+            <div class="featured_notes linktext">
                     ${featuredNotes}
                     <p>${observationInstance.summary()}</p>
                 </div>		
@@ -185,6 +189,7 @@
             </g:else>
         </div>
 
+        <g:if test="${!showFeatured}">
         <div class="row" style="margin-left:0px;">
             <obv:showFooter
                 model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
@@ -194,4 +199,5 @@
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
             </div>
         </div>
+        </g:if>
     </div>
