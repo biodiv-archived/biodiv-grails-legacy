@@ -41,7 +41,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 			carousel.size(data["count"]);
 		}
 	}	
-	if($(".jcarousel-item-horizontal").parent('.speciesField').length() > 0)
+	if($(".jcarousel-item-horizontal").parent('.speciesField').length > 0)
 		$(".jcarousel-item-horizontal").css('width', '210px');
 	else
 		$(".jcarousel-item-horizontal").css('width', '75px');
@@ -68,7 +68,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 function resizeImage(item) {
     var ele = item.find('img');
     var maxHeight=0,maxWidth=0;
-    if(item.parent('.speciesField').length() > 0) {
+    if(item.parent('.speciesField').length > 0) {
     	maxWidth='210px'
     	maxHeight='250px'
     } else {
