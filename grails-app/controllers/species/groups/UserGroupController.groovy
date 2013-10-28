@@ -1059,8 +1059,10 @@ class UserGroupController {
    def bulkPost = {
 	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
-	   r['resourceGroupHtml'] =  (params.pullType == 'single') ? g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':r.remove('resourceObj')]):null;
-	   r['msg'] = "${message(code:r.remove('msgCode'))}"
+       def resObj = r.remove('resourceObj')
+	   r['resourceGroupHtml'] =  (params.pullType == 'single') ? g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]):null;
+	   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
+       r['msg'] = "${message(code:r.remove('msgCode'))}"
 	   render r as JSON
    }
    /////////////////////////////////////////////////////////////////////////////////////////////

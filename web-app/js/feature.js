@@ -8,6 +8,7 @@ function feature(submitType, objectId, objectType, url) {
     if(submitType === 'feature') {
         if(featureNotes === '') {
             alert('Notes are required while featuring.')
+                return;
         }
     }
     $.ajax({
