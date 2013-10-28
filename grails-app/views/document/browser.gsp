@@ -26,7 +26,7 @@
 
             <obv:featured model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 
-            <h5 style="margin-top:40px;">Browse Documents</h5>
+            <h5>Browse Documents</h5>
 
             <div class="document-list span8 right-shadow-box" style="margin:0;">
                 <g:render template="/document/search" model="['params':params]" />
