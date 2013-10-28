@@ -345,7 +345,7 @@ class ActionController {
 	def deleteFlag  = {
 		log.debug params;
         params.author = springSecurityService.currentUser;
-		def flagInstance = Flag.read(params.id);  
+		def flagInstance = Flag.read(params.id.toLong());  
 		if(!flagInstance){
 			return
 		}
