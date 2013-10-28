@@ -31,17 +31,6 @@
             </div>		
         </g:if>
 
-        <g:if test="${!hideSocial}">
-		<div class="footer-item" style="position:absolute;right:0px;">
-                    <fb:like layout="button_count" href="${href}" width="450" show_faces="true" data-send="true"></fb:like>
-                    <div id="googleplus" class="pull-left"></div>
-                    <% String twitterDesc = title?:'';
-                    if(twitterDesc && description) twitterDesc += " - "
-                    twitterDesc += description?:'';
-                    %>
-                    <a href="https://twitter.com/share" class="twitter-share-button" data-via="inbiodiversity" data-hashtags="IBP" data-count="none" data-url="${href}" data-text="${twitterDesc}" data-size="450"></a>
-                </div>
-        </g:if>
     </div>
     <div class="span4 nav clearfix" style="margin-left:20px;margin-bottom:3px;">
         <%

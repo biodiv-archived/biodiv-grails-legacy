@@ -18,7 +18,6 @@ var itemLoadCallback = function(carousel, state) {
 		params.limit = carousel.last;
 	}
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
-            console.log(carousel.options.url)
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
 	});
 	// jqxhr.error(function() { alert("error"); });
@@ -158,7 +157,6 @@ var getSnippetHTML = function(carousel, item) {
 };
 
 var getSnippetTabletHTML = function(carousel, item) {
-    console.log(item);
 	var paramsString = "";
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	

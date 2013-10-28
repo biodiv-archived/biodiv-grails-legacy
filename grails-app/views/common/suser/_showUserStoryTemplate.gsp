@@ -1,6 +1,6 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.utils.Utils"%>
-<div class="observation_story" style="overflow: auto;">
+<div class="observation_story" style=" width: inherit; overflow: auto;">
 	<g:if test="${!showDetails }">
 		<h5 class="ellipsis">
 			<a
