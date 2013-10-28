@@ -209,6 +209,14 @@ h6 {
     width:934px;
 }
 
+#carousel_featureBy .thumbnail .observation_story_body {
+    padding-top:0px;
+}
+
+.thumbnail .observation_story_body {
+    padding:5px;
+}
+
 .thumbnail .observation_story_image {
     display:table;
     height:150px;

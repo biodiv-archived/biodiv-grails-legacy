@@ -36,7 +36,7 @@
 
             </div>
         </div>
-        <div>
+        <div class="observation_story_body">
 
             <g:if test="${showFeatured}">
             <div class="featured_title ellipsis"> 
