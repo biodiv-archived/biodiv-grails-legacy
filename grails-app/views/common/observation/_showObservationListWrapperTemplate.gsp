@@ -84,7 +84,7 @@
                         
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
-                    <h5>Species Distribution</h5>
+                                    <h5>Species Distribution</h5>
 					<obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
@@ -130,9 +130,10 @@ $(document).ready(function() {
         refreshList(getSelectedBounds());
     });
 
-    $('.observations_list_wrapper').on('updatedGallery', function() {
+    $('.observations_list').on('updatedGallery', function() {
         loadSpeciesGroupCount();
-        updateDistinctRecoTable();
+        loadDistinctRecoList();
+        //updateDistinctRecoTable();
     });
 });
 </g:javascript>
