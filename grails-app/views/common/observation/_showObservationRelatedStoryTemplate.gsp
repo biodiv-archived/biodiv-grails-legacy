@@ -10,7 +10,7 @@ $(document).ready(function() {
         carouselDivId:"#carousel_" + "${id}",
         carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
         carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
-        //itemFallbackDimension : window.params.carousel.maxWidth,
+        itemFallbackDimension : window.params.carousel.maxWidth,
         contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
         contextGroupWebaddress:"${userGroupWebaddress}",
         <g:if test="${filterProperty == 'featureBy'}">
@@ -19,8 +19,7 @@ $(document).ready(function() {
             getItemHTML:getSnippetHTML
         </g:if>
         <g:else>
-            scroll:1,
-            visible:3,
+            scroll:3,
             getItemHTML:getSnippetTabletHTML,
             horizontal:true
         </g:else>
