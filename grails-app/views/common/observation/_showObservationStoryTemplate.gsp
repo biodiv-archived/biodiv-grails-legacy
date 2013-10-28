@@ -190,7 +190,7 @@
         </div>
 
         <g:if test="${!showFeatured}">
-        <div class="row" style="margin-left:0px;">
+        <div class="row observation_footer" style="margin-left:0px;">
             <obv:showFooter
                 model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
 
