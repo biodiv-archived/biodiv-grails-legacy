@@ -10,9 +10,11 @@
         margin:0 1px 5px 0px;
         padding:0px;
     }
+
+.thumbnail .observation_story {
+    width: 784px;
+}
 </style>
-
-
 </head>
 
 <body>
