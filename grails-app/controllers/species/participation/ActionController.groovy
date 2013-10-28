@@ -345,20 +345,17 @@ class ActionController {
 	def deleteFlag  = {
 		log.debug params;
         params.author = springSecurityService.currentUser;
-		def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);  //kaun si kiski id hai???
-		def obv = activityFeedService.getDomainObject(flagInstance.objectType, flagInstance.objectId);    ///observation nikali hai...species bhi ho sakta hai
-        
-
+		def flagInstance = Flag.read(params.id);  
 		if(!flagInstance){
-			render obv.flagCount;
 			return
 		}
 		try {
+            def obv = activityFeedService.getDomainObject(flagInstance.objectType, flagInstance.objectId);
             def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
-            activityFeedService.addActivityFeed(obv, flagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
 			flagInstance.delete(flush: true);
             obv.flagCount--
 			obv.save(flush:true)
+            activityFeedService.addActivityFeed(obv, flagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
 			searchIndex(params.type,obv);    //observation ke liye only
             def message = [:]
             message['flagCount'] = obv.flagCount 
