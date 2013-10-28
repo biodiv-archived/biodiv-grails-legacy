@@ -194,8 +194,18 @@ h6 {
     padding:0px;
 }
 
+#carousel_featureBy {
+    margin-top:22px;
+}
+
 #carousel_featureBy .observation_story {
-    width:790px;
+    width:784px;
+}
+
+#carousel_featureBy li {
+    border: solid 3px cadetblue;
+    border-style: ridge;
+    width:934px;
 }
 
 .thumbnail .observation_story_image {
@@ -517,6 +527,15 @@ textarea#featureNotes {
 
 .featured_title {
     font-weight:bold;
+    display:inline-block;
+    height:32px;
+    line-height:32px;
+    vertical-align:middle;
+    background-color:whitesmoke;
+    width:100%;
+}
+
+.featured_title>.heading {
     display:inline-block;
 }
 
@@ -870,8 +889,9 @@ ul#recoSummary {
 /* 	height: 15px; */
 /* } */
 .observation_links {
-	margin-top: 5px;
 	float: right;
+        position:relative;
+        z-index:5;
 }
 
 /*#carousel_featureBy>.observation_links {
@@ -1406,6 +1426,7 @@ span.cke_skin_kama {
 
 .thumbnail {
 	border: 0px;
+        padding:0px;
 }
 
 .tablet h5 {
@@ -2043,14 +2064,19 @@ li#userOrEmail-new {
 	height:150px;
         width:150px;
 }
-.jcarousel-skin-ie7 .jcarousel-item-vertical, .jcarousel-skin-ie7 .jcarousel-clip-vertical {
+.jcarousel-skin-ie7 .jcarousel-item-vertical {
         width:100%;
         height:150px;
 }
 
+.jcarousel-skin-ie7 .jcarousel-clip-vertical {
+        width:100%;
+    height:156px;
+}
+
 .jcarousel-skin-ie7 .jcarousel-container-vertical {
         width:100%;
-        height:150px;
+        height:156px;
         padding:0px;
         margin: 0;
 }
@@ -2352,3 +2378,4 @@ div.noOfRatings {
 /*     color: #FFFFFF; */
 /*     opacity: 0.5; */
 /* } */
+
