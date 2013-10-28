@@ -146,6 +146,7 @@ class Species implements Rateable {
 		return res;
 	}
 	
+
 	String notes() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
