@@ -23,8 +23,7 @@ import species.participation.Featured;
  */
 class Document extends Metadata implements Taggable, Rateable {
 	
-	def activityFeedService
-    def springSecurityService;
+	def springSecurityService;
 	def documentService
 	
 	public enum DocumentType {

@@ -142,6 +142,7 @@ class ActivityFeedService {
 		
 		//updating time stamp on object after addition of activity
 		try {
+			updateResourceAssociation(af)
 			rootHolder.onAddActivity(af, flushImmidiatly)
 		}catch (Exception e) {
 			//e.printStackTrace();
@@ -226,6 +227,32 @@ class ActivityFeedService {
 	
 	def updateIsShowable(obj){
 		ActivityFeed.updateIsShowable(obj);
+	}
+	
+	def updateResourceAssociation(af){
+		if(af.activityType != RESOURCE_REMOVED_FROM_GROUP){
+			return
+		}
+		
+		//on unpost removing resource from feature table also if user has permission
+		def rootHolder = getDomainObject(af.rootHolderType, af.rootHolderId)
+		if(rootHolder.instanceOf(UserGroup)){
+			return
+		}
+		
+		def activityHolder = getDomainObject(af.activityHolderType, af.activityHolderId)
+		def featuredInstance = Featured.findWhere(objectId: af.rootHolderId, objectType: af.rootHolderType, userGroup: activityHolder)
+		if(!featuredInstance){
+			return
+		}
+		
+		rootHolder.featureCount--
+		try{
+			featuredInstance.delete(flush:true, failOnError:true)
+		}catch (Exception e) {
+			log.error "Remove of featuredInstance FAILDED " + featuredInstance
+			e.printStackTrace()
+		}
 	}
 	
 	def getContextInfo(ActivityFeed feedInstance, params=null){

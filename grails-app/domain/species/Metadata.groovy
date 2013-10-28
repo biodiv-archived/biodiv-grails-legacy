@@ -35,7 +35,8 @@ abstract class Metadata {
 	Date lastRevised = createdOn;
 
     def grailsApplication
-
+	def activityFeedService
+	
     //TODO: Contributions and Attributions
 
     static constraints = {
