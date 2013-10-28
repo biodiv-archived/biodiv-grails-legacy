@@ -216,8 +216,10 @@ $(document).ready(function(){
     $('#action-tabs a').click(function (e) {
         var tab = $(this);
         if(tab.parent('li').hasClass('active')){
+            window.setTimeout(function(){
                 $("#action-tab-content .tab-pane").removeClass('active');
                 tab.parent('li').removeClass('active');
+                },1);
         }
     });
 
@@ -388,6 +390,69 @@ function getSelectedHabitat() {
     hbt = hbt.replace(/\s*\,\s*$/,'');
     return hbt;	
 } 
+
+function selectTickUserGroupsSignature(parentGroupId) {
+    $(".userGroups button").click(function(e){
+		if($(this).hasClass('active')) {
+		    console.log("if 1st");	
+                    //trying to unselect group
+			
+			//if on obv create page	and one group is coming as parent group		
+			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+				console.log("IF KE ANDAR IF");
+                                //this group is parent group
+				if($(this).hasClass('create') && parentGroupId != '' && $(this).hasClass("'"+parentGroupId+"'")){
+					alert("Can't unselect parent group");
+				}else{
+					//un selecting other group
+					$(this).removeClass('btn-success');
+					$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+				}	
+			}else{
+                            console.log("IF KE ANDAR else");
+				$(this).removeClass('btn-success');
+				$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+				if($(this).hasClass("single-post")) {
+					$("#groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
+					$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+				} else {
+					if($("#groupsWithSharingAllowed button.active").length == 0) {
+						$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+					}
+				}
+			}
+		} else {
+                        console.log("else 1st");
+			//trying to select new group
+			
+			//if on obv create page and one group is coming as parent group
+			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+			    console.log("ELSE   KE ANDAR IF");	
+                            //either current one belongs to exclusive group or parent group is exclusive group
+			 	if($(this).hasClass("single-post") ||($("#groupsWithSharingNotAllowed button.create").length > 0)){
+					alert("Can't select this group because it will unselect parent group");
+				}else{
+					//parent group is multipost one and this new group is also belong to multi select so selecting it
+					$(this).removeClass('disabled').addClass('btn-success');
+					$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+				}
+			}else{
+                            console.log("ELSE KE ANDAR ELSE");
+				//on obv edit page
+				if($(this).hasClass("single-post")) {
+					$("#groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$(this).removeClass('disabled').addClass('btn-success');
+				} else {
+					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$(this).removeClass('disabled').addClass('btn-success');
+				}
+				$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+			}
+		}
+		e.preventDefault();
+	});
+}
 
 function getSelectedSortBy() {
     var sortBy = ''; 
