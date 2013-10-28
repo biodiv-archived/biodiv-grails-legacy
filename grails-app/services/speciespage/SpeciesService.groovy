@@ -159,7 +159,6 @@ class SpeciesService {
         paramsList.add('start', offset);
         def max = Math.min(params.max ? params.int('max') : 12, 100)
         paramsList.add('rows', max);
-        }
         params['sort'] = params['sort']?:"score"
         String sort = params['sort'].toLowerCase();
         if(isValidSortParam(sort)) {
