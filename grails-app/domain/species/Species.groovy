@@ -71,16 +71,19 @@ class Species implements Rateable {
 		if(!reprImage) {
 			def images = this.getImages();
 			this.reprImage = images ? images[0]:null;
+            println images
 			if(reprImage) {
+                println reprImage
 				log.debug " Saving representative image for species ===  $reprImage.fileName" ;
-				if(!this.save(flush:true)) {
-					this.errors.each { log.error it }
-				}
+                if(!this.save(flush:true)) {
+                    this.errors.each { log.error it }
+                }
 			}			
 		}
-		
-		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
-			return reprImage;
+		if(reprImage) {
+            if(new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists()) {
+			    return reprImage;
+            }
 		} else {
 			return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
 		}
@@ -106,7 +109,9 @@ class Species implements Rateable {
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r-> instances.find { i -> (r[0] == i.id) r[0].baseUrl= grailsApplication.config.speciesPortal.resources.serverURL} } 
+            results.collect {  r -> 
+                instances.find { i -> (r[0] == i.id) } 
+            } 
         } else {
             []
         }

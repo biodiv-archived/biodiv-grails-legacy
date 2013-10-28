@@ -122,6 +122,7 @@ h6 {
 .snippet.tablet .caption {
 	height:50px;
         padding:0px 0px;
+        position:relative;
 }
 
 .snippet.tablet .caption .story-footer {
@@ -2357,25 +2358,11 @@ div.noOfRatings {
 .resource_in_groups .sidebar_section {
 	margin-bottom: 0px;
 }
-/* .selectable { */
-/*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
-/*     background-color: transparent; */
-/*     color: #FFFFFF; */
-/*     opacity: 0.5; */
-/* } */
-/* /* .selectable:hover { */ */
-/* /*     background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent; */ */
-/* /* } */ */
-/* .selectedItem { */
-/*     background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent; */
-/*     background-color: transparent; */
-/*     color: #FFFFFF; */
-/*     opacity: 0.5; */
-/* } */
-/* .selectedItem:hover { */
-/*     background: url("../images/icons/x.png") no-repeat scroll 50% 50% transparent; */
-/*     background-color: transparent; */
-/*     color: #FFFFFF; */
-/*     opacity: 0.5; */
-/* } */
+
+.poor_species_content {
+    position: absolute;
+    top: -20px;
+    background-color: wheat;
+    width: 100%;
+}
 

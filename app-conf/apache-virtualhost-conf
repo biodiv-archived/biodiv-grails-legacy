@@ -70,7 +70,7 @@
     RewriteRule ^/biodiv/group/the_western_ghats(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv/group/the_western_ghats
 
-    RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|simg|images|content))) - [L]
+    RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|img|images|content))) - [L]
 	
     RewriteCond %{REQUEST_URI} ^/biodiv
 #       RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|group_icons|content))
