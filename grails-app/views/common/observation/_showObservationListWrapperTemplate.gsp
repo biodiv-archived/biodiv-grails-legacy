@@ -130,10 +130,10 @@ $(document).ready(function() {
         refreshList(getSelectedBounds());
     });
 
-    $('.observations_list').on('updatedGallery', function() {
-        loadSpeciesGroupCount();
-        loadDistinctRecoList();
-        //updateDistinctRecoTable();
+    $('.list').on('updatedGallery', function() {
+    	loadSpeciesGroupCount();
+        //loadDistinctRecoList();
+        updateDistinctRecoTable();
     });
 });
 </g:javascript>
