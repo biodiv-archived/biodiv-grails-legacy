@@ -36,8 +36,8 @@
 	<div class="paginateButtons centered">
 		<p:paginate controller="species" action="list"
 			total="${instanceTotal}" userGroup="${userGroup}"
-			userGroupWebaddress="${userGroupWebaddress}" params="${params}"
-			max="${params.max }" offset="${params.offset}" maxsteps="10" />
+			userGroupWebaddress="${userGroupWebaddress}" params="${queryParams}"
+			max="${queryParams.max }" offset="${queryParams.offset}" maxsteps="10" />
 	</div>
 	<div class="paginateButtons centered">
 		<p:paginateOnAlphabet controller="species" action="list"

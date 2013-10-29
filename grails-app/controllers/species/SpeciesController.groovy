@@ -64,8 +64,6 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-
-
 	def listXML = {
 		//cache "taxonomy_results"
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)

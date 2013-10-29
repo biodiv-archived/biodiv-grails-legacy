@@ -484,7 +484,7 @@ class SpeciesService {
                     countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                     countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
                 }
-                queryParams.sGroup  = groupIds
+                queryParams['sGroup']  = groupIds
             }
 
             if(params.featureBy == "true" ) {
