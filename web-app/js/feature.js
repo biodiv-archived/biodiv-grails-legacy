@@ -18,9 +18,9 @@ function feature(submitType, objectId, objectType, url) {
         data:{'id':objectId, 'type':objectType, 'userGroup': userGroup.join(","), 'notes': featureNotes},
         success: function(data) {
             if(data.status == 'success'){
-                $(".feature-user-groups button.active").removeClass("btn-success active")
-                $(".feature-user-groups i.icon-black").removeClass("icon-black").addClass("icon-white")
-                $("#featureNotes").val('')
+                $(".feature-user-groups button.active").removeClass("btn-success active");
+                $(".feature-user-groups i.icon-black").removeClass("icon-black").addClass("icon-white");
+                $("#featureNotes").val('');
                 $("#remainingC").html("Remaining characters : 400");
                 $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
                 if($(".resource_in_groups li .featured").size() > 0) {
@@ -31,8 +31,8 @@ function feature(submitType, objectId, objectType, url) {
                 }
                 //$('.show-user-groups').slideToggle("slow");
                 /*
-                $(".resource_in_groups li .featured").popover();
-                */
+                   $(".resource_in_groups li .featured").popover();
+                   */
                 $(".resource_in_groups li:has('.featured')" ).popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
                 });
@@ -42,32 +42,31 @@ function feature(submitType, objectId, objectType, url) {
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));
             }
             updateFeeds();	
-            }, error: function(xhr, ajaxOptions, error) {
-                var successHandler = this.success, errorHandler = showUpdateStatus;
-                handleError(xhr, ajaxOptions, error, successHandler, errorHandler);
-            }
+        }, error: function(xhr, ajaxOptions, error) {
+            var successHandler = this.success, errorHandler = showUpdateStatus;
+            handleError(xhr, ajaxOptions, error, successHandler, errorHandler);
+        }
     });
 }
 
 function loadObjectInGroups() {
     $.ajax({
         url: window.params.action.inGroupsUrl,
-        type: 'GET',
-        dataType: "json",
-        data:{'id':objectId, 'type':objectType},
-        success: function(data) {
-            if(data.status == 'success'){
-                $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
-                $(".resource_in_groups li .featured").popover({ 
-                    trigger:(is_touch_device ? "click" : "hover"),
-                });
-                showUpdateStatus(data.msg, data.status, $("#featureMsg"));
-            } else {
-                showUpdateStatus(data.msg, data.status, $("#featureMsg"));
-            }
-            }, error: function(xhr, ajaxOptions, error) {
-                console.log(error);
-            }
+    type: 'GET',
+    dataType: "json",
+    data:{'id':objectId, 'type':objectType},
+    success: function(data) {
+        if(data.status == 'success'){
+            $(".resource_in_groups").replaceWith(data.resourceGroupHtml);
+            $(".resource_in_groups li .featured").popover({ 
+                trigger:(is_touch_device ? "click" : "hover"),
+            });
+            showUpdateStatus(data.msg, data.status, $("#featureMsg"));
+        } else {
+            showUpdateStatus(data.msg, data.status, $("#featureMsg"));
+        }
+    }, error: function(xhr, ajaxOptions, error) {
+        console.log(error);
+    }
     });
-
 }

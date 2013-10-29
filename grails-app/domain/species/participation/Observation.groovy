@@ -363,7 +363,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 
     String summary() {
 		String location = "Observed at '" + (this.placeName.trim()?:this.reverseGeocodedName) +"'"
-		String desc = "- "+ location +" by "+this.author.name.capitalize() + (this.fromDate ?  (" on " +  this.fromDate.format('dd/MM/yyyy')) : "");
+		String desc = location +" by "+this.author.name.capitalize() + (this.fromDate ?  (" on " +  this.fromDate.format('dd/MM/yyyy')) : "");
 	
         return desc
     }

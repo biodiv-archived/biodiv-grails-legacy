@@ -34,26 +34,29 @@
                     </span>
                 </g:if>
 
+                <g:if test="${showFeatured}">
+                    <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
+                </g:if>
             </div>
         </div>
-        <div class="observation_story_body">
-
-            <g:if test="${showFeatured}">
-            <div class="featured_title ellipsis"> 
-                <div class="heading">
-                    <g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
-                        <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
-                    </g:link>
+        <g:if test="${showFeatured}">
+            <div class="featured_body">
+                <div class="featured_title ellipsis"> 
+                    <div class="heading">
+                        <g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                            <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
+                        </g:link>
+                    </div>
+                    <small> featured on <time class="timeago" datetime="${featuredOn.getTime()}"></time></small>
                 </div>
-                <small> featured on <time class="timeago" datetime="${featuredOn}"></time></small>
+                <div class="featured_notes linktext">
+                        ${featuredNotes}
+                        <small>${observationInstance.summary()}</small>
+                </div>
             </div>
-            <div class="featured_notes linktext">
-                    ${featuredNotes}
-                    <p>${observationInstance.summary()}</p>
-                </div>		
-            </g:if>
-            <g:else>
-            <div class="prop">
+        </g:if>
+        <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
+           <div class="prop">
                 <g:if test="${showDetails}">
                 <span class="name"><i class="icon-share-alt"></i>Name</span>
                 </g:if>
@@ -186,10 +189,7 @@
 
 
             </g:if>
-            </g:else>
-        </div>
 
-        <g:if test="${!showFeatured}">
         <div class="row observation_footer" style="margin-left:0px;">
             <obv:showFooter
                 model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
@@ -199,5 +199,5 @@
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
             </div>
         </div>
-        </g:if>
+        </div>
     </div>

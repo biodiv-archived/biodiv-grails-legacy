@@ -206,12 +206,12 @@ h6 {
 
 #carousel_featureBy li {
     border: solid 3px cadetblue;
-    border-style: ridge;
     width:934px;
 }
 
-#carousel_featureBy .thumbnail .observation_story_body {
+#carousel_featureBy .thumbnail .observation_story_body , #carousel_featureBy .thumbnail .featured_body {
     padding-top:0px;
+    padding-left:10px;
 }
 
 .thumbnail .observation_story_body {
@@ -288,7 +288,8 @@ h6 {
 	margin-right: 10px;*/
         position:absolute;
         right:0px;
-        top:0px
+        top:0px;
+        z-index:2;
 }
 
 .list_view.thumbnails {
@@ -575,6 +576,20 @@ textarea#featureNotes {
 
 }
 
+.toggle_story {
+    position:absolute;
+    top:0px;
+    background-color:white;
+    height:145px;
+}
+
+.featured_details {
+ /*   position:absolute;
+    bottom:0px;
+    right:0px;
+    z-index:2;*/
+}
+
 .recommendations {
 	background-color: #a6dfc8;
 	/*     border-radius: 7px 7px 7px 7px; */
@@ -801,7 +816,7 @@ ul#recoSummary {
 
 .story-footer {
 	position: absolute;
-	bottom: 5px;
+	bottom: 0px;
 	/* opacity:0.5;        */
 }
 

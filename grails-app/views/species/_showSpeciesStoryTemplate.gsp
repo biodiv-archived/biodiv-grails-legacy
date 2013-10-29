@@ -22,7 +22,7 @@
                 </g:link>
 
                 <g:if test="${showFeatured}">
-                <small> featured on <time class="timeago" datetime="${featuredOn}"></time></small>
+                <small> featured on <time class="timeago" datetime="${featuredOn.getTime()}"></time></small>
                 </g:if>
             </div>
         </div>

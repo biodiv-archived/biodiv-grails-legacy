@@ -12,7 +12,7 @@
                 <span class="ellipsis">${documentInstance.title}</span>
                 </g:link>
             </div>
-            <small> featured on <time class="timeago" datetime="${featuredOn}"></time></small>
+            <small> featured on <time class="timeago" datetime="${featuredOn.getTime()}"></time></small>
         </div>
         <div class="featured_notes linktext">
             ${featuredNotes}

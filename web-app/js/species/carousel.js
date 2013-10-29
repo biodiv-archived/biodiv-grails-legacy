@@ -26,6 +26,8 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		if (!carousel.has(actualIndex)) {
 			var item = carousel.add(actualIndex, carousel.options.getItemHTML(carousel, items[i]));
 			resizeImage(item);
+                        console.log(item);
+                        loadFeatureDetails(item);
 		}
 	}
 	if(state == 'init') {
@@ -47,6 +49,8 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
+
+        //loadFeatureDetails(item);
 }
 
 function resizeImage(item) {
@@ -109,8 +113,8 @@ var initCallback = function(carousel, status) {
 }
 
 var setupCallback = function(carousel) {
-    console.log('setup')
 }
+
 var getSnippetHTML = function(carousel, item) {
 	var paramsString = "";
 	if(carousel.options.filterProperty === "speciesName"){
@@ -130,21 +134,37 @@ var getSnippetHTML = function(carousel, item) {
                         '<div class="observation-icons">'
 
         eleHTML +=       (item.habitat)?
-                            '<span style="float:right;" class="habitat_icon group_icon habitats_sprites active '+item.habitat.toLowerCase()+'_gall_th" title="'+item.habitat+'"></span>':''
+                                '<span style="float:right;" class="habitat_icon group_icon habitats_sprites active '+item.habitat.toLowerCase()+'_gall_th" title="'+item.habitat+'"></span>':''
         eleHTML +=       (item.sGroup)?
-                            '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>':''
+                                '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>':''
 
-        eleHTML +=       '</div>'+
-                    '<div class="featured_title ellipsis">'
+        eleHTML +=              '<span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>'
 
-        eleHTML +=      '<div class="heading">'+
-                            '<a href='+ item.url + paramsString + '><span class="ellipsis">'+item.imageTitle + '</span></a>'+
+        eleHTML +=       '</div>'
+        eleHTML +=      '<div class="featured_body">' +
+                            '<div class="featured_title ellipsis">'
+
+        eleHTML +=              '<div class="heading">'+
+                                    '<a href='+ item.url + paramsString + '><span class="ellipsis">'+item.imageTitle + '</span></a>'+
+                                '</div>'+
+                                '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+new Date(item.featuredOn)+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
+                            '</div>'+
+                            '<div class="featured_notes linktext">'+item.notes+'</div>'+
+                        '</div>'
+
+        eleHTML +=      '<div class="observation_story_body toggle_story" style="display:none;">' +
+                            '<div class="prop">'+
+                                '<i class="pull-left icon-share-alt"></i>'+
+                                '<div class="value">'+
+                                    '<div class="species_title">'+
+                                            item.imageTitle +
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
                         '</div>'+
-                        '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+new Date(item.featuredOn)+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
                     '</div>'+
-                    '<div class="featured_notes linktext">'+item.notes+'</div>'+
-                '<div>'+
-            '</div></div>'
+            '</div>'+
+        '</div>'
         return eleHTML;
 };
 
@@ -159,3 +179,16 @@ var getSnippetTabletHTML = function(carousel, item) {
 	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
 
 }
+
+function loadFeatureDetails($ele) {
+    if(!$ele) return;
+    console.log($ele.find('.feature_details'))
+    $ele.find('.feature_details').click(
+            function() {
+                $(this).parent().parent().next().next().slideToggle('slow').find('.ellipsis').trunk8({
+                    lines:2
+                }).linkify()
+            });
+}
+
+
