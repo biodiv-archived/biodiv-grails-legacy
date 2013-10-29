@@ -22,7 +22,7 @@
 				style="margin-left: 0px; clear: both;">
 				<s:speciesFilter />
 				<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
-				<div class="observations_list_wrapper" style="top: 0px;">
+				<div class="list" style="top: 0px;">
 					<s:searchResults />
 				</div>
 			</div>
@@ -36,7 +36,7 @@ $(document).ready(function(){
 
 	$(".list_view").show();
 	
-    $('.observations_list_wrapper').on('updatedGallery', function(event) {
+    $('.list').on('updatedGallery', function(event) {
     	$(".list_view").show();
     });
 	

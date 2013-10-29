@@ -75,12 +75,17 @@ class AbstractObjectService {
                 String n = item.notes;
                 item.notes = param['featuredNotes']
                 if(n)
-                    item.notes += "<p>"+ n +"</p>" 
+                    item.notes += "<p><small>"+ n +"</small></p>" 
             }
            
             if(param['featuredOn']) {
                 item.featuredOn = param['featuredOn'].getTime();
             }
+            if(param['observation'].latitude) item.lat = param['observation'].latitude
+            if( param['observation'].longitude) item.lng = param['observation'].longitude
+            if( param['observation'].geoPrivacy) item.geoPrivacy = param['observation'].geoPrivacy
+            if(param['observation'].isChecklist) item.isChecklist = param['observation'].isChecklist
+            if(param['observation'].fromDate.getTime()) item.observedOn = param['observation'].fromDate.getTime();
 			urlList << item;
 		}
 		return urlList

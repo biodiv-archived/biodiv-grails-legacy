@@ -26,10 +26,8 @@ if(r) {
     }
 }
 	
-String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" on "+observationInstance.fromDate.format('dd/MM/yyyy');
 %>
-<g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
+<g:set var="description" value="${Utils.stripHTML(observationInstance.summary()) }" />
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 

@@ -51,7 +51,7 @@
 
 			<obv:showObservationFilterMessage />
 
-			<div class="observations_list_wrapper" style="top: 0px;">
+			<div class="list" style="top: 0px;">
 				<g:render template="/project/projectListTemplate" />
 			</div>
 
@@ -64,7 +64,7 @@ $(document).ready(function(){
 
 	$(".list_view").show();
 	
-    $('.observations_list_wrapper').on('updatedGallery', function(event) {
+    $('.list').on('updatedGallery', function(event) {
     	$(".list_view").show();
     });
 	

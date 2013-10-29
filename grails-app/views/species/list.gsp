@@ -40,7 +40,7 @@
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
 						</sUser:isAdmin>
 						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
-						<div class="observations_list_wrapper" style="top: 0px;">
+						<div class="list" style="top: 0px;">
 							<s:showSpeciesList/>
 						</div>
 				</div>
@@ -63,9 +63,9 @@
 		
 	</g:javascript>
 	<r:script>
-		$('.observations_list_wrapper').on('updatedGallery', function(event) {
+	    $('.list').on('updatedGallery', function(event) {
     		$(".grid_view").show();
-    	});
+    	    });
 		
 	</r:script>
 </body>

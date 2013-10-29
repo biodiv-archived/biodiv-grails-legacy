@@ -26,7 +26,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		if (!carousel.has(actualIndex)) {
 			var item = carousel.add(actualIndex, carousel.options.getItemHTML(carousel, items[i]));
 			resizeImage(item);
-                        console.log(item);
                         loadFeatureDetails(item);
 		}
 	}
@@ -182,7 +181,6 @@ var getSnippetTabletHTML = function(carousel, item) {
 
 function loadFeatureDetails($ele) {
     if(!$ele) return;
-    console.log($ele.find('.featured_details'))
     $ele.on('click', '.featured_details',
             function() {
                 $(this).parent().next().next().slideToggle('slow').find('.ellipsis').trunk8({

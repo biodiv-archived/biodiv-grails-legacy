@@ -49,7 +49,7 @@
                 </div>
                 <div class="featured_notes linktext">
                         ${featuredNotes}
-                        <small>${observationInstance.summary()}</small>
+                        <p><small>${observationInstance.summary()}</small></p>
                 </div>
             </div>
         </g:if>
