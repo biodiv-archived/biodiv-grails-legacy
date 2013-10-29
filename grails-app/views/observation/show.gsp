@@ -81,7 +81,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                         <div class="page-header clearfix ">
                                     <div style="width:100%;">
                                         <div class="main_heading" style="margin-left:0px; position:relative">
-                                            <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px">
+                                            <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? 'Featured':''}">
                                             </span>
 
                                             <div class="pull-right">

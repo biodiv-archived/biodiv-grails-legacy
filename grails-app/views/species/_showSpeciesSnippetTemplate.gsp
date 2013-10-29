@@ -9,7 +9,7 @@ def obvId = speciesInstance.id
     <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
 </g:if>
 <div class="snippet">
-    <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" >
+    <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" title="${(featureCount>0) ? 'Featured':''}">
                 </span>
 
     <div class="figure pull-left observation_story_image"

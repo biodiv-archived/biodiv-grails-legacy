@@ -5,7 +5,7 @@
 <g:if test="${entityName}">
 <div class="page-header" style= "position:relative;">
     <g:if test="${speciesInstance}">
-    <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px;" >
+    <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px;"   title="${(featureCount>0) ? 'Featured':''}">
     </span>
     </g:if>
     <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]"/>		
