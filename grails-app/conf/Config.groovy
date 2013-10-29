@@ -78,49 +78,7 @@ grails.exceptionresolver.params.exclude = ['password']
 
 def log4jConsoleLogLevel = Priority.INFO
 // log4j configuration
-log4j = {
-	// Example of changing the log pattern for the default console
-	// appender:
-	//
-	appenders {
-	    console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
-	}
 
-	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
-            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-            'org.codehaus.groovy.grails.web.mapping', // URL mapping
-            'org.codehaus.groovy.grails.commons', // core / classloading
-            'org.codehaus.groovy.grails.plugins', // plugins
-            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-            'org.hibernate',
-            'net.sf.ehcache.hibernate',
-            'org.springframework.security',
-            'org.codehaus.groovy.grails.web.servlet',  //  controllers
-            'grails.plugin',
-            'org.springframework.security.web',
-            'grails.app.tagLib.org.grails.plugin.resource'
-
-
-	warn   'org.mortbay.log'
-
-	debug	'species',
-			'speciespage',
-			'grails.app'
-//			'org.springframework.security',
-//			'org.springframework.security.core',
-//			'org.springframework.security.web',
-//			'org.springframework.security.openid',
-//			'org.openid4java',
-//			'species.auth'
-//			"org.springframework.security.acls",
-//			"org.springframework.security.access"
-			//'com.the6hours.grails.springsecurity.facebook'
-            //"org.grails.plugin.resource"	
-    info    'species.auth'	
-//    debug   'org.springframework.security'
-
-}
 
 grails.gorm.default.mapping = {
 	cache true
@@ -520,7 +478,13 @@ environments {
 
 
         log4jConsoleLogLevel = Priority.DEBUG
-
+	log4j = {
+		appenders {
+		    console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+		}
+		debug	'species',
+			'speciespage'
+	}
 	}
 	test {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
@@ -635,6 +599,13 @@ environments {
                 }
 
 		}
+		log4j = {
+			appenders {
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+			}
+			debug	'species',
+				'speciespage'
+		}
 	}
 	pambaTest {
 		appName = "biodiv_test"
@@ -713,7 +684,14 @@ environments {
                 }
 
 		}
-		
+		log4j = {
+			appenders {
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+			}
+			info	'species',
+				'speciespage'
+		}
+
 	}
 
 
@@ -791,7 +769,17 @@ environments {
             }
         }
 		
-        log4jConsoleLogLevel = Priority.INFO
+		log4j = {
+			appenders {
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.INFO
+			}
+			info	'species',
+				'speciespage'
+			warn 	'grails.app',
+				'org.springframework.security.web'
+
+
+		}
 	}
 }
 
