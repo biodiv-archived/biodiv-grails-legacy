@@ -11,7 +11,6 @@
     </g:if>
 </style>
 <div class="observation_story">
-    <div>
     	<%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
         %>
@@ -38,7 +37,6 @@
                     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
                 </g:if>
             </div>
-        </div>
         <g:if test="${showFeatured}">
             <div class="featured_body">
                 <div class="featured_title ellipsis"> 

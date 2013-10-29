@@ -138,7 +138,7 @@ var getSnippetHTML = function(carousel, item) {
         eleHTML +=       (item.sGroup)?
                                 '<span style="float:right;" class="group_icon species_groups_sprites active '+item.sGroup.toLowerCase()+'_gall_th" title="'+item.sGroup+'"></span>':''
 
-        eleHTML +=              '<span class="featured_details btn"><i class="icon-list"></i></span>'
+        eleHTML +=              '<span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>'
 
         eleHTML +=       '</div>'
         eleHTML +=      '<div class="featured_body">' +
@@ -182,10 +182,10 @@ var getSnippetTabletHTML = function(carousel, item) {
 
 function loadFeatureDetails($ele) {
     if(!$ele) return;
-    console.log($ele.find('.feature_details'))
-    $ele.on('click', '.feature_details',
+    console.log($ele.find('.featured_details'))
+    $ele.on('click', '.featured_details',
             function() {
-                $(this).parent().parent().next().next().slideToggle('slow').find('.ellipsis').trunk8({
+                $(this).parent().next().next().slideToggle('slow').find('.ellipsis').trunk8({
                     lines:2
                 }).linkify()
             });
