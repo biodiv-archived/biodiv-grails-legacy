@@ -81,11 +81,12 @@ class AbstractObjectService {
             if(param['featuredOn']) {
                 item.featuredOn = param['featuredOn'].getTime();
             }
-            if(param['observation'].latitude) item.lat = param['observation'].latitude
-            if( param['observation'].longitude) item.lng = param['observation'].longitude
-            if( param['observation'].geoPrivacy) item.geoPrivacy = param['observation'].geoPrivacy
-            if(param['observation'].isChecklist) item.isChecklist = param['observation'].isChecklist
-            if(param['observation'].fromDate.getTime()) item.observedOn = param['observation'].fromDate.getTime();
+            def obj = param['observation'];
+            if(obj.metaClass.hasProperty('latitude') && obj.latitude) item.lat = param['observation'].latitude
+            if(obj.metaClass.hasProperty('longitude') && obj.longitude) item.lng = param['observation'].longitude
+            if(obj.metaClass.hasProperty('geoPrivacy') && obj.geoPrivacy) item.geoPrivacy = param['observation'].geoPrivacy
+            if(obj.metaClass.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = param['observation'].isChecklist
+            if(obj.metaClass.hasProperty('fromDate') && obj.fromDate) item.observedOn = param['observation'].fromDate.getTime();
 			urlList << item;
 		}
 		return urlList

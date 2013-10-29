@@ -32,6 +32,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def observationsSearchService;
 	def SUserService;
     def observationService;
+    def userGroupService;
 
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -363,7 +364,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 
     String summary() {
         String location = "Observed at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>"
-		String desc = location +" by <b>"+this.author.name.capitalize() +'</b>'+ (this.fromDate ?  (" on <b>" +  this.fromDate.format('dd/MM/yyyy')+'</b>') : "");
+        String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
+		String desc = location +" by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'+ (this.fromDate ?  (" on <b>" +  this.fromDate.format('dd/MM/yyyy')+'</b>') : "");
 	
         return desc
     }
