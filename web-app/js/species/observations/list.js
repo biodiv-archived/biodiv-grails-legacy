@@ -273,6 +273,8 @@ $(document).ready(function(){
         $('.list_view_bttn').removeClass('active');
         $.cookie("listing", "grid", {path    : '/'});
     });
+    
+    $("#distinctRecoTableAction").click(loadDistinctRecoList);
 
     $('.loadMore').live('click', function() {
         $.autopager({
@@ -326,7 +328,7 @@ $(document).ready(function(){
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
-                $('.observations_list').trigger('updatedGallery');
+                $('.list').trigger('updatedGallery');
             }
         });
 
@@ -336,7 +338,7 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
-    $('.observations_list').trigger('updatedGallery');
+    $('.list').trigger('updatedGallery');
 });
 
 /**
@@ -684,7 +686,7 @@ function updateListPage(activeTag) {
         updateRelativeTime();
         last_actions();
         eatCookies();			
-        $('.observations_list').trigger('updatedGallery');
+        $('.list').trigger('updatedGallery');
     }
 }
 
@@ -878,7 +880,6 @@ $(document).ready(function(){
     $(".snippet.tablet .figure").hover(function() {
         $(this).children('.mouseover').toggle('slow')
     });
-    $("#distinctRecoTableAction").click(loadDistinctRecoList);
 });
 
 function loadDistinctRecoList() {
