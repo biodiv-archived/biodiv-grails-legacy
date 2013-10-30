@@ -197,7 +197,7 @@ h6 {
 
 #carousel_featureBy {
     margin-top:22px;
-    margin-bottom:40px;
+    margin-bottom:60px;
 }
 
 #carousel_featureBy .observation_story {
@@ -2423,4 +2423,30 @@ div.noOfRatings {
     position: absolute;
     top: -20px;
 }
+/*
+.feature_icon {
+    background:url('../images/features.png');
+    width:50px;
+    height:66px;
+}
+
+.tahsil {
+    background-position:10px 0px;
+}
+
+.soil {
+    background-position:-160px 0px;
+}
+
+.forest_type {
+    background-position:-240px 0px;
+}
+
+.rainfall {
+    background-position:-70px 0px;
+}
+
+.temperature {
+    background-position:-310px 0px;
+}*/
 

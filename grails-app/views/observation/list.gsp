@@ -39,7 +39,7 @@
             <obv:featured 
             model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 
-            <h5>Browse Observations</h5>
+            <h4>Browse Observations</h4>
             <obv:showObservationsListWrapper />
 	</div>
 

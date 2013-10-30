@@ -56,20 +56,20 @@ if(r) {
 
 .jcarousel-skin-ie7 .jcarousel-item {
 	width:210px;
-	height:250px;
+	height:380px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
 	width:210px;
-	height:250px;
+	height:380px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-	height:250px;
+	height:380px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
-	height:75px;
+	height:80px;
 	padding:16px 0px;
 	background-color : #fff;
 }

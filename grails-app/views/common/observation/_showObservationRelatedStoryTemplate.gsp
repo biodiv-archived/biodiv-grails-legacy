@@ -32,7 +32,7 @@ $(document).ready(function() {
 <div id="carousel_${id}" class="jcarousel-skin-ie7">
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
-        <h5>Featured ${controller.toLowerCase().capitalize()}</h5>
+        <h4>Featured ${controller.toLowerCase().capitalize()}</h4>
     </g:if>
 	<ul style="list-style:none; width:100%; margin-left:0px;">
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->

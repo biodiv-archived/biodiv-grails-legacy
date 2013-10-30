@@ -49,7 +49,7 @@
         </tr>
         <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
         <tr>
-            <td>${feature.key}</td>
+            <td class=" feature_icon ${feature.key.toLowerCase().replaceAll(/\s+/,'_')}" title="${feature.key}">${feature.key} </td>
             <td>${feature.value}</td>
         </tr>
         </g:each>

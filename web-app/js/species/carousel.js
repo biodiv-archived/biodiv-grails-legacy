@@ -119,9 +119,9 @@ var getSnippetHTML = function(carousel, item) {
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
-	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
+	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
 
-	var notes = item.notes?item.notes:''
+	var summary = item.summary?item.summary:''
         //TODO:split this into separate methods so that figure badge story parts can be build independently
 	var eleHTML = '<div class=thumbnail>'+
                 '<div class="'+item.type.replace(' ','_')+'_th snippet'+'">'+
@@ -144,11 +144,11 @@ var getSnippetHTML = function(carousel, item) {
                             '<div class="featured_title ellipsis">'
 
         eleHTML +=              '<div class="heading">'+
-                                    '<a href='+ item.url + paramsString + '><span class="ellipsis">'+item.imageTitle + '</span></a>'+
+                                    '<a href='+ item.url + paramsString + '><span class="ellipsis">'+item.title + '</span></a>'+
                                 '</div>'+
                                 '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+new Date(item.featuredOn)+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
                             '</div>'+
-                            '<div class="featured_notes linktext">'+item.notes+'</div>'+
+                            '<div class="featured_notes linktext">'+item.summary+'</div>'+
                         '</div>'
 
         eleHTML +=      '<div class="observation_story_body toggle_story" style="display:none;">' +
@@ -156,7 +156,7 @@ var getSnippetHTML = function(carousel, item) {
                                 '<i class="pull-left icon-share-alt"></i>'+
                                 '<div class="value">'+
                                     '<div class="species_title">'+
-                                            item.imageTitle +
+                                            item.title +
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -172,10 +172,11 @@ var getSnippetTabletHTML = function(carousel, item) {
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
-	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
+	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
 
 	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
+	var summary = item.summary?item.summary:''
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div><div class="'+'ellipsis multiline caption'+'">'+summary+'</div></div></div>';
 
 }
 

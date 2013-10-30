@@ -14,6 +14,9 @@
         </g:if>
     </div>
     <div>
+        <g:if test="${showFeatured}">
+        <div class="featured_body">
+        </g:if>
         <div class="featured_title ellipsis">
             <div class="heading"> 
                 <g:link
@@ -31,6 +34,7 @@
                 ${featuredNotes}
                 <p>${speciesInstance.summary()}</p>
             </div>		
+        </div>
         </g:if>
         <g:else>
             <%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>

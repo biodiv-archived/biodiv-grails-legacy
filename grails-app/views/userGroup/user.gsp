@@ -12,6 +12,11 @@
 .thumbnail {
 	margin: 0 25px;
 }
+.list_view .observervation_story {
+    width:784px;
+}
+
+
 </style>
 </head>
 <body>

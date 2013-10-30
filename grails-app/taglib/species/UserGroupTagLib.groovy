@@ -259,7 +259,7 @@ class UserGroupTagLib {
 			result[it] = false;
 		}
         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")){
-            def ibpGroup =  new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName);
+            def ibpGroup =  new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName, icon:'/'+grailsApplication.config.speciesPortal.app.logo);
             if(ug.contains(null)) {
                 result[ibpGroup] = true;
             }

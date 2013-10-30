@@ -158,8 +158,11 @@ function drawVisualization(rows) {
     data.addColumn('date', 'Date');
     data.addColumn('number', 'Observation');
     if(rows) {
+        var ignoreDate = new Date(1970,01,01,0,0,0,0);
         for(var i=0; i<rows.length; i++) {
-            data.addRow([new Date(rows[i].observedOn), 1]);
+            var obvDate = new Date(rows[i].observedOn);
+            if(obvDate != ignoreDate)
+                data.addRow([obvDate, 1]);
         }
     }
     if(data.getNumberOfRows() > 0) {

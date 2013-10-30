@@ -6,6 +6,8 @@
     %>
     <div>
         <g:if test="${showFeatured}">
+
+        <div class="featured_body">
         <div class="featured_title ellipsis"> 
             <div class="heading">
                 <g:link url="${uGroup.createLink(controller:'document', action:'show', id:documentInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
@@ -18,6 +20,7 @@
             ${featuredNotes}
             <p>${documentInstance.summary()}</p>
         </div>		
+    </div>
         </g:if>
         <g:else>
 

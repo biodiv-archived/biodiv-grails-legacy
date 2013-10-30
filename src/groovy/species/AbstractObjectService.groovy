@@ -41,7 +41,7 @@ class AbstractObjectService {
 			def item = [:];
             def controller = getTargetController(param['observation']);
 			item.url = "/" + controller + "/show/" + param['observation'].id
-			item.imageTitle = param['title']
+			item.title = param['title']
             item.type = controller
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
@@ -59,23 +59,21 @@ class AbstractObjectService {
 				}
 			}else{
 				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
-			}			
+			} 			
 			if(param.inGroup) {
 				item.inGroup = param.inGroup;
-			}
-/*			if(param['observation'].notes()) {
-				item.notes = param['observation'].notes()
-			} else {
-*/  			item.notes = param['observation'].summary();				
-//			}
+			} 
+			
+            item.notes = param['observation'].notes()
+  			item.summary = param['observation'].summary();				
             
             if(param['featuredNotes'] ==  null) {
             }
             else {
                 String n = item.notes;
-                item.notes = param['featuredNotes']
+                item.summary = param['featuredNotes']
                 if(n)
-                    item.notes += "<p><small>"+ n +"</small></p>" 
+                    item.summary += "<p><small>"+ n +"</small></p>" 
             }
            
             if(param['featuredOn']) {
