@@ -158,11 +158,12 @@ function drawVisualization(rows) {
     data.addColumn('date', 'Date');
     data.addColumn('number', 'Observation');
     if(rows) {
-        var ignoreDate = new Date(1970,01,01,0,0,0,0);
+        var ignoreDate = -19800000 // representing Thu Jan 01 1970 00:00:00 GMT+0530 (IST) in miliseconds
         for(var i=0; i<rows.length; i++) {
             var obvDate = new Date(rows[i].observedOn);
-            if(obvDate != ignoreDate)
+            if(obvDate.getTime() != ignoreDate){
                 data.addRow([obvDate, 1]);
+            }
         }
     }
     if(data.getNumberOfRows() > 0) {
