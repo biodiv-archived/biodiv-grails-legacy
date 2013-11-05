@@ -38,11 +38,11 @@
 						<g:if test="${params.parentType?.equalsIgnoreCase('observation')}">
 
 							<obv:showSnippet
-								model="['observationInstance':Observation.get(parentId)]"></obv:showSnippet>
+								model="['observationInstance':Observation.get(parentId), userGroup:userGroupInstance]"></obv:showSnippet>
 
 						</g:if>
 						<g:elseif test="${params.parentType?.equalsIgnoreCase('species')}">
-							<s:showSnippet model="['speciesInstance':Species.read(parentId)]" />
+							<s:showSnippet model="['speciesInstance':Species.read(parentId), userGroup:userGroupInstance]" />
 						</g:elseif>
 					</div>
 					<h5 style="position: relative; top: 40px; clear: both">

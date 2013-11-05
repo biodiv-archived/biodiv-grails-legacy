@@ -239,7 +239,6 @@ class PaginateTagLib {
    }
    
    def paginate = { attrs ->
-	   println attrs;
 	   def writer = out
 	   if (attrs.total == null) {
 		   throwTagError("Tag [paginate] is missing required attribute [total]")
@@ -263,7 +262,6 @@ class PaginateTagLib {
 	   linkParams.max = max
 	   if (params.sort) linkParams.sort = params.sort
 	   if (params.order) linkParams.order = params.order
-
 	   def linkTagAttrs = [action:action]
 	   linkTagAttrs.putAll(linkParams)
 	   linkTagAttrs.remove('offset')
@@ -283,7 +281,6 @@ class PaginateTagLib {
 		   linkTagAttrs.userGroupWebaddress = attrs.userGroupWebaddress
 	   }
 	   
-
 	   // determine paging variables
 	   def steps = maxsteps > 0
 	   int currentstep = (offset / max) + 1
@@ -358,7 +355,7 @@ class PaginateTagLib {
 		   linkTagAttrs.class = 'nextLink'
 		   linkTagAttrs.offset = offset + max
 		   def temp = linkTagAttrs.clone();
-		   temp['url'] = uGroup.createLink(temp)
+    	   temp['url'] = uGroup.createLink(temp)
 		   writer << link(temp) {
 			   (attrs.next ? attrs.next : messageSource.getMessage('paginate.next', null, messageSource.getMessage('default.paginate.next', null, 'Next', locale), locale))
 		   }

@@ -40,7 +40,7 @@
 						<li class="thumbnail" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:else>
 					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroup, canPullResource:canPullResource]"></obv:showSnippetTablet>
+						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
@@ -50,7 +50,7 @@
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
 					<li class="thumbnail feedParentContext  clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroup, canPullResource:canPullResource]"></obv:showSnippet>
+							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource]"></obv:showSnippet>
 					</li>
 				</g:each>
 			</ul>
@@ -69,12 +69,11 @@
 	
 	<%
 		activeFilters?.loadMore = true
-		activeFilters?.webaddress = userGroup?.webaddress
+		activeFilters?.webaddress = userGroupInstance?.webaddress
 	%>
-	
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
-		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'observation'}"
-			userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
+		<p:paginate total="${instanceTotal?20:0}" action="${params.action}" controller="${params.controller?:'observation'}"
+			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
 			 max="${queryParams.max}" params="${activeFilters}" />
 	</div>
 	

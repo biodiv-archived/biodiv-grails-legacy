@@ -519,7 +519,6 @@ class ObservationService extends AbstractObjectService {
      * 
      */
     private def createResourcesXML(params) {
-        println params
         NodeBuilder builder = NodeBuilder.newInstance();
         XMLConverter converter = new XMLConverter();
         def resources = builder.createNode("resources");

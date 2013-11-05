@@ -131,6 +131,7 @@ class UserGroup implements Taggable {
 	Resource icon(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.userGroups.rootDir.toString()+this.icon)).exists()
 		if(!iconPresent) {
+            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.userGroups.rootDir.toString()+this.icon
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
 		return new Resource(fileName:grailsApplication.config.speciesPortal.userGroups.serverURL+this.icon, type:ResourceType.ICON, title:this.name);

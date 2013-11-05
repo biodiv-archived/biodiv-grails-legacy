@@ -175,7 +175,6 @@ class ObservationController extends AbstractObjectController {
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
 		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService]
 	}
-	
 
 	@Secured(['ROLE_USER'])
 	def save = {
@@ -195,7 +194,6 @@ class ObservationController extends AbstractObjectController {
 		flash.message = result.message
 		redirect (url:result.url)
 	}
-
 
 	@Secured(['ROLE_USER'])
 	def update = {
@@ -768,8 +766,10 @@ class ObservationController extends AbstractObjectController {
 		result.relatedObv.observations.each { m-> 
 			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
 		}
-		
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+	    def activeFilters = new HashMap(params);
+        activeFilters.remove('userGroupInstance');
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:activeFilters, parentId:params.long('id'), filterProperty:params.filterProperty]
+
 		render (view:'listRelated', model:model)
 	}
 

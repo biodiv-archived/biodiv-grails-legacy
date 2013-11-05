@@ -483,7 +483,8 @@ environments {
 		    console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
 		}
 		debug	'species',
-			'speciespage'
+			    'speciespage'
+        info    'species.auth'
 	}
 	}
 	test {
