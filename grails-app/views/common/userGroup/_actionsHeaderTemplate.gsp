@@ -1,4 +1,4 @@
-<div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
+<div class="pull-right" style="position: absolute;top:0px;right: 0px;">
 	<g:if test="${canEditUserGroup}">
 		<uGroup:inviteExpert model="['userGroupInstance':userGroupInstance, 'isExpertOrFounder':isExpertOrFounder, 'experts_autofillUsersId':experts_autofillUsersId]"/>
 					
