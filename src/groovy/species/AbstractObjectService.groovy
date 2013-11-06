@@ -67,13 +67,8 @@ class AbstractObjectService {
             item.notes = param['observation'].notes()
   			item.summary = param['observation'].summary();				
             
-            if(param['featuredNotes'] ==  null) {
-            }
-            else {
-                String n = item.notes;
-                item.summary = param['featuredNotes']
-                if(n)
-                    item.summary += "<p><small>"+ n +"</small></p>" 
+            if(param['featuredNotes']) {
+                item.featuredNotes = param['featuredNotes']
             }
            
             if(param['featuredOn']) {
@@ -144,52 +139,46 @@ class AbstractObjectService {
         }
 
         def featured = []
-        def count;
-        if(ugId == null) {
-            def queryParams = ["type": type]
-            def countQuery = "select count(*) from Featured feat where feat.userGroup.id is null and feat.objectType = :type "
-            log.debug "CountQuery:"+ countQuery + "params: "+queryParams
-            count = Featured.executeQuery(countQuery, queryParams)
-            queryParams["max"] = limit
-            queryParams["offset"] = offset
-            def query = "from Featured feat where feat.userGroup.id is null and feat.objectType = :type "
-            def orderByClause = "order by feat.createdOn desc"
-            query += orderByClause
-            log.debug "FeaturedQuery:"+ query + "params: "+queryParams
-            featured = Featured.executeQuery(query, queryParams);
-        }
-        else{
-            def queryParams = ["ugId": ugId]
-            queryParams["type"] = type
-            def countQuery = "select count(*) from Featured feat where feat.userGroup.id = :ugId and feat.objectType = :type "
-            log.debug "CountQuery:"+ countQuery + "params: "+queryParams
-            count = Featured.executeQuery(countQuery, queryParams)
-            queryParams["max"] = limit
-            queryParams["offset"] = offset
-            def query = "from Featured feat where feat.userGroup.id = :ugId and feat.objectType = :type "
-            def orderByClause = "order by feat.createdOn desc"
-            query += orderByClause
-            
-            log.debug "FeaturedQuery:"+ query + "params: "+queryParams
+        def count = 0;
+        def queryParams = ["type": type]
+        def countQuery = "select count(*) from Featured feat where feat.objectType = :type "
+        def query = "from Featured feat where feat.objectType = :type "
 
-            featured = Featured.executeQuery(query, queryParams);
-            
+        if(ugId) {
+            queryParams = ["ugId": ugId]
+            countQuery += ' and feat.userGroup.id = :ugId'
+            query +=  ' and feat.userGroup.id = :ugId'
         }
+        
+        log.debug "CountQuery:"+ countQuery + "params: "+queryParams
+        count = Featured.executeQuery(countQuery, queryParams)
 
-        def observations = []
+        queryParams["max"] = limit
+        queryParams["offset"] = offset
+
+        def orderByClause = "order by feat.createdOn desc"
+        query += orderByClause
+
+        log.debug "FeaturedQuery:"+ query + "params: "+queryParams
+        featured = Featured.executeQuery(query, queryParams);
+
+        def observations = [:]
         featured.each {
-            observations.add(activityFeedService.getDomainObject(it.objectType,it.objectId))
+            def observation = activityFeedService.getDomainObject(it.objectType,it.objectId)
+            def featuredNotes = [];
+            if(observations.containsKey(observation)) {
+                featuredNotes = observations.get(observation);
+            } else {
+                observations.put(observation, featuredNotes);
+            }
+            //JSON marsheller is registered in Bootstrap
+            featuredNotes << it
         }
+
         def result = []
         def i = 0;
-        observations.each {
-            if(featured.notes[i] == null){
-                result.add([ 'observation':it, 'title': it.fetchSpeciesCall(),  'featuredOn':featured.createdOn[i] ]);
-            }
-            else{
-                result.add([ 'observation':it, 'title': it.fetchSpeciesCall(), 'featuredOn':featured.createdOn[i], 'featuredNotes': featured.notes[i] ]);
-            }
-            i = i + 1;
+        observations.each {key,value ->
+            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value]);
         }
         return['observations':result,'count':count[0]]
                 		

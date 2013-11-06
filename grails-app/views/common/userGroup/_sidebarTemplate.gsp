@@ -8,11 +8,7 @@
 
 	<li><search:searchBox />
 	</li>
-	<%--	<li><div class="header_group span2" style="height: 50px;">--%>
-	<%--			<obv:showRelatedStory--%>
-	<%--				model="['controller':'userGroup', 'observationId': 1, 'action':'getFeaturedUserGroups', 'id':'uG', hideShowAll:true]" />--%>
-	<%--		</div></li>--%>
-	
+
 	
 	<uGroup:showSuggestedUserGroups />
 

@@ -75,18 +75,8 @@ class Featured extends AbstractAction {
 
     //ugId null becoz of IBP group
     //returns true if resource featured in particular group
-    static String isFeaturedInGroup(object, ugId = null) {
-        UserGroup ug
-        if(ugId) {
-            ug = UserGroup.read(ugId)
-        }
-        def f = Featured.findWhere(objectType: object.class.getCanonicalName(), objectId: object.id, userGroup: ug)
-        if(f) {
-            return f.notes
-        }
-        else {
-            return ''
-        }
+    static boolean isFeaturedInGroup(object, ugId = null) {
+        return featuredNotes(object,ugId) ? true:false
     }
 
     //returns true if featured in any group
@@ -98,5 +88,18 @@ class Featured extends AbstractAction {
         else {
             return false
         }
+    }
+
+    static List featuredNotes(object, ugId=null) {
+        UserGroup ug
+        if(ugId) {
+            ug = UserGroup.read(ugId)
+        }
+        def fs;
+        if(ug)
+            fs = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id, userGroup: ug)
+        else
+            fs = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
+        return fs; 
     }
 }

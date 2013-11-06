@@ -13,6 +13,8 @@ class SecurityFilters {
     def filters = {
         all(controller:'*', action:'*') {
             before = {
+                log.debug params
+
 				grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
 				//println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
 				

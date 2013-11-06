@@ -9,6 +9,7 @@ import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry;
 import speciespage.ObservationService;
+import species.participation.Featured;
 
 abstract class Metadata {
 
@@ -36,7 +37,8 @@ abstract class Metadata {
 
     def grailsApplication
 	def activityFeedService
-	
+    def observationService
+
     //TODO: Contributions and Attributions
 
     static constraints = {
@@ -78,7 +80,11 @@ abstract class Metadata {
     String summary() {
         return "";
     }
-	
+
+    List featuredNotes() {
+        return Featured.featuredNotes(this);
+    }
+
 	def onAddComment(comment){
 		//updateTimeStamp()
 	}

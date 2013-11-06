@@ -27,6 +27,6 @@ def obvId = speciesInstance.id
 			</g:else>
 		</g:link>
 	</div>
-            <g:render template="/species/showSpeciesStoryTemplate" model="['speciesInstance':speciesInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, featuredNotes:featuredNotes, featuredOn:featuredOn, showFeatured:showFeatured, showDetails:showDetails ]"/>
+            <g:render template="/species/showSpeciesStoryTemplate" model="['speciesInstance':speciesInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, featuredNotes:featuredNotes, showFeatured:showFeatured, showDetails:showDetails ]"/>
             <uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
 </div>

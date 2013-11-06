@@ -282,6 +282,7 @@ class UserGroup implements Taggable {
 	}
 
 	def getAllMembersCount() {
+        if(id) {
 		def c = UserGroupMemberRole.createCriteria()
 		def memberCount = c.get {
 			eq('userGroup', this)
@@ -290,6 +291,9 @@ class UserGroup implements Taggable {
 			}
 		}
 		return memberCount;
+        } else {
+            return SUser.count();
+        }
 	}
 
 	boolean isFounder(SUser user) {
@@ -371,7 +375,16 @@ class UserGroup implements Taggable {
 		activityFeedService.deleteFeed(this)
 	}
 
-    def getObservationsCount() {
-        return userGroupService.getObservationCountByGroup(this);
+    def noOfObservations() {
+        return userGroupService.getCountByGroup(Observation.simpleName, this.id?this:null);
     }
+
+    def noOfSpecies() {
+        return userGroupService.getCountByGroup(Species.simpleName, this.id?this:null);
+    }
+
+    def noOfDocuments() {
+        return userGroupService.getCountByGroup(Document.simpleName, this.id?this:null);
+    }
+
 }

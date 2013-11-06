@@ -2,6 +2,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.auth.SUser"%>
 <%@page import="species.participation.Featured"%>
+<%@page import="species.groups.UserGroup"%>
 <%
 def groupUrl =  g.createLink(url:Utils.getIBPServerDomain())
 int membersCount =  0;
@@ -40,10 +41,22 @@ if(userGroup && userGroup.id) {
                 <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:120px'};"
                     title="${userGroupName}"> ${userGroupName} </span> 
             </a>
-            <g:if test="${!showDetails}">
-            <div class="pull-left">
+            <g:if test="${!showDetails && userGroup && userGroup.id}">
+            <div class="footer-item" title="Members">
                 <i class="icon-user"></i>
                 ${membersCount}
+            </div>
+            <div class="footer-item" title="Species">
+                <i class="icon-leaf"></i>
+                ${userGroup.noOfSpecies()}
+            </div>
+             <div class="footer-item" title="Observations">
+                <i class="icon-screenshot"></i>
+                ${userGroup.noOfObservations()}
+            </div>
+            <div class="footer-item" title="Documents">
+                <i class="icon-file"></i>
+                ${userGroup.noOfDocuments()}
             </div>
             </g:if>
     </div>

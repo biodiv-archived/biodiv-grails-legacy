@@ -80,7 +80,7 @@
                         <div class="span4" style="position:relative;top:20px">
                  
                  <uGroup:objectPostToGroupsWrapper 
-						model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName]" />
+						model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName, 'userGroup':userGroup]" />
                         
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">

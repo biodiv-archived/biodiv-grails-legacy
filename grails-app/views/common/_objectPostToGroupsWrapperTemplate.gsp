@@ -23,7 +23,7 @@
             <g:if test="${canPullResource}">
 	            <div class="tab-pane" id="tab1">
 	                <uGroup:objectPostToGroups
-	                model="['objectType':objectType, userGroup:params.userGroup, canPullResource:canPullResource, isBulkPull:isBulkPull, 'observationInstance':observationInstance]" />
+	                model="['objectType':objectType, userGroup:userGroup, canPullResource:canPullResource, isBulkPull:isBulkPull, 'observationInstance':observationInstance]" />
 	            </div>
 	        </g:if>     
             <g:if test="${observationInstance && canPullResource}">

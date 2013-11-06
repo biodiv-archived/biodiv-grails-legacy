@@ -78,7 +78,7 @@ class UserGroupController {
 	}
 
 	protected def getUserGroupList(params) {
-		def max = Math.min(params.max ? params.int('max') : 9, 100)
+		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 
 		def filteredUserGroup = userGroupService.getFilteredUserGroups(params, max, offset, false)

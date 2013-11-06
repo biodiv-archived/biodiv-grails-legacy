@@ -1148,7 +1148,7 @@ li.reco_block {
 
 .reco_block {
 	background-color: #ffffff;
-	padding: 5px;
+	padding: 2px;
 	margin-bottom: 3px;
 	border-radius: 5px;
 	min-height: 30px;
@@ -2423,30 +2423,33 @@ div.noOfRatings {
     position: absolute;
     top: -20px;
 }
-/*
+
 .feature_icon {
     background:url('../images/features.png');
-    width:50px;
-    height:66px;
+    width:32px;
+    height:32px;
 }
 
 .tahsil {
-    background-position:10px 0px;
+    background-position:0px 55px;
 }
 
 .soil {
-    background-position:-160px 0px;
+    background-position:-80px 55px;
 }
 
 .forest_type {
-    background-position:-240px 0px;
+    background-position:-120px 55px;
 }
 
 .rainfall {
-    background-position:-70px 0px;
+    background-position:-40px 55px;
 }
 
 .temperature {
-    background-position:-310px 0px;
-}*/
-
+    background-position:-160px 55px;
+}
+small {
+    font-size:75%;
+    color:#666;
+}

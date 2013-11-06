@@ -23,17 +23,10 @@
                 url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}" title="${speciesInstance.taxonConcept.name}">
                 <span class="ellipsis">${speciesInstance.taxonConcept.italicisedForm }</span>
                 </g:link>
-
-                <g:if test="${showFeatured}">
-                <small> featured on <time class="timeago" datetime="${featuredOn.getTime()}"></time></small>
-                </g:if>
             </div>
         </div>
         <g:if test="${showFeatured}">
-            <div class="featured_notes linktext">
-                ${featuredNotes}
-                <p>${speciesInstance.summary()}</p>
-            </div>		
+            <g:render template="/common/featureNotesTemplate" model="['instance':speciesInstance, 'featuredNotes':featuredNotes]"/>
         </div>
         </g:if>
         <g:else>

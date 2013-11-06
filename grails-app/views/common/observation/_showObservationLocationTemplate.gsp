@@ -6,8 +6,7 @@
     <h5>Location Information</h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>
-            <td>Place Name</td>
-            <td>
+            <td colspan="2">
                 <g:if test="${observationInstance.placeName != ''}">
                 <g:set var="location" value="${observationInstance.placeName}"/>
                 </g:if>
@@ -20,8 +19,7 @@
             </td>
         </tr>
         <tr>
-            <td>Coordinates</td>
-            <td>
+            <td colspan="2">
                 <%
                 def latitude='',longitude='',areas='';
                 def geoPrivacyAdjustment = observationInstance.fetchGeoPrivacyAdjustment()
@@ -49,7 +47,7 @@
         </tr>
         <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
         <tr>
-            <td class=" feature_icon ${feature.key.toLowerCase().replaceAll(/\s+/,'_')}" title="${feature.key}">${feature.key} </td>
+            <td class=" feature_icon ${feature.key.toLowerCase().replaceAll(/\s+/,'_')}" title="${feature.key}"></td>
             <td>${feature.value}</td>
         </tr>
         </g:each>

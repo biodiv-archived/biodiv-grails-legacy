@@ -14,12 +14,8 @@
                 <span class="ellipsis">${documentInstance.title}</span>
                 </g:link>
             </div>
-            <small> featured on <time class="timeago" datetime="${featuredOn.getTime()}"></time></small>
         </div>
-        <div class="featured_notes linktext">
-            ${featuredNotes}
-            <p>${documentInstance.summary()}</p>
-        </div>		
+        <g:render template="/common/featureNotesTemplate" model="['instance':documentInstance, 'featuredNotes':featuredNotes]"/>
     </div>
         </g:if>
         <g:else>

@@ -17,6 +17,7 @@ import groovy.sql.Sql;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 import species.participation.Flag;
+import species.participation.Featured;
 
 class Species implements Rateable {
 	String title; 
@@ -214,4 +215,7 @@ class Species implements Rateable {
 		return speciesService.getSpeciesList(params, action)
 	}
 	
+    List featuredNotes() {
+        return Featured.featuredNotes(this);
+    }
 }

@@ -37,7 +37,7 @@
                     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
                 </g:if>
             </div>
-        <g:if test="${showFeatured}">
+            <g:if test="${showFeatured}">
             <div class="featured_body">
                 <div class="featured_title ellipsis"> 
                     <div class="heading">
@@ -45,14 +45,11 @@
                             <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
                         </g:link>
                     </div>
-                    <small> featured on <time class="timeago" datetime="${featuredOn.getTime()}"></time></small>
                 </div>
-                <div class="featured_notes linktext">
-                        ${featuredNotes}
-                        <p><small>${observationInstance.summary()}</small></p>
-                </div>
+                <g:render template="/common/featureNotesTemplate" model="['instance':observationInstance, 'featuredNotes':featuredNotes]"/>
             </div>
-        </g:if>
+            </g:if>
+            <g:else>
         <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
            <div class="prop">
                 <g:if test="${showDetails}">
@@ -185,8 +182,7 @@
                     model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
                 </div>
 
-
-            </g:if>
+        </g:if>
 
         <div class="row observation_footer" style="margin-left:0px;">
             <obv:showFooter
@@ -198,4 +194,5 @@
             </div>
         </div>
         </div>
+        </g:else>
     </div>

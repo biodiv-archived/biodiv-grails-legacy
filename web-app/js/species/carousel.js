@@ -146,12 +146,25 @@ var getSnippetHTML = function(carousel, item) {
         eleHTML +=              '<div class="heading">'+
                                     '<a href='+ item.url + paramsString + '><span class="ellipsis">'+item.title + '</span></a>'+
                                 '</div>'+
-                                '<small style="font-weight:normal;"> featured on <time class="timeago" datetime="'+new Date(item.featuredOn)+'">'+$.datepicker.formatDate('M dd yy',new Date(item.featuredOn))+'</time> </small>'+
-                            '</div>'+
-                            '<div class="featured_notes linktext">'+item.summary+'</div>'+
-                        '</div>'
+                            '</div>'
+        for(var i=0; i<item.featuredNotes.length;i++) {
+        var featuredNotesItem = item.featuredNotes[i]; 
+        console.log(featuredNotesItem);
+        eleHTML +=          '<div class="featured_notes linktext">'
+                            + featuredNotesItem.notes
+                            + '<p style="margin:0px"><small>'+item.summary+'</small> <small>Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
 
-        eleHTML +=      '<div class="observation_story_body toggle_story" style="display:none;">' +
+        if(featuredNotesItem.userGroupUrl) {
+        eleHTML +=          ' in group <b><a href="'+featuredNotesItem.userGroupUrl+'">'+featuredNotesItem.userGroupName+'</a></b>'
+        }
+
+        eleHTML +=           '</small></p>'
+
+                            +'</div>'
+        }
+                        + '</div>'
+
+/*        eleHTML +=      '<div class="observation_story_body toggle_story" style="display:none;">' +
                             '<div class="prop">'+
                                 '<i class="pull-left icon-share-alt"></i>'+
                                 '<div class="value">'+
@@ -160,8 +173,8 @@ var getSnippetHTML = function(carousel, item) {
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
-                        '</div>'+
-                    '</div>'+
+                        '</div>'+*/
+          eleHTML +='</div>'+
             '</div>'+
         '</div>'
         return eleHTML;

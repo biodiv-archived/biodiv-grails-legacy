@@ -227,7 +227,7 @@ class UserGroupService {
 						from user_group_member_role '''
 			query += " where user_group_id in (select distinct(user_group_id) from user_group_member_role where s_user_id = "+userInstance.id+") "
 			query += 	''' group by user_group_id 
-						order by c desc limit 10''';
+						order by c desc limit 20''';
 //			query = '''select distinct s.user_group_id, max(s.count) as maxCount 
 //						from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, 
 //								(select observation_id, count(*) from user_group_observations group by observation_id) u2 
@@ -246,7 +246,7 @@ class UserGroupService {
 			query += '''select user_group_id, count(distinct(s_user_id)) as c
 						from user_group_member_role '''
 			query += 	''' group by user_group_id
-						order by c desc limit 10''';
+						order by c desc limit 20''';
 //			query = '''select distinct s.user_group_id, max(s.count) as maxCount from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, (select observation_id, count(*) from user_group_observations group by observation_id) u2 where u1.observation_id=u2.observation_id) union (select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1, (select species_group_id, count(*) from user_group_species_group group by species_group_id) u2 where u1.species_group_id=u2.species_group_id) union (select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1, (select habitat_id, count(*) from user_group_habitat group by habitat_id) u2 where u1.habitat_id=u2.habitat_id)) s group by s.user_group_id order by maxCount desc;'''
 		}
 		
@@ -478,15 +478,38 @@ class UserGroupService {
 		return count[0]
 	}
 
-	def long getObservationCountByGroup(UserGroup userGroupInstance){
-		def queryParams = [:]
-		queryParams['userGroup'] = userGroupInstance
-		queryParams['isDeleted'] = false;
-		queryParams['isChecklist'] = false;
-		queryParams['isShowable'] = true;
-		
-		def query = "select count(*) from Observation obv join obv.userGroups userGroup where obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable and userGroup=:userGroup"
-		return Observation.executeQuery(query, queryParams)[0]
+	def long getCountByGroup(String objectType, UserGroup userGroupInstance){
+        long count = 0;
+        def query = '';
+        def queryParams = [:]
+
+        if(userGroupInstance)
+            queryParams['userGroup'] = userGroupInstance
+
+        switch(objectType) {
+            case Observation.simpleName:
+            queryParams['isDeleted'] = false;
+            queryParams['isChecklist'] = false;
+            queryParams['isShowable'] = true;
+            query = "select count(*) from Observation obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup and "
+            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
+            count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
+            break;
+            case Species.simpleName :
+            query = "select count(*) from Species obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup"
+            count =  Species.executeQuery(query, queryParams, [cache:true])[0]
+            break;
+            case Document.simpleName :
+            query = "select count(*) from Document obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup"
+            count =  Document.executeQuery(query, queryParams, [cache:true])[0]
+        }
+        return count;
 	}
 	
 	def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {

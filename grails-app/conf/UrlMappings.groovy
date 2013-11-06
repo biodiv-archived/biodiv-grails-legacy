@@ -1,6 +1,17 @@
 class UrlMappings {
 
 	static mappings = {
+
+		
+		"500"(view:'/error')
+		"403"(view:'/error')
+		"404"(view:'/notfound')
+/*		"403"(controller: "errors", action: "error403")
+		"500"(controller: "errors", action: "error500")
+		"500"(controller: "errors", action: "error403", exception: AccessDeniedException)
+		"500"(controller: "errors", action: "error403", exception: NotFoundException)
+*/		
+
 		"/login/auth" {
 			controller = 'openId'
 			action = 'auth'
@@ -29,16 +40,6 @@ class UrlMappings {
 			} 
         }
 
-
-		
-		"500"(view:'/error')
-		"403"(view:'/error')
-		"404"(view:'/notfound')
-/*		"403"(controller: "errors", action: "error403")
-		"500"(controller: "errors", action: "error500")
-		"500"(controller: "errors", action: "error403", exception: AccessDeniedException)
-		"500"(controller: "errors", action: "error403", exception: NotFoundException)
-*/		
 		"/static/$path"(controller:"species", action:"staticContent")
 		
 		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {

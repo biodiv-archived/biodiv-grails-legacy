@@ -15,6 +15,7 @@ import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import com.vividsolutions.jts.geom.Geometry
 import com.vividsolutions.jts.io.WKTWriter;
 import grails.converters.JSON;
+import species.participation.Featured;
 
 class BootStrap {
 
@@ -163,6 +164,13 @@ class BootStrap {
                 log.error "Error writing polygon wkt : ${it}"
             }
             return geomStr;
+        }
+
+        JSON.registerObjectMarshaller(Featured) {
+            if(it.userGroup) 
+                return ['createdOn':it.createdOn, 'notes': it.notes, 'userGroupId':it.userGroup.id, 'userGroupName':it.userGroup.name, 'userGroupUrl':userGroupService.userGroupBasedLink(['mapping':'userGroup', 'controller':'userGroup', 'action':'show', 'userGroup':it.userGroup])]
+            else
+                return ['createdOn':it.createdOn, 'notes': it.notes]
         }
     }
 

@@ -326,14 +326,12 @@ class ObservationTagLib {
         if(attrs.model) {
             def p = [limit:1, offset:0, filterProperty:'featureBy', controller:attrs.model.controller, userGroup:attrs.model.userGroupInstance]
             def related = observationService.getRelatedObservations(p)?.relatedObv
-            println '===================================='
-            println related;
             if(related) {
                 attrs.model['relatedInstanceList'] = related.observations;
                 attrs.model['relatedInstanceListTotal'] = related.count;
             }
         }
-        out << obv.showRelatedStory(attrs, body);
+           out << obv.showRelatedStory(attrs, body);
     }
 }
 
