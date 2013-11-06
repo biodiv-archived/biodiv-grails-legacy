@@ -17,7 +17,7 @@ if(userGroup && userGroup.id) {
 %>
 
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'}"
-    style="margin-left: 0px;width:${showDetails?'auto':'200px;'}">
+    style="margin-left: 0px;width:${showDetails?'auto':'250px;'}">
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 

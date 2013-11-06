@@ -145,7 +145,7 @@ class AbstractObjectService {
         def query = "from Featured feat where feat.objectType = :type "
 
         if(ugId) {
-            queryParams = ["ugId": ugId]
+            queryParams["ugId"] = ugId
             countQuery += ' and feat.userGroup.id = :ugId'
             query +=  ' and feat.userGroup.id = :ugId'
         }
