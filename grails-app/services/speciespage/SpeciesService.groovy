@@ -492,14 +492,14 @@ class SpeciesService {
                 def featureQuery = ", Featured feat "
                 query += featureQuery;
                 countQuery += featureQuery
-                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType and "
-                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType and "
+                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
+                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
                 if(params.userGroup == null) {
-                    String str = "feat.userGroup is null "
-                    filterQuery += str
-                    countFilterQuery += str
+                    //String str = "feat.userGroup is null "
+                    //filterQuery += str
+                    //countFilterQuery += str
                 }else {
-                    String str = "feat.userGroup.id = :userGroupId "
+                    String str = " and feat.userGroup.id = :userGroupId "
                     filterQuery += str
                     countFilterQuery += str
                     queryParams["userGroupId"] = params.userGroup?.id

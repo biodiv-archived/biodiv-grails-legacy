@@ -391,7 +391,7 @@ class DocumentService {
 			filterQuery += " and document.id = feat.objectId and feat.objectType = :featType "
             params.userGroup = observationService.getUserGroup(params);
             if(params.userGroup == null) {
-                filterQuery += "and feat.userGroup is null"
+                //filterQuery += "and feat.userGroup is null"
             }
             else {
                 filterQuery += "and feat.userGroup.id =:userGroupId"

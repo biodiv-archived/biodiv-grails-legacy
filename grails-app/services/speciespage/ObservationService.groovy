@@ -800,11 +800,11 @@ class ObservationService extends AbstractObjectService {
         if(params.featureBy == "true" ) {
             featureQuery = ", Featured feat "
             query += featureQuery;
-            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType and "
+            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType "
             if(params.userGroup == null) {
-                filterQuery += "feat.userGroup is null "     
+                //filterQuery += " and feat.userGroup is null "     
             }else {
-                filterQuery += "feat.userGroup.id = :userGroupId "
+                filterQuery += " and feat.userGroup.id = :userGroupId "
                 queryParams["userGroupId"] = params.userGroup?.id
             }
             queryParams["featureBy"] = params.featureBy
