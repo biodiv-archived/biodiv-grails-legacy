@@ -156,7 +156,7 @@ class AbstractObjectService {
         queryParams["max"] = limit
         queryParams["offset"] = offset
 
-        def orderByClause = "order by feat.createdOn desc"
+        def orderByClause = " order by feat.createdOn desc"
         query += orderByClause
 
         log.debug "FeaturedQuery:"+ query + "params: "+queryParams

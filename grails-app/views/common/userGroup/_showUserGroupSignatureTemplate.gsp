@@ -17,7 +17,7 @@ if(userGroup && userGroup.id) {
 %>
 
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'}"
-    style="margin-left: 0px;width:${showDetails?'auto':'250px;'}">
+    style="margin-left: 0px;width:${showDetails?'auto':'250px;'} max-width:${showDetails?'auto':'250px;'}">
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 
@@ -38,7 +38,7 @@ if(userGroup && userGroup.id) {
 
             <a 
                 href="${groupUrl}">
-                <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:120px'};"
+                <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:200px'};"
                     title="${userGroupName}"> ${userGroupName} </span> 
             </a>
             <g:if test="${!showDetails && userGroup && userGroup.id}">
