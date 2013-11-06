@@ -13,7 +13,7 @@
                 <%
                 def ug
                 if(groupInfo.userGroup == null){
-                ug = new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName);
+                ug = new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName, icon:'/'+grailsApplication.config.speciesPortal.app.logo);
                 }
                 else {
                 ug = groupInfo.userGroup    

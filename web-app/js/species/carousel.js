@@ -155,7 +155,7 @@ var getSnippetHTML = function(carousel, item) {
                             + '<p style="margin:0px"><small>'+item.summary+'</small> <small>Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
 
         if(featuredNotesItem.userGroupUrl) {
-        eleHTML +=          ' in group <b><a href="'+featuredNotesItem.userGroupUrl+'">'+featuredNotesItem.userGroupName+'</a></b>'
+        eleHTML +=          ' in the group <b><a href="'+featuredNotesItem.userGroupUrl+'">'+featuredNotesItem.userGroupName+'</a></b>'
         }
 
         eleHTML +=           '</small></p>'

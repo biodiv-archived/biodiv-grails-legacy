@@ -3,7 +3,7 @@
 
 <div class="resource_in_groups">
     <%
-    ug = new UserGroup(id:0, name:grailsApplication.config.speciesPortal.app.siteName);
+    ug = new UserGroup(id:0, name:grailsApplication.config.speciesPortal.app.siteName, icon:'/'+grailsApplication.config.speciesPortal.app.logo);
     observationInstance.userGroups.add(ug)
     def featuredInUserGroups = [:];
     %>
