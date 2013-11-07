@@ -164,7 +164,6 @@ class ObservationService extends AbstractObjectService {
                 updateObservation(params, observationInstance)
                 feedType = activityFeedService.OBSERVATION_UPDATED
                 feedAuthor = springSecurityService.currentUser
-
             }
 
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
@@ -173,7 +172,7 @@ class ObservationService extends AbstractObjectService {
                 params.obvId = observationInstance.id
                 activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
 
-                saveObservationAssociation(params, observationInstance)
+                saveObservationAssociation(params, observationInstance, sendMail)
 
                 if(sendMail)
                     sendNotificationMail(mailType, observationInstance, null, params.webaddress);
@@ -196,16 +195,16 @@ class ObservationService extends AbstractObjectService {
      * @return
      * saving Groups, tags and resources
      */
-    def saveObservationAssociation(params, observationInstance){
+    def saveObservationAssociation(params, observationInstance, boolean sendMail = true){
         def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
         observationInstance.setTags(tags);
 
         if(params.groupsWithSharingNotAllowed) {
-            setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+            setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], sendMail);
         } else {
             if(params.userGroupsList) {
                 def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-                setUserGroups(observationInstance, userGroups);
+                setUserGroups(observationInstance, userGroups, sendMail);
             }
         }
 
@@ -1369,18 +1368,18 @@ class ObservationService extends AbstractObjectService {
         return false;
     }
 
-    def setUserGroups(Observation observationInstance, List userGroupIds) {
+    def setUserGroups(Observation observationInstance, List userGroupIds, boolean sendMail = true) {
         if(!observationInstance) return
 
-            def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
+        def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
         def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
         if(userGroupIds.size() == 0) {
-            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups, sendMail);
         } else {
             userGroupIds.removeAll(toRemainInUserGroups)
-            userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
+            userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds, sendMail);
             obvInUserGroups.removeAll(toRemainInUserGroups)
-            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups, sendMail);
         }
     }
 

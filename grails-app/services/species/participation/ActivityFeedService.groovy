@@ -401,11 +401,11 @@ class ActivityFeedService {
 	//////////////////////////////////// GROUP PULL RELATED ///////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	
-	def addFeedOnGroupResoucePull(resource, ug, SUser author, boolean isPost){
-		addFeedOnGroupResoucePull([resource], ug, author, isPost)
+	def addFeedOnGroupResoucePull(resource, UserGroup ug, SUser author, boolean isPost, boolean sendMail = true){
+		addFeedOnGroupResoucePull([resource], ug, author, isPost, true, false, sendMail)
 	}
 	
-	def addFeedOnGroupResoucePull(List resources, ug, SUser author, boolean isPost, boolean isShowable=true, isBulkPull=false){
+	def addFeedOnGroupResoucePull(List resources, UserGroup ug, SUser author, boolean isPost, boolean isShowable=true, boolean isBulkPull=false, boolean sendMail=true){
 		log.debug "Before Adding feed for resources " + resources.size()
 		if(resources.isEmpty()){
 			return
@@ -420,14 +420,15 @@ class ActivityFeedService {
 			af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
-			if(!isBulkPull){
+			if(!isBulkPull && sendMail){
 				observationService.sendNotificationMail(activityType, r, null, null, af)
 			}
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
 			af = addActivityFeed(ug, ug, author, activityType, description, true)
-			observationService.sendNotificationMail(activityType, ug, null, null, af)
+            if(sendMail)
+			    observationService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
 		return af
 	}

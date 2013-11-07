@@ -135,7 +135,6 @@
 									<b>Scientific Name:</b> ${scientific} <br />
 								</g:if>
 								<g:elseif test="${common}"> 
-									<b>Scientific Name:</b>  <br />
 								</g:elseif>
 								<g:else>
 									<b>Scientific Name:</b> Help Identify <br />
@@ -146,7 +145,6 @@
 									<b>Common Name:</b> ${common}<br />
 								</g:if>
 								<g:elseif test="${scientific}"> 
-									<b>Common Name:</b> <br />
 								</g:elseif>
 								<g:else>
 									<b>Common Name:</b> Help Identify <br />

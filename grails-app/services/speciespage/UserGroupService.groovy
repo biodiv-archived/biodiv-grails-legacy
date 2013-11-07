@@ -414,13 +414,13 @@ class UserGroupService {
 	}
 
 	/////////////// OBSERVATIONS RELATED /////////////////
-	void postObservationtoUserGroups(Observation observation, List userGroupIds) {
+	void postObservationtoUserGroups(Observation observation, List userGroupIds, boolean sendMail=true) {
 		log.debug "Posting ${observation} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
 				if(userGroup) {
-					postObservationToUserGroup(observation, userGroup)
+					postObservationToUserGroup(observation, userGroup, sendMail)
 				}
 			}
 		}
@@ -428,25 +428,25 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
+	void postObservationToUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
 		userGroup.addToObservations(observation);
 		if(!userGroup.save()) {
 			log.error "Could not add ${observation} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true);
+			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
 			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
 
-	void removeObservationFromUserGroups(Observation observation, List userGroupIds) {
+	void removeObservationFromUserGroups(Observation observation, List userGroupIds, boolean sendMail=true) {
 		log.debug "Removing ${observation} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
 				if(userGroup) {
-					removeObservationFromUserGroup(observation, userGroup)
+					removeObservationFromUserGroup(observation, userGroup, sendMail)
 				}
 			}
 		}
@@ -454,13 +454,13 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup) {
+	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
 		userGroup.observations.remove(observation);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${observation} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false);
+			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false, sendMail);
 			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
