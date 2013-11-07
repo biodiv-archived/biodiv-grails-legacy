@@ -11,9 +11,9 @@
         margin-bottom: 0px;
     }
 
-    .ellipsis {
+    /*.ellipsis {
         white-space:inherit;
-    }
+    }*/
 
 </style>
 </head>

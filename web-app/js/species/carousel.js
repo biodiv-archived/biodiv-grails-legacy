@@ -17,6 +17,12 @@ var itemLoadCallback = function(carousel, state) {
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
 	});
+	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
+		lines:3	
+	});
+
+	$(".jcarousel-item  .thumbnail .ellipsis").trunk8({lines:1});
+
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
@@ -26,7 +32,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		if (!carousel.has(actualIndex)) {
 			var item = carousel.add(actualIndex, carousel.options.getItemHTML(carousel, items[i]));
 			resizeImage(item);
-                        loadFeatureDetails(item);
 		}
 	}
 	if(state == 'init') {
@@ -45,11 +50,12 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		$(".jcarousel-item-horizontal").css('width', '210px');
 	else
 		$(".jcarousel-item-horizontal").css('width', '75px');
+
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
 
-        //loadFeatureDetails(item);
+	$(".jcarousel-item  .thumbnail .ellipsis").trunk8()
 }
 
 function resizeImage(item) {
@@ -90,9 +96,7 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 }
 
 var itemAfterLoadCallback = function(carousel, state) {
-	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
-		lines:3,		
-	});
+    console.log('ellipsis');
 }
 
 var initCallback = function(carousel, status) {
@@ -151,13 +155,13 @@ var getSnippetHTML = function(carousel, item) {
         var featuredNotesItem = item.featuredNotes[i]; 
         eleHTML +=          '<div class="featured_notes linktext">'
                             + featuredNotesItem.notes
-                            + '<p style="margin:0px"><small>'+item.summary+'</small> <small>Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
+                            + '<small><div class="ellipsis" style="margin:0px;height:'+(item.summary?20:0)+'px;">'+item.summary+'</div><div class="ellipsis" style="height:20px;"> Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
 
         if(featuredNotesItem.userGroupUrl) {
         eleHTML +=          ' in the group <b><a href="'+featuredNotesItem.userGroupUrl+'">'+featuredNotesItem.userGroupName+'</a></b>'
         }
 
-        eleHTML +=           '</small></p>'
+        eleHTML +=           '</div></small>'
 
                             +'</div>'
         }
@@ -191,15 +195,3 @@ var getSnippetTabletHTML = function(carousel, item) {
 	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div><div class="'+'ellipsis multiline caption'+'">'+summary+'</div></div></div>';
 
 }
-
-function loadFeatureDetails($ele) {
-    if(!$ele) return;
-    $ele.on('click', '.featured_details',
-            function() {
-                $(this).parent().next().next().slideToggle('slow').find('.ellipsis').trunk8({
-                    lines:2
-                }).linkify()
-            });
-}
-
-

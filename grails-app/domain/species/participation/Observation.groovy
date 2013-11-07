@@ -363,10 +363,9 @@ class Observation extends Metadata implements Taggable, Rateable {
     }
 
     String summary() {
-        String location = "Observed at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>"
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
-		String desc = location +" by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'+ (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
-	
+		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
+        desc += " at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
         return desc
     }
 
@@ -505,8 +504,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		}
 		return res
 	}
-
-    
 
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
 		if(!geoPrivacy || SUserService.ifOwns(author)){

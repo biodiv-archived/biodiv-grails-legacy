@@ -1,5 +1,5 @@
 <div class="observations_list observation" style="clear: both;">
-	<div class="btn-group button-bar" data-toggle="buttons-radio"
+	<!--div class="btn-group button-bar" data-toggle="buttons-radio"
 		style="float: right;">
 		<button class="list_view_bttn btn list_style_button active">
 			<i class="icon-align-justify"></i>
@@ -7,7 +7,7 @@
 		<button class="grid_view_bttn btn grid_style_button">
 			<i class="icon-th-large"></i>
 		</button>
-	</div>
+	</div-->
 	
 	<div class="mainContentList" style="clear:both;">
 		<div class="mainContent" name="p${params?.offset}">
@@ -23,14 +23,6 @@
 					</g:else>
 					<sUser:showUserSnippetTablet model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippetTablet>
 					</li>
-				</g:each>
-			</ul>
-	
-	
-			<ul class="list_view thumbnails" style="display: none;">
-				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<li class="thumbnail feedParentContext clearfix"><sUser:showUserSnippet
-							model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippet></li>
 				</g:each>
 			</ul>
 		</div>

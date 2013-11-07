@@ -257,7 +257,7 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    $('.list_view_bttn').live('click', function() {
+/*    $('.list_view_bttn').live('click', function() {
         $('.grid_view').hide();
         $('.list_view').show();
         $(this).addClass('active');
@@ -273,7 +273,7 @@ $(document).ready(function(){
         $('.list_view_bttn').removeClass('active');
         $.cookie("listing", "grid", {path    : '/'});
     });
-    
+*/    
     $("#distinctRecoTableAction").click(loadDistinctRecoList);
 
     $('.loadMore').live('click', function() {
@@ -308,14 +308,14 @@ $(document).ready(function(){
                     $(".loadMore .progress").hide();
                     $(".loadMore .buttonTitle").show();
                 }
-                if ($('.grid_view_bttn.active')[0]) {
+/*                if ($('.grid_view_bttn.active')[0]) {
                     $('.grid_view').show();
                     $('.list_view').hide();
                 } else {
                     $('.grid_view').hide();
                     $('.list_view').show();
                 }
-
+*/
                 var a = $('<a href="'+current.url+'"></a>');
                 var url = a.url();
                 var params = url.param();
@@ -353,11 +353,11 @@ function eatCookies() {
                     window.location.hash = "l"+hashString;
                 }
             }
-            $('.list_view').show();
+/*            $('.list_view').show();
             $('.grid_view').hide();
             $('.grid_view_bttn').removeClass('active');
             $('.list_view_bttn').addClass('active');
-        } else {
+*/        } else {
             if(!hashString.startsWith('g')) {
                 if(hashString.startsWith('l')) {
                     window.location.hash = "g"+hashString.substring(1);
@@ -365,11 +365,11 @@ function eatCookies() {
                     window.location.hash = "g"+hashString;
                 }
             }
-            $('.grid_view').show();
+/*            $('.grid_view').show();
             $('.list_view').not('.single_list_view').hide();
             $('.grid_view_bttn').addClass('active');
             $('.list_view_bttn').removeClass('active');
-        }
+*/        }
     adjustHeight();
 }
 

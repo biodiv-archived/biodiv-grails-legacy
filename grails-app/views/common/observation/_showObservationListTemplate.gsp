@@ -1,6 +1,6 @@
 <div class="observations_list observation" style="clear: both;">
 
-	<div class="btn-group button-bar" data-toggle="buttons-radio"
+	<!--div class="btn-group button-bar" data-toggle="buttons-radio"
 		style="float: right;">
                 
 		<button class="list_view_bttn btn list_style_button active">
@@ -9,7 +9,7 @@
 		<button class="grid_view_bttn btn grid_style_button">
 			<i class="icon-th-large"></i>
 		</button>
-	</div>
+	</div-->
         <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
                     <div class="controls">
                         <g:select name="limit" class="input-mini"
@@ -45,16 +45,7 @@
 
 				</g:each>
 			</ul>
-			
-			<ul class="list_view thumbnails" style="display: none;clear:both;">
-				<g:each in="${observationInstanceList}" status="i"
-					var="observationInstance">
-					<li class="thumbnail feedParentContext  clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource]"></obv:showSnippet>
-					</li>
-				</g:each>
-			</ul>
-			
+					
 		</div>
 	</div>
 	
