@@ -19,9 +19,12 @@
 	background-color: #ffffff;
 	width: 590px;
 }
-
-.project-list-item {
-	margin: 20px;
+.thumbnail .observation_story {
+        margin-left:0px;
+        width:100%;
+        padding-left:5px;
+        overflow:auto;
+        height:100%;
 }
 
 .thumbnails>.thumbnail {

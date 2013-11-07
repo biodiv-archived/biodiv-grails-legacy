@@ -277,6 +277,7 @@ $(document).ready(function(){
     $("#distinctRecoTableAction").click(loadDistinctRecoList);
 
     $('.loadMore').live('click', function() {
+        console.log('loadmore');
         $.autopager({
 
             autoLoad : false,

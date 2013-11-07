@@ -39,11 +39,11 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="description"> Description
+					<label class="control-label" for="notes"> Description
 					</label>
 					<div class="controls">
-						<textarea rows='4' name='${docId}.description' width="100%" class="input-block-level"
-							value='${documentInstance?.description}'
+						<textarea rows='4' name='${docId}.notes' width="100%" class="input-block-level"
+							value='${documentInstance?.notes}'
 							placeholder="Describe the file"> </textarea>
 					</div>
 

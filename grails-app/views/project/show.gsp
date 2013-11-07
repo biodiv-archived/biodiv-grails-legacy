@@ -267,8 +267,8 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
-								<g:render template="/document/showDocumentSnippetTemplate"
-									model="['documentInstance':proposalFile, 'showDetails':false]" />
+
+                                                                <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, showDetails:true]"/>
 							</g:each>
 						</g:if>
 					</div>

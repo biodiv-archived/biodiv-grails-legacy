@@ -16,6 +16,9 @@
 .list_view .observervation_story {
     width:784px;
 }
+.observations_list{
+    top:0px;
+}
 
 </style>
 

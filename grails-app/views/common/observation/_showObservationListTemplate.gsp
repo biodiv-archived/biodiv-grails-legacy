@@ -63,7 +63,7 @@
 		activeFilters?.webaddress = userGroupInstance?.webaddress
 	%>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
-		<p:paginate total="${instanceTotal?20:0}" action="${params.action}" controller="${params.controller?:'observation'}"
+		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'observation'}"
 			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
 			 max="${queryParams.max}" params="${activeFilters}" />
 	</div>
