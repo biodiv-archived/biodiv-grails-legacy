@@ -24,16 +24,3 @@
 
 </div>
 </sec:ifLoggedIn>
-
-<r:script>
-$(document).ready(function(){
-    $('#featureNotes').keydown(function(){
-
-    if(this.value.length > 400){
-    return false;
-    }
-    $("#remainingC").html("Remaining characters : " +(400 - this.value.length));
-    });
-});
-</r:script>
-

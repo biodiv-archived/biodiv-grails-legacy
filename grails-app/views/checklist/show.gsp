@@ -12,8 +12,6 @@
             .observation_story .observation_footer {
                 margin-top:50px;
             }
-
-
         </style>
     </head>
     <body>
