@@ -358,7 +358,7 @@ function select_location(marker) {
                 selectedMarker.bindPopup(content).openPopup();
 
                 if (results[0]) {
-                    $('#placeName').val(results[0].formatted_address);
+                    //$('#placeName').val(results[0].formatted_address);
                     //$('#reverse_geocoded_name').html(results[0].formatted_address);
                     //$('#latitude').html(marker.getLatLng().lat.toFixed(2));
                     //$('#longitude').html(marker.getLatLng().lng.toFixed(2));

@@ -149,7 +149,6 @@ var getSnippetHTML = function(carousel, item) {
                             '</div>'
         for(var i=0; i<item.featuredNotes.length;i++) {
         var featuredNotesItem = item.featuredNotes[i]; 
-        console.log(featuredNotesItem);
         eleHTML +=          '<div class="featured_notes linktext">'
                             + featuredNotesItem.notes
                             + '<p style="margin:0px"><small>'+item.summary+'</small> <small>Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
