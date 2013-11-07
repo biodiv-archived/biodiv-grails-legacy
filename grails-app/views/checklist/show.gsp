@@ -8,6 +8,13 @@
         <g:set var="description" value="${Utils.stripHTML(checklistInstance.notes?:'')}" />
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
         <r:require modules="checklist"/>
+        <style>
+            .observation_story .observation_footer {
+                margin-top:50px;
+            }
+
+
+        </style>
     </head>
     <body>
 
