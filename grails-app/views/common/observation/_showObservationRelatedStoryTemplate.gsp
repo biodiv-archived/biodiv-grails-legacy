@@ -20,7 +20,6 @@ $(document).ready(function() {
             getItemHTML:getSnippetHTML
         </g:if>
         <g:else>
-            scroll:3,
             getItemHTML:getSnippetTabletHTML,
             horizontal:true
         </g:else>

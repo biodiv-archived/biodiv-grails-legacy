@@ -1,7 +1,7 @@
 var itemLoadCallback = function(carousel, state) {
         carousel.last = carousel.last?carousel.last:3;
 	var params = {
-		"limit" : carousel.options.scroll,
+		"limit" :carousel.last - carousel.first, //carousel.options.scroll,
 		"offset" :carousel.first,
 		"filterProperty": carousel.options.filterProperty,
 		"filterPropertyValue": carousel.options.filterPropertyValue,
