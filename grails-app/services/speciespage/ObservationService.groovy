@@ -1437,18 +1437,29 @@ class ObservationService extends AbstractObjectService {
                 def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
                 try {
                     observationInstance.isDeleted = true;
-                    observationInstance.save(flush: true);
-                    sendNotificationMail(mailType, observationInstance, null, params.webaddress);
-                    observationsSearchService.delete(observationInstance.id);
-                    messageCode = 'default.deleted.message'
-                    url = generateLink(params.controller, 'list', [])
-                    ActivityFeed.updateIsDeleted(observationInstance)
+                    if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
+                        sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                        observationsSearchService.delete(observationInstance.id);
+                        messageCode = 'default.deleted.message'
+                        url = generateLink(params.controller, 'list', [])
+                        ActivityFeed.updateIsDeleted(observationInstance)
+                    } else {
+                        messageCode = 'default.not.deleted.message'
+                        url = generateLink(params.controller, 'show', [id: params.id])
+                        observationInstance.errors.allErrors.each { log.error it }
+                    }
                 }
                 catch (org.springframework.dao.DataIntegrityViolationException e) {
                     messageCode = 'default.not.deleted.message'
                     url = generateLink(params.controller, 'show', [id: params.id])
+                    e.printStackTrace();
+                    log.error e.getMessage();
                 }
+            } else {
+                if(!isFeatureDeleted) log.warn "Couldnot delete feature"
+                else log.warn "${observationInstance.author} doesnt own observation to delete"
             }
+
         }
         else {
             messageCode = 'default.not.found.message'

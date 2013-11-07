@@ -82,7 +82,7 @@ abstract class Metadata {
     }
 
     List featuredNotes() {
-        return Featured.featuredNotes(this);
+        return Featured.featuredNotes(this, null);
     }
 
 	def onAddComment(comment){

@@ -15,7 +15,7 @@ import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.Utils;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-
+import org.apache.commons.logging.LogFactory;
 
 class Featured extends AbstractAction {
 
@@ -26,6 +26,7 @@ class Featured extends AbstractAction {
     String notes;
     UserGroup userGroup;
 
+	private static final log = LogFactory.getLog(this);
 
     static constraints = {
         author(unique: ['objectId', 'objectType', 'userGroup'])
@@ -35,25 +36,27 @@ class Featured extends AbstractAction {
         notes (size:0..400)
     }
 
-
-
     static boolean deleteFeatureOnObv(object, SUser user, UserGroup ug = null) {
-        if(!user) return false;
+        boolean isFeatured = Featured.isFeaturedInGroup(object, ug);
+        if(!isFeatured) {
+            log.debug "Nothing to delete as object is not featured at all"
+            return true;
+        }
+
         boolean isAuthor = (user == object.author)
         boolean isAdmin = SpringSecurityUtils.ifAllGranted("ROLE_ADMIN") 
 
         if(isAuthor || isAdmin || ug.isFounder(user) || ug.isExpert(user) ) {
-            def f = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
-            if(f!= null){
-                f.each{
-                    if(!it.delete(flush: true)){
-                        println "Error deleting the featured object when Observation got deleted"
-                        f.errors.allErrors.each { println it }
-                        return null
-                    }
-                }
+            int result = Featured.executeUpdate("delete Featured feat where feat.objectType=:objectType and feat.objectId=:objectId", [objectType:object.class.getCanonicalName(), objectId:object.id])
+            if(result > 0) {
+                return true
+            } else {
+                log.error "Error deleting featured entries for ${object}"
             }
+        } else {
+            log.error "${user} is not Author|Admin|Founder|Expert for ${object} in user group ${ug} to delete"
         }
+        return false
     }
 
     /**
@@ -74,9 +77,18 @@ class Featured extends AbstractAction {
     } 
 
     //ugId null becoz of IBP group
+
+    static boolean isFeaturedInGroup(object) {
+        return featuredNotes(object,null) ? true:false
+    }
+
     //returns true if resource featured in particular group
-    static boolean isFeaturedInGroup(object, ugId = null) {
+    static boolean isFeaturedInGroup(object, long ugId) {
         return featuredNotes(object,ugId) ? true:false
+    }
+
+    static boolean isFeaturedInGroup(object, UserGroup ug) {
+        return featuredNotes(object,ug) ? true:false
     }
 
     //returns true if featured in any group
@@ -90,11 +102,19 @@ class Featured extends AbstractAction {
         }
     }
 
-    static List featuredNotes(object, ugId=null) {
+    static List featuredNotes(object) {
+        return featuredNotes(object, null);
+    }
+
+    static List featuredNotes(object, long ugId) {
         UserGroup ug
         if(ugId) {
             ug = UserGroup.read(ugId)
         }
+        return featuredNotes(object, ug);
+    }
+
+    static List featuredNotes(object, UserGroup ug) {
         def fs;
         if(ug)
             fs = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id, userGroup: ug)
@@ -102,4 +122,5 @@ class Featured extends AbstractAction {
             fs = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
         return fs; 
     }
+
 }
