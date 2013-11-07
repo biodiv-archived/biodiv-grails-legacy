@@ -127,6 +127,7 @@ modules = {
 		dependsOn 'observations, gallery, carousel, comment, activityfeed'
 
 		resource url:'/js/species/observations/show.js'
+		resource url:'/js/jquery/jquery.sparkline.min.js'
 	} 
 
 	observations_create {

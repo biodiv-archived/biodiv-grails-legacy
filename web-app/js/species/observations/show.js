@@ -154,19 +154,51 @@ function getMonthName(monthIndex) {
 }
 
 function drawVisualization(rows) {
-    var data = new google.visualization.DataTable();
-    data.addColumn('date', 'Date');
-    data.addColumn('number', 'Observation');
+    var d = []
+//    var data = new google.visualization.DataTable();
+//    data.addColumn('date', 'Date');
+//    data.addColumn('number', 'Observation');
     if(rows) {
         var ignoreDate = -19800000 // representing Thu Jan 01 1970 00:00:00 GMT+0530 (IST) in miliseconds
         for(var i=0; i<rows.length; i++) {
             var obvDate = new Date(rows[i].observedOn);
             if(obvDate.getTime() != ignoreDate){
-                data.addRow([obvDate, 1]);
+                //data.addRow([obvDate, 1]);
+                d.push([obvDate, 1]);
             }
         }
     }
-    if(data.getNumberOfRows() > 0) {
+    if(d.length >0) {
+        var gD = Array.apply(null, new Array(12)).map(Number.prototype.valueOf,0);
+        for(var i=0; i<d.length; i++) {
+            gD[d[i][0].getMonth()] = gD[d[i][0].getMonth()] + d[i][1]
+        }
+
+        $("#temporalDist").sparkline(gD, {
+            type: 'bar', 
+            barWidth: 24,
+            height:'108px',
+            width:'300px',
+            tooltipFormat: '{{offset:offset}} : {{value}} Observations',
+            tooltipValueLookups: {
+                'offset': {
+                    0:'Jan',
+                    1:'Feb',
+                    2:'Mar',
+                    3:'Apr',
+                    4:'May',
+                    5:'Jun',
+                    6:'Jul',
+                    7:'Aug',
+                    8:'Sep',
+                    9:'Oct',
+                    10:'Nov',
+                    11:'Dec'
+                }
+            }
+        });
+
+/*    if(data.getNumberOfRows() > 0) {
     var grouped_dt = google.visualization.data.group (
             data, [{column:0, modifier:getMonth, type:'number', label:'MonthNo'}],
             [{'column': 1, 'aggregation': google.visualization.data.sum, type: 'number', label:'#Observations'}, {'column': 0, 'aggregation': getMonthName, type: 'string', label:'Month'}]
@@ -190,8 +222,8 @@ function drawVisualization(rows) {
     }
     
     grouped_dt.sort([{column:0}]);
-
-    var view = new google.visualization.DataView(grouped_dt);
+*/
+/*    var view = new google.visualization.DataView(grouped_dt);
     view.setColumns([2,1]);
 
     var columnChart = new google.visualization.ColumnChart(
@@ -204,7 +236,7 @@ function drawVisualization(rows) {
         legend:{position: 'none'},
         chartArea:{width:'80%'}
     });
-    /*    var table = new google.visualization.Table(document.getElementById('table'));
+  */  /*    var table = new google.visualization.Table(document.getElementById('table'));
           table.draw(view, null);
 
           var grouped_table = new google.visualization.Table(document.getElementById('grouped_table'));

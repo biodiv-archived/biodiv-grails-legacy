@@ -55,9 +55,24 @@
 </div>	
 
 <g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
-    <div class="sidebar_section">
+    <div class="sidebar_section tile temporalDist">
         <h5>Temporal Distribution</h5>
-        <div id="temporalDist" style="height:300px;"></div>
+        <div id="temporalDist" style="height:108px;">
+        </div>
+        <ul>
+            <li>Jan</li>
+            <li>Feb</li>
+            <li>Mar</li>
+            <li>Apr</li>
+            <li>May</li>
+            <li>Jun</li>
+            <li>Jul</li>
+            <li>Aug</li>
+            <li>Sep</li>
+            <li>Oct</li>
+            <li>Nov</li>
+            <li>Dec</li>
+        </ul>
     </div>
 </g:if>
 

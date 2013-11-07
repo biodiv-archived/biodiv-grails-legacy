@@ -2453,3 +2453,13 @@ small {
     font-size:75%;
     color:#666;
 }
+
+.temporalDist ul {
+    list-style:none;
+    margin:0px;
+    font-size:11px;
+}
+.temporalDist ul>li {
+    width:22px;
+    display:inline-block;
+}
