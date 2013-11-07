@@ -192,6 +192,6 @@ var getSnippetTabletHTML = function(carousel, item) {
 
 	var notes = item.notes?item.notes:''
 	var summary = item.summary?item.summary:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div><div class="'+'ellipsis multiline caption'+'">'+summary+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'" style="'+(notes?'':'height:0px;padding:0px;')+'">'+notes+'</div><div class="'+'ellipsis multiline caption'+'" style="'+(summary?'':'height:0px;padding:0px;')+'">'+summary+'</div></div></div>';
 
 }
