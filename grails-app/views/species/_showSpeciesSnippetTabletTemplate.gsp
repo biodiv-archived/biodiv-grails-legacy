@@ -10,7 +10,6 @@ def obvId = speciesInstance.id
 </g:if>
 <div class="snippet tablet ">
     <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" > </span>
-
     <div class="figure"
         title='<g:if test="${obvTitle != null}">${obvTitle.replaceAll("<.*>","")}</g:if>'>
                 <g:link url="${uGroup.createLink(controller:'species', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup) }" name="g${pos}">

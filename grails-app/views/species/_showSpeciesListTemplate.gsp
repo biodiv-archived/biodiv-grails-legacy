@@ -6,8 +6,6 @@
 <%@page import="species.utils.Utils"%>
 
 <div class="observations_list" style="clear: both; top: 0px;">
-
-
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 
@@ -24,7 +22,7 @@
 							class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}">
 					</g:else>
 		                            <g:render template="/species/showSpeciesSnippetTabletTemplate"
-						model="['speciesInstance':speciesInstance, 'obvTitle':speciesInstance.title, 'userGroup':userGroup, canPullResource:canPullResource]"/>
+						model="['speciesInstance':speciesInstance, 'obvTitle':speciesInstance.title, 'userGroup':userGroupInstance, canPullResource:canPullResource]"/>
 					</li>
 				</g:each>
 			</ul>
@@ -35,13 +33,13 @@
 	</div>
 	<div class="paginateButtons centered">
 		<p:paginate controller="species" action="list"
-			total="${instanceTotal}" userGroup="${userGroup}"
+			total="${instanceTotal}" userGroup="${userGroupInstance}"
 			userGroupWebaddress="${userGroupWebaddress}" params="${queryParams}"
 			max="${queryParams.max }" offset="${queryParams.offset}" maxsteps="10" />
 	</div>
 	<div class="paginateButtons centered">
 		<p:paginateOnAlphabet controller="species" action="list"
-			total="${instanceTotal}" userGroup="${userGroup }" params="${params}"
+			total="${instanceTotal}" userGroup="${userGroupInstance }" params="${params}"
 			userGroupWebaddress="${userGroupWebaddress}"/>
 
 	</div>
