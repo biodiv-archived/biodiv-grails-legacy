@@ -915,7 +915,7 @@ class ObservationController extends AbstractObjectController {
 		}
 		
 		if(userGroup){
-			render userGroupService.getObservationCountByGroup(userGroup);
+			render userGroupService.getCountByGroup(Observation.simpleName, userGroup);
 		}else{
 			render Observation.createCriteria().count {
 				and {

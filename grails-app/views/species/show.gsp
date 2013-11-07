@@ -39,40 +39,42 @@ if(r) {
 
 <style>
 
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
-	width:210px;
-	height:150px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
+    width:210px;
+    height:150px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
-	max-width:210px;
-	max-height:150px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
+    max-width:210px;
+    max-height:150px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
-	max-width:210px;
-	max-height:140px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
+    max-width:210px;
+    max-height:140px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item {
-	width:210px;
-	height:380px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item {
+    width:210px;
+    height:250px;
+    margin-right:3px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
-	width:210px;
-	height:380px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
+    width:210px;
+    height:250px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-	height:380px;
-}
-
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
-	height:80px;
-	padding:16px 0px;
-	background-color : #fff;
-}
+    .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+        height:250px;
+        padding:0px 1px;
+    }
+    
+    .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
+    height:75px;
+    padding:16px 0px;
+    background-color : #fff;
+    }
 
 </style>
 

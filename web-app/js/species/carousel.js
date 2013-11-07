@@ -1,8 +1,10 @@
 var itemLoadCallback = function(carousel, state) {
         carousel.last = carousel.last?carousel.last:3;
+        var limit = carousel.last - carousel.first + 1
+        if(limit <=0) limit = carousel.options.scroll
 	var params = {
-		"limit" :carousel.last - carousel.first, //carousel.options.scroll,
-		"offset" :carousel.first,
+		"limit" : limit,
+                "offset" :carousel.first,
 		"filterProperty": carousel.options.filterProperty,
 		"filterPropertyValue": carousel.options.filterPropertyValue,
 		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
@@ -192,6 +194,6 @@ var getSnippetTabletHTML = function(carousel, item) {
 
 	var notes = item.notes?item.notes:''
 	var summary = item.summary?item.summary:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'" style="'+(notes?'':'height:0px;padding:0px;')+'">'+notes+'</div><div class="'+'ellipsis multiline caption'+'" style="'+(summary?'':'height:0px;padding:0px;')+'">'+summary+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption">'+(notes?notes:summary)+'</div></div></div>';
 
 }
