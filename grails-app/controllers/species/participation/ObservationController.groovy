@@ -769,7 +769,6 @@ class ObservationController extends AbstractObjectController {
 	    def activeFilters = new HashMap(params);
         activeFilters.remove('userGroupInstance');
 		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:activeFilters, parentId:params.long('id'), filterProperty:params.filterProperty]
-
 		render (view:'listRelated', model:model)
 	}
 

@@ -48,8 +48,8 @@
 					
 		</div>
 	</div>
-	
-	<g:if test="${instanceTotal > (queryParams.max?:0)}">
+        
+        <g:if test="${instanceTotal > (queryParams.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;">Loading ... </span> <span

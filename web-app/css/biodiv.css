@@ -2463,3 +2463,8 @@ small {
     width:22px;
     display:inline-block;
 }
+.table-column .title {
+    max-width:300px;
+    word-wrap:break-word;
+}
+

@@ -402,7 +402,7 @@ class UserGroupController {
 			return;
 		}
 		def instanceTotal = userGroupInstance.getExpertsCount();
-		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':experts, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount()]
+		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':experts, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':instanceTotal]
 		renderUsersModel(params, model);
 	}
 

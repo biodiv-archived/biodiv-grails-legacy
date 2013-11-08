@@ -30,7 +30,7 @@ class ChecklistController {
 
 	def show = {
 		log.debug params
-		if(params.id){
+		if(params.id) {
 			def checklistInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!checklistInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
@@ -63,7 +63,10 @@ class ChecklistController {
 					[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
-		}
+		} else {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
+				redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
+        }
 	}
 
 	def snippet = {

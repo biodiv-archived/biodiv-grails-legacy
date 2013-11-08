@@ -15,6 +15,10 @@
 .list_view .observervation_story {
     width:784px;
 }
+.observations_list{
+    top:0px;
+}
+
 
 
 </style>
@@ -53,7 +57,7 @@
 					</div>
 				</g:if>
 
-				<g:elseif test="${params.action == 'experts' }">
+				<g:elseif test="${params.action == 'experts' || params.action == 'moderators'}">
 					<div class="tab-pane" id="experts">
 						<sUser:showUserListWrapper
 							model="['results':userInstanceList, 'instanceTotal':expertsTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />

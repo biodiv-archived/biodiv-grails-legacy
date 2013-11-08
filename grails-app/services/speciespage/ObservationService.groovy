@@ -260,9 +260,9 @@ class ObservationService extends AbstractObjectService {
 
 
 
-    List getRelatedObservation(String property, long obvId, int limit, long offset){
+    Map getRelatedObservation(String property, long obvId, int limit, long offset){
         if(!property){
-            return []
+            return [observations:[], count:0]
         }
 
         def propertyValue = Observation.read(obvId)[property]
@@ -272,7 +272,7 @@ class ObservationService extends AbstractObjectService {
         obvs.each {
             result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
         }
-        return result
+        return [observations:result, count:obvs.size()]
     }
 
 
