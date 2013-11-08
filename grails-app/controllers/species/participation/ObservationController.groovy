@@ -249,7 +249,11 @@ class ObservationController extends AbstractObjectController {
 					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
-		}
+		} else {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+
+        }
 	}
 
 	/**

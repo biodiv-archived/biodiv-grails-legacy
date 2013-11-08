@@ -116,7 +116,7 @@ if(r) {
                                     </div>
                                     <center>
                                         <div id="gallerySpinner" class="spinner">
-                                        <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                        <img src="${r.resource(dir:'images',file:'spinner.gif', absolute:true)}"
                                             alt="${message(code:'spinner.alt',default:'Loading...')}" />
                                         </div>
                                     </center>
