@@ -1061,7 +1061,7 @@ class UserGroupController {
 	   def r = userGroupService.updateResourceOnGroup(params)
        def resObj = r.remove('resourceObj')
 	   if(params.pullType == 'single'){
-		   r['resourceGroupHtml'] =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]);
+           r['resourceGroupHtml'] =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]);
 		   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
 	   }
 	   
