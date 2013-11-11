@@ -16,6 +16,7 @@ class ProjectController {
 	def projectSearchService
 	def springSecurityService
 	def documentService
+    def userGroupService
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -139,8 +140,8 @@ class ProjectController {
 		def projectInstance = Project.get(params.id)
 		if (projectInstance) {
 			try {
+				userGroupService.removeProjectFromUserGroups(projectInstance, projectInstance.userGroups.collect{it.id})
 				projectInstance.delete(flush: true)
-				//userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'project.label', default: 'Project'), params.id])}"
 				redirect(action: "list")
 			}
