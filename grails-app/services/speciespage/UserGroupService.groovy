@@ -1324,7 +1324,7 @@ class UserGroupService {
 			String groupRes = ""
 			String functionString = ""
 			switch (objectType) {
-				case Observation.class.getCanonicalName():
+				case [Observation.class.getCanonicalName(), Checklists.class.getCanonicalName()]:
 					groupRes += 'observations'
 					functionString += (submitType == 'post')? 'addToObservations' : 'removeFromObservations'
 					break
