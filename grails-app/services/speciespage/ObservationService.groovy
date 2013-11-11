@@ -797,15 +797,15 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.featureBy == "true" ) {
-            if(params.userGroup == null) {
+           // if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
-                featureQuery = ", Featured feat "
-            } else {
-                featureQuery = ", Featured feat "
-            }
+              //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
+            //} else {
+              //  featureQuery = ", Featured feat "
+            //}
             query += featureQuery;
-            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType "
+            filterQuery += " and obv.featureCount > 0 "
             if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
             }else {
