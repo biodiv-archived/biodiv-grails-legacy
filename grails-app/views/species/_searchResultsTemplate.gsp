@@ -4,9 +4,9 @@
 		<div class="mainContent"  name="l${params?.offset}">
 			<ul class="list_view single_list_view thumbnails">
 				<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
-					<li class="thumbnail feedParentContext clearfix"><s:showSnippet
-							model="['speciesInstance':speciesInstance]" />
-					</li>
+                                <li class="thumbnail feedParentContext clearfix">
+                                    <s:showSnippet model="['speciesInstance':speciesInstance]" />
+				</li>
 				</g:each>
 			</ul>
 		</div>

@@ -40,6 +40,7 @@ class SUserController extends UserController {
 	def saltSource;
     def dataSource;
     def chartService;
+    def SUserSearchService;
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -50,7 +51,7 @@ class SUserController extends UserController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		params.max = Math.min(params.max ? params.int('max') : 24, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
 		def model = getUsersList(params);
@@ -112,6 +113,8 @@ class SUserController extends UserController {
 		}
 
 		addRoles(user)
+        log.debug "Publishing User on SOLR" + user
+        SUserSearchService.publishSearchIndex(user, true)
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 		redirect action: edit, id: user.id
 	}
@@ -207,6 +210,9 @@ class SUserController extends UserController {
 			}
 
 			userCache.removeUserFromCache user[usernameFieldName]
+            log.debug "Publishing User on SOLR" + user
+            SUserSearchService.publishSearchIndex(user, true)
+
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroupWebaddress':params.webaddress))
 			//redirect action: show, id: user.id
@@ -265,13 +271,13 @@ class SUserController extends UserController {
 	}
 
 	def search = {
-		println "search"
 		log.debug params
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
-		def model = getUsersList(params);
-
+		//def model = getUsersList(params);
+		def model = SUserService.getUsersFromSearch(params);
 		// add query params to model for paging
-		for (name in [
+		/*for (name in [
 			'username',
 			'enabled',
 			'accountExpired',
@@ -281,8 +287,9 @@ class SUserController extends UserController {
 			'order'
 		]) {
 			model[name] = params[name]
-		}
-		model['isSearch'] = true;
+		}*/
+		
+		//model['isSearch'] = true;
 		params.action = 'search'
 		params.controller = 'SUser'
 
@@ -388,7 +395,8 @@ class SUserController extends UserController {
 
 
 			if(params.sort == 'activity') {
-				results = chartService.getUserByRank(max, offset)
+				def userName = params['query'] ? (params['query'].toLowerCase() + '%') : null
+				results = chartService.getUserByRank(max, offset, userName)
 			} else {
 				String query = "SELECT DISTINCT u $hql $orderBy";
 				log.debug "UserQuery : ${query} with params ${queryParams}"
@@ -403,7 +411,7 @@ class SUserController extends UserController {
 			//		}
 		}
 
-		return ['userInstanceList': results, instanceTotal: totalCount, queryParams:queryParams, searched: true]
+		return ['userInstanceList': results, instanceTotal: totalCount, searchQuery:queryParams, searched: true]
 
 	}
 
@@ -547,6 +555,7 @@ class SUserController extends UserController {
 
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
+                log.debug "Assigning role : ${key}" 
 				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
 			}
 		}

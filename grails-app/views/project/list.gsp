@@ -19,9 +19,12 @@
 	background-color: #ffffff;
 	width: 590px;
 }
-
-.project-list-item {
-	margin: 20px;
+.thumbnail .observation_story {
+        margin-left:0px;
+        width:100%;
+        padding-left:5px;
+        overflow:auto;
+        height:100%;
 }
 
 .thumbnails>.thumbnail {
@@ -51,7 +54,7 @@
 
 			<obv:showObservationFilterMessage />
 
-			<div class="observations_list_wrapper" style="top: 0px;">
+			<div class="list" style="top: 0px;">
 				<g:render template="/project/projectListTemplate" />
 			</div>
 
@@ -64,7 +67,7 @@ $(document).ready(function(){
 
 	$(".list_view").show();
 	
-    $('.observations_list_wrapper').on('updatedGallery', function(event) {
+    $('.list').on('updatedGallery', function(event) {
     	$(".list_view").show();
     });
 	

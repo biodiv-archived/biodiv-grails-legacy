@@ -7,6 +7,7 @@ import java.util.Map;
 import content.eml.Document
 import grails.plugins.springsecurity.Secured;
 import groovy.sql.Sql;
+import groovy.util.Eval;
 
 import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
@@ -33,10 +34,13 @@ import org.springframework.security.acls.model.Sid;
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.Assert
 import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclObjectIdentity
+import org.apache.commons.logging.LogFactory;
 
 import species.Habitat;
 import species.Resource;
+import species.ResourceFetcher
 import species.Resource.ResourceType;
+import species.Species;
 import species.auth.Role;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
@@ -52,6 +56,7 @@ import utils.Newsletter;
 import content.eml.Document
 import content.Project
 import species.participation.Checklists
+import species.participation.Featured
 
 class UserGroupService {
 
@@ -67,8 +72,9 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-
-
+	def speciesService;
+	def SUserService;
+	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -113,6 +119,9 @@ class UserGroupService {
 
 			List founders = Utils.getUsersList(params.founderUserIds);
 			setUserGroupFounders(userGroup, founders, params.founderMsg, params.domain);
+			
+			List experts = Utils.getUsersList(params.expertUserIds);
+			setUserGroupExperts(userGroup, experts, params.expertMsg, params.domain);
 			params.founders = founders;
 		}
 	}
@@ -218,7 +227,7 @@ class UserGroupService {
 						from user_group_member_role '''
 			query += " where user_group_id in (select distinct(user_group_id) from user_group_member_role where s_user_id = "+userInstance.id+") "
 			query += 	''' group by user_group_id 
-						order by c desc limit 10''';
+						order by c desc limit 20''';
 //			query = '''select distinct s.user_group_id, max(s.count) as maxCount 
 //						from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, 
 //								(select observation_id, count(*) from user_group_observations group by observation_id) u2 
@@ -237,7 +246,7 @@ class UserGroupService {
 			query += '''select user_group_id, count(distinct(s_user_id)) as c
 						from user_group_member_role '''
 			query += 	''' group by user_group_id
-						order by c desc limit 10''';
+						order by c desc limit 20''';
 //			query = '''select distinct s.user_group_id, max(s.count) as maxCount from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, (select observation_id, count(*) from user_group_observations group by observation_id) u2 where u1.observation_id=u2.observation_id) union (select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1, (select species_group_id, count(*) from user_group_species_group group by species_group_id) u2 where u1.species_group_id=u2.species_group_id) union (select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1, (select habitat_id, count(*) from user_group_habitat group by habitat_id) u2 where u1.habitat_id=u2.habitat_id)) s group by s.user_group_id order by maxCount desc;'''
 		}
 		
@@ -405,13 +414,13 @@ class UserGroupService {
 	}
 
 	/////////////// OBSERVATIONS RELATED /////////////////
-	void postObservationtoUserGroups(Observation observation, List userGroupIds) {
+	void postObservationtoUserGroups(Observation observation, List userGroupIds, boolean sendMail=true) {
 		log.debug "Posting ${observation} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
 				if(userGroup) {
-					postObservationToUserGroup(observation, userGroup)
+					postObservationToUserGroup(observation, userGroup, sendMail)
 				}
 			}
 		}
@@ -419,26 +428,25 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
+	void postObservationToUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
 		userGroup.addToObservations(observation);
 		if(!userGroup.save()) {
 			log.error "Could not add ${observation} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			def feedType = observation.instanceOf(Checklists) ? activityFeedService.CHECKLIST_POSTED_ON_GROUP :activityFeedService.OBSERVATION_POSTED_ON_GROUP 
-			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, feedType);
+			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
 			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
 
-	void removeObservationFromUserGroups(Observation observation, List userGroupIds) {
+	void removeObservationFromUserGroups(Observation observation, List userGroupIds, boolean sendMail=true) {
 		log.debug "Removing ${observation} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
 				if(userGroup) {
-					removeObservationFromUserGroup(observation, userGroup)
+					removeObservationFromUserGroup(observation, userGroup, sendMail)
 				}
 			}
 		}
@@ -446,14 +454,13 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup) {
+	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
 		userGroup.observations.remove(observation);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${observation} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			def feedType = observation.instanceOf(Checklists) ? activityFeedService.CHECKLIST_REMOVED_FROM_GROUP : activityFeedService.OBSERVATION_REMOVED_FROM_GROUP
-			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, feedType);
+			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false, sendMail);
 			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
@@ -471,23 +478,46 @@ class UserGroupService {
 		return count[0]
 	}
 
-	def long getObservationCountByGroup(UserGroup userGroupInstance){
-		def queryParams = [:]
-		queryParams['userGroup'] = userGroupInstance
-		queryParams['isDeleted'] = false;
-		queryParams['isChecklist'] = false;
-		queryParams['isShowable'] = true;
-		
-		def query = "select count(*) from Observation obv join obv.userGroups userGroup where obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable and userGroup=:userGroup"
-		return Observation.executeQuery(query, queryParams)[0]
+	def long getCountByGroup(String objectType, UserGroup userGroupInstance){
+        long count = 0;
+        def query = '';
+        def queryParams = [:]
+
+        if(userGroupInstance)
+            queryParams['userGroup'] = userGroupInstance
+
+        switch(objectType) {
+            case Observation.simpleName:
+            queryParams['isDeleted'] = false;
+            queryParams['isChecklist'] = false;
+            queryParams['isShowable'] = true;
+            query = "select count(*) from Observation obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup and "
+            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
+            count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
+            break;
+            case Species.simpleName :
+            query = "select count(*) from Species obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup"
+            count =  Species.executeQuery(query, queryParams, [cache:true])[0]
+            break;
+            case Document.simpleName :
+            query = "select count(*) from Document obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup"
+            count =  Document.executeQuery(query, queryParams, [cache:true])[0]
+        }
+        return count;
 	}
 	
 	def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
 
 		if(!userGroupInstance) return;
-        println params
+        log.debug params
         params['userGroup'] = userGroupInstance;
-        println params.getClass()
+        log.debug params.getClass()
         return observationService.getFilteredObservations(params, max, offset, isMapView); 
 /*
 		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
@@ -680,9 +710,61 @@ class UserGroupService {
 			}
 		}
 	}
+	
+	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
+	def setUserGroupExperts(userGroupInstance, experts, expertsMsg, domain) {
+		//experts.add(springSecurityService.currentUser);
+		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+		def groupExperts = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, expertRole).collect {it.sUser};
+		def commons = experts.intersect(groupExperts);
+		groupExperts.removeAll(commons);
+		experts.removeAll(commons);
+
+		sendExpertInvitation(userGroupInstance, experts, expertsMsg, domain);
+
+		if(groupExperts) {
+			groupExperts.each { expert ->
+				//deletes as expert
+				userGroupInstance.deleteMember (expert);
+				//adds as member
+				userGroupInstance.addMember(expert);
+			}
+		}
+	}
+
+	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
+	void sendExpertInvitation(userGroupInstance, experts, expertsMsg, domain) {
+
+		log.debug "Sending invitation to ${experts}"
+
+		String usernameFieldName = 'name'
+
+		experts.each { expert ->
+			if(expert instanceof SUser && expert?.id == springSecurityService.currentUser.id) {
+				userGroupInstance.addExpert(expert);
+			} else {
+				String expertEmail, name, userId;
+				if(expert instanceof String) {
+					expertEmail = expert
+					name = expert.substring(0, expert.indexOf("@"));
+					userId = 'register'
+				} else {
+					expertEmail = expert.email;
+					name = expert."$usernameFieldName".capitalize()
+					userId = expert.id.toString()
+				}
+
+				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
+				userToken.save(flush: true)
+				emailConfirmationService.sendConfirmation(expertEmail,
+						"Invitation to join as moderator for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/expertInvitation'], userToken.token);
+			}
+		}
+	}
+
 
 	@PreAuthorize("hasPermission(#userGroupInstance, write)")
-	void sendMemberInvitation(userGroupInstance, members, domain) {
+	void sendMemberInvitation(userGroupInstance, members, domain, message=null) {
 		//find if the invited members are already part of the group and ignore sending invitation to them
 		//def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
@@ -706,7 +788,7 @@ class UserGroupService {
 			def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 			userToken.save(flush: true)
 			emailConfirmationService.sendConfirmation(memberEmail,
-					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, memberMsg:message, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 		}
 	}
 
@@ -814,10 +896,11 @@ class UserGroupService {
 	def userGroupBasedLink(attrs) {
 		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
 
-		//		println '-------------'
-		//		println attrs
+		//println '-------------'
+		//println attrs
 		String url = "";
 
+        if(attrs.userGroupInstance) attrs.userGroup = attrs.userGroupInstance
 		if(attrs.userGroup && attrs.userGroup.id) {
 			attrs.webaddress = attrs.userGroup.webaddress
 			String base = attrs.remove('base')
@@ -833,7 +916,7 @@ class UserGroupService {
 			}
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 				//				println url
 				//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
@@ -841,7 +924,7 @@ class UserGroupService {
 
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 					//					println url
 					//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
@@ -868,7 +951,7 @@ class UserGroupService {
 			}
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 				//				println url
 				//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
@@ -876,7 +959,7 @@ class UserGroupService {
 
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
 					//					println url
 					//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
@@ -899,9 +982,9 @@ class UserGroupService {
 				attrs.remove('params');
 			}
 			if(base) {
-				url = g.createLink(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
+				url = g.createLink(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 			} else {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
+				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 			}
 		}
 		//println url;
@@ -916,21 +999,23 @@ class UserGroupService {
 		def jsonData = []
 		String name = params.term
 
-		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		String userId = 'id';
+        if(name) {
+            String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+            String userId = 'id';
 
 
-		def results = UserGroup.executeQuery(
-				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
-				"FROM UserGroup u " +
-				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-				"ORDER BY u.$usernameFieldName",
-				[name: "${name.toLowerCase()}%"],
-				[max: params.max])
+            def results = UserGroup.executeQuery(
+                    "SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+                    "FROM UserGroup u " +
+                    "WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+                    "ORDER BY u.$usernameFieldName",
+                    [name: "${name.toLowerCase()}%"],
+                    [max: params.max])
 
-		for (result in results) {
-			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Groups"]
-		}
+            for (result in results) {
+                jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Groups"]
+            }
+        }
 
 		return jsonData;
 	}
@@ -1095,7 +1180,7 @@ class UserGroupService {
 			log.error "Could not add ${document} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, true);
 			log.debug "Added ${document} to userGroup ${userGroup}"
 		}
 	}
@@ -1120,7 +1205,7 @@ class UserGroupService {
 			log.error "Could not remove ${document} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, false);
 			log.debug "Removed ${document} from userGroup ${userGroup}"
 		}
 	}
@@ -1169,7 +1254,7 @@ class UserGroupService {
 			log.error "Could not add ${project} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, true);
 			log.debug "Added ${project} to userGroup ${userGroup}"
 		}
 	}
@@ -1194,7 +1279,7 @@ class UserGroupService {
 			log.error "Could not remove ${project} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, false);
 			log.debug "Removed ${project} from userGroup ${userGroup}"
 		}
 	}
@@ -1216,4 +1301,168 @@ class UserGroupService {
 		return secTagLib.hasPermission(['permission':permission, 'object':object], 'permitted')
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////// Bulk posting ////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def updateResourceOnGroup(params){
+		def r = [:]
+		try{
+			List groups = params['userGroups'].split(",").collect {
+				UserGroup.read(Long.parseLong(it))
+			}
+			def objectIds = params['objectIds']
+			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
+			List obvs = []
+			if(objectIds && objectIds != ""){
+				obvs = objectIds.split(",").collect { domainClass.read(Long.parseLong(it)) }
+			}
+			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
+			
+			String submitType = params.submitType
+			String objectType = params.objectType
+			String groupRes = ""
+			String functionString = ""
+			switch (objectType) {
+				case Observation.class.getCanonicalName():
+					groupRes += 'observations'
+					functionString += (submitType == 'post')? 'addToObservations' : 'removeFromObservations'
+					break
+				case Species.class.getCanonicalName():
+					groupRes += 'species'
+					functionString += (submitType == 'post')? 'addToSpecies' : 'removeFromSpecies'
+					break
+				case Document.class.getCanonicalName():
+					groupRes += 'documents'
+					functionString += (submitType == 'post')? 'addToDocuments' : 'removeFromDocuments'
+					break
+				default:
+					break
+			}
+			
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, groupRes, functionString)
+			r['success'] = true
+			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
+		}catch (Exception e) {
+			e.printStackTrace()
+			r['success'] = false
+			r['msgCode']= 'error'
+		}
+		return r
+	}
+	
+	def boolean getResourcePullPermission(params, isBulkPull=true){
+		if(!springSecurityService.isLoggedIn()){
+			return false
+		}
+		
+		SUser currUser = springSecurityService.currentUser;
+		//returning true for user with admin role
+		if(SUserService.isAdmin(currUser?.id)){
+			return true
+		}
+		
+		int groupCount = UserGroupMemberRole.countBySUser(currUser)
+		if(groupCount == 0){
+			return false
+		}
+		
+		if(!getExpertGroupsOnly(isBulkPull, params)){
+			return true
+		}
+		//if user is founder or expert in any group then retruing true permission for bulk upload
+		//on list apge of any resource (i.e. obv, species, docs)
+		return currUser.fetchIsFounderOrExpert()
+	}
+	
+	def boolean getExpertGroupsOnly(boolean isBulkPull, params){
+		//resource like species or bulk post can be done only by expert or founder in his group only  
+		return (isBulkPull || params.controller == 'species')
+	}
+	
+	private class ResourceUpdate {
+		private static final log = LogFactory.getLog(this);
+		
+		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
+			ResourceFetcher rf
+			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
+				rf = new ResourceFetcher(params.objectType, params.filterUrl)
+				List newList = rf.getAllResult()
+				newList.removeAll(allObvs)
+				allObvs = newList
+			}
+			
+			log.debug " All Resources " +  allObvs.size()
+			log.debug " All Groups " + groups
+			
+			def afDescriptionList = []
+			groups.each { UserGroup ug ->
+				def obvs = new ArrayList(allObvs)
+				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
+				if(success){
+					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
+					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
+				}
+			}
+			return afDescriptionList.join(" ")
+		}
+		
+		
+		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
+			UserGroup.withTransaction(){  status ->
+				if(submitType == 'post'){
+					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
+				}else{
+					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+					obvs = getFeatureSafeList(ug, obvs)
+				}
+				if(obvs.isEmpty()){
+					log.debug "Nothing to update because of permissoin or not part of group"
+					return false
+				}
+				log.debug submitType + " for group " + ug + "  resources size " +  obvs.size()
+				obvs.each { obv ->
+					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+				}
+				try{
+					ug.save(flush:true, failOnError:true)
+				}catch(Exception e){
+					ug.errors.allErrors.each { log.debug it }
+					status.setRollbackOnly()
+					e.printStackTrace()
+				} 
+			}
+			return !ug.hasErrors()
+		}
+		
+		private String getStatusMsg(af, resoruceClassName, remainingCount, submitType, userGroup){
+			String msg = af ? (activityFeedService.getContextInfo(af).activityTitle) : ("No " + activityFeedService.getResourceDisplayName(resoruceClassName) +  ((submitType == 'post') ? " posted to group ": " removed from group ") + activityFeedService.getUserGroupHyperLink(userGroup)) 
+			if(remainingCount > 0){
+				msg += ( ", " + remainingCount + " were " ) + ((submitType == 'post') ? "already part of this group" : "not part of this group")
+			}
+			msg += "."
+			return msg 
+		}
+		
+		private List getFeatureSafeList(ug, obvs){
+			SUser currUser = springSecurityService.currentUser;
+			//if admin or founder or expert then can un post any featured resource
+			if(SUserService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
+				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
+				return obvs
+			}
+			
+			def newObvs = []
+			obvs.each { obv ->
+				if(( obv.metaClass.hasProperty(obv, 'author') && (obv.author == currUser)) || !Featured.isFeaturedAnyWhere(obv)){
+					newObvs << obv
+					log.debug "User is author or obv is not featured in any group " + currUser
+				}
+			}
+			println "new obv  " + newObvs
+			return newObvs
+		}
+	}
+
 }

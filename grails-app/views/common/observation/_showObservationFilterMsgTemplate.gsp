@@ -15,10 +15,9 @@
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
 </g:javascript>
- 
 <div class="info-message" id="info-message">
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
-			class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> and ${instanceTotal- speciesCountWithContent} species stubs are found</g:if>
+                        class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}">and ${instanceTotal- speciesCountWithContent} species stubs are </g:if> found</g:if>
 		<g:else>
 			<span class="name" style="color: #b1b1b1;"><i
 				class="icon-search"></i></span> <g:if test="${instanceTotal==0}">No results </g:if>
@@ -38,9 +37,10 @@
 		</g:else>
 		<%
 			boolean dateRangeSet = false	
-		%>
-		<g:each in="${queryParams}" var="queryParam">
-			<g:if
+                        %>
+                
+                <g:each in="${queryParams}" var="queryParam">
+                            <g:if
 				test="${queryParam.key == 'groupId' && queryParam.value instanceof Long }">
 				<g:if
 					test="${queryParam.value && SpeciesGroup.get(queryParam.value)}">
@@ -86,7 +86,17 @@
 					href="${uGroup.createLink(controller:params.controller, action:"list",
 					params:[tag: queryParam.value])}">
 						${queryParam.value} <a id="removeTagFilter" href="#">[X]</a> </a> </span>
-			</g:if>
+                        </g:if>
+                                               <g:if test="${queryParam.key == 'featureBy' && queryParam.value}">
+                                     <span class="highlight">
+					<a
+					href="${uGroup.createLink(controller:params.controller, action:"list",
+					params:[featureBy: queryParam.value])}">
+						featured <a class="removeQueryFilter" data-target="featureBy"
+						href="#">[X]</a> </a> </span>
+                        </g:if>
+
+
 			<g:if
 				test="${queryParam.key == 'user' && SUser.read(queryParam.value)}">
                                     by user <span class="highlight">
@@ -120,7 +130,7 @@
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
 					action:params.action, params:[query: queryParam.value])}">
-						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter" data-target="#searchTextField"
+						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="#searchTextField"
 						href="#">[X]</a> </span>
 			</g:if>
 			
@@ -129,7 +139,7 @@
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
 					action:params.action, params:[(queryParam.key): queryParam.value])}">
-						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter" data-target="#${queryParam.key}"
+						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="#${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>
 		</g:each>

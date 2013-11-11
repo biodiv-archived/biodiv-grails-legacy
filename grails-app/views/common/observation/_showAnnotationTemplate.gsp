@@ -1,21 +1,15 @@
 <g:if test="${annotations.size() > 0 }">
 	<div>
-		<table class="table table-hover tablesorter span8"
+		<table class="table table-hover"
 			style="margin-left: 0px;">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Value</th>
-				</tr>
-			</thead>
 			<tbody class="mainContentList">
 				<g:each in="${annotations}" status="i"
 					var="annot">
 					<tr class="mainContent">
 						<td>
-							${annot.key}
+							${annot.key.replaceAll("_", " ").capitalize()}
 						</td>
-						<td class="ellipsis multiline" style="max-width: 250px;">
+						<td class="ellipsis multiline">
 							${annot.value}
 						</td>
 					</tr>

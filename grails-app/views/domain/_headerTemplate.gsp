@@ -18,15 +18,17 @@
 			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="brand">
                             <h1>${grailsApplication.config.speciesPortal.app.siteName}</h1>
 			</a>
+        
+
 		</g:else>
 	</div>
 </div>
 <div class="navbar navbar-static-top btn"
-	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; border-left-width:0; border-right-width: 0;">
+	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; border: 0;">
 	<div class="navbar-inner"
-		style="box-shadow: none; background-color: transparent; background-image: none;height:40px;">
+		style="box-shadow: none; background-color: transparent; background-image: none;height:30px;border:0px;">
 		<div class="container outer-wrapper"
-			style="background-color: transparent; padding-bottom: 0px;text-align:center;">
+			style="background-color: transparent; padding-bottom: 0px;text-align:center;height:30px;">
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
 
 				<ul class="nav pull-left">

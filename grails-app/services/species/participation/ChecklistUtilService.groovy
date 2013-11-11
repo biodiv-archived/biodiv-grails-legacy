@@ -391,28 +391,29 @@ class ChecklistUtilService {
 //	}
 //	
 //	//XXX this method is to add activity on back date only for checklist to observation migration
-//	public addActivityFeed(rootHolder, activityHolder, author, activityType, date){
-//		//to support discussion on comment thread
-//		def subRootHolderType = rootHolder?.class?.getCanonicalName()
-//		def subRootHolderId = rootHolder?.id
-//		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
-//			subRootHolderType = activityHolder.class.getCanonicalName()
-//			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
-//		}
-//		
-//		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
-//						activityHolderType:ActivityFeedService.getType(activityHolder), \
-//						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
-//						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId,
-//						dateCreated :date, lastUpdated:date);
-//					
-//		if(!af.save(flush:flushImmediately)){
-//			af.errors.allErrors.each { log.error it }
-//			return null
-//		}
-//		//Follow.addFollower(rootHolder, author)
-//		return af
-//	}
+	public addActivityFeed(rootHolder, activityHolder, author, activityType, date, description=null, isShowable=null){
+		//to support discussion on comment thread
+		def subRootHolderType = rootHolder?.class?.getCanonicalName()
+		def subRootHolderId = rootHolder?.id
+		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
+			subRootHolderType = activityHolder.class.getCanonicalName()
+			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
+		}
+		isShowable= (isShowable != null) ? isShowable : (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
+		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
+						activityHolderType:ActivityFeedService.getType(activityHolder), \
+						isShowable:isShowable,activityDescrption:description,\
+						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
+						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId,
+						dateCreated :date, lastUpdated:date);
+					
+		if(!af.save(flush:true)){
+			af.errors.allErrors.each { log.error it }
+			return null
+		}
+		//Follow.addFollower(rootHolder, author)
+		return af
+	}
 //	
 //	def addFollow(){
 //		def admin = SUser.findByUsername('admin')

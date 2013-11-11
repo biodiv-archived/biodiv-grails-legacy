@@ -1,6 +1,5 @@
 <div class="snippet tablet">
-	<g:set var="mainImage" value="${userInstance.profilePicture()}" />
-	<div class="figure" style="height:150px; width:200px;">
+	<div class="figure" style="height:150px; width:150px;">
 		<a href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 			<img src="${userInstance.profilePicture()}" class="img-polaroid"
 				title="${userInstance.name}" />

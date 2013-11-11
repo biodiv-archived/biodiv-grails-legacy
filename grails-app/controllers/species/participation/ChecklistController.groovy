@@ -30,7 +30,7 @@ class ChecklistController {
 
 	def show = {
 		log.debug params
-		if(params.id){
+		if(params.id) {
 			def checklistInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!checklistInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
@@ -63,7 +63,10 @@ class ChecklistController {
 					[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
-		}
+		} else {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
+				redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
+        }
 	}
 
 	def snippet = {
@@ -161,7 +164,15 @@ class ChecklistController {
 			columnList.add(0, params.sciNameColumn)
 		}
 		
-		params.columns =  columnList.collect { it.trim() }
+		
+		def validColumnList = []
+		columnList.each{
+			def colName =  it.trim()
+			if(colName != "" && !validColumnList.contains(colName)){
+				validColumnList << colName
+			}
+		}
+		params.columns = validColumnList
 		
 		//params.sciNameColumn = params.sciNameColumn ?: "scientific_name"
 		//params.commonNameColumn = params.commonNameColumn ?: "common_name"

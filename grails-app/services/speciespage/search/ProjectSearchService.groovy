@@ -1,6 +1,5 @@
 package speciespage.search
 
-
 import static groovyx.net.http.ContentType.JSON
 
 import java.text.SimpleDateFormat
@@ -11,24 +10,16 @@ import java.util.Map
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
+import org.apache.solr.common.SolrException
+
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 import content.Project
 
-class ProjectSearchService {
-
-	static transactional = false
-
-	def grailsApplication
-	
-	SolrServer solrServer;
-	
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	
-	static int BATCH_SIZE = 50;
+class ProjectSearchService extends AbstractSearchService {
 
 	/**
 	 *
@@ -50,10 +41,6 @@ class ProjectSearchService {
 		}
 		
 		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
-	}
-
-	def publishSearchIndex(Project proj, boolean commit) {
-		return publishSearchIndex([proj], commit);
 	}
 
 	/**
@@ -99,83 +86,7 @@ class ProjectSearchService {
 			
 		}
 
-		log.debug docs;
-
-		try {
-			solrServer.add(docs);
-			if(commit) {
-				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-                if(solrServer instanceof StreamingUpdateSolrServer)
-    				solrServer.blockUntilFinished();
-				solrServer.commit();
-				log.info "Finished committing to project solr core"
-			}
-		} catch(SolrServerException e) {
-			e.printStackTrace();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+        return commitDocs(docs, commit);
 	}
 
-	/**
-	 *
-	 * @param query
-	 * @return
-	 */
-	def search(query) {
-		def params = SolrParams.toSolrParams(query);
-		log.info "Running project search query : "+params
-		return solrServer.query( params );
-	}
-
-	/**
-	* delete requires an immediate commit
-	* @param id
-	* @return
-	*/
-   def delete(long id) {
-	   log.info "Deleting project from search index"
-	   solrServer.deleteByQuery("id:${id}");
-	   solrServer.commit();
-   }
-   
-	/**
-	 *
-	 * @return
-	 */
-	def deleteIndex() {
-		log.info "Deleting project search index"
-		solrServer.deleteByQuery("*:*")
-		solrServer.commit();
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	def optimize() {
-		log.info "Optimizing project search index"
-		solrServer.optimize();
-	}
-
-	/**
-	 * 
-	 * @param query
-	 * @param field
-	 * @param limit
-	 * @return
-	 */
-	def terms(query, field, limit) {
-		field = field?:"autocomplete";
-		SolrParams q = new SolrQuery().setQueryType("/terms")
-				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
-				.set(TermsParams.TERMS_LOWER, query)
-				.set(TermsParams.TERMS_LOWER_INCLUSIVE, true)
-				.set(TermsParams.TERMS_REGEXP_STR, query+".*")
-				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
-				.set(TermsParams.TERMS_LIMIT, limit)
-				.set(TermsParams.TERMS_RAW, true);
-		log.info "Running project search query : "+q
-		return solrServer.query( q );
-	}
 }

@@ -232,9 +232,9 @@
 						<g:if
 							test="${projectInstance.grantFrom || projectInstance.grantTo}">
 							<tr>
-								<td class="prop"><span class=" name">Grant Term</span></td>
+								<td class="prop"><span class=" name">Grant Term&nbsp;</span></td>
 								<td>
-									${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
+									${projectInstance?.grantFrom?.format('dd/MM/yyyy')} - ${projectInstance?.grantTo?.format('dd/MM/yyyy')}
 								</td>
 							</tr>
 						</g:if>
@@ -267,8 +267,8 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
-								<g:render template="/document/showDocument"
-									model="['documentInstance':proposalFile, 'showDetails':false]" />
+
+                                                            <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':proposalFile, showDetails:false]"/>
 							</g:each>
 						</g:if>
 					</div>
@@ -294,8 +294,8 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.reportFiles}" var="reportFile">
-								<g:render template="/document/showDocument"
-									model="['documentInstance':reportFile, 'showDetails':false]" />
+
+                                                            <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':reportFile, showDetails:false]"/>
 							</g:each>
 						</g:if>
 					</div>
@@ -349,8 +349,8 @@
 							<b>Files</b>
 
 							<g:each in="${projectInstance?.miscFiles}" var="miscFile">
-								<g:render template="/document/showDocument"
-									model="['documentInstance':miscFile, 'showDetails':false]" />
+
+                                                            <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':miscFile, showDetails:false]"/>
 							</g:each>
 						</g:if>
 					</div>

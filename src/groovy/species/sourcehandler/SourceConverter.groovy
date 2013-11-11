@@ -175,6 +175,7 @@ class SourceConverter {
 	}
 
 	protected Map getCustomFormat(String customFormat) {
+        if(!customFormat) return [:];
 		return customFormat.split(';').inject([:]) { map, token ->
 			token = token.toLowerCase();
 			token.split('=').with {
@@ -282,11 +283,7 @@ class SourceConverter {
 		if(text) {
 			text.split(delimiter).each {
 				if(it) {
-					if(!it.startsWith("CC")) {
-						licenses << "CC "+it.trim()
-					} else {
-						licenses << it.trim()
-					}
+					licenses << it.trim()
 				}
 			}
 		}

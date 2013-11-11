@@ -51,6 +51,9 @@
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
 							Founders (${foundersTotalCount})</a></li>
+					<li class="${(params.action == 'experts')?'active':'' }"><a
+						href="${uGroup.createLink(mapping:'userGroup', action:'moderators', 'userGroup':userGroupInstance)}">
+							Moderators (${expertsTotalCount})</a></li>
 				</ul>
 
 

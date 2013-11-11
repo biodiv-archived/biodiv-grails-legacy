@@ -5,17 +5,16 @@
     <g:if test="${!showDetails}">
 
     .observation .prop .value {
-    margin-left:10px;
+        margin-left:10px;
     }
 
     </g:if>
 </style>
-<div class="observation_story" style="${showDetails?'':'overflow:visible;width:100%'}">
-    <div>
+<div class="observation_story">
     	<%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
         %>
-        <g:if test="${showDetails}">
+        <g:if test="${showDetails && !showFeatured}">
         	<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
         </g:if>
             <div class="observation-icons">
@@ -29,16 +28,30 @@
                     title="${observationInstance.group?.name}"></span>
                 
                 <g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
-            	 <span>
-					<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
-				</span>
-				</g:if>
-                
-            </div>
-        </div>
-        <div class="span7">
+                <span>
+                    <s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
+                    </span>
+                </g:if>
 
-            <div class="prop">
+                <g:if test="${showFeatured}">
+                    <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
+                </g:if>
+            </div>
+            <g:if test="${showFeatured}">
+            <div class="featured_body">
+                <div class="featured_title ellipsis"> 
+                    <div class="heading">
+                        <g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                            <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
+                        </g:link>
+                    </div>
+                </div>
+                <g:render template="/common/featureNotesTemplate" model="['instance':observationInstance, 'featuredNotes':featuredNotes]"/>
+            </div>
+            </g:if>
+            <g:else>
+        <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
+           <div class="prop">
                 <g:if test="${showDetails}">
                 <span class="name"><i class="icon-share-alt"></i>Name</span>
                 </g:if>
@@ -75,12 +88,6 @@
                     -->
                 </div>
             </div>
-            <%--		<div class="prop">--%>
-                <%--			<span class="name">Recommendations</span>--%>
-                <%--			<div class="value">--%>
-                    <%--				${observationInstance.getRecommendationCount()}--%>
-                    <%--			</div>--%>
-                <%--		</div>--%>
 
             <div class="prop">
                 <g:if test="${showDetails}">
@@ -152,7 +159,7 @@
                     </div>
                     </g:if>
                     <g:else>
-                    <div class="value notes_view linktext ${showDetails?'':'ellipsis multiline'}">
+                    <div class="value notes_view linktext ${showDetails?'':'ellipsis'}">
                         ${Utils.stripHTML(observationInstance.notes)}
                     </div>
 
@@ -161,7 +168,6 @@
             </g:if>
 
             <g:if test="${showDetails}">
-
                 <g:if test="${observationInstance.isChecklist && observationInstance.refText}" >
                 <div class="prop">
                     <span class="name"><i class="icon-info-sign"></i>References</span>
@@ -176,22 +182,17 @@
                     model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
                 </div>
 
+        </g:if>
 
-            </g:if>
-
-        </div>
-        <div class="row" style="margin-left:0px;">
+        <div class="row observation_footer" style="margin-left:0px;">
             <obv:showFooter
-            model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
-            <div style="float: right; clear: both;">
+                model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
+
+            <div class="story-footer" style="right:3px;">
                 <sUser:showUserTemplate
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
             </div>
         </div>
-
-
-
-
-
-
+        </div>
+        </g:else>
     </div>

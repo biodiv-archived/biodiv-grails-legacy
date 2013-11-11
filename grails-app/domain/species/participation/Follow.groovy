@@ -3,62 +3,56 @@ package species.participation
 import grails.converters.JSON;
 import species.auth.SUser;
 
-class Follow {
+class Follow extends AbstractAction {
+	
 
-	String objectType
-	Long objectId;
-	
-	static belongsTo = [user:SUser];
-	
+		
 	static constraints = {
-		objectType(unique:['objectType', 'objectId', 'user'])
+		objectType(unique:['objectId', 'author'])
 	}
-	static mapping = {
-		version : false;
-    }
-	
-	static boolean fetchIsFollowing(object, SUser user) {
-		if(!user){
+		
+    static boolean fetchIsFollowing(object, SUser author) {
+		if(!author){
 			return false
 		}
 		
-//		if(object.author == user){
+//		if(object.author == author){
 //			return true
 //		}
 		
 		String objectType = object.class.getCanonicalName()
 		Long objectId = object.id
-		
-		def follow = Follow.findWhere(objectType:objectType, objectId:objectId, user:user)
+				def follow = Follow.findWhere(objectType:objectType, objectId:objectId, author:author)
 		return follow ? true : false
 	}
 	
-	static SUser addFollower(object, SUser user){
-		if(fetchIsFollowing(object, user)){
-			return user
-		}
-		
-		String objectType = object.class.getCanonicalName()
-		Long objectId = object.id
-		
-		Follow follow = new Follow(objectType:objectType, objectId:objectId, user:user)
-		if(!follow.save(flush:true)){
-			follow.errors.allErrors.each { log.error it }
-			return null
-		}
-		
-		return follow.user
-	}	
+	static SUser addFollower(object, SUser author,boolean flushImmidiatly=true){
+
+		if(!fetchIsFollowing(object, author)){
+            String objectType = object.class.getCanonicalName()
+            Long objectId = object.id
+            println objectType
+            println objectId
+            println author
+            Follow follow = new Follow(objectType:objectType, objectId:objectId, author:author)
+            if(!follow.save(flush:flushImmidiatly)){
+                follow.errors.allErrors.each { log.error it }
+                return null
+            }
+            
+            return follow.author
+	    }
+    }
 	
-	static  SUser deleteFollower(object, SUser user){
-		if(!fetchIsFollowing(object, user)){
-			return user
+	static  SUser deleteFollower(object, SUser author){
+		if(!fetchIsFollowing(object, author)){
+			return author
 		}
 		
 		String objectType = object.class.getCanonicalName()
 		Long objectId = object.id
-		
-		Follow follow = Follow.findWhere(objectType:objectType, objectId:objectId, user:user)
+	
+		Follow follow = Follow.findWhere(objectType:objectType, objectId:objectId, author:author)
 		try{
 			if(follow)
 				follow.delete(flush:true, failOnError:true)
@@ -67,7 +61,7 @@ class Follow {
 			return null
 		}
 		
-		return user
+		return author
 	}
 	
 	static List<SUser> getFollowers(object){
@@ -78,10 +72,10 @@ class Follow {
 	}
 	
 	static List<SUser> getFollowers(objectType, objectId){
-		return Follow.findAllByObjectTypeAndObjectId(objectType, objectId).collect{ it.user }
+		return Follow.findAllByObjectTypeAndObjectId(objectType, objectId).collect{ it.author }
 	}
 
-	static void deleteAll(SUser user) {
-		executeUpdate 'DELETE FROM Follow WHERE user=:user', [user: user]
+	static void deleteAll(SUser author) {
+		executeUpdate 'DELETE FROM Follow WHERE author=:author', [author: author]
 	}
 }

@@ -1,6 +1,18 @@
 execute pathogen#infect()
 
-source ~/rep/scripts/vimrc
+syntax on
+
+set sta
+set sw=4
+
+set foldmethod=marker
+set hlsearch
+set showmatch
+
+" use smart c-like indentation.
+set cindent
+" dont insert tabs on indentation. use spaces instead.
+set expandtab
 
 set autoindent
 syntax on

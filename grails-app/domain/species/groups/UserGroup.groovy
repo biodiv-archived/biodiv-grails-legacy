@@ -14,8 +14,9 @@ import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
-import content.eml.Document
-import content.Project
+import content.eml.Document;
+import content.Project;
+import species.Species
 
 import utils.Newsletter;
 
@@ -51,7 +52,7 @@ class UserGroup implements Taggable {
 	def springSecurityService;
 	def userGroupService;
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true
@@ -130,6 +131,7 @@ class UserGroup implements Taggable {
 	Resource icon(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.userGroups.rootDir.toString()+this.icon)).exists()
 		if(!iconPresent) {
+            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.userGroups.rootDir.toString()+this.icon
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
 		return new Resource(fileName:grailsApplication.config.speciesPortal.userGroups.serverURL+this.icon, type:ResourceType.ICON, title:this.name);
@@ -157,6 +159,14 @@ class UserGroup implements Taggable {
 			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
 		}
 	}
+	
+	def getExperts(int max, long offset) {
+		UserGroupMemberRole.withTransaction {
+			def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
+		}
+	}
+
 
 	void setFounders(List<SUser> founders) {
 		founders.add(springSecurityService.currentUser);
@@ -208,9 +218,30 @@ class UserGroup implements Taggable {
 		}
 	}
 
+	void setExperts(List<SUser> members) {
+		if(members) {
+			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+			members.each { member ->
+				userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+			}
+		}
+	}
+
+	
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+		}
+		return false;
+	}
+	
+	boolean addExpert(SUser member) {
+		if(member) {
+			if(isMember(member)){
+				deleteMember(member)	
+			}
+			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
 		}
 		return false;
@@ -240,12 +271,18 @@ class UserGroup implements Taggable {
 		return UserGroupMemberRole.countByUserGroupAndRole(this, memberRole);
 	}
 
+	def getExpertsCount() {
+		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+		return UserGroupMemberRole.countByUserGroupAndRole(this, memberRole);
+	}
+
 	def getFoundersCount() {
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		return UserGroupMemberRole.countByUserGroupAndRole(this, founderRole);
 	}
 
 	def getAllMembersCount() {
+        if(id) {
 		def c = UserGroupMemberRole.createCriteria()
 		def memberCount = c.get {
 			eq('userGroup', this)
@@ -254,6 +291,9 @@ class UserGroup implements Taggable {
 			}
 		}
 		return memberCount;
+        } else {
+            return SUser.count();
+        }
 	}
 
 	boolean isFounder(SUser user) {
@@ -334,5 +374,17 @@ class UserGroup implements Taggable {
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-	
+
+    def noOfObservations() {
+        return userGroupService.getCountByGroup(Observation.simpleName, this.id?this:null);
+    }
+
+    def noOfSpecies() {
+        return userGroupService.getCountByGroup(Species.simpleName, this.id?this:null);
+    }
+
+    def noOfDocuments() {
+        return userGroupService.getCountByGroup(Document.simpleName, this.id?this:null);
+    }
+
 }

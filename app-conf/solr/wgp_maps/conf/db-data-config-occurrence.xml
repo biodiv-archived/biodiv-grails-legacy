@@ -1,0 +1,16 @@
+    
+<dataConfig>
+    <dataSource type="JdbcDataSource" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost:5432/ibp" user="postgres" password="postgres123" />
+    <document>
+
+<entity name="occurrence" query="select id, species_name from occurrence" transformer="TemplateTransformer">
+
+<field column="layer" template="occurrence" />
+
+<field column="id" name="id" />
+<field column="species_name" name="occurrence_species" />
+
+</entity>
+
+    </document>
+</dataConfig>

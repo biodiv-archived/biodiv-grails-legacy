@@ -88,7 +88,7 @@
 											</div>
 								
 							</div>
-							<div class="span8 observation_story">
+                                                        <div class="observation_story" style="width:660px;float:left;">
 
 								<div
 									class="control-group ${hasErrors(bean: user, field: 'username', 'error')}">
@@ -454,7 +454,7 @@
 			    });
 			    return hbt;	
 			}
-			intializesSeciesHabitatInterest()
+			intializesSpeciesHabitatInterest()
 			<%
 				user.speciesGroups.each {
 					out << "jQuery('#group_${it.id}').addClass('active');";

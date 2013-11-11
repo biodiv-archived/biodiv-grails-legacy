@@ -28,21 +28,8 @@
 .super-section  {
     background-color:white;
 }
-
-.section h6, expertice h6 {
-    border-bottom: 1px solid #CDCDCD;
-    margin-bottom: 5px;
-    padding-botton:3px;
-}
-.map_wrapper {
-padding: 0px;
-border-radius: 0px;
-border-top-left-radius: 0;
-margin-bottom: 0px;
-}
-
-h6 .btn-link, h5 .btn-link {
-    font-size:10px;
+.thumbnail .observation_story {
+    width: 715px;
 }
 </style>
 </head>
@@ -77,23 +64,6 @@ h6 .btn-link, h5 .btn-link {
 					<a
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
-
-					<%--						<div class="prop">--%>
-					<%--							<span class="name">Member since </span> <span class="value">--%>
-					<%--							<sUser:showDate --%>
-					<%--								model="['SUserInstance':user, 'propertyName':'dateCreated']" />--%>
-					<%--							</span>--%>
-					<%--						</div>--%>
-					<%----%>
-					<%----%>
-					<%--						<div class="prop">--%>
-					<%--							<span class="name">Last visited </span> <span class="value">--%>
-					<%--							<sUser:showDate --%>
-					<%--								model="['SUserInstance':user, 'propertyName':'lastLoginDate']" />--%>
-					<%--							</span>--%>
-					<%--						</div>--%>
-					<%--					--%>
-
 					<div class="prop">
 						<span class="name"><i class="icon-time"></i>Member since </span>
 						<div class="value">
@@ -113,11 +83,9 @@ h6 .btn-link, h5 .btn-link {
 						</div>
 					</g:if>
 				</div>
-
-
-
-				
-				<sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+                                <div style="width:660px;float:left;">
+                                    <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+                                </div>
 				
 			</div>
 			<%
@@ -208,7 +176,7 @@ h6 .btn-link, h5 .btn-link {
                                     </h6>
                                     
                                     <obv:showRelatedStory
-                                    model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
+                                    model="['controller':'observation', 'action':'related', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroupInstance':userGroupInstance]" />
                                 </div>
                                 <div id="identifications" class="section" style="clear:both;">
                                     <h6>
@@ -222,7 +190,7 @@ h6 .btn-link, h5 .btn-link {
 
                                     </h6>
                                     <obv:showRelatedStory
-                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
+                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
 
                                 </div>
                                 

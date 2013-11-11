@@ -8,6 +8,8 @@
 <%@ page import="species.CommonNames"%>
 <%@ page import="species.Language"%>
 <%@page import="species.utils.Utils"%>
+<%@page import="species.participation.Featured"%>
+<%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 
@@ -15,7 +17,7 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${speciesInstance.taxonConcept.name}"/>
-<g:set var="description" value="${Utils.stripHTML(speciesInstance.findSummary()?:'')}" />
+<g:set var="description" value="${Utils.stripHTML(speciesInstance.notes()?:'')}" />
 <%
 def r = speciesInstance.mainImage();
 def imagePath = '';
@@ -37,40 +39,42 @@ if(r) {
 
 <style>
 
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
-	width:210px;
-	height:150px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
+    width:210px;
+    height:150px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
-	max-width:210px;
-	max-height:150px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
+    max-width:210px;
+    max-height:150px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
-	max-width:210px;
-	max-height:140px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
+    max-width:210px;
+    max-height:140px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item {
-	width:210px;
-	height:250px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item {
+    width:210px;
+    height:250px;
+    margin-right:3px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
-	width:210px;
-	height:250px;
-}
+    .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
+    width:210px;
+    height:250px;
+    }
 
-.jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-	height:250px;
-}
-
-.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
-	height:75px;
-	padding:16px 0px;
-	background-color : #fff;
-}
+    .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+        height:250px;
+        padding:0px 1px;
+    }
+    
+    .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
+    height:75px;
+    padding:16px 0px;
+    background-color : #fff;
+    }
 
 </style>
 
@@ -152,13 +156,14 @@ $(document).ready(function(){
 		$('.gallery').galleria({
 			height : 400,
 			preload : 1,
-			carousel : true,
+			carousel : false,
+			lightbox:false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
 			dataSelector : ".galleryImage",
                         debug : false,
-                        thumbnails:false,
+                        thumbnails:true,
 			thumbQuality : false,
 			maxScaleRatio : 1,
                         minScaleRatio : 1,
@@ -176,25 +181,33 @@ $(document).ready(function(){
 			dataConfig : function(img) {
 				return {
 					// tell Galleria to grab the content from the .desc div as caption
-					description : $(img).parent().next('.notes').html()
+					description : $(img).parent().next('.notes').html(),
+                                        _biodiv_url:$(img).data('original')
 				};
                         },
                         extend : function(options) {
                             this.bind('image', function(e) {
                                 $(e.imageTarget).click(this.proxy(function() {
-                                        this.openLightbox();
+                                     window.open(Galleria.get(0).getData()._biodiv_url);
+                                    //this.openLightbox();
                                 }));
                             });
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
                             })
+<%--                            this.bind('lightbox_image', function(e){--%>
+<%--                                $(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');--%>
+<%--                            })--%>
+
+
                         }
  
 		});	
                 Galleria.ready(function() {
                     $("#gallerySpinner").hide();
                     $("#resourceTabs").css('visibility', 'visible');
+                    $(".galleria-thumbnails-container").hide();
                 });
 			
 	} else {
@@ -311,9 +324,9 @@ $(document).ready(function(){
         this.bind('image', function(e) {
             // lets make galleria open a lightbox when clicking the main
 			// image:
-            $(e.imageTarget).click(this.proxy(function() {
-               this.openLightbox();
-            }));
+<%--            $(e.imageTarget).click(this.proxy(function() {--%>
+<%--               this.openLightbox();--%>
+<%--            }));--%>
         });
 	});
 
@@ -339,8 +352,7 @@ $(document).ready(function(){
 	} catch(e) {
   		console.log(e)
 	}  	
-
-<%--  	//init editables --%>
+        <%--  	//init editables --%>
 <%--$('.myeditable').editable({--%>
 <%--    url: '/post' //this url will not be used for creating new user, it is only for update--%>
 <%--});--%>
@@ -414,8 +426,13 @@ $(document).ready(function(){
 </head>
 
 <body>
+<g:if test="${speciesInstance}">
+<g:set var="featureCount" value="${speciesInstance.featureCount}"/>
+</g:if>
 
 <div class="span12">
+
+
 			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
 			
 			<g:if test="${!speciesInstance.percentOfInfo}">
@@ -459,8 +476,12 @@ $(document).ready(function(){
 						</ul>
 						<div id="resourceTabs-1">
 	<%--						<a href="#">Contribute Images</a>--%>
-							<div id="gallery1" class="gallery">
-								<g:if test="${speciesInstance.getImages()}">
+                                                        <g:set var="images" value="${speciesInstance.getImages()}"/>
+                                                        <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
+                                                            <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE, images.size()]]]"/>
+                                                        </div>
+                                                        <div id="gallery1" class="gallery">
+                                                                <g:if test="${images}">
 									<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
 								</g:if>
 								<g:else>
@@ -501,7 +522,7 @@ $(document).ready(function(){
                                 <div style="background-color:white">
 				
 				<!-- species page icons -->
-				<div style="padding:5px 0px;">
+				<div style="padding:5px 0px;position:relative;">
 					<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 					<div class="observation-icons">		
 						<img class="group_icon species_group_icon"  
@@ -522,15 +543,16 @@ $(document).ready(function(){
 					</g:each>
 				</div>
                                 <div class="readmore sidebar_section notes_view">
-				    ${speciesInstance.findSummary() }
+				    ${speciesInstance.notes() }
                                 </div>
                             </div>
                         </div>
+                                               
                         <div class="span12" style="margin-left:0px">
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">
-				<div class="sidebar_section" style="clear:both;">
-					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
+                                <div class="sidebar_section" style="clear:both;">
+                                    					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
 						<h5>Taxon Record Name</h5>
 					</a>
 					
@@ -552,7 +574,7 @@ $(document).ready(function(){
 									
 								</g:elseif> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase('year')}">
-									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${(int)Float.parseFloat(it?.description)}</td>
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${it?.description}</td>
 								</g:elseif> 
 								<g:else>
 									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${it?.description}</td>
@@ -560,7 +582,8 @@ $(document).ready(function(){
 							</tr>
 						</g:each>
 						</table>
-					</div>
+                                            </div>
+                                             
 					<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_TAXON_RECORD_NAME, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 				</div>
 				<br/>
@@ -685,7 +708,8 @@ $(document).ready(function(){
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
                             </div-->
-
+			        <uGroup:objectPostToGroupsWrapper 
+				    model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                            <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">

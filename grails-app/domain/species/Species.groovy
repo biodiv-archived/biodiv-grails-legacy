@@ -12,26 +12,31 @@ import species.groups.SpeciesGroup;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 import species.participation.Follow;
+import species.groups.UserGroup;
 import groovy.sql.Sql;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import species.participation.Flag;
+import species.participation.Featured;
 
 class Species implements Rateable {
-
-	String title;  
+	String title; 
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 
-	Date updatedOn;
+    Date updatedOn;
+    int featureCount = 0;
 	Date createdOn = new Date();
 	Date dateCreated;
 	Date lastUpdated;
-	
+	Habitat habitat;
+
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
 	def activityFeedService
+	def speciesService;
 	
 	private static final log = LogFactory.getLog(this);
 	
@@ -43,13 +48,19 @@ class Species implements Rateable {
 		indianDistributionEntities:GeographicEntity, 
 		indianEndemicityEntities:GeographicEntity, 
 		taxonomyRegistry:TaxonomyRegistry, 
-		resources:Resource];
+		resources:Resource,
+		userGroups:UserGroup];
+
+
+	static belongsTo = [UserGroup]
 
 	static constraints = {
 		guid(blank: false, unique: true);
 		reprImage(nullable:true);
 		percentOfInfo(nullable:true);
 		updatedOn(nullable:true);
+        featureCount nullable:false;
+        habitat nullable:true;
 	}
 
 	static mapping = {
@@ -61,18 +72,21 @@ class Species implements Rateable {
 		if(!reprImage) {
 			def images = this.getImages();
 			this.reprImage = images ? images[0]:null;
+            println images
 			if(reprImage) {
+                println reprImage
 				log.debug " Saving representative image for species ===  $reprImage.fileName" ;
-				if(!this.save(flush:true)) {
-					this.errors.each { log.error it }
-				}
+                if(!this.save(flush:true)) {
+                    this.errors.each { log.error it }
+                }
 			}			
 		}
-		
-		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
-			return reprImage;
+		if(reprImage) {
+            if(new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists()) {
+			    return reprImage;
+            }
 		} else {
-			return null;
+			return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
 		}
 	}
 
@@ -96,17 +110,28 @@ class Species implements Rateable {
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+            results.collect {  r -> 
+                instances.find { i -> (r[0] == i.id) } 
+            } 
         } else {
             []
         }
     }
 
+    List fetchAllFlags(){
+		return Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+	}
+
+    String fetchSpeciesCall(){
+		return this.title;
+	}
+
+
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
 		resources.each {
 			if(it?.type == species.Resource.ResourceType.ICON) {
-				icons.add(it);
+                icons.add(it);
 			}
 		}
 		return icons;
@@ -122,7 +147,8 @@ class Species implements Rateable {
 		return res;
 	}
 	
-	String findSummary() {
+
+	String notes() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
 			field.concept.equalsIgnoreCase(fieldsConfig.OVERVIEW) && field.category.equalsIgnoreCase(fieldsConfig.SUMMARY)
@@ -135,12 +161,17 @@ class Species implements Rateable {
 		}
 		return f?.description;
 	}
-	
+
+    String summary() {
+        return "";
+    }
+
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
-	}
-	
-	//TODO:remove this function after getting icons for all groups
+	}	
+
+    
+    //TODO:remove this function after getting icons for all groups
 	Resource fetchSpeciesGroupIcon(ImageType type) {
 		SpeciesGroup group = fetchSpeciesGroup();
 		return group.icon(type);
@@ -180,4 +211,11 @@ class Species implements Rateable {
 		activityFeedService.deleteFeed(this)
 	}
 	
+	def fetchList(params, action){
+		return speciesService.getSpeciesList(params, action)
+	}
+	
+    List featuredNotes() {
+        return Featured.featuredNotes(this);
+    }
 }

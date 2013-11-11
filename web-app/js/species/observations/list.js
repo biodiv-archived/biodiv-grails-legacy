@@ -168,17 +168,17 @@ $(document).ready(function(){
         if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
             return true;
         }
-    $('.sort_filter_label.active').removeClass('active');
-    $(this).addClass('active');
-    $("#selected_sort").html($(this).html() + caret);
-    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    return true;   
+	    $('.sort_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#selected_sort").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
     });
 
-    $(".paginateButtons a").click(function() {
+    $(".paginateButtons a").live('click', function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
-        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, false);
+        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
         return false;
     });
     
@@ -195,6 +195,9 @@ $(document).ready(function(){
 //		return false;
 //   });
 
+    $(".resource_in_groups li:has('.featured')").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                });
     $("#removeTagFilter").live('click', function(){
         var oldActiveTag = $("li.tagit-choice.active");
         if(oldActiveTag){
@@ -213,6 +216,15 @@ $(document).ready(function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
         return false;
     });
+    $('#action-tabs a').click(function (e) {
+        var tab = $(this);
+        if(tab.parent('li').hasClass('active')){
+            window.setTimeout(function(){
+                $("#action-tab-content .tab-pane").removeClass('active');
+                tab.parent('li').removeClass('active');
+                },1);
+        }
+    });
 
     $("#removeObvFilter").live('click', function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);
@@ -226,7 +238,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $("#removeQueryFilter").live('click', function(){
+    $(".removeQueryFilter").live('click', function(){
         var removeParam = undefined;
         if($($(this).attr('data-target').replace('.','\\.')).length != 0)
         $($(this).attr('data-target').replace('.','\\.')).val('')
@@ -245,7 +257,7 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    $('.list_view_bttn').live('click', function() {
+/*    $('.list_view_bttn').live('click', function() {
         $('.grid_view').hide();
         $('.list_view').show();
         $(this).addClass('active');
@@ -261,8 +273,11 @@ $(document).ready(function(){
         $('.list_view_bttn').removeClass('active');
         $.cookie("listing", "grid", {path    : '/'});
     });
+*/    
+    $("#distinctRecoTableAction").click(loadDistinctRecoList);
 
     $('.loadMore').live('click', function() {
+        console.log('loadmore');
         $.autopager({
 
             autoLoad : false,
@@ -294,28 +309,27 @@ $(document).ready(function(){
                     $(".loadMore .progress").hide();
                     $(".loadMore .buttonTitle").show();
                 }
-                if ($('.grid_view_bttn.active')[0]) {
+/*                if ($('.grid_view_bttn.active')[0]) {
                     $('.grid_view').show();
                     $('.list_view').hide();
                 } else {
                     $('.grid_view').hide();
                     $('.list_view').show();
                 }
-
+*/
                 var a = $('<a href="'+current.url+'"></a>');
                 var url = a.url();
                 var params = url.param();
                 delete params["append"]
-                    delete params["loadMore"]
-                    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
+                delete params["loadMore"]
+                params['max'] = parseInt(params['offset'])+parseInt(params['max']);
                 params['offset'] = 0
-                    var History = window.History;
+                var History = window.History;
                 History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
-                $('.observations_list_wrapper').trigger('updatedGallery');
-
+                //$('.list').trigger('updatedGallery');
             }
         });
 
@@ -325,16 +339,11 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
-    $('.observations_list_wrapper').trigger('updatedGallery');
+    $('.list').trigger('updatedGallery');
 });
 
-if (typeof String.prototype.startsWith != 'function') {
-    // see below for better implementation!
-    String.prototype.startsWith = function (str){
-        return this.indexOf(str) == 0;
-    };
-}
-
+/**
+ */
 function eatCookies() {	
     var hashString = window.location.hash.substring(1)
         if ($.cookie("listing") == "list") {
@@ -345,11 +354,11 @@ function eatCookies() {
                     window.location.hash = "l"+hashString;
                 }
             }
-            $('.list_view').show();
+/*            $('.list_view').show();
             $('.grid_view').hide();
             $('.grid_view_bttn').removeClass('active');
             $('.list_view_bttn').addClass('active');
-        } else {
+*/        } else {
             if(!hashString.startsWith('g')) {
                 if(hashString.startsWith('l')) {
                     window.location.hash = "g"+hashString.substring(1);
@@ -357,16 +366,12 @@ function eatCookies() {
                     window.location.hash = "g"+hashString;
                 }
             }
-            $('.grid_view').show();
+/*            $('.grid_view').show();
             $('.list_view').not('.single_list_view').hide();
             $('.grid_view_bttn').addClass('active');
             $('.list_view_bttn').removeClass('active');
-        }
+*/        }
     adjustHeight();
-}
-
-function stringTrim(s){
-    return $.trim(s);
 }
 
 function getSelectedGroup() {
@@ -391,6 +396,61 @@ function getSelectedHabitat() {
     hbt = hbt.replace(/\s*\,\s*$/,'');
     return hbt;	
 } 
+
+function selectTickUserGroupsSignature(parentGroupId) {
+    $(".userGroups button").click(function(e){
+		if($(this).hasClass('active')) {
+		    //trying to unselect group
+			//if on obv create page	and one group is coming as parent group		
+			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+			    //this group is parent group
+				if($(this).hasClass('create') && parentGroupId != '' && $(this).hasClass("'"+parentGroupId+"'")){
+					alert("Can't unselect parent group");
+				}else{
+					//un selecting other group
+					$(this).removeClass('btn-success');
+					$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+				}	
+			}else{
+                $(this).removeClass('btn-success');
+				$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+				if($(this).hasClass("single-post")) {
+					$("#groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
+					$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+				} else {
+					if($("#groupsWithSharingAllowed button.active").length == 0) {
+						$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+					}
+				}
+			}
+		} else {
+            //trying to select new group
+			//if on obv create page and one group is coming as parent group
+			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+			    //either current one belongs to exclusive group or parent group is exclusive group
+			 	if($(this).hasClass("single-post") ||($("#groupsWithSharingNotAllowed button.create").length > 0)){
+					alert("Can't select this group because it will unselect parent group");
+				}else{
+					//parent group is multipost one and this new group is also belong to multi select so selecting it
+					$(this).removeClass('disabled').addClass('btn-success');
+					$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+				}
+			}else{
+                //on obv edit page
+				if($(this).hasClass("single-post")) {
+					$("#groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$(this).removeClass('disabled').addClass('btn-success');
+				} else {
+					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$(this).removeClass('disabled').addClass('btn-success');
+				}
+				$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+			}
+		}
+		e.preventDefault();
+	});
+}
 
 function getSelectedSortBy() {
     var sortBy = ''; 
@@ -620,17 +680,18 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
-        //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
+        //$('.observation_location').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
+        reInitializeGroupPost();
         updateRelativeTime();
         last_actions();
         eatCookies();			
-        $('.observations_list_wrapper').trigger('updatedGallery');
+        $('.list').trigger('updatedGallery');
     }
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
     if(target === undefined) {
         target = window.location.pathname + window.location.search;
     }
@@ -639,10 +700,22 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var url = a.url();
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
-    // alert(" tag in params " + params['tag'] );
+    params['href'] = href;
+    params['base'] = url.attr('base');
+    return params;
+}
+
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+    
+    var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
+
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
+    var href = params.href;
+    var base = params.base;
+    delete params["href"]
+    delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
     
     var doc_url = href+'?'+recursiveDecoded;
@@ -674,7 +747,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
             updateMapView(params);
         }
     } else {
-        window.location = url.attr('base')+doc_url;
+        window.location = base+doc_url;
     }
 }
  
@@ -723,55 +796,8 @@ function refreshMapBounds() {
 }
 
 function showMapView() {
-    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+    updateMapView(getUpdateGalleryParams(undefined, undefined, 0, undefined, window.params.isGalleryUpdate));
 }
-
- 
-function refreshMarkers(p) {
-    if(!p) p = new Array()
-
-    p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
-    p['max'] = -1;
-    delete p['bounds']
-    
-    var url = window.params.observation.listUrl+'?'+decodeURIComponent($.param(p));
-
-    if(markers)
-        markers.clearLayers();
-    else 
-        markers = new M.MarkerClusterGroup({maxClusterRadius:50});
-
-    $.ajax({
-        url: url,
-        dataType: "json",
-        success: function(data) {
-            for(var i=0; i<data.observationInstanceList.length; i++) {
-                var obv = data.observationInstanceList[i];
-                var latitude = obv[1];
-            	var longitude = obv[2];
-            	var icon;
-                
-                if(obv[4]){
-                	icon = obv[3]?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
-                	latitude += data.geoPrivacyAdjust;
-                	longitude += data.geoPrivacyAdjust;
-                }else{
-                	icon = obv[3]?checklistIcon:pointIcon;
-                }
-                var marker = createMarker(latitude, longitude, {
-                    draggable: false,
-                    clusterable: true,
-                    icon:icon,
-                    clickable:load_content,
-                    data:{id:obv[0]}
-                });
-                if(marker) markers.addLayer(marker);
-            }
-            markers.addTo(map);
-        }
-    });
-}
-
 
 function refreshList(bounds){
     if (bounds !== undefined){
@@ -797,35 +823,13 @@ function mapViewSlideToggleHandler() {
     }
 }
 
-/*                        function getRandomNumber(){
-                          return ((Math.random() -.5) / 200);
-                          }
-
-                          function jitterCloseMarker(big_map){
-                          var zoomLevel = big_map.getZoom();
-                          if(zoomLevel >= 13){
-                          var markerKeys = [];
-                          var mapBounds = big_map.getBounds()
-                          for (var i = 0; i < markers.length; i++) {
-                          var pos = markers[i].getPosition();
-                          if(mapBounds.contains(pos)){
-                          if($.inArray(pos.toString(), markerKeys) != -1){
-                          markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
-                          }else{
-                          markerKeys.push(pos.toString());
-                          }
-                          }
-                          }
-                          }
-                          }  
-
-
-                          google.maps.event.addListener(big_map, 'zoom_changed', function() {
-                          jitterCloseMarker(big_map);
-
-                          });
-                          var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
-                          */                       
+function updateDistinctRecoTable(){
+	$('#distinctRecoTable tbody').empty();
+	var me = $('#distinctRecoTableAction');
+	$(me).show();
+	$(me).data('offset', 0);
+	$(me).click();
+}
 
 function load_content(params){
     var marker = this
@@ -836,29 +840,6 @@ function load_content(params){
         }
     });
 }
-/*
-
-   google.maps.event.addListener(big_map, 'dragend', function() { checkBounds(); });
-
-   function checkBounds() {
-   if (allowedBounds.contains(big_map.getCenter())) return;
-
-   var c = big_map.getCenter(),
-   x = c.lng(),
-   y = c.lat(),
-   maxX = allowedBounds.getNorthEast().lng(),
-   maxY = allowedBounds.getNorthEast().lat(),
-   minX = allowedBounds.getSouthWest().lng(),
-   minY = allowedBounds.getSouthWest().lat();
-
-   if (x < minX) x = minX;
-   if (x > maxX) x = maxX;
-   if (y < minY) y = minY;
-   if (y > maxY) y = maxY;
-
-   big_map.setCenter(new google.maps.LatLng(y, x));
-   }
-   */
 
 function speciesHabitatInterestHandler(event){
     if(!event.data.multiSelect) 
@@ -897,5 +878,86 @@ function updateDownloadBox(instanceTotal){
 //})/
 
 $(document).ready(function(){
+    $(".snippet.tablet .figure").hover(function() {
+        $(this).children('.mouseover').toggle('slow')
+    });
 });
+
+function loadDistinctRecoList() {
+    var $me = $(this);
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    params['max'] = $(this).data('max');
+    params['offset'] = $(this).data('offset');
+    var $distinctRecoTable = $('#distinctRecoTable');
+    $.ajax({
+        url:window.params.observation.distinctRecoListUrl,
+        dataType: "json",
+        data:params,
+        success: function(data) {
+            $('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
+            if(data.status === 'success') {
+                $.each(data.distinctRecoList, function(index, item) {
+                    if(item[1])
+                    $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
+                    else
+                    $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
+                });
+                $me.data('offset', data.next);
+                if(!data.next){
+                    $me.hide();
+                }
+            } else {
+                $me.hide();
+            }
+        }
+    });
+}
+
+function loadSpeciesGroupCount() {
+    var $me = $(this);
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    $.ajax({
+        url:window.params.observation.speciesGroupCountListUrl,
+        dataType: "json",
+        data:params,
+        success: function(data) {
+            if(data.status === 'success') {
+                if(data.speciesGroupCountList) {
+                    loadGoogleVisualizationAPI(function(){
+                        var visualization_data = new google.visualization.DataTable();
+                        $.each(data.speciesGroupCountList.columns, function(index, item) {
+                            visualization_data.addColumn( item[0], item[1]);
+                        });
+
+                        $.each(data.speciesGroupCountList.data, function(index, item) {
+                            visualization_data.addRow(item);
+                        });
+
+                        var columnChart = new google.visualization.ColumnChart(
+                            document.getElementById('speciesGroupCountList'));
+
+                        columnChart.draw(visualization_data,  {
+                            title:"No of observations per species group",
+                            vAxis:{minValue:0, maxValue:5, format: '#'},
+                            legend:{position: 'bottom'},
+                            chartArea:{width:'80%'}
+                        });
+                    })
+                } else {
+                    $("#speciesGroupCountList").html('<div id="relatedObservationMsg_a" class="alert alert-info" style="">No data!!</div>');
+                }
+            } else {
+                $("#speciesGroupCountList").html('<div class="alert alert-error">'+data.msg+'</div>');
+            }
+        }
+    });
+}
     

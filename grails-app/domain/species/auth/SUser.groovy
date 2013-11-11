@@ -9,13 +9,15 @@ import species.Resource.ResourceType;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.participation.Observation;
-import species.participation.ObservationFlag;
+import species.participation.Flag;
 import species.participation.RecommendationVote;
 import species.participation.curation.UnCuratedVotes;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.ImageType;
 import species.Habitat;
 import species.groups.SpeciesGroup;
 import content.eml.Document
+import species.utils.ImageUtils;
 
 class SUser {
 
@@ -47,7 +49,7 @@ class SUser {
 	boolean allowIdentifactionMail = true;
 
 
-	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
+	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 
@@ -125,7 +127,8 @@ class SUser {
 	def profilePicture(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.users.rootDir.toString()+this.icon)).exists()
 		if(iconPresent) {
-			return grailsApplication.config.speciesPortal.users.serverURL+this.icon //, type:ResourceType.ICON, title:this.name);
+			def thumbnailUrl =  grailsApplication.config.speciesPortal.users.serverURL + "/" + ImageUtils.getFileName(this.icon, type, null)
+			return thumbnailUrl;
 		}
 
 
@@ -136,21 +139,33 @@ class SUser {
 		def baseUrl = grailsApplication.config.speciesPortal.resources.serverURL;
 		switch(type) {
 			case ImageType.NORMAL :
-				case ImageType.LARGE : return baseUrl+"/users/user_large.png"
-			case ImageType.SMALL : return baseUrl+"/users/user.png"
-			case ImageType.VERY_SMALL : return baseUrl+"/users/user_small.png"
+				case ImageType.LARGE : return baseUrl+"/user_large.png"
+			case ImageType.SMALL : return baseUrl+"/user.png"
+			case ImageType.VERY_SMALL : return baseUrl+"/user_small.png"
 		}
 	}
 
-	Set<UserGroup> getUserGroups() {
+	Set<UserGroup> getUserGroups(onlyExpertGroups=false) {
 		def orderedByName = [
 			compare:{ a,b ->
 				a.name<=>b.name }
 		] as Comparator
 
 		def userGroups = new TreeSet(orderedByName)
-
-		def uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
+		def uGroups
+		if(onlyExpertGroups){
+			uGroups = UserGroupMemberRole.createCriteria().list{
+				and{
+					eq('sUser', this)
+					or{
+						eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()))
+						eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()))
+					}
+				}
+			}.collect {it.userGroup}
+		}else{
+			uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
+		}
 		uGroups.each {
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
 				userGroups.add(it)
@@ -162,6 +177,18 @@ class SUser {
 
 	boolean isUserGroupMember(UserGroup userGroup) {
 		return UserGroupMemberRole.countBySUserAndUserGroup(this, userGroup) ?: 0
+	}
+	
+	boolean fetchIsFounderOrExpert(){
+		return UserGroupMemberRole.createCriteria().count {
+			and{
+				eq('sUser', this)
+				or{
+					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()))
+					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()))
+				}
+			}
+		} > 0
 	}
 
 	@Override

@@ -11,6 +11,10 @@
 .comment-textbox {
 	width: 100%;
 }
+.thumbnail .observation_story {
+width:715px;
+}
+
 </style>
 </head>
 <body>

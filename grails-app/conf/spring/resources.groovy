@@ -1,4 +1,4 @@
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationFailureHandler;
 import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccessHandler;
 import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
@@ -53,19 +53,21 @@ beans = {
     if (Environment.current == Environment.DEVELOPMENT) {
         // In development we use messageLocalService as implementation
         // of MessageService.
-        File home = new File("${configRoot.speciesPortal.app.rootDir}/solr" );
-        File f = new File( home, "solr.xml" );
-        CoreContainer container = new CoreContainer();
-        container.load( "${configRoot.speciesPortal.app.rootDir}/solr", f );
+	//File home = new File("${configRoot.speciesPortal.app.rootDir}/solr" );
+        //File f = new File( home, "solr.xml" );
+        CoreContainer container = new CoreContainer("${configRoot.speciesPortal.app.rootDir}/solr");
+        container.load() 
 
         speciesSolrServer(EmbeddedSolrServer, container, "species" )
         observationsSolrServer(EmbeddedSolrServer, container, "observations" );
         newsletterSolrServer(EmbeddedSolrServer, container, "newsletters" );
         projectSolrServer(EmbeddedSolrServer, container, "projects" );
-        checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
+        //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
         documentSolrServer(EmbeddedSolrServer, container, "documents" );
+        usersSolrServer(EmbeddedSolrServer, container, "users" );
+
     } else {
-        speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
+        speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -77,7 +79,7 @@ beans = {
             log.debug "Initialized search server to "+config.serverURL+"/species"
         }
 
-        observationsSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
+        observationsSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -89,7 +91,7 @@ beans = {
             log.debug "Initialized search server to "+config.serverURL+"/observations"
         }
 
-        newsletterSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
+        newsletterSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -101,7 +103,7 @@ beans = {
             log.debug "Initialized search server to "+config.serverURL+"/newsletters"
         }
 
-        checklistSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
+        /*checklistSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -111,9 +113,9 @@ beans = {
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
             log.debug "Initialized search server to "+config.serverURL+"/checklists"
-        }
+        }*/
 
-        projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
+        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -125,7 +127,7 @@ beans = {
             log.debug "Initialized search server to "+config.serverURL+"/projects"
         }
 
-        documentSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
+        documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -136,6 +138,18 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             log.debug "Initialized search server to "+config.serverURL+"/documents"
          }
+        
+	usersSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/users", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/users"
+         }
     }//end of initializing solr Server
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
@@ -144,20 +158,21 @@ beans = {
     observationsSearchService(speciespage.search.ObservationsSearchService) {
         solrServer = ref('observationsSolrServer');
     }
-    checklistSearchService(speciespage.search.ChecklistSearchService) {
-        solrServer = ref('checklistSolrServer');
-    }
+    //checklistSearchService(speciespage.search.ChecklistSearchService) {
+    //    solrServer = ref('checklistSolrServer');
+    //}
     newsletterSearchService(speciespage.search.NewsletterSearchService) {
         solrServer = ref('newsletterSolrServer');
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
         solrServer = ref('projectSolrServer');
     }
-
     documentSearchService(speciespage.search.DocumentSearchService) {
         solrServer = ref('documentSolrServer');
     }
-
+    SUserSearchService(speciespage.search.SUserSearchService) {
+        solrServer = ref('usersSolrServer');
+    }
 
     preAuthenticationChecks(DefaultPreAuthenticationChecks)
     postAuthenticationChecks(DefaultPostAuthenticationChecks)

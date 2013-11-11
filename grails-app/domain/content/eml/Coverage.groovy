@@ -2,6 +2,7 @@ package content.eml
 
 import species.groups.SpeciesGroup
 import species.Habitat
+import speciespage.ObservationService
 
 import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
@@ -17,12 +18,14 @@ class Coverage {
 	
 	String placeName;
 	String reverseGeocodedName
-	//String location;
-	float latitude;
-	float longitude;
+	
+	
 	boolean geoPrivacy = false;
 	String locationAccuracy;
     Geometry topology;
+	
+	float latitude;
+	float longitude;
 
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat]
 	
@@ -35,6 +38,9 @@ class Coverage {
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
 		topology(nullable: true)
+//		topology validator : { val, obj ->
+//			return ObservationService.validateLocation(val, obj)
+//		}
     }
 	
     static mapping = {

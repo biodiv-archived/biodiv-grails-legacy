@@ -2,6 +2,7 @@
 //adhoc.patterns.excludes = ["*.css"]
 //mappers.hashandcache.excludes = ["**/*.css"]
 //
+
 modules = {
 	overrides {
 		jquery { 
@@ -42,7 +43,9 @@ modules = {
 		resource url:'/css/habitats.css'
 		resource url:'/css/tableSorter.css'
 		resource url:'/css/bootstrap-editable.css'
-		resource url:'/css/wgp.css'
+		resource url:'/css/biodiv.css'
+		resource url:"/css/${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.app.siteCode}.css"
+
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
@@ -70,6 +73,9 @@ modules = {
 		resource url:'/js/stats.js'
 		resource url:'/js/jquery.tablesorter.js'
 		resource url:'/js/bootstrap-editable.min.js'
+		resource url:'/js/species/posting.js'
+        resource url:'/js/feature.js'
+        resource url:'/js/flag.js'
 	}
 
 	auth {
@@ -114,13 +120,14 @@ modules = {
 		resource url:'/js/jsrender.js'
 		//resource url:'/js/bootstrap-typeahead.js'
 		resource url:'/js/bootstrap-combobox.js'
+		resource url:'/js/species/observations/map.js'
 	}
 
 	observations_show {
 		dependsOn 'observations, gallery, carousel, comment, activityfeed'
 
-		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
+		resource url:'/js/jquery/jquery.sparkline.min.js'
 	} 
 
 	observations_create {
@@ -133,7 +140,7 @@ modules = {
 	}
 
 	observations_list { 
-		dependsOn 'observations, list_utils, comment'
+		dependsOn 'observations, list_utils, comment, activityfeed'
 		
         resource url:'/js/species/observations/list.js'
 	}
@@ -153,7 +160,7 @@ modules = {
 
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
-		resource url:'/css/wgp.css'
+		resource url:'/css/biodiv.css'
 
 		resource url:'/js/species/species.js'
 
@@ -254,6 +261,7 @@ modules = {
 		resource url:'/js/species/checklist.js'
 		resource url:'/js/bootstrap-rowlink.min.js'
 		resource url:'/js/location/location-picker.js'
+		resource url:'/js/species/observations/map.js'
 	}
 	
     checklist_list {
@@ -261,7 +269,6 @@ modules = {
 
 		resource url:'/js/species/observations/list.js'
     }
-
 
 	checklist_create {
 		dependsOn 'observations_create, checklist, slickgrid, add_file'

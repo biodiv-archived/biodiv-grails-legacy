@@ -446,11 +446,12 @@ img {
 	line-height: 1.5;
 }
 
+/*
 .heading {
 	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
 	padding: 3px;
 	border-bottom: 3px solid #A9DA92;
-}
+}*/
 
 .resources .addedResource {
 	width: 220px;
@@ -1124,10 +1125,6 @@ ul.thumbwrap .license_options li:hover {
 	color: #ffffff;
 	font-size: 1.5em;
 	font-weight: bold;
-}
-
-.observation_links {
-	padding: 10px;
 }
 
 .info-message {

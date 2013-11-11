@@ -9,6 +9,7 @@ import java.util.Map
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
+import org.apache.solr.common.SolrException
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
@@ -20,21 +21,11 @@ import species.NamesParser
 import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
-class SpeciesSearchService {
-
-	static transactional = false
-
-	def grailsApplication
+class SpeciesSearchService extends AbstractSearchService {
 	
-	SolrServer solrServer;
-	
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	
-	static int BATCH_SIZE = 50;
-	
-	def sessionFactory;
+	int BATCH_SIZE = 20;
 
 	/**
 	 * 
@@ -60,31 +51,16 @@ class SpeciesSearchService {
 	
 	@Transactional(readOnly = true)
 	def listSpecies(id, params) {
-			return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
+			//return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
+			return Species.findAllByIdGreaterThan(id, params);
 	}
-
-	private void cleanUpGorm() {
-
-		def hibSession = sessionFactory?.getCurrentSession();
-
-		if(hibSession) {
-			log.debug "Flushing and clearing session"
-			try {
-				hibSession.flush()
-			} catch(ConstraintViolationException e) {
-				e.printStackTrace()
-			}
-			hibSession.clear()
-		}
-	}
-
 
 	/**
 	 * 
 	 * @param species
 	 * @return
 	 */
-	def publishSearchIndex(List<Species> species) {
+	def publishSearchIndex(List<Species> species, boolean commit=true) {
 		if(!species) return;
 		log.info "Initializing publishing to search index for species : "+species.size();
 
@@ -182,19 +158,7 @@ class SpeciesSearchService {
 
 		//log.debug docs;
 
-		try {
-			solrServer.add(docs);
-			//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-            if(solrServer instanceof StreamingUpdateSolrServer) {
-    			solrServer.blockUntilFinished();
-            }
-			solrServer.commit();
-			log.info "Finished committing to solr species core"
-		} catch(SolrServerException e) {
-			e.printStackTrace();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+        return commitDocs(docs, commit);
 	}
 
 	/**
@@ -237,52 +201,4 @@ class SpeciesSearchService {
 		return parsedNamesMap;
 	}
 
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	def search(query) {
-		def params = SolrParams.toSolrParams(query);
-		log.info "Running search query : "+params
-		return solrServer.query( params );
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	def deleteIndex() {
-		log.info "Deleting search index"
-		solrServer.deleteByQuery("*:*")
-		solrServer.commit();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	def optimize() {
-		log.info "Optimizing search index"
-		solrServer.optimize();
-	}
-
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	def terms(query, field, limit) {
-		field = field?:"autocomplete";
-		SolrParams q = new SolrQuery().setQueryType("/terms")
-				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
-				.set(TermsParams.TERMS_LOWER, query)
-				.set(TermsParams.TERMS_LOWER_INCLUSIVE, true)
-				.set(TermsParams.TERMS_REGEXP_STR, query+".*")
-				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
-				.set(TermsParams.TERMS_LIMIT, limit)
-				.set(TermsParams.TERMS_RAW, true);
-		log.info "Running species search query : "+q
-		return solrServer.query( q );
-	}
 }

@@ -3,6 +3,8 @@ package species
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
+import content.eml.Document;
+
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.RatingException;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
@@ -33,16 +35,11 @@ class ObservationTagLib {
 	}
 
     def showSnippetTablet = {attrs, body->
-		if(attrs.model.observationInstance) {
-			out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
-		}
+		out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
 	}
-
 	
-	def showStory = {attrs, body->
-		if(attrs.model.observationInstance) {
-			out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
-		}
+	def showStory = { attrs, body ->
+		out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
 	}
 	
 	def addFlag= {attrs, body->
@@ -64,13 +61,13 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
+        println attrs.model;
 			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	
 	def showGroupFilter = {attrs, body->
 			out << render(template:"/common/speciesGroupFilterTemplate", model:attrs.model);
 	}
-	
 	
 	def showRating = {attrs, body->
 		if(attrs.model.observationInstance) {
@@ -221,6 +218,10 @@ class ObservationTagLib {
 	}
 	
 	def showMapInput = {attrs, body->
+		def model = attrs.model
+		model.sourceInstance = model.sourceInstance ?: model.observationInstance
+		model.placeNameField = (model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
+		model.topologyNameField = (model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
 		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	
@@ -319,6 +320,18 @@ class ObservationTagLib {
 
         """
         
+    }
+
+    def featured = { attrs, body ->
+        if(attrs.model) {
+            def p = [limit:1, offset:0, filterProperty:'featureBy', controller:attrs.model.controller, userGroup:attrs.model.userGroupInstance]
+            def related = observationService.getRelatedObservations(p)?.relatedObv
+            if(related) {
+                attrs.model['relatedInstanceList'] = related.observations;
+                attrs.model['relatedInstanceListTotal'] = related.count;
+            }
+        }
+           out << obv.showRelatedStory(attrs, body);
     }
 }
 

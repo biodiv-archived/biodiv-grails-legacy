@@ -72,32 +72,31 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             if(newColumnName == null||$.trim(newColumnName)==''){
                 return;
             }
-
+            newColumnName = $.trim(newColumnName);
             var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
+            if(newColumn) return;
+            else {
+                options = $.extend({}, {
+                    id:newColumnName,
+                    name:newColumnName,
+                    field:newColumnName,
+                    editor: Slick.Editors.Text,
+                    header:getHeaderMenuOptions()
+                }, options);
 
-                if(newColumn) return newColumn;
+                newColumn = options;
+
+                if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
+                    columns.splice(position, 0 , newColumn);
                 else {
-                    options = $.extend({}, {
-                        id:newColumnName,
-                        name:newColumnName,
-                        field:newColumnName,
-                        editor: Slick.Editors.Text,
-                        header:getHeaderMenuOptions()
-                    }, options);
-
-                    newColumn = options;
-
-                    if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
-                        columns.splice(position, 0 , newColumn);
-                    else {
-                        newColumn = [newColumn]
-                            $.merge(columns,newColumn);
-                    }
-
-                    grid.setColumns(columns);
-                    grid.render();
-                    return newColumn;
+                    newColumn = [newColumn]
+                        $.merge(columns,newColumn);
                 }
+
+                grid.setColumns(columns);
+                grid.render();
+                return newColumn;
+            }
         };
 
 
@@ -488,14 +487,6 @@ $(document).ready(function(){
     });
 
     $(".tagit-hiddenSelect").css('display','none');
-
-    function getSelectedUserGroups() {
-        var userGroups = []; 
-        $('.userGroups button[class~="btn-success"]').each (function() {
-            userGroups.push($(this).attr('value'));
-        });
-        return userGroups;	
-    }
 
     $('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
         var previousValue = $(this).attr('previousValue');

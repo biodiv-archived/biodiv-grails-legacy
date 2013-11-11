@@ -12,6 +12,15 @@
 .thumbnail {
 	margin: 0 25px;
 }
+.list_view .observervation_story {
+    width:784px;
+}
+.observations_list{
+    top:0px;
+}
+
+
+
 </style>
 </head>
 <body>
@@ -33,7 +42,10 @@
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
 							Founders (${foundersTotalCount})</a></li>
-					
+							
+					<li class="${(params.action == 'experts')?'active':'' }"><a
+						href="${uGroup.createLink(mapping:'userGroup', action:'moderators', 'userGroup':userGroupInstance)}">
+							Moderators (${expertsTotalCount})</a></li>
 				</ul>
 
 
@@ -45,7 +57,7 @@
 					</div>
 				</g:if>
 
-				<g:elseif test="${params.action == 'experts' }">
+				<g:elseif test="${params.action == 'experts' || params.action == 'moderators'}">
 					<div class="tab-pane" id="experts">
 						<sUser:showUserListWrapper
 							model="['results':userInstanceList, 'instanceTotal':expertsTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />

@@ -2,21 +2,29 @@ package content.eml
 
 import java.util.Date;
 
+import species.Resource;
 import species.License;
+import species.Metadata
 import species.auth.SUser;
 import species.groups.UserGroup;
+import species.groups.SpeciesGroup;
+import species.Habitat;
 import org.grails.taggable.Taggable;
 import org.grails.rateable.*
+import species.participation.Flag;
+import species.participation.Follow;
+import species.participation.Featured;
+
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html
  *
  */
-class Document implements Taggable, Rateable {
+class Document extends Metadata implements Taggable, Rateable {
 	
-	def grailsApplication
-	def activityFeedService
+	def springSecurityService;
+	def documentService
 	
 	public enum DocumentType {
 		Report("Report"),
@@ -37,32 +45,30 @@ class Document implements Taggable, Rateable {
 	}
 
 	DocumentType type
-
-
+    int flagCount = 0;
+    int featureCount = 0;
 	String title
 	SUser author;
 	
 	UFile uFile   //covers physical file formats
-	
 	String uri
 	
-	String description
+	String notes // <=== description
 	String contributors;
 	String attribution;
 	
 	License license
+	String doi
 	
-
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
 
-	Coverage coverage 	//Coverage Information
-
-	String doi
+	//XXX uncmment it before migration
+	//Coverage coverage //<== extending metadata now	//Coverage Information
 	
-	Date dateCreated
-	Date lastUpdated
+	//Date createdOn  <=== dateCreated
+	//Date lastRevised <=== lastUpdated
 	
 	boolean deleted
 	
@@ -70,7 +76,7 @@ class Document implements Taggable, Rateable {
 	
 	static transients = [ 'deleted' ]
 
-
+	
 	static constraints = {
 		title nullable:false, blank:false
 		uFile validator : {val, obj -> 
@@ -81,29 +87,46 @@ class Document implements Taggable, Rateable {
 			val || obj.uFile
 		},nullable:true
 		contributors nullable:true
-		attribution nullable:true	
+		attribution  nullable:true	
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
 		author nullable:true
-		coverage nullable:true	
-		description nullable:true
+		notes nullable:true
 		doi nullable:true
 		license nullable:true
-		
+    	featureCount nullable:false
 		agreeTerms nullable:true
 		
+		//coverage related extended from metadata
+		placeName(nullable:true)
+		reverseGeocodedName(nullable:true)
+		fromDate(nullable: true)
+		group nullable:true
+		habitat nullable:true
 	}
 	
-	static hasMany =[userGroups:UserGroup]
-	
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup]
 	static belongsTo = [SUser, UserGroup]
 	
-	
 	static mapping = {
-		description type:"text"
+		notes type:"text"
+		attribution type:"text"
 	}
-	
-	
+
+     List fetchAllFlags(){
+        def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+        return fList;
+	}
+
+    def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
+		return Follow.fetchIsFollowing(this, user)
+	}
+
+    String fetchSpeciesCall(){
+		return this.title;
+	}
+
+
 	def getOwner() {
 		return author;
 	}
@@ -126,5 +149,29 @@ class Document implements Taggable, Rateable {
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
+
+    String notes() {
+        return this.notes;
+    }
+    
+    Resource mainImage() {  
+		String reprImage = "Document.png"
+	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
+        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
+ 	}
+
+	def beforeUpdate(){
+		if(isDirty() && isDirty('topology')){
+			updateLatLong()
+		}
+	}
 	
+	def beforeInsert(){
+		updateLatLong()
+	}
+	
+	def fetchList(params, max, offset){
+		return documentService.getFilteredDocuments(params, max, offset)
+	}
+
 }

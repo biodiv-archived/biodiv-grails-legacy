@@ -108,24 +108,21 @@ class Utils {
 	 * if more than 4 chars then return a string starting with _
 	 */
 	
-	private static getCleanFileExtension(String fileName){
+	public static getCleanFileExtension(String fileName){
 		String extension = ""
 		fileName = fileName?.trim()
 		if(!fileName || fileName == "")
 			return extension
 		
 		int beginIndex = fileName.lastIndexOf(".")
-		extension = (beginIndex > -1) ? fileName.substring(beginIndex) : ""
-		if(extension.size() > 5 || extension.size() == 1){
-			extension =  extension.replace(".", "_")
-		}
+		extension = (beginIndex > -1 && beginIndex+1 != fileName.size()) ? fileName.substring(beginIndex) : ""
+        if(extension.size() > 5) extension = "";
 		return extension
 	}
 	
 	
-	
 	static String cleanSearchQuery(String name) {
-		name = cleanName(name);
+		name = name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").trim();
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
 		return name;
 	}
@@ -236,7 +233,7 @@ class Utils {
 		if(domain.startsWith(config.wgp.domain)) {
 			return "The Westernghats Portal"
 		} else {
-			return "India Biodiversity Portal"
+			return config.speciesPortal.app.siteName
 		}
 		return "";
 	}
@@ -382,4 +379,54 @@ class Utils {
         WKTWriter wktWriter = new WKTWriter();
         return wktWriter.write(geom);
     }
+
+    public static boolean isInteger(String s, int radix=10) {
+        if(s.isEmpty()) return false;
+        for(int i = 0; i < s.length(); i++) {
+            if(i == 0 && s.charAt(i) == '-') {
+                if(s.length() == 1) return false;
+                else continue;
+            }
+            if(Character.digit(s.charAt(i),radix) < 0) return false;
+        }
+        return true;
+    }
+	
+	public static Map getQueryMap(URL url){
+		def map = [:]
+		if(!url.query) return map
+		url.query.split('&').each{kv ->
+			def (key, value) = kv.split('=').toList()
+		    if(value != null) {
+				map[key] = URLDecoder.decode(value)
+		    }
+		}
+		
+		//converting a.b.c = 10 to a:[b:[c:10]] 
+		def retMap = [:]
+		map.each{k, v ->
+			def arr = k.split("\\.")
+			def lookupMap = retMap
+			int count = 1
+			arr.each { ele ->
+				if(lookupMap.get(ele) == null){
+					if(count < (arr.length)){
+						lookupMap[ele] = [:]
+						lookupMap = lookupMap.get(ele)
+					}else{
+						lookupMap[ele] = v
+					}
+				}else{
+					lookupMap = lookupMap.get(ele)
+				}
+				count++
+			}
+		   
+		}
+		println "Returned url map" + retMap
+		return retMap
+	}
+	
 }
+
+

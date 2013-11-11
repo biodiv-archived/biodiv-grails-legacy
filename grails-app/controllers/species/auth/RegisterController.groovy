@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.web.context.request.RequestContextHolder as RCH
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 import species.auth.SUser;
 import species.participation.Observation;
@@ -23,8 +24,10 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	def springSecurityService;
 	def openIDAuthenticationFilter;
 	def jcaptchaService;
+	def activityFeedService;
 	//def recaptchaService;	
-	
+    def grailsApplication
+
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
@@ -120,6 +123,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		//recaptchaService.cleanUp(session)
 		
 		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
+		activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
 		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
 		
 		if(command.openId) {
@@ -133,6 +137,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 
 	}
+
 
 	def verifyRegistration = {
 		if (springSecurityService.isLoggedIn()) {
@@ -209,14 +214,19 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			body = evaluate(body, [username: user.name.capitalize(), url: url])
 		}
 		
-		mailService.sendMail {
-			to user.email
-			from conf.ui.forgotPassword.emailFrom
-			subject conf.ui.forgotPassword.emailSubject
-			html body.toString()
-		}
+		try {
+			mailService.sendMail {
+				to user.email
+				from grailsApplication.config.grails.mail.default.from
+				subject conf.ui.forgotPassword.emailSubject
+				html body.toString()
+			}
 		
-		[emailSent: true]
+			[emailSent: true]
+		}catch(all)  {
+		      log.error all.getMessage()
+		      [emailSent:false]
+		}
 	}
 
     def resetPassword = { ResetPasswordCommand2 command ->
@@ -284,7 +294,6 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 
 	protected void registerAndEmail(String username, String email, request) {
 		RegistrationCode registrationCode = SUserService.register(email)
-
 		if (registrationCode == null || registrationCode.hasErrors()) {
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params
@@ -293,6 +302,18 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 
 		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
+		sendVerificationMail(username,email,url,request)
+	}
+	
+	def resend = {
+		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]?.decodeHTML()
+		def registrationCode = RegistrationCode.findByUsername(username)
+		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
+        SUser user = SUser.findByEmail(username);
+		sendVerificationMail(user.name, username, url, request)
+	}
+
+	protected void sendVerificationMail(String username, String email, String url, request)  {
 
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.register.emailBody
@@ -305,16 +326,19 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			sub = evaluate(sub, [domain: Utils.getDomainName(request)])
 		}
 		
-		mailService.sendMail {
-			to email
-			from conf.ui.register.emailFrom
-			subject sub.toString()
-			html body.toString()
+		try {
+			mailService.sendMail {
+				to email
+				from grailsApplication.config.grails.mail.default.from
+				subject sub.toString()
+				html body.toString()
+			}
+			clearRegistrationInfoFromSession()
+		}catch(all)  {
+		    log.error all.getMessage()
 		}
-		clearRegistrationInfoFromSession()
 	}
-	
-	
+
 	/**
 	 * Authenticate the user for real now that the account exists/is linked and redirect
 	 * to the originally-requested uri if there's a SavedRequest.

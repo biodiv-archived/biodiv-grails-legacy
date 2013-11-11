@@ -5,14 +5,20 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import javax.imageio.ImageIO;
+import org.imgscalr.*;
+import java.awt.color.CMMException;
+import java.util.HashMap;
+import javax.imageio.IIOException;
+import net.sf.jmimemagic.Magic;
 
 import org.apache.commons.logging.LogFactory;
 
 class ImageUtils {
 
 	private static final log = LogFactory.getLog(this);
-	
-	
+
+
 	//TODO: chk synchronization probs ... static blocks
 	/**
 	 * Creates scaled versions of given image in the directory.
@@ -21,31 +27,40 @@ class ImageUtils {
 	 * @param imageFile
 	 * @param dir
 	 */
-	static void createScaledImages(File imageFile, File dir) {
+	static void createScaledImages(  File imageFile, File dir) {
 		log.debug "Creating scaled versions of image : "+imageFile.getAbsolutePath();
-		
+
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
-		
+
 		String fileName = imageFile.getName();
 		int lastIndex = fileName.lastIndexOf('.');
-		
+
 		log.debug "Creating thumbnail image";
 		def extension = config.thumbnail.suffix
 		String name = fileName;
-        if(lastIndex != -1) {
-            name = fileName.substring(0, lastIndex);
-        }
-		ImageUtils.convert(imageFile, new File(dir, name+extension ), config.thumbnail.width, config.thumbnail.height, 100);
-
-		log.debug "Creating gallery image";
+ 		if(lastIndex != -1) {
+			name = fileName.substring(0, lastIndex);
+		}
+		 
+		try{
+			 doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+		} catch (Exception e) {
+			log.error "Error whild resizing image $imageFile"
+			e.printStackTrace()
+		}
+		 
+		 
+        log.debug "Creating gallery image";
 		extension = config.gallery.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
 		log.debug "Creating gallery thumbnail image";
 		extension = config.galleryThumbnail.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
+
+		
 	}
-	
+
 	/**
 	 * Uses a Runtime.exec()to use imagemagick to perform the given conversion
 	 * operation. Returns true on success, false on failure. Does not check if
@@ -93,6 +108,87 @@ class ImageUtils {
 	}
 
 	/**
+	 *Resizing Image to 200*200
+	 */
+    public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
+        String fileName = inImg.getAbsolutePath();
+		//System.out.println(fileName);
+		String ext = checkMIME(inImg);
+        BufferedImage im = null;
+        try{       
+            im = ImageIO.read(inImg);
+        }catch(IIOException e){
+            try{
+                im = JpegReader.readCMYKImage(inImg);
+            }catch(Exception my_e){
+                log.error "CMYK Image also couldnt be read";
+            }
+        }
+        doResize(im, outImg, width, height, ext);
+    }
+	//XXX change this method to private after running migration script
+    private static void doResize(BufferedImage im, File outImg, int width, int height,String ext) throws Exception{
+	   //if(inImg != null){
+        //String fileName = outImg.getAbsolutePath();
+		//System.out.println(fileName);
+		//String ext = fileName.tokenize('.').last();
+        //ext = ext.toLowerCase();
+        //String ext = "jpg";
+		
+		BufferedImage scaled = null;
+		BufferedImage cropped = null;
+
+		int img_width = im.getWidth();
+		int img_height = im.getHeight();
+		float img_ratio = (img_width) / (float) (img_height);
+		//System.out.println(img_ratio);
+		// Case 1: When Width greater than height of image.
+ 		if (img_width > img_height) {
+			int new_width = (int) (height * img_ratio);
+			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, new_width, height);
+			int sca_height = scaled.getHeight();
+			int x = (new_width - sca_height) / 2;
+			int y = 0;
+			int rect_width = sca_height;
+			int rect_height = sca_height;
+			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
+		 }
+		// Case 2: When height greater than width of image.
+ 		else {
+			int new_height = (int) (width /img_ratio);
+			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, width, new_height);
+			int sca_width = scaled.getWidth();
+			int x = 0;
+			int y = (new_height - sca_width) / 2;
+			int rect_width = sca_width;
+			int rect_height = sca_width;
+			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
+		} 
+		ImageIO.write(cropped, ext, outImg);
+        jpegOptimize(outImg);
+
+		//		} catch(Exception e){
+		//
+		//			//System.out.println(e.getMessage());
+		//		}
+        //}
+	}
+
+    private static String checkMIME(File inImg) {
+		String mimeType = "";
+		try {
+			mimeType = Magic.getMagicMatch(inImg, false).getMimeType();
+		} catch (Exception e){
+            e.printStackTrace();
+            mimeType = "image/jpg";
+		
+        } 
+       		mimeType = mimeType.split("/")[1];
+			return mimeType;
+		
+	}
+
+	/**
 	 * Uses a Runtime.exec()to use jpegoptim program to optimize 
 	 * size of jpg files by stripping off all meta data
 	 *
@@ -119,8 +215,8 @@ class ImageUtils {
 
 		return (proc.exitValue() == 0)
 	}
-	
-	
+
+
 	/**
 	 * Convenience method that returns a scaled instance of the
 	 * provided {@code BufferedImage}.
@@ -197,45 +293,47 @@ class ImageUtils {
 
 		return ret;
 	}
-	
+
 	static String getFileName(String name, ImageType type, String defaultFileType=null) {
 		if(!name) return;
-	
+
 		if(!type) type = ImageType.NORMAL;
-		
+
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		
+
 		if(!defaultFileType) defaultFileType = '.'+config.speciesPortal.resources.images.defaultType;
-		
+
+        String ext = Utils.getCleanFileExtension(name);
+
 		switch(type) {
-			case ImageType.NORMAL : 
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+			case ImageType.NORMAL :
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.SMALL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename alreadyy has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
-				} 
+				}
 				break;
 			case ImageType.VERY_SMALL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.LARGE :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
@@ -243,25 +341,25 @@ class ImageUtils {
 			case ImageType.ORIGINAL :
 			default:
 				name = name + defaultFileType;
-				 
+
 		}
 		return name;
 	}
-	
+
 }
 
 
 public enum ImageType {
 	ORIGINAL, NORMAL,SMALL,VERY_SMALL, LARGE
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-	
+
 	public String getSuffix() {
 		switch(this) {
 			case ORIGINAL : return ""
 			case NORMAL : return config.speciesPortal.resources.images.thumbnail.suffix
 			case SMALL : return config.speciesPortal.resources.images.galleryThumbnail.suffix
 			case VERY_SMALL : return '_32X32'+'.'+config.speciesPortal.resources.images.defaultType
-			case LARGE : return config.speciesPortal.resources.images.gallery.suffix 
+			case LARGE : return config.speciesPortal.resources.images.gallery.suffix
 		}
 	}
 }

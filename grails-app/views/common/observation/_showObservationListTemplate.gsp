@@ -1,6 +1,6 @@
 <div class="observations_list observation" style="clear: both;">
 
-	<div class="btn-group button-bar" data-toggle="buttons-radio"
+	<!--div class="btn-group button-bar" data-toggle="buttons-radio"
 		style="float: right;">
                 
 		<button class="list_view_bttn btn list_style_button active">
@@ -9,7 +9,7 @@
 		<button class="grid_view_bttn btn grid_style_button">
 			<i class="icon-th-large"></i>
 		</button>
-	</div>
+	</div-->
         <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
                     <div class="controls">
                         <g:select name="limit" class="input-mini"
@@ -40,25 +40,16 @@
 						<li class="thumbnail" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:else>
 					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippetTablet>
+						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
 			</ul>
-			
-			<ul class="list_view thumbnails" style="display: none;clear:both;">
-				<g:each in="${observationInstanceList}" status="i"
-					var="observationInstance">
-					<li class="thumbnail feedParentContext  clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippet>
-					</li>
-				</g:each>
-			</ul>
-			
+					
 		</div>
 	</div>
-	
-	<g:if test="${instanceTotal > (queryParams.max?:0)}">
+        
+        <g:if test="${instanceTotal > (queryParams.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;">Loading ... </span> <span
@@ -69,12 +60,11 @@
 	
 	<%
 		activeFilters?.loadMore = true
-		activeFilters?.webaddress = userGroup?.webaddress
+		activeFilters?.webaddress = userGroupInstance?.webaddress
 	%>
-	
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'observation'}"
-			userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
+			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
 			 max="${queryParams.max}" params="${activeFilters}" />
 	</div>
 	

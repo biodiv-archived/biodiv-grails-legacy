@@ -18,20 +18,22 @@ import speciespage.ObvUtilService;
 import grails.converters.JSON
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
+import speciespage.ObservationService;
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
-	def grailsApplication;
 	def commentService;
-	def activityFeedService;
 	def springSecurityService;
     def resourceService;
 	def observationsSearchService;
 	def SUserService;
-	
+    def observationService;
+    def userGroupService;
+
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -60,7 +62,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 	long visitCount = 0;
 	boolean isDeleted = false;
 	int flagCount = 0;
-	String searchText;
+	int featureCount = 0;
+    String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 	
@@ -74,7 +77,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
     
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, annotations:Annotation];
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
 
 	static constraints = {
@@ -90,34 +93,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
-/*		latitude validator : { val, obj ->
-			if(!val) {
-                return ['default.blank.message', 'Latitude']
-            }
-			if(val){
-				if(Float.isNaN(val)) {
-					return ['typeMismatch.java.lang.Integer','Latitude']
-				}
-				if( val < 6.74678 || val > 35.51769) {
-					return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
-				}
-			}
-		}
-		longitude validator : { val, obj ->  
-            if(!val) {
-                return ['default.blank.message', 'Longitude']
-            }
-			if(val){
-				if(Float.isNaN(val)) { 
-					return ['typeMismatch.java.lang.Integer', 'Longitude']
-				}
-				if( val < 68.03215 || val > 97.40238) {
-					return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
-				}
-			}
-		}
-*/
-        placeName blank:false
+        featureCount nullable:false
+		latitude nullable: false
+		longitude nullable:false
+		topology nullable:false
+		fromDate nullable:false
+		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
 	}
@@ -182,8 +163,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	void calculateMaxVotedSpeciesName(){
 		maxVotedReco = findMaxRepeatedReco();
-		lastRevised = new Date();
-		saveConcurrently();
 	}
 
 	String fetchSuggestedCommonNames(){
@@ -282,8 +261,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
 	}
 
-
-
 	def getRecommendationCount(){
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])
@@ -329,27 +306,16 @@ class Observation extends Metadata implements Taggable, Rateable {
 	public static int getCountForGroup(groupId){
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
-
-	List fetchAllFlags(){
-		return ObservationFlag.findAllWhere(observation:this);
-	}
-
-	private updateObservationTimeStamp(){
-		lastRevised = new Date();
-		saveConcurrently();
-		observationsSearchService.publishSearchIndex(this, true);
+ 
+    List fetchAllFlags(){
+        def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+        return fList;
 	}
 	
 	private updateIsShowable(){
 		//supprssing all checklist generated observation even if they have media
 		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
-	}
-	
-	private  updateLatLong(){
-		def centroid =  topology.getCentroid()
-		latitude = (float) centroid.getY()
-		longitude = (float) centroid.getX()
 	}
 	
 	private updateChecklistAnnotation(recoVote){
@@ -369,10 +335,21 @@ class Observation extends Metadata implements Taggable, Rateable {
 		checklistAnnotations = m as JSON
 	}
 	
-	String fetchSpeciesCall(){
-		return maxVotedReco ? maxVotedReco.name : "Unknown"
+	String fetchFormattedSpeciesCall() {
+        if(!maxVotedReco) return "Unknown"
+
+        if(maxVotedReco.taxonConcept) //sciname from clean list
+            return maxVotedReco.taxonConcept.italicisedForm
+        else if(maxVotedReco.isScientificName) //sciname from dirty list
+            return '<i>'+maxVotedReco.name+'</i>'
+        else //common name
+		    return maxVotedReco.name
 	}
 	
+	String fetchSpeciesCall() {
+        return maxVotedReco ? maxVotedReco.name : "Unknown"
+    }
+
 	String title() {
 		String title = fetchSpeciesCall() 
 		if(!title || title.equalsIgnoreCase('Unknown')) {
@@ -381,12 +358,19 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return title;
 	}
 
+    String notes() {
+        return this.notes
+    }
+
+    String summary() {
+        String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
+		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
+        desc += " at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
+        return desc
+    }
+
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
-	}
-	
-	def onAddComment(comment){
-		updateObservationTimeStamp()
 	}
 	
 	def beforeDelete(){
@@ -461,24 +445,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def getOwner() {
 		return author;
 	}
-	
-	def saveConcurrently(f = {}){
-		try{
-			f()
-			if(!save(flush:true)){
-				errors.allErrors.each { log.error it }
-			}
-		}catch(org.hibernate.StaleObjectStateException e){
-			attach()
-			def m = merge()
-			//refresh()
-			//f()
-			if(!m.save(flush:true)){
-				m.errors.allErrors.each { log.error it }
-			}
-		}
-	}
-	
+
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
 	}
@@ -537,7 +504,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		}
 		return res
 	}
-	
+
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
 		if(!geoPrivacy || SUserService.ifOwns(author)){
 			return 0
@@ -553,4 +520,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 //	def fetchSourceChecklistTitle(){
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
 //	}
+
+    def getObservationFeatures() {
+        return observationService.getObservationFeatures(this);
+    }
+	
+	def fetchList(filterUrl, max, offset){
+		return observationService.getObservationList(filterUrl, max, offset)
+	}
 }

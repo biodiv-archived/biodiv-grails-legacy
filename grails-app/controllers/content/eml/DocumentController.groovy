@@ -4,10 +4,10 @@ import grails.plugins.springsecurity.Secured
 
 import grails.converters.JSON
 import org.grails.taggable.*
-
+import species.AbstractObjectController;
 import speciespage.search.DocumentSearchService;
 
-class DocumentController {
+class DocumentController extends AbstractObjectController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -64,6 +64,7 @@ class DocumentController {
 			redirect(action: "show", id: documentInstance.id)
 		}
 		else {
+			documentInstance.errors.allErrors.each { log.error it }
 			render(view: "create", model: [documentInstance: documentInstance])
 		}
 	}
@@ -145,11 +146,12 @@ class DocumentController {
 		if (documentInstance) {
 			try {
 				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
-				documentInstance.delete(flush: true)
+				documentInstance.delete(flush: true, failOnError:true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 				redirect(action: "browser")
 			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
+			catch (Exception e) {
+				log.debug e.printStackTrace()
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 				redirect(action: "show", id: params.id)
 			}
@@ -189,6 +191,7 @@ class DocumentController {
 		def documentInstanceList = filteredDocument.documentInstanceList
 		def queryParams = filteredDocument.queryParams
 		def activeFilters = filteredDocument.activeFilters
+		def canPullResource = filteredDocument.canPullResource
 		
 		def count = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList.size()
 		if(params.append?.toBoolean()) {
@@ -200,7 +203,7 @@ class DocumentController {
 
 		log.debug "Storing all doc ids list in session ${session['doc_ids_list']} for params ${params}";
 
-		return [documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document']
+		return [documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document', canPullResource:canPullResource]
 
 	}
 

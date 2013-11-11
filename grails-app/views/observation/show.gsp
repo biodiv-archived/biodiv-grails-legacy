@@ -7,6 +7,7 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.Resource"%>
 <%@page import="speciespage.ChartService"%>
+<%@page import="species.participation.Featured"%>
 
 <html>
 <head>
@@ -18,17 +19,15 @@ def r = observationInstance.mainImage();
 def imagePath = '', videoPath='';
 if(r) {
     if(r.type == ResourceType.IMAGE) {
-        imagePath = r.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)
+        imagePath = r.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)
     } else if(r.type == ResourceType.VIDEO){
         imagePath = r.thumbnailUrl()
         videoPath = r.getUrl();
     }
 }
 	
-String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" on "+observationInstance.fromDate.format('dd/MM/yyyy');
 %>
-<g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
+<g:set var="description" value="${Utils.stripHTML(observationInstance.summary()) }" />
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 
@@ -58,9 +57,12 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 .nameContainer .combobox-container {
 	left:198px;
 }
-
+ 
 .combobox-container .add-on {
 	right: -91px;
+}
+.observation_story .observation_footer {
+    margin-top:50px;
 }
 
 </style>
@@ -68,11 +70,18 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 <body>
 	
 			<div class="observation  span12">
-				<obv:showSubmenuTemplate/>
-
-				<div class="page-header clearfix">
+                            <obv:showSubmenuTemplate/>
+                            
+                        <g:if test="${observationInstance}">
+                            <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                            </g:if>
+                            
+                        <div class="page-header clearfix ">
                                     <div style="width:100%;">
-                                        <div class="main_heading" style="margin-left:0px;">
+                                        <div class="main_heading" style="margin-left:0px; position:relative">
+                                            <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? 'Featured':''}">
+                                            </span>
+
                                             <div class="pull-right">
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
@@ -102,16 +111,16 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 
 				<div class="span8 right-shadow-box" style="margin: 0;">
 				<div style="height:400px;position:relative">
-
+                                    <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
                                     <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
+                                    </div>
                                     <center>
                                         <div id="gallerySpinner" class="spinner">
-                                        <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                        <img src="${r.resource(dir:'images',file:'spinner.gif', absolute:true)}"
                                             alt="${message(code:'spinner.alt',default:'Loading...')}" />
                                         </div>
                                     </center>
-
-
+                                     
 					<div id="gallery1" style="visibility:hidden">
 
 						<g:if test="${observationInstance.resource}">
@@ -120,13 +129,15 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 								<%def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
 								<%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
 								<a target="_blank"
-									rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-									href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
+                                                                    rel="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+                                                                    href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
+                                                                    
 									<img class="galleryImage"
-									src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+									src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
+									data-original="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
 									title="${r?.description}" /> </a>
 
-								<g:imageAttribution model="['resource':r]" />
+								<g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
 								</g:if>
 								<g:elseif test="${r.type == ResourceType.VIDEO}">
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
@@ -139,7 +150,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						</g:if>
 						<g:else>
                                                 <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
-                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)}" />
+                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
 						</g:else>
 
 					</div>
@@ -155,7 +166,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 							<div id="seeMoreMessage" class="message"></div>
 							<div id="seeMore" class="btn btn-mini">Show all</div>
 						</div>
-						<div class="input-append">
+						<div class="input-append" style="width:100%;">
 							<g:hasErrors bean="${recommendationInstance}">
 								<div class="errors">
 									<g:renderErrors bean="${recommendationInstance}" as="list" />
@@ -184,7 +195,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 							<uGroup:showUserGroupsListInModal model="['userGroupInstanceList':observationInstance.userGroups]" />
 						</div>
 						
-					</div>
+                                            </div>
+                                                                                       
+					<uGroup:objectPostToGroupsWrapper 
+					    model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
 					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
@@ -192,69 +206,49 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 				</div>
 
                                 <div class="span4">
+                                        <obv:showLocation
+                                        model="['observationInstance':observationInstance]" />
 
-					<div class="sidebar_section">
-						<obv:showLocation
-							model="['observationInstance':observationInstance]" />
-					</div>
+                                    <!-- obv:showRating model="['observationInstance':observationInstance]" /-->
+                                    <!--  static species content -->
 
-					<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
-					<!--  static species content -->
+                                    <div class="sidebar_section">
+                                        <h5>Related observations</h5>
+                                        <div class="tile" style="clear: both">
+                                            <div class="title">Other observations of the same species</div>
+                                            <obv:showRelatedStory
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
+                                        </div>
+                                        <div class="tile">
+                                            <div class="title">Observations nearby</div>
+                                            <obv:showRelatedStory
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
+                                        </div>
+                                        
+                                    </div>
+                                    <%
+                                    def annotations = observationInstance.fetchChecklistAnnotation()
+                                    %>
+                                    <g:if test="${annotations?.size() > 0}">
+                                    <div class="sidebar_section">
+                                        <h5>Annotations</h5>
+                                        <div>
+                                            <obv:showAnnotation model="[annotations:annotations]" />
+                                        </div>
+                                    </div>	
+                                    </g:if>
+                                    <%--					<div class="sidebar_section">--%>
+                                        <%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
+                                        <%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
+                                        <%--					</div>--%>
+                                    <!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
+                                    <!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 
-					<div class="sidebar_section">
-						<h5>Related observations</h5>
-						<div class="tile" style="clear: both">
-							<div class="title">Other observations of the same species</div>
-							<obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation','filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-						</div>
-						<div class="tile">
-							<div class="title">Observations nearby</div>
-							<obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-						</div>
-
-					</div>
-					
-					<g:if test="${observationInstance.userGroups}">
-						<div class="sidebar_section">
-							<h5>Observation is in groups</h5>
-								<!-- div class="title">This observation belongs to following groups</div-->
-								<ul class="tile" style="list-style:none; padding-left: 10px;">
-									<g:each in="${observationInstance.userGroups}" var="userGroup">
-										<li class="">
-											<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />
-										</li>
-									</g:each>
-								</ul>
-								<!-- obv:showRelatedStory
-									model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
-						</div>
-					</g:if>
-					<%
-						def annotations = observationInstance.fetchChecklistAnnotation()
-					%>
-					<g:if test="${annotations?.size() > 0}">
-						<div class="sidebar_section">
-							<h5>Annotations</h5>
-							<div class="tile" style="clear: both">
-								<obv:showAnnotation model="[annotations:annotations]" />
-							</div>
-						</div>	
-					</g:if>
-					
-<%--					<div class="sidebar_section">--%>
-<%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
-<%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
-<%--					</div>--%>
-					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
-					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
-
-				</div>
+                                </div>
 
 
-			</div>
-	
+                            </div>
+
 	<r:script>
 	
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
@@ -272,8 +266,9 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		
 		$('#gallery1').galleria({
 			height : 400,
-			preload : 1,
-			carousel : true,
+                        preload : 1,
+                        lightbox: false,
+			carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -283,7 +278,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
                         _toggleInfo: false,
-                        thumbnails:false,
+                        thumbnails:true,
                         showCounter:true,
                         idleMode:false,
 			youtube : {
@@ -297,24 +292,34 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 			dataConfig : function(img) {
                             return {
                                 // tell Galleria to grab the content from the .desc div as caption
-                                description : $(img).parent().next('.notes').html()
+                                description : $(img).parent().next('.notes').html(),
+                                _biodiv_url:$(img).data('original')
                             };
 			},
 			extend : function(options) {
                             this.bind('image', function(e) {
                                 $(e.imageTarget).click(this.proxy(function() {
-                                        this.openLightbox();
+                                    window.open(Galleria.get(0).getData()._biodiv_url);
+                                    //this.openLightbox();
                                 }));
                             });
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
+                            });
+
+                            this.bind('lightbox_image', function(e){
+                            	//$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
                             })
+
                         }
                 });
                 Galleria.ready(function() {
+                    
                     $("#gallerySpinner").hide();
                     $("#gallery1").css('visibility', 'visible');
+                    $(".galleria-thumbnails-container").hide();
+
                 });
 	
 
@@ -348,15 +353,15 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 	            	if(data.status == 'success') {
 		             	if(data.canMakeSpeciesCall === 'false'){
 		             		$('#selectedGroupList').modal('show');
-		             	}else{
+		             	} else{
 		             		showRecos(data, null);
 		            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
 		            		updateFeeds();
 		            		setFollowButton();
-		            		showRecoUpdateStatus(data.msg, data.status);
+		            		showUpdateStatus(data.msg, data.status);
 		            	}
 	            	} else {
-         				showRecoUpdateStatus(data.msg, data.status);
+         				showUpdateStatus(data.msg, data.status);
          			}
          			$("#addRecommendation")[0].reset();
          			$("#canName").val("");
@@ -364,7 +369,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
 	            	//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+	            	var successHandler = this.success, errorHandler = showUpdateStatus;
 	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 				} 
 	     	});
@@ -380,7 +385,11 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                 });
 
                 preLoadRecos(3, 0, false);
-	});
+                //loadObjectInGroups();
+                
+                
+        });
+
 </r:script>
 <g:javascript>
 $(document).ready(function(){

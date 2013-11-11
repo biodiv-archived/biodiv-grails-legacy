@@ -42,6 +42,7 @@ class ExportJob {
 					case SPECIES:
 						log.info "Initiating Species export."
 						f = speciesService.export(dl.fetchMapFromText(), dl)
+                        break;
 					default:
 						log.debug "Invalid source Type $dl.sourceType"
 				}

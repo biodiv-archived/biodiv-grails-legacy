@@ -8,10 +8,13 @@ import species.groups.UserGroup;
 class SecurityFilters {
 
 	def grailsApplication;
+	def springSecurityService;
 	
     def filters = {
         all(controller:'*', action:'*') {
             before = {
+                log.debug params
+
 				grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
 				//println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
 				
@@ -51,6 +54,8 @@ class SecurityFilters {
 						model.userGroupInstance = userGroupInstance
 						def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
 						model.canEditUserGroup = secTagLib.hasPermission(['permission':org.springframework.security.acls.domain.BasePermission.WRITE, 'object':userGroupInstance], 'permitted')
+						def user = springSecurityService.getCurrentUser();
+						model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
 					}
 				}
 				if (!Environment.getCurrent().getName().startsWith("pamba")) {

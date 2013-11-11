@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
-<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>
+<%--<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>--%>
 
-<div id='searchToggleBox' class="input-append" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'':'display:none;'}">
+<div id='searchToggleBox' class="input-append">
 	<form method="get"
 		action="${uGroup.createLink(controller:controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
@@ -16,7 +16,7 @@
 			value="${((queryParams?.query)?:((queryParams?.q)?:params.query))?.encodeAsHTML()}"
 			class="search-query span3" placeholder="Search" />
 		
-		<button id="search" class="btn btn-link" type="button"><i class="icon-search"></i></button>
+		<button id="search" class="btn btn-link" type="button"><i class="icon-search icon-gray"></i></button>
 		<input type="hidden" name="fl" value="id" />
 		<g:hiddenField name="category" value="${controller}" />
 		
@@ -46,7 +46,7 @@ $(document).ready(function() {
 		'dropDownIconUrl' : "${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
-		'carousel':{maxHeight:75, maxWidth:75},
+		'carousel':{maxHeight:150, maxWidth:150},
                 'imagesPath': "${resource(dir:'images', absolute:true)}",
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
@@ -59,11 +59,19 @@ $(document).ready(function() {
                 },
                 'observation':{
                     listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"
+                    occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
+                    distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+                    speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+
                 },
                 'recommendation': {
                     'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
                     'suggest' : "${uGroup.createLink(controller:'recommendation', action: 'suggest', userGroup:userGroupInstance)}"
+                },
+                'action': {
+                    'inGroupsUrl':"${uGroup.createLink(controller:'action', action: 'inGroups', userGroup:userGroupInstance)}"
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");

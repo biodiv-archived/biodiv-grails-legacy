@@ -1,18 +1,22 @@
 <%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
 <%
-def imagePath = mainImage?mainImage.thumbnailUrl(null, observationInstance.isChecklist ? '.png' :null): null;
+def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
+<g:if test="${observationInstance}">
+    <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+</g:if>
 
-<div style="position:relative;overflow:hidden">
-    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
-    <div class="figure span3 observation_story_image" style="display: table;height:220px;" 
+<div class="snippet">
+    <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? 'Featured':''}">
+            </span>
+    <div class="figure pull-left observation_story_image" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
             <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
-                    >
-                    <div style="${observationInstance.isChecklist?'height:150px;width:150px;':''}position:relative;margin:auto;">
+            >
+                    <div style="position:relative;margin:auto;">
                     <g:if
                             test="${imagePath}">
                             <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
@@ -32,5 +36,5 @@ def obvId = observationInstance.id
             </g:link>
 
     </div>
+    <obv:showStory model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:showDetails, showFeatured:showFeatured]"></obv:showStory>
 </div>
-<obv:showStory model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStory>

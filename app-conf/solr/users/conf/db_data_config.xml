@@ -1,0 +1,15 @@
+<dataConfig>
+	<dataSource driver="org.postgresql.Driver"
+		url="jdbc:postgresql://localhost:5432/biodiv" user="postgres"
+		password="postgres123" />
+	<document>
+		<entity name="user" query="SELECT id, name, username, email, last_login_date, about_me from suser">
+			<field column="id" name="id" />
+			<field column="name" name="name" />
+			<field column="username" name="userame" />
+			<field column="email" name="email" />
+			<field column="last_login_date" name="last_login" />
+			<field column="about_me" name="about_me" />
+		</entity>
+	</document>
+</dataConfig>

@@ -202,12 +202,14 @@
 
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
+		
+		<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
 
 		<field name="title" type="text" indexed="true" required="true"
 			multiValued="false" />
 
 		<field name="grantee_organization" type="text" indexed="true"
-			required="true" />
+			required="false" />
 
 		<field name="sitename" type="string" indexed="true" required="false"
 			multiValued="true" />

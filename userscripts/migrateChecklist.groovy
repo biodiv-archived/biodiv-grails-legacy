@@ -14,6 +14,8 @@ import content.eml.Coverage
 import content.eml.Document
 import species.groups.UserGroup
 import grails.converters.JSON
+import species.auth.*;
+import groovy.util.Eval;
 
 def addDrupalId(){
 	def checklistUtilService = ctx.getBean("checklistUtilService");
@@ -44,5 +46,6 @@ def updateGeoPrivacy(){
 	}
 }
 
-updateGeoPrivacy()
-println "================ done "
+
+
+

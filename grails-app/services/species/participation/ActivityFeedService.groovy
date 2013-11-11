@@ -17,34 +17,51 @@ class ActivityFeedService {
 	//checklist related
 	static final String CHECKLIST_CREATED = "Checklist created"
 	static final String CHECKLIST_UPDATED = "Checklist updated"
-	static final String CHECKLIST_POSTED_ON_GROUP = "Posted checklist to group"
-	static final String CHECKLIST_REMOVED_FROM_GROUP = "Removed checklist from group"
+	//static final String CHECKLIST_POSTED_ON_GROUP = "Posted checklist to group"
+	//static final String CHECKLIST_REMOVED_FROM_GROUP = "Removed checklist from group"
 	
 	
 	//observation related
 	static final String OBSERVATION_CREATED = "Observation created"
 	static final String OBSERVATION_UPDATED = "Observation updated"
-	static final String OBSERVATION_FLAGGED = "Observation flagged"
-	static final String OBSERVATION_FLAG_DELETED = "Observation flag deleted"
+	static final String OBSERVATION_FLAGGED = "Flagged"
+	static final String REMOVED_FLAG = "Flag removed"
+	static final String OBSERVATION_FLAG_DELETED = "Flag deleted"
 	static final String OBSERVATION_DELETED = "Deleted observation"
 	
 	static final String SPECIES_RECOMMENDED = "Suggested species name"
 	static final String SPECIES_AGREED_ON = "Agreed on species name"
 	static final String RECOMMENDATION_REMOVED = "Suggestion removed"
-	static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
-	static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
+	//static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
+	//static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
 	
-	
+    //Feature Related
+    static final String FEATURED = "Featured";
+    static final String UNFEATURED = "UnFeatured";
+
 	//group related
 	static final String USERGROUP_CREATED = "Group created"
 	static final String USERGROUP_UPDATED = "Group updated"
 	static final String MEMBER_JOINED = "Joined group"
 	static final String MEMBER_LEFT = "Left Group"
 	static final String MEMBER_ROLE_UPDATED = "Role updated"
+	static final String USER_REGISTERED = "Registered to portal"
+	static final String RESOURCE_POSTED_ON_GROUP = "Posted resource"
+	static final String RESOURCE_REMOVED_FROM_GROUP = "Removed resoruce"
+	//static final String RESOURCE_BULK_POST = "Bulk posting"
+	//static final String RESOURCE_BULK_REMOVE = "Bulk removal"
 	
-	//observation related
+	
+	//document related
 	static final String DOCUMENT_CREATED = "Document created"
 	static final String DOCUMENT_UPDATED = "Document updated"
+	//static final String DOCUMENT_POSTED_ON_GROUP = "Posted document to group"
+	//static final String DOCUMENT_REMOVED_FROM_GROUP = "Removed document from group"
+	
+	//species related
+	//static final String SPECIES_POSTED_ON_GROUP = "Posted species to group"
+	//static final String SPECIES_REMOVED_FROM_GROUP = "Removed species from group"
+	
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"
@@ -99,7 +116,7 @@ class ActivityFeedService {
 		return ActivityFeed.fetchCount(params)
 	}
 	
-	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null){
+	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null, isShowable=null, flushImmidiatly=true){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
@@ -108,22 +125,30 @@ class ActivityFeedService {
 			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
 		}
 		
-		//to hide any object who has isShowable = false in all other cases making feed showable
-		boolean isShowable= (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
-		
+		//if not pass through params hiding object whose isShowable = false. In all other cases making feed showable
+		isShowable= (isShowable != null) ? isShowable : (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:getType(activityHolder), \
 						rootHolderId:rootHolder?.id, rootHolderType:getType(rootHolder), \
 						isShowable:isShowable,\
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
-					
+		
 		ActivityFeed.withNewSession {
-			if(!af.save(flush:true)){
-				af.errors.allErrors.each { log.error it }
-				return null
-			}
+				if(!af.save(flush:flushImmidiatly)){
+					af.errors.allErrors.each { log.error it }
+					return null
+				}
 		}
-		Follow.addFollower(rootHolder, author)
+		
+		//updating time stamp on object after addition of activity
+		try {
+			updateResourceAssociation(af)
+			rootHolder.onAddActivity(af, flushImmidiatly)
+		}catch (Exception e) {
+			//e.printStackTrace();
+		}
+		
+		Follow.addFollower(rootHolder, author, flushImmidiatly)
 		return af
 	}
 	
@@ -204,12 +229,37 @@ class ActivityFeedService {
 		ActivityFeed.updateIsShowable(obj);
 	}
 	
-	def getContextInfo(ActivityFeed feedInstance, params){
+	def updateResourceAssociation(af){
+		if(af.activityType != RESOURCE_REMOVED_FROM_GROUP){
+			return
+		}
+		
+		//on unpost removing resource from feature table also if user has permission
+		def rootHolder = getDomainObject(af.rootHolderType, af.rootHolderId)
+		if(rootHolder.instanceOf(UserGroup)){
+			return
+		}
+		
+		def activityHolder = getDomainObject(af.activityHolderType, af.activityHolderId)
+		def featuredInstance = Featured.findWhere(objectId: af.rootHolderId, objectType: af.rootHolderType, userGroup: activityHolder)
+		if(!featuredInstance){
+			return
+		}
+		
+		rootHolder.featureCount--
+		try{
+			featuredInstance.delete(flush:true, failOnError:true)
+		}catch (Exception e) {
+			log.error "Remove of featuredInstance FAILDED " + featuredInstance
+			e.printStackTrace()
+		}
+	}
+	
+	def getContextInfo(ActivityFeed feedInstance, params=null){
 		
 		def activityType = feedInstance.activityType
 		def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
 		def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
-		
 		def text = null
 		def activityTitle = null
 		
@@ -220,14 +270,18 @@ class ActivityFeedService {
 				text = activityDomainObj.body
 				break
 			case SPECIES_RECOMMENDED:
-				activityTitle = SPECIES_RECOMMENDED + " " + getSpeciesNameHtml(activityDomainObj, params)
+				activityTitle = SPECIES_RECOMMENDED + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case SPECIES_AGREED_ON:
-				activityTitle =  SPECIES_AGREED_ON + " " + getSpeciesNameHtml(activityDomainObj, params)
+				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
-				activityTitle = OBSERVATION_FLAGGED
-				text = activityDomainObj.flag.value() + ( activityDomainObj.notes ? " \n" + activityDomainObj.notes : "")
+				activityTitle = getResType(activityRootObj).capitalize() + " flagged"
+				text = feedInstance.activityDescrption
+				break
+            case REMOVED_FLAG:
+				activityTitle = getResType(activityRootObj).capitalize() + " flag removed" 
+				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
 				activityTitle = OBSERVATION_UPDATED
@@ -238,21 +292,6 @@ class ActivityFeedService {
 				break
 			case USERGROUP_UPDATED:
 				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " updated"
-				break
-			case OBSERVATION_POSTED_ON_GROUP:
-				activityTitle = OBSERVATION_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
-				break
-			
-			case OBSERVATION_REMOVED_FROM_GROUP:
-				activityTitle = OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
-				break
-			
-			case CHECKLIST_REMOVED_FROM_GROUP:
-				activityTitle = CHECKLIST_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
-				break
-			
-			case CHECKLIST_POSTED_ON_GROUP:
-				activityTitle = CHECKLIST_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
 				break
 			case MEMBER_JOINED:
 				activityTitle = "Joined group " + getUserGroupHyperLink(activityRootObj)
@@ -266,6 +305,29 @@ class ActivityFeedService {
 			case RECOMMENDATION_REMOVED:
 				activityTitle = "Removed species name " + feedInstance.activityDescrption
 				break
+			
+			case [RESOURCE_POSTED_ON_GROUP, RESOURCE_REMOVED_FROM_GROUP]:
+				activityTitle = feedInstance.activityDescrption  + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+            case [FEATURED, UNFEATURED]:
+                boolean b
+                if(activityType == FEATURED){
+                    b = true
+                }
+                else {
+                    b = false
+                }
+                def rootHolder = getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
+                def activityHolder = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+                //NOTE: Case for Not IBP group - an actual UserGroup Present
+                if(rootHolder != activityHolder) {
+                    activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
+                }
+                else {
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + " in " + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                }
+                text = feedInstance.activityDescrption
+                break
 			default:
 				activityTitle = activityType
 				break
@@ -329,17 +391,122 @@ class ActivityFeedService {
 	}
 	
 	def getUserGroupHyperLink(userGroup){
+        if(!userGroup){
+            return ""
+        }
 		return '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
 	}
 	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////// GROUP PULL RELATED ///////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def addFeedOnGroupResoucePull(resource, UserGroup ug, SUser author, boolean isPost, boolean sendMail = true){
+		addFeedOnGroupResoucePull([resource], ug, author, isPost, true, false, sendMail)
+	}
+	
+	def addFeedOnGroupResoucePull(List resources, UserGroup ug, SUser author, boolean isPost, boolean isShowable=true, boolean isBulkPull=false, boolean sendMail=true){
+		log.debug "Before Adding feed for resources " + resources.size()
+		if(resources.isEmpty()){
+			return
+		}
+		
+		log.debug "Adding feed for resources " + resources.size()
+		def activityType = isPost ? RESOURCE_POSTED_ON_GROUP : RESOURCE_REMOVED_FROM_GROUP
+		Map resCountMap = [:]
+		def af 
+		resources.each { r->
+			def description = getDescriptionForResourcePull(r, isPost)
+			af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
+			int oldCount = resCountMap.get(r.class.canonicalName)?:0
+			resCountMap.put(r.class.canonicalName, ++oldCount)
+			if(!isBulkPull && sendMail){
+				observationService.sendNotificationMail(activityType, r, null, null, af)
+			}
+		}
+		if(isBulkPull){
+			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
+			af = addActivityFeed(ug, ug, author, activityType, description, true)
+            if(sendMail)
+			    observationService.sendNotificationMail(activityType, ug, null, null, af)
+		} 
+		return af
+	}
+	
+	private String getDescriptionForBulkResourcePull(isPost, countMap){
+		def desc = isPost ? "Posted" : "Removed"
+		int loopVar = 0
+		countMap.each { k, v ->
+			println k
+			println v
+			if(loopVar > 0) desc += " and"
+			desc += " " + v + " " + getResourceDisplayName(k, v)
+			loopVar++
+		}
+		desc +=  isPost ? " to group" : " from group"
+		return desc
+	}
 	
 	
-	//	private getObservationHyperLink(obv){
-	//		return "" + (g.link(controller:"observation", action:"show", id:obv.id){"<i>Observation</i>"})
-	//	}
-	
-	
-//	static getDateInISO(date){
-//		return date.getTime()//DATE_FORMAT.format(date)
-//	}
+    private String getDescriptionForResourcePull(r, isPost){
+        def desc = isPost ? "Posted" : "Removed"
+        desc += " " + getResourceDisplayName(r.class.canonicalName)
+        desc +=  isPost ? " to group" : " from group"
+        return desc
+    }
+
+    /**
+     * returns resource name based on count to be displayed on email and msgs
+     */
+    def getResourceDisplayName(String canonicalName, int count = 0 ){
+        String res = ""
+        switch(canonicalName){
+            case Checklists.class.canonicalName:
+            res = "checklist" + ((count > 1) ? "s" : "")
+            break
+            case Species.class.canonicalName:
+            res = "species"
+            break
+            default:
+            res = canonicalName.toLowerCase().split("\\.")[-1] + ((count > 1) ? "s" : "")
+            break
+        }
+        return res 
+    }	
+
+
+    def getResType(r) {
+        def desc = ""
+        switch(r.class.canonicalName){
+            case Checklists.class.canonicalName:
+            desc += "checklist"
+            break
+            default:
+            desc += r.class.simpleName.toLowerCase()
+            break
+        }
+        return desc
+    }
+    def getDescriptionForFeature(r, ug, isFeature)  {
+        def desc = isFeature ? "Featured " : "Removed featured "
+        String temp = getResType(r)
+        desc+= temp
+        if(ug == null) {
+            return desc
+        }
+        desc +=  isFeature ? " to group" : " from group"
+        return desc
+
+
+    }
+/*
+    def getMailSubject(r, isFeature) {
+        def desc = ""
+        desc += isFeature ? "Featured " : "Removed featured "
+        String temp = getResType(r)
+        desc+= temp
+        return desc
+     }*/
+
 }
+

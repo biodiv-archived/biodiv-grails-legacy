@@ -1,5 +1,6 @@
 <%@page import="species.auth.SUser"%>
 <%@ page import="species.participation.Observation"%>
+<%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
@@ -11,7 +12,7 @@
 			<obv:showGroupFilter
 				model="['observationInstance':observationInstance, forObservations:true]" />
 		</div>
-		<div class="observations thumbwrap">
+		<div class="observation thumbwrap">
 			<div class="observation">
 				<div>
 					<obv:showObservationFilterMessage
@@ -23,7 +24,7 @@
 				
 				<!-- needs to be fixed -->
 				<g:if test="${!isSearch}">
-					<div id="map_view_bttn" class="btn-group">
+					<div id="map_view_bttn" class="btn-group" style="display:none;">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 							href="#">
 							Map view <span class="caret"></span> </a>
@@ -72,17 +73,36 @@
 				<obv:download
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
 
-				<div id="observations_list_map" class="observation"
-                                    style="clear: both; display:none">
+			</div>
+                        <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
+                            <obv:showObservationsList/>
+                        </div>
+                        <div class="span4" style="position:relative;top:20px">
+                 
+                                <uGroup:objectPostToGroupsWrapper 
+				    model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName, 'userGroup':userGroup]" />
+                        
+				<div id="observations_list_map" class="observation sidebar_section"
+                                    style="clear:both;overflow:hidden;display:none;">
+                                    <h5>Species Distribution</h5>
 					<obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
+                                        <a id="refreshListForBounds" data-toggle="dropdown"
+                                            href="#"><i class="icon-refresh"></i>
+							Refresh list to map bounds</a>
+
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
 				</div>
-			</div>
-			<obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />
+                                <div class="sidebar_section" style="clear:both;overflow:hidden;">
+                                    <h5> Species Groups </h5>
+                                    <div id="speciesGroupCountList"></div>
+                                </div>
+                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
+                                
+                        </div>
 		</div>
 	</div>
 
@@ -97,13 +117,23 @@ $(document).ready(function() {
         $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
     });
     <g:if test="${params.isMapView?.equalsIgnoreCase('true') || params.bounds}">
-        $("#map_view_bttn a").click();
     </g:if>
+        $("#map_view_bttn a").click();
 
     $('#big_map_canvas').on('maploaded', function(){
-        map.on('mouseout', function() {
+        /*map.on('viewreset', function() {
             refreshList(getSelectedBounds());
-        });
+        });*/
+    });
+    
+    $("#refreshListForBounds").click(function() {
+        refreshList(getSelectedBounds());
+    });
+
+    $('.list').on('updatedGallery', function() {
+    	loadSpeciesGroupCount();
+        //loadDistinctRecoList();
+        updateDistinctRecoTable();
     });
 });
 </g:javascript>

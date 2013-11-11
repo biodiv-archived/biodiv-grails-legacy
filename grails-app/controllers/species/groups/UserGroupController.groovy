@@ -78,7 +78,7 @@ class UserGroupController {
 	}
 
 	protected def getUserGroupList(params) {
-		def max = Math.min(params.max ? params.int('max') : 9, 100)
+		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 
 		def filteredUserGroup = userGroupService.getFilteredUserGroups(params, max, offset, false)
@@ -334,7 +334,7 @@ class UserGroupController {
 		}
 		
 		def instanceTotal = userGroupInstance.getAllMembersCount();
-		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':allMembers, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':instanceTotal, 'expertsTotalCount':0]
+		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':allMembers, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':instanceTotal, 'expertsTotalCount': userGroupInstance.getExpertsCount()]
 		renderUsersModel(params, model);
 	}
 
@@ -380,19 +380,30 @@ class UserGroupController {
 			return;
 		}
 		def instanceTotal = userGroupInstance.getFoundersCount();
-		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':founders, 'instanceTotal':instanceTotal, 'foundersTotalCount':instanceTotal, 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
+		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':founders, 'instanceTotal':instanceTotal, 'foundersTotalCount':instanceTotal, 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount()]
 		renderUsersModel(params, model);
 	}
 
-	def experts = {
-//		def userGroupInstance = findInstance(params.id, params.webaddress)
-//		if (!userGroupInstance) return
-//
-//			params.max = Math.min(params.max ? params.int('max') : 9, 100)
-//		params.offset = params.offset ? params.int('offset') : 0
-//
-//		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
-//		render(view:"user", model:['userGroupInstance':userGroupInstance, 'experts':experts, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+	def moderators = {
+		def userGroupInstance = findInstance(params.id, params.webaddress)
+		if (!userGroupInstance) return
+
+		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+
+		def experts = userGroupInstance.getExperts(params.max, params.offset);
+
+		if(params.isAjaxLoad?.toBoolean()) {
+			def expertsJSON = []
+			for(m in experts) {
+				expertsJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
+			}
+			render ([result:expertsJSON] as JSON);
+			return;
+		}
+		def instanceTotal = userGroupInstance.getExpertsCount();
+		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':experts, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':instanceTotal]
+		renderUsersModel(params, model);
 	}
 
 	def observation = {
@@ -422,6 +433,7 @@ class UserGroupController {
 	}
 	
 	def getUserGroupObservationsList(params) {
+        log.debug "+++++++++++++++++"+params
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
@@ -441,7 +453,11 @@ class UserGroupController {
 		
 
 		if(params.append?.toBoolean()) {
-			session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
+            def groupObvList = session[userGroupInstance.webaddress+"obv_ids_list"]
+            if(!groupObvList){
+                session[userGroupInstance.webaddress+"obv_ids_list"] = []
+            }
+			    session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
 		} else {
 			session[userGroupInstance.webaddress+"obv_ids_list_params"] = params.clone();
 			session[userGroupInstance.webaddress+"obv_ids_list"] = model.observationInstanceList.collect {it.id};
@@ -513,7 +529,7 @@ class UserGroupController {
 			}
 
 			int membersCount = members.size();
-			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request));
+			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request), params.message);
 			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
@@ -525,6 +541,41 @@ class UserGroupController {
 		}
 		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
 	}
+	
+	@Secured(['ROLE_USER'])
+	def inviteExperts = {
+		List members = Utils.getUsersList(params.expertUserIds);
+		log.debug members;
+
+		if(members) {
+			def userGroupInstance = findInstance(params.id, params.webaddress)
+			if (!userGroupInstance) {
+				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup is selected.'] as JSON);
+				return;
+			}
+			
+			int membersCount = members.size();
+			
+			def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+			def groupExperts = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, expertRole).collect {it.sUser};
+			def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+			def groupFounders = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, founderRole).collect {it.sUser};
+			groupExperts.addAll(groupFounders)
+			members.removeAll(groupExperts);
+			
+			userGroupService.sendExpertInvitation(userGroupInstance, members, params.message, Utils.getDomainName(request));
+			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
+			if(membersCount > members.size()) {
+				int alreadyMembersCount = membersCount-members.size();
+
+				msg += " as other "+alreadyMembersCount+" member(s) were already found to be already part of this group."
+			}
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+			return
+		}
+		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
+	}
+
 
 	@Secured(['ROLE_USER'])
 	def requestMembership = {
@@ -549,12 +600,45 @@ class UserGroupController {
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
-						"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
+						"Please confirm membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':'Sent request to all founders for confirmation.'] as JSON);
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':'Sent request to admins for confirmation.'] as JSON);
 			return;
 		}
-		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to request membership.'] as JSON);
+		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to confirm request.'] as JSON);
+
+	}
+	
+	@Secured(['ROLE_USER'])
+	def requestModeratorship = {
+		log.debug params;
+		def user = springSecurityService.currentUser;
+		if(user) {
+			def userGroupInstance = findInstance(params.id, params.webaddress)
+			if (!userGroupInstance) {
+				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup selected.'] as JSON);
+				return;
+			}
+
+			if(userGroupInstance.isExpert(user)) {
+				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a moderator', 'msg':'Already a moderator.'] as JSON);
+				return;
+			}
+			
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
+			founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
+			founders.each { founder ->
+				log.debug "Sending email to  founder or expert ${founder}"
+				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
+				userToken.save(flush: true)
+				emailConfirmationService.sendConfirmation(founder.email,
+						"Please confirm moderator",  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestModeratorship'], userToken.token);
+			}
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':'Sent request to admins for confirmation.'] as JSON);
+			return;
+		}
+		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to confirm request.'] as JSON);
 
 	}
 	
@@ -594,6 +678,11 @@ class UserGroupController {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
 						if(userGroupInstance.addFounder(user)) {
 							flash.message="Successfully added ${user} to this group as founder"
+						}
+						break;
+					case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
+						if(userGroupInstance.addExpert(user)) {
+							flash.message="Successfully added ${user} to this group as a moderator"
 						}
 						break;
 					default: log.error "No proper role type is specified."
@@ -642,7 +731,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
-		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount()]
+		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount()]
 	}
 
 	def getRelatedUserGroups = {
@@ -947,6 +1036,13 @@ class UserGroupController {
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
+   
+   def suggestedGroups = {
+	   log.debug params;
+	   def gList = userGroupService.getSuggestedUserGroups(null)
+	   def res =[suggestedGroupsHtml: g.render(template:"/common/userGroup/showSuggestedUserGroupsListTemplate", model:['userGroups':gList])];
+	   render res as JSON
+   }
 
 //   def species = {
 //	   log.debug params;
@@ -960,7 +1056,18 @@ class UserGroupController {
 	   render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
    }
    
-   
+   def bulkPost = {
+	   log.debug params;
+	   def r = userGroupService.updateResourceOnGroup(params)
+       def resObj = r.remove('resourceObj')
+	   if(params.pullType == 'single'){
+           r['resourceGroupHtml'] =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]);
+		   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
+	   }
+	   
+       r['msg'] = "${message(code:r.remove('msgCode'))}"
+	   render r as JSON
+   }
    /////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////To create and add user to a specific group (i.e BirdRace)////////////////
    /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1048,13 +1155,17 @@ class UserGroupController {
 	   }
 
 	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-		   mailService.sendMail {
+		   try {
+		   	mailService.sendMail {
 			   to user.email
-               bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+               		   bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 			   //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com","balachandert@gmail.com"
-			   from conf.ui.notification.emailFrom
+			   from grailsApplication.config.grails.mail.default.from
 			   subject mailSubject
 			   html body.toString()
+			}
+		   }catch(all)  {
+		       log.error all.getMessage()
 		   }
 	   //}
 		//   log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"

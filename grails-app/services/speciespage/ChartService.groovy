@@ -361,7 +361,7 @@ class ChartService {
 
 		int days = getPassedDays(params, userGroupInstance) 
 		log.debug "passed days $days"
-		days = (days > 500) ? 500 : days
+		days = (days > 365) ? 365 : days
 		
 		def result = []
 		Date currentDate = new Date()
@@ -423,8 +423,9 @@ class ChartService {
 	}
 
 	private int getRegisterUserCount(startDate, endDate){
-		return SUser.createCriteria().count {
+		return ActivityFeed.createCriteria().count {
 				and{
+					eq('activityType', ActivityFeedService.USER_REGISTERED)
 					between('dateCreated', startDate, endDate)
 				}
 			}
@@ -547,7 +548,7 @@ class ChartService {
 		}
 	}
 	
-	def List getUserByRank(max, offset){
+	def List getUserByRank(max, offset, userName = null){
 		return ActivityFeed.withCriteria(){
 			projections {
 				groupProperty('author')
@@ -555,6 +556,14 @@ class ChartService {
 			}
 			and{
 				eq('isShowable', true)
+				if(userName){
+					author{
+						or{
+							ilike("username", userName)
+							ilike("name", userName)
+						}
+					}
+				}
 			}
 			maxResults max
 			firstResult offset

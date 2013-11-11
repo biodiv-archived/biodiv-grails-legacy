@@ -19,7 +19,7 @@ import grails.converters.XML;
 import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
-import species.participation.ObservationFlag.FlagType
+import species.participation.Flag.FlagType
 import species.utils.ImageType;
 import species.utils.ImageUtils
 import species.utils.Utils;
@@ -34,8 +34,10 @@ import species.Resource.ResourceType;
 import species.auth.SUser;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
+import species.participation.Featured
+import species.AbstractObjectController;
 
-class ObservationController {
+class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
@@ -49,6 +51,8 @@ class ObservationController {
 	def activityFeedService;
 	def SUserService;
 	def obvUtilService;
+    def chartService;
+
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -63,7 +67,7 @@ class ObservationController {
 		} else {
 			 model = getObservationList(params);
 		}
-        if(params.loadMore?.toBoolean()){
+		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
@@ -89,23 +93,29 @@ class ObservationController {
 		log.debug params
 		
 		def model = getObservationList(params);
+		
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            model['width'] = 300;
+            model['height'] = 200;
 			render (view:"list", model:model)
 			return;
-		} else{
+		} else {
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
 			if(model.showTags) {
 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			}
+			 }
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+/*	        def chartModel = model.speciesGroupCountList
+            chartModel['width'] = 300;
+            chartModel['height'] = 270;
+*/
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
@@ -119,7 +129,7 @@ class ObservationController {
 	}
 
 	protected def getObservationList(params) {
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
@@ -147,11 +157,15 @@ class ObservationController {
                 };
             }
         }
-		
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount ,queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 	
+	def occurrences = {
+		log.debug params
+		def result = observationService.getObservationOccurences(params)
+		render result as JSON
+	}
 
 	@Secured(['ROLE_USER'])
 	def create = {
@@ -161,18 +175,25 @@ class ObservationController {
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
 		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService]
 	}
-	
 
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;
 		if(request.method == 'POST') {
-			saveAndRender(params)
+			//TODO:edit also calls here...handle that wrt other domain objects
+			saveAndRender(params, false)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		}
 	}
 
+    @Secured(['ROLE_USER'])
+	def flagDeleted = {
+        
+		def result = observationService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
+	}
 
 	@Secured(['ROLE_USER'])
 	def update = {
@@ -228,7 +249,11 @@ class ObservationController {
 					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
-		}
+		} else {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+
+        }
 	}
 
 	/**
@@ -413,7 +438,7 @@ class ObservationController {
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                         //context specific baseUrl for location picker script to work
 						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
-						def thumbnail = res.thumbnailUrl(baseUrl);
+						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
@@ -481,7 +506,6 @@ class ObservationController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote = {
-
 		if(chainModel?.chainedParams) {
 			//need to change... dont pass on params
 			chainModel.chainedParams.each {
@@ -494,7 +518,6 @@ class ObservationController {
 
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
-			
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
@@ -505,11 +528,17 @@ class ObservationController {
 			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
+			def mailType
 			try {
 				if(!recommendationVoteInstance) {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+					
+					if(params["createNew"]) {
+						mailType = observationService.OBSERVATION_ADDED;
+						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+					}
 
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
@@ -526,16 +555,23 @@ class ObservationController {
 					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
+					//sending email
+					if(params["createNew"]) {
+						mailType = observationService.OBSERVATION_ADDED;
+					} else {
+						mailType = observationService.SPECIES_RECOMMENDED;
+					}
+					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
+
 					if(!params["createNew"]){
-						//sending mail to user
-						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
+						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
-					}else{
+					}else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
@@ -598,7 +634,7 @@ class ObservationController {
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
@@ -677,12 +713,12 @@ class ObservationController {
 				def result = [
 					'status' : 'success',
 					canMakeSpeciesCall:params.canMakeSpeciesCall,
-					recoHtml:html,
-					uniqueVotes:results.uniqueVotes,
-					msg:params.msg,
-					speciesNameTemplate:speciesNameHtml,
-					speciesExternalLinkHtml:speciesExternalLinkHtml,
-					speciesName:observationInstance.fetchSpeciesCall()]
+					recoHtml:html?:'',
+					uniqueVotes:results.uniqueVotes?:'',
+					msg:params.msg?:'',
+					speciesNameTemplate:speciesNameHtml?:'',
+					speciesExternalLinkHtml:speciesExternalLinkHtml?:'',
+					speciesName:observationInstance.fetchSpeciesCall()?:'']
 				
 				if(results?.recoVotes.size() > 0) {
 					render result as JSON
@@ -734,97 +770,21 @@ class ObservationController {
 		result.relatedObv.observations.each { m-> 
 			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
 		}
-		
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+	    def activeFilters = new HashMap(params);
+        activeFilters.remove('userGroupInstance');
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:activeFilters, parentId:params.long('id'), filterProperty:params.filterProperty]
 		render (view:'listRelated', model:model)
 	}
 
 	/**
 	 * 
 	 */
-	def getRelatedObservation = {
-		log.debug params;
-		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-		
-		if(relatedObv) {
-			if(relatedObv.observations)
-				relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
-		} else {
-		}
-		//println relatedObv
-		render relatedObv as JSON
-	}
-
 	def tags = {
 		log.debug params;
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 
-	@Secured(['ROLE_USER'])
-	def flagDeleted = {
-		def result = observationService.delete(params)
-		flash.message = result.message
-		redirect (url:result.url)
-	}
-
-	@Secured(['ROLE_USER'])
-	def flagObservation = {
-		log.debug params;
-		params.author = springSecurityService.currentUser;
-		def obv = Observation.get(params.id.toLong())
-		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());
-		def observationFlagInstance = ObservationFlag.findByObservationAndAuthor(obv, params.author)
-		if (!observationFlagInstance) {
-			try {
-				observationFlagInstance = new ObservationFlag(observation:obv, author: params.author, flag:flag, notes:params.notes)
-				observationFlagInstance.save(flush: true)
-				obv.flagCount++
-				obv.save(flush:true)
-				activityFeedService.addActivityFeed(obv, observationFlagInstance, observationFlagInstance.author, activityFeedService.OBSERVATION_FLAGGED);
-				
-				observationsSearchService.publishSearchIndex(obv, COMMIT);
-				
-				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress)
-				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'observation.flag.error', default: 'Error during addition of flag')}"
-			}
-		}
-		else {
-			flash.message  = "${message(code: 'observation.flag.duplicate', default:'Already flagged')}"
-		}
-		redirect (url:uGroup.createLink(action:'show', controller:"observation", id: params.id, 'userGroupWebaddress':params.webaddress))
-		//redirect(action: "show", id: params.id)
-	}
-
-	@Secured(['ROLE_USER'])
-	def deleteObvFlag = {
-		log.debug params;
-		def obvFlag = ObservationFlag.get(params.id.toLong());
-		def obv = Observation.get(params.obvId.toLong());
-
-		if(!obvFlag){
-			//response.setStatus(500);
-			//def message = [info: g.message(code: 'observation.flag.alreadytDeleted', default:'Flag already deleted')];
-			render obv.flagCount;
-			return
-		}
-		try {
-			obvFlag.delete(flush: true);
-			obv.flagCount--;
-			obv.save(flush:true)
-			observationsSearchService.publishSearchIndex(obv, COMMIT);
-			render obv.flagCount;
-			return;
-		}catch (Exception e) {
-			e.printStackTrace();
-			response.setStatus(500);
-			def message = [error: g.message(code: 'observation.flag.error.onDelete', default:'Error on deleting observation flag')];
-			render message as JSON
-		}
-	}
-	
+		
 	@Secured(['ROLE_USER'])
 	def deleteRecoVoteComment = {
 		log.debug params;
@@ -958,7 +918,7 @@ class ObservationController {
 		}
 		
 		if(userGroup){
-			render userGroupService.getObservationCountByGroup(userGroup);
+			render userGroupService.getCountByGroup(Observation.simpleName, userGroup);
 		}else{
 			render Observation.createCriteria().count {
 				and {
@@ -982,16 +942,20 @@ class ObservationController {
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue(), params.sourceController?:'observation', params.sourceAction?:'show').mailBody
-				mailService.sendMail {
-					to entry.getKey()
-                    bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-					//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-					from conf.ui.notification.emailFrom
-					replyTo currentUserMailId
-					subject mailSubject
-					html body.toString()
+				try {
+					mailService.sendMail {
+						to entry.getKey()
+	                    			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
+						from grailsApplication.config.grails.mail.default.from
+						replyTo currentUserMailId
+						subject mailSubject
+						html body.toString()
+					}
+					log.debug " mail sent for identification "
+				}catch(all)  {
+				    log.error all.getMessage()
 				}
-				log.debug " mail sent for identification "
 			}
 		}
 		render (['success:true']as JSON);
@@ -1049,6 +1013,8 @@ class ObservationController {
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            model['width'] = 300;
+            model['height'] = 200;
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
 			return;
@@ -1062,8 +1028,11 @@ class ObservationController {
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			}
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+/*			def chartModel = model.speciesGroupCountList
+            chartModel['width'] = 300;
+            chartModel['height'] = 270;
+*/
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
@@ -1102,7 +1071,8 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def getList = {
 		log.debug params;
-		render getObservationList(params) as JSON
+		def result = getObservationList(params)
+        render result as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1148,7 +1118,6 @@ class ObservationController {
 	def getUserImage = {
 		log.debug params;
 		render SUser.read(params.id.toLong()).icon() 
-		
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1206,5 +1175,69 @@ class ObservationController {
         def locations = observationService.locations(params);
         render locations as JSON
     }
-	
+
+    /**
+    */
+    def distinctReco = {
+        log.debug params
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        Map result = [:];
+        try {
+            def distinctRecoListResult;
+		    if(params.actionType == 'search') {
+                distinctRecoListResult = observationService.getDistinctRecoListFromSearch(params, max, offset);
+            } else {
+                distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
+            }
+
+            if(distinctRecoListResult.distinctRecoList.size() > 0) {
+                result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]
+                
+            } else {
+                def message = "";
+                if(params.offset  > 0) {
+                    message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
+                } else {
+                    message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
+                }
+                result = [msg:message]
+            }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+        }
+        render result as JSON
+    }
+
+    /**
+    */
+    def speciesGroupCount = {
+        log.debug params
+        Map result = [:];
+        try {
+            def speciesGroupCountListResult;
+		    if(params.actionType == 'search') {
+                speciesGroupCountListResult = observationService.getSpeciesGroupCountFromSearch(params);
+            } else {
+                speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
+            }
+
+            if(speciesGroupCountListResult.speciesGroupCountList.size() > 0) {
+                result = ['speciesGroupCountList':speciesGroupCountListResult.speciesGroupCountList, status:'success', msg:'success']
+                
+            } else {
+                def message = g.message(code: 'speciesGroup.count.zero.message', default:'No data');
+                result = [msg:message]
+            }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+        }
+        render result as JSON
+    }
 }

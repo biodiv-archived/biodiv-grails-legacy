@@ -18,6 +18,17 @@ import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 import species.utils.ImageType;
 import species.utils.ImageUtils
+import species.ResourceFetcher;
+
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import content.eml.Coverage;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 
 class ObvUtilService {
 
@@ -49,8 +60,7 @@ class ObvUtilService {
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
 	
-	static final int MAX_EXPORT_SIZE = 5000;
-	
+	private static final int BATCH_SIZE = 50
 	
 	def userGroupService
 	def observationService
@@ -58,7 +68,7 @@ class ObvUtilService {
 	def grailsApplication
 	def activityFeedService
 	def observationsSearchService
-	
+	def checklistUtilService
 	
 	
 	///////////////////////////////////////////////////////////////////////
@@ -74,35 +84,13 @@ class ObvUtilService {
 	
 	def export(params, dl){
 		log.debug(params)
-		def observationInstanceList = getObservationList(params, dl)
+		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl).getAllResult()
 		log.debug " Obv total $observationInstanceList.size " 
 		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}
 	
 	
-	private getObservationList(params, dl){
-		String action = new URL(dl.filterUrl).getPath().split("/")[2]
-		if("search".equalsIgnoreCase(action)){
-			//getting result from solr
-			def idList = observationService.getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
-			def res = []
-			idList.each { obvId ->
-				res.add(Observation.read(obvId))
-			}
-			return res
-		}else if(params.webaddress){
-			def userGroupInstance =	userGroupService.get(params.webaddress)
-			if (!userGroupInstance){
-				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
-				return []
-			}
-			return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
-		}
-		else{
-			return observationService.getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
-			
-		}
-	}
+
 	
 	private File exportObservation(List obvList, exportType, reqUser){
 		if(! obvList)
@@ -351,18 +339,34 @@ class ObvUtilService {
 			return
 		}
 		
+		def resultObv = [] 
+		int i = 0;
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-			uploadObservation(imageDir, m)
+			if(m[IMAGE_FILE_NAMES].trim() != ""){
+				uploadObservation(imageDir, m,resultObv)
+				i++
+				if(i > BATCH_SIZE){
+					checklistUtilService.cleanUpGorm(true)
+					def obvs = resultObv.collect { Observation.read(it) }
+					try{
+						observationsSearchService.publishSearchIndex(obvs, true);
+					}catch (Exception e) {
+						log.error e.printStackTrace();
+					}
+					resultObv.clear();
+					i = 0;
+				}
+			}
 		}
 	}
 	
-	private uploadObservation(imageDir, Map m){
+	private uploadObservation(imageDir, Map m, resultObv){
 		Map obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
 		if(obvParams.isEmpty()){
 			log.error "No image file .. aborting this obs upload with params " + m
 		}else{
 			populateParams(obvParams, m)
-			saveObv(obvParams)
+			saveObv(obvParams, resultObv)
 			log.debug "observation saved"
 		}
 	}
@@ -392,6 +396,11 @@ class ObvUtilService {
 		
 		//author
 		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
+		
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        if(obvParams.latitude && obvParams.longitude) {
+            obvParams.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(obvParams.longitude?.toFloat(), obvParams.latitude?.toFloat())));
+        } 
  	}
 	
 	private getUserGroupIds(String names){
@@ -413,7 +422,7 @@ class ObvUtilService {
 		return gIds.join(",")
 	}
 	
-	private saveObv(Map params){
+	private saveObv(Map params, result){
 		if(!params.author){
 			log.error "Author not found for params $params"
 			return
@@ -429,9 +438,7 @@ class ObvUtilService {
 				params.obvId = observationInstance.id
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
 				addReco(params, observationInstance)
-				println "==============   tags " + params.tags 
 				def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
-				println "==============after    tags " + tags
 				observationInstance.setTags(tags);
 
 				if(params.groupsWithSharingNotAllowed) {
@@ -445,6 +452,8 @@ class ObvUtilService {
 				if(!observationInstance.save(flush:true)){
 					observationInstance.errors.allErrors.each { log.error it }
 				}
+				result.add(observationInstance.id)
+				
 			}else {
 					observationInstance.errors.allErrors.each { log.error it }
 			}
@@ -473,11 +482,7 @@ class ObvUtilService {
 			observationInstance.calculateMaxVotedSpeciesName();
 			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 		}
-		try{
-			observationsSearchService.publishSearchIndex(observationInstance, ObservationController.COMMIT);
-		}catch (Exception e) {
-			log.error "Error in publishing ===== "
-		}	
+			
 	}
 
 	private uploadImageFiles(imageDir, imagePaths, license){

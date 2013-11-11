@@ -31,6 +31,8 @@
                 	var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
 			$.get(url, function(data) {
 			    $('.homepage-content').html($(data).find('.bodymarker'));
+
+                            loadUserGroupLocation("${userGroupInstance.ne_latitude}","${userGroupInstance.ne_longitude}","${userGroupInstance.sw_latitude}","${userGroupInstance.sw_longitude}");
 			});
 		});
 	</r:script>
