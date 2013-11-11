@@ -249,7 +249,11 @@ class ObservationController extends AbstractObjectController {
 					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
-		}
+		} else {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+
+        }
 	}
 
 	/**
@@ -769,7 +773,6 @@ class ObservationController extends AbstractObjectController {
 	    def activeFilters = new HashMap(params);
         activeFilters.remove('userGroupInstance');
 		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:activeFilters, parentId:params.long('id'), filterProperty:params.filterProperty]
-
 		render (view:'listRelated', model:model)
 	}
 

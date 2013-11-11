@@ -560,18 +560,18 @@ environments {
 
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://wgp.saturn.strandls.com/${appName}/observations"
+				serverURL = "http://ibp.saturn.strandls.com/${appName}/observations"
                 filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	//serverURL = "http://localhost/${appName}/observations"
 			}
 			userGroups {
 				rootDir = "${app.rootDir}/userGroups"
-				serverURL = "http://wgp.saturn.strandls.com/${appName}/userGroups"
+				serverURL = "http://ibp.saturn.strandls.com/${appName}/userGroups"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			users {
 				rootDir = "${app.rootDir}/users"
-				serverURL = "http://wgp.saturn.strandls.com/${appName}/users"
+				serverURL = "http://ibp.saturn.strandls.com/${appName}/users"
 			}
 			search.serverURL="http://saturn.strandls.com:8080/solr"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
@@ -727,23 +727,23 @@ environments {
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
                 rootDir = "${app.rootDir}/observations"
-                serverURL = "http://thewesternghats.in/${appName}/observations"
+                serverURL = "http://indiabiodiversity.org/${appName}/observations"
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
-                serverURL = "http://thewesternghats.in/${appName}/userGroups"
+                serverURL = "http://indiabiodiversity.org/${appName}/userGroups"
             }
             users {
                 rootDir = "${app.rootDir}/users"
-                serverURL = "http://thewesternghats.in/${appName}/users"
+                serverURL = "http://indiabiodiversity.org/${appName}/users"
             }
 
             content{
                 rootDir = "${app.rootDir}/content"
-                serverURL = "http://thewesternghats.in/${appName}/content"
+                serverURL = "http://indiabiodiversity.org/${appName}/content"
             }	
 
-            search.serverURL="http://thewesternghats.in:8080/solr"
+            search.serverURL="http://indiabiodiversity.org:8080/solr"
             grails {
                 mail {
                     host = "127.0.0.1"
