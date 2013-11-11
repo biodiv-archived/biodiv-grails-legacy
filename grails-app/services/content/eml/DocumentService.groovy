@@ -387,8 +387,8 @@ class DocumentService {
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
         
         if(params.featureBy == "true"){
-			query = "select document from Document document,  Featured feat "
-			filterQuery += " and document.id = feat.objectId and feat.objectType = :featType "
+			query = "select document from Document document "
+			filterQuery += " and document.featureCount > 0 "
             params.userGroup = observationService.getUserGroup(params);
             if(params.userGroup == null) {
                 //filterQuery += "and feat.userGroup is null"

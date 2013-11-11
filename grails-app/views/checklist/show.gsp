@@ -56,8 +56,8 @@
                         <obv:showStory
                         model="['observationInstance':checklistInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
                     </div>
-
-
+                    <uGroup:objectPostToGroupsWrapper 
+                    model="['observationInstance':checklistInstance, 'objectType':checklistInstance.class.canonicalName]"/>
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                         <comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super','showCommentList':false]" />

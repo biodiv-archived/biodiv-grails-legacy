@@ -489,11 +489,12 @@ class SpeciesService {
 
             if(params.featureBy == "true" ) {
                 params.userGroup = observationService.getUserGroup(params)
-                def featureQuery = ", Featured feat "
-                query += featureQuery;
-                countQuery += featureQuery
-                countFilterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
-                filterQuery += " and s.id = feat.objectId and feat.objectType = :featType "
+               // def featureQuery = ", Featured feat "
+                //query += featureQuery;
+                //countQuery += featureQuery
+                def featureQuery = " and s.featureCount > 0"
+                countFilterQuery += featureQuery
+                filterQuery += featureQuery
                 if(params.userGroup == null) {
                     //String str = "feat.userGroup is null "
                     //filterQuery += str
