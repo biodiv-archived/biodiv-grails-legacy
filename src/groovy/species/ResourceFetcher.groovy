@@ -48,21 +48,20 @@ class ResourceFetcher {
 	}
 	
 	private computeNext(){
+		def paramsMap = Utils.getQueryMap(filterUrl)
+		String action = filterUrl.getPath().split("/")[2]
 		switch(rType){
 			case Observation.class.canonicalName:
-				nextResult = obv.fetchList(filterUrl, BATCH_SIZE, offset)
+				nextResult = obv.fetchList(paramsMap, BATCH_SIZE, offset, action)
 				break
 			case Document.class.canonicalName:
-				def paramsMap = Utils.getQueryMap(filterUrl)
 				paramsMap.offset = offset
 				paramsMap.max = BATCH_SIZE
 				nextResult = doc.fetchList(paramsMap, BATCH_SIZE, offset).documentInstanceList
 				break
 			case Species.class.canonicalName:
-				def paramsMap = Utils.getQueryMap(filterUrl)
 				paramsMap.offset = offset
 				paramsMap.max = BATCH_SIZE
-				String action = filterUrl.getPath().split("/")[2]
 				nextResult = species.fetchList(paramsMap, action).speciesInstanceList
 				break
 			default:
