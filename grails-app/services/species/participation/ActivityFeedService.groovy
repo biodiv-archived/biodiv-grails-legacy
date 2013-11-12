@@ -437,8 +437,6 @@ class ActivityFeedService {
 		def desc = isPost ? "Posted" : "Removed"
 		int loopVar = 0
 		countMap.each { k, v ->
-			println k
-			println v
 			if(loopVar > 0) desc += " and"
 			desc += " " + v + " " + getResourceDisplayName(k, v)
 			loopVar++
