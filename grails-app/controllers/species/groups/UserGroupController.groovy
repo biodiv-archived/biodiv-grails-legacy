@@ -668,7 +668,7 @@ class UserGroupController {
 				user = SUser.read(params.userId.toLong())
 			}
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
-			if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder())) {
+			if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder() || userGroupInstance.isExpert())) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
 						if(userGroupInstance.addMember(user)) {
