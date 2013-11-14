@@ -41,7 +41,6 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	def list = {
-		log.debug params
 		def model = speciesService.getSpeciesList(params, 'list');
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
@@ -279,7 +278,6 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def update = {
-		log.debug params;
 		if(!params.name || !params.pk) {
 			render ([success:false, msg:'Either field name or field id is missing'] as JSON)
 			return;
@@ -308,7 +306,6 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def addResource = {
-		log.debug params;
 		if(!params.id) {
 			render ([success:false, errors:[msg:'Species id is missing']] as JSON)
 			return;
@@ -407,7 +404,6 @@ class SpeciesController extends AbstractObjectController {
 	 *
 	 */
 	def search = {
-		log.debug params;
 		def model = speciesService.getSpeciesList(params, 'search')
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		model['isSearch'] = true;
@@ -439,7 +435,6 @@ class SpeciesController extends AbstractObjectController {
 	 *
 	 */
 	def terms = {
-		log.debug params;
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
 		List result = speciesService.nameTerms(params)
 		render result.value as JSON;
@@ -447,7 +442,6 @@ class SpeciesController extends AbstractObjectController {
 
 
 	//	def getRelatedObservations = {
-	//		log.debug params
 	//
 	//		def speciesInstance = Species.get(params.long('id'))
 	//		if (speciesInstance) {
@@ -474,7 +468,6 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
-        log.debug params;
         /*List contributors;
         if(!params.contributorIds) {
 			contributors = Utils.getUsersList(params.contributorIds);

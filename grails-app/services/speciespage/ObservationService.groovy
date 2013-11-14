@@ -797,25 +797,27 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.featureBy == "true" ) {
-           // if(params.userGroup == null) {
-                //filterQuery += " and feat.userGroup is null "     
+            if(params.userGroup == null) {
+                filterQuery += " and obv.featureCount > 0 "     
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
               //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
-            //} else {
-              //  featureQuery = ", Featured feat "
-            //}
+            } else {
+                featureQuery = ", Featured feat "
+            }
             query += featureQuery;
-            filterQuery += " and obv.featureCount > 0 "
+            //filterQuery += " and obv.featureCount > 0 "
             if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
             }else {
-                filterQuery += " and feat.userGroup.id = :userGroupId "
+                filterQuery += " and obv.id = feat.objectId and (feat.objectType =:featType or feat.objectType=:featType1) and feat.userGroup.id = :userGroupId "
                 queryParams["userGroupId"] = params.userGroup?.id
             }
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Observation.class.getCanonicalName();
+            queryParams["featType1"] = Checklists.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy
         }
+        //TODO: check logic
         if(params.featureBy == "false") {
             featureQuery = ", Featured feat "
             query += featureQuery;

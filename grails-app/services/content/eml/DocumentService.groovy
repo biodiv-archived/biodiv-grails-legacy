@@ -385,19 +385,27 @@ class DocumentService {
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
-        
+        params.userGroup = observationService.getUserGroup(params);
+ 
         if(params.featureBy == "true"){
 			query = "select document from Document document "
-			filterQuery += " and document.featureCount > 0 "
-            params.userGroup = observationService.getUserGroup(params);
-            if(params.userGroup == null) {
-                //filterQuery += "and feat.userGroup is null"
+		 	if(params.userGroup == null) {
+                filterQuery += " and document.featureCount > 0 "                
             }
-            else {
-                filterQuery += "and feat.userGroup.id =:userGroupId"
+             else {
+                query += ", Featured feat "
+                filterQuery += " and document.id = feat.objectId and feat.objectType =:featType and feat.userGroup.id = :userGroupId "
                 queryParams["userGroupId"] = params.userGroup?.id
+
             }
-            
+            //params.userGroup = observationService.getUserGroup(params);
+            // if(params.userGroup == null) {
+                //filterQuery += "and feat.userGroup is null"
+            //}
+            //else {
+                //filterQuery += "and feat.userGroup.id =:userGroupId"
+              //  queryParams["userGroupId"] = params.userGroup?.id
+            //}
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Document.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy
