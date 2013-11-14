@@ -99,9 +99,6 @@
 								<g:if test="${domainObjectType == 'species'}">
 								 	The species can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
 								</g:if>
-								<g:if test="${domainObjectType == 'usergroup'}">
-								 	You can be viewed the page <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
-								</g:if>
 
 								</p><!-- /Callout Panel -->
 						</div>

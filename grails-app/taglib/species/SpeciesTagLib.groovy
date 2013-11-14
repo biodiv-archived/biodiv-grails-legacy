@@ -100,7 +100,6 @@ class SpeciesTagLib {
 	}
 	
 	def speciesFilter = {attrs, body->
-        println "MMMMMMMMMMMMMMMMMMMMMMMMM : "+attrs
 		out << render(template:"/species/speciesFilterTemplate", model:attrs.model);
 	}
 
