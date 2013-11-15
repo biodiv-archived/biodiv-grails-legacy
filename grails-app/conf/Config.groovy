@@ -29,6 +29,7 @@ import org.apache.log4j.Priority
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = false // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
+grails.config.locations = ["file:/home/rahulk/git/biodiv/grails-app/conf/Configfile.groovy"]
 grails.mime.types = [ html: [
 		'text/html',
 		'application/xhtml+xml'
@@ -152,6 +153,13 @@ else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) 
 		"file:${userHome}/.grails/${appName}-config.properties"
 	]
 }
+
+else if (new File(System.getProperty("EXTERNAL_CONF_PATH")).exists()) {
+	println "*** User defined config: file:" + System.getProperty("EXTERNAL_CONF_PATH") + "***"
+	grails.config.locations = [
+		"file:" + System.getProperty("EXTERNAL_CONF_PATH")
+	]
+}
 else {
 	println "*** No external configuration file defined. ***"
 }
@@ -210,7 +218,7 @@ speciesPortal {
 		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
-		filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
+		//filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
@@ -429,12 +437,12 @@ imageConverterProg = "/usr/bin/convert";
 jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
-	development {
-        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+    development {
+             grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
         speciesPortal {
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "saturn.strandls.com"
-            wgp {
+            /*wgp {
                 facebook {
                     appId= "424071494335902"
                     secret= "bb87b98979ae30936342364178c7b170"
@@ -448,6 +456,7 @@ environments {
                 }
                 supportEmail = "support(at)indiabiodiversity(dot)org"
             }
+            */
         }
         google.analytics.enabled = false
         grails.resources.debug = false
@@ -458,7 +467,6 @@ environments {
                 port = 25
             }
         }
-
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
         //grails.resources.debug=true
@@ -501,8 +509,8 @@ environments {
                 'species'
         info    'species.auth'
 	}
-	}
-	test {
+    }	
+    test {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
 	}
@@ -511,7 +519,7 @@ environments {
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "127.0.0.1"
-			wgp {
+			/*wgp {
 				facebook {
 					appId= "327308053982589"
 					secret= "f36074901fc24b904794692755796fd1"
@@ -524,7 +532,7 @@ environments {
 					secret= "82d91308b5437649bfe891a027205501"
 				}
 				supportEmail = "support(at)indiabiodiversity(dot)org"
-			}
+			}*/
 		}
 		google.analytics.enabled = false
 
@@ -561,7 +569,7 @@ environments {
 			observations {
 				rootDir = "${app.rootDir}/observations"
 				serverURL = "http://ibp.saturn.strandls.com/${appName}/observations"
-                filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
+                //filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	//serverURL = "http://localhost/${appName}/observations"
 			}
 			userGroups {
@@ -581,7 +589,7 @@ environments {
 					 port = 25
 				}
 			}
-			wgp {
+			/*wgp {
 				facebook {
 					appId= "310694198984953"
 					secret= "eedf76e46272190fbd26e578ae764a60"
@@ -594,7 +602,7 @@ environments {
 					secret= "eedf76e46272190fbd26e578ae764a60"
 				}
 				supportEmail = "support(at)indiabiodiversity(dot)org"
-			}
+			}*/
 		}
 		google.analytics.enabled = false
 
@@ -666,7 +674,7 @@ environments {
 					 port = 25
 				}
 			}
-			wgp {
+			/*wgp {
 				facebook {
 					appId= "310694198984953"
 					secret= "eedf76e46272190fbd26e578ae764a60"
@@ -679,7 +687,7 @@ environments {
 					secret= "eedf76e46272190fbd26e578ae764a60"
 				}
 				supportEmail = "support(at)indiabiodiversity(dot)org"
-			}
+			}*/
 		}
 		google.analytics.enabled = false
 
@@ -728,7 +736,7 @@ environments {
             observations {
                 rootDir = "${app.rootDir}/observations"
                 serverURL = "http://indiabiodiversity.org/${appName}/observations"
-				filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
+				//filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
@@ -751,7 +759,7 @@ environments {
                     port = 25
                 }
             }
-            wgp {
+            /*wgp {
                 facebook {
                     //					appId= "327308053982589"
                     //					secret= "f36074901fc24b904794692755796fd1"
@@ -766,7 +774,7 @@ environments {
                     secret= "900d0811194fe28503006b31792690ae"
                 }
                 supportEmail = "support(at)indiabiodiversity(dot)org"
-            }
+            }*/
         }
 
         ibp.domain='indiabiodiversity.org'
