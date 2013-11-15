@@ -1,11 +1,3 @@
-/*if (new File(System.getProperty("dataPath")).exists()) {
-	println "*** User defined config: file:" + System.getProperty("dataPath") + "***"
-    grails.config.locations = [
-		"file:" + System.getProperty("dataPath")
-        //"file:/home/rahulk/git/biodiv/grails-app/envData.groovy" 
-	]
-}
-*/
 dataSource {
     pooled = true
     
