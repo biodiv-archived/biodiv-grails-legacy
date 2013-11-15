@@ -89,7 +89,6 @@ grails.project.dependency.resolution = {
         compile 'org.imgscalr:imgscalr-lib:4.2'
         compile 'org.apache.sanselan:sanselan:0.97-incubator'
         compile 'jmimemagic:jmimemagic:0.1.2'
-        compile 'net.bull.javamelody:javamelody-core:1.47.0' 
         
         //compile 'net.sf.jtidy:jtidy:r938'
 
