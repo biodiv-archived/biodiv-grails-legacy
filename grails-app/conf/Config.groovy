@@ -127,14 +127,16 @@ cache.headers.presets = [
  *  2. Looking for ${userHome}/.grails/${appName}-config.groovy
  *  3. Using system environment configuration file: " + System.getenv(ENV_NAME)
  *  4. Using user defined config: file:${userHome}/.grails/${appName}-config.properties.
+ *  5. If additional conf file present then adding it to main config.
  */
+
 def ENV_NAME = "${appName}.config.location"
 if (!grails.config.locations || !(grails.config.locations instanceof List)) {
 	grails.config.locations = []
 }
 if (System.getProperty(ENV_NAME) && new File(System.getProperty(ENV_NAME)).exists()) {
 	println "Using configuration file specified on command line: " + System.getProperty(ENV_NAME)
-	grails.config.locations << "file:" + System.getProperty(ENV_NAME)
+	grails.config.locations = ["file:" + System.getProperty(ENV_NAME) ]
 }
 else if (new File("${userHome}/.grails/${appName}-config.groovy").exists()) {
 	println "*** User defined config: file:${userHome}/.grails/${appName}-config.groovy. ***"
@@ -146,18 +148,16 @@ else if (System.getenv(ENV_NAME) && new File(System.getenv(ENV_NAME)).exists()) 
 	println("Using system environment configuration file: " + System.getenv(ENV_NAME))
 	grails.config.locations << "file:" + System.getenv(ENV_NAME)
 }
+
 else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) {
 	println "*** Using user defined config: file:${userHome}/.grails/${appName}-config.properties. ***"
 	grails.config.locations = [
 		"file:${userHome}/.grails/${appName}-config.properties"
 	]
 }
-
-else if (new File(System.getProperty("EXTERNAL_CONF_PATH")).exists()) {
-	println "*** User defined config: file:" + System.getProperty("EXTERNAL_CONF_PATH") + "***"
-	grails.config.locations = [
-		"file:" + System.getProperty("EXTERNAL_CONF_PATH")
-	]
+else if (new File("${userHome}/.grails/additional-config.groovy").exists()) {
+	println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
+	grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
 else {
 	println "*** No external configuration file defined. ***"
