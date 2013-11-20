@@ -455,7 +455,7 @@ class SpeciesService {
         } else if(queryParams.sort.equals('percentofinfo')) {
             queryParams.sort = 'percentOfInfo'
         }
-        queryParams.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
+        queryParams.order = (queryParams.sort.equals("percentOfInfo")||queryParams.sort.equals("lastUpdated"))?"desc":queryParams.sort.equals("title")?"asc":"asc"
 
         def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
 

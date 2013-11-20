@@ -118,8 +118,7 @@ class ActionController {
 
         if(ugParam != null && params.notes && obv) {
             List splitGroups = [];
-           println ugParam 
-             if(ugParam && ugParam.length() > 0){
+            if(ugParam && ugParam.length() > 0){
                 splitGroups = ugParam.split(",")
                  if(ugParam[-1] == ',') {//TODO:CHECK THIS
                     splitGroups.add("")
@@ -133,7 +132,6 @@ class ActionController {
             def featuredInstance;
             UserGroup.withTransaction() {
                 groups.each { ug ->
-                    println ug
                    if(ug == null) {
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }

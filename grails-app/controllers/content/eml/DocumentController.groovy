@@ -226,18 +226,15 @@ class DocumentController extends AbstractObjectController {
 //		model['isSearch'] = true;
 //
 //		if(params.loadMore?.toBoolean()){
-//			println "======================================== 11"
 //			params.remove('isGalleryUpdate');
 //			render(template:"/document/documentListTemplate", model:model);
 //			return;
 //
 //		} else if(!params.isGalleryUpdate?.toBoolean()){
-//		println "======================================== 22"
 //			params.remove('isGalleryUpdate');
 //			render (view:"browser", model:model)
 //			return;
 //		} else {
-//		println "======================================== 33"
 //			params.remove('isGalleryUpdate');
 //			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
 //			model.resultType = "document"

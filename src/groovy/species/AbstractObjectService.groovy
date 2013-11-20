@@ -175,12 +175,13 @@ class AbstractObjectService {
             //JSON marsheller is registered in Bootstrap
             featuredNotes << it
         }
-
+		
         def result = []
         def i = 0;
         observations.each {key,value ->
             result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value]);
         }
+		
         return['observations':result,'count':count[0]]
                 		
     }

@@ -332,10 +332,10 @@ class SpeciesController extends AbstractObjectController {
 				return;
 			}
 
-			println resourcesXML;
+			log.debug resourcesXML;
 			if(resourcesXML) {
 				def resources = speciesService.saveResources(resourcesXML,  speciesInstance.taxonConcept.canonicalForm);
-				println resources;
+				log.debug resources;
 				resources.each { resource ->
 					speciesInstance.addToResources(resource);
 				}
