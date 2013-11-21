@@ -389,6 +389,7 @@ class ObvUtilService {
 		
 		//tags, grouplist, notes
 		obvParams['notes'] = m[NOTES]
+
 		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",").collect { it.trim() } : null)
 		obvParams['userGroupsList'] = getUserGroupIds(m[USER_GROUPS])
 		
@@ -396,6 +397,8 @@ class ObvUtilService {
 		
 		//author
 		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
+		
+		obvParams['geoPrivacy'] = m["geoprivacy"]
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(obvParams.latitude && obvParams.longitude) {
