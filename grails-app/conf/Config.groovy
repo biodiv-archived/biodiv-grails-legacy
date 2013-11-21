@@ -217,7 +217,6 @@ speciesPortal {
 		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
-		//filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
@@ -441,21 +440,6 @@ environments {
         speciesPortal {
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "saturn.strandls.com"
-            /*wgp {
-                facebook {
-                    appId= "424071494335902"
-                    secret= "bb87b98979ae30936342364178c7b170"
-                }
-                supportEmail = "team(at)thewesternghats(dot)in"
-            }
-            ibp {
-                facebook {
-                    appId= "347177228674021"
-                    secret= "82d91308b5437649bfe891a027205501"
-                }
-                supportEmail = "support(at)indiabiodiversity(dot)org"
-            }
-            */
         }
         google.analytics.enabled = false
         grails.resources.debug = false
@@ -518,20 +502,6 @@ environments {
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "127.0.0.1"
-			/*wgp {
-				facebook {
-					appId= "327308053982589"
-					secret= "f36074901fc24b904794692755796fd1"
-				}
-				supportEmail = "team(at)thewesternghats(dot)in"
-			}
-			ibp {
-				facebook {
-					appId= "347177228674021"
-					secret= "82d91308b5437649bfe891a027205501"
-				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
-			}*/
 		}
 		google.analytics.enabled = false
 
@@ -568,8 +538,7 @@ environments {
 			observations {
 				rootDir = "${app.rootDir}/observations"
 				serverURL = "http://ibp.saturn.strandls.com/${appName}/observations"
-                //filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
-	//serverURL = "http://localhost/${appName}/observations"
+				//serverURL = "http://localhost/${appName}/observations"
 			}
 			userGroups {
 				rootDir = "${app.rootDir}/userGroups"
@@ -588,20 +557,6 @@ environments {
 					 port = 25
 				}
 			}
-			/*wgp {
-				facebook {
-					appId= "310694198984953"
-					secret= "eedf76e46272190fbd26e578ae764a60"
-				}
-				supportEmail = "team(at)thewesternghats(dot)in"
-			}
-			ibp {
-				facebook {
-					appId= "310694198984953"
-					secret= "eedf76e46272190fbd26e578ae764a60"
-				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
-			}*/
 		}
 		google.analytics.enabled = false
 
@@ -673,20 +628,6 @@ environments {
 					 port = 25
 				}
 			}
-			/*wgp {
-				facebook {
-					appId= "310694198984953"
-					secret= "eedf76e46272190fbd26e578ae764a60"
-				}
-				supportEmail = "team(at)thewesternghats(dot)in"
-			}
-			ibp {
-				facebook {
-					appId= "310694198984953"
-					secret= "eedf76e46272190fbd26e578ae764a60"
-				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
-			}*/
 		}
 		google.analytics.enabled = false
 
@@ -758,22 +699,6 @@ environments {
                     port = 25
                 }
             }
-            /*wgp {
-                facebook {
-                    //					appId= "327308053982589"
-                    //					secret= "f36074901fc24b904794692755796fd1"
-                    appId= "320284831369968"
-                    secret= "900d0811194fe28503006b31792690ae"
-                }
-                supportEmail = "team(at)thewesternghats(dot)in"
-            }
-            ibp {
-                facebook {
-                    appId= "320284831369968"
-                    secret= "900d0811194fe28503006b31792690ae"
-                }
-                supportEmail = "support(at)indiabiodiversity(dot)org"
-            }*/
         }
 
         ibp.domain='indiabiodiversity.org'
