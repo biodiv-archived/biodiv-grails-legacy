@@ -116,7 +116,7 @@ class ObservationService extends AbstractObjectService {
 
         //observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
         observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
-        observation.geoPrivacy = false;
+        observation.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
 
         observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
