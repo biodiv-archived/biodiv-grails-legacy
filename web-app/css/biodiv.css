@@ -112,7 +112,11 @@ h6 {
 
 .snippet.tablet {
 	width: 150px;
-	height: 200px;
+	height: 195px;
+}
+
+.observations_list .story-footer{
+    bottom:inherit;
 }
 
 .snippet.tablet .figure {
