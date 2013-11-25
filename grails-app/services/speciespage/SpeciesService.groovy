@@ -53,7 +53,7 @@ class SpeciesService {
     def springSecurityService;
 
     static int BATCH_SIZE = 10;
-    int noOfFields = Field.count();
+    //static int noOfFields = Field.count();
 
     def nameTerms(params) {
         List result = new ArrayList();

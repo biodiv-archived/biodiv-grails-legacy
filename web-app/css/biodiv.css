@@ -2389,6 +2389,10 @@ div.noOfRatings {
 	padding-left: 20px;
 } 
 
+.post-to-groups .checkbox {
+    padding-left:5px;
+}
+
 #ibp-header-bar .navbar-inner .brand, #ibp-header-bar .navbar-inner .dropdown-toggle {
 	color: #bbb;
 	text-shadow:none;

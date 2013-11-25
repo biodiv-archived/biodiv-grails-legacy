@@ -61,7 +61,6 @@ class SpeciesUploadService {
 	def springSecurityService
 
 	static int BATCH_SIZE = 10;
-	int noOfFields = Field.count();
 
 	/**
 	 * 

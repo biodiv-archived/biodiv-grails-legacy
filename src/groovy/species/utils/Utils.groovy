@@ -18,7 +18,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.EmailValidator;
-import org.codehaus.groovy.grails.plugins.springsecurity.ReflectionUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.ReflectionUtils;
 import org.codehaus.groovy.grails.validation.routines.UrlValidator
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;

@@ -26,7 +26,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	def jcaptchaService;
 	def activityFeedService;
 	//def recaptchaService;	
-    def grailsApplication
+    //def grailsApplication
 
 	def index = {
 		if (springSecurityService.isLoggedIn()) {

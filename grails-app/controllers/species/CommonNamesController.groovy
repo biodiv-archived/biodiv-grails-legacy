@@ -1,5 +1,7 @@
 package species
 
+import grails.plugins.springsecurity.Secured
+
 class CommonNamesController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -13,12 +15,14 @@ class CommonNamesController {
         [commonNamesInstanceList: CommonNames.list(params), commonNamesInstanceTotal: CommonNames.count()]
     }
 
+	@Secured(['ROLE_ADMIN'])
     def create = {
         def commonNamesInstance = new CommonNames()
         commonNamesInstance.properties = params
         return [commonNamesInstance: commonNamesInstance]
     }
 
+	@Secured(['ROLE_ADMIN'])
     def save = {
         def commonNamesInstance = new CommonNames(params)
         if (commonNamesInstance.save(flush: true)) {
@@ -41,6 +45,7 @@ class CommonNamesController {
         }
     }
 
+	@Secured(['ROLE_ADMIN'])
     def edit = {
         def commonNamesInstance = CommonNames.get(params.id)
         if (!commonNamesInstance) {
@@ -52,6 +57,7 @@ class CommonNamesController {
         }
     }
 
+	@Secured(['ROLE_ADMIN'])
     def update = {
         def commonNamesInstance = CommonNames.get(params.id)
         if (commonNamesInstance) {
@@ -79,6 +85,7 @@ class CommonNamesController {
         }
     }
 
+	@Secured(['ROLE_ADMIN'])
     def delete = {
         def commonNamesInstance = CommonNames.get(params.id)
         if (commonNamesInstance) {

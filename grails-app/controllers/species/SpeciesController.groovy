@@ -10,7 +10,6 @@ import species.sourcehandler.SpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
 import grails.converters.JSON;
 import grails.converters.XML;
-import grails.web.JSONBuilder;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;

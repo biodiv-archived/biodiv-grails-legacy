@@ -21,7 +21,7 @@ class AbstractObjectService {
 	def springSecurityService;
 	def sessionFactory;
 
-	private static final log = LogFactory.getLog(this);
+	protected static final log = LogFactory.getLog(this);
 
     /**
     */

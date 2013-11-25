@@ -34,6 +34,10 @@
 
     ProxyPassReverseCookiePath /biodiv /
 
+    <IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript application/json
+    </IfModule>
+
 </VirtualHost>
 
 <VirtualHost *:80>
@@ -88,6 +92,10 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
 
     RewriteCond %{REQUEST_URI} ^/user/login
     RewriteRule ^(.*)$ $1 [QSA,L]
+    <IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript application/json
+    </IfModule>
+
 </VirtualHost>
 
 <VirtualHost *:80>

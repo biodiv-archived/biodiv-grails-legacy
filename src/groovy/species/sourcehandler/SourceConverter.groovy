@@ -8,7 +8,8 @@ import species.License.LicenseType;
 
 class SourceConverter {
 	protected Map licenseUrlMap;
-	private static final log = LogFactory.getLog(this);
+	
+    protected static final log = LogFactory.getLog(this);
 	
 	protected SourceConverter() {
 		licenseUrlMap = new HashMap();

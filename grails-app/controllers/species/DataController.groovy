@@ -9,7 +9,6 @@ import species.sourcehandler.XMLConverter;
 import grails.converters.JSON;
 import grails.converters.XML;
 import grails.plugins.springsecurity.Secured;
-import grails.web.JSONBuilder;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
@@ -22,7 +21,6 @@ class DataController {
 	def dataSource
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
 	/**
 	 * 
@@ -34,7 +32,7 @@ class DataController {
 	 * 
 	 */
 	def listHierarchy = {
-		log.debug params;
+	    def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 		//cache "taxonomy_results"
 		includeOriginHeader();
 

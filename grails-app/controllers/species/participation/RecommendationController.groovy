@@ -14,9 +14,9 @@ class RecommendationController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+    def grailsApplication
 	def namesIndexerService;
 	def recommendationService;
-	def searchFieldsConfig = grailsApplication.config.speciesPortal.nameSearchFields
 
     def index = {
         redirect(action: "list", params: params)

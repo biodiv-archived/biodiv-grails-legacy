@@ -185,7 +185,7 @@ beans = {
     dbConf.facebook.bean.dao = 'facebookAuthDao'
     facebookAuthDao(DefaultFacebookAuthDao) {
         domainClassName = dbConf.facebook.domain.classname
-        connectionPropertyName = dbConf.facebook.domain.connectionPropertyName
+        appUserConnectionPropertyName = dbConf.facebook.domain.appUserConnectionPropertyName
         userDomainClassName = dbConf.userLookup.userDomainClassName
         rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
     }

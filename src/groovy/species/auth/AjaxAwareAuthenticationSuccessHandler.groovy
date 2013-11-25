@@ -1,4 +1,4 @@
-package species.auth
+package species.auth;
 
 import java.io.IOException;
 

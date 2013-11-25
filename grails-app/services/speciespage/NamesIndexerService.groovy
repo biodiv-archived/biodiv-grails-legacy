@@ -84,7 +84,7 @@ class NamesIndexerService {
 		/* setOutputUnigrams(boolean outputUnigrams) is deprecated....Confgure outputUnigrams during construction as shown below.*/
 		//def analyzer = new ShingleAnalyzerWrapper(Analyzer, minShingleSize, maxShingleSize, tokenSeprator, outputUnigram, outputUnigramsIfNoShingles)
 		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true)
-		return add(reco, analyzer, lookup);
+		return addRecoWithAnalyzer(reco, analyzer, lookup);
 	}
 
 	/**
@@ -94,7 +94,7 @@ class NamesIndexerService {
 	 * @param lookup
 	 * @return
 	 */
-	private boolean add(Recommendation reco, Analyzer analyzer, lookup) {
+	private boolean addRecoWithAnalyzer(Recommendation reco, Analyzer analyzer, lookup) {
 		if(isDirty()) {
 			log.info "Rebuilding index as its dirty"
 			rebuild();

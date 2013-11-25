@@ -169,12 +169,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 		if(!maxVotedReco){
 			return "";
 		}else{
-			return fetchSuggestedCommonNames(maxVotedReco.id, false);
+			return suggestedCommonNames(maxVotedReco.id, false);
 		}
 	}
 
 
-	private String fetchSuggestedCommonNames(recoId, boolean addLanguage){
+	private String suggestedCommonNames(recoId, boolean addLanguage){
 		def englistId = Language.getLanguage(null).id
 		Map langToCommonName = new HashMap()
 		this.recommendationVote.each{ rv ->
@@ -253,7 +253,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			def map = reco.getRecommendationDetails(this);
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
-			String cNames = fetchSuggestedCommonNames(reco.id, true)
+			String cNames = suggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			map.put("disAgree", (currentUser in map.authors));
 			result.add(map);

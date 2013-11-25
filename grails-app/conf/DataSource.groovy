@@ -33,7 +33,7 @@ environments {
     development {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
-            url = "jdbc:postgresql://localhost:5432/${appName}"
+            url = "jdbc:postgresql://127.0.0.1:5432/${appName}"
         }
     }
     test {

@@ -32,6 +32,7 @@ class BootStrap {
 	 * 
 	 */
 	def init = { servletContext ->
+        log.debug "Initializing biodiv application" 
 		//grailsApplication.config.'grails.web.disable.multipart' = true
 		initDefs();
 		initUsers();

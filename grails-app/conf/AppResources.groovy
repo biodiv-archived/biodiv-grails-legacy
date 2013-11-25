@@ -66,7 +66,7 @@ modules = {
 		//resource url:'/js/species/ajaxLogin.js'
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
 		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']
-		resource url:'/js/jquery/trunk8.js'
+		resource url:'/js/jquery/trunk8.min.js'
 		resource url:'/js/species/membership.js'
 		resource url:'/js/date.js'
 		resource url:'/js/daterangepicker.js'
@@ -333,5 +333,10 @@ modules = {
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
  
+    }
+
+    images{
+//        resource url:"${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/images/spinner.gif", attrs:[type:'gif', width='20', height='20', alt='Loading ...'], disposition:'inline'
+
     }
 }

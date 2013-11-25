@@ -116,8 +116,7 @@ if(r) {
                                     </div>
                                     <center>
                                         <div id="gallerySpinner" class="spinner">
-                                        <img src="${r.resource(dir:'images',file:'spinner.gif', absolute:true)}"
-                                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                                            <r:img uri="${grailsApplication.config.grails.serverURL}/images/spinner.gif" width="20" height="20"/>
                                         </div>
                                     </center>
                                      

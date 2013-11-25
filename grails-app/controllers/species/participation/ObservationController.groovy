@@ -90,7 +90,6 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list = {
-		log.debug params
 		
 		def model = getObservationList(params);
 		
@@ -122,7 +121,6 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def listJSON = {
-		log.debug params
 		def model = getObservationList(params);
         model.queryParams.remove('userGroup');
 		render model as JSON
@@ -162,7 +160,6 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	def occurrences = {
-		log.debug params
 		def result = observationService.getObservationOccurences(params)
 		render result as JSON
 	}
@@ -178,7 +175,6 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def save = {
-		log.debug params;
 		if(request.method == 'POST') {
 			//TODO:edit also calls here...handle that wrt other domain objects
 			saveAndRender(params, false)
@@ -197,7 +193,6 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def update = {
-		log.debug params;
 		def observationInstance = Observation.get(params.id?.toLong())
 		if(observationInstance)	{
 			saveAndRender(params, false)
@@ -218,7 +213,6 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def show = {
-		log.debug params;
 		if(params.id) {
 			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!observationInstance) {
@@ -261,7 +255,7 @@ class ObservationController extends AbstractObjectController {
 	 * @param pos
 	 * @return
 	 */
-	def getPrevNextObservations(int pos, String userGroupWebaddress) {
+	private def getPrevNextObservations(int pos, String userGroupWebaddress) {
 		String listKey = "obv_ids_list";
 		String listParamsKey = "obv_ids_list_params"
 		if(userGroupWebaddress) {
@@ -299,7 +293,6 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private void runLastListQuery(Map params) {
-		log.debug params;
 		if(params.webaddress) {
 			def userGroupController = new UserGroupController();
 			userGroupController.getUserGroupObservationsList(params)
@@ -351,7 +344,6 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def upload_resource = {
-		log.debug params;
 		def message;
 		if(params.ajax_login_error == "1") {
             message = [status:401, error:'Please login to continue']
@@ -492,7 +484,7 @@ class ObservationController extends AbstractObjectController {
 		}
 	}
 	
-	def download(url, File file)
+	private def download(url, File file)
 	{
 		def out = new BufferedOutputStream(new FileOutputStream(file))
 		out << new URL(url).openStream()
@@ -514,7 +506,6 @@ class ObservationController extends AbstractObjectController {
 			params.action = 'addRecommendationVote'
 		}
 		params.author = springSecurityService.currentUser;
-		log.debug params;
 
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
@@ -527,7 +518,6 @@ class ObservationController extends AbstractObjectController {
 			}
 			
 			def observationInstance = Observation.get(params.obvId);
-			log.debug params;
 			def mailType
 			try {
 				if(!recommendationVoteInstance) {
@@ -604,7 +594,6 @@ class ObservationController extends AbstractObjectController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addAgreeRecommendationVote = {
-		log.debug params;
 
 		params.author = springSecurityService.currentUser;
 
@@ -619,7 +608,6 @@ class ObservationController extends AbstractObjectController {
 			}
 			
 			def observationInstance = Observation.get(params.obvId);
-			log.debug params;
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
@@ -664,7 +652,6 @@ class ObservationController extends AbstractObjectController {
 	*/
    @Secured(['ROLE_USER'])
    def removeRecommendationVote = {
-	   log.debug params;
 
 	   def author = springSecurityService.currentUser;
 
@@ -698,7 +685,6 @@ class ObservationController extends AbstractObjectController {
 	 * 
 	 */
 	def getRecommendationVotes = {
-		log.debug params;
 		params.max = params.max ? params.int('max') : 1
 		params.offset = params.offset ? params.long('offset'): 0
 
@@ -753,7 +739,6 @@ class ObservationController extends AbstractObjectController {
 	 * 
 	 */
 	def voteDetails = {
-		log.debug params;
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
 		render (template:"/common/voteDetails", model:[votes:votes]);
 	}
@@ -763,7 +748,6 @@ class ObservationController extends AbstractObjectController {
 	 */
 
 	def listRelated = {
-		log.debug params;
 		def result = observationService.getRelatedObservations(params);
 		
 		def inGroupMap = [:]
@@ -780,14 +764,12 @@ class ObservationController extends AbstractObjectController {
 	 * 
 	 */
 	def tags = {
-		log.debug params;
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 
 		
 	@Secured(['ROLE_USER'])
 	def deleteRecoVoteComment = {
-		log.debug params;
 		def recoVote = RecommendationVote.get(params.id.toLong());
 		recoVote.comment = null;
 		try {
@@ -911,7 +893,6 @@ class ObservationController extends AbstractObjectController {
 	 * Count   
 	 */
 	def count = {
-		log.debug params
 		def userGroup 
 		if(params.webaddress) {
 			userGroup = userGroupService.get(params.webaddress)
@@ -932,7 +913,6 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def sendIdentificationMail = {
-		log.debug params;
 		def currentUserMailId = springSecurityService.currentUser?.email;
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
@@ -992,7 +972,6 @@ class ObservationController extends AbstractObjectController {
 	 *
 	 */
 	def search = {
-		log.debug params;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 		def model = observationService.getObservationsFromSearch(params);
@@ -1042,7 +1021,6 @@ class ObservationController extends AbstractObjectController {
 	 *
 	 */
 	def terms = {
-		log.debug params;
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
 		
 		List result = observationService.nameTerms(params)
@@ -1064,20 +1042,17 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def getObv = {
-		log.debug params;
 		render Observation.read(params.id.toLong()) as JSON
 	} 
 	
 	@Secured(['ROLE_USER'])
 	def getList = {
-		log.debug params;
 		def result = getObservationList(params)
         render result as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
 	def getHabitatList = {
-		log.debug params;
 		def res = new HashMap()
 			Habitat.list().each {
 			res[it.id] = it.name
@@ -1087,7 +1062,6 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def getGroupList = {
-		log.debug params;
 		def res = new HashMap()
 		SpeciesGroup.list().each {
 			res[it.id] = it.name
@@ -1098,7 +1072,6 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def getThumbObvImage = {
-		log.debug params;
 		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
@@ -1107,7 +1080,6 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def getFullObvImage = {
-		log.debug params;
 		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def gallImagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix):null
@@ -1116,13 +1088,11 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def getUserImage = {
-		log.debug params;
 		render SUser.read(params.id.toLong()).icon() 
 	}
 	
 	@Secured(['ROLE_USER'])
 	def getUserInfo = {
-		log.debug params;
 		def res = new HashMap()
 		def u = SUser.read(params.id.toLong())
 		res["id"] = u.id
@@ -1143,14 +1113,12 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_ADMIN'])
 	def batchUpload = {
-		log.debug params
 		obvUtilService.batchUpload(request, params)
 		render "== done"
 	}
 	
 	@Secured(['ROLE_USER'])
 	def requestExport = {
-		log.debug params
 		obvUtilService.requestExport(params)
 		def r = [:]
 		r['msg']= "${message(code: 'observation.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
@@ -1179,7 +1147,6 @@ class ObservationController extends AbstractObjectController {
     /**
     */
     def distinctReco = {
-        log.debug params
         def max = Math.min(params.max ? params.int('max') : 10, 100)
         def offset = params.offset ? params.int('offset') : 0
         Map result = [:];
@@ -1215,7 +1182,6 @@ class ObservationController extends AbstractObjectController {
     /**
     */
     def speciesGroupCount = {
-        log.debug params
         Map result = [:];
         try {
             def speciesGroupCountListResult;

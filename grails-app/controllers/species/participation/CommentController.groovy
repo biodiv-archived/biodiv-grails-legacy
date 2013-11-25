@@ -10,7 +10,6 @@ class CommentController {
 
 	@Secured(['ROLE_USER'])
 	def addComment = {
-		log.debug params;
 		params.author = springSecurityService.currentUser;
 		
 		
@@ -37,7 +36,6 @@ class CommentController {
 
 	@Secured(['ROLE_USER'])
 	def removeComment = {
-		log.debug params;
 		if(commentService.removeComment(params)){
 			render (['success:true']as JSON);
 		}else{
@@ -48,12 +46,10 @@ class CommentController {
 	}
 	
 	def getAllNewerComments = {
-		log.debug params;
 		render getResultForResponse(params) as JSON;
 	}
 
 	def getComments = {
-		log.debug params;
 		def comments = commentService.getComments(params);
 		def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
 		def olderTimeRef = (comments) ? (comments.last().lastUpdated.time.toString()) : null
@@ -65,24 +61,21 @@ class CommentController {
 	def getCommentByType = {
 		commentService.getCommentByType(params)
 	}
-	
 
 	@Secured(['ROLE_USER'])
 	def likeComment = {
-		log.debug params;
 		params.author = springSecurityService.currentUser;
 		render commentService.likeComment(params)
 	}
 	
 	@Secured(['ROLE_USER'])
 	def editComment = {
-		log.debug params;
 		render "To do edit"
 	}
 	
 	private getResultForResponse(params){
 		def result = ["success":true];
-		def comments = getAllNewerComments(params);
+		def comments = _getAllNewerComments(params);
 		if(!comments.isEmpty()){
 			def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
 			result.putAll([showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
@@ -90,7 +83,7 @@ class CommentController {
 		return result
 	}
 	
-	private getAllNewerComments(params){
+	private _getAllNewerComments(params){
 		params.max = 100
 		params.timeLine = "newer"
 		params.refTime = params.newerTimeRef ?: new Date().previous().time.toString()

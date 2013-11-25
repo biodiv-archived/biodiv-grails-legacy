@@ -15,7 +15,7 @@ import javax.servlet.http.Cookie;
 
 import species.utils.Utils;
 
-class FacebookAuthUtils {
+class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils {
 
 	private static def log = Logger.getLogger(this)
 
