@@ -74,6 +74,7 @@ class UserGroupMemberRole implements Serializable {
 
 	static boolean remove(UserGroup userGroup, SUser sUser, Role role, boolean flush = false) {
 		UserGroupMemberRole instance = UserGroupMemberRole.get(userGroup.id, sUser.id, role.id)
+		
 		if (!instance) {
 			return false
 		}

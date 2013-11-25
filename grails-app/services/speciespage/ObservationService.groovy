@@ -392,6 +392,7 @@ class ObservationService extends AbstractObjectService {
             projections {
                 groupProperty('sourceId')
                 groupProperty('isShowable')
+				groupProperty('lastRevised')
             }
             and {
                 eq("maxVotedReco", maxVotedReco)
@@ -399,6 +400,7 @@ class ObservationService extends AbstractObjectService {
                 if(obvId) ne("id", obvId)
             }
             order("isShowable", "desc")
+            order("lastRevised", "desc")
             if(limit >= 0) maxResults(limit)
                 firstResult (offset?:0)
         }
