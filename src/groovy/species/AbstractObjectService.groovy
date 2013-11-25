@@ -124,9 +124,11 @@ class AbstractObjectService {
     protected Map getFeaturedObject(Long ugId, int limit, long offset, String controller){
         log.debug "Getting featured objects for ${controller} in usergroup ${ugId?ugId:'IBP'}. limit:${limit} offset:${offset}"
         String type = ""
+        String type1 = ""
         //TODO:change hardcoded string to class definitions
         if (controller == "observation") {
             type = "species.participation.Observation";
+            type1 = "species.participation.Checklists";
         }
         else if (controller == "species") {
             type = "species.Species";
@@ -134,15 +136,14 @@ class AbstractObjectService {
         else if (controller == "document") {
             type = "content.eml.Document";
         }
-        else {
-            
+        else {    
         }
-
         def featured = []
         def count = 0;
         def queryParams = ["type": type]
-        def countQuery = "select count(*) from Featured feat where feat.objectType = :type "
-        def query = "from Featured feat where feat.objectType = :type "
+        queryParams["type1"] = type1
+        def countQuery = "select count(*) from Featured feat where feat.objectType = :type or feat.objectType = :type1 "
+        def query = "from Featured feat where feat.objectType = :type or feat.objectType = :type1 "
 
         if(ugId) {
             queryParams["ugId"] = ugId

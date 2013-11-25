@@ -797,15 +797,15 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.featureBy == "true" ) {
-            if(params.userGroup == null) {
+           // if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
-                featureQuery = ", Featured feat "
-            } else {
-                featureQuery = ", Featured feat "
-            }
+              //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
+            //} else {
+              //  featureQuery = ", Featured feat "
+            //}
             query += featureQuery;
-            filterQuery += " and obv.id = feat.objectId and feat.objectType = :featType "
+            filterQuery += " and obv.featureCount > 0 "
             if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
             }else {
@@ -2117,10 +2117,10 @@ class ObservationService extends AbstractObjectService {
     /*
      * used for download and post in bulk
      */
-    def getObservationList(params, String action){
-        if("search".equalsIgnoreCase(action)){
+    def getObservationList(params, max, offset, action){
+		if("search".equalsIgnoreCase(action)){
             //getting result from solr
-            def idList = getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
+            def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
             def res = []
             idList.each { obvId ->
                 res.add(Observation.read(obvId))
@@ -2132,10 +2132,10 @@ class ObservationService extends AbstractObjectService {
                 log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
                 return []
             }
-            return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
+            return userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
         }
         else{
-            return getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
+            return getFilteredObservations(params, max, offset, false).observationInstanceList
 
         }
     }

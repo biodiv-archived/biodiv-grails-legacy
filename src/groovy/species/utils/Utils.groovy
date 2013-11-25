@@ -25,6 +25,7 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 import species.auth.SUser;
 import species.NamesParser;
@@ -423,7 +424,8 @@ class Utils {
 			}
 		   
 		}
-		println "Returned url map" + retMap
+		retMap = new GrailsParameterMap(retMap, null)
+		println "Returned url map == " + retMap
 		return retMap
 	}
 	

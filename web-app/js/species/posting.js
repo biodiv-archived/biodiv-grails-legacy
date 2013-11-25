@@ -11,12 +11,12 @@ function updateObjSelection(id, comp){
 		if($('.post-to-groups .select-all').hasClass('active')){
 			rejectedObjects.push(id);
 		}else{
-			selectedObjects.splice(array.indexOf(id), 1);	
+			selectedObjects.splice(selectedObjects.indexOf(id), 1);
 		}
 	}else{
 		$(comp).addClass('selectedItem');
 		if($('.post-to-groups .select-all').hasClass('active')){
-			rejectedObjects.splice(array.indexOf(id), 1);
+			rejectedObjects.splice(rejectedObjects.indexOf(id), 1);
 		}else{
 			selectedObjects.push(id);	
 		}

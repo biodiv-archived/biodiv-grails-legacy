@@ -19,9 +19,16 @@
         <div class="span12">
 
 	    <clist:showSubmenuTemplate />
+             <g:if test="${checklistInstance}">
+                            <g:set var="featureCount" value="${checklistInstance.featureCount}"/>
+                            </g:if>
+
             <div class="page-header clearfix">
                 <div style="width:100%;">
-                    <div class="main_heading" style="margin-left:0px;">
+                    <div class="main_heading" style="margin-left:0px; position:relative">
+                        <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? 'Featured':''}">
+                                            </span>
+
                         <div class="pull-right">
                             <sUser:ifOwns model="['user':checklistInstance.author]">
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
@@ -56,8 +63,8 @@
                         <obv:showStory
                         model="['observationInstance':checklistInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
                     </div>
-
-
+                    <uGroup:objectPostToGroupsWrapper 
+                    model="['observationInstance':checklistInstance, 'objectType':checklistInstance.class.canonicalName]"/>
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                         <comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super','showCommentList':false]" />

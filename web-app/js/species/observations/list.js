@@ -329,7 +329,7 @@ $(document).ready(function(){
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
-                $('.list').trigger('updatedGallery');
+                //$('.list').trigger('updatedGallery');
             }
         });
 
