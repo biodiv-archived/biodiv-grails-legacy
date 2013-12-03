@@ -1,7 +1,7 @@
 package species.auth.drupal
 
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser
+import org.codehaus.groovy.grails.plugin.springsecurity.GrailsUser
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication

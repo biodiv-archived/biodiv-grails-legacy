@@ -2,7 +2,7 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.utils.Utils"%>
 <%@page
-	import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
+	import="org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils"%>
 <html  xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" 
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">

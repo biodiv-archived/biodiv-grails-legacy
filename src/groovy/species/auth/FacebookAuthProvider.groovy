@@ -11,10 +11,10 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.GrantedAuthorityImpl
 import org.springframework.security.core.userdetails.User
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPostAuthenticationChecks;
+import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPreAuthenticationChecks;
+import org.codehaus.groovy.grails.plugin.springsecurity.GrailsUser;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;

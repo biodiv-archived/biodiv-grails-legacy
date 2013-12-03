@@ -1,6 +1,6 @@
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.plugin.springsecurity.SecurityFilterPosition
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
 
 import species.Field;
 import species.UserGroupTagLib;

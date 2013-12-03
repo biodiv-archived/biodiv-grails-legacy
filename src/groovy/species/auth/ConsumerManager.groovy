@@ -1,6 +1,6 @@
 package species.auth
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
 import org.openid4java.message.AuthSuccess;
 
 class ConsumerManager extends org.openid4java.consumer.ConsumerManager {

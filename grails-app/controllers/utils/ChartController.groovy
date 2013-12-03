@@ -1,7 +1,7 @@
 package utils
 
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 
 class ChartController {
 

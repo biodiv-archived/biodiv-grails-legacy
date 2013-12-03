@@ -3,7 +3,7 @@ package content
 
 import grails.converters.JSON
 import content.Location
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 import org.grails.taggable.*
 import species.groups.UserGroup
 

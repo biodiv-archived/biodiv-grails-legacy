@@ -2,7 +2,7 @@ package species
 
 import grails.converters.JSON;
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 class ResourceController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

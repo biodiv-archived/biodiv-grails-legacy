@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.codec.digest.*
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityRequestHolder;
+import org.codehaus.groovy.grails.plugin.springsecurity.SecurityRequestHolder;
 
 
 class DrupalAuthDirectFilter extends AbstractAuthenticationProcessingFilter {

@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.plugins.springsecurity.RequestHolderAuthenticationFilter;
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityRequestHolder;
+import org.codehaus.groovy.grails.plugin.springsecurity.RequestHolderAuthenticationFilter;
+import org.codehaus.groovy.grails.plugin.springsecurity.SecurityRequestHolder;
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.security.authentication.AuthenticationManager
@@ -32,7 +32,7 @@ class DrupalAuthCookieFilter extends AbstractAuthenticationProcessingFilter {
 	String logoutUrl = '/j_spring_security_logout'
 
 	DrupalAuthCookieFilter() {
-		super(org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.plugins.springsecurity.apf.filterProcessesUrl);	
+		super(org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.plugin.springsecurity.apf.filterProcessesUrl);	
 	}
 	//		void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, javax.servlet.FilterChain chain) {
 	//			HttpServletRequest request = servletRequest

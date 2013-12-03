@@ -10,7 +10,7 @@ import java.util.List
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.converters.JSON
 import static org.codehaus.groovy.grails.commons.ConfigurationHolder.config as Config
 import org.springframework.http.HttpStatus
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 
 
 import speciespage.ObservationService

@@ -2,13 +2,13 @@ package utils
 
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.acls.domain.BasePermission;
 
 import species.groups.UserGroup;
 import species.utils.Utils;
 import grails.converters.JSON;
-import grails.plugins.springsecurity.Secured;
+import grails.plugin.springsecurity.Secured;
 
 class NewsletterController {
 

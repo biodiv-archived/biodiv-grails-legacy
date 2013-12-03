@@ -10,7 +10,7 @@ import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
 import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
 import com.octo.captcha.component.image.color.SingleColorGenerator
 import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
-import grails.plugins.springsecurity.SecurityConfigType;
+import grails.plugin.springsecurity.SecurityConfigType;
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
 import org.apache.log4j.Priority
 
@@ -1194,16 +1194,16 @@ grails.plugin.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appC
 	}
 }
 
-grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
+grails.plugin.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
 
 
 //TODO:Need to change
-grails.plugins.springsecurity.useRunAs = true
-grails.plugins.springsecurity.runAs.key = 'run-asKey'
+grails.plugin.springsecurity.useRunAs = true
+grails.plugin.springsecurity.runAs.key = 'run-asKey'
 
-grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
-grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
-grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
+grails.plugin.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
+grails.plugin.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
+grails.plugin.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
 grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation 
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
@@ -1299,8 +1299,8 @@ grails {
 remove this line */
 //grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
 //TODO remove this client side fb authentication ... as this is legacy code in plugin
-grails.plugins.springsecurity.facebook.filter.type='transparent,cookieDirect'
-grails.plugins.springsecurity.facebook.filter.types='transparent,cookieDirect'
+grails.plugin.springsecurity.facebook.filter.type='transparent,cookieDirect'
+grails.plugin.springsecurity.facebook.filter.types='transparent,cookieDirect'
 //TODO:In Spring Security 3.0 and earlier, the username was stored in the HTTP session under the key "SPRING_SECURITY_LAST_USERNAME". This no longer done, but the plugin will use the old behavior if the grails.plugin.springsecurity.apf.storeLastUsername setting is set to true (the default is false ). Further, the name is no longer escaped before storing, it is stored exactly as entered by the user, so you must escape it when redisplaying to avoid XSS attacks.
 grails.plugin.springsecurity.apf.storeLastUsername=true
 grails.databinding.useSpringBinder=true

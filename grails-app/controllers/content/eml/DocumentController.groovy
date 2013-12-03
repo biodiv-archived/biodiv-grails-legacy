@@ -1,6 +1,6 @@
 package content.eml
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 
 import grails.converters.JSON
 import org.grails.taggable.*

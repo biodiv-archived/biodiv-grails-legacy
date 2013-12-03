@@ -1,7 +1,7 @@
 package species.curation
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import species.NamesParser;

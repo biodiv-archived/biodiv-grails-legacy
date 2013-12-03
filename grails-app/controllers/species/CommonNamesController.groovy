@@ -1,6 +1,6 @@
 package species
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 
 class CommonNamesController {
 

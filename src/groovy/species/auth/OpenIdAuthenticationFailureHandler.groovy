@@ -8,10 +8,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationFailureHandler;
-import org.codehaus.groovy.grails.plugins.springsecurity.ReflectionUtils;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugins.springsecurity.openid.InvalidOpenidEndpoint;
+import org.codehaus.groovy.grails.plugin.springsecurity.AjaxAwareAuthenticationFailureHandler;
+import org.codehaus.groovy.grails.plugin.springsecurity.ReflectionUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.openid.InvalidOpenidEndpoint;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

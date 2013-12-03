@@ -1,6 +1,6 @@
 package species;
 
-import grails.plugins.springsecurity.acl.SecurityAclTagLib;
+import grails.plugin.springsecurity.acl.SecurityAclTagLib;
 
 import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl
 import org.springframework.security.acls.model.ObjectIdentityGenerator

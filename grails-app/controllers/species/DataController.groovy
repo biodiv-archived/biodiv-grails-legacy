@@ -8,7 +8,7 @@ import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
 import grails.converters.JSON;
 import grails.converters.XML;
-import grails.plugins.springsecurity.Secured;
+import grails.plugin.springsecurity.Secured;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;

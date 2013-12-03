@@ -3,7 +3,7 @@ package species.participation
 import grails.converters.JSON
 import species.License;
 import species.groups.SpeciesGroup;
-import grails.plugins.springsecurity.Secured;
+import grails.plugin.springsecurity.Secured;
 import species.Resource.ResourceType;
 
 class ChecklistController {

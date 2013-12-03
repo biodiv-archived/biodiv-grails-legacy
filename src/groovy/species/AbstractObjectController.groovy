@@ -11,12 +11,12 @@ import groovy.xml.XmlUtil;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.converters.XML;
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.Flag.FlagType

@@ -1,7 +1,7 @@
 package speciespage
 
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.social.facebook.api.FacebookProfile
 import org.springframework.social.facebook.api.impl.FacebookTemplate
@@ -98,7 +98,7 @@ class FacebookAuthService {
 	 */
 	void registerFacebookUser(FacebookAuthToken token, SUser appUser) {
 		log.debug "Saving facebook user domain class"
-		def conf =  grailsApplication.config.grails.plugins.springsecurity;
+		def conf =  grailsApplication.config.grails.plugin.springsecurity;
 		String domainClassName = conf.facebook.domain.classname;
 		String connectionPropertyName = conf.facebook.domain.connectionPropertyName
 		Class<?> UserClass = grailsApplication.getDomainClass(domainClassName)?.clazz

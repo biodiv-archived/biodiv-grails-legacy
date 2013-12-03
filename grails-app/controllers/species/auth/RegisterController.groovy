@@ -2,11 +2,11 @@ package species.auth;
 
 import grails.util.Environment;
 
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import org.codehaus.groovy.grails.plugin.springsecurity.NullSaltSource;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
-import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
+import org.codehaus.groovy.grails.plugin.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.web.context.request.RequestContextHolder as RCH
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
@@ -16,7 +16,7 @@ import species.utils.Utils;
 import org.springframework.security.web.WebAttributes;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
-class RegisterController extends grails.plugins.springsecurity.ui.RegisterController {
+class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 	
 	
 	def SUserService;
@@ -439,7 +439,7 @@ class ResetPasswordCommand2 {
 
     static constraints = {
         username nullable: false, email: true
-        password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
+        password blank: false, nullable: false, validator: grails.plugin.springsecurity.ui.RegisterController.passwordValidator
         password2 validator: RegisterController.password2Validator
     }
 }

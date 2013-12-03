@@ -1,7 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 import species.participation.Follow
 import species.auth.SUser
 

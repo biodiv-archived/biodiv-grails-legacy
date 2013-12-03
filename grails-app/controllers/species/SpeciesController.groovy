@@ -15,12 +15,12 @@ import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import species.utils.Utils;
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 
 class SpeciesController extends AbstractObjectController {
 

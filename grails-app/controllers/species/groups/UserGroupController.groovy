@@ -3,8 +3,8 @@ package species.groups
 import java.util.Map;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.ui.RegistrationCode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -19,7 +19,7 @@ import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 import grails.converters.JSON;
-import grails.plugins.springsecurity.Secured;
+import grails.plugin.springsecurity.Secured;
 import groovy.text.SimpleTemplateEngine
 
 class UserGroupController {

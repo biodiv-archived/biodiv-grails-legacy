@@ -1,7 +1,7 @@
 package species.auth
 
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
+import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPostAuthenticationChecks;
+import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPreAuthenticationChecks;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -1,10 +1,10 @@
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationFailureHandler;
-import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccessHandler;
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdUserDetailsService;
+import org.codehaus.groovy.grails.plugin.springsecurity.AjaxAwareAuthenticationFailureHandler;
+import org.codehaus.groovy.grails.plugin.springsecurity.AjaxAwareAuthenticationSuccessHandler;
+import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPostAuthenticationChecks;
+import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPreAuthenticationChecks;
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugin.springsecurity.openid.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;

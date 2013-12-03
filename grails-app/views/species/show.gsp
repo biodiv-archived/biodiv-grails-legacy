@@ -11,7 +11,7 @@
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ActivityFeedService"%>
-<%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
+<%@page import="org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils"%>
 
 <html>
 <head>

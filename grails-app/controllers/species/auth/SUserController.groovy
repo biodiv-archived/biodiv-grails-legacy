@@ -2,11 +2,11 @@ package species.auth
 
 import groovy.sql.Sql;
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured;
-import grails.plugins.springsecurity.ui.AbstractS2UiController;
-import grails.plugins.springsecurity.ui.RegisterController;
-import grails.plugins.springsecurity.ui.SpringSecurityUiService
-import grails.plugins.springsecurity.ui.UserController;
+import grails.plugin.springsecurity.Secured;
+import grails.plugin.springsecurity.ui.AbstractS2UiController;
+import grails.plugin.springsecurity.ui.RegisterController;
+import grails.plugin.springsecurity.ui.SpringSecurityUiService
+import grails.plugin.springsecurity.ui.UserController;
 import grails.util.GrailsNameUtils
 
 import java.util.List
@@ -14,8 +14,8 @@ import java.util.Map
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.solr.common.util.NamedList;
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.plugin.springsecurity.NullSaltSource
+import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -914,7 +914,7 @@ class ResetPasswordCommand {
 				return 'spring.security.ui.resetPassword.currentPassword.doesnt.match' 
 			}
 		} 
-		password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
+		password blank: false, nullable: false, validator: grails.plugin.springsecurity.ui.RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }

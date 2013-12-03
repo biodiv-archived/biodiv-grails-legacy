@@ -1,6 +1,6 @@
 package species.participation
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 import grails.converters.JSON
 import java.util.List;
 

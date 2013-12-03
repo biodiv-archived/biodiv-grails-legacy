@@ -4,7 +4,7 @@ import grails.util.*
 import org.grails.rateable.*
 import grails.converters.JSON;
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.Secured
 
 class RatingController extends RateableController {
     

@@ -14,7 +14,7 @@ import species.utils.Utils;
 
 class AjaxAwareAuthenticationSuccessHandler
 extends
-org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccessHandler {
+org.codehaus.groovy.grails.plugin.springsecurity.AjaxAwareAuthenticationSuccessHandler {
 
 	/**
 	 * {@inheritDoc}
