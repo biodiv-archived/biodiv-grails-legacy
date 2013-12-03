@@ -292,7 +292,6 @@ modules = {
 		resource url:'/js/location/location-picker.js'
 	}
 	
-	
 	content_view {
 		dependsOn 'core,  tagit'
 		resource url:'/css/main.css'
@@ -333,5 +332,18 @@ modules = {
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
  
+    }
+
+    maps {
+    	dependsOn 'core'
+		
+		resource url:'/css/am.css'
+
+		resource url:'/js/OpenLayers-2.10/OpenLayers.js'
+		resource url:'/js/species/maps/am.js'
+		resource url:'/js/species/maps/map-search.js'
+		resource url:'/js/species/maps/mapapp.js'
+		resource url:'/js/species/maps/cookie-chef.js'
+
     }
 }
