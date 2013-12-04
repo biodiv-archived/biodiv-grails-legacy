@@ -75,7 +75,7 @@ $(document).ready(function() {
                 },
                 'map': {
                     'domain':document.domain,
-                    'geoserverHost':'indiabiodiversity.localhost.org',
+                    'geoserverHost':document.domain,
                     'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
                 }
 	}
