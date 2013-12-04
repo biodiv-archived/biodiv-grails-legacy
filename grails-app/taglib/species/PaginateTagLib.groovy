@@ -111,6 +111,10 @@ class PaginateTagLib {
 				}
 			}
 		}
+		
+		//resetting startswith to initial original value after create link
+		linkTagAttrs.startsWith = startsWith
+		
 	}
 	
 	/**

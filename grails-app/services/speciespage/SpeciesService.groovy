@@ -468,6 +468,7 @@ class SpeciesService {
                 filterQuery += " and s.title like '<i>${params.startsWith}%' ";
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
+				queryParams["startsWith"] = params.startsWith
             }
         } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
             if(params.startsWith == "A-Z") {
@@ -480,6 +481,7 @@ class SpeciesService {
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
+				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
         } else {
@@ -494,6 +496,7 @@ class SpeciesService {
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
         }
@@ -537,6 +540,7 @@ class SpeciesService {
 
         query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
         countQuery += countFilterQuery + " group by s.percentOfInfo"
+		
         return [query:query, countQuery:countQuery, queryParams:queryParams]
 
 

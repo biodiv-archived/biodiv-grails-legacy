@@ -154,24 +154,30 @@ beans = {
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
         solrServer = ref('speciesSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     observationsSearchService(speciespage.search.ObservationsSearchService) {
         solrServer = ref('observationsSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     //checklistSearchService(speciespage.search.ChecklistSearchService) {
     //    solrServer = ref('checklistSolrServer');
     //}
     newsletterSearchService(speciespage.search.NewsletterSearchService) {
         solrServer = ref('newsletterSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
         solrServer = ref('projectSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
         solrServer = ref('documentSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     SUserSearchService(speciespage.search.SUserSearchService) {
         solrServer = ref('usersSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
 
     preAuthenticationChecks(DefaultPreAuthenticationChecks)
