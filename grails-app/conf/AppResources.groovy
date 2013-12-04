@@ -338,6 +338,7 @@ modules = {
     	dependsOn 'core'
 		
 		resource url:'/css/am.css'
+		resource url:'/css/styles.css'
 
 		resource url:'/js/OpenLayers-2.10/OpenLayers.js'
 		resource url:'/js/species/maps/am.js'

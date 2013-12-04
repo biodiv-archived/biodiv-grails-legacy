@@ -237,6 +237,7 @@ speciesPortal {
 
     maps {
         SRID = 4326;
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/maps"
     }
 
 	content{
@@ -573,6 +574,9 @@ environments {
 				rootDir = "${app.rootDir}/users"
 				serverURL = "http://ibp.saturn.strandls.com/${appName}/users"
 			}
+            maps {
+		        serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/maps"
+            }
 			search.serverURL="http://saturn.strandls.com:8080/solr"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 			grails {
@@ -656,7 +660,10 @@ environments {
 			content{
 				rootDir = "${app.rootDir}/content"
 				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
-			}	
+			}
+            maps {
+		        serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/maps"
+            }
 
 			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
@@ -742,6 +749,9 @@ environments {
                 rootDir = "${app.rootDir}/content"
                 serverURL = "http://indiabiodiversity.org/${appName}/content"
             }	
+            maps {
+		        serverURL = "http://indiabiodiversity.org/${appName}/maps"
+            }
 
             search.serverURL="http://indiabiodiversity.org:8080/solr"
             grails {

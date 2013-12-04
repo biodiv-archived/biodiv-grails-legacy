@@ -106,7 +106,12 @@ class NamesIndexerService {
 		boolean success = false;
 
 		def species = getSpecies(reco.taxonConcept);
-		def icon = getSpeciesIconPath(species);
+		def icon;
+        if(species)
+            icon = getIconPath(species.mainImage())
+        else 
+            icon = getIconPath(reco.taxonConcept?.group?.icon());
+
 		//log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
 		tokenStream.reset()
@@ -130,12 +135,9 @@ class NamesIndexerService {
 		return Species.findByTaxonConcept(taxonConcept);
 	}
 	
-	private String getSpeciesIconPath(species){
-		if(species?.mainImage()){
-			return ImageUtils.getFileName(species.mainImage().fileName, ImageType.SMALL, null);
-		}else{
-			return species?.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName;
-		}
+	private String getIconPath(mainImage){
+        if(!mainImage) return null;
+        return mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, !speciesInstance.resources ? '.png' :null): null;
 	}
 
 	/**

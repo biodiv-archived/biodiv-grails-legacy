@@ -72,6 +72,11 @@ $(document).ready(function() {
                 },
                 'action': {
                     'inGroupsUrl':"${uGroup.createLink(controller:'action', action: 'inGroups', userGroup:userGroupInstance)}"
+                },
+                'map': {
+                    'domain':document.domain,
+                    'geoserverHost':'indiabiodiversity.localhost.org',
+                    'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
