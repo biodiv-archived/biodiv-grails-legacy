@@ -112,7 +112,6 @@ class Species implements Rateable {
             }
         }
         //def idList = results.collect { it[0] }
-
         if(idList) {
             def instances = Resource.withCriteria {  
                 inList 'id', idList 
