@@ -99,9 +99,19 @@ class Species implements Rateable {
 		def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
         params['type'] = type;
+
         def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id and r.type !='"+ResourceType.ICON+"' and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
         
-        def idList = results.collect { it[0] }
+        def res = sql.rows("select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref where o.type !='"+ResourceType.ICON+"' and o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id)) order by avg desc, id asc", [id:this.id])
+
+        def idList = results.collect {it[0]}
+
+        res.each {
+            if(!idList.contains(it[0])) {
+                idList<<it[0]
+            }
+        }
+        //def idList = results.collect { it[0] }
 
         if(idList) {
             def instances = Resource.withCriteria {  
@@ -110,7 +120,7 @@ class Species implements Rateable {
             }
             results.collect {  r -> 
                 instances.find { i -> (r[0] == i.id) } 
-            } 
+            }
         } else {
             []
         }
