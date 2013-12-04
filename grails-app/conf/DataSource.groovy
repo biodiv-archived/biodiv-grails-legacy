@@ -14,9 +14,11 @@ dataSource {
         validationQuery="SELECT 1"
         testOnBorrow=true
         testOnReturn=false
-        testWhileIdle=false
+        testWhileIdle=true
 
-        timeBetweenEvictionRunsMillis = 1000 * 60 * 30
+        timeBetweenEvictionRunsMillis = 1000 * 60 * 15
+		numTestsPerEvictionRun=3
+		minEvictableIdleTimeMillis=1000 * 60 * 5
         //        maxWait = 30000
     }
 }
