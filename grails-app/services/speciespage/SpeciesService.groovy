@@ -452,7 +452,7 @@ class SpeciesService {
         if(queryParams.sort.equals('lastrevised')) {
             queryParams.sort = 'lastUpdated'
 
-        } else if(queryParams.sort.equals('percentofinfo')) {
+        } else if(queryParams.sort.equals('percentofinfo') || queryParams.sort.equals('score')) {
             queryParams.sort = 'percentOfInfo'
         }
         queryParams.order = (queryParams.sort.equals("percentOfInfo")||queryParams.sort.equals("lastUpdated"))?"desc":queryParams.sort.equals("title")?"asc":"asc"
