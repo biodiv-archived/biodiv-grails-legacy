@@ -178,15 +178,12 @@
 								class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 								href="${uGroup.createLink(controller:'user', action:'list')}"
 								title="Members">Members</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
-								href="/calendar" title="Events">Events</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
-								href="/biodiversity_news" title="News">News</a></li>
-
-                            
-
+<%--							<li--%>
+<%--								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a--%>
+<%--								href="/calendar" title="Events">Events</a></li>--%>
+<%--							<li--%>
+<%--								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a--%>
+<%--								href="/biodiversity_news" title="News">News</a></li>--%>
 							
 							<li
 								class="${(params.controller == 'chart')?' active':''}"><a
