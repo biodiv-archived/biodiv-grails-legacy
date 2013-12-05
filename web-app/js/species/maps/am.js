@@ -751,7 +751,7 @@ function showAjaxLinkPopup(url, title) {
 }
 
 function getLinkTableEntries(feature_id, layer_tablename, link_tablename) {
-    var url = 'http://' + getHost() + '/ml_orchestrator.php?action=getLinkTableEntries&layerdata_id=' + feature_id + '&layer_tablename=' + layer_tablename + '&link_tablename=' + link_tablename;
+    var url = 'http://' + getHost() + '/map/getLinkTableEntries?layerdata_id=' + feature_id + '&layer_tablename=' + layer_tablename + '&link_tablename=' + link_tablename;
     
     var layer_link_table_entries;
     
@@ -1548,7 +1548,7 @@ function getMapThumbnail(layer_tablename) {
     return html;
 }
 
-var india_baundary_lyr = getWorkspace() + ':lyr_121_india_boundary';
+var india_baundary_lyr;
 
 function getMapImage(layer_tablename, cql_filter, width, height, format) {
     
@@ -1787,13 +1787,9 @@ function updateLayersList(tag) {
         //var new_layers = ['lyr_299_wg_bats', 'lyr_293_kerala_rf_data','lyr_294_distribution','lyr_301_wg_bird_tree_transcet'];
 	//var new_layers = ['lyr_338_cape_comorin','lyr_340_transect','lyr_342_jan_feb_rainfall','lyr_344_march_may_rainfall','lyr_346_jun_sep_rainfall','lyr_348_oct_dec_rain','lyr_350_hydro_electric_projects','lyr_352_palani_hills','lyr_354_westernghats_dams','lyr_356_mines_ingoa','lyr_358_rain_annual', 'lyr_364_mammal_distribution'];
 	//var new_layers = ['lyr_369_wti_elephant_corridor','lyr_368_nilgiri_wetland','lyr_372_prachi_mehta_elephant','lyr_367_india_georegions_sing','lyr_370_aquatic_plants','lyr_371_plant_locations_aparna_watve','lyr_366_fish', 'lyr_381_tourism_information'];
-	var new_layers = ['lyr_383_amphibian_collections_wgrc','lyr_385_amphibians','lyr_387_brt_animal_sightings','lyr_391_odonates','lyr_381_tourism_information'];
 
-	/*
-        if (getWorkspace() === 'wgp' ){
-		new_layers = ['lyr_338_cape_comorin','lyr_340_transect','lyr_350_hydro_electric_projects','lyr_352_palani_hills','lyr_354_westernghats_dams','lyr_356_mines_ingoa', 'lyr_364_mammal_distribution'];
-
-	}*/
+/*	TODO change to get new layers from some service
+//      var new_layers = ['lyr_383_amphibian_collections_wgrc','lyr_385_amphibians','lyr_387_brt_animal_sightings','lyr_391_odonates','lyr_381_tourism_information'];
 
         if (getWorkspace() === 'wgp' ){
 		new_layers = ['lyr_383_amphibian_collections_wgrc','lyr_385_amphibians','lyr_387_brt_animal_sightings','lyr_391_odonates','lyr_381_tourism_information'];
@@ -1809,7 +1805,7 @@ function updateLayersList(tag) {
            var layer = getWorkspace() + ':' + new_layers[k];
            document.getElementById(layer).style.display = 'block';
         }
-    }
+*/    }
 
 
     /*

@@ -3,7 +3,7 @@
 <html>
     <head>
         <g:set var="title" value="${params?.title?:''}"/>
-        <g:render template="/common/titleTemplate" model="['title':title]"/>
+        <g:render template="/common/titleTemplate" model="[]"/>
         <r:require modules="maps" />
         <style>
             .container {
@@ -51,6 +51,7 @@
             $(document).ready(function() {
             loadGoogleMapsAPI(function() {
 
+                india_baundary_lyr = getWorkspace() + ':lyr_121_india_boundary';
                 var mapOptions = {
                     popup_enabled: false,
                     toolbar_enabled: true,
