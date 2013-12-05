@@ -775,7 +775,7 @@ opacity:1;
 }
 
 .layer_details_link {
-background-image: url("images/info.png");
+background-image: url("../images/info.png");
 background-repeat: no-repeat;
 background-position: left center;
 opacity:0.5;      
