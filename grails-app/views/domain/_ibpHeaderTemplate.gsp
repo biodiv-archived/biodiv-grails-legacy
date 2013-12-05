@@ -67,6 +67,11 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		</div>
 	</g:if>
 
+	<div class="alertMsg alert alert-info"
+		style="clear: both; margin: 0px; text-align: center;">
+		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).
+	</div>
+
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
 		${flash.message}
