@@ -29,7 +29,7 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title>${title}<g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
+<title><g:if test="${title}">${title} | </g:if><g:if test="${params.action.equals('show')}"> ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
 
 <g:if test="${favIconPath}">
 <link rel="shortcut icon" href="${favIconPath}" type="image/x-icon" />
@@ -47,7 +47,7 @@ if(description != null && description.length() > 300) {
 <meta property="og:description" content="${description}"/>
 </g:if>
 <meta property="og:type" content="article" />
-<meta property="og:title" content="${title}"/>
+<meta property="og:title" content="${title?:params.controller.capitalize()}"/>
 <g:if test="${videoPath}">
 <meta property="og:video" content="${videoPath}" />
 <meta property="og:video:width" content="640">

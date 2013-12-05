@@ -2,8 +2,8 @@
 <%@page import="species.utils.ImageType"%>
 <html>
     <head>
-        <g:set var="title" value="${params?.title?:''}"/>
-        <g:render template="/common/titleTemplate" model="[]"/>
+        <g:set var="title" value="${params?.title?:'Map'}"/>
+        <g:render template="/common/titleTemplate"/>
         <r:require modules="maps" />
         <style>
             .container {
