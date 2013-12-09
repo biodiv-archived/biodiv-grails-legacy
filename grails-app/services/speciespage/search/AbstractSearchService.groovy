@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
+import org.hibernate.SessionFactory;
+
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
@@ -21,10 +23,10 @@ abstract class AbstractSearchService {
     static transactional = false
 
     def grailsApplication;
-    def sessionFactory;
 
     protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     SolrServer solrServer;
+	SessionFactory sessionFactory;
     int BATCH_SIZE = 50;
 
     /**

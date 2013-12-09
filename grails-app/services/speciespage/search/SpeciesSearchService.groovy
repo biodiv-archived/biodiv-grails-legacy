@@ -200,5 +200,5 @@ class SpeciesSearchService extends AbstractSearchService {
 		}
 		return parsedNamesMap;
 	}
-
+	
 }

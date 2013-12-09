@@ -142,8 +142,8 @@ class AbstractObjectService {
         def count = 0;
         def queryParams = ["type": type]
         queryParams["type1"] = type1
-        def countQuery = "select count(*) from Featured feat where feat.objectType = :type or feat.objectType = :type1 "
-        def query = "from Featured feat where feat.objectType = :type or feat.objectType = :type1 "
+        def countQuery = "select count(*) from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
+        def query = "from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
 
         if(ugId) {
             queryParams["ugId"] = ugId
@@ -151,7 +151,7 @@ class AbstractObjectService {
             query +=  ' and feat.userGroup.id = :ugId'
         }
         
-        log.debug "CountQuery:"+ countQuery + "params: "+queryParams
+        log.debug "CountQuery:"+ countQuery + " params: "+queryParams
         count = Featured.executeQuery(countQuery, queryParams)
 
         queryParams["max"] = limit
@@ -160,7 +160,7 @@ class AbstractObjectService {
         def orderByClause = " order by feat.createdOn desc"
         query += orderByClause
 
-        log.debug "FeaturedQuery:"+ query + "params: "+queryParams
+        log.debug "FeaturedQuery:"+ query + " params: "+queryParams
         featured = Featured.executeQuery(query, queryParams);
 
         def observations = [:]
@@ -175,12 +175,13 @@ class AbstractObjectService {
             //JSON marsheller is registered in Bootstrap
             featuredNotes << it
         }
-
+		
         def result = []
         def i = 0;
         observations.each {key,value ->
             result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value]);
         }
+		
         return['observations':result,'count':count[0]]
                 		
     }

@@ -42,7 +42,6 @@ class AbstractObjectController {
     def observsationService;
     
     def related = {
-		log.debug params;
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 
 		if(relatedObv) {

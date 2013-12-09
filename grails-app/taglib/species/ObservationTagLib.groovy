@@ -61,7 +61,7 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
-        println attrs.model;
+        //println attrs.model;
 			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	

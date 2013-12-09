@@ -595,6 +595,7 @@ class UserGroupController {
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
+            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
@@ -656,10 +657,53 @@ class UserGroupController {
 //				params: linkParams)
 //	}
 
-	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    private boolean findDesignation (user, ug, role) {
+        switch(role) {
+            case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
+                if(ug.isFounder(user)) {
+                    flash.message="${user} is already founder of this group"
+                    return true
+                }
+                else if (ug.isExpert(user)) {
+                    flash.message="${user} is already moderator of this group"
+                    return true
+                }
+                else if( ug.isMember(user)) {
+                    flash.message="${user} is already member of this group"
+                    return true
+                }
+                else {
+                    return false
+                }
+                break;
+            case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
+                if(ug.isFounder(user)) {
+                    flash.message="${user} is already founder of this group"
+                    return true
+                }
+                else if (ug.isExpert(user)) {
+                    flash.message="${user} is already moderator of this group"
+                    return true
+                }
+                else {
+                    return false
+                }
+                break;
+            case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
+                if(ug.isFounder(user)) {
+                    flash.message="${user} is already founder of this group"
+                    return true
+                }
+                else {
+                    return false
+                }
+                break;
+            	default: log.error "No proper role type defined"
+        }
+    }
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest = {
 		log.debug params;
-		
 		if(params.userId && params.userGroupInstanceId) {
 			def user;
 			if(params.userId == 'register') {
@@ -668,20 +712,36 @@ class UserGroupController {
 				user = SUser.read(params.userId.toLong())
 			}
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
-			if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder())) {
+            //Founder can approve for all 3 roles here
+            //Expert can only approve for member and expert
+            //expert is not getting a mail to confirm for founder so it works fine
+			//Same func also used to accept invitation--important
+            if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder() || userGroupInstance.isExpert())) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
-						if(userGroupInstance.addMember(user)) {
-							flash.message="Successfully added ${user} to this group as member"
+					    boolean b = findDesignation(user, userGroupInstance, params.role)
+                        if(b) {
+                            break;
+                        }
+                        if(userGroupInstance.addMember(user)) {
+                            flash.message="Successfully added ${user} to this group as member"
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
-						if(userGroupInstance.addFounder(user)) {
+						boolean b = findDesignation(user, userGroupInstance, params.role)
+                        if(b) {
+                            break;
+                        }
+                        if(userGroupInstance.addFounder(user)) {
 							flash.message="Successfully added ${user} to this group as founder"
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
-						if(userGroupInstance.addExpert(user)) {
+						boolean b = findDesignation(user, userGroupInstance, params.role)
+                        if(b) {
+                            break;
+                        }
+                        if(userGroupInstance.addExpert(user)) {
 							flash.message="Successfully added ${user} to this group as a moderator"
 						}
 						break;

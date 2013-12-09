@@ -33,9 +33,9 @@ function feature(submitType, objectId, objectType, url) {
                 /*
                    $(".resource_in_groups li .featured").popover();
                    */
-                $(".resource_in_groups li:has('.featured')" ).popover({ 
+                /*$(".resource_in_groups li:has('.featured')" ).popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
-                });
+                });*/
                 $('#action-tabs a:first').tab('show');
                 showUpdateStatus(data.msg, data.status, $("#featureMsg"));
             } else {

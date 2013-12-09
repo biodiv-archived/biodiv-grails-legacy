@@ -627,6 +627,7 @@ class UserGroupService {
 	private deletePermissionsAsPerRole(UserGroup userGroup, SUser user, Role role) {
 		log.debug "Deleting permissions for member ${user} who had role ${role} in group ${userGroup}"
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		switch(role.id) {
 			case founderRole.id :
@@ -635,7 +636,7 @@ class UserGroupService {
 				log.debug "Deleting write permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;
-			case memberRole.id :
+			case [memberRole.id, expertRole.id] :
 				log.debug "Deleting write permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;

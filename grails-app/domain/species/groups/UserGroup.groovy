@@ -220,9 +220,8 @@ class UserGroup implements Taggable {
 
 	void setExperts(List<SUser> members) {
 		if(members) {
-			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 			members.each { member ->
-				userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+				userGroupService.addExpert(member);
 			}
 		}
 	}

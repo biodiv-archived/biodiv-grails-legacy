@@ -39,7 +39,7 @@
 	</div>
 	<div class="paginateButtons centered">
 		<p:paginateOnAlphabet controller="species" action="list"
-			total="${instanceTotal}" userGroup="${userGroupInstance }" params="${params}"
+			total="${instanceTotal}" userGroup="${userGroupInstance }" params="${queryParams}"
 			userGroupWebaddress="${userGroupWebaddress}"/>
 
 	</div>

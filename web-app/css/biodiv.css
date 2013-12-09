@@ -112,7 +112,11 @@ h6 {
 
 .snippet.tablet {
 	width: 150px;
-	height: 200px;
+	height: 195px;
+}
+
+.observations_list .story-footer{
+    bottom:inherit;
 }
 
 .snippet.tablet .figure {
@@ -523,8 +527,8 @@ textarea#featureNotes {
         box-sizing: border-box;
 }
 #action-tabs>.active>a, #action-tabs>.active>a:hover, #action-tabs>.active>a:focus {
-    border:1px solid #6ac9a2;
-    border-bottom: 0px solid #6ac9a2;
+   border:1px solid #6ac9a2;
+   border-bottom: 0px;
 }
 .userGroups{
     list-style:none;
@@ -720,7 +724,9 @@ ul#recoSummary {
 	background-color: #FFFFFF;
 /* 	color: #333333; */
 	display: block;
-	margin: 10px 0px;
+	/*padding: 10px 0px;*/
+        margin-top:10px;
+        margin-left:0px;
 	overflow: hidden;
 }
 
@@ -1400,6 +1406,20 @@ span.cke_skin_kama {
 /* 	display: inline; */
 /* 	cursor: pointer; */
 /* } */
+
+.nav-tabs>li>a{
+    color: black;
+    background-color:rgba(98, 100, 39, 0.14);
+    border: none
+}
+.nav-tabs>.active>.btn{
+    background-position: 0 0px;
+}
+.nav-tabs>.active>a{
+    font-weight:bold;
+    color: #16509E;
+    background-color: #CEEBD3;
+}
 .nav-tabs {
 	border-bottom: 0px solid #FFF;
 	background-color: whiteSmoke;
@@ -2386,8 +2406,12 @@ div.noOfRatings {
 .thumbnail .selectable  .checkbox {
 	margin-bottom: 0px;
 	min-height: 5px;
-	padding-left: 20px;
+        padding-left: 5px;
 } 
+
+.thumbnails .checkbox {
+    padding-left:5px;
+}
 
 #ibp-header-bar .navbar-inner .brand, #ibp-header-bar .navbar-inner .dropdown-toggle {
 	color: #bbb;
@@ -2468,3 +2492,15 @@ small {
     word-wrap:break-word;
 }
 
+.groups-wrapper .tab-pane {
+    border:1px solid #6ac9a2;
+    overflow:hidden;
+}
+
+.groups-wrapper li {
+    margin-bottom:0px;
+}
+
+.groups-wrapper li.active {
+    margin-bottom:-1px;
+}

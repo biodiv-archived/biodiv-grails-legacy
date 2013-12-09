@@ -102,17 +102,21 @@ class SpeciesTagLib {
 	def speciesFilter = {attrs, body->
 		out << render(template:"/species/speciesFilterTemplate", model:attrs.model);
 	}
+
 	def showSpeciesList = {attrs, body->
 		out << render(template:"/species/showSpeciesListTemplate", model:attrs.model);
 	}
+
 	def showHeadingAndSubHeading = {attrs, body->
 		out << render(template:"/common/headingAndSubHeading", model:attrs.model);
 	}
+
 	def showSnippet = {attrs, body->
 		if(attrs.model.speciesInstance) {
 			out << render(template:"/species/showSpeciesSnippetTemplate", model:attrs.model);
 		}
 	}
+
 	def showSpeciesExternalLink = {attrs, body->
 		out << render(template:"/species/showSpeciesExternalLinkTemplate", model:attrs.model);
 	}
@@ -120,4 +124,5 @@ class SpeciesTagLib {
 	def showDownloadAction = {attrs, body->
 		out << render(template:"/species/showDownloadAction", model:attrs.model);
 	}
+
 }

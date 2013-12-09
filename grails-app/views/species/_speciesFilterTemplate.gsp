@@ -2,10 +2,9 @@
 	<% params['isGalleryUpdate'] = true; %>
 	<div class="paginateButtons">
 		<center>
-			<p:paginateOnAlphabet controller="species"
-				action="${params.action?:'list' }" total="${instanceTotal}"
-				userGroup="${userGroup }" userGroupWebaddress="${userGroupWebaddress}" 
-				params="${params}"/>
+		<p:paginateOnAlphabet controller="species" action="list"
+			total="${instanceTotal}" userGroup="${userGroupInstance }" params="${queryParams}"
+			userGroupWebaddress="${userGroupWebaddress}"/>
 		</center>
 	</div>
 

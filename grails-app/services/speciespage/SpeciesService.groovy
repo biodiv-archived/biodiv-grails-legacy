@@ -79,7 +79,7 @@ class SpeciesService {
 
         String aq = "";
         int i=0;
-        if(params.aq instanceof GrailsParameterMap) {
+        if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
             params.aq.each { key, value ->
                 queryParams["aq."+key] = value;
                 activeFilters["aq."+key] = value;
@@ -429,103 +429,120 @@ class SpeciesService {
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
         def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
         params.sGroup = params.sGroup ?: allGroup.id+""
-        params.max = Math.min(params.max ? params.int('max') : 42, 100);
-        params.offset = params.offset ? params.int('offset') : 0
-        params.sort = params.sort?:"percentOfInfo"
-        if(params.sort.equals('lastrevised')) {
-            params.sort = 'lastUpdated'
-        } else if(params.sort.equals('percentofinfo')) {
-            params.sort = 'percentOfInfo'
-        }
-        params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
+        
+        int count = 0;
+        String query, countQuery;
+        String filterQuery = " where s.id is not null " //dummy statement
+        String countFilterQuery = " where s.id is not null " //dummy statement
 
-        log.debug params
+        def queryParams = [:]
+
+        queryParams.max = Math.min(params.max ? params.int('max') : 42, 100);
+        queryParams.offset = params.offset ? params.int('offset') : 0
+
+        if(queryParams.max < 0 ) {
+            queryParams.max = 42 
+        }
+
+        if(queryParams.offset < 0) {
+            queryParams.offset = 0
+        }
+
+        queryParams.sort = params.sort?:"percentOfInfo"
+        if(queryParams.sort.equals('lastrevised')) {
+            queryParams.sort = 'lastUpdated'
+
+        } else if(queryParams.sort.equals('percentofinfo') || queryParams.sort.equals('score')) {
+            queryParams.sort = 'percentOfInfo'
+        }
+        queryParams.order = (queryParams.sort.equals("percentOfInfo")||queryParams.sort.equals("lastUpdated"))?"desc":queryParams.sort.equals("title")?"asc":"asc"
+
         def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
 
-        int count = 0;
-        if (params.startsWith && params.sGroup) {
-            String query, countQuery;
-            String filterQuery = " where s.id is not null " //dummy statement
-            String countFilterQuery = " where s.id is not null " //dummy statement
-            def queryParams = [:]
-
-            if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
-                if(params.startsWith == "A-Z") {
-                    query = "select s from Species s ";
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s "
-                } else {
-                    query = "select s from Species s "
-                    filterQuery += " and s.title like '<i>${params.startsWith}%' ";
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s "
-                    countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
-                }
-            } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
-                if(params.startsWith == "A-Z") {
-                    query = "select s from Species s, TaxonomyDefinition t " 
-                    filterQuery += " and s.taxonConcept = t and t.group.id  is null "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
-                } else {
-                    query = "select s from Species s, TaxonomyDefinition t "
-                    filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
-                }
+        if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+            if(params.startsWith == "A-Z") {
+                query = "select s from Species s ";
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s "
             } else {
-                if(params.startsWith == "A-Z") {
-                    query = "select s from Species s, TaxonomyDefinition t "
-                    filterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup) "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
-
-                } else {
-                    query = "select s from Species s, TaxonomyDefinition t "
-                    filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
-                }
-                queryParams['sGroup']  = groupIds
+                query = "select s from Species s "
+                filterQuery += " and s.title like '<i>${params.startsWith}%' ";
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+                countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
+				queryParams["startsWith"] = params.startsWith
             }
+        } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
+            if(params.startsWith == "A-Z") {
+                query = "select s from Species s, TaxonomyDefinition t " 
+                filterQuery += " and s.taxonConcept = t and t.group.id  is null "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
+            } else {
+                query = "select s from Species s, TaxonomyDefinition t "
+                filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
+				queryParams["startsWith"] = params.startsWith
+            }
+            queryParams['sGroup']  = groupIds
+        } else {
+            if(params.startsWith == "A-Z") {
+                query = "select s from Species s, TaxonomyDefinition t "
+                filterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup) "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
-            if(params.featureBy == "true" ) {
-                params.userGroup = observationService.getUserGroup(params)
-               // def featureQuery = ", Featured feat "
-                //query += featureQuery;
-                //countQuery += featureQuery
+            } else {
+                query = "select s from Species s, TaxonomyDefinition t "
+                filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+				queryParams["startsWith"] = params.startsWith
+            }
+            queryParams['sGroup']  = groupIds
+        }
+
+        if(params.featureBy == "true" ) {
+            params.userGroup = observationService.getUserGroup(params)
+            // def featureQuery = ", Featured feat "
+            //query += featureQuery;
+            //countQuery += featureQuery
+            if(params.userGroup == null) {
                 def featureQuery = " and s.featureCount > 0"
                 countFilterQuery += featureQuery
                 filterQuery += featureQuery
-                if(params.userGroup == null) {
-                    //String str = "feat.userGroup is null "
-                    //filterQuery += str
-                    //countFilterQuery += str
-                }else {
-                    String str = " and feat.userGroup.id = :userGroupId "
-                    filterQuery += str
-                    countFilterQuery += str
-                    queryParams["userGroupId"] = params.userGroup?.id
-                }   
-                queryParams["featureBy"] = params.featureBy
-                queryParams["featType"] = Species.class.getCanonicalName();
-            }
-
-
-            if(params.webaddress) {
-                def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
-                if(userGroupInstance){
-                    queryParams['userGroup'] = userGroupInstance
-                    query += " join s.userGroups userGroup "
-                    filterQuery += " and userGroup=:userGroup "
-                    countQuery += " join s.userGroups userGroup "
-                    countFilterQuery += " and userGroup=:userGroup "
-                }
-            }
-
-            query += filterQuery + " order by s.${params.sort} ${params.order}"
-            countQuery += countFilterQuery + " group by s.percentOfInfo"
-            return [query:query, countQuery:countQuery, queryParams:queryParams]
-
+                //String str = "feat.userGroup is null "
+                //filterQuery += str
+                //countFilterQuery += str
+            }else {
+                String featureQuery = ", Featured feat "
+                query += featureQuery
+                countQuery += featureQuery
+                String str = " and s.id = feat.objectId and feat.objectType =:featType and feat.userGroup.id = :userGroupId "
+                filterQuery += str
+                countFilterQuery += str
+                queryParams["userGroupId"] = params.userGroup?.id
+            }   
+            queryParams["featureBy"] = params.featureBy
+            queryParams["featType"] = Species.class.getCanonicalName();
         }
+
+
+        if(params.webaddress) {
+            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
+            if(userGroupInstance){
+                queryParams['userGroup'] = userGroupInstance
+                query += " join s.userGroups userGroup "
+                filterQuery += " and userGroup=:userGroup "
+                countQuery += " join s.userGroups userGroup "
+                countFilterQuery += " and userGroup=:userGroup "
+            }
+        }
+
+        query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
+        countQuery += countFilterQuery + " group by s.percentOfInfo"
+		
+        return [query:query, countQuery:countQuery, queryParams:queryParams]
+
 
     }
 
@@ -537,18 +554,19 @@ class SpeciesService {
         def hqlQuery = sessionFactory.currentSession.createQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createQuery(queryParts.countQuery)
         def queryParams = queryParts.queryParams
-        if(params.max > -1){
-            hqlQuery.setMaxResults(params.max);
-            queryParams["max"] = params.max
+        if(queryParams.max > -1){
+            hqlQuery.setMaxResults(queryParams.max);
         }
-        if(params.offset > -1) {
-            hqlQuery.setFirstResult(params.offset);
-            queryParams["offset"] = params.offset
+        if(queryParams.offset > -1) {
+            hqlQuery.setFirstResult(queryParams.offset);
         } 
         hqlQuery.setProperties(queryParams);
         hqlCountQuery.setProperties(queryParams);
-        //log.debug "Species query :${query}"
+        
+        log.debug "Species list query :${queryParts.query} with params ${queryParams}"
         def speciesInstanceList = hqlQuery.list();
+
+        log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
 
         def speciesCountWithContent = 0;
