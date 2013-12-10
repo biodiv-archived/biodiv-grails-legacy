@@ -114,11 +114,11 @@ if(r) {
 <ckeditor:resources />
 <script type="text/javascript" src="${resource(dir:'plugins',file:'ckeditor-3.6.0.0/js/ckeditor/_source/adapters/jquery.js')}"></script>
 <g:javascript src="ckEditorConfig.js" />
--->
 
 <script type="text/javascript"
 		src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
 <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
+-->
 <g:javascript>
 
 occurrenceCount = undefined

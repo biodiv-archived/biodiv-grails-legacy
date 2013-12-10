@@ -54,7 +54,7 @@
 		<domain:showSiteFooter />
 
 	</div>
-	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>
+<%--	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>--%>
 	<r:layoutResources />
 </body>
 </html>

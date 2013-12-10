@@ -167,7 +167,7 @@ modules = {
 	}
 
 	species_show {
-		dependsOn 'species, gallery, comment, activityfeed'
+		dependsOn 'species, maps, gallery, comment, activityfeed'
 
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
