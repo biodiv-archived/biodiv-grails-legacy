@@ -31,8 +31,8 @@
                 <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit List':'Add List']"/>
 
                 <%
-                def allowedExtensions = "['csv']"
-				def fileParams = [uploadDir:'checklist']
+                def allowedExtensions = "['csv', 'xls', 'xlsx']"
+                def fileParams = [uploadDir:'checklist',checklistConvert:true]
                 def form_id = "addObservation"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Add Checklist"

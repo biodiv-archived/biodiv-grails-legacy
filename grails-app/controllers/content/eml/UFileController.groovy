@@ -7,6 +7,7 @@ import org.grails.taggable.Tag
 import java.io.File;
 import java.io.InputStream;
 import java.util.List
+import java.util.ArrayList;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -22,8 +23,9 @@ import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
 import grails.plugins.springsecurity.Secured
+import species.formatReader.SpreadsheetReader;
 
-
+ 
 import speciespage.ObservationService
 import species.utils.Utils
 import content.eml.Document
@@ -94,7 +96,62 @@ class UFileController {
 
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
-			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
+		    //println "============================="	
+            //println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
+            //println "UPLOAD DIR ===== " + params.uploadDir
+           
+            if(params.checklistConvert == "true"){
+                if(fileExtension(originalFilename) == "csv"){
+                
+                }
+                else{
+                //println "#########################################################"
+                List spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath).get(0)
+                File outCSVFile = createFile("output.csv", params.uploadDir)
+
+                FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                //ArrayList arrList = new ArrayList();
+                int  size = spread.get(0).size()
+                int count = 0;
+                spread.get(0).each { 
+                        count++;
+                        if(count == size){
+                            bw.write(it.getKey());
+                            count = 0;
+                        }
+                        else{
+                            bw.write(it.getKey() + ",");
+                        }
+                    
+                    bw.write("\n");
+                }
+
+                spread.each { rowMap->  
+                    rowMap.each{ r->
+                        count++;
+                        if(count == size){
+                            bw.write(r.getValue());
+                            count = 0;
+                        }
+                        else{
+                            bw.write(r.getValue() + ",");
+                        }
+                    }
+                    bw.write("\n");
+                }
+                bw.close();
+                relPath = outCSVFile.absolutePath.replace(contentRootDir, "")
+                url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
+                File temp = uploaded
+                uploaded = outCSVFile
+                temp.delete()
+                //println "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                }
+            }
+             println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
+            
+            //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 
 			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
@@ -255,6 +312,13 @@ class UFileController {
 
 	}
 
-
+    private String fileExtension(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension;
+    }
 
 }

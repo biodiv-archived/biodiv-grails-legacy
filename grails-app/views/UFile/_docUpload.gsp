@@ -4,26 +4,26 @@
 	multiple="false"
 	allowedExtensions="${allowedExtensions}" 
 	params="${fileParams}"
-	sizeLimit="${grailsApplication.config.speciesPortal.content.MAX_DOC_SIZE}">
+        sizeLimit="${grailsApplication.config.speciesPortal.content.MAX_DOC_SIZE}">
 
-	<uploader:onComplete>
-				//Available variables: id, fileName, responseJSON
-		
-				if(responseJSON.success) {
-				
-					$('#${name}_uploaded').show();
-					$('#${name}_file').attr('href',responseJSON.fileURL);
-					$('#${name}_file').html(fileName);
-					$('#${name}_path').val(responseJSON.filePath);
-					$('#${name}_name').val(fileName);
-					
-				}
-				
-				<g:if test="${uploadCallBack}">
-					${uploadCallBack}
-				</g:if>			
+        <uploader:onComplete>
+        //Available variables: id, fileName, responseJSON
 
-		</uploader:onComplete>	
+        if(responseJSON.success) {
+
+        $('#${name}_uploaded').show();
+        $('#${name}_file').attr('href',responseJSON.fileURL);
+        $('#${name}_file').html(fileName);
+        $('#${name}_path').val(responseJSON.filePath);
+        $('#${name}_name').val(fileName);
+
+        }
+
+        <g:if test="${uploadCallBack}">
+        ${uploadCallBack}
+        </g:if>			
+
+        </uploader:onComplete>	
 </uploader:uploader>
 <div id="${name}_uploaded" style="display: ${path?'':'none'};">
 <%

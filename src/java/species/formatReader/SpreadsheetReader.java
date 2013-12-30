@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 
 import org.apache.commons.logging.Log;
@@ -74,7 +75,7 @@ public class SpreadsheetReader {
 		List<Map> headerList = new ArrayList<Map>();
 		for (Cell cell : headerRow) {
 			String cellVal = getCellText(cell);
-			HashMap headerConfig = new HashMap();
+			HashMap headerConfig = new LinkedHashMap();
 			if (cellVal != null && !cellVal.equals("")) {
 				headerConfig.put("name", cellVal.trim().toLowerCase());
 				headerConfig.put("position", cell.getColumnIndex() + "");
@@ -84,7 +85,7 @@ public class SpreadsheetReader {
 		for (Row row : sheet) {
 			if (row.getRowNum() <= headerRowNo)
 				continue;
-			Map rowData = new HashMap();
+			Map rowData = new LinkedHashMap();
 			for (int i = 0; i < headerList.size(); i++) {
 				Map headerConfig = (Map) headerList.get(i);
 				String key = (String) headerConfig.get("name");
