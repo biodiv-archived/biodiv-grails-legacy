@@ -100,7 +100,20 @@ public class SpreadsheetReader {
 			}
 			content.add(rowData);
 		}
-
+                if (content.size() == 0){
+                    Map rowData = new LinkedHashMap();
+                    for (int i = 0; i < headerList.size(); i++) {
+                        Map headerConfig = (Map) headerList.get(i);
+                        String key = (String) headerConfig.get("name");
+                        int index = Integer.parseInt((String) headerConfig
+                                .get("position"));
+                        String value = "";
+                        // String validTagName =
+                        // DocumentUtils.convertToValidXMLTagName(key);
+                        rowData.put(key, value);
+                    }
+                    content.add(rowData);
+                }
 		return content;
 	}
 

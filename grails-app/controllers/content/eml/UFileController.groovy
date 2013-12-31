@@ -284,25 +284,25 @@ class UFileController {
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         if(spread.size() != 0){
-        int  size = spread.get(0).size()
-        int count = 0;
-        
-        def headerNameList = spread.get(0).collect {
-            it.getKey()
-        }
+            int  size = spread.get(0).size()
+            int count = 0;
 
-        def  joinedHeader = headerNameList.join(", ")
-        
-        bw.write(joinedHeader + "\n")
-        
-        spread.each { rowMap->  
-            def content = rowMap.collect{ 
-                it.getValue();
+            def headerNameList = spread.get(0).collect {
+                it.getKey()
             }
-            def joinedContent = content.join(", ")
 
-            bw.write(joinedContent + "\n")
-        }
+            def  joinedHeader = headerNameList.join(", ")
+
+            bw.write(joinedHeader + "\n")
+
+            spread.each { rowMap->  
+                def content = rowMap.collect{ 
+                    it.getValue();
+                }
+                def joinedContent = content.join(", ")
+
+                bw.write(joinedContent + "\n")
+            }
         }
         bw.close();
         String relPath = outCSVFile.absolutePath.replace(contentRootDir, "")
