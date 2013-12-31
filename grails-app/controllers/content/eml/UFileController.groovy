@@ -105,12 +105,13 @@ class UFileController {
             //FIND out a proper method to detect excel
             if(params.checklistConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
                 res = convertExcelToCSV(uploaded, params)
-                relPath = res.get("relPath")
-                url = res.get("url")
-                File temp = uploaded
-                uploaded = res.get("outCSVFile")
-                temp.delete()
-
+                if(res != null) {
+                    relPath = res.get("relPath")
+                    url = res.get("url")
+                    File temp = uploaded
+                    uploaded = res.get("outCSVFile")
+                    temp.delete()
+                }
             }
 
             //println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
@@ -282,6 +283,7 @@ class UFileController {
 
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
+        if(spread.size() != 0){
         int  size = spread.get(0).size()
         int count = 0;
         
@@ -301,6 +303,7 @@ class UFileController {
 
             bw.write(joinedContent + "\n")
         }
+        }
         bw.close();
         String relPath = outCSVFile.absolutePath.replace(contentRootDir, "")
         def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
@@ -309,6 +312,7 @@ class UFileController {
         res.put("relPath" , relPath)
         res.put("url" , url)
         return res
+        
 
     }
 
