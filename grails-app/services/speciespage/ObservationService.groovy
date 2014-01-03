@@ -886,8 +886,8 @@ class ObservationService extends AbstractObjectService {
 
         if(params.daterangepicker_start && params.daterangepicker_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
-            def startDate = df.parse(params.daterangepicker_start)
-            def endDate = df.parse(params.daterangepicker_end)
+            def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
+            def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
             Calendar cal = Calendar.getInstance(); // locale-specific
             cal.setTime(endDate)
             cal.set(Calendar.HOUR_OF_DAY, 23);
