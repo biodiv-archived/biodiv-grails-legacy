@@ -119,6 +119,11 @@ h6 {
     bottom:inherit;
 }
 
+.tab-pane .qq-upload-button{
+    margin-top: 20px;
+    margin-left: 107px;
+}
+
 .snippet.tablet .figure {
 	height:150px;
 	width:auto;

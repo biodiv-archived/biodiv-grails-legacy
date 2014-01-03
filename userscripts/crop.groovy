@@ -113,7 +113,7 @@ def doCrop(){
 
 //doCrop();
 
-ImageUtils.createScaledImages(new File('/tmp/142.jpg'), new File('/tmp') )
+ImageUtils.createScaledImages(new File('/home/rahulk/Downloads/450px-Haliastur_indus_-Cherai_Beach,_Kochi,_Kerala,_India-8.jpg'), new File('/home/rahulk/Downloads') )
 println "=========== DONE!!";
 
 /*

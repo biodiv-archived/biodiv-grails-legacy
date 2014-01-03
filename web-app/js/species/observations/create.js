@@ -190,10 +190,14 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
  */
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
-    if($('#textAreaSection').is(':visible'))
+    if($('#textAreaSection').is(':visible')){
+        console.log("LOAD CALL BACK ");
         parseData(  window.params.content.url + input , {callBack:loadDataToGrid});
-    else
+    }
+    else{
+        console.log("INIT GRID");
         parseData(  window.params.content.url + input , {callBack:initGrid});
+    }
 }
 
 function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
@@ -265,6 +269,10 @@ function loadGrid(url, id){
 	});
 }
 
+
+function loadTest() {
+    console.log("working");
+}
 
 
 $('#addNewColumn').unbind('click').click(function(){
@@ -708,6 +716,19 @@ $(document).ready(function(){
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {}; var incorrectNames = false;
                 for(var rowId=0; rowId<gridData.length; rowId++) {
+                    var rowEntry = grid.getDataItem(rowId);
+                    var dataPresent = false;
+                    for(var key in rowEntry) {
+                        if(rowEntry[key] == "") {
+                            
+                        }
+                        else {
+                            dataPresent = true;
+                        }
+                    }
+                    if(!dataPresent){
+                        continue;
+                    }
                     if(data.hasOwnProperty(rowId+'')) {
                         if(!changes[rowId])
                             changes[rowId] = {}

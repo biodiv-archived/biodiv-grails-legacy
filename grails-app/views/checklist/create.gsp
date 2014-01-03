@@ -50,41 +50,60 @@
 
                         <div id="textAreaSection" class="section ${params.action != 'create'?'hide':''}">
                             <div>
-                                <i class="icon-picture"></i>
-                                Type your list below
                                 <g:if test="${ params.action != 'create'}">
                                 <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance, 'checklistData':checklistData, 'checklistColumns':checklistColumns, 'sciNameColumn':sciNameColumn, 'commonNameColumn':commonNameColumn]"/>
                                 </g:if>
+                                
                                 <g:else>
-                                or
-                                <div class="upload_file" style="display:inline-block">
-                                    <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
-                                </div>
+
                                 </g:else>
                             </div>
-                            
-                            <div
-                                class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistColumns', 'error')}">
-                                <label for="checklistColumns" class="control-label"><g:message
-                                    code="checklist.checklistColumns.label" default="Headers" />
-                                </label>
-                                <div class="controls">
-                                    <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="scientific name, common name, uses, notes,.... " title='Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....'/>
-                                    <small class="help-inline">
-Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....
-                                </small> 
 
-                                </div>
-                            </div>
-                            <div
-                                class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistData', 'error')}">
-                                <label for="checklistData" class="control-label"><g:message
-                                    code="checklist.checklistData.label" default="Data" /></label>
-                                <div class="controls">
-                                    <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Mangifera indica, Mango, Fruits are edible, Have this in my backyard'
-                                    title='Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ,).' />
-<small class="help-inline"> Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ","). </small> 
-                                    <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
+                            <div class="tabbable checklist-tabs">
+                                <ul class="nav nav-tabs" id="checklist-tabs" style="margin:0px;background-color:transparent;">
+                                    <li id ="tab_grid"class="active"><a href="#tab0" class="btn" data-toggle="tab">Spreadsheet</a></li>
+                                    <li id ="tab_up_file"><a href="#tab1" class="btn" data-toggle="tab">Upload File</a></li>
+                                    <li id ="tab_type_list"><a href="#tab2" class="btn" data-toggle="tab">Text Area</a></li>
+                                </ul>
+
+                                <div class="tab-content ">
+                                    <div class="tab-pane active" id="tab0">
+                                            
+                                    </div>
+
+                                    <div class="tab-pane " id="tab1">
+
+                                        <div class="upload_file" style="display:inline-block">
+                                            <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane " id="tab2">
+
+                                        <div
+                                            class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistColumns', 'error')}">
+                                            <label for="checklistColumns" class="control-label"><g:message
+                                                code="checklist.checklistColumns.label" default="Headers" />
+                                            </label>
+                                            <div class="controls">
+                                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="scientific name, common name, uses, notes,.... " title='Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....'/>
+                                                <small class="help-inline">
+                                                    Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....
+                                                </small> 
+
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistData', 'error')}">
+                                            <label for="checklistData" class="control-label"><g:message
+                                                code="checklist.checklistData.label" default="Data" /></label>
+                                            <div class="controls">
+                                                <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Mangifera indica, Mango, Fruits are edible, Have this in my backyard'
+                                                title='Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ,).' />
+                                                <small class="help-inline"> Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ","). </small> 
+                                                <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -187,7 +206,7 @@ Enter column headers separated by commas. Eg: scientific name,  common name, use
                     </div>
 
                     <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;${params.action=='create'?:'display:none;'}">
-                        <a id="addNames" class="btn btn-primary"
+                        <a id="addNames" class="btn btn-primary"observationInstance
                             style="float: right; margin-right: 5px;">Load List</a>
                         <a id="createChecklist" class="btn btn-primary"
                             style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
@@ -213,24 +232,49 @@ Enter column headers separated by commas. Eg: scientific name,  common name, use
         <script type="text/javascript" src="http://api.filepicker.io/v1/filepicker.js"></script>
         <r:script>
         $(document).ready(function(){
-           <%
-           if(observationInstance?.group) {
-           out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
-           }
-           if(observationInstance?.habitat) {
-           out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
-           }
-	    %>
+            <%
+            if(observationInstance?.group) {
+            out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
+            }
+            if(observationInstance?.habitat) {
+            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
+            }
+            %>
             filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
-            var data = []
-            var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:250, formatter:sciNameFormatter},
-            {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:250},
-            {id: "notes", name: "Notes", field: "notes", editor: Slick.Editors.LongText, width:200},
-            {id: "addMedia", name: "Add Media", field: "addMedia", width:100}
-            ]
 
-//          initGrid(data, columns);
+            var rowData = [{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""}];
+            
+            //var columns = new Array();
+            var columns = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
+            {id: "Sci_Name", name: "Sci_Name", field: "Sci_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()},
+            {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()}
+            ]
+            columns.push(getMediaColumnOptions());
+            loadDataToGrid(rowData, columns, "Sci_Name", "Common_Name");
+            $("#textAreaSection").show();
+            $("#parseNames").click(function(){
+                $("#textAreaSection").hide();
+            }); 
+            //showGrid();
             $('#addResourcesModal').modal({show:false});
+
+            $("#tab_grid").click(function(){
+                $("#gridSection").show();
+                $("#addNames").hide();
+            });
+
+            $("#tab_up_file").click(function(){
+                $("#gridSection").hide();
+                $("#addNames").hide();
+            });
+
+            $("#tab_type_list").click(function(){
+                $("#gridSection").hide();
+                $('#checklistColumns').val('');
+                $("#checklistData").val('');
+                $("#addNames").show();
+            });
+
         });
         </r:script>
 
