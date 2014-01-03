@@ -52,13 +52,6 @@ function parseCSVData(data, options) {
  
     var rowData = new Array();
     var columns = new Array();
-    /*var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:250, header:getHeaderMenuOptions()},
-            {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:250, header:getHeaderMenuOptions()},
-            {id: "notes", name: "Notes", field: "notes", editor: Slick.Editors.LongText, width:200, header:getHeaderMenuOptions()}
-            ]
-            columns.push(getMediaColumnOptions());
-*/
-
 
     //console.log(rowData.length)
     var lines = data.replace('\r','').split('\n');
@@ -105,7 +98,6 @@ function parseCSVData(data, options) {
         columns.push(getMediaColumnOptions());
 
         if(options.callBack){
-            console.log(rowData);
             options.callBack(rowData, columns);
         }
     }

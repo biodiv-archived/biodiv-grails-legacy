@@ -191,11 +191,9 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
     if($('#textAreaSection').is(':visible')){
-        console.log("LOAD CALL BACK ");
         parseData(  window.params.content.url + input , {callBack:loadDataToGrid});
     }
     else{
-        console.log("INIT GRID");
         parseData(  window.params.content.url + input , {callBack:initGrid});
     }
 }
@@ -268,12 +266,6 @@ function loadGrid(url, id){
 		}
 	});
 }
-
-
-function loadTest() {
-    console.log("working");
-}
-
 
 $('#addNewColumn').unbind('click').click(function(){
     grid.addNewColumn();

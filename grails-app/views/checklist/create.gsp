@@ -206,7 +206,7 @@
                     </div>
 
                     <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;${params.action=='create'?:'display:none;'}">
-                        <a id="addNames" class="btn btn-primary"observationInstance
+                        <a id="addNames" class="btn btn-primary"
                             style="float: right; margin-right: 5px;">Load List</a>
                         <a id="createChecklist" class="btn btn-primary"
                             style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
@@ -241,21 +241,27 @@
             }
             %>
             filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
-
-            var rowData = [{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""}];
             
-            //var columns = new Array();
-            var columns = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
-            {id: "Sci_Name", name: "Sci_Name", field: "Sci_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()},
-            {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()}
-            ]
-            columns.push(getMediaColumnOptions());
-            loadDataToGrid(rowData, columns, "Sci_Name", "Common_Name");
+            function initBlankSpreadsheet() {
+            
+                var rowDataForBlankSheet = [{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""}];
+
+                var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
+                {id: "Sci_Name", name: "Sci_Name", field: "Sci_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()},
+                {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()}
+                ]
+                columnDataForBlankSheet.push(getMediaColumnOptions());
+                loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "Sci_Name", "Common_Name"); 
+            }
+            
+            initBlankSpreadsheet();
+
             $("#textAreaSection").show();
+            
             $("#parseNames").click(function(){
                 $("#textAreaSection").hide();
-            }); 
-            //showGrid();
+            });
+
             $('#addResourcesModal').modal({show:false});
 
             $("#tab_grid").click(function(){
