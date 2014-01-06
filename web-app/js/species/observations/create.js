@@ -718,15 +718,17 @@ $(document).ready(function(){
                 var commonNameColumnIndex = grid.getColumnIndex($('#commonNameColumn').val());
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {}; var incorrectNames = false;
+                var rowData = grid.getDataItem(0);
+                var keys = Object.keys(rowData);
                 for(var rowId=0; rowId<gridData.length; rowId++) {
                     var rowEntry = grid.getDataItem(rowId);
                     var dataPresent = false;
-                    for(var key in rowEntry) {
-                        if(rowEntry[key] == "") {
-                            
-                        }
-                        else {
+                    var key;
+                    for(var k=0; k< keys.length; k++) {
+                        key=keys[k];
+                        if(rowEntry[key] != "" && rowEntry[key] != undefined && rowEntry[key] != null) {
                             dataPresent = true;
+                            break;
                         }
                     }
                     if(!dataPresent){

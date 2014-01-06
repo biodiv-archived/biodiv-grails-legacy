@@ -161,7 +161,7 @@ class ChecklistService {
 	
 	@Transactional
 	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
-		if(!params.checklistData && !isGlobalUpdate)
+        if(!params.checklistData && !isGlobalUpdate)
 			return
 		
 		Checklists.withTransaction() {
