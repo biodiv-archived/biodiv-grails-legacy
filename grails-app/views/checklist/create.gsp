@@ -244,18 +244,18 @@
             
             function initBlankSpreadsheet() {
             
-                var rowDataForBlankSheet = [{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""},{S_No:"",Sci_Name:"",Common_Name:""}];
+                var rowDataForBlankSheet = [{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""}];
 
                 var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
-                {id: "Sci_Name", name: "Sci_Name", field: "Sci_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()},
-                {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:200, header:getHeaderMenuOptions()}
+                {id: "scientific_name", name: "scientific_name", field: "scientific_name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
+                {id: "common_name", name: "common_name", field: "common_name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
                 ]
                 columnDataForBlankSheet.push(getMediaColumnOptions());
-                loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "Sci_Name", "Common_Name"); 
+                loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet); 
             }
-            
-            initBlankSpreadsheet();
-
+            if(${params.action=="create"}){
+                initBlankSpreadsheet();
+            }
             $("#textAreaSection").show();
             
             $("#parseNames").click(function(){

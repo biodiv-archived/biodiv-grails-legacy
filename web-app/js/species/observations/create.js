@@ -140,12 +140,23 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
-
+        /* 
+        else{
+            $('#sciNameColumn').val(sciNameColumn);
+            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+        }
+        */
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
+        /*
+        else{
+            $('#commonNameColumn').val(commonNameColumn);
+            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
 
+        }
+        */
     });
 } 
 
@@ -213,7 +224,7 @@ function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
         line = line.slice(1);
         d = d + '\n' + line
     });
-
+    
     $("#checklistData").val(d);
     $("#checklistColumns").val(cols.slice(1));
    
