@@ -8,10 +8,10 @@ function getDataFromGrid(){
         return grid.getData();
     }
 
-    var selectedRows = grid.getSelectedRows()
-        if(selectedRows.length > 0){
-            dirtyRows.push(selectedRows.last());
-        }
+    var selectedRows = grid.getSelectedRows();
+    if(selectedRows.length > 0){
+    	dirtyRows.push(selectedRows.last());
+    }
 
     dirtyRows = dirtyRows.unique();
     var data = new Array();
@@ -22,7 +22,7 @@ function getDataFromGrid(){
 }
 
 function addDirtyRows(e, args) {
-    if(dirtyRows)
+	if(dirtyRows)
         dirtyRows.push(args.row);
 };
 
@@ -140,23 +140,10 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
-        /* 
-        else{
-            $('#sciNameColumn').val(sciNameColumn);
-            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
-        }
-        */
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
-        /*
-        else{
-            $('#commonNameColumn').val(commonNameColumn);
-            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
-
-        }
-        */
     });
 } 
 
@@ -706,6 +693,18 @@ $(document).ready(function(){
 
         $('#legend').hide();
         var me = this
+        
+        function isEmptyRow(rowEntry){
+        	var emptyRow = true;
+        	$.each( rowEntry, function( key, value ) {
+        		if(value != "" && value != undefined && value != null) {
+        			emptyRow = false;
+        		}
+        	});
+        	return emptyRow;
+        }
+        
+        
         $.ajax({
             url : window.params.recommendation.getRecos,
             type : 'post', 
@@ -718,20 +717,9 @@ $(document).ready(function(){
                 var commonNameColumnIndex = grid.getColumnIndex($('#commonNameColumn').val());
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {}; var incorrectNames = false;
-                var rowData = grid.getDataItem(0);
-                var keys = Object.keys(rowData);
                 for(var rowId=0; rowId<gridData.length; rowId++) {
-                    var rowEntry = grid.getDataItem(rowId);
-                    var dataPresent = false;
-                    var key;
-                    for(var k=0; k< keys.length; k++) {
-                        key=keys[k];
-                        if(rowEntry[key] != "" && rowEntry[key] != undefined && rowEntry[key] != null) {
-                            dataPresent = true;
-                            break;
-                        }
-                    }
-                    if(!dataPresent){
+                	var rowEntry = grid.getDataItem(rowId);
+                	if(isEmptyRow(rowEntry)){
                         continue;
                     }
                     if(data.hasOwnProperty(rowId+'')) {
