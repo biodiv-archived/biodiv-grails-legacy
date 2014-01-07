@@ -70,7 +70,7 @@ function parseCSVData(data, options) {
 	                headerCount = headers.length;
 	                $.each(headers, function(headerCount, header) {
 	                	var columnName = header;
-	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
+	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, width: 150, header:getHeaderMenuOptions()});
 	                    //console.log(columns);
 	                });
                 }

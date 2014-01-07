@@ -244,43 +244,43 @@
             
             function initBlankSpreadsheet() {
             
-                var rowDataForBlankSheet = [{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""},{S_No:"",scientific_name:"",common_name:""}];
-
-                var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
-                {id: "scientific_name", name: "scientific_name", field: "scientific_name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
-                {id: "common_name", name: "common_name", field: "common_name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
-                ]
-                columnDataForBlankSheet.push(getMediaColumnOptions());
-                loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet); 
+            var rowDataForBlankSheet = new Array();
+            for (var i =0 ; i<10 ; i++ ){
+                rowDataForBlankSheet.push({S_No:"",Scientific_Name:"",Common_Name:""});
             }
+
+            var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
+                {id: "Scientific_Name", name: "Scientific_Name", field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
+                {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
+                ]
+
+            columnDataForBlankSheet.push(getMediaColumnOptions());
+            loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "Scientific_Name", "Common_Name"); 
+            }
+
             if(${params.action=="create"}){
                 initBlankSpreadsheet();
-            }
+                }
+
             $("#textAreaSection").show();
-            
             $("#parseNames").click(function(){
                 $("#textAreaSection").hide();
             });
-
             $('#addResourcesModal').modal({show:false});
-
             $("#tab_grid").click(function(){
                 $("#gridSection").show();
                 $("#addNames").hide();
             });
-
             $("#tab_up_file").click(function(){
                 $("#gridSection").hide();
                 $("#addNames").hide();
             });
-
             $("#tab_type_list").click(function(){
                 $("#gridSection").hide();
                 $('#checklistColumns').val('');
                 $("#checklistData").val('');
                 $("#addNames").show();
             });
-
         });
         </r:script>
 

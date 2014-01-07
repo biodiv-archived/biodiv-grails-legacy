@@ -7,12 +7,10 @@ function getDataFromGrid(){
     if(!dirtyRows){
         return grid.getData();
     }
-
     var selectedRows = grid.getSelectedRows();
     if(selectedRows.length > 0){
     	dirtyRows.push(selectedRows.last());
     }
-
     dirtyRows = dirtyRows.unique();
     var data = new Array();
     $.each(dirtyRows, function(index, rowId) {
@@ -140,7 +138,15 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
+        else {
+            $('#sciNameColumn').val(sciNameColumn);
+            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+        }
         if(commonNameColumn) {
+            $('#commonNameColumn').val(commonNameColumn);
+            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+        }
+        else{
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
