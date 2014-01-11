@@ -2,6 +2,7 @@
 <%@page import="species.Species"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ActivityFeed"%>
+<%@page import="species.groups.UserGroup"%>
 <%@page import="content.eml.Document"%>
 <html>
     <head>
@@ -45,8 +46,8 @@
                 </div>
  
                 <div class="entry">
-                    <span class="stats_normal">Number of</span><br><span class="stats_big_bold">CHECKLISTS</span>
-                    <div class="stats_number">${Observation.countByIsDeleted(false)}</div>
+                    <span class="stats_normal">Number of</span><br><span class="stats_big_bold">GROUPS</span>
+                    <div class="stats_number">${UserGroup.count()}</div>
                 </div>
                 <div class="entry">
                     <span class="stats_normal">Number of</span><br><span class="stats_big_bold">ACTIVITY</span>
