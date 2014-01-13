@@ -33,7 +33,7 @@
                     <div class="stats_number">${Species.count()}</div>
                 </div>
                 <div class="entry"><span class="stats_normal">Number of</span><br><span class="stats_big_bold">OBSERVATIONS</span>
-                    <div class="stats_number">${Observation.countByIsDeleted(false)}</div>
+                    <div class="stats_number">${Observation.countObservations()}</div>
                 </div>
 
                 <div class="entry">

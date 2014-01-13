@@ -528,4 +528,25 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def fetchList(params, max, offset, action){
 		return observationService.getObservationList(params, max, offset, action)
 	}
+
+    static long countObservations() {
+        def c = Observation.createCriteria();
+        def observationCount = c.count {
+            eq ('isDeleted', false);
+            eq ('isShowable', true);
+            eq ('isChecklist', false);
+        }
+        return observationCount;
+    }
+
+    static long countChecklists() {
+        def c = Observation.createCriteria();
+        def observationCount = c.count {
+            eq ('isDeleted', false);
+            eq ('isShowable', true);
+            eq ('isChecklist', true);
+        }
+        return observationCount;
+    }
+
 }
