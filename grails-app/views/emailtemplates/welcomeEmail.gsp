@@ -131,11 +131,8 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <p class="article-title" align="left"><singleline label="Title"><br>
 </singleline></p>
 <div class="article-content" align="left"><big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username}</small></big><span style="font-weight: bold;">,</span><br><br>
-Welcome to the India Biodiversity Portal (IBP)! You are now part of an
-exciting initiative designed to facilitate participation and enable
-open access for all citizens in contributing information on Indian
-biodiversity for the benefit of science and society. The portal offers the
-following modules: </div>
+    <g:message code="welcomeemail.intro" />
+</div>
 </td>
 </tr>
 <tr>
@@ -156,13 +153,9 @@ following modules: </div>
 </tr>
 </tbody>
 </table>
-<div class="article-content" align="left">An aggregation of user
-submitted photos of individual sightings of a species with time and
-location information. Unidentified images can be identified harnessing
-the collaborative effort of our knowledgeable user community. You can
-submit observations, help in the identification or simply view
-submissions within your interest group, habitat or locality, using
-filters. </div>
+<div class="article-content" align="left">
+    <g:message code="welcomeemail.observation" />
+</div>
 </td>
 </tr>
 <tr>
@@ -178,14 +171,10 @@ filters. </div>
 </tr>
 </tbody>
 </table>
-<div class="article-content" align="left"> &nbsp;A
-collection of more than hundred web-based interactive map layers with
-spatial information on Indian biodiversity. Over 60 of these map layers
-are downloadable. The fully-featured webGIS system allows you to
-overlay and visualize multiple layers; query and measure distances and
-areas; and zoom in and out, to look at areas of your interest. You can
-generate a URL for an indiabiodiversity map layers that you like, and
-embed it on your own web page. </div>
+<div class="article-content" align="left"> 
+    
+    <g:message code="welcomeemail.map" />
+</div>
 </td>
 </tr>
 <tr>
@@ -207,13 +196,10 @@ embed it on your own web page. </div>
 </tr>
 </tbody>
 </table>
-<div class="article-content" align="left"> A compilation of checklists of species
-belonging to a wide range of
-taxa and covering varied geographies of the Indian subcontinent. You
-can search for a particular checklist by taxa, species name or
-location. Each checklist comes with it's own metadata, and terms of
-use, specified by the author and/or source. You can also download a
-copy of a checklist that interests you in more than one format. </div>
+<div class="article-content" align="left"> 
+
+    <g:message code="welcomeemail.checklist" />
+</div>
 </td>
 </tr>
 <tr>
@@ -229,12 +215,10 @@ copy of a checklist that interests you in more than one format. </div>
 </tr>
 </tbody>
 </table>
-<div class="article-content" align="left"> An authenticated database
-of species pages with detailed information
-such as taxonomy, names, natural history, habitat and distribution,
-conservation and occurrence records. These pages also have links to
-further references and embedded images of the organism from the wider
-web. </div>
+<div class="article-content" align="left"> 
+    
+    <g:message code="welcomeemail.species" />
+</div>
 </td>
 </tr>
 <tr>
@@ -250,15 +234,9 @@ web. </div>
 </tr>
 </tbody>
 </table>
-<div class="article-content" align="left">Our Groups module connects
-you to join and
-interact with a fraternity
-of like-minded individuals comprising of experts and enthusiasts to
-discuss topics of interest within the purview of the group subject.
-Groups can assemble observations, include species pages, maps and
-checklists. Each group also has pages and newsletters to allow members
-to collect,
-build and disseminate information. </div>
+<div class="article-content" align="left">
+    <g:message code="welcomeemail.groups" />
+</div>
 </td>
 </tr>
 <tr>
