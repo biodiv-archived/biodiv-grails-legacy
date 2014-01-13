@@ -188,17 +188,16 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <tbody>
 <tr>
 <td class="w580" width="580">
-    <p class="article-title" align="left"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><span style="font-weight: bold;"><big>Checklists</big></span></a></p>
+    <p class="article-title" align="left"><a href="${uGroup.createLink(controller:'document', action:'list', absolute:true)}"><span style="font-weight: bold;"><big>Documents</big></span></a></p>
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-    <td class="w30" width="15"><a href="${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'checklists_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Checklists" hspace="5"></a></td>
+    <td class="w30" width="15"><a href="${uGroup.createLink(controller:'document', action:'list', absolute:true)}"><img src="${resource(dir:'images', file:'documents_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Documents" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
 <div class="article-content" align="left"> 
-
-    <g:message code="welcomeemail.checklist" />
+    <g:message code="welcomeemail.documents" />
 </div>
 </td>
 </tr>
