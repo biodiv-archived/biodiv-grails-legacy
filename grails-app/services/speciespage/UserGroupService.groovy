@@ -1397,12 +1397,13 @@ class UserGroupService {
 			log.debug " All Groups " + groups
 			
 			def afDescriptionList = []
+			def currUser = springSecurityService.currentUser?:SUser.read(params.author?.toLong()) 
 			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
 				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
 				if(success){
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
-					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
 				}
 			}

@@ -245,6 +245,35 @@ def migrateCoverageToDoc(){
 
 
 
+def pullTreeSpecies(){
+	def startDate = new Date()
+	def userGroupService = ctx.getBean("userGroupService");
+	def ds = ctx.getBean("dataSource");
+	def conn = new Sql(ds);
+	String query = "select species_id from species_field where description ILIKE '%tree%' and id in (select id from species_field where field_id in (4, 7, 16));"
+	try {
+		def speciesIdList = conn.rows(query);
+		def newList = []
+		speciesIdList.each{ 
+			if(!newList.contains(it.species_id))
+				newList << it.species_id
+		}
+		println "============ new list size  " + newList.size()
+		//println "========== species list " + 	newList.join(",")
+		def userGroups = [18]
+		def myMap = ['pullType':'bulk', 'selectionType':'reset', 'objectType':species.Species.class.canonicalName, 'objectIds':newList.join(","), 'submitType':'post', 'userGroups':userGroups.join(","), 'filterUrl':'', 'author':'1426']
+		userGroupService.updateResourceOnGroup(myMap)
+		println "========== Done  start date " + startDate + "   endDate " + new Date() 
+				
+	}catch (Exception e) {
+		// TODO: handle exception
+		e.printStackTrace();
+	}
+}
+
+pullTreeSpecies()
+	
+
 //migrateCoverageToDoc()
 //addDocumentPostFeed()
 
