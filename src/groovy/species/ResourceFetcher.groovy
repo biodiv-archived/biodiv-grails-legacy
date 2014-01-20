@@ -18,12 +18,18 @@ class ResourceFetcher {
 	private String rType;
 	private int offset = 0;
 	private URL filterUrl = null;
+	private String userGroupWebAddress = null;
 	
 	List nextResult = null
+
+	public ResourceFetcher(String rType, String filterUrl){
+		this(rType, filterUrl, null)
+	}
 	
-	public  ResourceFetcher(String rType, String filterUrl){
+	public  ResourceFetcher(String rType, String filterUrl, String userGroupWebAddress){
 		this.rType = rType
 		this.filterUrl = new URL(filterUrl)
+		this.userGroupWebAddress = userGroupWebAddress
 		init()
 	}
 	
@@ -49,6 +55,8 @@ class ResourceFetcher {
 	
 	private computeNext(){
 		def paramsMap = Utils.getQueryMap(filterUrl)
+		//adding group filter parameter for list/search query
+		paramsMap["webaddress"] = this.userGroupWebAddress
 		String action = filterUrl.getPath().split("/")[2]
 		switch(rType){
 			case Observation.class.canonicalName:

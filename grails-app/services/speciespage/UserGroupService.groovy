@@ -1387,7 +1387,7 @@ class UserGroupService {
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
 			ResourceFetcher rf
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-				rf = new ResourceFetcher(params.objectType, params.filterUrl)
+				rf = new ResourceFetcher(params.objectType, params.filterUrl, params.webaddress)
 				List newList = rf.getAllResult()
 				newList.removeAll(allObvs)
 				allObvs = newList

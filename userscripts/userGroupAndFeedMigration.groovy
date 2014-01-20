@@ -250,7 +250,7 @@ def pullTreeSpecies(){
 	def userGroupService = ctx.getBean("userGroupService");
 	def ds = ctx.getBean("dataSource");
 	def conn = new Sql(ds);
-	String query = "select species_id from species_field where description ILIKE '%tree%' and id in (select id from species_field where field_id in (4, 7, 16));"
+	String query = "select species_id from species_field where description ILIKE '%tree%' and id in (select id from species_field where field_id in (4, 7, 16)) and id not in (select species_field_contributors_id from species_field_contributor where contributor_id = 268373);"
 	try {
 		def speciesIdList = conn.rows(query);
 		def newList = []
@@ -271,8 +271,35 @@ def pullTreeSpecies(){
 	}
 }
 
-pullTreeSpecies()
-	
+
+def pullTreeObservations(){
+	def startDate = new Date()
+	def userGroupService = ctx.getBean("userGroupService");
+	def ds = ctx.getBean("dataSource");
+	def conn = new Sql(ds);
+	String query = "select id from observation where is_deleted = false and is_checklist = false and source_id = id and max_voted_reco_id in ( select id from recommendation where taxon_concept_id in ( select taxon_concept_id from species where id in (select species_id from user_group_species where user_group_id = 18)));"
+	try {
+		def speciesIdList = conn.rows(query);
+		def newList = []
+		speciesIdList.each{ 
+			if(!newList.contains(it.id))
+				newList << it.id
+		}
+		println "============ new list size  " + newList.size()
+		//println "========== species list " + 	newList.join(",")
+		def userGroups = [18]
+		def myMap = ['pullType':'bulk', 'selectionType':'reset', 'objectType':species.participation.Observation.class.canonicalName, 'objectIds':newList.join(","), 'submitType':'post', 'userGroups':userGroups.join(","), 'filterUrl':'', 'author':'1426']
+		userGroupService.updateResourceOnGroup(myMap)
+		println "========== Done  start date " + startDate + "   endDate " + new Date() 
+				
+	}catch (Exception e) {
+		// TODO: handle exception
+		e.printStackTrace();
+	}
+}
+
+//pullTreeSpecies()
+pullTreeObservations()
 
 //migrateCoverageToDoc()
 //addDocumentPostFeed()
