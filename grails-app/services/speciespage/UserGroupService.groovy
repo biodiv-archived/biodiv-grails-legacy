@@ -871,7 +871,16 @@ class UserGroupService {
 	}
 
 	def getGroupThemes(){
-		return ["default"]
+        def themes = ['default'];
+        File themesFile = new File(grailsApplication.config.speciesPortal.app.rootDir+'/group-themes/themes.txt');
+        if(themesFile.exists()) {
+            themesFile.eachLine { theme ->
+                themes << theme;
+            }
+        } else {
+            log.error "${themesFile.getAbsolutePath()} does not exist"
+        }
+        return themes;
 	}
 
 	def fetchHomePageTitle(UserGroup userGroupInstance){

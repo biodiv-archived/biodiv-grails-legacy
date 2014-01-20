@@ -131,7 +131,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <p class="article-title" align="left"><singleline label="Title"><br>
 </singleline></p>
 <div class="article-content" align="left"><big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username}</small></big><span style="font-weight: bold;">,</span><br><br>
-    <g:message code="welcomeemail.intro" />
+    <g:message code="welcomeEmail.intro" />
 </div>
 </td>
 </tr>
@@ -154,7 +154,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tbody>
 </table>
 <div class="article-content" align="left">
-    <g:message code="welcomeemail.observation" />
+    <g:message code="welcomeEmail.observation" />
 </div>
 </td>
 </tr>
@@ -173,7 +173,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </table>
 <div class="article-content" align="left"> 
     
-    <g:message code="welcomeemail.map" />
+    <g:message code="welcomeEmail.map" />
 </div>
 </td>
 </tr>
@@ -197,7 +197,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tbody>
 </table>
 <div class="article-content" align="left"> 
-    <g:message code="welcomeemail.documents" />
+    <g:message code="welcomeEmail.documents" />
 </div>
 </td>
 </tr>
@@ -216,7 +216,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </table>
 <div class="article-content" align="left"> 
     
-    <g:message code="welcomeemail.species" />
+    <g:message code="welcomeEmail.species" />
 </div>
 </td>
 </tr>
@@ -234,7 +234,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tbody>
 </table>
 <div class="article-content" align="left">
-    <g:message code="welcomeemail.groups" />
+    <g:message code="welcomeEmail.groups" />
 </div>
 </td>
 </tr>
