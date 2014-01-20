@@ -395,7 +395,9 @@ class Utils {
 	
 	public static Map getQueryMap(URL url){
 		def map = [:]
-		if(!url.query) return map
+		if(!url.query){
+			return new GrailsParameterMap(map, null)
+		}
 		url.query.split('&').each{kv ->
 			def (key, value) = kv.split('=').toList()
 		    if(value != null) {
@@ -425,7 +427,6 @@ class Utils {
 		   
 		}
 		retMap = new GrailsParameterMap(retMap, null)
-		println "Returned url map == " + retMap
 		return retMap
 	}
 	

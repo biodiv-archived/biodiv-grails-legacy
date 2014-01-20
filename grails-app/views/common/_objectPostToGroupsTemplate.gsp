@@ -11,9 +11,9 @@
                 <uGroup:getCurrentUserUserGroups model="[observationInstance:observationInstance, onlyExpertGroups:onlyExpertGroups]"/>
             </div>
         </div>
-        <a onclick="submitToGroups('post', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroup:userGroup)}', ${isBulkPull} ,'${observationInstance?.id}');return false;" class="btn btn-primary"
+        <a onclick="submitToGroups('post', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', webaddress:params.webaddress, userGroup:params.userGroup)}', ${isBulkPull} ,'${observationInstance?.id}');return false;" class="btn btn-primary"
             style="float: right; margin-right: 5px;"> Post </a>
-        <a onclick="submitToGroups('unpost', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroup:userGroup)}', ${isBulkPull}, '${observationInstance?.id}');return false;" class="btn btn-danger"
+        <a onclick="submitToGroups('unpost', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', webaddress:params.webaddress, userGroup:params.userGroup)}', ${isBulkPull}, '${observationInstance?.id}');return false;" class="btn btn-danger"
             style="float: right; margin-right: 5px;"> Unpost </a>
     </div>
 </div>
