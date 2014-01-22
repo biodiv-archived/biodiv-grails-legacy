@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
+import species.groups.UserGroup;
 import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.SpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
@@ -52,6 +53,7 @@ class SpeciesController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else{
+			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
 			model.resultType = "species"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
