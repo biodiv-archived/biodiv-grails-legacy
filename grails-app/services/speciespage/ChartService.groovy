@@ -576,4 +576,66 @@ class ChartService {
 		return ActivityFeed.countByAuthorAndIsShowable(user,true);
 	}
 
+	def long getObservationCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Observation.simpleName, userGroup);
+		}else{
+			count = Observation.createCriteria().count {
+				and {
+					eq("isDeleted", false)
+					eq("isShowable", true)
+					eq("isChecklist", false)
+				}
+			}
+		}
+		return count
+	}
+
+	def long getChecklistCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Checklists.simpleName, userGroup);
+		}else{
+			count = Checklists.countByIsDeleted(false);
+		}
+		return count
+	}
+
+	def long getSpeciesCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Species.simpleName, userGroup);
+		}else{
+			count = Species.count();
+		}
+		return count
+	}
+
+	def long getDocumentCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Document.simpleName, userGroup);
+		}else{
+			count = Document.count();
+		}
+		return count
+	}
+
 }

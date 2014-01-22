@@ -35,5 +35,13 @@ class ChartController {
 		log.debug params
 		params.days = "" + 30
 		render template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)]
-	} 
+	}
+
+	/**
+	* Will return basic dynamic stats i.e. observationCount, speciesCount
+	*/
+	def basicStat = {
+		log.debug params
+		render [observationCount:chartService.getObservationCount(params), speciesCount:chartService.getSpeciesCount(params), checklistCount:chartService.getChecklistCount(params), documentCount:chartService.getDocumentCount(params) ]
+	}  
 }

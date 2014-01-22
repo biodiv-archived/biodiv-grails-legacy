@@ -16,6 +16,7 @@ class ChecklistController {
 	def checklistUtilService
 	def observationService
 	def SUserService
+	def chartService
 	
 	def index = {
 		redirect(action:list, params: params)
@@ -96,16 +97,7 @@ class ChecklistController {
 	
 	def count = {
 		log.debug params
-		def userGroup
-		if(params.webaddress) {
-			userGroup = userGroupService.get(params.webaddress)
-		}
-		
-		if(userGroup){
-			render getChecklistCount(null, userGroup)
-		}else{
-			render Checklists.countByIsDeleted(false);
-		}
+		render chartService.getChecklistCount(params)
 	}
 	
 	@Secured(['ROLE_USER'])
