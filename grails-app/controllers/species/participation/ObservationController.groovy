@@ -11,12 +11,12 @@ import groovy.xml.XmlUtil;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.converters.XML;
 
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.Flag.FlagType
@@ -89,7 +89,7 @@ class ObservationController extends AbstractObjectController {
 		}
 	}
 
-	def list = {
+	def list() {
 		
 		def model = getObservationList(params);
 		
@@ -165,7 +165,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		def observationInstance = new Observation()
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
@@ -174,7 +174,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def save = {
+	def save() {
 		if(request.method == 'POST') {
 			//TODO:edit also calls here...handle that wrt other domain objects
 			saveAndRender(params, false)
@@ -184,7 +184,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
     @Secured(['ROLE_USER'])
-	def flagDeleted = {
+	def flagDeleted() {
         
 		def result = observationService.delete(params)
 		flash.message = result.message
@@ -192,7 +192,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def update = {
+	def update() {
 		def observationInstance = Observation.get(params.id?.toLong())
 		if(observationInstance)	{
 			saveAndRender(params, false)
@@ -212,7 +212,7 @@ class ObservationController extends AbstractObjectController {
 		}
 	}
 
-	def show = {
+	def show() {
 		if(params.id) {
 			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!observationInstance) {
@@ -304,7 +304,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
 		def observationInstance = Observation.findWhere(id:params.id?.toLong(), isDeleted:false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -319,7 +319,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-	def delete = {
+	def delete() {
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			try {
@@ -343,7 +343,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def upload_resource = {
+	def upload_resource() {
 		def message;
 		if(params.ajax_login_error == "1") {
             message = [status:401, error:'Please login to continue']
@@ -497,7 +497,7 @@ class ObservationController extends AbstractObjectController {
 	 * saves recommendation if it doesn't exist
 	 */
 	@Secured(['ROLE_USER'])
-	def addRecommendationVote = {
+	def addRecommendationVote() {
 		if(chainModel?.chainedParams) {
 			//need to change... dont pass on params
 			chainModel.chainedParams.each {
@@ -593,7 +593,7 @@ class ObservationController extends AbstractObjectController {
 	 * saves recommendation if it doesn't exist
 	 */
 	@Secured(['ROLE_USER'])
-	def addAgreeRecommendationVote = {
+	def addAgreeRecommendationVote() {
 
 		params.author = springSecurityService.currentUser;
 
@@ -651,7 +651,7 @@ class ObservationController extends AbstractObjectController {
 	* Deletes recommendation vote
 	*/
    @Secured(['ROLE_USER'])
-   def removeRecommendationVote = {
+   def removeRecommendationVote() {
 
 	   def author = springSecurityService.currentUser;
 
@@ -769,7 +769,7 @@ class ObservationController extends AbstractObjectController {
 
 		
 	@Secured(['ROLE_USER'])
-	def deleteRecoVoteComment = {
+	def deleteRecoVoteComment() {
 		def recoVote = RecommendationVote.get(params.id.toLong());
 		recoVote.comment = null;
 		try {
@@ -912,7 +912,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def sendIdentificationMail = {
+	def sendIdentificationMail() {
 		def currentUserMailId = springSecurityService.currentUser?.email;
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
@@ -1041,18 +1041,18 @@ class ObservationController extends AbstractObjectController {
 	///////////////////////////////////////////////////////////////////////////////
 	
 	@Secured(['ROLE_USER'])
-	def getObv = {
+	def getObv() {
 		render Observation.read(params.id.toLong()) as JSON
 	} 
 	
 	@Secured(['ROLE_USER'])
-	def getList = {
+	def getList() {
 		def result = getObservationList(params)
         render result as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
-	def getHabitatList = {
+	def getHabitatList() {
 		def res = new HashMap()
 			Habitat.list().each {
 			res[it.id] = it.name
@@ -1061,7 +1061,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def getGroupList = {
+	def getGroupList() {
 		def res = new HashMap()
 		SpeciesGroup.list().each {
 			res[it.id] = it.name
@@ -1071,7 +1071,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def getThumbObvImage = {
+	def getThumbObvImage() {
 		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
@@ -1079,7 +1079,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def getFullObvImage = {
+	def getFullObvImage() {
 		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def gallImagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix):null
@@ -1087,12 +1087,12 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def getUserImage = {
+	def getUserImage() {
 		render SUser.read(params.id.toLong()).icon() 
 	}
 	
 	@Secured(['ROLE_USER'])
-	def getUserInfo = {
+	def getUserInfo() {
 		def res = new HashMap()
 		def u = SUser.read(params.id.toLong())
 		res["id"] = u.id
@@ -1112,13 +1112,13 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_ADMIN'])
-	def batchUpload = {
+	def batchUpload() {
 		obvUtilService.batchUpload(request, params)
 		render "== done"
 	}
 	
 	@Secured(['ROLE_USER'])
-	def requestExport = {
+	def requestExport() {
 		obvUtilService.requestExport(params)
 		def r = [:]
 		r['msg']= "${message(code: 'observation.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
@@ -1127,7 +1127,7 @@ class ObservationController extends AbstractObjectController {
 	
 	
 	@Secured(['ROLE_USER'])
-	def downloadFile = {
+	def downloadFile() {
 		log.debug(params)
 		def dl = DownloadLog.read(params.id.toLong())
 		if(dl && dl.author == springSecurityService.currentUser){

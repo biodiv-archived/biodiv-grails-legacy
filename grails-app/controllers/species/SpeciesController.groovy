@@ -15,12 +15,12 @@ import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import species.utils.Utils;
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 class SpeciesController extends AbstractObjectController {
 
@@ -39,7 +39,7 @@ class SpeciesController extends AbstractObjectController {
 		redirect(action: "list", params: params)
 	}
 
-	def list = {
+	def list() {
 		log.debug params
 		def model = speciesService.getSpeciesList(params, 'list');
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
@@ -63,7 +63,7 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	def listXML = {
+	def listXML() {
 		//cache "taxonomy_results"
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		def speciesList = Species.list(params) as XML;
@@ -77,14 +77,14 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		def speciesInstance = new Species()
 		speciesInstance.properties = params
 		return [speciesInstance: speciesInstance]
 	}
 
 	@Secured(['ROLE_USER'])
-	def save = {
+	def save() {
 		def speciesInstance = new Species(params)
 		if (speciesInstance.save(flush: true)) {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
@@ -95,7 +95,7 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	def show = {
+	def show() {
 		//cache "content"
 		def speciesInstance = Species.get(params.long('id'))
 		if (!speciesInstance) {
@@ -259,7 +259,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
 		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
 			if (!speciesInstance) {
@@ -277,7 +277,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def update = {
+	def update() {
 		log.debug params;
 		if(!params.name || !params.pk) {
 			render ([success:false, msg:'Either field name or field id is missing'] as JSON)
@@ -306,7 +306,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def addResource = {
+	def addResource() {
 		log.debug params;
 		if(!params.id) {
 			render ([success:false, errors:[msg:'Species id is missing']] as JSON)
@@ -361,7 +361,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def delete = {
+	def delete() {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
@@ -472,7 +472,7 @@ class SpeciesController extends AbstractObjectController {
 	//	}
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def upload = {
+	def upload() {
         log.debug params;
         /*List contributors;
         if(!params.contributorIds) {
@@ -498,7 +498,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_ADMIN'])
-	def requestExport = {
+	def requestExport() {
 		log.debug "Export of species requested" + params
 		speciesService.requestExport(params)
 		def r = [:]

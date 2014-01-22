@@ -1,6 +1,6 @@
 package species
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 class AuthTagLib {
 	

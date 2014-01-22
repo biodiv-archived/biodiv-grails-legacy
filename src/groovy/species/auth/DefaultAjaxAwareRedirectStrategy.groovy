@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.util.UrlUtils;
-import org.codehaus.groovy.grails.plugin.springsecurity.ReflectionUtils;
+import grails.plugin.springsecurity.ReflectionUtils;
 
 import species.utils.Utils;
 

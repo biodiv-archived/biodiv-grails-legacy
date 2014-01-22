@@ -1,10 +1,10 @@
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.codehaus.groovy.grails.plugin.springsecurity.AjaxAwareAuthenticationFailureHandler;
-import org.codehaus.groovy.grails.plugin.springsecurity.AjaxAwareAuthenticationSuccessHandler;
-import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPostAuthenticationChecks;
-import org.codehaus.groovy.grails.plugin.springsecurity.DefaultPreAuthenticationChecks;
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugin.springsecurity.openid.OpenIdUserDetailsService;
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler;
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler;
+import grails.plugin.springsecurity.userdetails.DefaultPostAuthenticationChecks;
+import grails.plugin.springsecurity.userdetails.DefaultPreAuthenticationChecks;
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;
@@ -21,8 +21,6 @@ import species.auth.OpenIDAuthenticationFilter;
 import species.auth.OpenIDAuthenticationProvider;
 import species.auth.OpenIdAuthenticationFailureHandler;
 
-import species.auth.drupal.DrupalAuthCookieFilter;
-import species.auth.drupal.DrupalAuthUtils;
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao

@@ -2,11 +2,11 @@ package species.auth;
 
 import grails.util.Environment;
 
-import org.codehaus.groovy.grails.plugin.springsecurity.NullSaltSource;
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugin.springsecurity.ui.RegistrationCode;
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource;
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
-import org.codehaus.groovy.grails.plugin.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
+import grails.plugin.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.web.context.request.RequestContextHolder as RCH
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 

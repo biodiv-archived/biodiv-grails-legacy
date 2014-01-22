@@ -4,8 +4,8 @@ import grails.plugin.springsecurity.ui.SpringSecurityUiService;
 import grails.util.Environment;
 import groovy.text.SimpleTemplateEngine;
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugin.springsecurity.ui.RegistrationCode;
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.ui.RegistrationCode;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;

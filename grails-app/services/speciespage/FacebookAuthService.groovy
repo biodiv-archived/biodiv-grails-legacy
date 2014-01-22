@@ -1,7 +1,7 @@
 package speciespage
 
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.social.facebook.api.FacebookProfile
 import org.springframework.social.facebook.api.impl.FacebookTemplate

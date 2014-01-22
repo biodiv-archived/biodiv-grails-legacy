@@ -11,14 +11,14 @@ import groovy.xml.XmlUtil;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.converters.XML;
 
 import species.participation.Flag.FlagType
 import species.participation.Follow
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.Flag.FlagType
@@ -103,7 +103,7 @@ class ActionController {
     }
 
     @Secured(['ROLE_USER'])
-    def featureIt = {  
+    def featureIt() {  
         log.debug params;
         boolean status = false;
         String msg = '';
@@ -212,7 +212,7 @@ class ActionController {
     }
 
     @Secured(['ROLE_USER'])
-    def unfeatureIt = {
+    def unfeatureIt() {
         log.debug params;
         boolean status = false;
         String msg = '';
@@ -302,7 +302,7 @@ class ActionController {
     } 
 
 	@Secured(['ROLE_USER'])
-	def flagIt = { 
+	def flagIt() { 
         log.debug params;
 		params.author = springSecurityService.currentUser;
 		def obv = activityFeedService.getDomainObject(params.type,params.id);     
@@ -342,7 +342,7 @@ class ActionController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def deleteFlag  = {
+	def deleteFlag() {
 		log.debug params;
         params.author = springSecurityService.currentUser;
 		def flagInstance = Flag.read(params.id.toLong());  
@@ -367,5 +367,5 @@ class ActionController {
 			def message = [error: g.message(code: 'flag.error.onDelete', default:'Error on deleting flag')];
             render message as JSON
 		} 
-	}
+	} 
 }

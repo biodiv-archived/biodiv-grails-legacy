@@ -10,7 +10,7 @@ import java.util.List
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.converters.JSON
 import static org.codehaus.groovy.grails.commons.ConfigurationHolder.config as Config
 import org.springframework.http.HttpStatus
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 
 import speciespage.ObservationService
@@ -68,7 +68,7 @@ class UFileController {
 	 */
 
 	@Secured(['ROLE_USER'])
-	def fileUpload = {
+	def fileUpload() {
 		log.debug params
 		try {
 
@@ -109,7 +109,7 @@ class UFileController {
 	 * Document is created after uploading of file. THe document id is passed to form and for further tracking.
 	 */
 	@Secured(['ROLE_USER'])
-	def upload = {
+	def upload() {
 		log.debug "&&&&&&&&&&&&&&&&&&& <><><<>>params in upload of file" +  params
 		try {
 

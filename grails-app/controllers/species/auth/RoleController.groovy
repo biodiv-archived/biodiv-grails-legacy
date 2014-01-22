@@ -1,14 +1,14 @@
 package species.auth
 
-import grails.plugin.springsecurity.Secured;
+import grails.plugin.springsecurity.annotation.Secured;
 import grails.util.GrailsNameUtils;
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 @Secured(['ROLE_ADMIN'])
 class RoleController extends grails.plugin.springsecurity.ui.RoleController {
 
-	def edit = {
+	def edit() {
 
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 				SpringSecurityUtils.securityConfig.authority.nameField, null)

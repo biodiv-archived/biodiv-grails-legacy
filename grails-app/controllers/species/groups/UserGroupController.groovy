@@ -3,8 +3,8 @@ package species.groups
 import java.util.Map;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugin.springsecurity.ui.RegistrationCode;
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.ui.RegistrationCode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -19,7 +19,7 @@ import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 import grails.converters.JSON;
-import grails.plugin.springsecurity.Secured;
+import grails.plugin.springsecurity.annotation.Secured;
 import groovy.text.SimpleTemplateEngine
 
 class UserGroupController {
@@ -49,7 +49,7 @@ class UserGroupController {
 		}
 	}
 	
-	def list = {
+	def list() {
 		def model = getUserGroupList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
@@ -136,7 +136,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		log.debug params
 		def userGroupInstance = new UserGroup()
 		userGroupInstance.properties = params
@@ -144,7 +144,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def save = {
+	def save() {
 		log.debug params;
 		params.domain = Utils.getDomainName(request)
 		def userGroupInstance = userGroupService.create(params);
@@ -160,7 +160,7 @@ class UserGroupController {
 		}
 	}
 
-	def show = {
+	def show() {
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
@@ -219,7 +219,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			//flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
@@ -233,7 +233,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def update = {
+	def update() {
 		log.debug params;
 		
 		def userGroupInstance = findInstance(params.id, params.webaddress)
@@ -269,7 +269,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def delete = {
+	def delete() {
 		log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (userGroupInstance) {
@@ -474,7 +474,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
-	def settings = {
+	def settings() {
 		log.debug params
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
@@ -492,7 +492,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-	def joinUs = {
+	def joinUs() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			render (['success':true,'statusComplete':false, 'msg':'No userGroup is selected.'] as JSON);
@@ -514,10 +514,10 @@ class UserGroupController {
 		}
 		flash.error = 'We are extremely sorry as we are not able to process your request now. Please try again.';
 		render ([success:true, 'statusComplete':false, 'shortMsg':'Cannot process now', 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
-	}
+	} 
 
 	@Secured(['ROLE_USER'])
-	def inviteMembers = {
+	def inviteMembers() {
 		List members = Utils.getUsersList(params.memberUserIds);
 		log.debug members;
 
@@ -543,7 +543,7 @@ class UserGroupController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def inviteExperts = {
+	def inviteExperts() {
 		List members = Utils.getUsersList(params.expertUserIds);
 		log.debug members;
 
@@ -578,7 +578,7 @@ class UserGroupController {
 
 
 	@Secured(['ROLE_USER'])
-	def requestMembership = {
+	def requestMembership() {
 		log.debug params;
 		def user = springSecurityService.currentUser;
 		if(user) {
@@ -610,7 +610,7 @@ class UserGroupController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def requestModeratorship = {
+	def requestModeratorship() {
 		log.debug params;
 		def user = springSecurityService.currentUser;
 		if(user) {
@@ -657,7 +657,7 @@ class UserGroupController {
 //	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-	def confirmMembershipRequest = {
+	def confirmMembershipRequest() {
 		log.debug params;
 		
 		if(params.userId && params.userGroupInstanceId) {
@@ -708,7 +708,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-	def leaveUs = {
+	def leaveUs() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			flash.error = 'No userGroup selected.'
@@ -781,7 +781,7 @@ class UserGroupController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def upload_resource = {
+	def upload_resource() {
 		log.debug params;
 
 		try {
@@ -1073,7 +1073,7 @@ class UserGroupController {
    /////////////////////////////////////////////////////////////////////////////////////////////
    
    @Secured(['ROLE_USER'])
-   def addUserToGroup = {
+   def addUserToGroup() {
 	   log.debug params
 	   UserGroup ug = UserGroup.read(params.groupId.toLong())
 	   boolean sendMail = (params.sendMail ? params.sendMail.toBoolean() : false)

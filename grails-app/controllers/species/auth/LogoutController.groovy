@@ -1,6 +1,6 @@
 package species.auth
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 class LogoutController {
 

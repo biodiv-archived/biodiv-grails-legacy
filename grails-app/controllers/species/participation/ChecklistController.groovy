@@ -3,7 +3,7 @@ package species.participation
 import grails.converters.JSON
 import species.License;
 import species.groups.SpeciesGroup;
-import grails.plugin.springsecurity.Secured;
+import grails.plugin.springsecurity.annotation.Secured;
 import species.Resource.ResourceType;
 
 class ChecklistController {
@@ -21,14 +21,14 @@ class ChecklistController {
 		redirect(action:list, params: params)
 	}
 
-	def list = {
+	def list() {
 		log.debug params
 		params.isChecklistOnly = "" + true
 		redirect(controller:'observation', action:list, params: params)
 	}
 
 
-	def show = {
+	def show() {
 		log.debug params
 		if(params.id) {
 			def checklistInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
@@ -109,7 +109,7 @@ class ChecklistController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		log.debug params
 		def checklistInstance = new Checklists(license:License.findByName(License.LicenseType.CC_BY))
 		checklistInstance.properties = params;
@@ -117,7 +117,7 @@ class ChecklistController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def save = {
+	def save() {
 		log.debug params;
 		if(request.method == 'POST') {
 			def result = saveAndRender(params)
@@ -196,7 +196,7 @@ class ChecklistController {
 	} 
 	
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
         log.debug params;
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id?.toLong(), false)
 		if (!observationInstance) {
@@ -212,7 +212,7 @@ class ChecklistController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def update = {
+	def update() {
 		log.debug params;
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id?.toLong(), false)
 		if(observationInstance)	{
@@ -283,7 +283,7 @@ class ChecklistController {
 	}
 	
 	@Secured(['ROLE_USER'])
-	def flagDeleted = {
+	def flagDeleted() {
 		def result = observationService.delete(params)
 		flash.message = result.message
 		redirect (url:result.url)
@@ -345,7 +345,7 @@ class ChecklistController {
 	}
 	
 	@Secured(['ROLE_ADMIN'])
-	def test = {
+	def test() {
 		checklistService.serializeClData()
 		render " done  "
 	}
@@ -444,7 +444,7 @@ class ChecklistController {
 	
 
 	
-//	def create = {
+//	def create() {
 //		log.debug params;
 //	}
 	

@@ -2,7 +2,7 @@ package species.auth
 
 import groovy.sql.Sql;
 import grails.converters.JSON
-import grails.plugin.springsecurity.Secured;
+import grails.plugin.springsecurity.annotation.Secured;
 import grails.plugin.springsecurity.ui.AbstractS2UiController;
 import grails.plugin.springsecurity.ui.RegisterController;
 import grails.plugin.springsecurity.ui.SpringSecurityUiService
@@ -14,8 +14,8 @@ import java.util.Map
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.solr.common.util.NamedList;
-import org.codehaus.groovy.grails.plugin.springsecurity.NullSaltSource
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -50,7 +50,7 @@ class SUserController extends UserController {
 		redirect(action: "list", params: params)
 	}
 
-	def list = {
+	def list() {
 		params.max = Math.min(params.max ? params.int('max') : 24, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
@@ -95,13 +95,13 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def create = {
+	def create() {
 		def user = lookupUserClass().newInstance(params)
 		[user: user, authorityList: sortedRoles()]
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def save = {
+	def save() {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
@@ -119,7 +119,7 @@ class SUserController extends UserController {
 		redirect action: edit, id: user.id
 	}
 
-	def show = {
+	def show() {
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
 		}
@@ -140,7 +140,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
-	def edit = {
+	def edit() {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
@@ -157,7 +157,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
-	def update = {
+	def update() {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
@@ -224,7 +224,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def delete = {
+	def delete() {
 		def user = findById()
 		if (!user) return
 
@@ -666,7 +666,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def upload_resource = {
+	def upload_resource() {
 		log.debug params;
 
 		try {
@@ -765,7 +765,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def resetPassword = {  ResetPasswordCommand command ->
+	def resetPassword (ResetPasswordCommand command ) {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		if(SUserService.ifOwns(params.long('id'))) {
@@ -887,7 +887,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER'])
-    def myprofile = {
+    def myprofile() {
 		def user = springSecurityService.currentUser
 		redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
     }

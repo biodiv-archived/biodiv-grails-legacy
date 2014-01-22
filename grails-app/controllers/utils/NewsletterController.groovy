@@ -2,13 +2,13 @@ package utils
 
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.acls.domain.BasePermission;
 
 import species.groups.UserGroup;
 import species.utils.Utils;
 import grails.converters.JSON;
-import grails.plugin.springsecurity.Secured;
+import grails.plugin.springsecurity.annotation.Secured;
 
 class NewsletterController {
 
@@ -26,13 +26,13 @@ class NewsletterController {
 		redirect url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages", params: params)
 	}
 
-	def list = {
+	def list() {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		redirect url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages", params: params)
 	}
 
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		log.debug params
 		boolean permitted = false;
 		if(params.webaddress||params.userGroup) { 
@@ -63,7 +63,7 @@ class NewsletterController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def save = {
+	def save() {
 		log.debug params
 		def newsletterInstance;
 		
@@ -107,7 +107,7 @@ class NewsletterController {
 		}
 	}
 
-	def show = {
+	def show() {
 		log.debug params
 		def newsletterInstance = Newsletter.get(params.id)
 		if (!newsletterInstance) {
@@ -125,7 +125,7 @@ class NewsletterController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
 		def newsletterInstance = Newsletter.get(params.id)
 		if (!newsletterInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
@@ -150,7 +150,7 @@ class NewsletterController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def update = {
+	def update() {
 		def newsletterInstance = Newsletter.get(params.id)
 
 		if (newsletterInstance) {
@@ -207,7 +207,7 @@ class NewsletterController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def delete = {
+	def delete() {
 		def newsletterInstance = Newsletter.get(params.id)
 		if (newsletterInstance) {
 			boolean permitted = false;

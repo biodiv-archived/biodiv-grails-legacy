@@ -1,6 +1,6 @@
 package species.participation
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 import species.utils.ImageType;
 import species.utils.Utils

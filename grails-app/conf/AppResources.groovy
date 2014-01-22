@@ -9,7 +9,7 @@ modules = {
             defaultBundle 'core' 
         }
 
-		'jquery-ui' {
+		/*'jquery-ui' {
 			defaultBundle 'core'
 			resource id:'js', url:[dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js'],
 					nominify: true, disposition: 'defer'
@@ -21,7 +21,8 @@ modules = {
 					url:[dir: 'css',
 						file:'jquery-ui.css'],
 					attrs:[media:'screen, projection']
-		}
+		
+        }*/
 
 	}
 

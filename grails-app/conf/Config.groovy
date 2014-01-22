@@ -477,7 +477,7 @@ environments {
         }
 
 
-        log4jConsoleLogLevel = Priority.DEBUG
+        log4jConsoleLogLevel = Priority.INFO
         log4j = {
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
@@ -1317,4 +1317,5 @@ grails.controllers.defaultScope = 'singleton'
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password', 'password2']
 
+grails.plugin.springsecurity.logout.postOnly = false
 

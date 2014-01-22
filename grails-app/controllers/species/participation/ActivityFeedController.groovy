@@ -1,7 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import species.participation.Follow
 import species.auth.SUser
 
@@ -45,7 +45,7 @@ class ActivityFeedController {
 		redirect(action:list, params:params)
 	}
 	
-	def list = {
+	def list() {
 		log.debug params
 		['feedType':params.feedType, 'feedCategory':params.feedCategory]
 	}
@@ -54,7 +54,7 @@ class ActivityFeedController {
 	////////////////////////////////////// Follow Related////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Secured(['ROLE_USER'])
-	def follow = {
+	def follow() {
 		log.debug params
 		def author = springSecurityService.currentUser;
 		def domainObj = activityFeedService.getDomainObject(params.className, params.id);

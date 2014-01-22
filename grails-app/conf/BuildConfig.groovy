@@ -35,7 +35,7 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     checksums true // Whether to verify checksums on resolve
     //TODO verify if you need this setting of legacyResolve
-    legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
+//    legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
 
 
     repositories {  

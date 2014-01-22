@@ -40,7 +40,7 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 import org.apache.solr.common.util.DateUtil;
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 

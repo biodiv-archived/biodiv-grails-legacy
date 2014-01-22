@@ -1,7 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 class CommentController {
 
@@ -9,7 +9,7 @@ class CommentController {
 	def commentService;
 
 	@Secured(['ROLE_USER'])
-	def addComment = {
+	def addComment() {
 		params.author = springSecurityService.currentUser;
 		
 		
@@ -35,7 +35,7 @@ class CommentController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def removeComment = {
+	def removeComment() {
 		if(commentService.removeComment(params)){
 			render (['success:true']as JSON);
 		}else{
@@ -63,13 +63,13 @@ class CommentController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def likeComment = {
+	def likeComment() {
 		params.author = springSecurityService.currentUser;
 		render commentService.likeComment(params)
 	}
 	
 	@Secured(['ROLE_USER'])
-	def editComment = {
+	def editComment() {
 		render "To do edit"
 	}
 	

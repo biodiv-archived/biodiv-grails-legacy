@@ -4,19 +4,19 @@ import grails.util.*
 import org.grails.rateable.*
 import grails.converters.JSON;
 
-import grails.plugin.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 class RatingController extends RateableController {
     
 	@Secured(['ROLE_USER'])
-    def rate = {
+    def rate() {
         log.debug params;
         def result =  rateIt(params.id.toLong(), params.type, params.rating);
         render result as JSON
     }
 
     @Secured(['ROLE_USER'])
-    def unrate = {
+    def unrate() {
         log.debug params
         def rater = evaluateRater()
 

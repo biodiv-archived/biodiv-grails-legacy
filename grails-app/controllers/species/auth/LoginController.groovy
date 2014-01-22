@@ -5,7 +5,7 @@ import grails.converters.JSON
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationTar
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
-import org.codehaus.groovy.grails.plugin.springsecurity.ui.RegistrationCode;
+import grails.plugin.springsecurity.ui.RegistrationCode;
 import species.utils.Utils;
 
 import species.auth.DefaultAjaxAwareRedirectStrategy;

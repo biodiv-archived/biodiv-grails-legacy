@@ -1,6 +1,4 @@
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.grails.plugin.springsecurity.SecurityFilterPosition
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
 
 import species.Field;
 import species.UserGroupTagLib;
@@ -126,9 +124,6 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
-		if(grailsApplication.config.checkin.drupal) {
-			SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
-		}
 	}
 
 	def initEmailConfirmationService() {
