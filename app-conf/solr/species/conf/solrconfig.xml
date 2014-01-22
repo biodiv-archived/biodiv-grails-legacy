@@ -106,14 +106,6 @@
        for Solr's main Lucene index. -->
 <indexConfig>
    <!-- Values here affect all index writers and act as a default unless overridden. -->
-    <useCompoundFile>false</useCompoundFile>
-
-    <mergeFactor>10</mergeFactor>
-
-    <!-- Sets the amount of RAM that may be used by Lucene indexing
-      for buffering added documents and deletions before they are
-      flushed to the Directory.  -->
-    <ramBufferSizeMB>32</ramBufferSizeMB>
     <!-- <maxMergeDocs>2147483647</maxMergeDocs> -->
     <maxFieldLength>10000</maxFieldLength>
     <writeLockTimeout>1000</writeLockTimeout>

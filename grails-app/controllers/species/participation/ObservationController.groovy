@@ -103,6 +103,8 @@ class ObservationController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else {
+
+			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";

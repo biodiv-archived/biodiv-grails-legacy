@@ -37,21 +37,7 @@
 
   <indexConfig>
    <!-- Values here affect all index writers and act as a default unless overridden. -->
-    <useCompoundFile>false</useCompoundFile>
 
-    <mergeFactor>10</mergeFactor>
-    <!--
-     If both ramBufferSizeMB and maxBufferedDocs is set, then Lucene will flush based on whichever limit is hit first.
-
-     -->
-    <!--<maxBufferedDocs>1000</maxBufferedDocs>-->
-    <!-- Tell Lucene when to flush documents to disk.
-    Giving Lucene more memory for indexing means faster indexing at the cost of more RAM
-
-    If both ramBufferSizeMB and maxBufferedDocs is set, then Lucene will flush based on whichever limit is hit first.
-
-    -->
-    <ramBufferSizeMB>32</ramBufferSizeMB>
     <maxMergeDocs>2147483647</maxMergeDocs>
     <maxFieldLength>10000</maxFieldLength>
     <writeLockTimeout>1000</writeLockTimeout>
