@@ -161,7 +161,7 @@ class ChecklistService {
 	
 	@Transactional
 	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
-		if(!params.checklistData && !isGlobalUpdate)
+        if(!params.checklistData && !isGlobalUpdate)
 			return
 		
 		Checklists.withTransaction() {
@@ -262,6 +262,15 @@ class ChecklistService {
 	}
 	
 	private saveReco(Observation obv, Map m, Checklists cl){
+		def safeMap = new HashMap()
+		m.each { k, v ->
+			if(k.trim() && v && !m.isNull(k)){
+				safeMap.put(k.trim(), v.trim())
+			}
+		}
+		
+		m = safeMap
+		
 		def res = observationService.getRecommendation([recoName:m[cl.sciNameColumn], commonName: m[cl.commonNameColumn]])
 		
 		if(!isNewReco(obv,res))

@@ -445,11 +445,11 @@ class ObvUtilService {
 				observationInstance.setTags(tags);
 
 				if(params.groupsWithSharingNotAllowed) {
-					observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+					observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
 				}else {
 					if(params.userGroupsList) {
 						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-						observationService.setUserGroups(observationInstance, userGroups);
+						observationService.setUserGroups(observationInstance, userGroups, false);
 					}
 				}
 				if(!observationInstance.save(flush:true)){

@@ -70,8 +70,8 @@ function parseCSVData(data, options) {
 	                headerCount = headers.length;
 	                $.each(headers, function(headerCount, header) {
 	                	var columnName = header;
-	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
-	                    console.log(columns);
+	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, width: 150, header:getHeaderMenuOptions()});
+	                    //console.log(columns);
 	                });
                 }
             } else if (lineCount >= options.startLine) {
@@ -97,10 +97,9 @@ function parseCSVData(data, options) {
     }else{
         columns.push(getMediaColumnOptions());
 
-
-	    if(options.callBack){
-	        options.callBack(rowData, columns);
-	    }
+        if(options.callBack){
+            options.callBack(rowData, columns);
+        }
     }
 }
 

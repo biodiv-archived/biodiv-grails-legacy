@@ -7,6 +7,7 @@ import org.grails.taggable.Tag
 import java.io.File;
 import java.io.InputStream;
 import java.util.List
+import java.util.ArrayList;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -22,8 +23,9 @@ import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
 import grails.plugins.springsecurity.Secured
+import species.formatReader.SpreadsheetReader;
 
-
+ 
 import speciespage.ObservationService
 import species.utils.Utils
 import content.eml.Document
@@ -41,7 +43,8 @@ class UFileController {
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	String contentRootDir = config.speciesPortal.content.rootDir
-
+    
+    static String outputCSVFile = "output.csv" 
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
@@ -94,8 +97,27 @@ class UFileController {
 
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
-			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
+            
+            String fileExt = fileExtension(originalFilename);
+            def res;
 
+            //Conversion of excel to csv 
+            //FIND out a proper method to detect excel
+            if(params.checklistConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
+                res = convertExcelToCSV(uploaded, params)
+                if(res != null) {
+                    relPath = res.get("relPath")
+                    url = res.get("url")
+                    File temp = uploaded
+                    uploaded = res.get("outCSVFile")
+                    temp.delete()
+                }
+            }
+
+            //println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
+            
+            //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
+            
 			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
@@ -255,6 +277,52 @@ class UFileController {
 
 	}
 
+    private Map convertExcelToCSV(File uploaded, params ) {
+        List spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath).get(0)
+        File outCSVFile = createFile(outputCSVFile, params.uploadDir)
 
+        FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        if(spread.size() != 0){
+            int  size = spread.get(0).size()
+            int count = 0;
+
+            def headerNameList = spread.get(0).collect {
+                it.getKey()
+            }
+
+            def  joinedHeader = headerNameList.join(", ")
+
+            bw.write(joinedHeader + "\n")
+
+            spread.each { rowMap->  
+                def content = rowMap.collect{ 
+                    it.getValue();
+                }
+                def joinedContent = content.join(", ")
+
+                bw.write(joinedContent + "\n")
+            }
+        }
+        bw.close();
+        String relPath = outCSVFile.absolutePath.replace(contentRootDir, "")
+        def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
+        Map res = new HashMap();
+        res.put("outCSVFile" , outCSVFile)
+        res.put("relPath" , relPath)
+        res.put("url" , url)
+        return res
+        
+
+    }
+
+    private String fileExtension(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension.toLowerCase();
+    }
 
 }

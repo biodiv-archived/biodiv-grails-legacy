@@ -7,12 +7,10 @@ function getDataFromGrid(){
     if(!dirtyRows){
         return grid.getData();
     }
-
-    var selectedRows = grid.getSelectedRows()
-        if(selectedRows.length > 0){
-            dirtyRows.push(selectedRows.last());
-        }
-
+    var selectedRows = grid.getSelectedRows();
+    if(selectedRows.length > 0){
+    	dirtyRows.push(selectedRows.last());
+    }
     dirtyRows = dirtyRows.unique();
     var data = new Array();
     $.each(dirtyRows, function(index, rowId) {
@@ -22,7 +20,7 @@ function getDataFromGrid(){
 }
 
 function addDirtyRows(e, args) {
-    if(dirtyRows)
+	if(dirtyRows)
         dirtyRows.push(args.row);
 };
 
@@ -140,12 +138,18 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
-
+        else {
+            $('#sciNameColumn').val(sciNameColumn);
+            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+        }
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
-
+        else{
+            $('#commonNameColumn').val(commonNameColumn);
+            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+        }
     });
 } 
 
@@ -190,10 +194,12 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
  */
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
-    if($('#textAreaSection').is(':visible'))
+    if($('#textAreaSection').is(':visible')){
         parseData(  window.params.content.url + input , {callBack:loadDataToGrid});
-    else
+    }
+    else{
         parseData(  window.params.content.url + input , {callBack:initGrid});
+    }
 }
 
 function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
@@ -211,7 +217,7 @@ function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
         line = line.slice(1);
         d = d + '\n' + line
     });
-
+    
     $("#checklistData").val(d);
     $("#checklistColumns").val(cols.slice(1));
    
@@ -264,8 +270,6 @@ function loadGrid(url, id){
 		}
 	});
 }
-
-
 
 $('#addNewColumn').unbind('click').click(function(){
     grid.addNewColumn();
@@ -695,6 +699,18 @@ $(document).ready(function(){
 
         $('#legend').hide();
         var me = this
+        
+        function isEmptyRow(rowEntry){
+        	var emptyRow = true;
+        	$.each( rowEntry, function( key, value ) {
+        		if(value != "" && value != undefined && value != null) {
+        			emptyRow = false;
+        		}
+        	});
+        	return emptyRow;
+        }
+        
+        
         $.ajax({
             url : window.params.recommendation.getRecos,
             type : 'post', 
@@ -708,6 +724,10 @@ $(document).ready(function(){
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {}; var incorrectNames = false;
                 for(var rowId=0; rowId<gridData.length; rowId++) {
+                	var rowEntry = grid.getDataItem(rowId);
+                	if(isEmptyRow(rowEntry)){
+                        continue;
+                    }
                     if(data.hasOwnProperty(rowId+'')) {
                         if(!changes[rowId])
                             changes[rowId] = {}

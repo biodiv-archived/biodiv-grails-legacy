@@ -497,6 +497,16 @@ class UserGroupService {
             query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
             count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
             break;
+            case Checklists.simpleName:
+            queryParams['isDeleted'] = false;
+            queryParams['isChecklist'] = true;
+            queryParams['isShowable'] = true;
+            query = "select count(*) from Observation obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup and "
+            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
+            count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
+            break;
             case Species.simpleName :
             query = "select count(*) from Species obv "
             if(userGroupInstance)
@@ -871,7 +881,16 @@ class UserGroupService {
 	}
 
 	def getGroupThemes(){
-		return ["default"]
+        def themes = ['default'];
+        File themesFile = new File(grailsApplication.config.speciesPortal.app.rootDir+'/group-themes/themes.txt');
+        if(themesFile.exists()) {
+            themesFile.eachLine { theme ->
+                themes << theme;
+            }
+        } else {
+            log.error "${themesFile.getAbsolutePath()} does not exist"
+        }
+        return themes;
 	}
 
 	def fetchHomePageTitle(UserGroup userGroupInstance){
@@ -1387,7 +1406,7 @@ class UserGroupService {
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
 			ResourceFetcher rf
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-				rf = new ResourceFetcher(params.objectType, params.filterUrl)
+				rf = new ResourceFetcher(params.objectType, params.filterUrl, params.webaddress)
 				List newList = rf.getAllResult()
 				newList.removeAll(allObvs)
 				allObvs = newList
@@ -1397,12 +1416,13 @@ class UserGroupService {
 			log.debug " All Groups " + groups
 			
 			def afDescriptionList = []
+			def currUser = springSecurityService.currentUser?:SUser.read(params.author?.toLong()) 
 			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
 				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
 				if(success){
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
-					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
 				}
 			}

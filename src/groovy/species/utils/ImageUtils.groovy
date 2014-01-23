@@ -34,31 +34,40 @@ class ImageUtils {
 
 		String fileName = imageFile.getName();
 		int lastIndex = fileName.lastIndexOf('.');
-
-		log.debug "Creating thumbnail image";
-		def extension = config.thumbnail.suffix
 		String name = fileName;
  		if(lastIndex != -1) {
 			name = fileName.substring(0, lastIndex);
 		}
-		 
-		try{
-			 doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
-		} catch (Exception e) {
-			log.error "Error whild resizing image $imageFile"
-			e.printStackTrace()
-		}
-		 
-		 
+        ///////////////////////////////////////////////////
+
         log.debug "Creating gallery image";
-		extension = config.gallery.suffix
-		ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
+        def extension = config.gallery.suffix
+        ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
-		log.debug "Creating gallery thumbnail image";
-		extension = config.galleryThumbnail.suffix
-		ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
+        ///////////////////////////////////////////////////
+        log.debug "Creating gallery thumbnail image";
+        extension = config.galleryThumbnail.suffix
+        ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
 
-		
+        ////////////////////////////////////////////////
+        log.debug "Creating thumbnail image";
+        extension = config.thumbnail.suffix 
+        try{
+            doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+        } catch (Exception e) {
+            log.debug "Error while resizing image probably due to unsupported type so using _gall_th.jpg image for _th1.jpg image $imageFile"
+            def jpgGall_extension = config.gallery.suffix
+
+            try{
+                doResize(new File(dir, name+jpgGall_extension), new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+            }
+            catch (Exception e1){
+                log.error "Error even on using _gall_th.jpg image for this file " + dir +"/" + name+jpgGall_extension +" target file " + name+extension;
+                e1.printStackTrace()
+            }
+
+        } 
+				
 	}
 
 	/**
