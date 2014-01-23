@@ -143,7 +143,7 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                                             }
                                                         });
                                                 } else{
-                                                        var redirectTarget = ${targetUrl?'"&spring-security-redirect='+targetUrl+'"':'""'};
+                                                        var redirectTarget = "${targetUrl?'spring-security-redirect='+targetUrl:''}";
                                                         window.location = "${uGroup.createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
                                                 }
                                         } else {

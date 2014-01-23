@@ -13,9 +13,9 @@
 <title><g:layoutTitle/></title>
 
 <r:require modules="observations_list" />
-<r:layoutResources />
-<ckeditor:resources />
 <g:layoutHead />
+<ckeditor:resources />
+<r:layoutResources />
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>

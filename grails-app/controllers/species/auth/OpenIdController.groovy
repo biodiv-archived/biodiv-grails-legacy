@@ -19,6 +19,7 @@ import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.util.StringUtils;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
@@ -70,7 +71,9 @@ class OpenIdController {
 		
 
 		def targetUrl = "";
-		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+        def requestCache = new HttpSessionRequestCache();
+		def savedRequest = requestCache.getRequest(request, response);
+        // request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 		if(savedRequest == null) {
 			if(params.login_error) {
 				targetUrl = request.getSession().getAttribute("LOGIN_REFERRER");
@@ -89,7 +92,7 @@ class OpenIdController {
 			log.debug "Passing targetUrlParameter for redirect: " + targetUrl;
 		} else {
 			if(Utils.isAjax(savedRequest)) {
-				request.getSession()?.removeAttribute(WebAttributes.SAVED_REQUEST)
+		        requestCache.removeRequest(request, response);
 			}
 		}
 		render (view:'auth', model:[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",

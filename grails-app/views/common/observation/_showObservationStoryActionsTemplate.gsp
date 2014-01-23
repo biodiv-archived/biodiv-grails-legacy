@@ -104,13 +104,13 @@
         if(pos>=0 && (prevObservationId || nextObservationId)) 
             navParams['pos'] = pos-1; 
         %>
-        <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink([navParams.clone()])}"><i class="icon-backward"></i>Prev</a>
+        <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink(navParams.clone())}"><i class="icon-backward"></i>Prev</a>
 
         <% navParams['id'] = nextId; 
         if(pos>=0 && (prevObservationId || nextObservationId))
             navParams['pos'] = pos+1; 
         %>
-        <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink([navParams.clone()])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
+        <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink(navParams.clone())}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
 
         <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
         if(pos)

@@ -71,7 +71,7 @@ grails.enable.native2ascii = true
 // whether to install the java.util.logging bridge for sl4j. Disable for AppEngine!
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
-grails.spring.bean.packages = []
+grails.spring.bean.packages = ['species.*']
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
@@ -489,22 +489,23 @@ environments {
                 debug 'file'
                 warn 'stdout'
             }
-            warn   'org.codehaus.groovy.grails.web.pages', //  GSP
-            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-            'org.codehaus.groovy.grails.web.mapping', // URL mapping
-            'org.codehaus.groovy.grails.commons', // core / classloading
-            'org.codehaus.groovy.grails.plugins', // plugins
-            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-            'org.hibernate',
-            'net.sf.ehcache.hibernate',
-            'org.springframework.security',
-            'org.codehaus.groovy.grails.web.servlet',  //  controllers
-            'grails.plugin',
-            'org.springframework.security.web',
-            'grails.app.tagLib.org.grails.plugin.resource'
+            error   'net.sf.ehcache.hibernate'
+            warn    'org.codehaus.groovy.grails.web.pages', //  GSP
+                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
+                    'org.codehaus.groovy.grails.commons', // core / classloading
+                    'org.codehaus.groovy.grails.plugins', // plugins
+                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+                    'org.hibernate',
+                    'org.springframework.security',
+                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
+                    'grails.plugin',
+                    'org.springframework.security.web',
+                    'grails.app.tagLib.org.grails.plugin.resource'
+
             debug   'speciespage',
-            'grails.app',
-            'species'
+                    'grails.app',
+                    'species'
             info    'species.auth'
         }
     }
@@ -1207,6 +1208,10 @@ grails.plugin.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_
 
 grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation 
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+    '/*/list*/**':                  ['permitAll'],
+    '/*/show/**':                  ['permitAll'],
+    '/*/create/**':                  ['ROLE_USER'],
+    '/*/edit/**':                  ['ROLE_USER'],
 	'/role/**': ['ROLE_ADMIN'],
 	'/persistentLogin/**': ['ROLE_ADMIN'],
 	'/abstractS2Ui/**': ['ROLE_ADMIN'],
@@ -1218,7 +1223,15 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/requestmap/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
-    '/rateable/rate/**': ['ROLE_USER']
+    '/rateable/rate/**': ['ROLE_USER'],
+    '/index':             ['permitAll'],
+    '/index.gsp':         ['permitAll'],
+    '/**/js/**':          ['permitAll'],
+    '/**/css/**':         ['permitAll'],
+    '/**/images/**':      ['permitAll'],
+    '/**/favicon.ico':    ['permitAll'],
+    '/login/**':          ['permitAll'],
+    '/logout/**':         ['permitAll']
  ]
 
 

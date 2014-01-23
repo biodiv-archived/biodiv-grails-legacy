@@ -15,6 +15,7 @@ import species.participation.Observation;
 import species.utils.Utils;
 import org.springframework.security.web.WebAttributes;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 	
@@ -34,10 +35,13 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			return;
 		}
 		
-		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+        def requestCache = new HttpSessionRequestCache();
+        def savedRequest = requestCache.getRequest(request, response);
+		//def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 		if(savedRequest != null) {
 			if(Utils.isAjax(savedRequest)) {
-				request.getSession()?.removeAttribute(WebAttributes.SAVED_REQUEST)
+                requestCache.removeRequest(request,response);
+		//		request.getSession()?.removeAttribute(WebAttributes.SAVED_REQUEST)
 			}
 		}
 		

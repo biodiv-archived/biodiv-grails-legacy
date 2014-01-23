@@ -232,9 +232,12 @@ class ObservationTagLib {
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource
-        boolean hideForm = attrs.model.hideForm
-        int index = attrs.model.index
+        boolean hideForm = attrs.model.hideForm?:false
+        println "1111"
+        int index = attrs.model.index?:0
+        println "1111"
         String divClass = attrs.model.class?:'rating'
+        println "1111"
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
             long averageRating = resource.averageRating ?: 0
@@ -264,6 +267,7 @@ class ObservationTagLib {
 
     def like = {attrs, body->
         def resource = attrs.model.resource
+        println "1111"
         String divClass = attrs.model.class?:'rating'
         boolean hideForm = attrs.model.hideForm
         if(resource) {

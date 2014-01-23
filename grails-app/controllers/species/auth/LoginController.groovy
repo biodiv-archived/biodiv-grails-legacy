@@ -19,6 +19,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
 import grails.plugin.springsecurity.ui.RegistrationCode;
 import species.utils.Utils;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 
@@ -79,7 +80,9 @@ class LoginController {
 				return;
 			}
 
-			def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+            def requestCache = new HttpSessionRequestCache();
+		    def defaultSavedRequest = requestCache.getRequest(request, response);
+			//def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 			log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
 			if(defaultSavedRequest) {
 				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());

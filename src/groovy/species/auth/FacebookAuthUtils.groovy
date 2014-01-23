@@ -105,13 +105,15 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 
 	public boolean verifySign(String sign, String payload, String secret) {
 		String signer = 'HMACSHA256'
-		//log.debug("Secret $secret")
-		SecretKeySpec sks = new SecretKeySpec(secret.getBytes(), signer)
-		//log.debug("Payload1: `$payload`")
-		payload = payload.replaceAll("-", "+").replaceAll("_", "/").trim()
-		//log.debug("Payload2: `$payload`")
-		sign = sign.replaceAll("-", "+").replaceAll("_", "/")
+
 		try {
+            //log.debug("Secret $secret")
+            SecretKeySpec sks = new SecretKeySpec(secret?.getBytes(), signer)
+            //log.debug("Payload1: `$payload`")
+            payload = payload.replaceAll("-", "+").replaceAll("_", "/").trim()
+            //log.debug("Payload2: `$payload`")
+            sign = sign.replaceAll("-", "+").replaceAll("_", "/")
+
 			Mac mac = Mac.getInstance(signer)
 			mac.init(sks)
 			byte[] my = mac.doFinal(payload.getBytes('UTF-8'))
