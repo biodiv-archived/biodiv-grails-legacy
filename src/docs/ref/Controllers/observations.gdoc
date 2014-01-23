@@ -1,0 +1,53 @@
+
+h3. Observations API
+
+h4. list 
+
+* Filtered Observations listing 
+
+** all observations 
+{code}
+http://indiabiodiversity.org/observation/listJSON
+{code}
+
+** within certain bounds 
+{code}
+http://indiabiodiversity.org/observation/list?bounds=4.8282597468669755%2C69.521484375%2C37.09023980307208%2C95.888671875&max=24&offset=0
+{code}
+
+** with species group and habitat filter 
+{code}
+http://indiabiodiversity.org/observation/list?bounds=4.8282597468669755,69.521484375,37.09023980307208,95.888671875&max=24&offset=0&sGroup=837&habitat=267835
+{code}
+
+* Related Observations
+** Featured Observations 
+{code}
+http://indiabiodiversity.org/observation/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
+{code}
+** Related Observations by species name
+** Related Observations by location
+
+* Observation Occurences 
+{code}
+http://indiabiodiversity.org/observation/occurrences?sGroup=829&habitat=267835&offset=0&max=-1&fl=id&fetchField=id,latitude,longitude,isChecklist,geoPrivacy
+{code}
+
+* All unique species available in the list of observations satisfying certain criteria 
+{code}
+http://indiabiodiversity.org/observation/distinctReco?sGroup=829&habitat=267835&offset=0&fl=id&bounds=4.8282597468669755%2C69.521484375%2C37.09023980307208%2C95.888671875
+{code}
+
+h4. show
+
+h4. create
+
+h4. edit
+
+h4. delete
+
+h4. flag
+
+h4. addRecommendation
+
+h4. agreeRecommendation
