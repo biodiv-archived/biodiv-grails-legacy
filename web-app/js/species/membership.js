@@ -221,7 +221,7 @@ function membership_actions() {
 					if(data === "true"){
 						$('#memberUserIds').val('');
 						$('#userAndEmailList_1').val('');
-						$('ul.userOrEmail-list > li').each(function(){
+						members_autofillUsersComp[0].parent().children('li').each(function(){
 							members_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
 						});
 						$('#inviteMembersForm')[0].reset()
@@ -244,7 +244,7 @@ function membership_actions() {
 				if(data === "true"){
 					$('#expertUserIds').val('');
 					$('#userAndEmailList_2').val('');
-					$('ul.userOrEmail-list > li').each(function(){
+					experts_autofillUsersComp[0].parent().children('li').each(function(){
 						experts_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
 					});
 					$('#inviteExpertsForm')[0].reset()
@@ -286,7 +286,7 @@ function init_group_header() {
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
-	
+
 	experts_autofillUsersComp = $("#userAndEmailList_"+window.experts_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
