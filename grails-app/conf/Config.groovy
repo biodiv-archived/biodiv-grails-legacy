@@ -394,10 +394,10 @@ speciesPortal {
 		GRANTEE_ORGANIZATION = "grantee_organization"
 		SITENAME = "sitename"
 		CORRIDOR = "corridor"
-		DESCRIPTION = "description"
-		TYPE = "type"
-        	TOPOLOGY = "topology"
-        	SCORE = "score"
+        DESCRIPTION = "description"
+        TYPE = "type"
+        TOPOLOGY = "topology"
+        SCORE = "score"
 
 		EMAIL = "email"
 		USERNAME = "username"
@@ -1225,4 +1225,7 @@ grails.rateable.rater.evaluator = {
         return user
     }
 }
-
+grails.doc.authors='Prabhakar R, Thomas Vattakaven, Sravanthi M, Sandeep Tandekar, Rahul kumar Sinha'
+grails.doc.license=''
+grails.doc.copyright=''
+grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
