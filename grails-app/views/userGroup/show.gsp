@@ -33,6 +33,8 @@
 			    $('.homepage-content').html($(data).find('.bodymarker'));
 
                             loadUserGroupLocation("${userGroupInstance.ne_latitude}","${userGroupInstance.ne_longitude}","${userGroupInstance.sw_latitude}","${userGroupInstance.sw_longitude}");
+                            
+                loadUserGroupStats('${uGroup.createLink(controller:'chart', action:'basicStat', userGroupWebaddress:params.webaddress, userGroup:params.userGroup)}')
 			});
 		});
 	</r:script>

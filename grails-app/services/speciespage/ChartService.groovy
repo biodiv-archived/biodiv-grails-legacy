@@ -15,6 +15,8 @@ import species.utils.ImageType;
 import species.participation.ActivityFeed;
 import species.participation.ActivityFeedService;
 import species.participation.Observation;
+import species.participation.Checklists;
+import content.eml.Document;
 import species.participation.RecommendationVote;
 
 class ChartService {
@@ -634,6 +636,20 @@ class ChartService {
 			count = userGroupService.getCountByGroup(Document.simpleName, userGroup);
 		}else{
 			count = Document.count();
+		}
+		return count
+	}
+
+	def long getUserCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroup.getAllMembersCount();
+		}else{
+			count = SUser.count();
 		}
 		return count
 	}
