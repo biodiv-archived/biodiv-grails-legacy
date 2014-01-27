@@ -2,10 +2,53 @@
 
 $(document).ready(function(){
 
-	if('${responseHeader?.params?.q}'){
-		$("#searchTextField").val('${responseHeader?.params?.q}')
-	} else {
-		$("#searchTextField").val('${params.query}');
+	</form>
+<div id="nameSuggestionsMain" class="dropdown span3" style="left:-20px;">
+			<a class="dropdown-toggle" role="button" data-toggle="dropdown"
+			data-target="#" href="#"></a>
+		</div>	
+</div>
+<g:javascript>
+$(document).ready(function() {
+	window.params = {
+		'offset':"${params.offset}",
+		'isGalleryUpdate':'true',	
+		"queryParamsMax":"${queryParams?.max}",
+		'speciesName':"${params.speciesName }",
+		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
+		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
+		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
+		'dropDownIconUrl' : "${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
+		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
+		'searchController' : "${controller}",
+		'carousel':{maxHeight:150, maxWidth:150},
+                'imagesPath': "${resource(dir:'images', absolute:true)}",
+                'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
+                'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
+                'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
+                'species':{
+                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
+                },
+                'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
+                'content':{
+                    'url':"${uGroup.createLink('controller':'content')}"
+                },
+                'observation':{
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
+                    distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+                    speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+
+                },
+                'recommendation': {
+                    'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
+                    'suggest' : "${uGroup.createLink(controller:'recommendation', action: 'suggest', userGroup:userGroupInstance)}"
+                },
+                'action': {
+                    'inGroupsUrl':"${uGroup.createLink(controller:'action', action: 'inGroups', userGroup:userGroupInstance)}"
+                }
 	}
 	
 	var cache = {},

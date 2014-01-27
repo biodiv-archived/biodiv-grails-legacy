@@ -176,4 +176,111 @@ modules = {
 		resource url:'/js/activityfeed.js'
 	}
 	
+	slickgrid {
+		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
+		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
+		resource url:'/js/SlickGrid-2.0.2/examples/examples.css'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'
+
+
+		resource url:'/js/SlickGrid-2.0.2/lib/jquery.event.drag-2.0.min.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.core.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.formatters.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.editors.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.grid.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangedecorator.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangeselector.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js'
+	}
+	
+	checklist {
+		dependsOn 'location_utils, list_utils, tagit, comment, activityfeed'
+
+		resource url:'/js/bootstrap-rowlink.min.css'
+		resource url:'/js/species/checklist.js'
+		resource url:'/js/bootstrap-rowlink.min.js'
+		resource url:'/js/location/location-picker.js'
+		resource url:'/js/species/observations/map.js'
+	}
+	
+    checklist_list {
+		dependsOn 'checklist'
+
+		resource url:'/js/species/observations/list.js'
+    }
+
+	checklist_create {
+		dependsOn 'observations_create, checklist, slickgrid, add_file'
+		
+		resource url:'/js/species/parseUtil.js'
+		resource url:'/js/species/jquery.csv-0.71.min.js'
+        resource url:'/js/species/observations/upload.js'
+	}
+    
+    species_upload {
+        dependsOn 'checklist_create'
+
+        resource url:'/js/species/observations/upload.js'
+    }
+
+	chart {
+		dependsOn 'core'
+		
+		resource url:'/js/chart.js'
+	}
+
+	add_file {
+		dependsOn 'core, tagit, list_utils'
+		
+		resource url:'/css/content.css'
+		resource url:'/js/content.js'
+		resource url:'/css/location_picker.css'
+		resource url:'/js/location/location-picker.js'
+	}
+	
+	
+	content_view {
+		dependsOn 'core,  tagit'
+		resource url:'/css/main.css'
+		
+		resource url:'/css/content.css'
+		resource url:'/js/content.js'
+		
+	}
+
+    prettyPhoto {
+        resource url:'/css/prettyPhoto.css'
+		resource url:'/js/jquery/jquery.prettyPhoto.js'
+    }
+
+    leaflet {
+        resource url:'js/Leaflet/dist/leaflet.css'
+        resource url:'js/Leaflet/dist/leaflet.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/dist/leaflet.js'
+        resource url:'js/Leaflet/plugins/leaflet-plugins/layer/tile/Google.js'
+        resource url:'js/Leaflet/plugins/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.1.css'
+        resource url:'js/Leaflet/plugins/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.1.min.js'
+        resource url:'js/Leaflet/plugins/Leaflet.label/dist/leaflet.label.css'
+        resource url:'js/Leaflet/plugins/Leaflet.label/dist/leaflet.label.js'
+        resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.css'
+        resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.js'
+        resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css'
+        resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.min.js'
+        resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.js'
+        resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.css'
+        resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.css'
+        resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.js'
+        resource url:'js/Wicket/wicket.js'
+        resource url:'js/Wicket/wicket-leaflet.js'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster-src.js'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
+ 
+    }
 }

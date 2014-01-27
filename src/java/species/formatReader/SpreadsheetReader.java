@@ -71,16 +71,20 @@ public class SpreadsheetReader {
 
 		Sheet sheet = wb.getSheetAt(sheetNo);
 		Row headerRow = sheet.getRow(headerRowNo);
-		List<Map> headerList = new ArrayList<Map>();
-		for (Cell cell : headerRow) {
-			String cellVal = getCellText(cell);
-			HashMap headerConfig = new HashMap();
-			if (cellVal != null && !cellVal.equals("")) {
-				headerConfig.put("name", cellVal.trim().toLowerCase());
-				headerConfig.put("position", cell.getColumnIndex() + "");
-				headerList.add(headerConfig);
-			}
-		}
+                List<Map> headerList = new ArrayList<Map>();
+                if(headerRow !=null){
+                    for (Cell cell : headerRow) {
+                        String cellVal = getCellText(cell);
+                        HashMap headerConfig = new LinkedHashMap();
+                        if (cellVal != null && !cellVal.equals("")) {
+                            headerConfig.put("name", cellVal.trim().toLowerCase());
+                            headerConfig.put("position", cell.getColumnIndex() + "");
+                            headerList.add(headerConfig);
+                        }
+                        //System.out.println("====HEADER CONFIG ==== " + headerConfig);
+                    }
+                }
+                //System.out.println ("=======HEADER LIST===== " + headerList);
 		for (Row row : sheet) {
 			if (row.getRowNum() <= headerRowNo)
 				continue;
@@ -97,6 +101,24 @@ public class SpreadsheetReader {
 			}
 			content.add(rowData);
 		}
+
+                if (content.size() == 0){
+                    Map rowData = new LinkedHashMap();
+                    for (int i = 0; i < headerList.size(); i++) {
+                        Map headerConfig = (Map) headerList.get(i);
+                        String key = (String) headerConfig.get("name");
+                        int index = Integer.parseInt((String) headerConfig
+                                .get("position"));
+                        String value = "";
+                        // String validTagName =
+                        // DocumentUtils.convertToValidXMLTagName(key);
+                        rowData.put(key, value);
+                    }
+                    content.add(rowData);
+                }
+                //System.out.println("========FROM SPREADSHEET READER======= " + content);
+		return content;
+	}
 
 		return content;
 	}
