@@ -512,4 +512,22 @@ class SpeciesUploadService {
         return new FileAppender(new PatternLayout("%d %m%n"), filename, true);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////Online upload related //////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    def List getDataColumns(){
+    	List columnList = []
+    	Field.list(sort:"concept", order:"asc").each {
+    		def tmpList = []
+    		tmpList << it.concept
+    		if(it.category)
+    			tmpList << it.category
+    		if(it.subCategory)
+    			tmpList << it.subCategory
+
+    		columnList << tmpList.join("|")
+    	}
+    	return columnList
+    }
 }
