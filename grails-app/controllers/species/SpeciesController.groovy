@@ -504,4 +504,22 @@ class SpeciesController extends AbstractObjectController {
 		r['msg']= "${message(code: 'species.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
 		render r as JSON
 	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////Online upload //////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def uploadOnline = {
+		if(params.fileName) {
+			String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
+			File speciesFile = new File(contentRootDir, params.fileName)
+			if(/*contributors && */speciesFile.exists()) {
+				File mappingFile = new File(contentRootDir, params.uFile.path[1])
+				speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
+				render "Done mapped species upload"
+			}
+		}
+	}
+
 }

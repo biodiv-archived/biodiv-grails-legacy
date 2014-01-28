@@ -254,6 +254,8 @@ class SpeciesUploadService {
 			if(speciesElement)
 				speciesElements.add(speciesElement);
 		}
+		
+		//saving last batch
 		if(speciesElements.size() > 0) {
 			noOfInsertions += saveSpeciesElements(speciesElements);
 			speciesElements.clear();
@@ -526,7 +528,7 @@ class SpeciesUploadService {
     		if(it.subCategory)
     			tmpList << it.subCategory
 
-    		columnList << tmpList.join("|")
+    		columnList <<  tmpList.join("|")
     	}
     	return columnList
     }
