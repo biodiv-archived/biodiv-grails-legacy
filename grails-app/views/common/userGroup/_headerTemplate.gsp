@@ -37,7 +37,6 @@
 	window.aboutUrl = "${uGroup.createLink(controller:'userGroup',action:'about', 'userGroup':userGroupInstance) }";
 	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}";
 	window.members_autofillUsersId = 1;
-        window.experts_autofillUsersId = 2;
-        window.speciesFile.downloadUrl = "${uGroup.createLink(controller:'UFile', action:'downloadModifiedSpeciesFile','userGroup':userGroupInstance) }";
-        // Don''t put any code here. Put it in init_header function in membership.js
+	window.experts_autofillUsersId = 2;
+	// Don''t put any code here. Put it in init_header function in membership.js
 </g:javascript>

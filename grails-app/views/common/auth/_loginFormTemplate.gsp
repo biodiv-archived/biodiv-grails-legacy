@@ -1,7 +1,9 @@
-<div style='clear: both'>
+<div>
 	<fieldset>
 		<legend>
-			<g:message code="springSecurity.login.title" default="Log in" />
+			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a> | 
+			<g:link controller='register'>Register</g:link>
+			 
 		</legend>
 		<div class="control-group"
 			style="clear: both; float: left; line-height: 40px;">Using:</div>
@@ -31,21 +33,21 @@
 				</div>
 			</div>
 			
-			<g:if test="${params['spring-security-redirect']}">
+			<g:if test="${targetUrl}">
 				<input type="hidden" name="spring-security-redirect"
-					value="${params['spring-security-redirect']}" />
+					value="${targetUrl}" />
 			</g:if>
 			
 			<div class="control-group">
 				<label class="control-label" for="optionsCheckbox"></label>
 				<div class="controls">
 					<label class="checkbox"> <input type="checkbox"
-						name="${rememberMeParameter}" for='remember_me'> <g:message
-							code='spring.security.ui.login.rememberme' /> | <g:link
-							controller='register' action='forgotPassword'>
+						name="${rememberMeParameter}" for="remember_me"/> <g:message
+							code='spring.security.ui.login.rememberme' /> | 
+							<a href="${uGroup.createLink(controller:'register', action:'forgotPassword','userGroupWebaddress':params.webaddress)}">
 							<g:message code='spring.security.ui.login.forgotPassword' />
-						</g:link> </label> <input class="btn btn-primary" type="submit" value="Login"
-						class="s2ui_hidden_button" style="float: right;margin: 3px;">
+						</a> </label> <input class="btn btn-primary" type="submit" value="Login"
+						style="float: right;margin: 3px;">
 				</div>
 			</div>
 		</form>

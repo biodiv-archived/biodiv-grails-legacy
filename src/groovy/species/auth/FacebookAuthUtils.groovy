@@ -34,7 +34,7 @@ class FacebookAuthUtils {
 		def json = JSON.parse(jsonData)
 
 		if (json.algorithm != 'HMAC-SHA256') {
-			throw new BadCredentialsException("Unknown hashing algoright: $json.algorithm")
+			throw new BadCredentialsException("Unknown hashing algorightm: $json.algorithm")
 		}
 
 		//log.debug("Payload: $jsonData")
@@ -82,7 +82,21 @@ class FacebookAuthUtils {
 		try {
 			String authUrl = "https://graph.facebook.com/oauth/access_token?client_id=$applicationId&redirect_uri=&client_secret=$secret&code=$code"
 			URL url = new URL(authUrl)
-			return url.readLines().first().split('&').first().split('=')[1]
+			HttpURLConnection httpConn = (HttpURLConnection)url.openConnection()
+			InputStream is;
+			if (httpConn.getResponseCode() >= 400) {
+				is = httpConn.getErrorStream();
+				List lines = is.readLines();
+				log.error "Error reading from facebook : ${lines} for url ${authUrl}"
+				return null;
+			} else {
+				is = httpConn.getInputStream();
+				List lines = is.readLines();
+				log.debug "Access token lines ${lines} for url ${authUrl}"
+				return lines.first().split('&').first().split('=')[1]
+			}
+			
+			
 		} catch (IOException e) {
 			log.error("Can't read data from Facebook", e)
 			return null
@@ -145,7 +159,7 @@ class FacebookAuthUtils {
 		if (cookie != null) {
 			cookie.maxAge = 0
 			cookie.path = '/'
-			cookie.domain = "."+Utils.getDomain(httpServletRequest);
+			cookie.domain = "."+Utils.getIBPServerCookieDomain();
 			httpServletResponse.addCookie(cookie)
 		}
 
@@ -153,7 +167,7 @@ class FacebookAuthUtils {
 		if (cookie2 != null) {
 			cookie2.maxAge = 0
 			cookie2.path = '/'
-			cookie2.domain = "."+Utils.getDomain(httpServletRequest);
+			cookie2.domain = "."+Utils.getIBPServerCookieDomain();
 			httpServletResponse.addCookie(cookie2)
 		}
 	}

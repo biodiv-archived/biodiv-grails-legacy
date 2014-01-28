@@ -1,3 +1,9 @@
+function deleteCommentActivity(targetComp, commentId, url){
+	if(confirm('This comment will be deleted. Are you sure ?')){
+		deleteComment(commentId, url);
+		removeActivity(targetComp);
+	}
+}
 
 function deleteComment(commentId, url){
 	$.ajax({
@@ -6,6 +12,7 @@ function deleteComment(commentId, url){
 		
 		success: function(data){
 			$('.comment .' + commentId).remove();
+			return true;
 		},
 		
 		statusCode: {
@@ -16,6 +23,7 @@ function deleteComment(commentId, url){
 		error: function(xhr, status, error) {
 			var msg = $.parseJSON(xhr.responseText);
 			alert(msg);
+			return false;
 		}
 	});
 }
@@ -48,7 +56,7 @@ function updateUnionComment(postComp, url){
 
 function postAsAjax(postComp, url, newCommentUrl, update){
 	var targetComp = $(postComp).closest('.comment');
-	$(postComp).ajaxSubmit({ 
+	var options = { 
      	url:url,
 		dataType: 'json', 
 //		clearForm: true,
@@ -58,15 +66,21 @@ function postAsAjax(postComp, url, newCommentUrl, update){
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
-        	if(data.showCommentListHtml){
+        	if(data.status == 401) {
+        		$(postComp).ajaxSubmit(options);
+        	}else if(data.status === 'Error'){
+        		alert(data.msg);
+        	}
+        	else if(data.showCommentListHtml){
     			var htmlData = $(data.showCommentListHtml);
-    			dcorateCommentBody(htmlData.find('.yj-message-body'));
+    			//dcorateCommentBody(htmlData.find('.yj-message-body'));
     			$(targetComp).children('ul').prepend(htmlData);
     			$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
     			if(update){
     				updateFeeds();
-        			updateUnionComment(postComp, newCommentUrl);
+    				setFollowButton();
+    				updateUnionComment(postComp, newCommentUrl);
     			}
     			if(data.clearForm){
     				$(postComp).children('textarea[name=commentBody]').val("");
@@ -77,16 +91,19 @@ function postAsAjax(postComp, url, newCommentUrl, update){
         error:function (xhr, ajaxOptions, thrownError){
         	//successHandler is used when ajax login succedes
         	var successHandler = this.success, errorHandler = undefined;
-        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, function(){
+        		
+        	});
 		} 
- 	});
+ 	}
+	$(postComp).ajaxSubmit(options);
 }
 
 function updateCountOnPopup(postComp, newlyAddedCount){
 	var popupButton = $(postComp).closest('.comment-popup').children('a');
 	if(popupButton.attr("class")){
 		var newCount = parseInt(popupButton.text()) + newlyAddedCount;
-		popupButton.html('<i class="icon-comment"></i>' + newCount);
+		popupButton.html('<i class="icon-comment"></i>' + ' ' + newCount);
 	}
 }
 
@@ -98,7 +115,7 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 		data: {commentType:commentType, commentHolderId:commentHolderId , commentHolderType:commentHolderType, rootHolderId:rootHolderId, rootHolderType:rootHolderType, refTime:refTime},	
 		success: function(data) {
 			var htmlData = $(data.showCommentListHtml);
-			dcorateCommentBody(htmlData.find('.yj-message-body'));
+			//dcorateCommentBody(htmlData.find('.yj-message-body'));
 			$(targetComp).children('ul').append(htmlData);
 			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 			if(data.remainingCommentCount == 0){
@@ -106,11 +123,46 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 			}else{
 				$(targetComp).children('a').text("Show " + data.remainingCommentCount + " older comments >>");
 			}
+			feedPostProcess();
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
 	   	}
 	});
 }
 
+function replyOnComment(comp, parentId, url){
+	var params = {};
+	params["commentBody"] = $(comp).siblings(".comment-textbox").val();
+	params["parentId"] = parentId;
+	
+	if($.trim(params["commentBody"]) === ""){
+		$(comp).prev().addClass('comment-textEmpty').next('span').show();
+		return false;
+	}
+	
+	var options = {
+ 		url: url,
+		dataType: "json",
+		data: params,
+		type: 'POST',
+		success: function(data) {
+			if(data.status == 401) {
+				$.ajax(options);
+			}else if(data.status === 'Error'){
+        		alert(data.msg);
+        	}
+			else if(data.success){
+				$(comp).parent().hide().prev().show();
+				updateFeeds();
+			}
+		},
+		error:function (xhr, ajaxOptions, thrownError){
+        	//successHandler is used when ajax login succedes
+        	var successHandler = this.success, errorHandler = null;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+		}
+	}
+	$.ajax(options);
+}
  
 

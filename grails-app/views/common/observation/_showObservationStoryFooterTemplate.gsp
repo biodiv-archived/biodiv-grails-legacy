@@ -1,49 +1,51 @@
 <%@page import="species.utils.Utils"%>
-<div class="story-footer" style="width: 100%">
-	<div class="footer-item">
-		<i class="icon-eye-open"></i>
-		${observationInstance.getPageVisitCount()}
+<%@page import="species.participation.Checklists"%>
 
-	</div>
+    
+<div class="story-footer">
 
-	<div class="footer-item">
-		<i class="icon-check"></i>
-		${observationInstance.getRecommendationCount()}
+    <g:if test="${showLike && !showDetails}">
+    <div class="footer-item pull-left">
+        <obv:like model="['resource':observationInstance]"/>
+    </div>	
+    </g:if>
 
-	</div>
+    <g:if test="${showDetails}">
+    <div class="footer-item">
+        <i class="icon-comment" title="Comments"></i>
+        <span class="">${observationInstance.fetchCommentCount()}</span>
+    </div>
+    </g:if>
+    <div class="footer-item">
+        <g:if test="${!observationInstance.isChecklist}">
+        <i class="icon-check" title="Species calls"></i>
+        <span class="">${observationInstance.fetchRecoVoteOwnerCount()}</span>
+        </g:if>
+    </div>
 
-	<g:if test="${showDetails}">
-	<div class="footer-item">
-		<i class="icon-comment"></i>
-		${observationInstance.fetchCommentCount()}
-	</div>
+    <g:if test="${showDetails}">
+        <div class="footer-item">
+            <i class="icon-eye-open" title="Page views"></i>
+            <span class="">${observationInstance.getPageVisitCount()}</span>
+        </div>
+        <g:if test="${observationInstance.isChecklist}">
+            <div class="footer-item"> 
+                <i class="icon-screenshot" title="Species"></i>
+                <span class="">${observationInstance.speciesCount}</span>
+            </div>
 
+            <div class="footer-item"> 
+                <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
+                title="${observationInstance.license.name}"/>
+            </div>
+        </g:if>
+        
+    </g:if>
+    <g:if test="${!hidePost}">
+    	<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+    </g:if>	
 	
-		<div class="footer-item"">
-			<obv:addFlag model="['observationInstance':observationInstance]" />
-		</div>
-	</g:if>
-	<g:else>
-		<g:if test="${observationInstance.flagCount>0}">
-			<div id="show-flag-count" class="footer-item">
-				<i class="icon-flag"></i>
-				${observationInstance.flagCount}
-			</div>
-		</g:if>
-	</g:else>
-
-	<g:if test="${showDetails}">
-		<div class="footer-item"">
-			<obv:identificationByEmail
-				model="['source':'observationShow', 'requestObject':request]" />
-		</div>
-	</g:if>
-	<g:if test="${showDetails}">
-		<div class="footer-item" style="width: 100px">
-			<fb:like layout="button_count"
-				href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
-				width="450" show_faces="true"></fb:like>
-		</div>
-	</g:if>
-
+    <g:if test="${!showDetails}">
+        <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
+    </g:if>
 </div>

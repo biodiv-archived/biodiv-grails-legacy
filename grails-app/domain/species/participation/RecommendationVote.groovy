@@ -1,9 +1,7 @@
 package species.participation
 
-import species.Contributor;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
-
 
 class RecommendationVote {
 	
@@ -49,8 +47,9 @@ class RecommendationVote {
 		comment type:'text';
 	}
 	
-	def afterDelete(){
-		activityFeedService.deleteFeed(this)
+	def beforeDelete(){
+		//XXX commenting this so that add/agree and remove both will be in sync
+		//activityFeedService.deleteFeed(this)
 	}
 
 }

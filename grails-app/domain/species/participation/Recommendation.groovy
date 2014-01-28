@@ -27,7 +27,13 @@ class Recommendation {
 	}
 
 	void setName(String name) {
-		this.name = Utils.cleanName(name);
+		name = Utils.cleanName(name);
+		//if common name
+		if(!isScientificName){
+			name = Utils.getTitleCase(name)
+		}
+		
+		this.name = name
 	}	
 	
 	/**
@@ -44,9 +50,9 @@ class Recommendation {
 		   map.put("speciesId", this?.taxonConcept?.findSpeciesId());
 		   map.put("canonicalForm", this?.taxonConcept?.canonicalForm)
 	   } else {
-		   map.put("name", this?.name)
 	   }
 	   
+	   map.put("name", this?.name)
 	   def recos = RecommendationVote.withCriteria {
 		   eq('recommendation', this)
 		   eq('observation', obv)
@@ -54,6 +60,12 @@ class Recommendation {
 	   }
 	   map.put("authors", recos.collect{it.author})
 	   map.put("votedOn", recos.collect{it.votedOn})
+	   map.put("noOfVotes", recos.size())
+	   
+	   def allRecos = RecommendationVote.withCriteria {
+		   eq('observation', obv)
+	   }
+	   map.put("totalVotes", allRecos.size())
 	   
 	   def recoComments = []
 	   recos.each {

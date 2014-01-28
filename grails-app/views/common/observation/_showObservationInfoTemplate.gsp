@@ -16,14 +16,14 @@
 
 		<div class="user-icon">
 			<a href=/biodiv/SUser/show/${observationInstance.author.id}> <img
-				src="${observationInstance.author.icon()}" class="small_profile_pic"
+				src="${observationInstance.author.profilePicture()}" class="small_profile_pic"
 				title="${observationInstance.author.username}" /> </a>
 		</div>
 	</div>
 	<div style="clear: both;"></div>
 	<h5>
 		<obv:showSpeciesName
-			model="['observationInstance':observationInstance]" />
+			model="['observationInstance':observationInstance, 'userGroup':userGroup]" />
 	</h5>
 
 	<!--div class="prop tablet">
@@ -90,8 +90,8 @@
 
 
 	<div class="btn btn-primary view-button">
-		<g:link action="show" controller="observation"
-			id="${observationInstance.id}">View</g:link>
+		<a href="${uGroup.createLink(action:"show", controller:"observation",
+			id:observationInstance.id)}">View</a>
 	</div>
 
 

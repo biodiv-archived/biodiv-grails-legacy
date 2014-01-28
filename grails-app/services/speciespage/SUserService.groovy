@@ -6,28 +6,39 @@ import groovy.text.SimpleTemplateEngine;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.util.NamedList
 
 import species.auth.SUser;
 import species.utils.Utils;
+import speciespage.search.SUserSearchService;
 
-class SUserService extends SpringSecurityUiService {
+class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
 
 	def springSecurityService
 	def mailService
-	
+	def SUserSearchService
+	private ApplicationTagLib g
+	ApplicationContext applicationContext
+
 	public static final String NEW_USER = "newUser";
 	public static final String USER_DELETED = "deleteUser";
-	
+
+
 	/**
 	 * 
 	 */
 	SUser create(Map propsMap) {
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
-		
+
 		propsMap.remove('metaClass')
 		propsMap.remove('class')
 
@@ -83,20 +94,20 @@ class SUserService extends SpringSecurityUiService {
 	 * @param user
 	 */
 	void assignRoles(SUser user) {
-		
+
 		def securityConf = SpringSecurityUtils.securityConfig
 
 		def defaultRoleNames = securityConf.ui.register.defaultRoleNames;
 
 		Class<?> PersonRole = grailsApplication.getDomainClass(securityConf.userLookup.authorityJoinClassName).clazz
 		Class<?> Authority = grailsApplication.getDomainClass(securityConf.authority.className).clazz
-		
+
 		PersonRole.withTransaction { status ->
 			defaultRoleNames.each { String roleName ->
 				String findByField = securityConf.authority.nameField[0].toUpperCase() + securityConf.authority.nameField.substring(1)
 				def auth = Authority."findBy${findByField}"(roleName)
 				if (auth) {
-					log.debug "Assigning role $auth"
+					log.debug "Assigning role $auth to user $user"
 					PersonRole.create(user, auth)
 				} else {
 					log.error("Can't find authority for name '$roleName'")
@@ -104,70 +115,206 @@ class SUserService extends SpringSecurityUiService {
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param user
 	 * @return
 	 */
-	def ifOwns(SUser user) {
-		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))	
+	boolean ifOwns(SUser user) {
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
-	
-	def ifOwns(long id) {
+
+	boolean ifOwns(id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
-	
-	def isAdmin(long id) {
+
+	boolean isAdmin(id) {
+		if(!id) return false
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+	}
+	
+	boolean isCEPFAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
 	}
 
 	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
 		def conf = SpringSecurityUtils.securityConfig
-		
+		g = applicationContext.getBean(ApplicationTagLib)
+
 		//def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
 
 		def templateMap = [username: user.name.capitalize(), email:user.email, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
 
 		def mailSubject = ""
-		def body = ""
+		def bodyContent = ""
+
+		def replyTo = conf.ui.notification.emailReplyTo;
 
 		switch ( notificationType ) {
 			case NEW_USER:
 				mailSubject = conf.ui.newuser.emailSubject
-				body = conf.ui.newuser.emailBody
-				break
+			//bodyContent = g.render(template:"/emailtemplates/welcomeEmail", model:templateMap)
+				if (mailSubject.contains('$')) {
+					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+				}
+
+					try {
+						mailService.sendMail {
+							to user.email
+				            if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+	                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+                            }
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
+							from grailsApplication.config.grails.mail.default.from
+							subject mailSubject
+							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+						}
+						log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
+					}catch(all)  {
+					    log.error all.getMessage()
+					}
+				
+
+				return;
 			case USER_DELETED:
 				mailSubject = conf.ui.userdeleted.emailSubject
-				body = conf.ui.userdeleted.emailBody
+				bodyContent = conf.ui.userdeleted.emailBody
+				if (bodyContent.contains('$')) {
+					bodyContent = evaluate(bodyContent, templateMap)
+				}
+
+				if (mailSubject.contains('$')) {
+					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+				}
+
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+					try {
+						mailService.sendMail {
+	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+							from conf.ui.notification.emailFrom
+							subject mailSubject
+							html bodyContent.toString()
+						}
+					}catch(all)  {
+					    log.error all.getMessage()
+					}
+				}
 				break
 			default:
 				log.debug "invalid notification type"
 		}
 
-		if (body.contains('$')) {
-			body = evaluate(body, templateMap)
-		}
-		
-		if (mailSubject.contains('$')) {
-			mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
-		}
-
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			mailService.sendMail {
-				to user.email
-				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
-				from conf.ui.notification.emailFrom
-				subject mailSubject
-				html body.toString()
-			}
-		}
-			log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 	}
-	
+
 	protected String evaluate(s, binding) {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
+
+	def nameTerms(params) {
+		return getUserSuggestions(params);
+	}
+
+	def getUserSuggestions(params){
+		def jsonData = []
+		String username = params.term
+
+        if(username) {
+		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		String userId = 'id';
+
+
+		def results = grailsApplication.getDomainClass(SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz.executeQuery(
+				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+				"FROM ${SpringSecurityUtils.securityConfig.userLookup.userDomainClassName} u " +
+				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+				"ORDER BY u.$usernameFieldName",
+				[name: "${username.toLowerCase()}%"],
+				[max: params.max])
+
+		for (result in results) {
+			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members"]
+		}
+        }
+		return jsonData;
+	}
 	
-	
+	/**
+	 * User Search 
+	 **/
+
+	 def getUsersFromSearch(params)  {
+		def max = Math.min(params.max ? params.max.toInteger() : 12, 100)
+		def offset = params.offset ? params.offset.toLong() : 0
+		def model;
+		try {
+		    model = getFilteredUsersFromSearch(params, max, offset);
+		} catch(SolrException e) {
+		    e.printStackTrace();
+		}
+		return model;
+	 }
+
+         /**
+	   * Filter observations by group, habitat, tag, user, species
+	   * max: limit results to max: if max = -1 return all results
+	   * offset: offset results: if offset = -1 its not passed to the
+	   * executing query
+	   */
+	 Map getFilteredUsersFromSearch(params, max, offset){
+	 	def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		//Store all teh parameter list here
+		NamedList paramsList = new NamedList();
+		//Check for the parameters passed by user and convert them to solr queries
+		def queryParams = [:]
+		queryParams["query"] = params.query
+		queryParams["max"]  = max
+
+		params.query = params.query ?:""
+		paramsList.add('q', Utils.cleanSearchQuery(params.query))
+		paramsList.add('start', offset);
+		paramsList.add('rows', max);
+		params['sort'] = params['sort']?:"score"
+		String sort = params['sort'].toLowerCase();
+		if(isValidSortParam(sort)) {
+		     if(sort.indexOf(' desc') == -1) {
+		            sort += " desc";
+		     }
+		     paramsList.add('sort', sort);
+		}
+		
+		List<SUser> userList = new ArrayList<SUser>();
+		def totalUserList = []
+		def responseHeader
+		long noOfResults = 0
+		if(paramsList)  {
+			def queryResult = SUserSearchService.search(paramsList);
+
+			Iterator it = queryResult.getResults().listIterator();
+
+			while(it.hasNext()) {
+				def doc = it.next()
+				def user = SUser.read(Long.parseLong(doc.getFieldValue("id") + ""))
+
+				if(user)  {
+					totalUserList.add(Long.parseLong(doc.getFieldValue("id") + ""))
+					userList.add(user)
+				}
+			}
+			responseHeader = queryResult?.responseHeader
+			noOfResults = queryResult?.getResults().getNumFound()
+		}
+
+		return [responseHeader:responseHeader, userInstanceList:userList, resultType:'user', instanceTotal:noOfResults, searchQuery:queryParams, totalUserIdList:totalUserList, searched:true, isSearch:true ] 
+	}
+        
+	private boolean isValidSortParam(String sortParam) {
+	    if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("name")  || sortParam.equalsIgnoreCase("lastLoginDate") )
+	          return true;
+	    return false;
+	}
+
+
 }

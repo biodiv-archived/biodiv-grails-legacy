@@ -1,14 +1,9 @@
-
+<%@page import="species.utils.Utils"%>
 <%@ page import="utils.Newsletter" %>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="main" />
-        <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
-
-        <g:set var="entityName" value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+<g:set var="title" value="Newsletters"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
         .body {
             padding: 10px;        
@@ -18,9 +13,10 @@
             padding: 5px;
         }
         </style>
+        <r:require modules="core"/>
     </head>
     <body>
-        <div class="body">
+        <div class="span12">
             <div style="float: right;"><g:link action="create"><h3>Create newsletter</h3></g:link></div>
             <h1>Newsletters Archive</h1>
             <g:if test="${flash.message}">

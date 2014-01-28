@@ -6,9 +6,12 @@ class HttpUtils {
 
 	private static final log = LogFactory.getLog(this);
 	
-	static File download(String address, File directory, boolean forceDownload)
+	static File download(String address, File directory, boolean forceDownload, String filename=null)
 	{
-		def file = new File(directory, address.tokenize("/")[-1]);
+        if(!filename) {
+            filename = Utils.generateSafeFileName(address.tokenize("/")[-1])
+        }
+		def file = new File(directory, filename);
 		if(file.exists() && !forceDownload) {
 			log.debug "File already exists : "+file.getAbsolutePath();
 			return file;

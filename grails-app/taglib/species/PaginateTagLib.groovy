@@ -1,5 +1,6 @@
 package species
 
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import species.groups.SpeciesGroup;
@@ -7,6 +8,7 @@ import species.groups.SpeciesGroup;
 class PaginateTagLib {
 	
 	def grailsApplication;
+	static namespace = "p"
 
 	def paginateOnSpeciesGroup = { attrs ->
 		def writer = out
@@ -59,12 +61,21 @@ class PaginateTagLib {
 		def total = attrs.int('total') ?: 0
 		def action = (attrs.action ? attrs.action : (params.action ? params.action : "list"))
 
-		def linkParams = [:]
-		if (attrs.params) linkParams.putAll(attrs.params)
+		def linkParams = [:];
+		if(attrs.params) linkParams = attrs.params
+		
+		//on click of alphabet offset should reset
+		linkParams.offset = 0
+		
+	   //if (attrs.params) linkParams.putAll(attrs.params)
 		if (params.sort) linkParams.sort = params.sort
 		if (params.order) linkParams.order = params.order
-
-		def linkTagAttrs = [action:action]
+		
+		linkParams.isGalleryUpdate = true;
+		
+		def linkTagAttrs = linkParams
+		linkTagAttrs['action'] = action;
+		linkTagAttrs['total'] = total;
 		if (attrs.controller) {
 			linkTagAttrs.controller = attrs.controller
 		}
@@ -74,7 +85,7 @@ class PaginateTagLib {
 		if (attrs.fragment != null) {
 			linkTagAttrs.fragment = attrs.fragment
 		}
-		linkTagAttrs.params = linkParams
+		
 
 		String startsWith = params.startsWith ?: "A-Z";
 		int currentstep = startsWith.charAt(0) - 65;
@@ -91,15 +102,19 @@ class PaginateTagLib {
 			}
 			else {
 				if(i==-1) {
-					linkParams.startsWith = 'A-Z';
-					writer << link(linkTagAttrs.clone()) {'A-Z'}
+					linkTagAttrs.startsWith = 'A-Z';
+					writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {'A-Z'}
 				} else {
 					//linkParams.offset = (i - 1) * max
-					linkParams.startsWith = Character.toChars(i+65)[0];
-					writer << link(linkTagAttrs.clone()) {Character.toChars(i+65)[0]}
+					linkTagAttrs.startsWith = Character.toChars(i+65)[0];
+					writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {Character.toChars(i+65)[0]}
 				}
 			}
 		}
+		
+		//resetting startswith to initial original value after create link
+		linkTagAttrs.startsWith = startsWith
+		
 	}
 	
 	/**
@@ -226,4 +241,129 @@ class PaginateTagLib {
 		   }
 	   }
    }
+   
+   def paginate = { attrs ->
+	   def writer = out
+	   if (attrs.total == null) {
+		   throwTagError("Tag [paginate] is missing required attribute [total]")
+	   }
+
+	   def messageSource = grailsAttributes.messageSource
+	   def locale = RCU.getLocale(request)
+
+	   def total = attrs.int('total') ?: 0
+	   def action = (attrs.action ? attrs.action : (params.action ? params.action : "list"))
+	   def offset = params.int('offset') ?: 0
+	   def max = params.int('max')
+	   def maxsteps = (attrs.int('maxsteps') ?: 10)
+
+	   if (!offset) offset = (attrs.int('offset') ?: 0)
+	   if (!max) max = (attrs.int('max') ?: 10)
+
+	   def linkParams = [:]
+	   if (attrs.params) linkParams.putAll(attrs.params)
+	   linkParams.offset = offset - max
+	   linkParams.max = max
+	   if (params.sort) linkParams.sort = params.sort
+	   if (params.order) linkParams.order = params.order
+	   def linkTagAttrs = [action:action]
+	   linkTagAttrs.putAll(linkParams)
+	   linkTagAttrs.remove('offset')
+	   if (attrs.controller) {
+		   linkTagAttrs.controller = attrs.controller
+	   }
+	   if (attrs.id != null) {
+		   linkTagAttrs.id = attrs.id
+	   }
+	   if (attrs.fragment != null) {
+		   linkTagAttrs.fragment = attrs.fragment
+	   }
+	   if (attrs.userGroup) {
+		   linkTagAttrs.userGroup = attrs.userGroup
+	   }
+	   if (attrs.userGroupWebaddress) {
+		   linkTagAttrs.userGroupWebaddress = attrs.userGroupWebaddress
+	   }
+	   
+	   // determine paging variables
+	   def steps = maxsteps > 0
+	   int currentstep = (offset / max) + 1
+	   int firststep = 1
+	   int laststep = Math.round(Math.ceil(total / max))
+	   
+	   // display previous link when not on firststep
+	   if (currentstep > firststep) {
+		   linkTagAttrs.class = 'prevLink'
+		   linkTagAttrs.offset = offset - max
+		   def temp = linkTagAttrs.clone();
+		   temp['url'] = uGroup.createLink(temp)
+		   writer << link(temp) {
+			   (attrs.prev ?: messageSource.getMessage('paginate.prev', null, messageSource.getMessage('default.paginate.prev', null, 'Previous', locale), locale))
+		   }
+	   }
+
+	   // display steps when steps are enabled and laststep is not firststep
+	   if (steps && laststep > firststep) {
+		   linkTagAttrs.class = 'step'
+
+		   // determine begin and endstep paging variables
+		   int beginstep = currentstep - Math.round(maxsteps / 2) + (maxsteps % 2)
+		   int endstep = currentstep + Math.round(maxsteps / 2) - 1
+
+		   if (beginstep < firststep) {
+			   beginstep = firststep
+			   endstep = maxsteps
+		   }
+		   if (endstep > laststep) {
+			   beginstep = laststep - maxsteps + 1
+			   if (beginstep < firststep) {
+				   beginstep = firststep
+			   }
+			   endstep = laststep
+		   }
+
+		   // display firststep link when beginstep is not firststep
+		   if (beginstep > firststep) {
+			   linkParams.offset = 0
+			   def temp = linkTagAttrs.clone();
+			   temp['url'] = uGroup.createLink(temp)
+			   writer << link(temp) {firststep.toString()}
+			   writer << '<span class="step">..</span>'
+		   }
+
+		   // display paginate steps
+		   (beginstep..endstep).each { i ->
+			   if (currentstep == i) {
+				   writer << "<span class=\"currentStep\">${i}</span>"
+			   }
+			   else {
+				   linkTagAttrs.offset = (i - 1) * max
+				   def temp = linkTagAttrs.clone();
+				   temp['url'] = uGroup.createLink(temp)
+				   writer << link(temp) {i.toString()}
+			   }
+		   }
+
+		   // display laststep link when endstep is not laststep
+		   if (endstep < laststep) {
+			   writer << '<span class="step">..</span>'
+			   linkTagAttrs.offset = (laststep -1) * max
+			   def temp = linkTagAttrs.clone();
+			   temp['url'] = uGroup.createLink(temp)
+			   writer << link(temp) { laststep.toString() }
+		   }
+	   }
+
+	   // display next link when not on laststep
+	   if (currentstep < laststep) {
+		   linkTagAttrs.class = 'nextLink'
+		   linkTagAttrs.offset = offset + max
+		   def temp = linkTagAttrs.clone();
+    	   temp['url'] = uGroup.createLink(temp)
+		   writer << link(temp) {
+			   (attrs.next ? attrs.next : messageSource.getMessage('paginate.next', null, messageSource.getMessage('default.paginate.next', null, 'Next', locale), locale))
+		   }
+	   }
+   }
+
 }

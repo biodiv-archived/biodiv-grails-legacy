@@ -1,0 +1,1032 @@
+    
+<dataConfig>
+    <dataSource type="JdbcDataSource" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost:5432/ibp" user="postgres" password="postgres123" />
+    <document>
+
+
+<entity name="lyr_104_india_states_census01" query="select __mlocate__id,state from lyr_104_india_states_census01" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_104_india_states_census01" />
+
+<field column="search_columns" template="state" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="state" name="state" />
+
+</entity>
+
+
+<entity name="lyr_105_india_districts" query="select __mlocate__id,state,district from lyr_105_india_districts" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_105_india_districts" />
+
+<field column="search_columns" template="state:district" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="state" name="state" />
+
+<field column="district" name="district" />
+
+</entity>
+
+
+<entity name="lyr_106_india_tahsils_census01" query="select __mlocate__id,state,district,tahsil from lyr_106_india_tahsils_census01" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_106_india_tahsils_census01" />
+
+<field column="search_columns" template="state:district:tahsil" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="state" name="state" />
+
+<field column="district" name="district" />
+
+<field column="tahsil" name="tahsil" />
+
+</entity>
+
+
+<entity name="lyr_160_brt_vegetation" query="select __mlocate__id,veg_type from lyr_160_brt_vegetation" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_160_brt_vegetation" />
+
+<field column="search_columns" template="veg_type" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="veg_type" name="veg_type" />
+
+</entity>
+
+
+<entity name="lyr_167_brt_vegplots" query="select __mlocate__id,source from lyr_167_brt_vegplots" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_167_brt_vegplots" />
+
+<field column="search_columns" template="source" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="source" name="source" />
+
+</entity>
+
+
+<entity name="lyr_185_wg_cepf_grants" query="select __mlocate__id,grantee,grantee_ty,sitename,corridor,title,keywords from lyr_185_wg_cepf_grants" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_185_wg_cepf_grants" />
+
+<field column="search_columns" template="grantee:grantee_ty:sitename:corridor:title:keywords" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="grantee" name="grantee" />
+
+<field column="grantee_ty" name="grantee_ty" />
+
+<field column="sitename" name="sitename" />
+
+<field column="corridor" name="corridor" />
+
+<field column="title" name="title" />
+
+<field column="keywords" name="keywords" />
+
+</entity>
+
+
+<entity name="lyr_1_wg_cepflandcorr" query="select __mlocate__id,textuserid from lyr_1_wg_cepflandcorr" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_1_wg_cepflandcorr" />
+
+<field column="search_columns" template="textuserid" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="textuserid" name="textuserid" />
+
+</entity>
+
+
+<entity name="lyr_200_dryseason" query="select __mlocate__id from lyr_200_dryseason" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_200_dryseason" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_202_rainfall" query="select __mlocate__id from lyr_202_rainfall" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_202_rainfall" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_206_temperature" query="select __mlocate__id from lyr_206_temperature" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_206_temperature" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_208_wg_mapbound" query="select __mlocate__id from lyr_208_wg_mapbound" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_208_wg_mapbound" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_210_india_checklists" query="select __mlocate__id,cltaxa,cltitle,clgeograph from lyr_210_india_checklists" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_210_india_checklists" />
+
+<field column="search_columns" template="cltaxa:cltitle:clgeograph" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="cltaxa" name="cltaxa" />
+
+<field column="cltitle" name="cltitle" />
+
+<field column="clgeograph" name="clgeograph" />
+
+</entity>
+
+
+<entity name="lyr_212_wg_fire_2002" query="select __mlocate__id from lyr_212_wg_fire_2002" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_212_wg_fire_2002" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_213_wg_fire_2003" query="select __mlocate__id from lyr_213_wg_fire_2003" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_213_wg_fire_2003" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_214_wg_fire_2010" query="select __mlocate__id from lyr_214_wg_fire_2010" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_214_wg_fire_2010" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_215_wg_fire_2007" query="select __mlocate__id from lyr_215_wg_fire_2007" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_215_wg_fire_2007" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_216_wg_fire_2004" query="select __mlocate__id from lyr_216_wg_fire_2004" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_216_wg_fire_2004" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_217_wg_fire_2008" query="select __mlocate__id from lyr_217_wg_fire_2008" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_217_wg_fire_2008" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_218_wg_fire_2005" query="select __mlocate__id from lyr_218_wg_fire_2005" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_218_wg_fire_2005" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_219_wg_fire_2006" query="select __mlocate__id from lyr_219_wg_fire_2006" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_219_wg_fire_2006" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_220_wg_fire_2001" query="select __mlocate__id from lyr_220_wg_fire_2001" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_220_wg_fire_2001" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_221_wg_fire_2000" query="select __mlocate__id from lyr_221_wg_fire_2000" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_221_wg_fire_2000" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_222_wg_fire_2009" query="select __mlocate__id from lyr_222_wg_fire_2009" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_222_wg_fire_2009" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_235_wg_birdtransects" query="select __mlocate__id,site,habitat from lyr_235_wg_birdtransects" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_235_wg_birdtransects" />
+
+<field column="search_columns" template="site:habitat" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="site" name="site" />
+
+<field column="habitat" name="habitat" />
+
+</entity>
+
+
+<entity name="lyr_237_reconnaissance_soil" query="select __mlocate__id,morpho_ped,morpho_p_1,morpho_p_2,geology from lyr_237_reconnaissance_soil" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_237_reconnaissance_soil" />
+
+<field column="search_columns" template="morpho_ped:morpho_p_1:morpho_p_2:geology" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="morpho_ped" name="morpho_ped" />
+
+<field column="morpho_p_1" name="morpho_p_1" />
+
+<field column="morpho_p_2" name="morpho_p_2" />
+
+<field column="geology" name="geology" />
+
+</entity>
+
+
+<entity name="lyr_238_western_anamalai" query="select __mlocate__id from lyr_238_western_anamalai" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_238_western_anamalai" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_239_belgaum_dharwar_panaji_floristictypes" query="select __mlocate__id,forest,floristic from lyr_239_belgaum_dharwar_panaji_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_239_belgaum_dharwar_panaji_floristictypes" />
+
+<field column="search_columns" template="forest:floristic" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+</entity>
+
+
+<entity name="lyr_240_belgaum_dharwar_panaji_physiognomy" query="select __mlocate__id,physio from lyr_240_belgaum_dharwar_panaji_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_240_belgaum_dharwar_panaji_physiognomy" />
+
+<field column="search_columns" template="physio" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="physio" name="physio" />
+
+</entity>
+
+
+<entity name="lyr_241_belgaum_dharwar_panaji_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_241_belgaum_dharwar_panaji_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_241_belgaum_dharwar_panaji_majorforest" />
+
+<field column="search_columns" template="m_forest:s_forest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+</entity>
+
+
+<entity name="lyr_242_kmtr" query="select __mlocate__id,type from lyr_242_kmtr" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_242_kmtr" />
+
+<field column="search_columns" template="type" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="type" name="type" />
+
+</entity>
+
+
+<entity name="lyr_243_mercara_mysore_physiognomy" query="select __mlocate__id,physio from lyr_243_mercara_mysore_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_243_mercara_mysore_physiognomy" />
+
+<field column="search_columns" template="physio" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="physio" name="physio" />
+
+</entity>
+
+
+<entity name="lyr_244_mercara_mysore_floristictypes" query="select __mlocate__id,forest,floristic from lyr_244_mercara_mysore_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_244_mercara_mysore_floristictypes" />
+
+<field column="search_columns" template="forest:floristic" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+</entity>
+
+
+<entity name="lyr_245_mercara_mysore_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_245_mercara_mysore_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_245_mercara_mysore_majorforest" />
+
+<field column="search_columns" template="m_forest:s_forest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+</entity>
+
+
+<entity name="lyr_246_thiruvananthapuram_tirunelveli_floristictypes" query="select __mlocate__id,forest,floristic from lyr_246_thiruvananthapuram_tirunelveli_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_246_thiruvananthapuram_tirunelveli_floristictypes" />
+
+<field column="search_columns" template="forest:floristic" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+</entity>
+
+
+<entity name="lyr_247_thiruvananthapuram_tirunelveli_physiognomy" query="select __mlocate__id,physio from lyr_247_thiruvananthapuram_tirunelveli_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_247_thiruvananthapuram_tirunelveli_physiognomy" />
+
+<field column="search_columns" template="physio" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="physio" name="physio" />
+
+</entity>
+
+
+<entity name="lyr_248_thiruvananthapuram_tirunelveli_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_248_thiruvananthapuram_tirunelveli_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_248_thiruvananthapuram_tirunelveli_majorforest" />
+
+<field column="search_columns" template="m_forest:s_forest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+</entity>
+
+
+<entity name="lyr_249_wg_simple_14class_vegetation" query="select __mlocate__id,forest_typ from lyr_249_wg_simple_14class_vegetation" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_249_wg_simple_14class_vegetation" />
+
+<field column="search_columns" template="forest_typ" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest_typ" name="forest_typ" />
+
+</entity>
+
+
+<entity name="lyr_250_coimbatore_thrissur_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_250_coimbatore_thrissur_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_250_coimbatore_thrissur_majorforest" />
+
+<field column="search_columns" template="m_forest:s_forest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+</entity>
+
+
+<entity name="lyr_252_coimbatore_thrissur_floristictypes" query="select __mlocate__id,forest,floristic from lyr_252_coimbatore_thrissur_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_252_coimbatore_thrissur_floristictypes" />
+
+<field column="search_columns" template="forest:floristic" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+</entity>
+
+
+<entity name="lyr_253_shimoga_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_253_shimoga_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_253_shimoga_majorforest" />
+
+<field column="search_columns" template="m_forest:s_forest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+</entity>
+
+
+<entity name="lyr_254_shimoga_floristictypes" query="select __mlocate__id,forest,floristic from lyr_254_shimoga_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_254_shimoga_floristictypes" />
+
+<field column="search_columns" template="forest:floristic" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+</entity>
+
+
+<entity name="lyr_255_shimoga_physiognomy" query="select __mlocate__id,physio from lyr_255_shimoga_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_255_shimoga_physiognomy" />
+
+<field column="search_columns" template="physio" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="physio" name="physio" />
+
+</entity>
+
+
+<entity name="lyr_256_soilcorban77" query="select __mlocate__id from lyr_256_soilcorban77" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_256_soilcorban77" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_257_soilcorban99" query="select __mlocate__id from lyr_257_soilcorban99" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_257_soilcorban99" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_258_gudalur_mudumalai" query="select __mlocate__id,range,beat,division from lyr_258_gudalur_mudumalai" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_258_gudalur_mudumalai" />
+
+<field column="search_columns" template="range:beat:division" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="range" name="range" />
+
+<field column="beat" name="beat" />
+
+<field column="division" name="division" />
+
+</entity>
+
+
+<entity name="lyr_259_wg_subbasin" query="select __mlocate__id,sub_basin,basin from lyr_259_wg_subbasin" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_259_wg_subbasin" />
+
+<field column="search_columns" template="sub_basin:basin" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="sub_basin" name="sub_basin" />
+
+<field column="basin" name="basin" />
+
+</entity>
+
+
+<entity name="lyr_260_wg_watershed" query="select __mlocate__id,sub_basin,basin from lyr_260_wg_watershed" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_260_wg_watershed" />
+
+<field column="search_columns" template="sub_basin:basin" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="sub_basin" name="sub_basin" />
+
+<field column="basin" name="basin" />
+
+</entity>
+
+
+<entity name="lyr_261_wg_river" query="select __mlocate__id,river_name from lyr_261_wg_river" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_261_wg_river" />
+
+<field column="search_columns" template="river_name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="river_name" name="river_name" />
+
+</entity>
+
+
+<entity name="lyr_262_wg_dam" query="select __mlocate__id,dam_name from lyr_262_wg_dam" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_262_wg_dam" />
+
+<field column="search_columns" template="dam_name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="dam_name" name="dam_name" />
+
+</entity>
+
+
+<entity name="lyr_263_wg_basin" query="select __mlocate__id from lyr_263_wg_basin" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_263_wg_basin" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_291_coimbatore_thrissur_physiognomy" query="select __mlocate__id from lyr_291_coimbatore_thrissur_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_291_coimbatore_thrissur_physiognomy" />
+
+<field column="search_columns" template="" />
+
+<field column="__mlocate__id" name="id" />
+
+</entity>
+
+
+<entity name="lyr_2_wg_endemicsspsatlas" query="select __mlocate__id,species,source,family from lyr_2_wg_endemicsspsatlas" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_2_wg_endemicsspsatlas" />
+
+<field column="search_columns" template="species:source:family" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="species" name="species" />
+
+<field column="source" name="source" />
+
+<field column="family" name="family" />
+
+</entity>
+
+
+<entity name="lyr_32_nbr_vegtype" query="select __mlocate__id,zone,sname,structure,type,sub_type from lyr_32_nbr_vegtype" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_32_nbr_vegtype" />
+
+<field column="search_columns" template="zone:sname:structure:type:sub_type" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="zone" name="zone" />
+
+<field column="sname" name="sname" />
+
+<field column="structure" name="structure" />
+
+<field column="type" name="type" />
+
+<field column="sub_type" name="sub_type" />
+
+</entity>
+
+
+<entity name="lyr_33_nbr_vegsample" query="select __mlocate__id,location,ftype,disturbanc from lyr_33_nbr_vegsample" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_33_nbr_vegsample" />
+
+<field column="search_columns" template="location:ftype:disturbanc" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="location" name="location" />
+
+<field column="ftype" name="ftype" />
+
+<field column="disturbanc" name="disturbanc" />
+
+</entity>
+
+
+<entity name="lyr_34_brt_boundary" query="select __mlocate__id,biogeograp,contact from lyr_34_brt_boundary" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_34_brt_boundary" />
+
+<field column="search_columns" template="biogeograp:contact" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="biogeograp" name="biogeograp" />
+
+<field column="contact" name="contact" />
+
+</entity>
+
+
+<entity name="lyr_39_brt_biomasschange1973_98" query="select __mlocate__id,change from lyr_39_brt_biomasschange1973_98" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_39_brt_biomasschange1973_98" />
+
+<field column="search_columns" template="change" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="change" name="change" />
+
+</entity>
+
+
+<entity name="lyr_3_wg_flow" query="select __mlocate__id,station,river from lyr_3_wg_flow" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_3_wg_flow" />
+
+<field column="search_columns" template="station:river" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="station" name="station" />
+
+<field column="river" name="river" />
+
+</entity>
+
+
+<entity name="lyr_41_brt_lantanadistribution" query="select __mlocate__id,lantana from lyr_41_brt_lantanadistribution" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_41_brt_lantanadistribution" />
+
+<field column="search_columns" template="lantana" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="lantana" name="lantana" />
+
+</entity>
+
+
+<entity name="lyr_42_brt_ranges" query="select __mlocate__id,ranges from lyr_42_brt_ranges" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_42_brt_ranges" />
+
+<field column="search_columns" template="ranges" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="ranges" name="ranges" />
+
+</entity>
+
+
+<entity name="lyr_44_brt_fire1999" query="select __mlocate__id,legend from lyr_44_brt_fire1999" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_44_brt_fire1999" />
+
+<field column="search_columns" template="legend" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+</entity>
+
+
+<entity name="lyr_48_vembanad_birdsurvey" query="select __mlocate__id,site from lyr_48_vembanad_birdsurvey" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_48_vembanad_birdsurvey" />
+
+<field column="search_columns" template="site" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="site" name="site" />
+
+</entity>
+
+
+<entity name="lyr_49_vembanad_lake" query="select __mlocate__id,name,status,livelihood from lyr_49_vembanad_lake" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_49_vembanad_lake" />
+
+<field column="search_columns" template="name:status:livelihood" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<field column="status" name="status" />
+
+<field column="livelihood" name="livelihood" />
+
+</entity>
+
+
+<entity name="lyr_4_wg_cepfpriorsites" query="select __mlocate__id,name from lyr_4_wg_cepfpriorsites" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_4_wg_cepfpriorsites" />
+
+<field column="search_columns" template="name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+</entity>
+
+
+<entity name="lyr_50_vembanad_basinstations" query="select __mlocate__id,location,community,type from lyr_50_vembanad_basinstations" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_50_vembanad_basinstations" />
+
+<field column="search_columns" template="location:community:type" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="location" name="location" />
+
+<field column="community" name="community" />
+
+<field column="type" name="type" />
+
+</entity>
+
+
+<entity name="lyr_5_wg_cepfcrtlinks" query="select __mlocate__id,lnk_no,lnkname from lyr_5_wg_cepfcrtlinks" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_5_wg_cepfcrtlinks" />
+
+<field column="search_columns" template="lnk_no:lnkname" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="lnk_no" name="lnk_no" />
+
+<field column="lnkname" name="lnkname" />
+
+</entity>
+
+
+<entity name="lyr_60_bandipur_villages" query="select __mlocate__id,name from lyr_60_bandipur_villages" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_60_bandipur_villages" />
+
+<field column="search_columns" template="name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+</entity>
+
+
+<entity name="lyr_61_bandipur_apcwtfrh" query="select __mlocate__id,names,descri from lyr_61_bandipur_apcwtfrh" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_61_bandipur_apcwtfrh" />
+
+<field column="search_columns" template="names:descri" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="names" name="names" />
+
+<field column="descri" name="descri" />
+
+</entity>
+
+
+<entity name="lyr_62_bandipurtanks_polygon" query="select __mlocate__id,name from lyr_62_bandipurtanks_polygon" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_62_bandipurtanks_polygon" />
+
+<field column="search_columns" template="name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+</entity>
+
+
+<entity name="lyr_63_bandipur_boundary" query="select __mlocate__id,name,state,district,biogeograp,protection from lyr_63_bandipur_boundary" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_63_bandipur_boundary" />
+
+<field column="search_columns" template="name:state:district:biogeograp:protection" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<field column="state" name="state" />
+
+<field column="district" name="district" />
+
+<field column="biogeograp" name="biogeograp" />
+
+<field column="protection" name="protection" />
+
+</entity>
+
+
+<entity name="lyr_64_bandipurtanks_point" query="select __mlocate__id,name from lyr_64_bandipurtanks_point" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_64_bandipurtanks_point" />
+
+<field column="search_columns" template="name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+</entity>
+
+
+<entity name="lyr_6_wg_mammals_ncf" query="select __mlocate__id,state,areaofsurv,forestdivi,range,type_of_ob,location,locationde,sps_name,prey_sps from lyr_6_wg_mammals_ncf" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_6_wg_mammals_ncf" />
+
+<field column="search_columns" template="state:areaofsurv:forestdivi:range:type_of_ob:location:locationde:sps_name:prey_sps" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="state" name="state" />
+
+<field column="areaofsurv" name="areaofsurv" />
+
+<field column="forestdivi" name="forestdivi" />
+
+<field column="range" name="range" />
+
+<field column="type_of_ob" name="type_of_ob" />
+
+<field column="location" name="location" />
+
+<field column="locationde" name="locationde" />
+
+<field column="sps_name" name="sps_name" />
+
+<field column="prey_sps" name="prey_sps" />
+
+</entity>
+
+
+<entity name="lyr_7_wg_boundary" query="select __mlocate__id,name from lyr_7_wg_boundary" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_7_wg_boundary" />
+
+<field column="search_columns" template="name" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+</entity>
+
+
+<entity name="lyr_8_wg_flow_catchments" query="select __mlocate__id,station,river from lyr_8_wg_flow_catchments" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_8_wg_flow_catchments" />
+
+<field column="search_columns" template="station:river" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="station" name="station" />
+
+<field column="river" name="river" />
+
+</entity>
+
+
+    </document>
+</dataConfig>
+

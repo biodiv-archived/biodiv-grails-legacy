@@ -4,7 +4,7 @@
 .combobox-container {
 	position: absolute;
 	top: 0;
-	left: 210px;
+	right:4%;
 	
 }
 .combobox-container input:first-child {
@@ -13,14 +13,13 @@
 
 .combobox-container .add-on {
 	position: absolute;
-	right: -26px;
-	height: 20px;
+	height: 22px;
 }
 
-#addObservation .combobox-container .add-on {
+/*#addObservation .combobox-container .add-on {
 	height:36px;
-}
-.caret {
+}*/
+.combobox-container .caret {
 	vertical-align: middle;
 }
 </style>
@@ -32,6 +31,9 @@
 		if(tmp_cn_reco && (tmp_cn_reco.languageId != null)){
 			species_sn_lang = Language.read(tmp_cn_reco.languageId).name
 		}
+	}
+	if(params.action == 'save'){
+		species_sn_lang = saveParams?.languageName
 	}
 %>
 <r:script>

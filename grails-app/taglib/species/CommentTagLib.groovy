@@ -4,6 +4,7 @@ class CommentTagLib {
 	static namespace = "comment"
 	
 	def commentService
+	def activityFeedService
 	
 	def showComment = {attrs, body->
 		out << render(template:"/common/comment/showCommentTemplate", model:attrs.model);
@@ -22,6 +23,19 @@ class CommentTagLib {
 		out << render(template:"/common/comment/showCommentContextTemplate", model:attrs.model);
 	}
 	
+	def showCommentWithReply = {attrs, body->
+		def model = attrs.model
+//		def showAlways = (model.showAlways != null)?model.showAlways:false
+//		 
+//		if(showAlways || model.feedInstance.showComment()){
+		model.commentInstance = commentService.getDomainObject( model.feedInstance.activityHolderType, model.feedInstance.activityHolderId)
+		//this is for checklist row and species field comment
+		model.commentContext = activityFeedService.COMMENT_ADDED  + activityFeedService.getCommentContext(model.commentInstance, params)
+		out << render(template:"/common/comment/showCommentWithReplyTemplate", model:attrs.model);
+//		}
+	}
+	
+	
 	def showCommentPopup = {attrs, body->
 		def model = attrs.model
 		model.rootHolder = model.rootHolder?:model.commentHolder
@@ -39,6 +53,7 @@ class CommentTagLib {
 		model.rootHolder = model.rootHolder?:model.commentHolder
 		model.showCommentList = (model.showCommentList == null)? true: model.showCommentList
 		model.commentType = model.commentType ?: "context"
+		model.canPostComment = (model.canPostComment != null)? model.canPostComment : true
 		if(model.showCommentList){
 			if(model.commentType == "context"){
 				model.comments = commentService.getComments(model.commentHolder, model.rootHolder, 3, new Date().time.toString(), null)

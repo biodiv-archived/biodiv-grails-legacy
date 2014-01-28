@@ -91,27 +91,38 @@ var positionTOC = function() {
 }
 
 var showOccurence = function(speciesName) {
-	var mapOptions = {
-		popup_enabled : true,
-		toolbar_enabled : true,
-		bbox : "7461654.5592605,881162.00757659,9259453.4642059,2246021.5843922"
-	};
-	var layersOptions = [ {
-		title : 'Occurrence',
-		layers : 'ibp:occurrence',
-		styles : '',
-		cql_filter : "species_name='" + speciesName + "'",
-		opacity : 0.7
-	},
-	{
-		title : 'Observation',
-		layers : 'ibp:observation_locations',
-		styles : '',
-		cql_filter : "species_name='" + speciesName + "'",
-		opacity : 0.7
-	}
-	]
-	showMap("map1311326056727", mapOptions, layersOptions)
+        loadGoogleMapsAPI(function() {
+            var mapOptions = {
+                    popup_enabled : true,
+                    toolbar_enabled : true
+                    //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
+            };
+            var layersOptions = [
+            {
+                    title : 'Occurrence',
+                    layers : 'ibp:occurrence',
+                    styles : '',
+                    cql_filter : "species_name='" + speciesName + "'",
+                    opacity : 0.7
+            },
+            {
+                    title : 'Observation',
+                    layers : 'ibp:observation_locations',
+                    styles : '',
+                    cql_filter : "species_name='" + speciesName + "'",
+                    opacity : 0.7
+            },
+            {
+                    title : 'Checklist',
+                    layers : 'ibp:checklist_species_locations',
+                    styles : '',
+                    cql_filter : "species_name='" + speciesName + "'",
+                    opacity : 0.7
+            }
+            ]
+            showMap("map1311326056727", mapOptions, layersOptions)
+            $("#mapSpinner").hide();
+        });
 }
 
 var updateEditorContent = function() {
@@ -185,3 +196,43 @@ function loadIFrame() {
 	uBioLink.remove();
 	$('iframe#uBioIframe').attr('src', url).height("500px").width("100%");
 }
+
+
+$(document).ready(function() {
+	
+	$('li.poor_species_content').hover(function(){
+		$(this).children('.poor_species_content').slideDown(200);
+	}, function(){
+		$(this).children('.poor_species_content').slideUp(200);
+	});
+	$(".grid_view").toggle();
+	
+	$.fn.editable.defaults.mode = 'inline';
+	$('.editField').editable({
+			disabled:window.is_species_admin?!window.is_species_admin:true,
+			wysihtml5 : {
+				"font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+				"emphasis": true, //Italics, bold, etc. Default true
+				"lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+				"html": true, //Button which allows you to edit the generated HTML. Default false
+				"link": true, //Button to insert a link. Default true
+				"image": true, //Button to insert an image. Default true,
+				"color": false //Button to change color of font
+			},
+			success: function(response, newValue) {
+				if(!response) {
+		            return "Unknown error!";
+		        }          
+		        
+			    if(!response.success) {
+			    	$(this).next(".alert-error").html(response.msg).show();
+			    	return response.msg
+			    } else {
+			    	$(this).next(".alert-error").hide();
+			    }
+			},
+			error:function(xhr) {
+				console.log(xhr)
+			}
+	});
+});

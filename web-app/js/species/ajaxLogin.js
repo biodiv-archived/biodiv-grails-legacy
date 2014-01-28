@@ -20,6 +20,7 @@
 							},
 							success : ajaxLoginSuccessHandler,
 							error : function(xhr, ajaxOptions, thrownError) {
+								//some uncaught server error during authentication or processing of save request
 								handleError(
 										xhr,
 										ajaxOptions,
@@ -36,7 +37,9 @@
 														.addClass(
 																'alter alert-error')
 														.show();
+												alert('Error while processing the request.');
 											}
+											updateLoginInfo();
 										});
 							}
 						});
@@ -60,4 +63,13 @@
 		"show" : false,
 		"backdrop" : "static"
 	});
+
+	$('#ajaxLogin').on('hidden', function () {
+		$('#ajaxLogin form')[0].reset();
+                if(ajaxLoginCancelCallbackFunction) {
+                    ajaxLoginCancelCallbackFunction();
+                }
+	})
+	
+	$(".s2ui_hidden_button").hide();
 })(jQuery);

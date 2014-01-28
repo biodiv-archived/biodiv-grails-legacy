@@ -1,0 +1,53 @@
+@CHARSET "UTF-8";
+
+.ufile-block {
+	border: solid 1px;
+	padding: 5px;
+/*	margin: 15px;*/
+}
+
+}
+.desc-field {
+	
+}
+
+div.field {
+	display: inline-block;
+}
+
+.file-tags {
+	
+}
+
+.upload-form {
+	position: absolute;
+	left: -9999em;
+}
+
+ul.file-tags {
+	margin-left: 0px;
+}
+
+.qq-upload-success {
+	display: none;
+}
+
+.show-ufile {
+	background-color: #f7f7f7;
+	margin: 5px;
+	padding: 10px;
+}
+
+.show-document {
+	margin:10px 0px;
+}
+
+#tc_tagcloud {
+	max-height: 300px;
+	overflow:hidden;
+}
+
+.cke_cama {
+	max-width: 100%;
+}
+

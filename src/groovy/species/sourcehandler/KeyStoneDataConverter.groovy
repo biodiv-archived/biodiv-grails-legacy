@@ -208,24 +208,9 @@ class KeyStoneDataConverter extends SourceConverter {
 	 * @param mappedField
 	 */
 	private void attachMetadata(Node data, postId, Map mappedField) {
-		new Node(data, "contributor", "opendata@keystone-foundation.org");
+		new Node(data, "contributor", "Keystone Foundation");
 		new Node(data, "attribution", "Keystone Foundation");
 		new Node(data, "license", "CC BY-NC");
-	}
-
-	/**
-	 * 
-	 * @param customFormat
-	 * @return
-	 */
-	private Map getCustomFormat(String customFormat) {
-		return customFormat.split(';').inject([:]) { map, token ->
-			token = token.toLowerCase();
-			token.split('=').with {
-				map[it[0]] = it[1];
-			}
-			map
-		}
 	}
 
 	/**

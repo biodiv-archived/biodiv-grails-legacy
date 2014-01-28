@@ -41,9 +41,13 @@
 			that manipulate the value into a string value that isn't human-readable in 
 			its internal form, but with a lexicographic ordering the same as the numeric 
 			ordering, so that range queries work correctly. -->
-		<fieldType name="sint" class="solr.SortableIntField"
+		<fieldType name="sint" class="solr.TrieIntField"
 			sortMissingLast="true" omitNorms="true" />
-
+		<fieldType name="long" class="solr.TrieLongField"
+			sortMissingLast="true" omitNorms="true" />
+		<fieldType name="sfloat" class="solr.TrieFloatField"
+            sortMissingLast="true" omitNorms="true" />
+		
 		<!-- solr.TextField allows the specification of custom text analyzers specified 
 			as a tokenizer and a list of token filters. Different analyzers may be specified 
 			for indexing and querying. The optional positionIncrementGap puts space between 
@@ -206,8 +210,12 @@
 		<!--document reference annotations -->
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
+		<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
 		<field name="guid" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
+		<field name="title" type="taxonText" indexed="true" stored="true" required="true" multiValued="false" />
+		<!-- field name="title_exact" type="textExact" indexed="true" stored="true" required="true" multiValued="false" />
+		<copyField source="title" dest="title_exact" /-->
 		
 		<field name="contributor" type="taxonText" indexed="true" stored="true" multiValued="true" />
 		<field name="location" type="text" indexed="true" stored="true" multiValued="true"/>
@@ -261,6 +269,15 @@
 		<copyField source="name" dest="autocomplete" />
 		<copyField source="taxon" dest="autocomplete" />
 
+		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
+		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
+		<field name="percent_of_info" type="sfloat" indexed="true" stored="true"  multiValued="false"/>
+		
+		<field name="createdon" type="tdate" indexed="true" required="true"/>
+		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
+		<field name="sgroup" type="long" indexed="true" required="true"/>
+		<field name="habitat" type="long" indexed="true" required="false"/>
+		
 		<dynamicField name="*" type="text" indexed="true" stored="true"
 			multiValued="true" />
 

@@ -3,10 +3,19 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 import species.Field;
+import species.UserGroupTagLib;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
+import species.groups.UserGroupController;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
+import species.participation.UserToken;
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import com.vividsolutions.jts.geom.Geometry
+import com.vividsolutions.jts.io.WKTWriter;
+import grails.converters.JSON;
+import species.participation.Featured;
 
 class BootStrap {
 
@@ -17,7 +26,8 @@ class BootStrap {
 	def namesIndexerService
 	def navigationService
 	def springSecurityService
-
+	def emailConfirmationService
+	def userGroupService
 	/**
 	 * 
 	 */
@@ -28,7 +38,9 @@ class BootStrap {
 		//initGroups();
 		initNames();
 		initFilters();
-	}
+		initEmailConfirmationService();
+        initJSONMarshallers();
+       	}
 
 	def initDefs() {
 		if(Field.count() == 0) {
@@ -58,9 +70,10 @@ class BootStrap {
 	private void createOrUpdateUser(email, password, boolean isAdmin) {
 		def userRole = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(flush:true, failOnError: true)
 		def adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(flush:true, failOnError: true)
-		def fbRole = Role.findByAuthority('ROLE_FACEBOOK') ?: new Role(authority: 'ROLE_FACEBOOK').save(flush:true, failOnError: true)
-		def drupalAdminRole = Role.findByAuthority('ROLE_DRUPAL_ADMIN') ?: new Role(authority: 'ROLE_DRUPAL_ADMIN').save(flush:true, failOnError: true)
-
+		def cepfAdminRole = Role.findByAuthority('ROLE_CEPF_ADMIN') ?: new Role(authority: 'ROLE_CEPF_ADMIN').save(flush:true, failOnError: true)
+		def speciesAdminRole = Role.findByAuthority('ROLE_SPECIES_ADMIN') ?: new Role(authority: 'ROLE_SPECIES_ADMIN').save(flush:true, failOnError: true)
+		
+		
 		def user = SUser.findByEmail(email) ?: new SUser(
 				email: email,
 				password: password,
@@ -74,6 +87,10 @@ class BootStrap {
 			if (!user.authorities.contains(adminRole)) {
 				SUserRole.create user, adminRole
 			}
+		}
+		
+		UserGroupMemberRoleType.each { it ->
+			Role.findByAuthority(it.value()) ?: new Role(authority: it.value()).save(flush:true, failOnError: true)
 		}
 	}
 
@@ -112,7 +129,51 @@ class BootStrap {
 			SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
 		}
 	}
+
+	def initEmailConfirmationService() {
+		emailConfirmationService.onConfirmation = { email, uid, confirmationToken ->
+			log.info("User with id $uid has confirmed their email address $email")
+			def userToken = UserToken.findByToken(uid);
+			if(userToken) {
+				userToken.params.tokenId = userToken.id.toString();
+				userToken.params.confirmationToken = confirmationToken;
+				def userGroupController = new UserGroupController();
+				def userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
+				return [url: userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)]
+			} else {
+				//TODO
+			}
+		  }
+		  emailConfirmationService.onInvalid = { uid ->
+//        	return [url: userGroupService.userGroupBasedLink('controller':'userGroup', action:'members', userGroup:userGroup, params:userToken.params)]
+
+			log.warn("User with id $uid failed to confirm email address after 30 days")
+		  }
+		  emailConfirmationService.onTimeout = { email, uid ->
+			 log.warn("User with id $uid failed to confirm email address after 30 days")
+		  }
+	}
 	
+    def initJSONMarshallers() {
+        JSON.registerObjectMarshaller(Geometry) {
+            String geomStr = "error"
+            WKTWriter wkt = new WKTWriter();
+            try {
+                geomStr = wkt.write(it);
+            } catch(Exception e) {
+                log.error "Error writing polygon wkt : ${it}"
+            }
+            return geomStr;
+        }
+
+        JSON.registerObjectMarshaller(Featured) {
+            if(it.userGroup) 
+                return ['createdOn':it.createdOn, 'notes': it.notes, 'userGroupId':it.userGroup.id, 'userGroupName':it.userGroup.name, 'userGroupUrl':userGroupService.userGroupBasedLink(['mapping':'userGroup', 'controller':'userGroup', 'action':'show', 'userGroup':it.userGroup])]
+            else
+                return ['createdOn':it.createdOn, 'notes': it.notes]
+        }
+    }
+
 	/**
 	 * 
 	 */
@@ -120,4 +181,5 @@ class BootStrap {
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		//namesIndexerService.store(indexStoreDir);
 	}
+	
 }

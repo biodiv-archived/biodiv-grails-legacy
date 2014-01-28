@@ -1,5 +1,6 @@
 package species
 
+import grails.converters.JSON;
 import species.groups.SpeciesGroup;
 
 class SpeciesGroupController {
@@ -21,6 +22,11 @@ class SpeciesGroupController {
 		}
 	}
 
+	def tags = {
+		log.debug params;
+		render SpeciesGroup.list().collect{it.name} as JSON
+	}
+	
 	def create = {
 		def speciesGroupInstance = new SpeciesGroup()
 		speciesGroupInstance.properties = params

@@ -2,6 +2,10 @@
  * 
  */
 
+var serverTimeDiff = null;
+var alwaysRelativeTime = false;
+var is_touch_device = ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch;
+
 $(function() {
 	var spt = $('span.mailme');
 	var at = /\(at\)/;
@@ -40,11 +44,53 @@ function dcorateCommentBody(comp){
 	//var text = $(comp).text().replace(/\n\r?/g, '<br />');
 	//$(comp).html(text);
 	$(comp).linkify();
-	
+}
+
+
+function initRelativeTime(url){
+	if(!serverTimeDiff){
+		$.ajax({
+	 		url: url,
+			dataType: "json",
+			success: function(data) {
+				serverTimeDiff = parseInt(data) - new Date().getTime();
+				$('body').timeago({serverTimeDiff:serverTimeDiff, alwaysRelativeTime:alwaysRelativeTime});
+			}, error: function(xhr, status, error) {
+				//alert(xhr.responseText);
+		   	}
+		});	
+	}
 }
 
 function updateRelativeTime(){
-	$('.timeago').timeago('refresh');
+	$('.timeago').timeago({serverTimeDiff:serverTimeDiff, alwaysRelativeTime:alwaysRelativeTime});
+}
+
+function feedPostProcess(){
+	$(".ellipsis.multiline").trunk8({
+		lines:2,
+                tooltip:false,
+                fill: '&hellip; <a id="read-more" href="#">more</a>'
+	});
+        $('#read-more').live('click', function (event) {
+              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
+                
+                return false;
+        });
+
+        $('#read-less').live('click', function (event) {
+              $(this).parent().trunk8();
+                
+                return false;
+        });
+	
+	$('.linktext').linkify();  
+	$('.yj-message-body').linkify();
+	updateRelativeTime();
+        rating();
+	$(".youtube_container").each(function(){
+		loadYoutube(this);
+	});
 }
 
 //to show relative date
@@ -72,3 +118,50 @@ function updateRelativeTime(){
 //			} 
 //		}); 
 //}
+
+function initLoader() {
+    var script = document.createElement("script");
+    script.src = "https://www.google.com/jsapi?callback=loadMaps";
+    script.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function loadGoogleMapsAPI(callback) {
+    //if (typeof google === 'object' && typeof google.maps === 'object') {
+    //    console.log("google maps already loaded")
+    //} else {
+        if(google != undefined) {
+            console.log("loading google maps")
+            google.load("maps", "3.12", {'callback':function() {
+                google.maps.visualRefresh = true;
+                callback();
+            }, other_params: "sensor=true"});
+        }
+    //}
+}
+
+var isVisualizationLibLoaded = false;
+function loadGoogleVisualizationAPI(callback) {
+    if(!isVisualizationLibLoaded) {
+        google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
+            isVisualizationLibLoaded = true;
+            callback();
+        }});
+    } else {
+        callback();
+    }
+}
+
+if (typeof String.prototype.startsWith != 'function') {
+    // see below for better implementation!
+    String.prototype.startsWith = function (str){
+        return this.indexOf(str) == 0;
+    };
+}
+
+function stringTrim(s){
+    return $.trim(s);
+}
+
+
+

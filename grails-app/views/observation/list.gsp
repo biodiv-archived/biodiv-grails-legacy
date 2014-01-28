@@ -1,43 +1,54 @@
+<%@page import="species.utils.Utils"%>
+<%@page import="species.Resource.ResourceType"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Observations')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<r:require modules="observations_list"/>
+<g:set var="title" value="Observations"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
+<r:require modules="observations_list" />
+<style>
+    
+    .map_wrapper {
+        margin-bottom: 0px;
+    }
+
+    /*.ellipsis {
+        white-space:inherit;
+    }*/
+
+</style>
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="span12">
-				<div class="page-header clearfix">
-						<h1>
-							<g:message code="default.observation.heading" args="[entityName]" />
-						</h1>
-				</div>
 
-				<g:if test="${flash.message}">
-					<div class="message alert alert-info">
-						${flash.message}
-					</div>
-				</g:if>
+	<div class="span12">
+            <obv:showSubmenuTemplate/>
 
-				<obv:showObservationsListWrapper />
+            <div class="page-header clearfix">
+                <div style="width:100%;">
+                    <div class="main_heading" style="margin-left:0px;">
+
+                        <h1>Observations</h1>
+
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
 
 
-			</div>
-		</div>
+
+            <uGroup:rightSidebar/>
+            <obv:featured 
+            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+
+            <h4>Browse Observations</h4>
+            <obv:showObservationsListWrapper />
 	</div>
-	<r:script>
-		$( "#search" ).unbind('click');
-		$( "#search" ).click(function() {          
-			var target = "${createLink(action:'search')}" + window.location.search;
-			updateGallery(target, ${queryParams.max}, 0, undefined, false);
-        	return false;
-		});
-	</r:script>
+
+	<g:javascript>
+		$(document).ready(function() {
+			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
+                        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+                        
+                });
+	</g:javascript>
 </body>
 </html>

@@ -255,7 +255,11 @@
                 ]
 
             columnDataForBlankSheet.push(getMediaColumnOptions());
+<<<<<<< HEAD
             loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "checklist", "Scientific_Name", "Common_Name"); 
+=======
+            loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "Scientific_Name", "Common_Name"); 
+>>>>>>> fa3c07a70a49ea1af25ebda69c82a4ca1c46a6cd
             }
 
             if(${params.action=="create"}){

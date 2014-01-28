@@ -58,8 +58,6 @@ function setUnEditableColumn(columns){
         grid = new Slick.Grid("#myGrid", data, columns, options);
         grid.autosizeColumns();
         grid.setSelectionModel(new Slick.CellSelectionModel());
-        
-        
 
         grid.onAddNewRow.subscribe(function (e, args) {
             var item = args.item;
@@ -144,12 +142,21 @@ function setUnEditableColumn(columns){
         
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
-        
-        var tags = new Array("option1", "option2", "option3");
 
         if(res === "species") {
-            console.log(columns[0].name);
-            populateTagHeaders(columns, tags);
+            populateTagHeaders(columns);
+            $.ajax({
+                url:window.params.getDataColumnsDB,
+                dataType:'JSON',
+                success:function(data){
+                    $(".dataColumns").tagit({
+                        availableTags:data,
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+                    updateMetadataValues();
+                }
+            });
         }
 
 
@@ -169,7 +176,6 @@ function setUnEditableColumn(columns){
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
-        
     });
 } 
 
@@ -843,7 +849,8 @@ $(document).ready(function(){
             alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
         }
     });
-	
+
+    
 });	
 
  function AutoCompleteEditor(args) {

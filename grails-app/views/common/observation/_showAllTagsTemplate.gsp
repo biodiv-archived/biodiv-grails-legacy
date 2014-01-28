@@ -31,19 +31,22 @@
 		}
 	});
 </g:javascript>
+
 <div id="tags_section">
-	<h5>
+	<a data-toggle="collapse" href="#tags"><h5>
 		<i class="icon-tags"></i>
 		<g:message code="default.tags.title" default="Tags" />
-	</h5>
-	<div class="tag-tools">
-		View as <span id="as_list" class="btn">List</span> <span id="as_cloud"
-			class="btn active">Cloud</span>
-	</div>
-	<div id="tagCloud" class="tagsView">
-		<obv:showTagsCloud model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
-	</div>
-	<div id="tagList" class="tagsView" style="display: none;">
-		<obv:showTagsList model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
+	</h5></a>
+	<div id="tags">
+		<div class="tag-tools">
+			View as <span id="as_list" class="btn">List</span> <span id="as_cloud"
+				class="btn active">Cloud</span>
+		</div>
+		<div id="tagCloud" class="tagsView">
+			<obv:showTagsCloud model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
+		</div>
+		<div id="tagList" class="tagsView" style="display: none;">
+			<obv:showTagsList model="['tags': tags, 'isAjaxLoad':isAjaxLoad, controller:params.controller]" />
+		</div>
 	</div>
 </div>

@@ -1,310 +1,463 @@
-/**
- * 
- */
-
 $(document).ready(function(){
-	$('#selected_sort').tooltip({placement:'right'});
+    $('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
-    	
+
     $('#speciesNameFilter').button();
     if(window.params.speciesName == 'Unknown'){
-		$("#speciesNameFilterButton").addClass('active');
-		$("#speciesNameAllButton").removeClass('active');
-	}else{
-		$("#speciesNameFilterButton").removeClass('active');
-		$("#speciesNameAllButton").addClass('active');
+        $("#speciesNameFilterButton").addClass('active');
+        $("#speciesNameAllButton").removeClass('active');
+    }else {
+        $("#speciesNameFilterButton").removeClass('active');
+        $("#speciesNameAllButton").addClass('active');
+    }
+    $("#speciesNameFilter").val(window.params.speciesName);
+
+    $('#observationFlagFilter').button();
+    if(window.params.isFlagged == 'true' ){
+        $("#observationFlaggedButton").addClass('active');
+        $("#observationWithNoFlagFilterButton").removeClass('active')
+    }else{
+        $("#observationFlaggedButton").removeClass('active');
+        $("#observationWithNoFlagFilterButton").addClass('active')
+    }
+
+
+    $('#observationAllChecklistFilter').button();
+    if(window.params.isChecklistOnly == 'true' ){
+        $("#observationChecklistOnlyButton").addClass('active');
+        $("#observationAllButton").removeClass('active')
+    }else{
+        $("#observationChecklistOnlyButton").removeClass('active');
+        $("#observationAllButton").addClass('active')
+    }
+
+    $("#observationChecklistOnlyButton").click(function() {
+        if($("#observationChecklistOnlyButton").hasClass('active')){
+            return false;
+        }
+        $("#observationAllChecklistFilter").val('true')
+        $("#observationAllButton").removeClass('active')
+        $("#observationChecklistOnlyButton").addClass('active')
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+    return false;
+    });
+
+    $("#observationAllButton").click(function() {
+        if($("#observationAllButton").hasClass('active')){
+            return false;
+        }
+        $("#observationAllChecklistFilter").val('false');
+        $("#observationChecklistOnlyButton").removeClass('active');
+        $("#observationAllButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('#observationMediaFilter').button();
+    if(window.params.isMediaFilter ==  undefined || window.params.isMediaFilter == 'true' ){
+        $("#observationMediaAllFilterButton").removeClass('active');
+        $("#observationMediaOnlyFilterButton").addClass('active');
+    }else{
+        $("#observationMediaAllFilterButton").addClass('active');
+        $("#observationMediaOnlyFilterButton").removeClass('active');
     }
     
-	$('#observationFlagFilter').button();
-    if(window.params.isFlagged == 'true' ){
-		$("#observationFlaggedButton").addClass('active');
-		$("#observationWithNoFlagFilterButton").removeClass('active')
-	}else{
-		$("#observationFlaggedButton").removeClass('active');
-		$("#observationWithNoFlagFilterButton").addClass('active')
-	}
+    $("#observationMediaAllFilterButton").click(function() {
+        if($("#observationMediaAllFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#observationMediaFilter").val('false');
+        $("#observationMediaOnlyFilterButton").removeClass('active');
+        $("#observationMediaAllFilterButton").addClass('active');
 
-   
-   $("#observationFlaggedButton").click(function() {
-   		if($("#observationFlaggedButton").hasClass('active')){
-   			return false;
-   		}
-		$("#observationFlagFilter").val('true')
-		$("#observationWithNoFlagFilterButton").removeClass('active')
-		$("#observationFlaggedButton").addClass('active')
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	
-	$("#observationWithNoFlagFilterButton").click(function() {
-   		if($("#observationWithNoFlagFilterButton").hasClass('active')){
-   			return false;
-   		}
-		$("#observationFlagFilter").val('false')
-		$("#observationFlaggedButton").removeClass('active')
-		$("#observationWithNoFlagFilterButton").addClass('active')
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	
-	$("#speciesNameAllButton").click(function() {
-   		if($("#speciesNameAllButton").hasClass('active')){
-   			return false;
-   		}
-		$("#speciesNameFilter").val('All')
-		$("#speciesNameFilterButton").removeClass('active')
-		$("#speciesNameAllButton").addClass('active')
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	
-	$("#speciesNameFilterButton").click(function() {
-		if($("#speciesNameFilterButton").hasClass('active')){
-   			return false;
-   		}
-	    $("#speciesNameFilter").val('Unknown')
-		$("#speciesNameFilterButton").addClass('active')
-	    $("#speciesNameAllButton").removeClass('active')
-			
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	                
-	$('#speciesGroupFilter button').click(function(){
-		if($(this).hasClass('active')){
-			return false;
-		}
-		$('#speciesGroupFilter button.active').removeClass('active');
-    	$(this).addClass('active');
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
- 	});
-        
- 	$('#habitatFilter button').click(function(){
- 		if($(this).hasClass('active')){
-			return false;
-		}
- 		$('#habitatFilter button.active').removeClass('active');
-    	$(this).addClass('active');
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
- 	});
-        
-   $('.sort_filter_label').click(function(){
-   		var caret = '<span class="caret"></span>'
-   		if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
-   			$("#sortFilter").hide();
-        	return false;
-		}
-		$('.sort_filter_label.active').removeClass('active');
-		$(this).addClass('active');
-        $("#selected_sort").html($(this).html() + caret);
-        $("#sortFilter").hide();
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;   
-   });
+        return false;
+    });
 
-	$("#selected_sort").click(function(){
-		$("#sortFilter").show();
-	});
-	
-        
-    $(".paginateButtons a").click(function() {
+
+    $("#observationMediaOnlyFilterButton").click(function() {
+        if($("#observationMediaOnlyFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#observationMediaFilter").val('true');
+        $("#observationMediaAllFilterButton").removeClass('active');
+        $("#observationMediaOnlyFilterButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#observationFlaggedButton").click(function() {
+        if($("#observationFlaggedButton").hasClass('active')){
+            return false;
+        }
+        $("#observationFlagFilter").val('true')
+        $("#observationWithNoFlagFilterButton").removeClass('active')
+        $("#observationFlaggedButton").addClass('active')
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+    return false;
+    });
+
+
+
+    $("#observationWithNoFlagFilterButton").click(function() {
+        if($("#observationWithNoFlagFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#observationFlagFilter").val('false');
+        $("#observationFlaggedButton").removeClass('active');
+        $("#observationWithNoFlagFilterButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+
+
+    $("#speciesNameAllButton").click(function() {
+        if($("#speciesNameAllButton").hasClass('active')){
+            return false;
+        }
+        $("#speciesNameFilter").val('All');
+        $("#speciesNameFilterButton").removeClass('active');
+        $("#speciesNameAllButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#speciesNameFilterButton").click(function() {
+        if($("#speciesNameFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#speciesNameFilter").val('Unknown');
+        $("#speciesNameFilterButton").addClass('active');
+        $("#speciesNameAllButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('#speciesGroupFilter button').click(function(){
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $('#speciesGroupFilter button.active').removeClass('active');
+        $(this).addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('#habitatFilter button').click(function(){
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $('#habitatFilter button.active').removeClass('active');
+        $(this).addClass('active');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('.sort_filter_label').click(function(){
+        var caret = '<span class="caret"></span>'
+        if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
+            return true;
+        }
+	    $('.sort_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#selected_sort").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
+    });
+
+    $(".paginateButtons a").live('click', function() {
+    	$('.paginateButtons a.active').removeClass('active');
+    	$(this).addClass('active');
         updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
         return false;
     });
     
-    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
-	$("li.tagit-choice").live('click', function(){
-   		setActiveTag($(this).contents().first().text());
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
+//    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
+    $(".observation_story li.tagit-choice").live('click', function(){
+        setActiveTag($(this).contents().first().text());
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
     });
-   
-   $('#tc_tagcloud a').live('click', function(){
-   		setActiveTag($(this).contents().first().text());
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-		return false;
-   });
-   
+
+//   $('#tc_tagcloud a').live('click', function(){
+//   		setActiveTag($(this).contents().first().text());
+//		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+//		return false;
+//   });
+
+    /*$(".resource_in_groups li:has('.featured')").popover({ 
+                    trigger:(is_touch_device ? "click" : "hover"),
+                });*/
     $("#removeTagFilter").live('click', function(){
-    	var oldActiveTag = $("li.tagit-choice.active");
-		if(oldActiveTag){
-			oldActiveTag.removeClass('active');
-		}
-		var oldActiveTag = $("#tc_tagcloud a.active");
-		if(oldActiveTag){
-			oldActiveTag.removeClass('active');
-		}
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
+        var oldActiveTag = $("li.tagit-choice.active");
+        if(oldActiveTag){
+            oldActiveTag.removeClass('active');
+        }
+        var oldActiveTag = $("#tc_tagcloud a.active");
+        if(oldActiveTag){
+            oldActiveTag.removeClass('active');
+        }
+        $("input#tag").val('');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
     });
- 
+
     $("#removeUserFilter").live('click', function(){
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
-    	return false;
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
+        return false;
     });
-    
-    $("#removeQueryFilter").live('click', function(){
-    	$( "#searchTextField" ).val('');
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
+    $('#action-tabs a').click(function (e) {
+        var tab = $(this);
+        if(tab.parent('li').hasClass('active')){
+            window.setTimeout(function(){
+                $("#action-tab-content .tab-pane").removeClass('active');
+                tab.parent('li').removeClass('active');
+                },1);
+        }
     });
-   
-   var tmpTarget =  window.location.pathname + window.location.search;
-   setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
-   
-   $('.list_view_bttn').live('click', function() {
-		$('.grid_view').hide();
-		$('.list_view').show();
-		$(this).addClass('active');
-		$('.grid_view_bttn').removeClass('active');
-		$.cookie("observation_listing", "list");
-		adjustHeight();
-	});
 
-	$('.grid_view_bttn').live('click', function() {
-		$('.grid_view').show();
-		$('.list_view').hide();
-		$(this).addClass('active');
-		$('.list_view_bttn').removeClass('active');
-		$.cookie("observation_listing", "grid");
-	});
+    $("#removeObvFilter").live('click', function(){
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);
+        return false;
+    });
 
-	$('.loadMore').live('click', function() {
-		$.autopager({
+    $("#removeDateRange").live('click', function(){
+        $("input[name='daterangepicker_start']").val("");
+        $("input[name='daterangepicker_end']").val("");
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate);
+        return false;
+    });
 
-			autoLoad : false,
-			// a selector that matches a element of next page link
-			link : 'div.paginateButtons a.nextLink',
+    $(".removeQueryFilter").live('click', function(){
+        var removeParam = undefined;
+        if($($(this).attr('data-target').replace('.','\\.')).length != 0)
+        $($(this).attr('data-target').replace('.','\\.')).val('')
+        else {
+            $( "#searchTextField" ).val('');	
+        }
+    removeParam = $(this).attr('data-target').replace('#','');
+    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+    return false;
+    });
 
-			// a selector that matches page contents
-			content : '.mainContent',
+    $('select[name="limit"]').live('change', function() {
+        updateGallery(undefined, $(this).val(), window.params.offset, false, window.params.isGalleryUpdate);
+    });
 
-			appendTo : '.mainContentList',
+    var tmpTarget =  window.location.pathname + window.location.search;
+    setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-			// a callback function to be triggered when loading start 
-			start : function(current, next) {
+/*    $('.list_view_bttn').live('click', function() {
+        $('.grid_view').hide();
+        $('.list_view').show();
+        $(this).addClass('active');
+        $('.grid_view_bttn').removeClass('active');
+        $.cookie("listing", "list", {path    : '/'});
+        adjustHeight();
+    });
 
-				$(".loadMore .progress").show();
-				$(".loadMore .buttonTitle").hide();
-			},
+    $('.grid_view_bttn').live('click', function() {
+        $('.grid_view').show();
+        $('.list_view').hide();
+        $(this).addClass('active');
+        $('.list_view_bttn').removeClass('active');
+        $.cookie("listing", "grid", {path    : '/'});
+    });
+*/    
+    $("#distinctRecoTableAction").click(loadDistinctRecoList);
 
-			// a function to be executed when next page was loaded. 
-			// "this" points to the element of loaded content.
-			load : function(current, next) {
-				$(".mainContent:last").hide().fadeIn(3000);
-				
-				$("div.paginateButtons a.nextLink").attr('href', next.url);
-				if (next.url == undefined) {
-					$(".loadMore").hide();
-				} else {
-					$(".loadMore .progress").hide();
-					$(".loadMore .buttonTitle").show();
-				}
-				if ($('.grid_view_bttn.active')[0]) {
-					$('.grid_view').show();
-					$('.list_view').hide();
-				} else {
-					$('.grid_view').hide();
-					$('.list_view').show();
-				}
-					
-				var a = $('<a href="'+current.url+'"></a>');
-			    var url = a.url();
-			    var params = url.param();
-			    delete params["append"]
-			    delete params["loadMore"]
-			    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
-			    params['offset'] = 0
-			    var History = window.History;
-			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-				eatCookies();
-			}
-		});
+    $('.loadMore').live('click', function() {
+        console.log('loadmore');
+        $.autopager({
 
-		$.autopager('load');
-		return false;
-	});
-	
-	eatCookies();
+            autoLoad : false,
+            // a selector that matches a element of next page link
+            link : 'div.paginateButtons a.nextLink',
+
+            // a selector that matches page contents
+            content : '.mainContent',
+
+            //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
+            appendTo : '.mainContentList',
+
+            // a callback function to be triggered when loading start 
+            start : function(current, next) {
+
+                $(".loadMore .progress").show();
+                $(".loadMore .buttonTitle").hide();
+            },
+
+            // a function to be executed when next page was loaded. 
+            // "this" points to the element of loaded content.
+            load : function(current, next) {
+                $(".mainContent:last").hide().fadeIn(3000);
+
+                $("div.paginateButtons a.nextLink").attr('href', next.url);
+                if (next.url == undefined) {
+                    $(".loadMore").hide();
+                } else {
+                    $(".loadMore .progress").hide();
+                    $(".loadMore .buttonTitle").show();
+                }
+/*                if ($('.grid_view_bttn.active')[0]) {
+                    $('.grid_view').show();
+                    $('.list_view').hide();
+                } else {
+                    $('.grid_view').hide();
+                    $('.list_view').show();
+                }
+*/
+                var a = $('<a href="'+current.url+'"></a>');
+                var url = a.url();
+                var params = url.param();
+                delete params["append"]
+                delete params["loadMore"]
+                params['max'] = parseInt(params['offset'])+parseInt(params['max']);
+                params['offset'] = 0
+                var History = window.History;
+                History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+                updateRelativeTime();
+                last_actions();
+                eatCookies();
+                //$('.list').trigger('updatedGallery');
+            }
+        });
+
+        $.autopager('load');
+        return false;
+    });
+
+    //	last_actions();
+    eatCookies();
+    $('.list').trigger('updatedGallery');
 });
 
-if (typeof String.prototype.startsWith != 'function') {
-	  // see below for better implementation!
-	  String.prototype.startsWith = function (str){
-	    return this.indexOf(str) == 0;
-	  };
-	}
-
-function eatCookies() {
-	
-	var hashString = window.location.hash.substring(1)
-	if ($.cookie("observation_listing") == "list") {
-		if(!hashString.startsWith('l')) {
-			if(hashString.startsWith('g')) {
-				window.location.hash = "l"+hashString.substring(1);
-			} else if(hashString){
-				window.location.hash = "l"+hashString;
-			}
-		}
-		$('.list_view').show();
-		$('.grid_view').hide();
-		$('.grid_view_bttn').removeClass('active');
-		$('.list_view_bttn').addClass('active');
-	} else {
-		if(!hashString.startsWith('g')) {
-			if(hashString.startsWith('l')) {
-				window.location.hash = "g"+hashString.substring(1);
-			} else if(hashString){
-				window.location.hash = "g"+hashString;
-			}
-		}
-		$('.grid_view').show();
-		$('.list_view').hide();
-		$('.grid_view_bttn').addClass('active');
-		$('.list_view_bttn').removeClass('active');
-	}
-	adjustHeight();
-}
-
-function stringTrim(s){
-	return $.trim(s);
+/**
+ */
+function eatCookies() {	
+    var hashString = window.location.hash.substring(1)
+        if ($.cookie("listing") == "list") {
+            if(!hashString.startsWith('l')) {
+                if(hashString.startsWith('g')) {
+                    window.location.hash = "l"+hashString.substring(1);
+                } else if(hashString){
+                    window.location.hash = "l"+hashString;
+                }
+            }
+/*            $('.list_view').show();
+            $('.grid_view').hide();
+            $('.grid_view_bttn').removeClass('active');
+            $('.list_view_bttn').addClass('active');
+*/        } else {
+            if(!hashString.startsWith('g')) {
+                if(hashString.startsWith('l')) {
+                    window.location.hash = "g"+hashString.substring(1);
+                } else if(hashString){
+                    window.location.hash = "g"+hashString;
+                }
+            }
+/*            $('.grid_view').show();
+            $('.list_view').not('.single_list_view').hide();
+            $('.grid_view_bttn').addClass('active');
+            $('.list_view_bttn').removeClass('active');
+*/        }
+    adjustHeight();
 }
 
 function getSelectedGroup() {
     var grp = ''; 
     $('#speciesGroupFilter button').each (function() {
-            if($(this).hasClass('active')) {
-                    grp += $(this).attr('value') + ',';
-            }
+        if($(this).hasClass('active')) {
+            grp += $(this).attr('value') + ',';
+        }
     });
 
     grp = grp.replace(/\s*\,\s*$/,'');
     return grp;	
 } 
-    
+
 function getSelectedHabitat() {
     var hbt = ''; 
     $('#habitatFilter button').each (function() {
-            if($(this).hasClass('active')) {
-                    hbt += $(this).attr('value') + ',';
-            }
+        if($(this).hasClass('active')) {
+            hbt += $(this).attr('value') + ',';
+        }
     });
     hbt = hbt.replace(/\s*\,\s*$/,'');
     return hbt;	
 } 
-    
+
+function selectTickUserGroupsSignature(parentGroupId) {
+    $(".userGroups button").click(function(e){
+		if($(this).hasClass('active')) {
+		    //trying to unselect group
+			//if on obv create page	and one group is coming as parent group		
+			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+			    //this group is parent group
+				if($(this).hasClass('create') && parentGroupId != '' && $(this).hasClass("'"+parentGroupId+"'")){
+					alert("Can't unselect parent group");
+				}else{
+					//un selecting other group
+					$(this).removeClass('btn-success');
+					$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+				}	
+			}else{
+                $(this).removeClass('btn-success');
+				$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+				if($(this).hasClass("single-post")) {
+					$("#groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
+					$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+				} else {
+					if($("#groupsWithSharingAllowed button.active").length == 0) {
+						$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+					}
+				}
+			}
+		} else {
+            //trying to select new group
+			//if on obv create page and one group is coming as parent group
+			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
+			    //either current one belongs to exclusive group or parent group is exclusive group
+			 	if($(this).hasClass("single-post") ||($("#groupsWithSharingNotAllowed button.create").length > 0)){
+					alert("Can't select this group because it will unselect parent group");
+				}else{
+					//parent group is multipost one and this new group is also belong to multi select so selecting it
+					$(this).removeClass('disabled').addClass('btn-success');
+					$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+				}
+			}else{
+                //on obv edit page
+				if($(this).hasClass("single-post")) {
+					$("#groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$(this).removeClass('disabled').addClass('btn-success');
+				} else {
+					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+					$(this).removeClass('disabled').addClass('btn-success');
+				}
+				$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+			}
+		}
+		e.preventDefault();
+	});
+}
+
 function getSelectedSortBy() {
     var sortBy = ''; 
-     $('.sort_filter_label').each (function() {
-            if($(this).hasClass('active')) {
-                sortBy += $(this).attr('value') + ',';
-            }
+    $('.sort_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            sortBy += $(this).attr('value') + ',';
+        }
     });
 
     sortBy = sortBy.replace(/\s*\,\s*$/,'');
@@ -313,201 +466,498 @@ function getSelectedSortBy() {
 
 function getSelectedFlag() {
     var flag = ''; 
-	flag = $("#observationFlagFilter").attr('value');
-	if(flag) {
-    	flag = flag.replace(/\s*\,\s*$/,'');
-    	return flag;
+    flag = $("#observationFlagFilter").attr('value');
+    if(flag) {
+        flag = flag.replace(/\s*\,\s*$/,'');
+        return flag;
     }	
-} 
-    
+}
+
+function getSelectedAllChecklistFlag() {
+    var flag = ''; 
+    flag = $("#observationAllChecklistFilter").attr('value');
+    if(flag) {
+        flag = flag.replace(/\s*\,\s*$/,'');
+        return flag;
+    }	
+}
+
+function getSelectedMedia() {
+    var media = ''; 
+    media = $("#observationMediaFilter").attr('value');
+    if(media) {
+        media = media.replace(/\s*\,\s*$/,'');
+        return media;
+    }	
+}
+
 function getSelectedSpeciesName() {
     var sName = ''; 
-	sName = $("#speciesNameFilter").attr('value');
-	if(sName) {
-    	sName = sName.replace(/\s*\,\s*$/,'');
-    	return sName;
-    }	
-} 
-	
-function getSelectedTag() {
-	var tag = ''; 
-	tag = $("li.tagit-choice.active").contents().first().text();
-	if(!tag){
-		tag = $("#tc_tagcloud a.active").contents().first().text();	
-	}
-	if(tag) {
-    	tag = stringTrim(tag.replace(/\s*\,\s*$/,''));
-    	return tag;
+    sName = $("#speciesNameFilter").attr('value');
+    if(sName) {
+        sName = sName.replace(/\s*\,\s*$/,'');
+        return sName;
     }	
 } 
 
-function getFilterParameters(url, limit, offset, removeUser) {
+function getSelectedTag() {
+    var tag = $("li.tagit-choice.active").contents().first().text();
+    if(!tag){
+        tag = $("#tc_tagcloud a.active").contents().first().text();	
+    }  
+    if(tag) {
+        tag = stringTrim(tag.replace(/\s*\,\s*$/,''));
+        return tag;
+    } else {
+        return $("input#tag").val()
+    }
+} 
+
+function getSelectedUserGroup() {
+    return $('#advSearchForm input[name=uGroup]:radio:checked').val()
+} 
+
+function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-    var sortBy = getSelectedSortBy();
-    if(sortBy) {
+
+    if(removeParam) {
+        delete params[removeParam]
+    }
+    removeSort = (typeof removeSort === "undefined") ? false : removeSort;
+
+    if(!removeSort) {
+        var sortBy = getSelectedSortBy();
+        if(sortBy) {
             params['sort'] = sortBy;
+        }
     }
 
     var sName = getSelectedSpeciesName();
     if(sName) {
-            params['speciesName'] = sName;
+        params['speciesName'] = sName;
     }
-	
-	var flag = getSelectedFlag();
+
+    var flag = getSelectedFlag();
     if(flag) {
-            params['isFlagged'] = flag;
+        params['isFlagged'] = flag;
     }
+
+    var allChecklistFlag = getSelectedAllChecklistFlag();
+    if(allChecklistFlag) {
+        params['isChecklistOnly'] = allChecklistFlag;
+    }
+
+    //    var mediaFilter = getSelectedMedia();
+    //    if(mediaFilter) {
+    //            params['isMediaFilter'] = mediaFilter;
+    //    }
+
     var grp = getSelectedGroup();
     if(grp) {
-            params['sGroup'] = grp;
+        params['sGroup'] = grp;
     }
 
     var habitat = getSelectedHabitat();
     if(habitat) {
-            params['habitat'] = habitat;
+        params['habitat'] = habitat;
     }
 
-    if(limit != undefined) {
+
+    var tag = getSelectedTag();
+    if(tag){
+        params['tag'] = tag;
+    }else{
+        // removing old tag from url
+        if(params['tag'] != undefined){
+            delete params['tag'];
+        }
+    }
+
+    var query = $( "#searchTextField" ).val();
+    if(query){
+        params['query'] = query;
+    }else{
+        // removing old tag from url
+        if(params['query'] != undefined){
+            delete params['query'];
+        }
+    }
+
+    if(!isRegularSearch) {
+        $("#advSearchForm :input").each(function(index, ele) {
+            var field = $(this).attr('name');
+            var query = $( this ).val();
+            if(query){
+                params[field] = query;
+            } else {
+                // removing old tag from url
+                if(params[field] != undefined){
+                    delete params[field];
+                }
+            }
+        });
+        if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
+            delete params['daterangepicker_start'];
+            delete params['daterangepicker_end'];
+        }
+    }
+
+    if($("#limit").length != 0) {
+        params['max'] = $('select[name="limit"]').val();
+    } else if(limit != undefined) {
         params['max'] = limit.toString();
     } 
 
     if(offset != undefined) {
         params['offset'] = offset.toString();
     }
-	
-	var tag = getSelectedTag();
-	if(tag){
-		params['tag'] = tag;
-	}else{
-		// removing old tag from url
-		if(params['tag'] != undefined){
-			delete params['tag'];
-		}
-	}
-	
-	var query = $( "#searchTextField" ).val();
-	if(query){
-		params['query'] = query;
-	}else{
-		// removing old tag from url
-		if(params['query'] != undefined){
-			delete params['query'];
-		}
-	}
-	
-	if(removeUser){
-		if(params['user'] != undefined){
-			delete params['user'];
-		}
-	}
-	
-	return params;
+
+    if(removeUser){
+        if(params['user'] != undefined){
+            delete params['user'];
+        }
+    }
+
+    if(removeObv){
+        if(params['observation'] != undefined){
+            delete params['observation'];
+        }
+    }
+
+    var uGroup = getSelectedUserGroup();
+    if(uGroup) {
+        params['uGroup'] = uGroup;
+    } else {
+        if(params['uGroup'] != undefined){
+            delete params['uGroup'];
+        }
+    }
+
+    var bounds = $("#bounds").val();
+    if(bounds) {
+        params['bounds'] = bounds;
+    } else {
+        delete params['bounds'];
+    }
+
+    var isMapView = $("#isMapView").val()
+        if(isMapView) {
+            params['isMapView'] = isMapView
+        } else {
+            delete params['isMapView']
+        }
+    return params;
 }	
 
 function setActiveTag(activeTag){
-	if(activeTag != undefined){
-				$('li.tagit-choice').each (function() {
-					if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
-       				$(this).addClass('active');
-       			}
-       			else{
-       				if($(this).hasClass('active')){
-       					$(this).removeClass('active');
-       				}
-       			}
-       		});
-       		
-       		$('#tc_tagcloud a').each(function() {
-					if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
-       				$(this).addClass('active');
-       			}else{
-       				if($(this).hasClass('active')){
-       					$(this).removeClass('active');
-       				}
-       			}
-			});
-			
- 		}
+    if(activeTag != undefined){
+        $('li.tagit-choice').each (function() {
+            if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
+                $(this).addClass('active');
+            }
+            else{
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active');
+                }
+            }
+        });
+
+        $('#tc_tagcloud a').each(function() {
+            if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
+                $(this).addClass('active');
+            }else{
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active');
+                }
+            }
+        });
+
+    }
 }
 
 function updateListPage(activeTag) {
-		return function (data) {
-			$('.observations_list').replaceWith(data.obvListHtml);
-			$('#info-message').replaceWith(data.obvFilterMsgHtml);
-			$('#tags_section').replaceWith(data.tagsHtml);
-			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
-			setActiveTag(activeTag);
-			eatCookies();
-	}
+    return function (data) {
+        $('.observations_list').replaceWith(data.obvListHtml);
+        $('#info-message').replaceWith(data.obvFilterMsgHtml);
+        $('#tags_section').replaceWith(data.tagsHtml);
+        //$('.observation_location').replaceWith(data.mapViewHtml);
+        setActiveTag(activeTag);
+        updateDownloadBox(data.instanceTotal);
+        reInitializeGroupPost();
+        updateRelativeTime();
+        last_actions();
+        eatCookies();			
+        $('.list').trigger('updatedGallery');
+    }
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
+function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
     if(target === undefined) {
-            target = window.location.pathname + window.location.search;
+        target = window.location.pathname + window.location.search;
     }
-    
+
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
     var href = url.attr('path');
-    var params = getFilterParameters(url, limit, offset, removeUser);
-    // alert(" tag in params " + params['tag'] );
+    var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
+    params['href'] = href;
+    params['base'] = url.attr('base');
+    return params;
+}
+
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+    
+    var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
+
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
+    var href = params.href;
+    var base = params.base;
+    delete params["href"]
+    delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
     
     var doc_url = href+'?'+recursiveDecoded;
     var History = window.History;
     delete params["isGalleryUpdate"]
-    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-    // alert("doc_url " + doc_url);
+    History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
+    console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
-       	$.ajax({
-				url: doc_url,
-				dataType: 'json',
-				
-				beforeSend : function(){
-					$('.observations_list').css({"opacity": 0.5});
-					$('#tags_section').css({"opacity": 0.5});
-				},
-				
-				success: updateListPage(params["tag"]),
-			statusCode: {
-				401: function() {
-					show_login_dialog();
-				}	    				    			
-			},
-			error: function(xhr, status, error) {
-				var msg = $.parseJSON(xhr.responseText);
-				$('.message').html(msg);
-			}
-		});
-	} else {
-		window.location = doc_url;
-	}
+        $.ajax({
+            url: doc_url,
+            dataType: 'json',
+
+            beforeSend : function(){
+                $('.observations_list').css({"opacity": 0.5});
+                $('#tags_section').css({"opacity": 0.5});
+            },
+            success: updateListPage(params["tag"]),
+            statusCode: {
+                401: function() {
+                    show_login_dialog();
+                }	    				    			
+            },
+            error: function(xhr, status, error) {
+                var msg = $.parseJSON(xhr.responseText);
+                $('.message').html(msg);
+            }
+        });
+        if(params.isMapView === "true" || params.bounds != undefined) {
+            updateMapView(params);
+        }
+    } else {
+        window.location = base+doc_url;
+    }
 }
-   
-        
-		
+ 
+var oldParams = {}
+function updateMapView (params, callback) {
+//    if($('#observations_list_map').is(':hidden')) {
+//        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
+//    }
+    var p = jQuery.extend({}, params);
+    delete p.bounds;
+    delete oldParams.bounds;
+    //console.log(JSON.stringify(oldParams));
+    //console.log(JSON.stringify(p));
+    if(isMapViewLoaded !== true) {
+        loadGoogleMapsAPI(function() {
+            initialize(document.getElementById("big_map_canvas"), false);
+            refreshMarkers(p);
+            refreshMapBounds();
+            oldParams = params;
+	    $('#big_map_canvas').trigger('maploaded');
+        })
+
+    } else {
+        //TODO:remove bounds before comparision
+        //order of params is important for this test to pass
+        if(JSON.stringify(oldParams) != JSON.stringify(p))
+            refreshMarkers(p);
+        refreshMapBounds();
+        oldParams = params;
+    }
+}
+
+function refreshMapBounds() {
+    var bounds = $('#bounds').val();
+    if(bounds) {
+        bounds = bounds.split(',');
+        if(bounds.length == 4) {
+            map.fitBounds([
+                    [bounds[0], bounds[1]],
+                    [bounds[2], bounds[3]]
+                    ]);
+        }
+    } else {
+        resetMap();
+    }
+}
+
 function showMapView() {
-	$('#observations_list_map').slideToggle(function() {
-
-		if ($(this).is(':hidden')) {
-			$('div.observations > div.observations_list').show();
-			$('#map_view_bttn').css('background-color', 'transparent');
-			$('#map_results_list > div.observations_list').remove();
-			updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
-			// alert(" hiding map view");
-			
-		} else {
-			$('div.observations > div.observations_list').hide();
-			$('div.observations > div.observations_list').html('');
-			// alert("showing map view");
-		}
-
-		google.maps.event.trigger(big_map, 'resize');
-		big_map.setCenter(nagpur_latlng);
-	});
+    updateMapView(getUpdateGalleryParams(undefined, undefined, 0, undefined, window.params.isGalleryUpdate));
 }
 
+function refreshList(bounds){
+    if (bounds !== undefined){
+        $("#bounds").val(bounds);
+    } else {
+        $("#bounds").val('');
+    }
+    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+}
 
+function mapViewSlideToggleHandler() {
+    if ($('#observations_list_map').is(':hidden')) {
+        $('div.observations > div.observations_list').show();
+        $('#map_view_bttn').css('background-color', 'transparent');
+        $('#map_results_list > div.observations_list').remove();
+        $("#isMapView").val("false");
+        $('#bounds').val('');
+    } else {
+        $('div.observations > div.observations_list').hide();
+        $('div.observations > div.observations_list').html('');
+        $("#isMapView").val("true");
+        showMapView();
+    }
+}
+
+function updateDistinctRecoTable(){
+	$('#distinctRecoTable tbody').empty();
+	var me = $('#distinctRecoTableAction');
+	$(me).show();
+	$(me).data('offset', 0);
+	$(me).click();
+}
+
+function load_content(params){
+    var marker = this
+    $.ajax({
+        url: window.params.snippetUrl+"/"+params.id,
+        success: function(data){
+            marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
+        }
+    });
+}
+
+function speciesHabitatInterestHandler(event){
+    if(!event.data.multiSelect) 
+        $(event.data.button_group).find('button.active').removeClass('active');
+    if($(this).hasClass('active')) {
+        $(this).removeClass('active');
+    } else {
+        $(this).addClass('active');
+    }
+    return false;
+}
+
+function intializesSpeciesHabitatInterest(multiSelect){
+    
+    multiSelect = typeof multiSelect !== 'undefined' ? multiSelect : true;
+
+    $('#speciesGroupFilter button').unbind('click');
+    $('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#speciesGroupFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);
+
+    $('#habitatFilter button').unbind('click');
+    $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#habitatFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);
+}
+
+function updateDownloadBox(instanceTotal){
+    if(instanceTotal > 0){
+        $('#download-box').show();
+    }else{
+        $('#download-box').hide();
+    }
+}
+	
+//
+//$(".observations_list .thumbnail").hover(function() {
+//	
+//	$("#postToUGroup").fadeToggle("fast");
+//})/
+
+$(document).ready(function(){
+    $(".snippet.tablet .figure").hover(function() {
+        $(this).children('.mouseover').toggle('slow')
+    });
+});
+
+function loadDistinctRecoList() {
+    var $me = $(this);
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    params['max'] = $(this).data('max');
+    params['offset'] = $(this).data('offset');
+    var $distinctRecoTable = $('#distinctRecoTable');
+    $.ajax({
+        url:window.params.observation.distinctRecoListUrl,
+        dataType: "json",
+        data:params,
+        success: function(data) {
+            $('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
+            if(data.status === 'success') {
+                $.each(data.distinctRecoList, function(index, item) {
+                    if(item[1])
+                    $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
+                    else
+                    $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
+                });
+                $me.data('offset', data.next);
+                if(!data.next){
+                    $me.hide();
+                }
+            } else {
+                $me.hide();
+            }
+        }
+    });
+}
+
+function loadSpeciesGroupCount() {
+    var $me = $(this);
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    $.ajax({
+        url:window.params.observation.speciesGroupCountListUrl,
+        dataType: "json",
+        data:params,
+        success: function(data) {
+            if(data.status === 'success') {
+                if(data.speciesGroupCountList) {
+                    loadGoogleVisualizationAPI(function(){
+                        var visualization_data = new google.visualization.DataTable();
+                        $.each(data.speciesGroupCountList.columns, function(index, item) {
+                            visualization_data.addColumn( item[0], item[1]);
+                        });
+
+                        $.each(data.speciesGroupCountList.data, function(index, item) {
+                            visualization_data.addRow(item);
+                        });
+
+                        var columnChart = new google.visualization.ColumnChart(
+                            document.getElementById('speciesGroupCountList'));
+
+                        columnChart.draw(visualization_data,  {
+                            title:"No of observations per species group",
+                            vAxis:{minValue:0, maxValue:5, format: '#'},
+                            legend:{position: 'bottom'},
+                            chartArea:{width:'80%'}
+                        });
+                    })
+                } else {
+                    $("#speciesGroupCountList").html('<div id="relatedObservationMsg_a" class="alert alert-info" style="">No data!!</div>');
+                }
+            } else {
+                $("#speciesGroupCountList").html('<div class="alert alert-error">'+data.msg+'</div>');
+            }
+        }
+    });
+}
+    

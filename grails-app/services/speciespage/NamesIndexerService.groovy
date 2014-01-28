@@ -6,6 +6,7 @@ import java.util.List
 
 import org.apache.commons.logging.LogFactory
 import org.apache.lucene.analysis.Analyzer
+import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.analysis.shingle.ShingleAnalyzerWrapper
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute
@@ -41,8 +42,9 @@ class NamesIndexerService {
 
 		setDirty(false);
 
-		def analyzer = new ShingleAnalyzerWrapper(Version.LUCENE_CURRENT, 2, 15)
-		analyzer.setOutputUnigrams(true);
+		def a = new StandardAnalyzer(Version.LUCENE_CURRENT)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, ' ', true, true)
+		//analyzer.setOutputUnigrams(true);
 
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
@@ -78,8 +80,10 @@ class NamesIndexerService {
 	 * @return
 	 */
 	boolean add(Recommendation reco) {
-		def analyzer = new ShingleAnalyzerWrapper(Version.LUCENE_CURRENT, 2, 15)
-		analyzer.setOutputUnigrams(true);
+		def a = new StandardAnalyzer(Version.LUCENE_CURRENT)
+		/* setOutputUnigrams(boolean outputUnigrams) is deprecated....Confgure outputUnigrams during construction as shown below.*/
+		//def analyzer = new ShingleAnalyzerWrapper(Analyzer, minShingleSize, maxShingleSize, tokenSeprator, outputUnigram, outputUnigramsIfNoShingles)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true)
 		return add(reco, analyzer, lookup);
 	}
 
@@ -105,9 +109,9 @@ class NamesIndexerService {
 		def icon = getSpeciesIconPath(species);
 		//log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
+		tokenStream.reset()
 		OffsetAttribute offsetAttribute = tokenStream.getAttribute(OffsetAttribute.class);
 		CharTermAttribute charTermAttribute = tokenStream.getAttribute(CharTermAttribute.class);
-
 		def wt = 0;
 		while (tokenStream.incrementToken()) {
 			int startOffset = offsetAttribute.startOffset();
@@ -193,7 +197,7 @@ class NamesIndexerService {
 		log.info "Suggest name using params : "+params
 		def result = new ArrayList();
 		if(params.term) {
-			int max = params.max ?: 10;
+			int max = params.max ?: 5;
 			List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, max, params.nameFilter);
 			result = getFormattedResult(lookupResults,  params.term)
 		}

@@ -8,8 +8,7 @@
     <head>
         <g:set var="title" value="Species"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-
-        <r:require modules="add_file, species_upload" />
+        <r:require modules="species_upload" />
         <uploader:head />
     </head>
     <body>
@@ -34,8 +33,8 @@
                                     </div>
                                 </div>
                             </div>
-                            %{--
-                            <div
+                    
+                            <!--div
                                 class="control-group">
                                 <label class="control-label span2" for="mappingFile"> Mapping File</label>
                                 <div class="controls span9" style="">
@@ -44,8 +43,8 @@
                                     <div class="help-inline">
                                     </div>
                                 </div>
-                            </div>
-                            --}%
+                            </div-->
+
                             <div
                                 class="control-group">
                                 <label class="control-label span2" for="imagesDir"> Images Url</label>
@@ -66,15 +65,10 @@
                                     <sUser:selectUsers model="['id':contributor_autofillUsersId]" />
                                     <input type="hidden" name="contributorIds" id="contributorIds" />
                                 </div>
-                                </div-->
-                            </div>
+                            </div-->
                         </div>
-
-
-
-
-
-                        <div class="section" style="margin-top: 20px; margin-bottom: 40px;clear:both;">
+                    </div>
+                    <div class="section" style="margin-top: 20px; margin-bottom: 40px;clear:both;">
 
                         <a href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
                             style="float: right; margin-right: 5px;"> Cancel </a>
@@ -123,34 +117,36 @@
                         style="float: right; margin: 5px;display:none;">Validate Names</a>
 
                 </div>
-
+                %{--
+                <table id="tableHeader" border="1">
+                    <tr>
+                        <td class="columnName">S_No</td>
+                        <td class="dataColCell" ><input class="dataColumns"></td>
+                        <td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td>
+                        <td class="headerFlagCell"><input type="checkbox" class="headeFlag" name = "header" value = "headerFlag"></td>
+                        <td><input type="radio" class="groupRadio" name="group" value="G1">G1<input type="radio" class="groupRadio" name="group" value="G2">G2<input type="radio" name="group" value="G3">G3</td>
+                        <td><input type="text" class="delimiter"></td>
+                    </tr>
+                
+                    <tr>
+                        <td>Scien_Name</td>
+                        <td><input class="tagsInput"></td>
+                        <td> <input type="checkbox" name = "merge" value = "mergeFlag"></td>
+                    </tr>
+                    --}%
+                </table>            
                 <div id="tagHeaders" style="display:none;">
-                    <select id="headerOptions" onchange = "updateMetadataValues(this.value)">
-
-                    </select>
-                    <form id = "dataColumns" action="">
-                        Data Columns : 
-                    </form>
-
-                    <form id= "headerFlag">
-                        Header : 
-                        <input type="checkbox" name = "header" value = "headerFlag"><br>
-                    </form>
-
-                    <form id = "groupRadio">
-                        Group : 
-                        <input type="radio" name="group" value="G1">G1
-                        <input type="radio" name="group" value="G2">G2
-                        <input type="radio" name="group" value="G3">G3<br>
-                    </form>
-                    
-                    <form id= "mergeFlag">
-                        Merge : 
-                        <input type="checkbox" name = "merge" value = "mergeFlag"><br>
-                    </form>
+                    <table id="tableHeader" border="1">
+                        <th>Column_Name</th>
+                        <th>Data_Columns</th>
+                        <th>Header</th>
+                        <th>Merge</th>
+                        <th>Group</th>
+                        <th>Delimiter</th>
+                    </table>
 
 
-                    <button id="tagHeadersButton">Mark this Header</button>
+                    %{-- <button id="tagHeadersButton">Mark this Header</button> --}%
                     <button id="downloadModifiedSpecies">Download</button>
                 </div>
 
@@ -162,15 +158,14 @@
                     <input type="text" value="">
                 </div>
 
-
                 <div id="saveModifiedUrl" style="display:none;">
                     <input type="text" value="">
-                </div>
-
+                </div> 
                 <form id="downloadSpeciesFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
                     <input type="text" name="downloadFile" value="">
                     <input type="submit" value="Submit">
                 </form>
+
 
                 <div id="uploadConsole">
 
@@ -188,7 +183,7 @@
                 //$('#contributorIds').val(contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
                 $('#uploadSpeciesForm').submit();
             });
-            
+                    
        });
         </r:script>
     </html>

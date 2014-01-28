@@ -1,5 +1,4 @@
 <%@ page import="org.grails.taggable.Tag"%>
-<%@ page import="species.participation.Observation"%>
 <div class="view_tags">
 	<g:if test="${tags}">
 		<ul class="tagit">
@@ -13,12 +12,13 @@
 	<g:else>
 		<span class="msg" style="padding-left: 50px;">No tags</span>
 	</g:else>
+	
 <g:javascript>
 	$(document).ready(function() {
 		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
 			 $("li.tagit-choice").click(function(){
 			 	var tg = $(this).contents().first().text();
-	         	window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	         	window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
 	         });
          }
 	})

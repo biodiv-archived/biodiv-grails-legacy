@@ -15,7 +15,6 @@ import java.net.URL;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-
 import static org.codehaus.groovy.grails.commons.ConfigurationHolder.config as Config
 import org.springframework.http.HttpStatus
 import uk.co.desirableobjects.ajaxuploader.exception.FileUploadException
@@ -28,7 +27,6 @@ import grails.util.GrailsNameUtils
 import grails.plugins.springsecurity.Secured
 import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
-
  
 import speciespage.ObservationService
 import species.utils.Utils
@@ -338,7 +336,7 @@ class UFileController {
     public Map getHeaderMetaData(File uploaded) {
         def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
         def sheetContent
-        int numAttributes = 4
+        int numAttributes = 5
         def res = [:]
         if(completeContent.size() == 3 ){
             sheetContent = completeContent.get(2)
@@ -409,8 +407,6 @@ class UFileController {
         res.put("relPath" , relPath)
         res.put("url" , url)
         return res
-
-
     }
 
     private String fileExtension(String fileName) {

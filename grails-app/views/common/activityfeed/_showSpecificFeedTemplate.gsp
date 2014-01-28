@@ -1,18 +1,20 @@
 <%@page import="species.utils.ImageType"%>
-<div class="yj-message-container">
-	<div class="yj-avatar">
-		<g:link controller="SUser" action="show"
-			id="${feedInstance.author.id}">
-			<img class="small_profile_pic"
-				src="${feedInstance.author.icon(ImageType.SMALL)}"
-				title="${feedInstance.author.name}" />
-		</g:link>
+<%@page import="species.participation.ActivityFeedService"%>
+<g:if test="${feedInstance.activityType == ActivityFeedService.COMMENT_ADDED}">
+	<comment:showCommentWithReply model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
+</g:if>
+<g:else>
+	<div class="yj-message-container">
+		<div class="yj-avatar">
+			<a href="${uGroup.createLink(controller:'SUser', action:'show', id:feedInstance.author.id, userGroup:feedInstance.fetchUserGroup(), 'userGroupWebaddress':feedInstance.fetchUserGroup()?.webaddress)}">
+				<img class="small_profile_pic"
+					src="${feedInstance.author.profilePicture(ImageType.SMALL)}"
+					title="${feedInstance.author.name}" />
+			</a>
+		</div>
+		<feed:showActivity model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
+		<div>
+			<time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
+		</div>
 	</div>
-	<b> ${feedInstance.author.name} :<span class="yj-context"> ${feedInstance.activityType}</span></b>
-	<feed:showActivity model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
-<%--	<div class="yj-attributes timestamp" style="clear:both;">--%>
-<%--		<input type="hidden" name='creationTime' value="${feedInstance.lastUpdated.getTime()}"/>--%>
-<%--		<span></span>--%>
-<%--	</div>--%>
-	 <time class="timeago" datetime="${feedInstance.getDate()}"></time>
-</div>
+</g:else>

@@ -1,29 +1,40 @@
+<%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
-<%def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null%>
+<%
+def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
+def controller = observationInstance.isChecklist ? 'checklist' :'observation'
+def obvId = observationInstance.id
+%>
+<g:if test="${observationInstance}">
+    <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+</g:if>
 
-<div class="snippet span8">
-	<div class="row">
-		<div class="figure span3 observation_story_image" style="display: table;" 
-			title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
+<div class="snippet">
+    <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? 'Featured':''}">
+            </span>
+    <div class="figure pull-left observation_story_image" 
+            title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
+            <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
+            >
+                    <div style="position:relative;margin:auto;">
+                    <g:if
+                            test="${imagePath}">
+                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
+                                    src="${imagePath}"
+                                    />
+                    </g:if>
+                    <g:else>
+                            <img class="galleryImage img-polaroid"
+                                    src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+                                    title="You can contribute!!!" />
+                    </g:else>
+                        <g:if test="${observationInstance.isChecklist}">
+                        <div class="checklistCount">${observationInstance.speciesCount}</div>
+                        </g:if>
+                    </div>
 
-			<g:link action="show" controller="observation"
-				id="${observationInstance.id}"  params="['pos':pos]" name="l${pos}">
-				<g:if
-					test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
-					<img
-						src="${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath)}"
-						/>
-				</g:if>
-				<g:else>
-					<img class="galleryImage"
-						src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-						title="You can contribute!!!" />
-				</g:else>
-			</g:link>
+            </g:link>
 
-		</div>
-		<div class="span5 observation_story_wrapper">
-			<obv:showStory model="['observationInstance':observationInstance]"></obv:showStory>
-		</div>
-	</div>
+    </div>
+    <obv:showStory model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:showDetails, showFeatured:showFeatured]"></obv:showStory>
 </div>

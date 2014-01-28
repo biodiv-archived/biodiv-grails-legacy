@@ -84,28 +84,32 @@
     TimeAgo.prototype.timeAgoInWords = function(timeString) {
       var absolutTime;
       absolutTime = this.parse(timeString);
-      return "" + this.options.lang.prefixes.ago + (this.distanceOfTimeInWords(absolutTime)) + this.options.lang.suffix;
+      var diffTime = this.getTimeDistanceInMinutes(absolutTime);
+      
+      if((diffTime > 60*24) && !this.options.alwaysRelativeTime){
+    	  return absolutTime.toString("MMMM  d, yyyy");
+      }
+      return "" + this.options.lang.prefixes.ago + (this.distanceOfTimeInWords(diffTime)) + this.options.lang.suffix;
     };
 
     TimeAgo.prototype.parse = function(iso8601) {
       var timeStr;
       timeStr = $.trim(iso8601);
-      timeStr = timeStr.replace(/\.\d\d\d+/, "");
-      timeStr = timeStr.replace(/-/, "/").replace(/-/, "/");
-      timeStr = timeStr.replace(/T/, " ").replace(/Z/, " UTC");
-      timeStr = timeStr.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2");
-      return new Date(timeStr);
+//      timeStr = timeStr.replace(/\.\d\d\d+/, "");
+//      timeStr = timeStr.replace(/-/, "/").replace(/-/, "/");
+//      timeStr = timeStr.replace(/T/, " ").replace(/Z/, " UTC");
+//      timeStr = timeStr.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2");
+      return new Date(parseInt(timeStr));
     };
 
     TimeAgo.prototype.getTimeDistanceInMinutes = function(absolutTime) {
       var timeDistance;
-      timeDistance = new Date().getTime() - absolutTime.getTime();
+      timeDistance = new Date().getTime() - absolutTime.getTime() + this.options.serverTimeDiff;
       return Math.round((Math.abs(timeDistance) / 1000) / 60);
     };
 
-    TimeAgo.prototype.distanceOfTimeInWords = function(absolutTime) {
+    TimeAgo.prototype.distanceOfTimeInWords = function(dim) {
       var dim;
-      dim = this.getTimeDistanceInMinutes(absolutTime);
       if (dim === 0) {
         return "" + this.options.lang.prefixes.lt + " " + this.options.lang.units.minute;
       } else if (dim === 1) {

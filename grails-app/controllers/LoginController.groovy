@@ -15,6 +15,10 @@ import org.springframework.security.web.authentication.AbstractAuthenticationTar
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import species.utils.Utils;
+
+import species.auth.DefaultAjaxAwareRedirectStrategy;
 
 class LoginController {
 
@@ -38,7 +42,8 @@ class LoginController {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 		}
 		else {
-			redirect action: 'auth', params: params
+			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
+			//redirect action: 'auth', params: params
 		}
 	}
 
@@ -59,17 +64,23 @@ class LoginController {
 
 	def authSuccess = {
 		if(params.uid) {
-			def target = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
-			if (StringUtils.hasText(target)) {
-				log.debug "Redirecting to target : $target";
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, target);
+			def targetUrl = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
+			if (StringUtils.hasText(targetUrl)) {
+				try {
+					targetUrl = URLDecoder.decode(targetUrl, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+				}
+				
+				log.debug "Redirecting to target : $targetUrl";
+				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, targetUrl);
 				return;
 			}
 
 			def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 			log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
 			if(defaultSavedRequest) {
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 				return
 			} else {
 				redirect uri:"/";
@@ -93,7 +104,8 @@ class LoginController {
 		if (springSecurityService.isLoggedIn() &&
 		authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
 			// have cookie but the page is guarded with IS_AUTHENTICATED_FULLY
-			redirect action: 'full', params: params
+			//redirect action: 'full', params: params
+			redirect url:uGroup.createLink(action:'full', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
 		}
 	}
 
@@ -115,6 +127,8 @@ class LoginController {
 		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]
 		String msg = ''
 		def exception = session[WebAttributes.AUTHENTICATION_EXCEPTION]
+		log.debug exception
+
 		if (exception) {
 			if (exception instanceof AccountExpiredException) {
 				msg = g.message(code: "springSecurity.errors.login.expired")
@@ -126,19 +140,27 @@ class LoginController {
 				msg = g.message(code: "springSecurity.errors.login.disabled")
 			}
 			else if (exception instanceof LockedException) {
-				msg = g.message(code: "springSecurity.errors.login.locked")
+				//check if the email has been verified and give option to resend the email
+				def registerationCode = RegistrationCode.findAllByUsername(username.decodeHTML()) 
+				if(registerationCode) {
+					def url = Utils.getDomainServerUrl(request) + "/register/resend"	
+					msg = g.message(code: "You have not verified your email yet! <a href=\"${url}\">Resend Verification Email</a>")
+				}else 
+					msg = g.message(code: "springSecurity.errors.login.locked")
 			}
 			else {
-				msg = g.message(code: "springSecurity.errors.login.fail")
+				msg = g.message(code: "springSecurity.errors.login.fail");
+                msg += " ("+exception.message+")"
 			}
 		}
-
-		if (springSecurityService.isAjax(request)) {
+		
+        if (springSecurityService.isAjax(request)) {
 			render([error: msg] as JSON)
 		}
 		else {
 			flash.error = msg
-			redirect action: 'auth', params: params
+			//redirect action: 'auth', params: params
+			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
 		}
 	}
 
@@ -183,7 +205,8 @@ class LoginController {
 			response.setHeader 'Location', request.getHeader('referer')
 			response.sendError HttpServletResponse.SC_UNAUTHORIZED
 		} else {
-			redirect (action:'auth');
+			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress)
+			//redirect (action:'auth');
 		}
 	}
 }

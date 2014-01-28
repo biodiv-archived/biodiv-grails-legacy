@@ -1,269 +1,265 @@
 <%@page import="species.participation.Observation"%>
 <%@ page import="species.auth.SUser"%>
 <%@ page import="species.utils.Utils"%>
+<%@page import="species.participation.DownloadLog"%>
+<%@page import="species.participation.ActivityFeedService"%>
+<%@page import="species.utils.ImageType"%>
+<%@page import="species.Resource.ResourceType"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<r:require modules="observations_show"/>
+
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'show', id:user.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${user.name}"/>
+<%def imagePath = user.profilePicture();%>
+<g:set var="description" value="${Utils.stripHTML(user.aboutMe)?:'' }" />
+
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
+
+
+<r:require modules="observations_show,chart" />
+<gvisualization:apiImport />
 <g:set var="entityName"
 	value="${message(code: 'SUser.label', default: 'SUser')}" />
-<title><g:message code="default.show.label" args="[entityName]" />
-</title>
 
 <style>
 .prop .name {
-	clear:both;
+	clear: both;
 }
-	</style>
+.super-section  {
+    background-color:white;
+}
+.thumbnail .observation_story {
+    width: 715px;
+}
+</style>
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="span12">
-				<div class="page-header">
+	<div class="span12">
+		<div class="page-header clearfix">
+			<div style="width: 100%;">
+				<div class="span8 main_heading" style="margin-left: 0px;">
+					<h1>
+						${fieldValue(bean: user, field: "name")}
+					</h1>
+				</div>
 
-				<h1>
-					${fieldValue(bean: user, field: "name")}
+				<div style="float: right; margin: 10px 0;">
 					<sUser:ifOwns model="['user':user]">
-						<span style="font-size: 60%; float: right;" class="btn btn-primary"> <g:link
-								controller="SUser" action="edit" id="${user.id }">Edit Profile
-							</g:link> </span>
+
+						<a class="btn btn-info pull-right"
+							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
+							class="icon-edit"></i>Edit Profile </a>
 					</sUser:ifOwns>
-				</h1>
-
 				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-<%--				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
-				<div class="super-section">
-					<div class="row section" style="">
-						<div class="figure span3"
-							style="float: left; max-height: 220px; max-width: 200px">
-							<g:link controller="SUser" action="show"
-								id="${user.id }">
-								<img class="normal_profile_pic" src="${user.icon()}" />
-							</g:link>
-
-							<%--						<div class="prop">--%>
-							<%--							<span class="name">Member since </span> <span class="value">--%>
-							<%--							<sUser:showDate --%>
-							<%--								model="['SUserInstance':user, 'propertyName':'dateCreated']" />--%>
-							<%--							</span>--%>
-							<%--						</div>--%>
-							<%----%>
-							<%----%>
-							<%--						<div class="prop">--%>
-							<%--							<span class="name">Last visited </span> <span class="value">--%>
-							<%--							<sUser:showDate --%>
-							<%--								model="['SUserInstance':user, 'propertyName':'lastLoginDate']" />--%>
-							<%--							</span>--%>
-							<%--						</div>--%>
-							<%--					--%>
-
-							<div class="prop">
-								<span class="name"><i class="icon-time"></i>Member since </span> <div class="value">
-									<g:formatDate format="dd/MM/yyyy"
-										date="${user.dateCreated}" type="datetime"
-										style="MEDIUM" /> </div>
-							</div>
-							<div class="prop">
-								<span class="name"><i class="icon-time"></i>Last visited </span> <div class="value">
-									<g:formatDate format="dd/MM/yyyy"
-										date="${user.lastLoginDate}" type="datetime"
-										style="MEDIUM" /> </div>
-							</div>
-						</div>
-
-					
-
-					<div class="span8 observation_story">
-
-						<div class="prop">
-							<span class="name"><i class="icon-user"></i><g:message code="suser.username.label"
-									default="Username" /> </span> <div class="value"> ${fieldValue(bean: user, field: "username")}
-							</div>
-						</div>
-
-						<sUser:ifOwnsOrIsPublic model="['user':user, 'isPublic':!user.hideEmailId]">
-							<div class="prop">
-								<span class="name"><i class="icon-envelope"></i><g:message code="suser.email.label"
-										default="Email" /> </span> <div class="value"> <a
-									href="mailto:${fieldValue(bean: user, field: 'email')}">
-										${fieldValue(bean: user, field: "email")} </a> </div>
-
-							</div>
-						</sUser:ifOwnsOrIsPublic>
-
-						<g:if test="${user.location}">
-							<div class="prop">
-								<span class="name"><i class="icon-map-marker"></i><g:message code="suser.location.label"
-										default="Location" /> </span> <div class="value"> ${fieldValue(bean: user, field: "location")}
-								</div>
-							</div>
-						</g:if>
-						
-						<div class="prop">
-							<span class="name"><i class="icon-road"></i><g:message code="suser.website.label"
-									default="Website" /> </span> 
-								<div class="value"> 
-									<g:if test="${Utils.isURL(user.website) }">
-										<a target="_blank" href="${user.getWebsiteLink()}">
-										${fieldValue(bean: user, field: 'website')} </a>
-									</g:if>
-									<g:else>
-										${fieldValue(bean: user, field: 'website')}
-									</g:else>							
-									<% def openId = user.openIds.find { it.url.indexOf('facebook') != -1 }
-									def facebookUrl = openId?.url %>
-									<g:if test="${facebookUrl}">
-										 <div class="facebookButton" style="background-repeat:no-repeat; margin:0px;height:33px;"> 
-													<a class="fbJustConnect"
-												target="_blank" 
-												href="${facebookUrl}">Facebook Profile</a>
-										</div>
-									</g:if>
-									
-								</div>
-								
-								
-									
-						</div>
-						
-						
-					</div>
-				
-				</div>
-
-				
-				<g:if test="${user.aboutMe}">
-					<div class="section">
-						<h5><i class="icon-user"></i>About Me</h5>
-						${user.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
-					</div>
-				</g:if>
-
-<%--				<g:if test="${user.openIds}">--%>
-<%--					<div class="section" style="clear: both;">--%>
-<%--						<h5>--%>
-<%--							<span class="name" style="color: #b1b1b1;"><i class="icon-gift"></i>${user.openIds?.size()}</span>--%>
-<%--							External Provider Identification<g:if test="${user.openIds?.size()>1}">s</g:if>--%>
-<%--						</h5>--%>
-<%--						<g:each in="${user.openIds}" var="openId">--%>
-<%--							<g:if test="${openId.url.indexOf('facebook') != -1}">--%>
-<%--								<a href="${openId.url}" target="blank">Facebook</a>--%>
-<%--							</g:if>--%>
-<%--							<g:elseif test="${openId.url.indexOf('google') != -1 }">--%>
-<%--								<a href="${openId.url}" target="blank">Google</a>--%>
-<%--							</g:elseif>--%>
-<%--							<g:elseif test="${openId.url.indexOf('yahoo')  != -1}">--%>
-<%--								<a href="${openId.url}" target="blank">Yahoo</a>--%>
-<%--							</g:elseif>--%>
-<%--							<g:else>--%>
-<%--								<a href="${openId.url}" target="blank">openId.url</a>--%>
-<%--							</g:else>--%>
-<%--						</g:each>--%>
-<%--					</div>--%>
-<%----%>
-<%--				</g:if>--%>
-
-				<div class="section" style="clear: both;">
-					<h5>
-						<span class="name" style="color: #b1b1b1;">
-						<i class="icon-screenshot"></i><obv:showNoOfObservationsOfUser model="['user':user]"/></i>
-						</span> 	Observations
-					</h5>
-					<obv:showRelatedStory
-						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a']" />
-				</div>
-
-				<div class="section" style="clear: both;">
-					<h5>
-						<span class="name" style="color: #b1b1b1;">
-						<i class="icon-check"></i><obv:showNoOfRecommendationsOfUser model="['user':user]"/></i>
-						</span> 	Identifications
-					</h5>
-					<div>
-						<ul id="recoSummary" class="pollBars">
-							
-						</ul>
-						<div id="seeMoreMessage" class="message"></div>
-						<div id="seeMore" class="btn btn-mini observation_links">Show all</div>
-					</div>
-					
-					
-				</div>
-
-							
-			</div>
 			</div>
 		</div>
+		<div style="clear: both;"></div>
 
 
+		<%--				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
+		<div>
+			<div class="row section" style="">
+				<div class="figure span3"
+					style="float: left; max-height: 220px; max-width: 220px; font-size: 75%;">
+					<a
+						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
+					<div class="prop">
+						<span class="name"><i class="icon-time"></i>Member since </span>
+						<div class="value">
+							<g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"
+								type="datetime" style="MEDIUM" />
+						</div>
+					</div>
+					<g:if test="${user.lastLoginDate}">
+						<div class="prop">
+							<span class="name"><i class="icon-time"></i>Last visited </span>
+							<div class="value">
+								
+									<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
+										type="datetime" style="MEDIUM" />
+							
+							</div>
+						</div>
+					</g:if>
+				</div>
+                                <div style="width:660px;float:left;">
+                                    <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+                                </div>
+				
+			</div>
+			<%
+				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
+			%>
+
+                        <div id="userprofilenavbar" class="navbar">
+                            <!--data-spy="affix affix-top" data-offset-top="10px" style="z-index:10000"-->
+                            <div class="navbar-inner">
+                                <ul class="nav">
+
+                                    <li><a href="#aboutMe"><i class="icon-user"></i>About Me</a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-book"></i> Content
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#observations"><i class="icon-screenshot"></i>Observations</a></li>
+                                                <li><a href="#identifications"><i class="icon-eye-open"></i>Identifications</a></li>
+                                                <li><a href="#downloads"><i class="icon-download"></i>Downloads</a></li>
+                                            </ul>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#groups"><i class="icon-group"></i>Groups</a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="container">
+                            <div id="aboutMe" class="super-section" style="overflow:hidden;padding-bottom:10px;">
+                                <h5>
+                                    <i class="icon-user"></i>About Me
+                			<sUser:ifOwns model="['user':user]">
+
+						<a class="btn btn-link"
+							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
+							class="icon-edit"></i>Edit </a>
+					</sUser:ifOwns>
+                                </h5>
+                                <div class="section" style="clear:both;margin-left:20px;">
+                                    <g:if test="${user.aboutMe}">
+                                        ${user.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
+                                        </g:if>
+                                </div>
+
+                                <div class="section" style="clear:both;margin-left:20px;">
+                                    <h6>
+                                        Interested in Species Groups &amp; Habitats
+                                    </h6>
+                                    <sUser:interestedSpeciesGroups model="['userInstance':user]" />
+                                    <div style="padding:3px;"></div>
+                                    <sUser:interestedHabitats model="['userInstance':user]" />
+                                </div>
+                               <div id="observations_list_map" class="section observation span6"
+                                    style="margin:0px;margin-left:20px;">
+                                    <h6>
+                                        Observations Spread
+                                    </h6>
+        			    <obv:showObservationsLocation
+						model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:460, height:400]">
+				    </obv:showObservationsLocation>
+                                </div>
+                                <div id="expertice" class="section span6" style="margin:0px;margin-left:20px;width:420px;">
+                                         <chart:showStats model="['title':'Observations by Species Group', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/>
+	                        </div>
+ 
+                            </div>
+
+                            <div id="content" class="super-section" style="clear: both;">
+                                <h5>
+                                    <span class="name" style="color: #b1b1b1;"> <i
+                                            class="icon-book"></i>
+                                    </span> Content
+                                </h5>
+                                <div id="observations" class="section" style="clear:both;margin-left:20px;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"> 
+                                            <obv:showNoOfObservationsOfUser
+                                            model="['user':user]" /> </span> Observations
+                 			<sUser:ifOwns model="['user':user]">
+						<a class="btn btn-link"
+							href="${uGroup.createLink(action:'create', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Add Observation</a>
+					</sUser:ifOwns>
+
+                                    </h6>
+                                    
+                                    <obv:showRelatedStory
+                                    model="['controller':'observation', 'action':'related', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroupInstance':userGroupInstance]" />
+                                </div>
+                                <div id="identifications" class="section" style="clear:both;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"> 
+                                            <obv:showNoOfRecommendationsOfUser model="['user':user]" /> </span>
+                                        Identifications
+                 			<sUser:ifOwns model="['user':user]">
+						<a class="btn btn-link"
+							href="${uGroup.createLink(action:'list', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-list"></i>Browse Observations</a>
+					</sUser:ifOwns>
+
+                                    </h6>
+                                    <obv:showRelatedStory
+                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
+
+                                </div>
+                                
+                                <g:if test="${!downloadLogList.isEmpty()}">
+                                <div id="downloads" class="section" style="clear: both;overflow:auto;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"></span> Downloads
+                                    </h6>
+                                    <obv:downloadTable model="[downloadLogList:downloadLogList]" />
+                                </div>
+                                </g:if>
+                            </div>
+			<div id="groups" class="super-section" style="clear: both;">
+				<h5>
+					<span class="name" style="color: #b1b1b1;"> <i
+						class="icon-group"></i></span> Groups
+                 			<sUser:ifOwns model="['user':user]">
+						<a class="btn btn-link"
+							href="${uGroup.createLink(action:'list', controller:'userGroup', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Join Groups</a>
+					</sUser:ifOwns>
+
+				</h5>
+				<uGroup:showUserUserGroups model="['userInstance':user]"></uGroup:showUserUserGroups>
+
+			</div>
+			<%--			</div>--%>
+			<div id="activity" class="super-section" style="clear: both;">
+				<h5>
+					<span class="name" style="color: #b1b1b1;"> <i
+                                                class="icon-tasks"></i> </span>Activity
+                                        </h5>
+                                        <feed:showAllActivityFeeds model="['user':user?.id, feedType:ActivityFeedService.USER, 'feedPermission':false, 'feedOrder':ActivityFeedService.LATEST_FIRST]" />
+                        </div>
+
+                        </div>
+                    
+		</div>
 	</div>
-	
-	
-	
-<r:script>
+
+
+
+	<r:script>
 	var userRecoffset = 0;
-    $(document).ready(function() {
+        $(document).ready(function() {
+            updateMapView({'user':'${user?.id}'});
 		$("#seeMoreMessage").hide();
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
-			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+			window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
 	    	return false;
 	 	});
-	 	
-      	var max =  3;
-         $("#seeMore").click(function() {   
-         	preLoadRecos(max, true);
-         	userRecoffset = max + userRecoffset;
-		 });
-         
-         preLoadRecos(max, true);
-         userRecoffset = max + userRecoffset;
+            var max = 3;
+	    $("#seeMore").click(function(){
+                preLoadRecos(max, userRecoffset, true);
+                userRecoffset = max + userRecoffset;
+            });
+
+            preLoadRecos(max, userRecoffset, false);
+            userRecoffset = max + userRecoffset;
+            $('.linktext').linkify();
+            //$('#userprofilenavbar').affix();
 	});
-	   function preLoadRecos(max, seeAllClicked, obvId, liComponent){
-         	$("#seeMoreMessage").hide();        	
-         	$.ajax({
-         		url: "${createLink(action:'getRecommendationVotes', id:user.id) }",
-				method: "POST",
-				dataType: "json",
-				data: {max:max , offset:userRecoffset, obvId:obvId},	
-				success: function(data) {
-					if(seeAllClicked){
-						$("#recoSummary").append(data.recoHtml);
-						var uniqueVotes = parseInt(data.uniqueVotes);
-						if(uniqueVotes < 3){
-							$("#seeMore").hide();
-						} else {
-							$("#seeMore").show();
-						}
-					}else{
-						$(liComponent).replaceWith(data.recoHtml)
-					}
-					
-				}, error: function(xhr, status, error) {
-	    			handleError(xhr, status, error, undefined, function() {
-		    			var msg = $.parseJSON(xhr.responseText);
-		    			if(msg.info) {
-		    				showRecoUpdateStatus(msg.info, 'info');
-		    			}else if(msg.success){
-		    				showRecoUpdateStatus(msg.success, 'success');
-						} else {
-							showRecoUpdateStatus(msg.error, 'error');
-						}
-					});
-			   	}
-			});
-         }
-	
-         
-</r:script>	
+</r:script>
+<g:javascript>
+$(document).ready(function(){
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'SUser', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
+    window.params.observation.listUrl = "${uGroup.createLink(controller:'observation', action: 'listJSON')}"
+});
+</g:javascript>
 </body>
 
 </html>

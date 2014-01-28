@@ -1,98 +1,88 @@
+<%@page import="species.utils.Utils"%>
+<%@page import="species.utils.ImageType"%>
+<%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
+<%@ page import="species.groups.UserGroup"%>
+<%@ page import="species.participation.ActivityFeedService"%>
 <script>
-<sec:ifLoggedIn>
-$(function(){
-$('.login-box').mouseover(function(){
-    $('.login-box-options').show();      
-    });
-    
-$('.login-box').mouseout(function(){
-    $('.login-box-options').hide();      
-});
-});
-</sec:ifLoggedIn>
+	<sec:ifLoggedIn>
+	$(function() {
+		$('.login-box').mouseover(function() {
+			$('.login-box-options').show();
+		});
+
+		$('.login-box').mouseout(function() {
+			$('.login-box-options').hide();
+		});
+	});
+	</sec:ifLoggedIn>
 </script>
-<style>
-.login-box {
-font-weight: normal;
-height: 80px;
-margin: 0;
-top: 0;
-width: 180px;
-float: right;       
-}
-<sec:ifLoggedIn>
-.login-box:hover {
-background-color: #ffffff;    
-box-shadow: 0 6px 8px -6px #5e5e5e;
-}
-</sec:ifLoggedIn>
-.login-box-options {
-float:right;
-right: 0;
-padding-right:10px;       
-padding-bottom:10px;       
-}
 
-.login-box img {
-max-height: 32px;
-min-height: 16px;
-max-width: 32px;       
-}
+<ul class="nav header_userInfo pull-right">
+	<sec:ifNotLoggedIn>
+		<li><a id="loginLink"
+			href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
+		</li>
+	</sec:ifNotLoggedIn>
+	<sec:ifLoggedIn>
+		<li><div class="login-box">
+				<sUser:renderProfileLink model="['hideDetails':true]"/>
+			</div></li>
+		<li class="dropdown"  style="height:32px;">
+		
+		<a href="#" class="dropdown-toggle"  style="height:30px;"
+			data-toggle="dropdown"> <%--			<i class="icon-home" title="Home"></i>--%>
+                        <i class="icon-cog icon-gray"></i>
+				 </a> <!--h5 class="nav-header">Home</h5-->
+			<ul class="dropdown-menu">
 
-.loginLink {
-margin: 0;
-position: relative;
-float: right;       
-}
-.register {
-float: right;
-margin-right: 10px;       
-}
-.user-icon {
-height: 32px;
-line-height: 32px;
-margin: 0 auto;
-text-align: center;
-width: 32px;
-}
-.figure {
-font-size: 80%;
-font-style: italic;
-position: relative !important;
-text-align: center;
-}
-.user_signature {
-height: 50px;
-padding-left: 5px;
-padding-top: 2px;
-text-align: left;
-width: 175px;
-}
-.story-footer .footer-item {
-float: left;
-margin-right: 10px;
-}
-.prop {
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
-</style>
-<div class="login-box">
-<div class="register">
-<sec:ifNotLoggedIn>
-            <g:link controller='login'>Login</g:link> | <g:link
-                controller='register'>Register</g:link>
-</sec:ifNotLoggedIn>
-</div>
 
-    <span class='loginLink'>
-            <sec:ifLoggedIn>
-                    <sUser:renderProfileLink />
-            </sec:ifLoggedIn> 
-    </span>
-    <div class="login-box-options" style="display:none;">
-        <sec:ifLoggedIn>
-            <a id="logout" href="${createLink(controller:'logout')}">Logout</a>
-        </sec:ifLoggedIn> 
-    </div>
-</div>
+				<li><a
+					href="${uGroup.createLink(controller:'activityFeed', absolute:'true', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.MY_FEEDS])}"><i
+						class="icon-home"></i>My Feed</a>
+				</li>
+
+				<li><a
+					href="${uGroup.createLink(controller:'user', absolute:'true', action:'show', id:sUser.renderCurrentUserId())}"><i
+						class="icon-user"></i>My Profile</a>
+				</li>
+
+				<li><a style="margin-right: 5px; display: inline-block;"
+					href="${uGroup.createLink(controller:'observation', absolute:'true', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
+						class="icon-screenshot"></i>My Observations</a> <!-- a class="pull-right" style="display:inline-block;"
+					href="${uGroup.createLink(controller:'observation', action:'create', absolute:'true')}"><i class="icon-plus"></i>
+				</a-->
+				</li>
+
+				<li><a
+					href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list', params:['user':sUser.renderCurrentUserId()])}"
+					title="Groups"><i
+						class="icon-user"></i>My Groups<sup>Beta</sup> </a> <uGroup:getCurrentUserUserGroupsSidebar />
+				</li>
+				<li><a id="logout"
+					href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><i
+						class="icon-off"></i>Logout</a></li>
+
+			</ul></li>
+
+
+	</sec:ifLoggedIn>
+</ul>
+
+<%--<div class="login-box">--%>
+<%--	<div class="register">--%>
+<%--		<sec:ifNotLoggedIn>--%>
+<%--			<g:link controller='login'>Login</g:link> | <g:link--%>
+<%--				controller='register'>Register</g:link>--%>
+<%--		</sec:ifNotLoggedIn>--%>
+<%--	</div>--%>
+<%----%>
+<%--	<span class='loginLink'> <sec:ifLoggedIn>--%>
+<%--			<sUser:renderProfileLink />--%>
+<%--		</sec:ifLoggedIn> </span>--%>
+<%--	<div class="login-box-options" style="display: none;">--%>
+<%--		<sec:ifLoggedIn>--%>
+<%--			<a id="logout" href="${createLink(controller:'logout')}">Logout</a>--%>
+<%--		</sec:ifLoggedIn>--%>
+<%--	</div>--%>
+<%--</div>--%>

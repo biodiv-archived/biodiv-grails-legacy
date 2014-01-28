@@ -1,0 +1,144 @@
+.btn-group.open .dropdown-menu {
+	top: 43px;
+}
+
+.group_option a {
+	text-align: left;
+	line-height:33px;
+}
+
+.btn-large .caret {
+	margin-top: 15px;
+	position: absolute;
+	right: 10px;
+}
+
+.btn-group .btn-large.dropdown-toggle {
+	width: 300px;
+	height:44px;
+	text-align: left;
+	line-height:33px;
+	padding:5px;
+}
+
+.textbox input{
+	text-align: left;
+	/*width: 290px;
+	height:34px;*/
+	padding:5px;
+}
+
+.form-horizontal .row {
+	margin-top: 15px;
+}
+
+.block {
+	border-radius: 5px;
+	background-color: #a6dfc8; 
+	margin: 0px;
+}
+
+.block label {
+	float: left; 
+	text-align: left; 
+	padding: 10px; 
+	width: auto;
+}
+
+.block small{
+    color: #444444;
+}
+
+#help-identify {
+	height: 0;
+    left: 139px;
+    padding: 0;
+    position: relative;
+    top: -25px;
+}
+
+.left-indent {
+	margin-left:100px;
+}
+
+.control-group.error  .help-inline {
+    padding-top : 15px;
+    font-size:14px;
+    display:block;
+}
+
+.cke_skin_kama .cke_editor {
+display: table !important;
+}
+
+input.dms_field {
+	width: 15%;
+	display: none;       
+}
+.btn .combobox-clear {
+    margin-top: 5px;
+}
+#ui-datepicker-div {
+	width: 16%;
+}
+
+.observation_create .super-section {
+	margin-left:0px;
+}
+.sidebar-section {
+	width: 450px;
+	margin: 0px 0px 20px -10px;
+	float: right;
+}
+.slick-header-menu {
+    border: 1px solid #718BB7;
+    background: #f0f0f0;
+    padding: 2px;
+    -moz-box-shadow: 2px 2px 2px silver;
+    -webkit-box-shadow: 2px 2px 2px silver;
+    min-width: 100px;
+    z-index: 20;
+}
+
+.slick-header-menubutton {
+    background-image: url(../../images/dropdown_active.gif);
+    display:visible;
+}
+
+.slick-header-menuitem {
+    padding: 2px 4px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+.slick-header-menuitem:hover {
+    border-color: silver;
+    background: white;
+}
+
+.slick-header-menuitem-disabled {
+    border-color: transparent !important;
+    background: inherit !important;
+}
+
+.slick-header-column > .slick-header-menubutton {
+    display:inline-block    
+}
+
+.slick-header-menuitem>.slick-header-menuicon.icon-check {
+    background-position:-144px -72px;
+}
+
+.icon-help {
+    background-image: url(../images/help.png);
+}
+.combobox-container .add-on {
+	right: -26px;
+}
+.slick-header-column>.slick-column-name {
+    width:90%;
+    display: initial;
+}
+.slick-cell.nameColumn a{
+    color:#0000FF;
+}

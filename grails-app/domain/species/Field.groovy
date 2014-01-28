@@ -7,6 +7,7 @@ class Field {
 	String subCategory;
 	String description;
 	int displayOrder;
+	String urlIdentifier
 	
 	static mapping = {
 		description type:'text';
@@ -19,5 +20,6 @@ class Field {
 		subCategory(nullable:true);
 		description(nullable:true);
 		description (blank : true);
+		urlIdentifier(blank : true, nullable:true);
     }
 }

@@ -1,53 +1,81 @@
+.activityfeed {
+	clear:both;
+}
+
 .activityfeed li {
-	margin-left: -9px;
+	margin-left: -22px;
 	list-style: none none;
 }
 
-.activityfeed a {
-    color: #16509E;
-    text-decoration: none;
+/* .activityfeed a { */
+/*     color: #16509E; */
+/*     text-decoration: none; */
+/* } */
+.activityfeed .feedParentContext table{
+	margin-left: 0px;
+	margin-bottom: -8px;
 }
-
-.activityfeedAll {
-	width:700px;
+.activityfeedAll, .activityfeedGeneric, .activityfeedMyFeeds,.activityfeedUser{
 	background-color:#ffffff;
 }
 
-.activityfeedGeneric {
-	width:700px;
-	background-color:#ffffff;
-}
-
-.activityfeedSpecific {
+.activityfeedSpecific, .activityfeedGroupSpecific{
 	clear:both;
 	background-color: rgba(106, 201, 162, 0.15);
 }
 
-.activityfeedSpecific .activityFeed-container {
+.activityfeedSpecific .activityFeed-container, .activityfeedGroupSpecific .activityFeed-container, .activityfeedAll .activityFeed-container, .activityfeedMyFeeds .activityFeed-container,.activityfeedUser .activityFeed-container  {
 	background-color: #e5e5e5;
 }
 
 .activityFeedContext {
 	clear:both;
 	margin-top:5px;
+	margin-left: 0px;
 }
 
-.feedParentContext {
+.activityfeedGroupSpecific .activityFeedContext, .activityfeedAll .activityFeedContext, .activityfeedMyFeeds .activityFeedContext{
 	background-color:#ffffff;
 }
+.feedParentContext {
+	background-color:#ffffff;
+	display:table;
+}
 
+.feedSubParentContext, .feedSubParentContext .yj-message-body pre {
+/* 	background-color:#99ff88; */
+	background-color:#E7F0FE;
+
+}
 .activityFeed-container{
     border-bottom: 1px solid #DDDDDD;
     margin: 0 0 2px;
     min-height: 20px;
     padding: 7px;
+    margin-right: 2px;
 }
 
-
-
-.activityfeed .feedActivityHolderContext{
+.activityfeed .feedActivityHolderContext {
 	background-color: #EBEBEB;
 	clear:both;
 }
 
+.timeago{
+    color: #666666;
+    display: inline;
+    line-height: 16px;
+    margin-bottom: 0;
+}
+
+.activityfeed .activiyfeednewermsg {
+	color: navy;
+	min-height: 30px;
+	font-size: 20px;
+}
+
+.activityfeed .activiyfeedNoMoreFeedmsg{
+	text-align: center;
+	color: darkred;
+	font-size: 16px;
+}
 

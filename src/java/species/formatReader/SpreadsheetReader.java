@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 
 import org.apache.commons.logging.Log;
@@ -65,7 +66,7 @@ public class SpreadsheetReader {
 		return null;
 	}
 
-	public static List<Map> readSpreadSheet(Workbook wb, int sheetNo,
+	private static List<Map> readSpreadSheet(Workbook wb, int sheetNo,
 			int headerRowNo) {
 		List<Map> content = new ArrayList<Map>();
 
@@ -88,20 +89,19 @@ public class SpreadsheetReader {
 		for (Row row : sheet) {
 			if (row.getRowNum() <= headerRowNo)
 				continue;
-			Map rowData = new HashMap();
+			Map rowData = new LinkedHashMap();
 			for (int i = 0; i < headerList.size(); i++) {
 				Map headerConfig = (Map) headerList.get(i);
 				String key = (String) headerConfig.get("name");
 				int index = Integer.parseInt((String) headerConfig
 						.get("position"));
-				String value = getCellText(row.getCell(index));
+				String value = getCellText(row.getCell(index, Row.CREATE_NULL_AS_BLANK));
 				// String validTagName =
 				// DocumentUtils.convertToValidXMLTagName(key);
 				rowData.put(key, value);
 			}
 			content.add(rowData);
 		}
-
                 if (content.size() == 0){
                     Map rowData = new LinkedHashMap();
                     for (int i = 0; i < headerList.size(); i++) {
@@ -116,13 +116,44 @@ public class SpreadsheetReader {
                     }
                     content.add(rowData);
                 }
-                //System.out.println("========FROM SPREADSHEET READER======= " + content);
 		return content;
 	}
 
+	public static List<List<String>> readSpreadSheet(String file, int sheetNo) {
+		InputStream inp;
+		try {
+			inp = new FileInputStream(file);
+			Workbook wb = WorkbookFactory.create(inp);
+			return readSpreadSheet(wb, sheetNo);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static List<List<String>> readSpreadSheet(Workbook wb, int sheetNo) {
+		List<List<String>> content = new ArrayList<List<String>>();
+
+		Sheet sheet = wb.getSheetAt(sheetNo);
+		
+		for (Row row : sheet) {
+			List<String> rowData = new ArrayList<String>();
+			 
+			 int lastCellNum = row.getLastCellNum();
+	         for(int i = 0; i <= lastCellNum; i++) {
+	        	 Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
+            	 String cellVal = getCellText(cell);
+            	 rowData.add(cellVal);
+	         }
+			content.add(rowData);
+		}
 		return content;
 	}
-
+	
 	private static String getCellText(Cell cell) {
 		// return cell.getRichStringCellValue().getString();
 		String text = formatter.formatCellValue(cell).trim();

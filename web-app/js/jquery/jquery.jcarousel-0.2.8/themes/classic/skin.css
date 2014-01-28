@@ -11,13 +11,13 @@
 }
 
 .jcarousel-skin-ie7 .jcarousel-container-horizontal {
-/*     width: 245px; */
+/*     width: 100%;  */
     padding: 20px 40px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-container-vertical {
-    width: 75px;
-    height: 245px;
+    width: 210px;
+    height: 250px;
     padding: 40px 20px;
 }
 
@@ -26,18 +26,18 @@
 }
 
 .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-/*     width:  245px; */
-    height: 77px;
+    width:  100%;
+    height: 250px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-clip-vertical {
-    width:  77px;
-    height: 245px;
+    width:  210px;
+    height: 250px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item {
-    width: 75px;
-    height: 75px;
+    width: 210px;
+    height: 250px;
 /*     border: 1px solid #fff; */
 }
 
@@ -206,7 +206,7 @@
 .jcarousel-skin-ie7 .jcarousel-prev-horizontal {
     background: url("../../../../../images/arrow-left-right.png") no-repeat scroll 0 0 transparent;
     cursor: pointer;
-    height: 75px;
+    height: 100%;
     position: absolute;
     top: 0px;
     width: 17px;
@@ -220,7 +220,7 @@
     background: url("../../../../../images/arrow-left-right.png") no-repeat scroll 0 0 transparent;
     background-position: -17px 0;            
     cursor: pointer;
-    height: 75px;
+    height: 100%;
     position: absolute;
     top: 0px;
     width: 17px;
@@ -245,5 +245,5 @@
 }
 
 .jcarousel-skin-ie7 .jcarousel-item a img{
-	position: absolute;
+/* 	position: absolute; */
 }

@@ -117,7 +117,7 @@ class TaxonomyDefinition {
 	}
 	
 	/**
-	* Returns parents as per all classifications
+	* Returns parents as per classification
 	* @return
 	*/
    Map<Classification, List<TaxonomyDefinition>> parentTaxonRegistry(Classification classification) {

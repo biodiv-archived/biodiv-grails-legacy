@@ -17,28 +17,28 @@ class SpeciesTagLib {
 		
 		switch(attrs.model.key) {
 			case "eolId" : 
-				out << "<a href=\"http://www.eol.org/pages/${extLink.eolId}\" title=\"View on Encyclopedia of Life\" target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'eol.png', absolute:true)}\"/></a>" ;
+				out << "<a href=\"http://www.eol.org/pages/${extLink.eolId}\" title=\"View on Encyclopedia of Life\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'eol.png', absolute:true)}\"/></a>" ;
 				break;
 			case "gbifId" : 
-				out << "<a href=\"http://data.gbif.org/species/${extLink.gbifId}\" title=\"View on GBIF\" target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'gbif.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://data.gbif.org/species/${extLink.gbifId}\" title=\"View on GBIF\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'gbif.png', absolute:true)}\"/></a>";
 				 break; 
 			case "iucnId" : 
-				out << "<a href=\"http://www.iucnredlist.org/apps/redlist/details/${extLink.iucnId?.replace('IUCN-', '')}\" title=\"View on IUCN Red List\" target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'iucn.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://www.iucnredlist.org/apps/redlist/details/${extLink.iucnId?.replace('IUCN-', '')}\" title=\"View on IUCN Red List\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'iucn.png', absolute:true)}\"/></a>";
 				break;
 			case "colId" : 
-				out << "<a href=\"http://www.catalogueoflife.org/annual-checklist/2010/details/species/id/${extLink.colId}\" title=\"View on COL\"  target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'col.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://www.catalogueoflife.org/annual-checklist/2010/details/species/id/${extLink.colId}\" title=\"View on COL\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'col.png', absolute:true)}\"/></a>";
 				break;
 			case "itisId" : 
-				out << "http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=${extLink.itisId}\" title=\"View on ITIS\"  target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'itis.png', absolute:true)}\"/></a>";
+				out << "http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=${extLink.itisId}\" title=\"View on ITIS\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'itis.png', absolute:true)}\"/></a>";
 				break;
 			case "ncbiId" : 
-				out << "<a href=\"http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${extLink.ncbiId}\" title=\"View on NCBI\"  target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'ncbi.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${extLink.ncbiId}\" title=\"View on NCBI\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'ncbi.png', absolute:true)}\"/></a>";
 				break;
 			case "uBio" : 
-				out << "<a href=\"http://www.ubio.org/browser/search.php?search_all=${attrs.model.taxonConcept.binomialForm}\" title=\"View on uBio\" target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'uBio.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://www.ubio.org/browser/search.php?search_all=${attrs.model.taxonConcept.binomialForm}\" title=\"View on uBio\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'uBio.png', absolute:true)}\"/></a>";
 				break;
 			case "wikipedia" :
-				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'wiki.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'wiki.png', absolute:true)}\"/></a>";
 				break;
 		}
 	}
@@ -90,5 +90,39 @@ class SpeciesTagLib {
 	def chooseLanguage = { attrs, body->
 		out << render(template:"/common/chooseLanguageTemplate", model:attrs.model);
 	}
+
+	def showSubmenuTemplate = {attrs, body->
+		out << render(template:"/species/speciesSubmenuTemplate", model:attrs.model);
+	}
 	
+	def searchResults = {attrs, body->
+		out << render(template:"/species/searchResultsTemplate", model:attrs.model);
+	}
+	
+	def speciesFilter = {attrs, body->
+		out << render(template:"/species/speciesFilterTemplate", model:attrs.model);
+	}
+
+	def showSpeciesList = {attrs, body->
+		out << render(template:"/species/showSpeciesListTemplate", model:attrs.model);
+	}
+
+	def showHeadingAndSubHeading = {attrs, body->
+		out << render(template:"/common/headingAndSubHeading", model:attrs.model);
+	}
+
+	def showSnippet = {attrs, body->
+		if(attrs.model.speciesInstance) {
+			out << render(template:"/species/showSpeciesSnippetTemplate", model:attrs.model);
+		}
+	}
+
+	def showSpeciesExternalLink = {attrs, body->
+		out << render(template:"/species/showSpeciesExternalLinkTemplate", model:attrs.model);
+	}
+	
+	def showDownloadAction = {attrs, body->
+		out << render(template:"/species/showDownloadAction", model:attrs.model);
+	}
+
 }

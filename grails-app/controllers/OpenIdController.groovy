@@ -1,19 +1,31 @@
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.PortResolver;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
 import org.springframework.social.facebook.api.FacebookProfile;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
+import org.springframework.util.StringUtils;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
+import species.auth.DefaultAjaxAwareRedirectStrategy;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
-
+import species.utils.Utils;
+import species.auth.CustomRegisterCommand;
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
  * associated with an OpenID and also by associating a new OpenID to an existing account.
@@ -31,12 +43,11 @@ class OpenIdController {
 
 	def facebookAuthService
 	def SUserService
-	
+	def portResolver
+
 	static defaultAction = 'auth'
-	
-	def checkauth = {
-		log.debug "inside check auth " + params
-	}
+
+	def checkauth = { log.debug "inside check auth " + params }
 
 	/**
 	 * Shows the login page. The user has the choice between using an OpenID and a username
@@ -53,12 +64,38 @@ class OpenIdController {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
+		
+		
 
-		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+		def targetUrl = "";
+		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+		if(savedRequest == null) {
+			if(params.login_error) {
+				targetUrl = request.getSession().getAttribute("LOGIN_REFERRER");
+			} else {
+				targetUrl = request.getHeader("Referer")?:"";
+				if (StringUtils.hasText(targetUrl)) {
+					try {
+						targetUrl = URLEncoder.encode(targetUrl, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+					}
+				}
+				//params["spring-security-redirect"] = targetUrl
+			}
+			request.getSession().setAttribute("LOGIN_REFERRER", targetUrl);
+			log.debug "Passing targetUrlParameter for redirect: " + targetUrl;
+		} else {
+			if(Utils.isAjax(savedRequest)) {
+				request.getSession()?.removeAttribute(WebAttributes.SAVED_REQUEST)
+			}
+		}
+		render (view:'auth', model:[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
-					openidIdentifier: config.openid.claimedIdentityFieldName]
+					openidIdentifier: config.openid.claimedIdentityFieldName,
+					targetUrl:targetUrl]);
 	}
 
 	/**
@@ -81,7 +118,7 @@ class OpenIdController {
 		}
 
 		log.debug "Processing OpenId authentication in createAccount/merge"
-		
+
 		def emailAttribute = attributes.find { l ->
 			if(l.name == 'email') {
 				return l;
@@ -100,13 +137,13 @@ class OpenIdController {
 		if(email) {
 			user = SUser.findByEmail(email)
 		}
-		
+
 		if(user) {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
 			registerAccountOpenId user.email, openId
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			authenticateAndRedirect user."$usernamePropertyName"
+			authenticateAndRedirect user."$usernamePropertyName", request, response
 		} else {
 			log.info "Redirecting to register"
 			CustomRegisterCommand command = new CustomRegisterCommand();
@@ -147,12 +184,12 @@ class OpenIdController {
 			flash.error = 'Sorry, no user was found with that username and password'
 			return [command: command, openId: openId]
 		}
-		
+
 		def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		authenticateAndRedirect user."$usernamePropertyName"
-		
+		authenticateAndRedirect user."$usernamePropertyName", request, response
+
 	}
-	
+
 	def createFacebookAccount = {
 
 		def token = session["LAST_FACEBOOK_USER"]
@@ -179,16 +216,16 @@ class OpenIdController {
 		if(email) {
 			user = SUser.findByEmail(email)
 		}
-		
+
 		if(user) {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
 			facebookAuthService.mergeFacebookUserDetails user, fbProfile
 			registerAccountOpenId user.email, fbProfile.link
 			facebookAuthService.registerFacebookUser token, user
-			
+
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			authenticateAndRedirect user."$usernamePropertyName"
+			authenticateAndRedirect user."$usernamePropertyName", request, response
 		} else {
 			log.info "Redirecting to register"
 			CustomRegisterCommand command = new CustomRegisterCommand();
@@ -207,18 +244,18 @@ class OpenIdController {
 	 *
 	 * @param username the user's login name
 	 */
-	private void authenticateAndRedirect(String username) {
+	private void authenticateAndRedirect(String username, final HttpServletRequest request, final HttpServletResponse response) {
 		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
 		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
 		session.removeAttribute "LAST_FACEBOOK_USER"
-		
+
 		springSecurityService.reauthenticate username
 
 		def config = SpringSecurityUtils.securityConfig
 
 		def savedRequest = session[DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY]
 		if (savedRequest && !config.successHandler.alwaysUseDefault) {
-			redirect url: savedRequest.redirectUrl
+			(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, savedRequest.getRedirectUrl());
 		}
 		else {
 			redirect uri: config.successHandler.defaultTargetUrl
@@ -274,17 +311,24 @@ class OpenIdController {
 	private void registerAccountOpenId(String email, String openId) {
 		SUser.withTransaction { status ->
 			def user = SUser.findByEmail(email);
+			def securityConf = SpringSecurityUtils.securityConfig
+			user[securityConf.userLookup.enabledPropertyName] = true
+			user[securityConf.userLookup.accountExpiredPropertyName] = false
+			user[securityConf.userLookup.accountLockedPropertyName] = false
+			user[securityConf.userLookup.passwordExpiredPropertyName] = false
+			
 			user.addToOpenIds(url: openId)
 			if (!user.save(flush:true, failOnError:true)) {
+				log.error "Coudn't save user openIds"
 				status.setRollbackOnly()
 			}
-			
+
 			SUserService.assignRoles(user);
 		}
-		
+
 	}
 
-	
+
 
 	/**
 	 * For the initial form display, copy any registered AX values into the command.
@@ -294,25 +338,25 @@ class OpenIdController {
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
 		String firstName, lastName="";
 		for (attribute in attributes) {
-			
+
 			String name = attribute.name
 			if(name == "firstname") {
-				firstName = attribute.values[0]	
+				firstName = attribute.values[0]
 			} else if(name == "lastname") {
 				lastName = attribute.values[0]
 			}
-			
+
 			if (command.hasProperty(name)) {
 				command."$name" = attribute.values[0]
 			}
 		}
-		
+
 		if(firstName) {
 			command.name = firstName + " "+ lastName
 			command.name = command.name.trim();
-		} 
+		}
 	}
-	
+
 }
 
 class OpenIdRegisterCommand {

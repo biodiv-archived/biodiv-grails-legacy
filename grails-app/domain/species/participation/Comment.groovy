@@ -23,20 +23,33 @@ class Comment{
 	Long rootHolderId;
 	String rootHolderType;
 
-	//comment parent (to handle reply)
-	//Comment parentComment;
-
+	//to store immediate parent comment 
+	Long parentId;
+	//to store main comment thread
+	Long mainParentId;
+	
 	static hasMany = [likes:SUser, attachments:Resource];
 	static belongsTo = [author:SUser];
 
 	static constraints = {
 		body blank:false;
-		//parentComment nullable:false;
+		parentId nullable:true;
+		mainParentId nullable:true;
 	}
 
 	static mapping = {
 		version : false;
 		body type:'text';
+		
+		//fething this right away
+		author fetch: 'join'
+		
+		rootHolderId index: 'rootHolderId_Index'
+		rootHolderType index: 'rootHolderType_Index'
+		lastUpdated index: 'lastUpdated_Index'
+		
+		commentHolderId index: 'commentHolderId_Index'
+		commentHolderType index: 'commentHolderType_Index'
 	}
 
 	static int fetchCount(commentHolder, rootHolder, refTime, timeLine){
@@ -50,11 +63,11 @@ class Comment{
 				and{
 					if(commentHolder){
 						eq('commentHolderId', commentHolder.id)
-						eq('commentHolderType', getType(commentHolder))
+						eq('commentHolderType', ActivityFeedService.getType(commentHolder))
 					}
 					if(rootHolder){
 						eq('rootHolderId', rootHolder.id)
-						eq('rootHolderType', getType(rootHolder))
+						eq('rootHolderType', ActivityFeedService.getType(rootHolder))
 					}
 					if(refTime){
 						(timeLine == "older") ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
@@ -81,11 +94,11 @@ class Comment{
 			and{
 				if(commentHolder){
 					eq('commentHolderId', commentHolder.id)
-					eq('commentHolderType', getType(commentHolder))
+					eq('commentHolderType', ActivityFeedService.getType(commentHolder))
 				}
 				if(rootHolder){
 					eq('rootHolderId', rootHolder.id)
-					eq('rootHolderType', getType(rootHolder))
+					eq('rootHolderType', ActivityFeedService.getType(rootHolder))
 				}
 				(timeLine == "older") ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
 			}
@@ -98,11 +111,6 @@ class Comment{
 		return fetchComments(null, rootHolder, max, refTime, timeLine)
 	}
 	
-	private static getType(obj){
-		return Hibernate.getClass(obj).getName();
-	}
-
-
 	private static getValidDate(String timeIn){
 		if(!timeIn){
 			return null
@@ -116,19 +124,85 @@ class Comment{
 		return null
 	}
 	
+	def isMainThread(){
+		return mainParentId == null;
+	}
+	
+	
+	def deleteComment(){
+		this.delete(flush:true, failOnError:true)
+		if(isMainThread()){
+			deleteAllChild()
+		}else{
+			setParentToNull()
+		}
+	}
+	
 	def afterInsert(){
-		activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
+		//activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this);
+	
 	}
 	
-	def getDate(){
-		return activityFeedService.getDateInISO(lastUpdated);
+	def deleteAllChild(){
+		def commentList = Comment.findAllByMainParentId(this.id)
+		commentList.each{ Comment c ->
+			try{
+				//Comment.withNewSession {
+					c.delete(flush:true, failOnError:true)
+				//} 
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}
 	}
 	
-	//	int compareTo(obj) {
-	//		lastUpdated.compareTo(obj.lastUpdated);
-	//	}
+	def setParentToNull(){
+		def commentList = Comment.findAllByParentId(this.id)
+		commentList.each{ Comment c ->
+			try{
+				//Comment.withNewSession {
+					c.parentId = null
+					c.save(flush:true)
+				//}
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}
+	}
+	
+	def fetchParent(){
+		return Comment.read(parentId)
+	}
+	
+	def fetchMainThread(){
+		return Comment.read(mainParentId)
+	}
+	
+	def fetchParentText(){
+		def parentComment = fetchParent()
+		if(parentComment){
+			return parentComment.body
+		}
+		return "Parent comment has been deleted"
+	}
+	
+	def fetchParentCommentAuthor(){
+		def parentComment = fetchParent()
+		if(parentComment){
+			return parentComment.author
+		}
+		return null
+	}
+	
+	def onAddComment(Comment comment){
+		try {
+			activityFeedService.getDomainObject(comment.rootHolderType, comment.rootHolderId).onAddComment(comment)
+		}catch (MissingMethodException e) {
+			//e.printStackTrace();
+		}
+	}
 }

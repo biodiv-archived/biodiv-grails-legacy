@@ -14,14 +14,14 @@
 					<g:each var="recoVoteInstance" in="${recoComments}">
 						<li style="padding: 0 5px; clear: both;"><span
 							class="flagInstanceClass ellipsis multiline">
-							<g:link controller="SUser" action="show" id="${recoVoteInstance.author?.id}">
-							<img class="very_small_profile_pic"
-								src="${recoVoteInstance.author?.icon(ImageType.VERY_SMALL)}"
+							<g:link url="${uGroup.createLink(controller:"SUser", action:"show", id:recoVoteInstance.author?.id)}">
+							<img class="small_profile_pic"
+								src="${recoVoteInstance.author?.profilePicture(ImageType.SMALL)}"
 								title="${recoVoteInstance.author.name}"/>
 							</g:link> on <g:formatDate date="${recoVoteInstance.votedOn}" type="datetime" style="LONG" timeStyle="SHORT"/> : ${recoVoteInstance.comment} 
 						</span>
 						<sUser:ifOwns model="['user':recoVoteInstance.author]">
-								<a href="#" onclick="removeRecoComment(${recoVoteInstance.recoVoteId},'#reco_comment_' + ${recoId}, '${createLink(controller:'observation', action:'deleteRecoVoteComment')}',$(this).parent()); return false;"><span class="deleteCommentIcon" data-original-title="Remove this comment" ><i class="icon-trash icon-red"></i></span></a>
+								<a href="#" onclick="removeRecoComment(${recoVoteInstance.recoVoteId},'#reco_comment_' + ${recoId}, '${uGroup.createLink(controller:'observation', action:'deleteRecoVoteComment')}',$(this).parent()); return false;"><span class="deleteCommentIcon" data-original-title="Remove this comment" ><i class="icon-trash icon-red"></i></span></a>
 						</sUser:ifOwns>
 						</li>
 					</g:each>

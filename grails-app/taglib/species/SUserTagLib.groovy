@@ -14,11 +14,24 @@ class SUserTagLib {
 	def renderProfileLink = { attrs ->
 		def currentUser = springSecurityService.getCurrentUser()
 		if(currentUser) {
-			out << showUserTemplate(model:['userInstance':currentUser]);
+			out << showUserTemplate(model:['userInstance':currentUser, 'hideDetails':attrs.model?.hideDetails]);
 		}
 	}
 
+	def renderProfileHyperLink = { attrs ->
+		def currentUser = springSecurityService.getCurrentUser()
+		if(currentUser) {
+			out << createLink(controller:"user", action:"show", id:springSecurityService.currentUser.id);
+		}
+	}
 
+	def renderCurrentUserId = { attrs ->
+		def currentUser = springSecurityService.getCurrentUser()
+		if(currentUser) {
+			out << currentUser.id
+		}
+	}
+	
 	/**
 	 * Renders the body if the authenticated user owns this page.
 	 */
@@ -116,13 +129,36 @@ class SUserTagLib {
 			out<< body();
 		}
 	}
+	
+	def selectUsers = { attrs, body->
+		out << render(template:"/common/suser/selectUsersTemplate", model:attrs.model);
+	}
 
 	/**
 	 * Renders the body if the authenticated user owns this page.
 	 */
 	def isAdmin = { attrs, body ->
-		if (SUserService.isAdmin(attrs.model.user?.id)) {
+		def user = attrs.model ? attrs.model.user : null;
+		user = user?:springSecurityService.getCurrentUser()
+		if (SUserService.isAdmin(user?.id)) {
 			out << body()
 		}
 	}
+	
+	def interestedSpeciesGroups = {attrs, body ->
+		out<<render(template:"/common/suser/interestedSpeciesGroupsTemplate", model:attrs.model);
+	}
+
+	def interestedHabitats = {attrs, body ->
+		out<<render(template:"/common/suser/interestedHabitatsTemplate", model:attrs.model);
+	}
+	
+	def isCEPFAdmin = { attrs, body ->
+		def user = attrs.model ? attrs.model.user : null;
+		user = user?:springSecurityService.getCurrentUser()
+		if (SUserService.isCEPFAdmin(user?.id)) {
+			out << body()
+		}
+	}
+
 }

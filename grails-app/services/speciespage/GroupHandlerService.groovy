@@ -1,6 +1,7 @@
 package speciespage
 
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification;
 import species.Species;
@@ -100,7 +101,7 @@ class GroupHandlerService {
 	int updateGroups() {
 		int noOfUpdations = 0;
 		int offset = 0;
-		int limit = 50000;
+		int limit = 60000;
 		
 		def taxonConcepts;
 		
@@ -147,19 +148,19 @@ class GroupHandlerService {
 	 * A species should not have multiple paths in the same classification
 	 * @return
 	 */
-	int updateGroups(List<Species> species) {
+	int updateGroups(List<Species> species, boolean flush) {
 		int noOfUpdations = 0;
 
 		species.each { s ->
 			if(updateGroup(s.taxonConcept)) {
 				noOfUpdations ++;
 			}
-			if(noOfUpdations % BATCH_SIZE == 0) {
+			if(noOfUpdations % BATCH_SIZE == 0 && flush) {
 				cleanUpGorm();
 			}
 		}
 
-		if(noOfUpdations) {
+		if(noOfUpdations && flush) {
 			cleanUpGorm();
 		}
 		return noOfUpdations;
@@ -181,7 +182,7 @@ class GroupHandlerService {
 	 * @return
 	 */
 	boolean updateGroup(TaxonomyDefinition taxonConcept, SpeciesGroup group) {
-		log.info "Updating group associations for taxon concept : "+taxonConcept;
+		log.info "Updating group associations for taxon concept : "+taxonConcept + " to ${group}";
 		int noOfUpdations = 0;
 
 		if(taxonConcept && group) {
@@ -211,6 +212,9 @@ class GroupHandlerService {
 		speciesGroupMappings.each { mapping ->
 			if((taxonConcept.name.trim().equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
 				group = mapping.speciesGroup;
+				if(!group.isAttached()) {
+					group.attach();
+				}
 			}
 		}
 		return group;
@@ -243,7 +247,11 @@ class GroupHandlerService {
 		def hibSession = sessionFactory?.getCurrentSession()
 		if(hibSession) {
 			log.debug "Flushing and clearing session"
-			hibSession.flush()
+			try {
+				hibSession.flush()
+			} catch(ConstraintViolationException e) {
+				e.printStackTrace()
+			}
 			hibSession.clear()
 			speciesGroupMappings.each { mapping ->
 				if(!mapping.isAttached()) {

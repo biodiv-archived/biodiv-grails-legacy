@@ -20,6 +20,8 @@ class SpeciesGroup {
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
 	
+	static fetchMode = [parentGroup: 'eager']
+	
     static constraints = {
 		name(blank:false, unique:true);
 		parentGroup nullable:true;
@@ -33,14 +35,13 @@ class SpeciesGroup {
 	Resource icon(ImageType type) {
 		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 		name = ImageUtils.getFileName(name, type, '.png');
-
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/speciesGroups/${name}")).exists()
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/../group_icons/speciesGroups/${name}")).exists()
 		if(!iconPresent) {
 			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
 		
-		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
+		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.IMAGE, title:"You can contribute!!!", baseUrl:grailsApplication.config.grails.serverURL);
 	}
 
 	/* (non-Javadoc)
@@ -60,6 +61,8 @@ class SpeciesGroup {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (this.is(obj))
+			return true;
 		if (obj == null)
 			return false;
 		if (!(obj instanceof SpeciesGroup))

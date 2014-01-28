@@ -2,8 +2,9 @@
 
 <head>
 	<meta name='layout' content='admin'/>
-	<g:set var="entityName" value="${message(code: 'user.label', default: 'User')}"/>
-	<title><g:message code="default.create.label" args="[entityName]"/></title>
+<g:set var="title" value="User"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
+
 </head>
 
 <body>

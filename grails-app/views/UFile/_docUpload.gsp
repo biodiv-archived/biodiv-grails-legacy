@@ -44,9 +44,3 @@ fileURL = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.ser
 		<input type="hidden" name="uFile.size"  id="${name}_size" value="${size}">
 	
 </div>
-
-            <r:script>
-            $(document).ready(function() {
-               updateMetadataValues($("#headerOptions").val()); 
-            });
-             </r:script>

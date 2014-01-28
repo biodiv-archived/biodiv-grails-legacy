@@ -1,60 +1,49 @@
-<%@ page import="species.participation.ObservationFlag.FlagType"%>
+<%@ page import="species.participation.Flag.FlagType"%>
 <%@ page import="species.participation.Observation"%>
 <%@page import="species.utils.ImageType"%>
-<div>
+ <div>
 	<div class="btn-group">
-		<a id="flag-action" class="btn btn-mini" data-toggle="dropdown"
+		<button id="flag-action" class="btn btn-link" data-toggle="dropdown"
+                        title="Report an inappropriate or erroneous contribution"
 			href="#"> <g:if test="${observationInstance.flagCount>0}">
 				<i class="icon-flag icon-red"></i>
 			</g:if> <g:else>
 				<i class="icon-flag"></i>
 			</g:else> Flag
-		</a>
+		</button>
 
-
-		<div id="flag-options" class="popup-form" style="display: none">
+               		<div id="flag-options" class="popup-form" style="display: none">
 			<h5>Why?</h5>
 			<form id="flag-form"
-				action="${createLink(controller:'observation', action:'flagObservation', id:observationInstance.id)}">
+                            action="javascript:flag('${observationInstance.id}', '${observationInstance.class.getCanonicalName()}','${uGroup.createLink(controller:'action', action:'flagIt', id:observationInstance.id)}')">
 				<g:each in="${FlagType.list() }" var="flag" status="i">
 					<g:if test="${i > 0}">
-						<input type="radio" name="obvFlag" value="${flag}">
-						${flag.value()}</input>
+						<input type="radio" style="margin-top: 0px;" name="obvFlag" value="${flag}"/>
+						${flag.value()}
 						<br />
 					</g:if>
 					<g:else>
-						<input type="radio" name="obvFlag" value="${flag}" CHECKED>
-						${flag.value()}</input>
+						<input type="radio" style="margin-top: 0px;" name="obvFlag" value="${flag}" CHECKED/>
+						${flag.value()}
 						<br />
 					</g:else>
 				</g:each>
-
-				<input type="text" name="notes" placeholder="Any other reason"></input><br />
-				<input class="btn btn-danger" type="submit" value="Flag"></input>
+				<br/>
+				<textarea id ="flagNotes" class="comment-textbox" placeholder="Tell Why??" name="notes"></textarea>
+<%--				<input type="text" name="notes" placeholder="Any other reason"></input><br />--%>
+				<input class="btn btn-danger pull-right" type="submit" value="Flag"/>
 				<div id="flag-close" class="popup-form-close" value="close">
 					<i class="icon-remove"></i>
 				</div>
 			</form>
 
 			<div id="flagged">
-				<g:if test="${observationInstance.flagCount>0}">
+				<g:if test="${observationInstance.flagCount> -1}">
 					<span id="flagHeadings" style="font-weight: bold">Who flagged and why:</span>
-				</g:if>
-				<div>
-					<g:each var="flagInstance" in="${observationInstance.fetchAllFlags()}">
-						<li style="padding: 0 5px; clear: both;">
-							<span class="flagInstanceClass">
-							<g:link controller="SUser" action="show" id="${flagInstance.author?.id}">
-							<img class="very_small_profile_pic"
-								src="${flagInstance.author?.icon(ImageType.VERY_SMALL)}"
-								title="${flagInstance.author.name}"/></g:link> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
-							<sUser:ifOwns model="['user':flagInstance.author]">
-								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash"></i></span></a>
-							</sUser:ifOwns>
-							
-						</li>
-					</g:each>
-				</div>
+                                        </g:if>
+                                        <div class = "flag-list-users">
+                                            <g:render template="/common/observation/flagListUsersTemplate" model="['observationInstance':observationInstance]"/>
+                                            </div>
 			</div>
 			<div id="flagMessage">
 			</div>
@@ -79,19 +68,21 @@ $('#flag-close').click(function(){
 	$('#flag-options').hide();
 });
 
-function removeFlag(flagId, obvId, flagComponent){ 
+function removeFlag(flagId, flagComponent){ 
 	$.ajax({
-		url: "${createLink(controller:'observation', action:'deleteObvFlag')}",
-		data:{"id":flagId, "obvId":obvId},
+		url: "${uGroup.createLink(controller:'action', action:'deleteFlag')}",
+		data:{"id":flagId},
 		
-		success: function(data){
-			if(parseInt(data) == 0){
-				$("#flagHeadings").hide();
-				$("#flag-action>i").removeClass("icon-red");
+                success: function(data){
+
+                    if(parseInt(data.flagCount) == 0){
+                        $("#flagHeadings").hide();
+			$("#flag-action>i").removeClass("icon-red");
 			}
 			$(".deleteFlagIcon").tooltip('hide');
 			flagComponent.remove();
-			$("#flagMessage").html('');
+                        $("#flagMessage").html('');
+                        updateFeeds();  
 		},
 		
 		statusCode: {
