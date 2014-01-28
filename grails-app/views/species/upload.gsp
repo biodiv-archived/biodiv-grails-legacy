@@ -134,6 +134,7 @@
                         <td> <input type="checkbox" name = "merge" value = "mergeFlag"></td>
                     </tr>
                     --}%
+
                 </table>            
                 <div id="tagHeaders" style="display:none;">
                     <table id="tableHeader" border="1">
