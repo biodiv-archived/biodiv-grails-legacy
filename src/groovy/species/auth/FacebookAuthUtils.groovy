@@ -134,7 +134,7 @@ class FacebookAuthUtils {
 
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+		} else {//if(domain.equals(grailsApplication.config.ibp.domain)) {
 			return grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
 		return null;
@@ -147,7 +147,7 @@ class FacebookAuthUtils {
 
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.secret
-		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 			return grailsApplication.config.speciesPortal.ibp.facebook.secret
 		}
 		return null;
