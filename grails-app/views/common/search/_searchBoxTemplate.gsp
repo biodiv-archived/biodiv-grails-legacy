@@ -54,6 +54,8 @@ $(document).ready(function() {
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
                 },
+                'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
+                'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
                 'content':{
                     'url':"${uGroup.createLink('controller':'content')}"
                 },

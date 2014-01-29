@@ -60,7 +60,7 @@ class SpeciesUploadService {
 	def observationService;
 	def springSecurityService
 
-	static int BATCH_SIZE = 10;
+	static int BATCH_SIZE = 1;
 	int noOfFields = Field.count();
 
 	/**

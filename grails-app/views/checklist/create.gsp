@@ -32,7 +32,7 @@
 
                 <%
                 def allowedExtensions = "['csv', 'xls', 'xlsx']"
-                def fileParams = [uploadDir:'checklist',checklistConvert:true]
+                def fileParams = [uploadDir:'checklist',fileConvert:true, fromChecklist: true]
                 def form_id = "addObservation"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Add Checklist"
@@ -255,7 +255,11 @@
                 ]
 
             columnDataForBlankSheet.push(getMediaColumnOptions());
+<<<<<<< HEAD
+            loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "checklist", "Scientific_Name", "Common_Name"); 
+=======
             loadDataToGrid(rowDataForBlankSheet, columnDataForBlankSheet, "Scientific_Name", "Common_Name"); 
+>>>>>>> fa3c07a70a49ea1af25ebda69c82a4ca1c46a6cd
             }
 
             if(${params.action=="create"}){

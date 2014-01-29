@@ -477,6 +477,8 @@ class SpeciesController extends AbstractObjectController {
             contributors << springSecurityService.currentUser
         }
         */
+		
+		println "================= upload params " + params
 
         if(params.uFile) {
             String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
@@ -493,7 +495,6 @@ class SpeciesController extends AbstractObjectController {
                 }
             }
         }
-
 	}
 	
 	@Secured(['ROLE_ADMIN'])
@@ -504,8 +505,6 @@ class SpeciesController extends AbstractObjectController {
 		r['msg']= "${message(code: 'species.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
 		render r as JSON
 	}
-	
-	
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////Online upload //////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -522,4 +521,34 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
+    def getDataColumns = {
+        List res = speciesUploadService.getDataColumns();
+        render res as JSON
+    }
+
+    @Secured(['ROLE_SPECIES_ADMIN'])
+	def uploadTest = {
+		params.imagesDir = "/home/sandeept/species-online/3mapping"
+		String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
+            
+    	println "================= upload test params " + contentRootDir
+		def oldDir = grailsApplication.config.speciesPortal.images.uploadDir 
+		//grailsApplication.config.speciesPortal.images.uploadDir  = params.imagesDir
+		
+        //if(params.uFile) {
+            File speciesDataFile = new File(contentRootDir, "species_account188.xlsx")
+            println "========== specie data file "
+            if(speciesDataFile.exists()) {
+                    File mappingFile = new File(contentRootDir, "speciesaccount188_mapping.xlsx")
+                    speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
+                    grailsApplication.config.speciesPortal.images.uploadDir  = oldDir
+					render "Done mapped species upload"
+                }
+                else{
+                	render "not found"
+                }
+        //}
+        
+        
+	}
 }
