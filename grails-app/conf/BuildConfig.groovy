@@ -91,7 +91,7 @@ grails.project.dependency.resolution = {
         compile 'jmimemagic:jmimemagic:0.1.2'
         
         //compile 'net.sf.jtidy:jtidy:r938'
-
+        compile 'com.mchange:c3p0:0.9.5-pre6'
     }
     plugins { 
         compile ":spring-security-core:1.2.7.3" 

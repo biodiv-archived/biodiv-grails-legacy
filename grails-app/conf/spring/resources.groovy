@@ -30,6 +30,8 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
 
+import com.mchange.v2.c3p0.ComboPooledDataSource
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
 
 // Place your Spring DSL code here
 beans = {
@@ -268,5 +270,15 @@ beans = {
     redirectStrategy(DefaultAjaxAwareRedirectStrategy) {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }
+
+    dataSource(ComboPooledDataSource) { bean ->
+        bean.destroyMethod = 'close'
+        user = CH.config.dataSource.username
+        password = CH.config.dataSource.password
+        driverClass = CH.config.dataSource.driverClassName
+        jdbcUrl = CH.config.dataSource.url
+        //unreturnedConnectionTimeout = 5 // seconds
+        debugUnreturnedConnectionStackTraces = true
+      } 
 
 }

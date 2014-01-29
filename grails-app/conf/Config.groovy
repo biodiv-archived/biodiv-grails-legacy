@@ -76,7 +76,7 @@ grails.spring.bean.packages = []
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
 
-def log4jConsoleLogLevel = Priority.INFO
+def log4jConsoleLogLevel = Priority.DEBUG
 // log4j configuration
 
 
@@ -490,7 +490,8 @@ environments {
 		debug   'speciespage',
                 'grails.app',
                 'species'
-        info    'species.auth'
+        info    'species.auth',
+        		'com.mchange.v2.resourcepool.BasicResourcePool' 
 	}
     }	
     test {
