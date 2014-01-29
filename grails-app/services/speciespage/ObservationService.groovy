@@ -2157,4 +2157,27 @@ class ObservationService extends AbstractObjectService {
 
         return null;
     }
+
+    //Create file with given filename
+    def File createFile(String fileName, String uploadDir, String contentRootDir) {
+        File uploaded
+        if (uploadDir) {
+            File fileDir = new File(contentRootDir + "/"+ uploadDir)
+            if(!fileDir.exists())
+                fileDir.mkdirs()
+                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+
+        } else {
+
+            File fileDir = new File(contentRootDir)
+            if(!fileDir.exists())
+                fileDir.mkdirs()
+                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+            //uploaded = File.createTempFile('grails', 'ajaxupload')
+        }
+
+        log.debug "New file created : "+ uploaded.getPath()
+        return uploaded
+    }
+
 }

@@ -1,5 +1,4 @@
 <% def allowedExtensions = allowedExtensions?:"[ 'pdf']" 
-    def saveModifiedUrl =  "${uGroup.createLink(controller:'UFile', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }"
 %>
 <uploader:uploader id="${name}_uploader"
 	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
@@ -19,7 +18,6 @@
             $('#${name}_name').val(fileName);
             $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
             $('#headerMetadata').val(responseJSON.headerMetadata);
-            $('#saveModifiedUrl').val("${saveModifiedUrl}");
         }
 
         <g:if test="${uploadCallBack}">

@@ -39,10 +39,10 @@ class UFileController {
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def observationService
-	def springSecurityService;
-	def grailsApplication
-
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def springSecurityService;
+    def grailsApplication
+    def speciesUploadService;
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	String contentRootDir = config.speciesPortal.content.rootDir
     
@@ -89,7 +89,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = createFile(originalFilename, params.uploadDir)
+			File uploaded = observationService.createFile(originalFilename, params.uploadDir,contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
@@ -151,7 +151,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = createFile(originalFilename, params.uploadDir)
+			File uploaded = observationService.createFile(originalFilename, params.uploadDir, contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 
@@ -213,27 +213,7 @@ class UFileController {
 		return request.inputStream
 	}
 
-	//Create file with given filename
-    private File createFile(String fileName, String uploadDir) {
-        File uploaded
-        if (uploadDir) {
-            File fileDir = new File(contentRootDir + "/"+ uploadDir)
-            if(!fileDir.exists())
-                fileDir.mkdirs()
-                uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
 
-        } else {
-
-            File fileDir = new File(contentRootDir)
-            if(!fileDir.exists())
-                fileDir.mkdirs()
-                uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
-            //uploaded = File.createTempFile('grails', 'ajaxupload')
-        }
-
-        log.debug "New file created : "+ uploaded.getPath()
-        return uploaded
-    }
 
 
     def download = {
@@ -267,20 +247,7 @@ class UFileController {
 
     def saveModifiedSpeciesFile = {
         //log.debug params
-        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers; 
-        def gData = JSON.parse(params.gridData)
-        def headerMarkers = JSON.parse(params.headerMarkers)
-        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers
-        String fileName = "speciesSpreadsheet.xlsx"
-        String uploadDir = "species"
-        //URL url = new URL(data.xlsxFileUrl);
-        File file = createFile(fileName , uploadDir);
-        //FileUtils.copyURLToFile(url, f);
-        println "===NEW MODIFIED SPECIES FILE=== " + file
-        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim();
-        println "===XLSX FILE URL ======= " + xlsxFileUrl
-        InputStream input = new URL(xlsxFileUrl).openStream();
-        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers);
+        File file = speciesUploadService.saveModifiedSpeciesFile(params);
         return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
         /*
         if (f.exists()) {
@@ -367,7 +334,7 @@ class UFileController {
 
     private Map convertExcelToCSV(File uploaded, params ) {
         def spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath).get(0)
-        File outCSVFile = createFile(outputCSVFile, params.uploadDir)
+        File outCSVFile = observationService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
 
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);

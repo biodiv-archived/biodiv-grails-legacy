@@ -291,11 +291,13 @@ $('#downloadModifiedSpecies').click(function() {
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
     //headerMarkers = JSON.stringify(headerMarkers);
-    var headerMarkers = JSON.stringify($('#headerMetadata').val());
-    console.log(gData);
-    var saveModifiedUrl = $('#saveModifiedUrl').val(); 
+    //Getting headerMetadata only
+    //var headerMarkers = JSON.stringify($('#headerMetadata').val());
+    var headerMarkers = JSON.stringify(getHeaderMetadata());
+    //console.log(gData);
+    //var saveModifiedUrl = $('#saveModifiedUrl').val(); 
     $.ajax({
-        url : saveModifiedUrl,
+        url : window.params.saveModifiedSpecies,
         type : 'post', 
         dataType: 'json',
         data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData },
@@ -307,10 +309,34 @@ $('#downloadModifiedSpecies').click(function() {
 
         },
         error: function(xhr, textStatus, errorThrown) {
-            alert('Error making tags for this header');
+            alert('Error downloading file!!');
             console.log(xhr);
         }
     });
 
 });
+
+$('#uploadSpecies').click(function() {
+    getTagsForHeaders();
+    var xlsxFileUrl = $('#xlsxFileUrl').val();
+    var gData = JSON.stringify(grid.getData());
+    var headerMarkers = JSON.stringify(getHeaderMetadata());
+    $.ajax({
+        url : window.params.uploadSpecies,
+        type : 'post', 
+        dataType: 'json',
+        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData },
+        success : function(data) {
+            $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
+            $("#uploadSpeciesDiv").hide();
+            document.getElementById("downloadSpeciesFile").style.visibility = "visible";
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert('Error uploading species!!');
+            console.log(xhr);
+        }
+    });
+
+});
+
 

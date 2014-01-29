@@ -476,12 +476,18 @@ class SpeciesController extends AbstractObjectController {
         } else {
             contributors << springSecurityService.currentUser
         }
-        */
-
-        if(params.uFile) {
+         */
+        println "===Upload called ===" + params
+        if(params.xlsxFileUrl) {
+            File file = speciesUploadService.saveModifiedSpeciesFile(params)
+            println "=====THE FILE BEING UPLOADED====== " + file
+            return render(text: [success:true,msg:"SUCCESSFULLY UPLOADED", downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+        }
+    /*
+    if(params.uFile) {
             String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
             File speciesDataFile = new File(contentRootDir, params.uFile.path[0])
-            if(/*contributors && */speciesDataFile.exists()) {
+            if(/*contributors && speciesDataFile.exists()) {
                 if(params.uFile.path[1]) {
                     File mappingFile = new File(contentRootDir, params.uFile.path[1])
                     speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
@@ -490,9 +496,10 @@ class SpeciesController extends AbstractObjectController {
 					//grailsApplication.config.speciesPortal.images.uploadDir = params.imagesDir
                     speciesUploadService.uploadNewSimpleSpreadsheet(speciesDataFile.getAbsolutePath(), params.imagesDir);
 					render "Done simple species upload"
-                }
+                 }
             }
         }
+        */
 	}
 	
 	@Secured(['ROLE_ADMIN'])
