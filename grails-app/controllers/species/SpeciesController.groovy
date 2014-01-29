@@ -53,7 +53,8 @@ class SpeciesController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else{
-			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            if(params.webaddress)
+			    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
 			model.resultType = "species"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -419,6 +420,9 @@ class SpeciesController extends AbstractObjectController {
 			render (view:"search", model:model)
 			return;
 		} else {
+            if(params.webaddress)
+			    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+
 			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
 			model.resultType = "specie"
