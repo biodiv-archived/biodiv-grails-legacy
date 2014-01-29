@@ -105,8 +105,8 @@ max-width: 100%;
 				</g:hasErrors>
 			
 			
-			<g:set var="founders_autofillUsersId" value="id1" />
-			<g:set var="experts_autofillUsersId" value="id2" />
+			<g:set var="founders_autofillUsersId" value="founder_id" />
+			<g:set var="experts_autofillUsersId" value="expert_id" />
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
 				<input type="hidden" name="id" value="${userGroupInstance?.id}"/>

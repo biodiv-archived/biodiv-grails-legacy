@@ -60,4 +60,16 @@ function loadUserGroupLocation (ne_latitude, ne_longitude, sw_latitude, sw_longi
     });
 }
 
+function loadUserGroupStats(url){
+	if($('.basicStatDiv').length > 0){
+		$.get(url, function(data) {
+			$('.basicStatDiv .observationCount').text(data.observationCount);
+			$('.basicStatDiv .checklistCount').text(data.checklistCount);
+			$('.basicStatDiv .speciesCount').text(data.speciesCount);
+			$('.basicStatDiv .documentCount').text(data.documentCount);
+			$('.basicStatDiv .userCount').text(data.userCount);
+		});
+	}
+}
+
 

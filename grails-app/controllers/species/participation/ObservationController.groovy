@@ -914,22 +914,7 @@ class ObservationController extends AbstractObjectController {
 	 */
 	def count = {
 		log.debug params
-		def userGroup 
-		if(params.webaddress) {
-			userGroup = userGroupService.get(params.webaddress)
-		}
-		
-		if(userGroup){
-			render userGroupService.getCountByGroup(Observation.simpleName, userGroup);
-		}else{
-			render Observation.createCriteria().count {
-				and {
-					eq("isDeleted", false)
-					eq("isShowable", true)
-					eq("isChecklist", false)
-				}
-			}
-		}
+		render chartService.getObservationCount(params)
 	}
 
 	@Secured(['ROLE_USER'])
