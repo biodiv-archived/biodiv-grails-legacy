@@ -256,17 +256,20 @@ class SpeciesService {
         return false;
     }
 
-
-    def updateContributor(long contributorId, long speciesFieldId, def value, String type) {
+    def updateContributor(contributorId, long speciesFieldId, def value, String type) {
         if(!value) {
             return [success:false, msg:"Field content cannot be empty"]
         }
 
-        Contributor oldContrib = Contributor.read(contributorId);
-        if(!oldContrib) {
-            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
-        } else if(oldContrib.name == value) {
-            return [success:true, msg:"Nothing to change"]
+        Contributor oldContrib;
+        if(contributorId) {
+            oldContrib = Contributor.read(contributorId);
+
+            if(!oldContrib) {
+                return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+            } else if(oldContrib.name == value) {
+                return [success:true, msg:"Nothing to change"]
+            }
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
@@ -279,23 +282,34 @@ class SpeciesService {
             if(!c) {
                 return [success:false, msg:"Error while updating ${type}"]
             } else {
+                String msg = '';
+                def content;
                 if(type == 'contributor') {
-                    speciesField.removeFromContributors(oldContrib);
+                    if(oldContrib)
+                        speciesField.removeFromContributors(oldContrib);
                     speciesField.addToContributors(c);
+                    msg = 'Successfully added contributor';
+                    content = speciesField.contributors;
                 } else if (type == 'attributor') {
-                    speciesField.removeFromAttributors(oldContrib);
+                    if(oldContrib)
+                        speciesField.removeFromAttributors(oldContrib);
                     speciesField.addToAttributors(c);
+                    msg = 'Successfully added attributor';
+                    content = speciesField.attributors;
+                } else {
+                    return [success:false, msg:"Error while updating ${type}"]
                 }
+
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
                     return [success:false, msg:"Error while updating ${type}"]
                 }
-                return [success:true, msg:""]
+                return [success:true, msg:msg, content:content]
             }
         }
     }
 
-    def updateDescription(long id, def value) {
+    def updateDescription(Long id, def value) {
         if(!value) {
             return [success:false, msg:"Field content cannot be empty"]
         }

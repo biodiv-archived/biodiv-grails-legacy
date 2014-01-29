@@ -34,7 +34,7 @@ class SpeciesController extends AbstractObjectController {
 	def speciesService;
 	def observationService;
 	def userGroupService
-	
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -53,7 +53,8 @@ class SpeciesController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else{
-			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            if(params.webaddress)
+			    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
 			model.resultType = "species"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);

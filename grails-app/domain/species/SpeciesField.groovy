@@ -42,18 +42,18 @@ class SpeciesField implements Rateable {
 	String description;
 	Date dateCreated
 	Date lastUpdated
-	
+    List<Contributor> contributors;
+    List<Contributor> attributors;
 	
 	static hasMany = [contributors:Contributor, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
 	static mapping = {
 		description type:"text";
-		tablePerHierarchy true		
+		tablePerHierarchy true;
 	}
 	
 	static constraints = {
-	
 		contributors validator : { val, obj ->
 			if(!val) {
 				println "++++++${obj}"
@@ -68,6 +68,4 @@ class SpeciesField implements Rateable {
 			}
 		}
 	}
-
-	
 }

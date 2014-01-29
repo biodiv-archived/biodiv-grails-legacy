@@ -2576,3 +2576,6 @@ small {
     font-weight: bold;
     color: #9e9e9e;
 }
+.editable-click, a.editable-click, a.editable-click:hover {
+    border-bottom: none;
+}

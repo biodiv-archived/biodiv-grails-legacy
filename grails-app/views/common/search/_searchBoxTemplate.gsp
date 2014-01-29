@@ -52,7 +52,8 @@ $(document).ready(function() {
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
                 'species':{
-                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
+                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
+                    'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}"
                 },
                 'content':{
                     'url':"${uGroup.createLink('controller':'content')}"
