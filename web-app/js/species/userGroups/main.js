@@ -64,7 +64,7 @@ function loadUserGroupStats(url){
 	if($('.basicStatDiv').length > 0){
 		$.get(url, function(data) {
 			$('.basicStatDiv .observationCount').text(data.observationCount);
-			$('.basicStatDiv .checklistCount').text(data.checklistCount);
+			$('.basicStatDiv .checklistsCount').text(data.checklistsCount);
 			$('.basicStatDiv .speciesCount').text(data.speciesCount);
 			$('.basicStatDiv .documentCount').text(data.documentCount);
 			$('.basicStatDiv .userCount').text(data.userCount);

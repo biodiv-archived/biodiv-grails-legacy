@@ -385,5 +385,11 @@ class UserGroup implements Taggable {
     def noOfDocuments() {
         return userGroupService.getCountByGroup(Document.simpleName, this.id?this:null);
     }
-
+    
+    
+    static UserGroup findByWebaddress(webaddress){
+    	if(webaddress){
+    		return UserGroup.findWhere(webaddress: webaddress)
+    	}
+    }
 }
