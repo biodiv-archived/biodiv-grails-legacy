@@ -70,7 +70,7 @@ function getSpeciesHeaderMenuOptions() {
 function populateTagHeaders(columns, tags) {    
     var tableRow = '';
     for(i=0; i<columns.length; i++){
-        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"><input class="dataColumns"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "headerFlag"></td><td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td><td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="G1">G1<input type="radio" class="groupRadio" name="group'+i+'" value="G2">G2<input type="radio" class="groupRadio" name="group'+i+'" value="G3">G3</td><td class="delimiterCell"><input type="text" class="delimiter"></td></tr>'
+        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"><input class="dataColumns"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td><td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td><td class="delimiterCell"><input type="text" class="delimiter"></td></tr>'
     } 
     /*
     for (i=0;i<columns.length;i++){
@@ -108,9 +108,13 @@ function getTagsForHeaders() {
                  headerInfo["dataColumns"] =  $(this).find(".dataColumns").val();
              }
              else if($(this).attr("class") == "headerFlagCell") {
-                 headerInfo["header"] = ""
+                headerInfo["header"] = ""
              //if($(this).children(".headerFlag").prop("checked")){
-             headerInfo["header"] =  $(this).children(".headerFlag:checked").map(function() {return this.value;}).get().join();
+                headerInfo["header"] =  $(this).children(".headerFlag:checked").map(function() {return this.value;}).get().join();
+                if(headerInfo["header"] == "")
+                {
+                    headerInfo["header"] = "false";
+                }
          //}
              }
              else if($(this).attr("class") == "mergeFlagCell") {
@@ -320,7 +324,9 @@ $('#uploadSpecies').click(function() {
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
-    var headerMarkers = JSON.stringify(getHeaderMetadata());
+    var hm = getHeaderMetadata();
+    delete hm["undefined"];
+    var headerMarkers = JSON.stringify(hm);
     $.ajax({
         url : window.params.uploadSpecies,
         type : 'post', 

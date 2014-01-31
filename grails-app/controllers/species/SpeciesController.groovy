@@ -477,29 +477,50 @@ class SpeciesController extends AbstractObjectController {
             contributors << springSecurityService.currentUser
         }
          */
+        
         println "===Upload called ===" + params
         if(params.xlsxFileUrl) {
+            def startTime = new Date()
             File file = speciesUploadService.saveModifiedSpeciesFile(params)
             println "=====THE FILE BEING UPLOADED====== " + file
+            def endTime = new Date()
+            def otherParams = [:]
+            def usersMailList = []
+            speciesList.each{ sp ->
+                curators = speciesPermissionService.getCurators(sp)
+                curators.each { cu ->
+                    usersMailList.add(cu)
+                }
+            }
+            otherParams["usersMailList"] = usersMailList
+            def linkParams = [:]
+            linkParams["daterangepicker_start"] = startTime
+            linkParams["daterangepicker_end"] = endTime
+            String link = observationService.generateLink("species", "list", linkParams)
+            otherParams["link"] = link
+            //FOR EACH SPECIES UPLOADED send mail
+            //how to send the link generated
+            //what about activity feed
+            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,speciesList[0],null,null,null,otherParams)
             return render(text: [success:true,msg:"SUCCESSFULLY UPLOADED", downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
-        }
+    }
     /*
     if(params.uFile) {
-            String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
-            File speciesDataFile = new File(contentRootDir, params.uFile.path[0])
-            if(/*contributors && speciesDataFile.exists()) {
-                if(params.uFile.path[1]) {
-                    File mappingFile = new File(contentRootDir, params.uFile.path[1])
-                    speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-					render "Done mapped species upload"
-                } else {
-					//grailsApplication.config.speciesPortal.images.uploadDir = params.imagesDir
-                    speciesUploadService.uploadNewSimpleSpreadsheet(speciesDataFile.getAbsolutePath(), params.imagesDir);
-					render "Done simple species upload"
-                 }
-            }
+        String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
+        File speciesDataFile = new File(contentRootDir, params.uFile.path[0])
+        if(/*contributors && speciesDataFile.exists()) {
+        if(params.uFile.path[1]) {
+        File mappingFile = new File(contentRootDir, params.uFile.path[1])
+        speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
+        render "Done mapped species upload"
+        } else {
+        //grailsApplication.config.speciesPortal.images.uploadDir = params.imagesDir
+        speciesUploadService.uploadNewSimpleSpreadsheet(speciesDataFile.getAbsolutePath(), params.imagesDir);
+        render "Done simple species upload"
         }
-        */
+        }
+        }
+         */
 	}
 	
 	@Secured(['ROLE_ADMIN'])
