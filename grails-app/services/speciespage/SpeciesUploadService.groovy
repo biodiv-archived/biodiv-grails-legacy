@@ -60,7 +60,7 @@ class SpeciesUploadService {
 	def observationService;
 	def springSecurityService
 
-	static int BATCH_SIZE = 1;
+	static int BATCH_SIZE = 5;
 	int noOfFields = Field.count();
 
 	/**
@@ -163,7 +163,7 @@ class SpeciesUploadService {
 	 * @param contentHeaderRowNo
 	 * @return
 	 */
-	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="") {
+	Map uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="") {
         log.info "Uploading mapped spreadsheet : "+file;
 
 		List<Species> species = new ArrayList<Species>();
@@ -171,13 +171,17 @@ class SpeciesUploadService {
 
 
 		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
+		
+		println "======================== map after read  " 
+		//println  converter.mappingConfig
+		println "================================================================="
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		List<Map> imagesMetaData;
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 			converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 		}
 
-		return saveSpecies(converter, content, imagesDir);
+		return ['uploadCount' : saveSpecies(converter, content, imagesDir), 'log':converter.getSummary()];
 	}
 
 	/**
@@ -237,14 +241,16 @@ class SpeciesUploadService {
 	}
 
 	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
-        converter.setLogAppender(fa);
+		converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		def speciesElements = [];
 		int noOfSpecies = content.size();
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
-				noOfInsertions += saveSpeciesElements(speciesElements);
+				def res = saveSpeciesElements(speciesElements)
+				noOfInsertions += res.noOfInsertions;
+				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
 				speciesElements.clear();
 				cleanUpGorm();
 			}
@@ -257,17 +263,42 @@ class SpeciesUploadService {
 		
 		//saving last batch
 		if(speciesElements.size() > 0) {
-			noOfInsertions += saveSpeciesElements(speciesElements);
+			def res = saveSpeciesElements(speciesElements)
+			noOfInsertions += res.noOfInsertions;
+			converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
 			speciesElements.clear();
 			cleanUpGorm();
 		}
 
+		
+		println "================================ LOG SUMMARY======================"
+		println  converter.getSummary()
+		println "=================================================================="
+		
 		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		log.info "Total number of species that got added : ${noOfInsertions}"
 		return noOfInsertions;
 	}
 
-	private int saveSpeciesElements(List speciesElements) {
+	private Map saveSpeciesElementsWrapper(List speciesElements) {
+		def res = saveSpeciesElements(speciesElements)
+		if(res.noOfInsertions == speciesElements.size()){
+			return res
+		}
+		
+		//batch fail now running 1 by 1 for each species
+		List<Species> species = new ArrayList<Species>();
+		int noOfInsertions = 0;
+		speciesElements.each { sEle ->
+			def tmpRes = saveSpeciesElements([sEle])
+			noOfInsertions += tmpRes.noOfInsertions
+			species.addAll(tmpRes.species)
+		}
+		
+		return ['noOfInsertions':noOfInsertions, 'species':species];
+	}
+	
+	private Map saveSpeciesElements(List speciesElements) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
 
@@ -276,7 +307,6 @@ class SpeciesUploadService {
 
 		int noOfInsertions = 0;
 		try {
-			List<Species> addedSpecies = new ArrayList<Species>();
 			//Species.withTransaction { status ->
 				for(Node speciesElement : speciesElements) {
 					Species s = converter.convertSpecies(speciesElement)
@@ -302,10 +332,7 @@ class SpeciesUploadService {
 			e.printStackTrace()
 		}
 
-
-
-
-		return noOfInsertions;
+		return ['noOfInsertions':noOfInsertions, 'species':species];
 	}
 
 	/** 
@@ -360,13 +387,17 @@ class SpeciesUploadService {
 
 				//externalLinksService.updateExternalLinks(taxonConcept);
 			} catch(e) {
+				s.appendLogSummary(e.printStackTrace())
 				e.printStackTrace()
 			}
 
 			s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
-				s.errors.allErrors.each { log.error it }
+				s.errors.allErrors.each { 
+					log.error it
+					s.appendLogSummary(it)
+				}
 			} else {
 				noOfInsertions++;
 				//addedSpecies.add(s);

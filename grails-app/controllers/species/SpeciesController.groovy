@@ -540,9 +540,9 @@ class SpeciesController extends AbstractObjectController {
             println "========== specie data file "
             if(speciesDataFile.exists()) {
                     File mappingFile = new File(contentRootDir, "speciesaccount188_mapping.xlsx")
-                    speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-                    grailsApplication.config.speciesPortal.images.uploadDir  = oldDir
-					render "Done mapped species upload"
+                    def res = speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
+                    //grailsApplication.config.speciesPortal.images.uploadDir  = oldDir
+					render res.log
                 }
                 else{
                 	render "not found"

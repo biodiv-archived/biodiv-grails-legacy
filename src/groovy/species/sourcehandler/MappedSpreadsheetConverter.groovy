@@ -22,8 +22,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	public List<Map> imagesMetaData;
 	public List<Map> mappingConfig;
 	
+	//to keep track of current species index. used for reporting error.
+	private int currentRowIndex = 1;
+	private StringBuffer summary; 
 	public MappedSpreadsheetConverter() {
-		imagesMetaData = [];		
+		imagesMetaData = [];
+		summary = new StringBuffer()
 	}
 
 	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo, String imagesDir="") {
@@ -62,7 +66,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int i=0;
 		
 			//log.debug speciesContent;
-			Node speciesElement = builder.createNode("species");
+			Node speciesElement = builder.createNode("species", ['rowIndex':currentRowIndex++]);
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
 				String delimiter = mappedField.get("content delimiter");
@@ -252,5 +256,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
             LOG.addAppender(fa);
         }
     }
-
+	
+	def addToSummary(String str){
+		if(str){
+			summary.append(str+ System.getProperty("line.separator"))
+		}
+	}
+	
+	def String getSummary(){
+		return summary.toString()
+	}
 }
