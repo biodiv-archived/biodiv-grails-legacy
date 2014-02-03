@@ -47,6 +47,8 @@ class UFileController {
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
+    static String columnSep = SpreadsheetWriter.columnSep
+    static String keyValueSep = SpreadsheetWriter.keyValueSep
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
@@ -106,7 +108,7 @@ class UFileController {
             if(params.fileConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
                 xlsxFileUrl = url;
                 if(params.fromChecklist == "false") {
-                    headerMetadata = getHeaderMetaData(uploaded);
+                    headerMetadata = getHeaderMetaDataInFormat(uploaded);
                     println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
                 }
                 res = convertExcelToCSV(uploaded, params)
@@ -299,6 +301,95 @@ class UFileController {
         return [totalUFileInstanceList:totalUFileInstanceList, UFileInstanceList: UFileInstanceList, UFileInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
 
     }
+
+    public Map getHeaderMetaDataInFormat(File uploaded) {
+		def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+        def sheetContent
+        def res = [:]
+        if(completeContent.size() == 3 ){
+            sheetContent = completeContent.get(2)
+            println "==SHEET CONTENT ======== " + sheetContent
+        }
+        else{
+            println " ======NO HEADER METADATA=== "
+            return res
+        }
+		sheetContent.each{ sc ->
+			String s1,s2
+			if(sc["category"] == ""){
+				s1 = ""
+	 		}
+	 		else{
+				s1 = "|"
+			}
+			if(sc["subcategory"] == ""){
+				s2 = ""
+	 		}
+	 		else{
+				s2 = "|"
+			}
+			String dataColumn = sc["concept"] + s1 + sc["category"] + s2 + sc["subcategory"]
+			String fieldNames = sc["field name(s)"].toLowerCase()
+            String conDel = sc["content delimiter"]
+            String conFor = sc["content format"]
+            if(fieldNames != ""){
+                List fnList = fieldNames.split(",")
+                def cdMap = [:]
+                def gMap = [:]
+                def hMap = [:]
+                if(conDel != ""){
+                    println conDel
+                    List conDelList = conDel.split(columnSep)
+                    println "===CDLIST = " + conDelList
+                    conDelList.each { cdl ->
+                        def z = cdl.split(keyValueSep)
+                        if(z.size()==2){
+                            cdMap[z[0]] = z[1]
+                        }
+                        else{
+                            cdMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(conFor != ""){
+                    List conForList = conFor.split(columnSep)
+                    conForList.each { cfl ->
+                        def z = cfl.split(keyValueSep)
+                        def q = z[1].split(";")
+                        if(q[0].split("=").size() == 2){
+                            gMap[z[0]] = q[0].split("=")[1]
+                        }else{
+                            gMap[z[0]] = "" 
+                        }
+                        if(q[1].split("=").size() == 2){
+
+                            hMap[z[0]] = q[1].split("=")[1]	
+                        }
+                        else{
+                            hMap[z[0]] = ""
+                        }
+                    }
+                }
+                fnList.each{ fn ->
+                    fn = fn.trim()
+                    def val = res[fn]
+                    if(val){
+                        val["dataColumns"] = val["dataColumns"] + "," + dataColumn
+                    }
+                    else{
+                        def m =[:]
+                        m["dataColumns"] = dataColumn
+                        m["delimiter"] = cdMap[fn]
+                        m["group"] = gMap[fn]
+                        m["header"] = hMap[fn]
+                        res[fn] = m
+                    }
+                }
+            }
+        }
+        println "=======QQQQQQQQQQQQQQQ==========" + res
+        return res
+	}
 
     public Map getHeaderMetaData(File uploaded) {
         def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)

@@ -144,17 +144,28 @@ function setUnEditableColumn(columns){
         $('#checklistStartFile_uploaded').hide();
 
         if(res === "species") {
-            populateTagHeaders(columns);
+            var col = new Array();
+            var k = 0;
+            for(var i= 0; i < columns.length; i++) {
+                if(columns[i].name != "Media"){
+                    console.log(columns[i].name);
+                    col[k] = columns[i];
+                    k=k+1;
+                }
+            }
+            populateTagHeaders(col);
             $.ajax({
                 url:window.params.getDataColumnsDB,
                 dataType:'JSON',
                 success:function(data){
-                    $(".dataColumns").tagit({
+                   updateMetadataValues();  
+                    $(".headerInfoTags").tagit({
                         availableTags:data,
+                        fieldName: 'tags', 
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                    updateMetadataValues();
+                   
                 }
             });
         }

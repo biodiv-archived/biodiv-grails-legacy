@@ -26,8 +26,10 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.usermodel.DataFormatter;
 
 public class SpreadsheetWriter {
+
     static final String keyValueSep = "#11#";
     static final String columnSep = "#12#";
+    
     public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers) {
         System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
@@ -149,6 +151,7 @@ public class SpreadsheetWriter {
 
         for(Map.Entry<String , Map<String,String> > entry : headerMarkers.entrySet()) {
             String headerName = entry.getKey();
+            headerName = headerName.trim().toLowerCase();
             Map<String,String> headerValues = new HashMap();
             for(Map.Entry<String, String> en : entry.getValue().entrySet()) {
                 System.out.println("=======HERE======" + en.getKey());
@@ -160,10 +163,29 @@ public class SpreadsheetWriter {
             System.out.println(entry);
             System.out.println("---------" + entry.getValue() + entry.getValue().getClass());
             System.out.println("-------" + headerValues + headerValues.getClass());
-            String dataColumns = headerValues.get("dataColumns");
-            String group = headerValues.get("group");
-            String includeHeadings = headerValues.get("header");
-            String delimiter = headerValues.get("delimiter");
+            String dataColumns = "";
+            if(headerValues.get("dataColumns") != null){
+                dataColumns = headerValues.get("dataColumns");
+                dataColumns = dataColumns.trim();
+            }
+            String group = "";
+            if(headerValues.get("group") != null){
+                group = headerValues.get("group");
+                group = group.trim();
+            }
+
+            System.out.println("====ERROR FINIDING==" + headerValues.get("group"));
+            String includeHeadings = "";
+            if(headerValues.get("header") != null){
+                includeHeadings = headerValues.get("header");
+                includeHeadings = includeHeadings.trim();
+            }
+            String delimiter = "";
+            if(headerValues.get("delimiter") != null){
+                delimiter = headerValues.get("delimiter");
+                delimiter = delimiter.trim();
+            }
+
             System.out.println("=======" + dataColumns);
             List<String> dcList = Arrays.asList(dataColumns.split(","));
             Iterator<String> dcIterator = dcList.iterator();
@@ -181,29 +203,31 @@ public class SpreadsheetWriter {
                     }
                     String contentDelimiter = m.get("contentDelimiter");
                     if(contentDelimiter != "") {
-                        contentDelimiter += columnSep + headerName + keyValueSep + delimiter;
+                            contentDelimiter += columnSep + headerName + keyValueSep + delimiter;
                         m.put("contentDelimiter", contentDelimiter);
                     }
                     else {
-                        m.put("contentDelimiter", headerName + keyValueSep + delimiter);
+                            m.put("contentDelimiter", headerName + keyValueSep + delimiter);
                     }
                     String contentFormat = m.get("contentFormat");
                     if(contentFormat != "") {
-                        contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";includeHeadings=" + includeHeadings;
-                        m.put("contentFormat", contentFormat);
+                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";";
+                            m.put("contentFormat", contentFormat);
                     }
                     else {
-                        m.put("contentFormat", headerName + keyValueSep + "Group=" + group +";includeHeadings=" + includeHeadings);
+                        m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
                     }
                 }else {
                     Map<String, String> m1 = new HashMap();
                     m1.put("fieldNames", headerName);
-                    m1.put("contentDelimiter",  headerName + keyValueSep + delimiter);
-                    m1.put("contentFormat", headerName + keyValueSep + "Group=" + group +";includeHeadings=" + includeHeadings);
+                    m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
+                    m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+
+
                     reverseMarkers.put(nextVal, m1);
                 }
             }
-            
+
         }
 
         Row row = sheet.createRow(rownum++);
@@ -217,9 +241,7 @@ public class SpreadsheetWriter {
         for(Map.Entry<String , Map<String,String> > entry : reverseMarkers.entrySet()) {
             String[] arr = new String[numOfColumns];
             String headerName = entry.getKey();
-            System.out.println(entry.getKey().split("\\|"));
             List<String> pipedNameList = Arrays.asList(headerName.split("\\|"));
-            System.out.println(pipedNameList);
             Iterator<String> pnlIterator = pipedNameList.iterator();
             for(int i = 0; i < 3; i++){
                 if(pnlIterator.hasNext()){
@@ -238,9 +260,9 @@ public class SpreadsheetWriter {
                 Cell cell = row.createCell(cellNum);
                 cell.setCellValue(arr[cellNum]);
             }
-            
+
         }
-    
+
     }
 
     public static void writeHeaderMarkersInSheet(Workbook wb, Map<String, Map<String,String> > headerMarkers) {

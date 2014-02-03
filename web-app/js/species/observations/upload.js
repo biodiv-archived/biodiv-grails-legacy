@@ -67,10 +67,10 @@ function getSpeciesHeaderMenuOptions() {
     }
 }
 
-function populateTagHeaders(columns, tags) {    
+function populateTagHeaders(columns) {    
     var tableRow = '';
     for(i=0; i<columns.length; i++){
-        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"><input class="dataColumns"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td><td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td><td class="delimiterCell"><input type="text" class="delimiter"></td></tr>'
+        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><!--td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td--><td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td><td class="delimiterCell"><input type="text" class="delimiter"></td></tr>'
     } 
     /*
     for (i=0;i<columns.length;i++){
@@ -105,7 +105,13 @@ function getTagsForHeaders() {
                  console.log(headerName);
              }
              else if($(this).attr("class") == "dataColCell") {
-                 headerInfo["dataColumns"] =  $(this).find(".dataColumns").val();
+                var valArr = [];
+                $(this).find('span.tagit-label').each(function(i){
+                    valArr.push($(this).text()); // This is your rel value
+                });
+                var valData = valArr.join();
+                console.log(valData);
+                headerInfo["dataColumns"] =  valData;
              }
              else if($(this).attr("class") == "headerFlagCell") {
                 headerInfo["header"] = ""
@@ -170,12 +176,9 @@ function getTagsForHeaders() {
 
 
 function updateMetadataValues() {
-    /*<li class="tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable"><span class="tagit-label">option1</span><a class="tagit-close"><span class="text-icon">×</span><span class="ui-icon ui-icon-close"></span></a></li>
-    <ul class="tagit ui-widget ui-widget-content ui-corner-all">
-    */
     var headerMetadata = getHeaderMetadata();
     console.log("UPDATE METADATA");
-    console.log();
+    console.log(JSON.stringify(headerMetadata));
     
     if(Object.keys(headerMetadata).length != 0){
         $("#tableHeader tr").each(function () {
@@ -184,90 +187,58 @@ function updateMetadataValues() {
                 if($(this).attr("class") == "columnName"){
                     var columnName = $(this).text();
                     taggedValues = headerMetadata[columnName];
+                    console.log("======" + columnName);
+                    console.log(" ====== "+ JSON.stringify(taggedValues));
                 }
-                else if($(this).attr("class") == "dataColCell") {
-                    var dataColumns = taggedValues["dataColumns"];
-                    if(dataColumns!== ""){
-                        var dataColArr = dataColumns.split(",");
-                        //APPEND EACH VALUE TO UL COMPONENT
-                        var preList="";
-                        $.each(dataColArr, function( index, value ) {
-                            preList += '<li class="tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable"><span class="tagit-label">'+value+'</span><a class="tagit-close"><span class="text-icon">×</span><span class="ui-icon ui-icon-close"></span></a></li>'
-                        });
-                        console.log(preList);
-                        $(this).find('ul').prepend(preList);
+                if(taggedValues != undefined){
+                    if($(this).attr("class") == "dataColCell") {
+                        var preList='<ul class="headerInfoTags" >';
+                        var dataColumns = taggedValues["dataColumns"];
+                        if(dataColumns!== ""){
+                            var dataColArr = dataColumns.split(",");
+                            //APPEND EACH VALUE TO UL COMPONENT
+                            $.each(dataColArr, function( index, value ) {
+                                preList += '<li>'+value+'</li>'
+                            });
+                            preList += '</ul>';
+                            $(this).append(preList);
+                        }
                     }
-                }
-                else if($(this).attr("class") == "headerFlagCell") {
-                    var header = taggedValues["header"];
-                    if(header !== ""){
-                        $(this).children("input[value='" + header + "']").prop('checked', true);
+                    else if($(this).attr("class") == "headerFlagCell") {
+                        var header = taggedValues["header"];
+                        if(header !== ""){
+                            $(this).children("input[value='" + header + "']").prop('checked', true);
+                        }
                     }
-                }
-                else if($(this).attr("class") == "mergeFlagCell") {
-                    var merge = taggedValues["merge"];
-                    if(merge !== ""){
-                        $(this).children("input[value='" + merge + "']").prop('checked', true);
+                    /*
+                       else if($(this).attr("class") == "mergeFlagCell") {
+                       var merge = taggedValues["merge"];
+                       if(merge !== ""){
+                       $(this).children("input[value='" + merge + "']").prop('checked', true);
+                       }
+                       }
+                       */
+                    else if($(this).attr("class") == "groupRadioCell") {
+                        var group = taggedValues["group"];
+                        if(group !== ""){
+                            $(this).children("input[value='" + group + "']").prop('checked', true);
+                        }
                     }
-                }
-                else if($(this).attr("class") == "groupRadioCell") {
-                    var group = taggedValues["group"];
-                    if(group !== ""){
-                        $(this).children("input[value='" + group + "']").prop('checked', true);
-                    }
-                }
-                else if($(this).attr("class") == "delimiterCell") {
-                    var delimiter = taggedValues["delimiter"];
-                    if(delimiter !== ""){
-                        $(this).children(".delimiter").val(delimiter);
+                    else if($(this).attr("class") == "delimiterCell") {
+                        var delimiter = taggedValues["delimiter"];
+                        if(delimiter !== ""){
+                            $(this).children(".delimiter").val(delimiter);
+                        }
                     }
                 }
             });
 
         });
     }
-    /*	
-        console.log("UPDATION CALLED");
-        var headerMetadata = getHeaderMetadata();
-        console.log(headerMetadata);
-        $("#dataColumns").children().prop('checked', false);
-        $("#groupRadio").children().prop('checked', false);
-        $("#mergeFlag").children().prop('checked', false);
-        $("#headerFlag").children().prop('checked', false);
-    if(headerMetadata && headerMetadata[value] != null) {
-        console.log("VALUE HAI ISKI");
-        var taggedValues = headerMetadata[value];
-        var group = taggedValues["group"];
-        var dataColumns = taggedValues["dataColumns"];
-        var merge = taggedValues["merge"];
-        var header = taggedValues["header"];
-        console.log(taggedValues + "==== "+ group);
-        if(group !== ""){
-            $('#groupRadio').children("input[value='" + group + "']").prop('checked', true);
-        }
-        if(dataColumns!== ""){
-            var dataColArr = dataColumns.split(",");
-            $.each(dataColArr, function( index, value ) {
-                $('#dataColumns').children("input[value='" + value + "']").prop('checked', true);
-            });
-        }
-        if(merge !== ""){
-            $('#mergeFlag').children("input[value='" + merge + "']").prop('checked', true);
-        }
-        if(header !== ""){
-            $('#headerFlag').children("input[value='" + header + "']").prop('checked', true);
-        }
-
-
     }
-    //$('#groupRadio').children("input[value='G2']");
-   //$("input[value='" + val + "']").prop('checked', true);
-   */
-}
 
 function getHeaderMetadata() {
     var headerMetadata = $('#headerMetadata').val();
-    console.log("getting data " + headerMetadata);
     //var headerMetadataParse = $.parseJSON(headerMetadata);
     //console.log("after parse" + headerMetadataParse);
     return headerMetadata;
@@ -298,7 +269,7 @@ $('#downloadModifiedSpecies').click(function() {
     //Getting headerMetadata only
     //var headerMarkers = JSON.stringify($('#headerMetadata').val());
     var headerMarkers = JSON.stringify(getHeaderMetadata());
-    //console.log(gData);
+    console.log("==CHECK THIS===" + headerMarkers);
     //var saveModifiedUrl = $('#saveModifiedUrl').val(); 
     $.ajax({
         url : window.params.saveModifiedSpecies,
