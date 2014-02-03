@@ -69,8 +69,10 @@ class ObservationService extends AbstractObjectService {
     def activityFeedService;
     def mailService;
     def SUserService;
+    def speciesPermissionService;
 
     static final String OBSERVATION_ADDED = "observationAdded";
+    static final String SPECIES_UPLOADED = "speciesUploaded"
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
     static final String SPECIES_AGREED_ON = "speciesAgreedOn";
     static final String SPECIES_NEW_COMMENT = "speciesNewComment";
@@ -1474,7 +1476,7 @@ class ObservationService extends AbstractObjectService {
 
     /**
      */
-    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null) {
+    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
         def conf = SpringSecurityUtils.securityConfig
         log.debug "Sending email"
         try {
@@ -1522,7 +1524,14 @@ class ObservationService extends AbstractObjectService {
                 templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
                 toUsers.add(getOwner(obv))
                 break
-
+                
+                case SPECIES_UPLOADED:
+                mailSubject = "Request to curate species"
+                bodyView = "Hello"
+                templateMap["message"] = "curate these species"
+                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                toUsers.add(speciesPermissionService.getCurators(obv))
+                break
 
                 case OBSERVATION_FLAGGED :
                 mailSubject = activityFeedService.getResType(obv).capitalize() + " flagged"
@@ -2157,4 +2166,27 @@ class ObservationService extends AbstractObjectService {
 
         return null;
     }
+
+    //Create file with given filename
+    def File createFile(String fileName, String uploadDir, String contentRootDir) {
+        File uploaded
+        if (uploadDir) {
+            File fileDir = new File(contentRootDir + "/"+ uploadDir)
+            if(!fileDir.exists())
+                fileDir.mkdirs()
+                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+
+        } else {
+
+            File fileDir = new File(contentRootDir)
+            if(!fileDir.exists())
+                fileDir.mkdirs()
+                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+            //uploaded = File.createTempFile('grails', 'ajaxupload')
+        }
+
+        log.debug "New file created : "+ uploaded.getPath()
+        return uploaded
+    }
+
 }

@@ -470,32 +470,58 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
-        /*List contributors;
-        if(!params.contributorIds) {
-			contributors = Utils.getUsersList(params.contributorIds);
-        } else {
-            contributors << springSecurityService.currentUser
-        }
-        */
+        println "===Upload called =====================" + params
+		def startTime = new Date()
+		def res = ""
 		
-		println "================= upload params " + params
-
-        if(params.uFile) {
-            String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
-            File speciesDataFile = new File(contentRootDir, params.uFile.path[0])
-            if(/*contributors && */speciesDataFile.exists()) {
-                if(params.uFile.path[1]) {
-                    File mappingFile = new File(contentRootDir, params.uFile.path[1])
-                    speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-					render "Done mapped species upload"
-                } else {
-					//grailsApplication.config.speciesPortal.images.uploadDir = params.imagesDir
-                    speciesUploadService.uploadNewSimpleSpreadsheet(speciesDataFile.getAbsolutePath(), params.imagesDir);
-					render "Done simple species upload"
+        if(params.xlsxFileUrl) {
+            
+            File speciesDataFile = speciesUploadService.saveModifiedSpeciesFile(params)
+            println "=====THE FILE BEING UPLOADED====== " + speciesDataFile
+			
+			
+			if(speciesDataFile.exists()) {
+				//File mappingFile = new File(contentRootDir, "speciesaccount188_mapping.xlsx")
+				println "=============== start ing   "
+				res = speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);
+				println "=============== done "
+				res = res.log
+			}
+			else{
+				res =  "not found"
+			}
+			
+			def endTime = new Date()
+			def mymsg =  " start time  " + startTime + "   end time " + endTime + "\n\n " + res
+			
+			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath()] as JSON, contentType:'text/html')
+			
+        }
+			
+            
+			/*
+            def otherParams = [:]
+            def usersMailList = []
+            speciesList.each{ sp ->
+                curators = speciesPermissionService.getCurators(sp)
+                curators.each { cu ->
+                    usersMailList.add(cu)
                 }
             }
-        }
-	}
+            otherParams["usersMailList"] = usersMailList
+            def linkParams = [:]
+            linkParams["daterangepicker_start"] = startTime
+            linkParams["daterangepicker_end"] = endTime
+            String link = observationService.generateLink("species", "list", linkParams)
+            otherParams["link"] = link
+            //FOR EACH SPECIES UPLOADED send mail
+            //how to send the link generated
+            //what about activity feed
+            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,speciesList[0],null,null,null,otherParams)
+            return render(text: [success:true,msg:"SUCCESSFULLY UPLOADED", downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+            */
+    }
+    
 	
 	@Secured(['ROLE_ADMIN'])
 	def requestExport = {

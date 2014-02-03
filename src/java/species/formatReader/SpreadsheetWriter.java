@@ -27,13 +27,16 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 
 public class SpreadsheetWriter {
 
+    static final String keyValueSep = "#11#";
+    static final String columnSep = "#12#";
+    
     public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers) {
         System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
             writeDataInSheet(wb, gridData, sheetNo);
-            writeHeaderMarkersInSheet(wb, headerMarkers);
+            writeHeadersInFormat(wb, headerMarkers);
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
             out.close();
@@ -133,6 +136,134 @@ public class SpreadsheetWriter {
         }
         return;
     }
+    
+    public static void writeHeadersInFormat(Workbook wb, Map<String, Map<String,String> > headerMarkers) {
+        System.out.println("=CLASS===="+headerMarkers.getClass());
+        Object o = headerMarkers.remove("undefined");
+        Sheet sheet = wb.getSheet("headerMetadata");
+        if(sheet != null) {
+            int sindex = wb.getSheetIndex(sheet);
+            wb.removeSheetAt(sindex);
+        }
+        sheet = wb.createSheet("headerMetadata");
+        Map <String, Map<String,String>> reverseMarkers = new HashMap();
+        int rownum = 0;
+
+        for(Map.Entry<String , Map<String,String> > entry : headerMarkers.entrySet()) {
+            String headerName = entry.getKey();
+            headerName = headerName.trim().toLowerCase();
+            Map<String,String> headerValues = new HashMap();
+            for(Map.Entry<String, String> en : entry.getValue().entrySet()) {
+                System.out.println("=======HERE======" + en.getKey());
+                if(en.getKey() != "undefined"){
+                    headerValues.put(en.getKey(), en.getValue());
+                }
+            }
+            System.out.println("==========NEW FUNC==============");
+            System.out.println(entry);
+            System.out.println("---------" + entry.getValue() + entry.getValue().getClass());
+            System.out.println("-------" + headerValues + headerValues.getClass());
+            String dataColumns = "";
+            if(headerValues.get("dataColumns") != null){
+                dataColumns = headerValues.get("dataColumns");
+                dataColumns = dataColumns.trim();
+            }
+            String group = "";
+            if(headerValues.get("group") != null){
+                group = headerValues.get("group");
+                group = group.trim();
+            }
+
+            System.out.println("====ERROR FINIDING==" + headerValues.get("group"));
+            String includeHeadings = "";
+            if(headerValues.get("header") != null){
+                includeHeadings = headerValues.get("header");
+                includeHeadings = includeHeadings.trim();
+            }
+            String delimiter = "";
+            if(headerValues.get("delimiter") != null){
+                delimiter = headerValues.get("delimiter");
+                delimiter = delimiter.trim();
+            }
+
+            System.out.println("=======" + dataColumns);
+            List<String> dcList = Arrays.asList(dataColumns.split(","));
+            Iterator<String> dcIterator = dcList.iterator();
+            while (dcIterator.hasNext()) {
+                String nextVal = dcIterator.next();
+                if(reverseMarkers.containsKey(nextVal)){
+                    Map<String, String> m = reverseMarkers.get(nextVal);
+                    String fieldNames = m.get("fieldNames");
+                    if(fieldNames != "") {
+                        fieldNames += "," + headerName;
+                        m.put("fieldNames", fieldNames);
+                    }
+                    else {
+                        m.put("fieldNames", headerName);
+                    }
+                    String contentDelimiter = m.get("contentDelimiter");
+                    if(contentDelimiter != "") {
+                            contentDelimiter += columnSep + headerName + keyValueSep + delimiter;
+                        m.put("contentDelimiter", contentDelimiter);
+                    }
+                    else {
+                            m.put("contentDelimiter", headerName + keyValueSep + delimiter);
+                    }
+                    String contentFormat = m.get("contentFormat");
+                    if(contentFormat != "") {
+                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";";
+                            m.put("contentFormat", contentFormat);
+                    }
+                    else {
+                        m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                    }
+                }else {
+                    Map<String, String> m1 = new HashMap();
+                    m1.put("fieldNames", headerName);
+                    m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
+                    m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+
+
+                    reverseMarkers.put(nextVal, m1);
+                }
+            }
+
+        }
+
+        Row row = sheet.createRow(rownum++);
+        int numOfColumns = 6;
+        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT"};
+        for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
+            Cell cell = row.createCell(cellNum);
+            cell.setCellValue(headerRowValues[cellNum]);
+        }
+        System.out.println("====REVERSE MARKERS=====" + reverseMarkers);
+        for(Map.Entry<String , Map<String,String> > entry : reverseMarkers.entrySet()) {
+            String[] arr = new String[numOfColumns];
+            String headerName = entry.getKey();
+            List<String> pipedNameList = Arrays.asList(headerName.split("\\|"));
+            Iterator<String> pnlIterator = pipedNameList.iterator();
+            for(int i = 0; i < 3; i++){
+                if(pnlIterator.hasNext()){
+                    arr[i] = pnlIterator.next();
+                }
+                else{
+                    arr[i] = "";
+                }
+            }
+            Map<String,String> m2 = new HashMap(entry.getValue());
+            arr[3] = m2.get("fieldNames");
+            arr[4] = m2.get("contentDelimiter");
+            arr[5] = m2.get("contentFormat");
+            row = sheet.createRow(rownum++);
+            for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
+                Cell cell = row.createCell(cellNum);
+                cell.setCellValue(arr[cellNum]);
+            }
+
+        }
+
+    }
 
     public static void writeHeaderMarkersInSheet(Workbook wb, Map<String, Map<String,String> > headerMarkers) {
         Sheet sheet = wb.getSheet("headerMetadata");
@@ -143,7 +274,7 @@ public class SpreadsheetWriter {
         sheet = wb.createSheet("headerMetadata");
         int rownum = 0;
         String headerName;
-        int headerMarkersSize = 0;
+        //int headerMarkersSize = 0;
         /*
            for(int i = 0; i<headerMarkersSize; i++){
            JSONObject marker = headerMarkers.get(i);

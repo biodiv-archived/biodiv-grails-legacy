@@ -15,6 +15,8 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
+import grails.converters.JSON
+
 
 import species.Contributor;
 import species.Field
@@ -39,6 +41,8 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
+import species.formatReader.SpreadsheetReader;
+import species.formatReader.SpreadsheetWriter;
 
 class SpeciesUploadService {
 
@@ -59,9 +63,11 @@ class SpeciesUploadService {
 	def namesIndexerService;
 	def observationService;
 	def springSecurityService
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static int BATCH_SIZE = 5;
 	int noOfFields = Field.count();
+    String contentRootDir = config.speciesPortal.content.rootDir
 
 	/**
 	 * 
@@ -152,7 +158,8 @@ class SpeciesUploadService {
 
 		return noOfInsertions;
 	}
-
+	
+	
 	/**
 	 * 
 	 * @param file
@@ -562,5 +569,23 @@ class SpeciesUploadService {
     		columnList <<  tmpList.join("|")
     	}
     	return columnList
+    }
+
+    File saveModifiedSpeciesFile(params){
+        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers; 
+        def gData = JSON.parse(params.gridData)
+        def headerMarkers = JSON.parse(params.headerMarkers)
+        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers
+        String fileName = "speciesSpreadsheet.xlsx"
+        String uploadDir = "species"
+        //URL url = new URL(data.xlsxFileUrl);
+        File file = observationService.createFile(fileName , uploadDir, contentRootDir);
+        //FileUtils.copyURLToFile(url, f);
+        println "===NEW MODIFIED SPECIES FILE=== " + file
+        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim();
+        println "===XLSX FILE URL ======= " + xlsxFileUrl;
+        InputStream input = new URL(xlsxFileUrl).openStream();
+        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers);
+        return file
     }
 }

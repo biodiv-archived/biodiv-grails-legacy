@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.commons.logging.LogFactory;
 
 import species.License.LicenseType;
+import species.formatReader.SpreadsheetWriter;
 
 class SourceConverter {
 	protected Map licenseUrlMap;
@@ -176,13 +177,28 @@ class SourceConverter {
 
 	protected Map getCustomFormat(String customFormat) {
         if(!customFormat) return [:];
-		return customFormat.split(';').inject([:]) { map, token ->
-			token = token.toLowerCase();
-			token.split('=').with {
-				map[it[0]] = it[1];
+
+        Map m = new HashMap()
+		//SpreadsheetWriter.keyValueSep
+		//SpreadsheetWriter.columnSep
+        println "============= custmot >>>>>>>>>> " + customFormat
+		def columnList = customFormat.split(SpreadsheetWriter.columnSep).each { cols ->
+			cols.split(SpreadsheetWriter.keyValueSep).each { columnInfo ->
+				def colName = columnInfo[0]
+				def colAttrs = columnInfo[1]
+				colAttrs.split(";").each { pair ->
+					def tmppairval = pair.split("=")
+					if(tmppairval.size() > 1){
+						m.put(tmppairval[0], tmppairval[1])
+					}
+
+				} 
 			}
-			map
+
 		}
+
+		return m
+		
 	}
 
 

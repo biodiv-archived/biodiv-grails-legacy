@@ -39,14 +39,16 @@ class UFileController {
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def observationService
-	def springSecurityService;
-	def grailsApplication
-
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def springSecurityService;
+    def grailsApplication
+    def speciesUploadService;
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
+    static String columnSep = SpreadsheetWriter.columnSep
+    static String keyValueSep = SpreadsheetWriter.keyValueSep
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
@@ -89,7 +91,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = createFile(originalFilename, params.uploadDir)
+			File uploaded = observationService.createFile(originalFilename, params.uploadDir,contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
@@ -106,7 +108,7 @@ class UFileController {
             if(params.fileConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
                 xlsxFileUrl = url;
                 if(params.fromChecklist == "false") {
-                    headerMetadata = getHeaderMetaData(uploaded);
+                    headerMetadata = getHeaderMetaDataInFormat(uploaded);
                     println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
                 }
                 res = convertExcelToCSV(uploaded, params)
@@ -151,7 +153,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = createFile(originalFilename, params.uploadDir)
+			File uploaded = observationService.createFile(originalFilename, params.uploadDir, contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 
@@ -213,27 +215,7 @@ class UFileController {
 		return request.inputStream
 	}
 
-	//Create file with given filename
-    private File createFile(String fileName, String uploadDir) {
-        File uploaded
-        if (uploadDir) {
-            File fileDir = new File(contentRootDir + "/"+ uploadDir)
-            if(!fileDir.exists())
-                fileDir.mkdirs()
-                uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
 
-        } else {
-
-            File fileDir = new File(contentRootDir)
-            if(!fileDir.exists())
-                fileDir.mkdirs()
-                uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
-            //uploaded = File.createTempFile('grails', 'ajaxupload')
-        }
-
-        log.debug "New file created : "+ uploaded.getPath()
-        return uploaded
-    }
 
 
     def download = {
@@ -267,20 +249,7 @@ class UFileController {
 
     def saveModifiedSpeciesFile = {
         //log.debug params
-        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers; 
-        def gData = JSON.parse(params.gridData)
-        def headerMarkers = JSON.parse(params.headerMarkers)
-        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers
-        String fileName = "speciesSpreadsheet.xlsx"
-        String uploadDir = "species"
-        //URL url = new URL(data.xlsxFileUrl);
-        File file = createFile(fileName , uploadDir);
-        //FileUtils.copyURLToFile(url, f);
-        println "===NEW MODIFIED SPECIES FILE=== " + file
-        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim();
-        println "===XLSX FILE URL ======= " + xlsxFileUrl
-        InputStream input = new URL(xlsxFileUrl).openStream();
-        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers);
+        File file = speciesUploadService.saveModifiedSpeciesFile(params);
         return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
         /*
         if (f.exists()) {
@@ -333,6 +302,95 @@ class UFileController {
 
     }
 
+    public Map getHeaderMetaDataInFormat(File uploaded) {
+		def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+        def sheetContent
+        def res = [:]
+        if(completeContent.size() == 3 ){
+            sheetContent = completeContent.get(2)
+            println "==SHEET CONTENT ======== " + sheetContent
+        }
+        else{
+            println " ======NO HEADER METADATA=== "
+            return res
+        }
+		sheetContent.each{ sc ->
+			String s1,s2
+			if(sc["category"] == ""){
+				s1 = ""
+	 		}
+	 		else{
+				s1 = "|"
+			}
+			if(sc["subcategory"] == ""){
+				s2 = ""
+	 		}
+	 		else{
+				s2 = "|"
+			}
+			String dataColumn = sc["concept"] + s1 + sc["category"] + s2 + sc["subcategory"]
+			String fieldNames = sc["field name(s)"].toLowerCase()
+            String conDel = sc["content delimiter"]
+            String conFor = sc["content format"]
+            if(fieldNames != ""){
+                List fnList = fieldNames.split(",")
+                def cdMap = [:]
+                def gMap = [:]
+                def hMap = [:]
+                if(conDel != ""){
+                    println conDel
+                    List conDelList = conDel.split(columnSep)
+                    println "===CDLIST = " + conDelList
+                    conDelList.each { cdl ->
+                        def z = cdl.split(keyValueSep)
+                        if(z.size()==2){
+                            cdMap[z[0]] = z[1]
+                        }
+                        else{
+                            cdMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(conFor != ""){
+                    List conForList = conFor.split(columnSep)
+                    conForList.each { cfl ->
+                        def z = cfl.split(keyValueSep)
+                        def q = z[1].split(";")
+                        if(q[0].split("=").size() == 2){
+                            gMap[z[0]] = q[0].split("=")[1]
+                        }else{
+                            gMap[z[0]] = "" 
+                        }
+                        if(q[1].split("=").size() == 2){
+
+                            hMap[z[0]] = q[1].split("=")[1]	
+                        }
+                        else{
+                            hMap[z[0]] = ""
+                        }
+                    }
+                }
+                fnList.each{ fn ->
+                    fn = fn.trim()
+                    def val = res[fn]
+                    if(val){
+                        val["dataColumns"] = val["dataColumns"] + "," + dataColumn
+                    }
+                    else{
+                        def m =[:]
+                        m["dataColumns"] = dataColumn
+                        m["delimiter"] = cdMap[fn]
+                        m["group"] = gMap[fn]
+                        m["header"] = hMap[fn]
+                        res[fn] = m
+                    }
+                }
+            }
+        }
+        println "=======QQQQQQQQQQQQQQQ==========" + res
+        return res
+	}
+
     public Map getHeaderMetaData(File uploaded) {
         def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
         def sheetContent
@@ -367,7 +425,7 @@ class UFileController {
 
     private Map convertExcelToCSV(File uploaded, params ) {
         def spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath).get(0)
-        File outCSVFile = createFile(outputCSVFile, params.uploadDir)
+        File outCSVFile = observationService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
 
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);

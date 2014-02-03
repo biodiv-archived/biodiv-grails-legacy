@@ -12,12 +12,9 @@
         <uploader:head />
     </head>
     <body>
-        <div>
+        <div id="uploadSpeciesDiv">
             <s:showSubmenuTemplate model="['entityName':'Species Upload']" />
                 <uGroup:rightSidebar/>
-                <form id="uploadSpeciesForm" action="${uGroup.createLink(controller:'species', action:'upload')}" 
-                    title="Upload spreadsheet" 
-                    method="post">
                     <div class="super-section span12" style="margin-left: 0px;">
                         <div class="section">
 
@@ -50,7 +47,7 @@
                                 <label class="control-label span2" for="imagesDir"> Images Url</label>
 
                                 <div class="controls span9">
-                                    <input type="text" class="input-block-level" name="imagesDir"
+                                    <input id="imagesDir" type="text" class="input-block-level" name="imagesDir"
                                     placeholder="Enter URL for the images"
                                     value="${imagesDir}" />
                                 </div>
@@ -68,28 +65,15 @@
                             </div-->
                         </div>
                     </div>
-                    <div class="section" style="margin-top: 20px; margin-bottom: 40px;clear:both;">
+                   
 
-                        <a href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
-                            style="float: right; margin-right: 5px;"> Cancel </a>
-
-                        <a id="uploadSpecies"
-                            class="btn btn-primary" style="float: right; margin-right: 5px;">
-                            Upload Species</a>
-                        <span class="policy-text"> By submitting this form for
-                            uploading species data you agree to our <a href="/terms">Terms
-                                and Conditions</a> on the use of our site </span>
-                    </div>
-
-
-                </form>			
                     
 
                 <div id="speciesGridSection" class="section checklist-slickgrid ${params.action=='upload'?'hide':''}">
-                    <span id="addNewColumn" class="btn-link">+ Add New Column</span>
-                    <span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span>
+                    %{--<span id="addNewColumn" class="btn-link">+ Add New Column</span>--}%
+                    <!--span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span-->
 
-                    <div id="myGrid" class="" style="width:100%;height:350px;"></div>
+                    <div id="myGrid" class="" style="width:100%;height:350px;clear:both;"></div>
                     <div id="nameSuggestions" style="display: block;"></div>
                     <div id="legend" class="hide">
                         <span class="incorrectName badge">Incorrect Names</span>
@@ -117,40 +101,36 @@
                         style="float: right; margin: 5px;display:none;">Validate Names</a>
 
                 </div>
-                %{--
-                <table id="tableHeader" border="1">
-                    <tr>
-                        <td class="columnName">S_No</td>
-                        <td class="dataColCell" ><input class="dataColumns"></td>
-                        <td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td>
-                        <td class="headerFlagCell"><input type="checkbox" class="headeFlag" name = "header" value = "headerFlag"></td>
-                        <td><input type="radio" class="groupRadio" name="group" value="G1">G1<input type="radio" class="groupRadio" name="group" value="G2">G2<input type="radio" name="group" value="G3">G3</td>
-                        <td><input type="text" class="delimiter"></td>
-                    </tr>
                 
-                    <tr>
-                        <td>Scien_Name</td>
-                        <td><input class="tagsInput"></td>
-                        <td> <input type="checkbox" name = "merge" value = "mergeFlag"></td>
-                    </tr>
-                    --}%
-
                 </table>            
-                <div id="tagHeaders" style="display:none;">
+                <div id="tagHeaders" class="section checklist-slickgrid" style="display:none;">
                     <table id="tableHeader" border="1">
                         <th>Column_Name</th>
                         <th>Data_Columns</th>
                         <th>Header</th>
-                        <th>Merge</th>
+                        <!--th>Merge</th-->
                         <th>Group</th>
                         <th>Delimiter</th>
                     </table>
 
 
                     %{-- <button id="tagHeadersButton">Mark this Header</button> --}%
-                    <button id="downloadModifiedSpecies">Download</button>
+                    <button class="btn btn-primary" id="downloadModifiedSpecies" style="margin-top: 8px">Download</button>
                 </div>
 
+                <div class="section" style="margin-top: 0px; margin-bottom: 40px;clear:both;">
+
+                    <a href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
+                        style="float: right; margin-right: 5px;"> Cancel </a>
+
+                    <a id="uploadSpecies"
+                        class="btn btn-primary" style="float: right; margin-right: 5px;">
+                        Upload Species</a>
+                    <span class="policy-text"> By submitting this form for
+                        uploading species data you agree to our <a href="/terms">Terms
+                            and Conditions</a> on the use of our site </span>
+                </div>
+                </div>
                 <div id="xlsxFileUrl" style="display:none;">
                     <input type="text" value="">
                 </div>
@@ -159,19 +139,17 @@
                     <input type="text" value="">
                 </div>
 
-                <div id="saveModifiedUrl" style="display:none;">
-                    <input type="text" value="">
-                </div> 
                 <form id="downloadSpeciesFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
-                    <input type="text" name="downloadFile" value="">
-                    <input type="submit" value="Submit">
+                    <input type="text" name="downloadFile" value="" style="visibility:hidden;">
+                    Download the uploaded sheet here <input class="btn btn-primary" type="submit" value="Download">
                 </form>
 
 
                 <div id="uploadConsole">
 
                 </div>
-            </div>
+                 
+
         </body>
         <r:script>
         $(document).ready(function() {
@@ -179,12 +157,12 @@
             var contributor_autofillUsersComp = $("#userAndEmailList_${contributor_autofillUsersId}").autofillUsers({
             usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
             });
-        */
+        
  	    $("#uploadSpecies").click(function(){
                 //$('#contributorIds').val(contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
                 $('#uploadSpeciesForm').submit();
             });
-                    
+        */            
        });
         </r:script>
     </html>
