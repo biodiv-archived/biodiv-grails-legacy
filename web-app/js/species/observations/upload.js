@@ -70,7 +70,7 @@ function getSpeciesHeaderMenuOptions() {
 function populateTagHeaders(columns) {    
     var tableRow = '';
     for(i=0; i<columns.length; i++){
-        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><!--td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td--><td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td><td class="delimiterCell"><input type="text" class="delimiter"></td></tr>'
+        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><!--td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td--><!--td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td--><td class="delimiterCell"><input type="text" class="delimiter" style="width:49px;"></td></tr>'
     } 
     /*
     for (i=0;i<columns.length;i++){
@@ -190,9 +190,10 @@ function updateMetadataValues() {
                     console.log("======" + columnName);
                     console.log(" ====== "+ JSON.stringify(taggedValues));
                 }
-                if(taggedValues != undefined){
-                    if($(this).attr("class") == "dataColCell") {
-                        var preList='<ul class="headerInfoTags" >';
+                //if(taggedValues != undefined){
+                else if($(this).attr("class") == "dataColCell") {
+                    var preList='<ul class="headerInfoTags" >';
+                    if(taggedValues != undefined){
                         var dataColumns = taggedValues["dataColumns"];
                         if(dataColumns!== ""){
                             var dataColArr = dataColumns.split(",");
@@ -200,37 +201,49 @@ function updateMetadataValues() {
                             $.each(dataColArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
-                            preList += '</ul>';
-                            $(this).append(preList);
                         }
+
                     }
-                    else if($(this).attr("class") == "headerFlagCell") {
-                        var header = taggedValues["header"];
-                        if(header !== ""){
-                            $(this).children("input[value='" + header + "']").prop('checked', true);
+                    preList += '</ul>';
+                    $(this).append(preList);
+
+                }
+                else if($(this).attr("class") == "headerFlagCell") {
+                    var header = ""
+                        if(taggedValues != undefined){
+                            header = taggedValues["header"];
                         }
-                    }
-                    /*
-                       else if($(this).attr("class") == "mergeFlagCell") {
-                       var merge = taggedValues["merge"];
-                       if(merge !== ""){
-                       $(this).children("input[value='" + merge + "']").prop('checked', true);
-                       }
-                       }
-                       */
-                    else if($(this).attr("class") == "groupRadioCell") {
-                        var group = taggedValues["group"];
-                        if(group !== ""){
-                            $(this).children("input[value='" + group + "']").prop('checked', true);
-                        }
-                    }
-                    else if($(this).attr("class") == "delimiterCell") {
-                        var delimiter = taggedValues["delimiter"];
-                        if(delimiter !== ""){
-                            $(this).children(".delimiter").val(delimiter);
-                        }
+                    if(header !== ""){
+                        $(this).children("input[value='" + header + "']").prop('checked', true);
                     }
                 }
+                /* //WRite it just as above
+                   else if($(this).attr("class") == "mergeFlagCell") {
+                   var merge = taggedValues["merge"];
+                   if(merge !== ""){
+                   $(this).children("input[value='" + merge + "']").prop('checked', true);
+                   }
+                   }
+                   */
+                else if($(this).attr("class") == "groupRadioCell") {
+                    var group = ""
+                        if(taggedValues != undefined){
+                            group = taggedValues["group"];
+                        }
+                    if(group !== ""){
+                        $(this).children("input[value='" + group + "']").prop('checked', true);
+                    }
+                }
+                else if($(this).attr("class") == "delimiterCell") {
+                    var delimiter = ""
+                        if(taggedValues != undefined){
+                            delimiter = taggedValues["delimiter"];
+                        }
+                    if(delimiter !== ""){
+                        $(this).children(".delimiter").val(delimiter);
+                    }
+                }
+                //}
             });
 
         });
@@ -265,6 +278,8 @@ $('#downloadModifiedSpecies').click(function() {
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
+    console.log(grid.getData().length);
+    console.log(gData);
     //headerMarkers = JSON.stringify(headerMarkers);
     //Getting headerMetadata only
     //var headerMarkers = JSON.stringify($('#headerMetadata').val());

@@ -87,6 +87,11 @@ public class SpreadsheetWriter {
             cell.setCellValue(keysArray[a]);
             i++;
         }
+        int lastHeaderCellNum = row.getLastCellNum();
+        for(int j = i; j <= lastHeaderCellNum; j++) {
+            Cell cell = row.getCell(j, Row.CREATE_NULL_AS_BLANK);
+            cell.setCellValue("");
+        }
 
         for (int k = 0; k < gDataSize; k++) {
             System.out.println("REACHED FOR LOOP");
@@ -191,40 +196,44 @@ public class SpreadsheetWriter {
             Iterator<String> dcIterator = dcList.iterator();
             while (dcIterator.hasNext()) {
                 String nextVal = dcIterator.next();
-                if(reverseMarkers.containsKey(nextVal)){
-                    Map<String, String> m = reverseMarkers.get(nextVal);
-                    String fieldNames = m.get("fieldNames");
-                    if(fieldNames != "") {
-                        fieldNames += "," + headerName;
-                        m.put("fieldNames", fieldNames);
-                    }
-                    else {
-                        m.put("fieldNames", headerName);
-                    }
-                    String contentDelimiter = m.get("contentDelimiter");
-                    if(contentDelimiter != "") {
+                nextVal = nextVal.trim();
+                System.out.println("==THIS IS THE VALUE=== " + nextVal);
+                if(!nextVal.equals("") && !nextVal.equals(null)){
+                    if(reverseMarkers.containsKey(nextVal)){
+                        Map<String, String> m = reverseMarkers.get(nextVal);
+                        String fieldNames = m.get("fieldNames");
+                        if(fieldNames != "") {
+                            fieldNames += "," + headerName;
+                            m.put("fieldNames", fieldNames);
+                        }
+                        else {
+                            m.put("fieldNames", headerName);
+                        }
+                        String contentDelimiter = m.get("contentDelimiter");
+                        if(contentDelimiter != "") {
                             contentDelimiter += columnSep + headerName + keyValueSep + delimiter;
-                        m.put("contentDelimiter", contentDelimiter);
-                    }
-                    else {
+                            m.put("contentDelimiter", contentDelimiter);
+                        }
+                        else {
                             m.put("contentDelimiter", headerName + keyValueSep + delimiter);
-                    }
-                    String contentFormat = m.get("contentFormat");
-                    if(contentFormat != "") {
+                        }
+                        String contentFormat = m.get("contentFormat");
+                        if(contentFormat != "") {
                             contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";";
                             m.put("contentFormat", contentFormat);
-                    }
-                    else {
-                        m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
-                    }
-                }else {
-                    Map<String, String> m1 = new HashMap();
-                    m1.put("fieldNames", headerName);
-                    m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
-                    m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                        }
+                        else {
+                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                        }
+                    }else {
+                        Map<String, String> m1 = new HashMap();
+                        m1.put("fieldNames", headerName);
+                        m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
+                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
 
 
-                    reverseMarkers.put(nextVal, m1);
+                        reverseMarkers.put(nextVal, m1);
+                    }
                 }
             }
 

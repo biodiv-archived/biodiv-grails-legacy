@@ -102,8 +102,9 @@ function parseCSVData(data, options) {
     if (error) {
         alert(error);
     }else{
-        columns.push(getMediaColumnOptions());
-
+        if(options.res !== "species"){
+            columns.push(getMediaColumnOptions());
+        }
         if(options.callBack){
             options.callBack(rowData, columns, options.res);
         }
@@ -111,9 +112,9 @@ function parseCSVData(data, options) {
 }
 
 function getSafeHeaders(array){
-	var newArray = new Array();
-	$.each(array, function(index, value) {
-		value = getDefaultColumnName(newArray, array.length, value)
+    var newArray = new Array();
+    $.each(array, function(index, value) {
+        value = getDefaultColumnName(newArray, array.length, value)
 		newArray.push($.trim(value))
 	});
 	return newArray

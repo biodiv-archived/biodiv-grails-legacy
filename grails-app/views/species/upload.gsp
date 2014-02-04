@@ -69,7 +69,7 @@
 
                     
 
-                <div id="speciesGridSection" class="section checklist-slickgrid ${params.action=='upload'?'hide':''}">
+                <div id="speciesGridSection" style="clear:both;" class="section checklist-slickgrid ${params.action=='upload'?'hide':''}">
                     %{--<span id="addNewColumn" class="btn-link">+ Add New Column</span>--}%
                     <!--span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span-->
 
@@ -109,7 +109,7 @@
                         <th>Data_Columns</th>
                         <th>Header</th>
                         <!--th>Merge</th-->
-                        <th>Group</th>
+                        <!--th>Group</th-->
                         <th>Delimiter</th>
                     </table>
 

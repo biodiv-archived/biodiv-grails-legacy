@@ -6,6 +6,7 @@ import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
+import species.auth.SUser;
 import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.SpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
@@ -472,7 +473,7 @@ class SpeciesController extends AbstractObjectController {
 	def upload = {
         println "===Upload called =====================" + params
 		def startTime = new Date()
-		def res = ""
+		def res = [:]
 		
         if(params.xlsxFileUrl) {
             
@@ -487,13 +488,41 @@ class SpeciesController extends AbstractObjectController {
 				println "=============== done "
 				res = res.log
 			}
-			else{
-				res =  "not found"
+			else {
+				//res =  "not found"
 			}
 			
 			def endTime = new Date()
 			def mymsg =  " start time  " + startTime + "   end time " + endTime + "\n\n " + res
-			
+
+            /*
+            def otherParams = [:]
+            def usersMailList = []
+            def suser = SUser.get(3L)
+
+            usersMailList.add(suser)
+            usersMailList.add(SUser.get(4L))
+            println "======" + usersMailList
+            
+            speciesList.each{ sp ->
+                curators = speciesPermissionService.getCurators(sp)
+                curators.each { cu ->
+                    usersMailList.add(cu)
+                }
+            }
+            
+            otherParams["usersMailList"] = usersMailList
+            def linkParams = [:]
+            linkParams["daterangepicker_start"] = startTime
+            linkParams["daterangepicker_end"] = endTime
+            String link = observationService.generateLink("species", "list", linkParams)
+            otherParams["link"] = link
+            //FOR EACH SPECIES UPLOADED send mail
+            //how to send the link generated
+            //what about activity feed
+            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,null,null,null,null,otherParams)
+            
+			*/
 			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath()] as JSON, contentType:'text/html')
 			
         }
