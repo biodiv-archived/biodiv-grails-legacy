@@ -1527,10 +1527,14 @@ class ObservationService extends AbstractObjectService {
                 
                 case SPECIES_UPLOADED:
                 mailSubject = "Request to curate species"
-                bodyView = "Hello"
-                templateMap["message"] = "curate these species"
+                bodyView = "/emailtemplates/speciesUploaded"
+                templateMap["link"] = otherParams["link"] 
                 populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
-                toUsers.add(speciesPermissionService.getCurators(obv))
+                println "==================================" + otherParams["link"]
+                toUsers = otherParams["usersMailList"]
+                /*otherParams["usersMailList"].each{ 
+                    toUsers.add(it)
+                }*/
                 break
 
                 case OBSERVATION_FLAGGED :

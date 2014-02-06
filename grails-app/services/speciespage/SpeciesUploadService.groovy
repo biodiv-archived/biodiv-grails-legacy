@@ -248,13 +248,15 @@ class SpeciesUploadService {
 	}
 
 	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
-		converter.setLogAppender(fa);
+		println "============================================================================================================================="
+        converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		def speciesElements = [];
 		int noOfSpecies = content.size();
 		for(int i=0; i<noOfSpecies; i++) {
-			if(speciesElements.size() == BATCH_SIZE) {
+			println "============================##############################################################################################================================"
+            if(speciesElements.size() == BATCH_SIZE) {
 				def res = saveSpeciesElements(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
@@ -397,7 +399,7 @@ class SpeciesUploadService {
 				s.appendLogSummary(e.printStackTrace())
 				e.printStackTrace()
 			}
-
+            println "==========SPECIES YE HAI =========== " + s
 			s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
@@ -415,6 +417,7 @@ class SpeciesUploadService {
 		//log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
+        println "===========QQQQQQQQQQQQQQQQQQQQQQQ=================" + noOfInsertions
 		return noOfInsertions;
 	}
 
@@ -498,7 +501,8 @@ class SpeciesUploadService {
 		//		int taxaHierarchies = TaxonomyRegistry.countByTaxonDefinitionAndClassification(s.taxonConcept, authClassification);
 		//TODO: int occRecords =
 		//TODO: observations =
-		int textSize = 0;
+		println "======I M HERE======" + s
+        int textSize = 0;
 		s.fields.each { field ->
 			textSize += field.description?.length();
 		}
@@ -583,9 +587,11 @@ class SpeciesUploadService {
         //FileUtils.copyURLToFile(url, f);
         println "===NEW MODIFIED SPECIES FILE=== " + file
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim();
+        String writeContributor = params.writeContributor.replace("\"","").trim();
         println "===XLSX FILE URL ======= " + xlsxFileUrl;
+        String contEmail = springSecurityService.currentUser.email;
         InputStream input = new URL(xlsxFileUrl).openStream();
-        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers);
+        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail);
         return file
     }
 }

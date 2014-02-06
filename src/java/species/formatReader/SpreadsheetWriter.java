@@ -30,12 +30,12 @@ public class SpreadsheetWriter {
     static final String keyValueSep = "#11#";
     static final String columnSep = "#12#";
     
-    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers) {
+    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail) {
         System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
-            writeDataInSheet(wb, gridData, sheetNo);
+            writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail);
             writeHeadersInFormat(wb, headerMarkers);
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
@@ -51,7 +51,17 @@ public class SpreadsheetWriter {
 
     }
 
-    public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo) {
+    public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail) {
+        System.out.println("================================" + writeContributor +"===" + contEmail );
+        if(writeContributor.equals("true")){
+            JSONObject r =  gridData.getJSONObject(0);
+            if(!r.has("contributor")){
+                for(int k = 0; k < gridData.length();k++){
+                    JSONObject r1 =  gridData.getJSONObject(k);
+                    r1.put("contributor", contEmail);
+                }
+            }
+        }
         Sheet sheet = wb.getSheetAt(sheetNo);
         Iterator<Row> rowIterator = sheet.iterator();
         int index = 0;

@@ -473,7 +473,7 @@ class SpeciesController extends AbstractObjectController {
 	def upload = {
         println "===Upload called =====================" + params
 		def startTime = new Date()
-		def res = [:]
+		def res = ""
 		
         if(params.xlsxFileUrl) {
             
@@ -489,7 +489,7 @@ class SpeciesController extends AbstractObjectController {
 				res = res.log
 			}
 			else {
-				//res =  "not found"
+				res =  "not found"
 			}
 			
 			def endTime = new Date()
@@ -503,6 +503,8 @@ class SpeciesController extends AbstractObjectController {
             usersMailList.add(suser)
             usersMailList.add(SUser.get(4L))
             println "======" + usersMailList
+            
+            def sp = Species.get(6L)
             
             speciesList.each{ sp ->
                 curators = speciesPermissionService.getCurators(sp)
@@ -520,9 +522,9 @@ class SpeciesController extends AbstractObjectController {
             //FOR EACH SPECIES UPLOADED send mail
             //how to send the link generated
             //what about activity feed
-            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,null,null,null,null,otherParams)
-            
-			*/
+            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,sp,null,null,null,otherParams)
+            */
+			
 			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath()] as JSON, contentType:'text/html')
 			
         }

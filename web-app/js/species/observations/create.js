@@ -117,8 +117,6 @@ function setUnEditableColumn(columns){
         });
         
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
-            //alert("Command: " + args);
-            console.log(args);
             var name = args.column.name;
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
@@ -148,7 +146,6 @@ function setUnEditableColumn(columns){
             var k = 0;
             for(var i= 0; i < columns.length; i++) {
                 if(columns[i].name != "Media"){
-                    console.log(columns[i].name);
                     col[k] = columns[i];
                     k=k+1;
                 }
@@ -755,7 +752,6 @@ $(document).ready(function(){
             data : {'names':JSON.stringify(getNames())},
             success : function(data) {
                 var gridData = grid.getData();
-                console.log(gridData);
                 var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
                 var sciNameColumn = grid.getColumns()[sciNameColumnIndex];
                 var commonNameColumnIndex = grid.getColumnIndex($('#commonNameColumn').val());

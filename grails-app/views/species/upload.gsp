@@ -108,7 +108,7 @@
                         <th>Column_Name</th>
                         <th>Data_Columns</th>
                         <th>Header</th>
-                        <!--th>Merge</th-->
+                        <th>Append</th>
                         <!--th>Group</th-->
                         <th>Delimiter</th>
                     </table>

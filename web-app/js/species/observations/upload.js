@@ -70,7 +70,7 @@ function getSpeciesHeaderMenuOptions() {
 function populateTagHeaders(columns) {    
     var tableRow = '';
     for(i=0; i<columns.length; i++){
-        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><!--td class="mergeFlagCell"><input type="checkbox" class="mergeFlag" name = "merge" value = "mergeFlag"></td--><!--td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td--><td class="delimiterCell"><input type="text" class="delimiter" style="width:49px;"></td></tr>'
+        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell" align="center"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><td class="appendFlagCell" align="center"><input type="checkbox" class="appendFlag" name = "append" value = "appendFlag"></td><!--td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td--><td class="delimiterCell"><input type="text" class="delimiter" style="width:49px;"></td></tr>'
     } 
     /*
     for (i=0;i<columns.length;i++){
@@ -114,26 +114,30 @@ function getTagsForHeaders() {
                 headerInfo["dataColumns"] =  valData;
              }
              else if($(this).attr("class") == "headerFlagCell") {
-                headerInfo["header"] = ""
+                 headerInfo["header"] = ""
              //if($(this).children(".headerFlag").prop("checked")){
-                headerInfo["header"] =  $(this).children(".headerFlag:checked").map(function() {return this.value;}).get().join();
-                if(headerInfo["header"] == "")
-                {
-                    headerInfo["header"] = "false";
-                }
+             headerInfo["header"] =  $(this).children(".headerFlag:checked").map(function() {return this.value;}).get().join();
+         if(headerInfo["header"] == "")
+         {
+             headerInfo["header"] = "false";
+         }
          //}
              }
-             else if($(this).attr("class") == "mergeFlagCell") {
-                headerInfo["merge"] = ""
-             //if($(this).children(".mergeFlag").prop("checked")){
-                headerInfo["merge"] =  $(this).children(".mergeFlag:checked").map(function() {return this.value;}).get().join();
-         //}
+             else if($(this).attr("class") == "appendFlagCell") {
+                console.log("IN APPEND");
+                headerInfo["append"] = ""
+                headerInfo["append"] =  $(this).children(".appendFlag:checked").map(function() {return this.value;}).get().join();
+                 if(headerInfo["append"] == "")
+                {
+                    headerInfo["append"] = "false";
+                }
+ 
              }
              else if($(this).attr("class") == "groupRadioCell") {
-                headerInfo["group"] = $(this).children(".groupRadio:checked").val();
-                if(headerInfo["group"] == undefined){
-                    headerInfo["group"] = "";
-                }
+                 headerInfo["group"] = $(this).children(".groupRadio:checked").val();
+                 if(headerInfo["group"] == undefined){
+                     headerInfo["group"] = "";
+                 }
              }
              else if($(this).attr("class") == "delimiterCell") {
                  headerInfo["delimiter"] = $(this).children(".delimiter").val();        
@@ -209,36 +213,37 @@ function updateMetadataValues() {
 
                 }
                 else if($(this).attr("class") == "headerFlagCell") {
-                    var header = ""
-                        if(taggedValues != undefined){
-                            header = taggedValues["header"];
-                        }
+                    var header = "";
+                    if(taggedValues != undefined){
+                        header = taggedValues["header"];
+                    }
                     if(header !== ""){
                         $(this).children("input[value='" + header + "']").prop('checked', true);
                     }
                 }
-                /* //WRite it just as above
-                   else if($(this).attr("class") == "mergeFlagCell") {
-                   var merge = taggedValues["merge"];
-                   if(merge !== ""){
-                   $(this).children("input[value='" + merge + "']").prop('checked', true);
-                   }
-                   }
-                   */
+                else if($(this).attr("class") == "appendFlagCell") {
+                    var append = "";
+                    if(taggedValues != undefined){
+                        append = taggedValues["append"];
+                    }
+                    if(append !== ""){
+                        $(this).children("input[value='" + append + "']").prop('checked', true);
+                    }
+                }
                 else if($(this).attr("class") == "groupRadioCell") {
-                    var group = ""
-                        if(taggedValues != undefined){
-                            group = taggedValues["group"];
-                        }
+                    var group = "";
+                    if(taggedValues != undefined){
+                        group = taggedValues["group"];
+                    }
                     if(group !== ""){
                         $(this).children("input[value='" + group + "']").prop('checked', true);
                     }
                 }
                 else if($(this).attr("class") == "delimiterCell") {
-                    var delimiter = ""
-                        if(taggedValues != undefined){
-                            delimiter = taggedValues["delimiter"];
-                        }
+                    var delimiter = "";
+                    if(taggedValues != undefined){
+                        delimiter = taggedValues["delimiter"];
+                    }
                     if(delimiter !== ""){
                         $(this).children(".delimiter").val(delimiter);
                     }
@@ -290,7 +295,7 @@ $('#downloadModifiedSpecies').click(function() {
         url : window.params.saveModifiedSpecies,
         type : 'post', 
         dataType: 'json',
-        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData },
+        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'writeContributor' : 'false' },
         success : function(data) {
             console.log(data.downloadFile);
             //var downloadUrl = window.params.downloadFile+"?downloadFile=" + encodeURIComponent(data.downloadFile);
@@ -317,7 +322,7 @@ $('#uploadSpecies').click(function() {
         url : window.params.uploadSpecies,
         type : 'post', 
         dataType: 'json',
-        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val() },
+        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val(), 'writeContributor': 'true' },
         success : function(data) {
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
             $("#uploadSpeciesDiv").hide();
