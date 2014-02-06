@@ -57,7 +57,7 @@ function parseCSVData(data, options) {
     var headerCount = 0;
     var error = '';
     var foundHeader = false;
-    var rowLimit = 5;
+    var rowLimit = 500;
     var rowCount = 0;
     $.each(lines, function(lineCount, line) {
         line = $.trim(line);
