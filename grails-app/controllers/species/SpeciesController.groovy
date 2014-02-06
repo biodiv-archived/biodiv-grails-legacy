@@ -6,6 +6,7 @@ import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
+import species.auth.SUser;
 import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.SpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
@@ -34,6 +35,7 @@ class SpeciesController extends AbstractObjectController {
 	def speciesService;
 	def observationService;
 	def userGroupService
+    def springSecurityService;
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -120,6 +122,8 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	private Map getTreeMap(List fields) {
+        def user = springSecurityService.currentUser;
+
 		Map map = new LinkedHashMap();
 		for(Field field : fields) {
 			Map finalLoc;
@@ -132,7 +136,6 @@ class SpeciesController extends AbstractObjectController {
 					map.put(field.concept, conceptMap);
 				}
 				finalLoc = conceptMap;
-
 
 				if(field.category && !field.category.equals("")) {
 					if(conceptMap.containsKey(field.category)) {
@@ -154,6 +157,9 @@ class SpeciesController extends AbstractObjectController {
 					}
 				}
 				finalLoc.put ("field", field);
+                if(user && speciesService.isContributor(null, field, user)) {
+                    finalLoc.put('hasContent', true);
+                }
 			}
 		}
 
@@ -163,15 +169,31 @@ class SpeciesController extends AbstractObjectController {
 	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map) {
 
 		def config = grailsApplication.config.speciesPortal.fields
+        SUser user = springSecurityService.currentUser;
 
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
+            //concept
 			if(map.containsKey(sField.field.concept)) {
 				finalLoc = map.get(sField.field.concept);
-				if(finalLoc.containsKey(sField.field.category)) {
-					finalLoc = finalLoc.get(sField.field.category);
+                if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
+                    finalLoc.put('hasContent', true);
+                }
+                //category
+                if(finalLoc.containsKey(sField.field.category)) {
+                    finalLoc = finalLoc.get(sField.field.category);
+                    if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
+                            map.get(sField.field.concept).put('hasContent', true);
+                            finalLoc.put('hasContent', true);
+                    }
+                    //subcategory
 					if(sField.field.subCategory && finalLoc.containsKey(sField.field.subCategory)) {
 						finalLoc = finalLoc.get(sField.field.subCategory);
+                        if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
+                            map.get(sField.field.concept).put('hasContent', true);
+                            map.get(sField.field.concept).get(sField.field.category).put('hasContent', true);
+                            finalLoc.put('hasContent', true);
+                        }
 					}
 				}
 			}
@@ -182,21 +204,18 @@ class SpeciesController extends AbstractObjectController {
 					finalLoc.put('speciesFieldInstance', t);
 				}
 				t.add(sField);
+                //TODO:do an insertion sort instead of sorting collection again and again
+            //    speciesService.sortAsPerRating(t);
 			}
 		}
-
-		//remove empty information hierarchy
-		Map newMap = new LinkedHashMap();
-		for(concept in map) {
-			//log.debug "Concept : "+concept
-			Map newConceptMap = new LinkedHashMap();
-			if(hasContent(concept.value.get('speciesFieldInstance'))) {
-				newConceptMap.put('speciesFieldInstance', sortAsPerRating(concept.value.get('speciesFieldInstance')));
+       
+        //remove empty information hierarchy
+		for(concept in map.clone()) {
+            if(concept.value.get('speciesFieldInstance')) {
+                speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
-			for(category in concept.value) {
-				Map newCategoryMap = new LinkedHashMap();
-				//				log.debug "Category : "+category
-				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") || category.key.equalsIgnoreCase('Species Resources'))  {
+			for(category in concept.value.clone()) {
+				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent")  || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
 					boolean show = false;
@@ -211,55 +230,40 @@ class SpeciesController extends AbstractObjectController {
 						show = true;
 					}
 					if(show) {
-						newConceptMap.put(category.key, category.value);
+                            map.get(concept.key).get(category.key).put('hasContent', true);
+                            map.get(concept.key).put('hasContent', true);
 					}
-				} else if(hasContent(category.value.get('speciesFieldInstance'))) {
-					newCategoryMap.put('speciesFieldInstance',  sortAsPerRating(category.value.get('speciesFieldInstance')));
+				} else if(category.value.get('speciesFieldInstance')) {
+					    speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get('speciesFieldInstance'));
 				}
-				for(subCategory in category.value) {
 
-					//					log.debug "subCategory : "+subCategory;
-					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance")) continue;
+                if(category.value.get('hasContent')) {
+                    map.get(concept.key).get(category.key).put('hasContent', true);
+                    map.get(concept.key).put('hasContent', true);
+                }
+
+				for(subCategory in category.value.clone()) {
+					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent')) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
 					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||
 					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
 					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
-					hasContent(subCategory.value.get('speciesFieldInstance'))) {
-						//						log.debug "Putting distribution entities ${subCategory.key}"
-                        sortAsPerRating(subCategory.value.get('speciesFieldInstance'));
-						newCategoryMap.put(subCategory.key,  subCategory.value)
+					subCategory.value.get('speciesFieldInstance')) {
+                        if(subCategory.value.get('speciesFieldInstance')) {
+                            speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get(subCategory.key).get('speciesFieldInstance'));
+                        }
 					}
-				}
-				//log.debug 'NSC : '+newCategoryMap
 
-				if(newCategoryMap.size() != 0) {
-					newConceptMap.put(category.key, newCategoryMap)
+                    if(subCategory.value.get('hasContent')) { 
+                        map.get(concept.key).get(category.key).put('hasContent', true);
+                        map.get(concept.key).put('hasContent', true);
+                    }
 				}
-				//log.debug "NC : "+newConceptMap;
-			}
-			if(newConceptMap.size() != 0) {
-				newMap.put(concept.key, newConceptMap)
 			}
 		}
-		//log.debug newMap;
-		return newMap;
-		//return map;
+		return map;
 	}
-
-	private boolean hasContent(speciesFieldInstances) {
-		for(speciesFieldInstance in speciesFieldInstances) {
-			if(speciesFieldInstance.description) {
-				return true
-			}
-		}
-		return false;
-	}
-
-    private sortAsPerRating(List fields) {
-        if(!fields) return;
-        fields.sort( { a, b -> b.averageRating <=> a.averageRating } as Comparator )
-    }
 
 	@Secured(['ROLE_USER'])
 	def edit = {
@@ -279,7 +283,7 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_SPECIES_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def update = {
 		if(!params.name || !params.pk) {
 			render ([success:false, msg:'Either field name or field id is missing'] as JSON)
@@ -302,6 +306,18 @@ class SpeciesController extends AbstractObjectController {
 			case "description":
 				result = speciesService.updateDescription(speciesFieldId, value);
 				break;
+            case "newdescription":
+                long speciesId = params.speciesId? params.long('speciesId') : null;
+                long fieldId = speciesFieldId;
+        		result = speciesService.addDescription(speciesId, fieldId, value);
+                def html = [];
+                result.content.each {sf ->
+                    html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field]);
+                }
+                result.content = html;
+				break;
+            default :
+                result=[];
 		}
 
 		render result as JSON
@@ -420,6 +436,9 @@ class SpeciesController extends AbstractObjectController {
 			render (view:"search", model:model)
 			return;
 		} else {
+            if(params.webaddress)
+			    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+
 			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
 			model.resultType = "specie"

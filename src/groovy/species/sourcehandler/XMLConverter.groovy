@@ -273,6 +273,15 @@ class XMLConverter extends SourceConverter {
     }
 
     /**
+    */
+    public SpeciesField createSpeciesField(Species s, Field field, String text, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
+        Node fieldNode = createFieldNode(field);
+        createDataNode(fieldNode, text, contributors, attributions, licenses, audiences, status); 
+
+        return createSpeciesFields(s, fieldNode, SpeciesField.class, null, null, null, null, []) [0]
+    }
+
+    /**
      * 
      * @param fieldNode
      * @param sFieldClass
@@ -285,7 +294,7 @@ class XMLConverter extends SourceConverter {
     private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode, List<Synonyms> synonyms) {
         log.debug "Creating species field from node : "+fieldNode;
         List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
-        def field = getField(fieldNode, false);
+        Field field = getField(fieldNode, false);
         if(field == null) {
             log.warn "NO SUCH FIELD : "+field?.name;
             return;
@@ -315,44 +324,44 @@ class XMLConverter extends SourceConverter {
             //TODO:HACK just for keystone
             String dt = data.replaceAll("</?p>","");
             for (sField in sFields) {
-                if(isDuplicateSpeciesField(sField,contributors, dt)) {
+                if(isDuplicateSpeciesField(sField, contributors, dt)) {
                     log.debug "Found already existing species fields for field ${field} ${sField}"
                     temp << sField;
                 }
             }
 
-            println "Found duplicate fields ${temp}"
+            log.debug "Found duplicate fields ${temp}"
 
-                if(dataNode.action?.text()?.trim() == "merge") {
-                    for(sField in temp) {
+            if(dataNode.action?.text()?.trim() == "merge") {
+                for(sField in temp) {
 
                     //HACK for deleting keystone fields with different content and contributor 
                     /*if(dt.equals(sField.description.replaceAll("</?p>",""))) {
-                        println "Deleting same description field"
-                        s.removeFromFields(sField);
-                        sField.delete();
+                      println "Deleting same description field"
+                      s.removeFromFields(sField);
+                      sField.delete();
 
-                    } else*/ if(sField.description.contains(dt)){
-                        log.debug "Field already contains given text"
-                    } else {
-                        log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
-                        data = sField.description + "<br/>" + data
-                        speciesField = sField
-                    }
-                    }
-                } else {
-                    for(sField in temp) {
-
-                        //HACK for deleting keystone fields with different content and contributor 
-                        /*if(!dt.equals(sField.description.replaceAll("</?p>",""))) {
-                            println "Deleting different description field & retaining new description field"
-                            s.removeFromFields(sField);
-                            sField.delete()
-                        } else {*/
-                            speciesField = sField
-                       // }
-                    }
+                      } else*/ if(sField.description.contains(dt)){
+                          log.debug "Field already contains given text"
+                      } else {
+                          log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
+                          data = sField.description + "<br/>" + data
+                          speciesField = sField
+                      }
                 }
+            } else {
+                for(sField in temp) {
+
+                    //HACK for deleting keystone fields with different content and contributor 
+                    /*if(!dt.equals(sField.description.replaceAll("</?p>",""))) {
+                      println "Deleting different description field & retaining new description field"
+                      s.removeFromFields(sField);
+                      sField.delete()
+                      } else {*/
+                    speciesField = sField
+                    // }
+                }
+            }
 
             if(!speciesField) {
                 log.debug "Adding new field to species ${s}"
@@ -383,7 +392,7 @@ class XMLConverter extends SourceConverter {
             }			
         }
         return speciesFields;
-    }
+    } 
 
     private String getData(Node dataNode) {
         if(!dataNode) return "";
@@ -462,6 +471,10 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private Field getField(Node fieldNode, boolean createNew) {
+        if(fieldNode.fieldInstance) {
+            return fieldNode.fieldInstance[0].value();
+        }
+
         String concept = fieldNode.concept?.text()?.trim();
         String category = fieldNode.category?.text()?.trim();
         String subCategory = fieldNode.subcategory?.text()?.trim();

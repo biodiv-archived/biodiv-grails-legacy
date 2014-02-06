@@ -8,7 +8,9 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
+import species.License.LicenseType;
 import species.Contributor;
 import species.Field
 import species.Resource;
@@ -25,6 +27,7 @@ import species.sourcehandler.SourceConverter;
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
+import species.auth.SUser;
 import java.text.SimpleDateFormat;
 import species.sourcehandler.exporter.DwCAExporter
 import org.apache.log4j.PatternLayout;
@@ -304,19 +307,56 @@ class SpeciesService {
                     speciesField.errors.each { log.error it }
                     return [success:false, msg:"Error while updating ${type}"]
                 }
-                return [success:true, msg:msg, content:content]
+                return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
             }
         }
     }
 
-    def updateDescription(Long id, def value) {
-        if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+    def addDescription(long speciesId, long fieldId, String value) { 
+        if(!value || !fieldId || !speciesId) {
+            return [success:false, msg:"Id or value cannot be empty"]
         }
+        XMLConverter converter = new XMLConverter();
 
-        SpeciesField c = SpeciesField.get(id)
+        Species speciesInstance = Species.get(speciesId);
+        Field field = Field.read(fieldId);
+
+        if(!field) {
+            return [success:false, msg:"Invalid field"]
+        }
+        try {
+            SpeciesField speciesFieldInstance = converter.createSpeciesField(speciesInstance, field, value, [springSecurityService.currentUser.username], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_CREATION.value()]);
+            if(speciesFieldInstance) {
+                speciesInstance.addToFields(speciesFieldInstance);
+                //TODO:make sure this is run in only one user updates this species at a time
+                Species.withTransaction {
+                    if(!speciesInstance.save()) {
+                        speciesInstance.errors.each { log.error it }
+                        return [success:false, msg:"Error while adding species field"]
+                    }
+                }
+                List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                sortAsPerRating(sameFieldSpeciesFieldInstances);
+                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'description', content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            return [success:false, msg:"Error while adding species field"]
+        }
+        return [success:false, msg:"Error while adding species field"]
+    }
+
+    def updateDescription(long id, String value) {
+        if(!value || id) {
+            return [success:false, msg:"Id or value cannot empty"]
+        }
+        SpeciesField c = SpeciesField.get(id);
+        return updateDescription(c, value);
+    }
+    
+    def updateDescription(SpeciesField c, String value) {
         if(!c) {
-            return [success:false, msg:"SpeciesField with id ${id} is not found"]
+            return [success:false, msg:"SpeciesField not found"]
         } else {
             SpeciesField.withTransaction {
                 c.description = value.trim()
@@ -596,4 +636,47 @@ class SpeciesService {
         //return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
         //}
     }
+
+    private sortAsPerRating(List fields) {
+        if(!fields) return;
+        fields.sort( { a, b -> 
+            if (a.averageRating < b.averageRating) {
+                return -1;
+            } else if (a.averageRating > b.averageRating) {
+                return 1;
+            } else {
+                return a.lastUpdated <=> b.lastUpdated;
+            }
+        } as Comparator )
+    }
+
+    boolean isSpeciesFieldContributor(SpeciesField speciesFieldInstance, SUser user) {
+        if(!user) return false;
+        return  SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN');
+    }
+
+    boolean isFieldContributor(Field fieldInstance, SUser user) {
+        if(!user) return false;
+        return  SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN');
+    }
+
+    boolean isContributor(SpeciesField speciesFieldInstance, Field fieldInstance, SUser user) {
+        if(!user) return false;
+        return ((speciesFieldInstance && isSpeciesFieldContributor(speciesFieldInstance, user)) || (fieldInstance && isFieldContributor(fieldInstance, user)) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'))
+    }
+
+    boolean hasContent(speciesFieldInstances) {
+        if(!speciesFieldInstances) return false;
+        if(speciesFieldInstances.instanceOf(SpeciesField)) {
+            if(speciesFieldInstances.description)
+                return true;
+        }
+		for(speciesFieldInstance in speciesFieldInstances) {
+			if(speciesFieldInstance.description) {
+				return true
+			}
+		}
+		return false;
+	}
+
 }

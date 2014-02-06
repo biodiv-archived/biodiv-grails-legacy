@@ -1,7 +1,7 @@
 <%@ page import="species.Synonyms"%>
 <%@ page import="species.CommonNames"%>
 <%@page import="species.participation.ActivityFeedService"%>
-<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{if(it.value && it.value.containsKey('speciesFieldInstance')){ return it.value.speciesFieldInstance[0]}} %>
+<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{if(it.value && !it.key.equals('hasContent') && it.value.containsKey('speciesFieldInstance')){ return it.value.speciesFieldInstance[0]}} %>
 <g:if test="${nameRecords}">
 <div class="sidebar_section" style="clear:both;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">

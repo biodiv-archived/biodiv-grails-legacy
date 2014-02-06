@@ -76,7 +76,7 @@ grails.spring.bean.packages = []
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
 
-def log4jConsoleLogLevel = Priority.INFO
+def log4jConsoleLogLevel = Priority.DEBUG
 // log4j configuration
 
 
@@ -491,7 +491,8 @@ environments {
 		debug   'speciespage',
                 'grails.app',
                 'species'
-        info    'species.auth'
+        info    'species.auth',
+        		'com.mchange.v2.resourcepool.BasicResourcePool' 
 	}
     }	
     test {
@@ -581,12 +582,14 @@ environments {
                 }
 
 		}
+		log4jConsoleLogLevel = Priority.DEBUG
 		log4j = {
 			appenders {
 				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
 			}
 			debug	'species',
-				'speciespage'
+					'speciespage'
+			info 'com.mchange.v2.resourcepool.BasicResourcePool' 
 		}
 	}
 	pambaTest {
@@ -660,7 +663,8 @@ environments {
 				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
 			}
 			info	'species',
-				'speciespage'
+					'speciespage',
+					'com.mchange.v2.resourcepool.BasicResourcePool' 
 		}
 
 	}
@@ -727,15 +731,16 @@ environments {
                 image.denied = []
             }
         }
-		
+		log4jConsoleLogLevel = Priority.DEBUG
 		log4j = {
 			appenders {
 				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.INFO
 			}
 			info	'species',
-				'speciespage'
+					'speciespage',
+					'com.mchange.v2.resourcepool.BasicResourcePool' 
 			warn 	'grails.app',
-				'org.springframework.security.web'
+					'org.springframework.security.web'
 
 
 		}

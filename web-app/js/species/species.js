@@ -363,6 +363,56 @@ function initEditableFields() {
             disabled:window.is_species_admin?!window.is_species_admin:true,
             wysihtml5 : {
                 "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+            "emphasis": true, //Italics, bold, etc. Default true
+            "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+            "html": true, //Button which allows you to edit the generated HTML. Default false
+            "link": true, //Button to insert a link. Default true
+            "image": true, //Button to insert an image. Default true,
+            "color": false //Button to change color of font
+            },
+            success: function(response, newValue) {
+                if(!response) {
+                    return "Unknown error!";
+                }          
+
+                if(!response.success) {
+                    $(this).next(".alert-error").html(response.msg).show();
+                    return response.msg
+                } else {
+                    $(this).next(".alert-error").hide();
+                }
+            },
+            error:function(response, newValue) {
+                var successHandler = this.success, errorHandler;
+                handleError(response, undefined, undefined, function(data){
+                    $ele.find('.editField').editable('submit');
+                    return "Please resubmit the form again";
+                }, function(data) {
+                    if(data && data.status == 401) {
+                        return "Please login and resubmit the changes"; 
+                    } else if(response.status === 500) {
+                        return 'Service unavailable. Please try later.';
+                    } else {
+                        return response.responseText;
+                    }
+                });
+            }
+        });
+
+
+        $ele.find(".editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find('.editFieldButton').click(function(e){    
+            e.stopPropagation();
+            $(this).next('.editable').editable('toggle');
+        });
+    }
+
+    function initAddables($ele) {
+        if($ele == undefined)
+            $ele = $(document);
+        $ele.find('.addField').editable({
+            wysihtml5 : {
+                "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
                 "emphasis": true, //Italics, bold, etc. Default true
                 "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
                 "html": true, //Button which allows you to edit the generated HTML. Default false
@@ -380,78 +430,89 @@ function initEditableFields() {
                     return response.msg
                 } else {
                     $(this).next(".alert-error").hide();
+                    console.log(response.content);
                 }
             },
-            error:function(response, newValue) {
-                if(response.status === 500) {
-                    return 'Service unavailable. Please try later.';
+            display: function(value, sourceData, response) {
+                var html = [];
+                if(sourceData && sourceData.content) {
+                    var speciesId = sourceData.speciesId?sourceData.speciesId:'';
+                    var content = sourceData.content;
+                    var data_type = 'text';
+                    html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                    $.each(content, function(i, v) { 
+                        switch(sourceData.type) {
+                            case 'contributor' :
+                            case 'attributor' :
+                                html.push (createContributor(v, sourceData, v));
+                                break;
+                            case 'description' : 
+                                data_type = 'wysihtml5';
+                                html.push (v);//createSpeciesFieldHtml(v, sourceData));
+                                break;
+                        }
+                    });
+                   
+                    var $ul = $(this).parent().parent();
+                    $ul.empty().html(html.join(' '));
+
+                    initEditables($ul);
+                    initAddables($ul);
                 } else {
-                    return response.responseText;
+                    $(this).html('Add'); 
                 }
+                return 'Successfully added data';
+            },
+            error:function(response, newValue) {
+                var successHandler = this.success, errorHandler;
+                handleError(response, undefined, undefined, function(data){
+                         $ele.find('.addField').editable('submit');
+                        return "Please resubmit the form again";
+                    }, function(data) {
+                    if(data && data.status == 401) {
+                        return "Please login and resubmit the changes"; 
+                    } else if(response.status === 500) {
+                        return 'Service unavailable. Please try later.';
+                    } else {
+                        return response.responseText;
+                    }
+                })
             }
-        });
-
-
-        //$(".attributionContent .editable").before("<a class='pull-right btn btn-link addFieldButton'>Add</a>");
-        $ele.find(".editable").before("<a class='pull-right btn btn-link editFieldButton'>Edit</a>");
-        $ele.find('.editFieldButton').click(function(e){    
-            e.stopPropagation();
-            $(this).next('.editable').editable('toggle');
-        });
+        })
     }
 
+    function createContributor(content, sourceData) {
+        return '<li><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.name)+'</a></li>' ;
+    }
+
+    function createSpeciesFieldHtml(content, sourceData) {
+        var toolbar = createMetadataToolbar(content);
+        return '<div class="contributor_entry"><div href="#" class="editField description" data-type="wysihtml5" data-pk="'+content.id+'"  data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+content.description+'</div>'+toolbar+'</div>'; 
+    }
+
+    function createMetadataToolbar(content, sourceData) {
+        var html = [];
+        html.push("<div class='toolbar'>");
+        $.each(content.contributors, function(i, v) {
+            html.push (createContributor(v, sourceData));
+        });
+        $.each(content.attributors, function(i, v) {
+            html.push (createContributor(v, sourceData));
+        });
+        html.push('</div>');
+        return html.join(' ');
+    }
+
+
     initEditables();
-    $('.addField').editable({
-        ajaxOptions:{
-            method:'get',
-            dataType:'json'
-        },
-        mode:'popup',
-        success: function(response, newValue) {
-            if(!response) {
-                return "Unknown error!";
-            }          
-
-            if(!response.success) {
-                $(this).next(".alert-error").html(response.msg).show();
-                return response.msg
-            } else {
-                $(this).next(".alert-error").hide();
-                console.log(response.content);
-            }
-            console.log($(this));
-        },
-        display: function(value, sourceData, response) {
-            var html = []
-            if(sourceData && sourceData.content) {
-                var content = sourceData.content;
-                $.each(content, function(i, v) { 
-                    html.push ('<li><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+v.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+v.class+'" data-original-title="Edit '+v.class+' name">'+ $.fn.editableutils.escape(v.name)+'</a></li>'); 
-                });
-                var $ul = $(this).parent().parent()
-                $ul.empty().html(html.join(' '));
-                initEditables($ul);
-            } else {
-                $(this).empty(); 
-            }
-        },
-        error:function(response, newValue) {
-            if(response.status === 500) {
-                return 'Service unavailable. Please try later.';
-            } else {
-                return response.responseText;
-            }
-        }
-
-    })
-
+    initAddables();
 }
 
 $(document).ready(function() {
 
     $(".readmore").readmore({
         substr_len : 400,
-    more_link : '<a class="more readmore">&nbsp;More</a>'
+        more_link : '<a class="more readmore">&nbsp;More</a>'
     });
 
     /*$("#toc").tocify({

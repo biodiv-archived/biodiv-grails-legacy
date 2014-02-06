@@ -26,7 +26,7 @@ String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
 	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
-} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+} else{ // if(domain.equals(grailsApplication.config.ibp.domain)) {
 	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
 }
 %>

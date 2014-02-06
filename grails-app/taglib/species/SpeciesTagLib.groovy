@@ -1,8 +1,13 @@
 package species
 
+import species.auth.SUser;
+
 class SpeciesTagLib {
 	
 	static namespace = "s"
+
+    def springSecurityService;
+    def speciesService;
 
 	def showSpeciesImages = { attrs, body->
 		out << render(template:"/common/speciesImagesTemplate", model:attrs.model);
@@ -125,4 +130,33 @@ class SpeciesTagLib {
 		out << render(template:"/species/showDownloadAction", model:attrs.model);
 	}
 
+    def hasPermission = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        Field fieldInstance = attrs.model.fieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if((speciesFieldInstance && speciesFieldInstance.description) || speciesService.isContributor(speciesFieldInstance, fieldInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def isContributor = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        Field fieldInstance = attrs.model.fieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if(speciesService.isContributor(speciesFieldInstance, fieldInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def hasContent = {attrs, body ->
+        def map = attrs.model.map;
+        println "___________________"
+        println map;
+        if(map instanceof Map && map.hasContent) {
+            println ")))))))))))"
+            out << body();
+        }
+    }
 }

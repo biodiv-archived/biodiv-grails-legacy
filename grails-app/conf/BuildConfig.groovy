@@ -91,14 +91,15 @@ grails.project.dependency.resolution = {
         compile 'jmimemagic:jmimemagic:0.1.2'
         
         //compile 'net.sf.jtidy:jtidy:r938'
+        compile 'com.mchange:c3p0:0.9.5-pre6'
     }
     plugins { 
-/*        compile ":resources:1.1.6" 
+        compile ":resources:1.1.6" 
         compile ":spring-security-core:1.2.7.3" 
         compile ":spring-security-ui:0.2" 
         compile ":webxml:1.4.1" 
         compile ':plugin-config:0.1.5'
-  */  } 
+    } 
 
     grails.war.resources = { stagingDir ->
         /*for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j']) {

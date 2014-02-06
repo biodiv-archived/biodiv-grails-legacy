@@ -20,7 +20,7 @@ import species.participation.Flag;
 import species.participation.Featured;
 
 class Species implements Rateable { 
-	String title; 
+	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;

@@ -186,6 +186,8 @@
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
+                        <br/>
+                        <s:hasContent model="['map':concept.value]">
                         <g:if
                         test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)}">
                         </g:if>
@@ -203,6 +205,7 @@
                         <br/>
                         <%conceptCounter++%>
                         </g:else>
+                        </s:hasContent>
                         </g:each>
                     </ul>
                 </div>			
