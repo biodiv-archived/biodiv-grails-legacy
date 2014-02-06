@@ -8,6 +8,7 @@ class SpeciesTagLib {
 
     def springSecurityService;
     def speciesService;
+	def speciesPermissionService;
 
 	def showSpeciesImages = { attrs, body->
 		out << render(template:"/common/speciesImagesTemplate", model:attrs.model);
@@ -135,27 +136,41 @@ class SpeciesTagLib {
         Field fieldInstance = attrs.model.fieldInstance;
         SUser currentUser = springSecurityService.currentUser;
 
-        if((speciesFieldInstance && speciesFieldInstance.description) || speciesService.isContributor(speciesFieldInstance, fieldInstance, currentUser)) {
+        if((speciesFieldInstance && speciesFieldInstance.description) || speciesPermissionService.isContributor(speciesFieldInstance, fieldInstance, currentUser)) {
             out << body();
         }
     }
 
-    def isContributor = {attrs, body ->
-        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
-        Field fieldInstance = attrs.model.fieldInstance;
+    def isSpeciesContributor = {attrs, body -> 
+        Species speciesInstance = attrs.model.speciesInstance;
         SUser currentUser = springSecurityService.currentUser;
 
-        if(speciesService.isContributor(speciesFieldInstance, fieldInstance, currentUser)) {
+        if(speciesPermissionService.isSpeciesContributor(speciesInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def isSpeciesFieldContributor = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if(speciesPermissionService.isSpeciesFieldContributor(speciesFieldInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def isCurator = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if(speciesPermissionService.isCurator(speciesFieldInstance, currentUser)) {
             out << body();
         }
     }
 
     def hasContent = {attrs, body ->
         def map = attrs.model.map;
-        println "___________________"
-        println map;
         if(map instanceof Map && map.hasContent) {
-            println ")))))))))))"
             out << body();
         }
     }

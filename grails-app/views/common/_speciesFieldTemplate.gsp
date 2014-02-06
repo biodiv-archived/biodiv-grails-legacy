@@ -1,14 +1,12 @@
-
+<s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
+    <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
+</s:isSpeciesFieldContributor>
 <div class="contributor_entry">
-    <s:isContributor model="['speciesFieldInstance':speciesFieldInstance, 'fieldInstance':fieldInstance]">
-        <g:set var="isContributor" value="${Boolean.TRUE}"/>
-        </s:isContributor>
-
         <g:if test="${speciesFieldInstance?.field?.subCategory}">
         <h6 style="margin-bottom: 0px">
             ${speciesFieldInstance?.field?.subCategory}
         </h6>
-        <g:if test="${isContributor}">
+        <g:if test="${isSpeciesContributor}">
         <a href="#" class="addField"  data-pk="${fieldInstance.id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
         </g:if>
         </g:if>
@@ -76,7 +74,7 @@
             <!-- content -->
 
 
-            <div class="${isContributor?'editField ':' '} description" data-type="wysihtml5"
+            <div class="${isSpeciesFieldContributor?'editField ':' '} description" data-type="wysihtml5"
                 data-pk="${speciesFieldInstance.id}"
                 data-url="${uGroup.createLink(controller:'species', action:'update') }"
                 data-name="description" data-original-title="Edit description">
@@ -127,7 +125,7 @@
             </g:elseif>
 
             <g:showSpeciesFieldToolbar
-            model="['speciesFieldInstance':speciesFieldInstance, 'isContributor':isContributor]" />
+            model="['speciesFieldInstance':speciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
             <g:if test="${speciesFieldInstance != null}">
             <comment:showCommentPopup
             model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />

@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import species.Field;
 
 import species.License.LicenseType;
+import species.formatReader.SpreadsheetWriter;
 
 class SourceConverter {
     protected Map licenseUrlMap;
@@ -212,73 +213,87 @@ class SourceConverter {
 
     protected Map getCustomFormat(String customFormat) {
         if(!customFormat) return [:];
-        return customFormat.split(';').inject([:]) { map, token ->
-            token = token.toLowerCase();
-            token.split('=').with {
-                map[it[0]] = it[1];
-            }
-            map
-        }
-    }
+        Map m = new HashMap()
+		//SpreadsheetWriter.keyValueSep
+		//SpreadsheetWriter.columnSep
+        println "============= custmot >>>>>>>>>> " + customFormat
+		def columnList = customFormat.split(SpreadsheetWriter.columnSep).each { cols ->
+			cols.split(SpreadsheetWriter.keyValueSep).each { columnInfo ->
+				def colName = columnInfo[0]
+				def colAttrs = columnInfo[1]
+				colAttrs.split(";").each { pair ->
+					def tmppairval = pair.split("=")
+					if(tmppairval.size() > 1){
+						m.put(tmppairval[0], tmppairval[1])
+					}
+
+				} 
+			}
+
+		}
+
+		return m
+		
+	}
 
 
-    protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="") {
-        log.debug "Creating images ${imageIds}"
+	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="") {
+		log.debug "Creating images ${imageIds}"
+		
+		if(!imageIds) return;
+		
+		Node images = new Node(speciesElement, "images");
+		imageMetaData.each { imageData ->
+			String refKey = imageData.get("id");
+			if(imageIds.contains(refKey)) {
+				Node image = new Node(images, "image");		
+				String imagePath =  imageData.get("image")?:refKey;
+				File file = new File(imagesDir, imagePath);
+				new Node(image, "refKey", refKey);
+				new Node(image, "fileName", file.getAbsolutePath());
+				new Node(image, "source", imageData.get("source"));
+				new Node(image, "caption", imageData.get("caption"));
+				
+				List<String> contributors = getContributors(imageData.get("contributor"));
+				for(c in contributors) {
+					new Node(image, "contributor", c);
+				}
+				
+				List<String> attributions = getAttributions(imageData.get("attribution"));
+				for(a in attributions) {
+					new Node(image, "attribution", a);
+				}
+				
+				List<String> licenses = getLicenses(imageData.get('license'))
+				for (l in licenses) {
+					new Node(image, "license", l);
+				}
+			}
+		}
+		log.debug images
+	}
 
-        if(!imageIds) return;
+	protected void createImages(Node images, String imageId, List<Map> imageMetaData, String imagesDir="") {
+		imageMetaData.each { imageData ->
+			String refKey = imageData.get("id");
+			if(refKey.trim().equals(imageId.trim())) {
+				Node image = new Node(images, "image");
+				String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
+				File file = new File(imagesDir, cleanLoc(loc));
+				new Node(image, "refKey", refKey);
+				new Node(image, "fileName", file.getAbsolutePath());
+				new Node(image, "source", imageData.get("source")?:imageData.get("url"));
+				new Node(image, "caption", imageData.get("possiblecaption")?:imageData.get("caption"));
+				new Node(image, "attribution", imageData.get("attribution"));
+				new Node(image, "contributor", imageData.get("contributor"));
+				new Node(image, "license", imageData.get("license"));
+			}
+		}
+	}
 
-        Node images = new Node(speciesElement, "images");
-        imageMetaData.each { imageData ->
-            String refKey = imageData.get("id");
-            if(imageIds.contains(refKey)) {
-                Node image = new Node(images, "image");		
-                String imagePath =  imageData.get("image")?:refKey;
-                File file = new File(imagesDir, imagePath);
-                new Node(image, "refKey", refKey);
-                new Node(image, "fileName", file.getAbsolutePath());
-                new Node(image, "source", imageData.get("source"));
-                new Node(image, "caption", imageData.get("caption"));
-
-                List<String> contributors = getContributors(imageData.get("contributor"));
-                for(c in contributors) {
-                    new Node(image, "contributor", c);
-                }
-
-                List<String> attributions = getAttributions(imageData.get("attribution"));
-                for(a in attributions) {
-                    new Node(image, "attribution", a);
-                }
-
-                List<String> licenses = getLicenses(imageData.get('license'))
-                for (l in licenses) {
-                    new Node(image, "license", l);
-                }
-            }
-        }
-        log.debug images
-    }
-
-    protected void createImages(Node images, String imageId, List<Map> imageMetaData, String imagesDir="") {
-        imageMetaData.each { imageData ->
-            String refKey = imageData.get("id");
-            if(refKey.trim().equals(imageId.trim())) {
-                Node image = new Node(images, "image");
-                String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
-                File file = new File(imagesDir, cleanLoc(loc));
-                new Node(image, "refKey", refKey);
-                new Node(image, "fileName", file.getAbsolutePath());
-                new Node(image, "source", imageData.get("source")?:imageData.get("url"));
-                new Node(image, "caption", imageData.get("possiblecaption")?:imageData.get("caption"));
-                new Node(image, "attribution", imageData.get("attribution"));
-                new Node(image, "contributor", imageData.get("contributor"));
-                new Node(image, "license", imageData.get("license"));
-            }
-        }
-    }
-
-    protected String cleanLoc(String loc) {
-        return loc.replaceAll("\\\\", File.separator);
-    }
+	protected String cleanLoc(String loc) {
+		return loc.replaceAll("\\\\", File.separator);
+	}
 
 
     protected List<String> getContributors(String text, String delimiter="\n") {

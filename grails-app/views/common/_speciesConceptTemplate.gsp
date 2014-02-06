@@ -18,12 +18,12 @@
             class="speciesField collapse in">
             <g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 
-            <s:isContributor model="['speciesFieldInstance':speciesFieldInstance, 'fieldInstance':concept.value.get('field')]">
+            <g:if test="${isSpeciesContributor}">
             <a href="#" class="addField"  data-pk="${concept.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
-            </s:isContributor>
+            </g:if>
             <g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
             <g:showSpeciesField
-            model="['speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':concept.value.get('field')]" />
+            model="['speciesInstance':speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':concept.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
             </g:each>
             </g:if>
             <g:else>
@@ -35,10 +35,8 @@
             <div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory">
 
                 <h6><a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a></h6>
-                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-                    <s:isContributor model="['speciesFieldInstance':speciesFieldInstance, 'fieldInstance':category.value.get('field')]">
+                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
                         <a href="#" class="addField"  data-pk="${category.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
-                    </s:isContributor>
                 </g:if>
 
                 <div 
@@ -57,7 +55,7 @@
                     <g:else>
                     <g:each in="${category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
                     <g:showSpeciesField
-                    model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':category.value.get('field')]" />
+                    model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':category.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
                     </g:each>
                     </g:else>
                     </g:if>
@@ -69,14 +67,14 @@
                     (it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY))
                     ) && category.value }">
                     <g:showSpeciesField
-                    model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance')?.getAt(0), 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field')]" />
+                    model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance')?.getAt(0), 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
                     </g:if>
                     <g:elseif
                     test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance') && !it.key.equals('hasContent')}">
 
                     <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
                     <g:showSpeciesField
-                    model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field')]" />
+                    model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
                     </g:each>
                     </g:elseif>
                     </g:each>

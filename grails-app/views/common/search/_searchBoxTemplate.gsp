@@ -55,6 +55,10 @@ $(document).ready(function() {
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}"
                 },
+                'saveModifiedSpecies' : "${uGroup.createLink(controller:'UFile', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
+                'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
+                'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
+                'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
                 'content':{
                     'url':"${uGroup.createLink('controller':'content')}"
                 },

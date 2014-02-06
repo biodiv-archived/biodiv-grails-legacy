@@ -95,6 +95,7 @@ class XMLConverter extends SourceConverter {
             log.info "Creating/Updating species"
             log.debug species;
             s = new Species();
+			s.appendLogSummary("ROW   " + species.attributes()['rowIndex']?:0)
 
             removeInvalidNode(species);
 
@@ -135,7 +136,9 @@ class XMLConverter extends SourceConverter {
                             catch(org.springframework.dao.DataIntegrityViolationException e) {
                                 e.printStackTrace();
                                 log.error "Could not delete species ${existingSpecies.id} : "+e.getMessage();
-                                return;
+								s.appendLogSummary("Could not delete species ${existingSpecies.id} : "+e.getMessage())
+								s.appendLogSummary(e.printStackTrace());
+								return;
                             }
                         } else if(defaultSaveAction == SaveAction.MERGE){
                             log.info "Merging with already existing species information : "+existingSpecies.id;

@@ -161,7 +161,10 @@
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
-
+        <s:isSpeciesContributor model="['speciesInstance':speciesInstance]">
+        <g:set var="isSpeciesContributor" value="${Boolean.TRUE}"/>
+        </s:isSpeciesContributor>
+ 
         <div class="span12">
             <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
 
@@ -200,7 +203,7 @@
                         <li class="nav ui-state-default">
                         </g:else>
                         <g:showSpeciesConcept
-                        model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress]" />
+                        model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, 'isSpeciesContributor':isSpeciesContributor]" />
                         </li>
                         <br/>
                         <%conceptCounter++%>

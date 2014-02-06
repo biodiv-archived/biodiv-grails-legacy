@@ -11,25 +11,25 @@
                 <g:each in="${speciesFieldInstance.attributors}" var="r">
                 <g:if test="${r}">
                 <li>
-                <a href="#" class="${isContributor?'editField':''}" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name">${r.name}
+                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name">${r.name}
                 </a>
                 </li>
                 </g:if>
                 </g:each>
-                <g:if test="${isContributor}">
+                <g:if test="${isSpeciesContributor}">
                 <li>
-                    <a href="#" class="${isContributor?'addField':''}"  data-pk="${speciesFieldInstance.id}" data-type="text" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
+                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="text" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
                 </li>
                 </g:if>
             </ul>
     </div>
     </g:if>
-    <g:elseif test="${isContributor}">
+    <g:elseif test="${isSpeciesContributor}">
     <div class="prop span11">
         <div class="name" style="float:none;">Attributions</div>
             <ul>
                 <li>
-                <a href="#" class="${isContributor?'addField':''}"  data-pk="${speciesFieldInstance.id}" data-type="text" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
+                <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="text" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
                 </li>
             </ul>
     </div>
@@ -42,11 +42,11 @@
                 in="${ speciesFieldInstance?.contributors}" var="contributor">
                 <g:if test="${contributor}">
                 <li>
-                <a href="#" class="${isContributor?'editField':''}" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${contributor.id}}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Edit contributor name">${contributor.name}</a>
+                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${contributor.id}}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Edit contributor name">${contributor.name}</a>
                 </li> 
                 </g:if>
                 </g:each>
-                <g:if test="${isContributor}">
+                <g:if test="${isSpeciesContributor}">
                 <li> 
                 <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="text" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Add contributor name" data-placeholder="Add contributor"></a>
                 </li>

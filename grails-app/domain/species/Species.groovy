@@ -31,7 +31,8 @@ class Species implements Rateable {
 	Date dateCreated;
 	Date lastUpdated;
 	Habitat habitat;
-
+	StringBuffer sLog;
+	
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
@@ -50,7 +51,7 @@ class Species implements Rateable {
 		taxonomyRegistry:TaxonomyRegistry, 
 		resources:Resource,
 		userGroups:UserGroup];
-
+ 
 
 	static belongsTo = [UserGroup]
 
@@ -67,7 +68,10 @@ class Species implements Rateable {
 		id generator:'species.utils.PrefillableUUIDHexGenerator'
 		fields sort : 'field'
 	}
-
+	
+	//used for debugging
+	static transients = [ "sLog" ]
+	
 	Resource mainImage() {  
 		if(!reprImage) {
 			def images = this.getImages();
@@ -248,5 +252,23 @@ class Species implements Rateable {
 //			}
 //		}
 //	}
+	
+	def appendLogSummary(String s){
+		if(!sLog)
+			sLog = new StringBuffer()
+		
+		sLog.append(s + System.getProperty("line.separator"));
+	}
+	/*
+	private class SpeciesLog {
+		int uploadRowIndex;
+		StringBuffer summary;
+		
+		public SpeciesLog(){
+			uploadRowIndex = 0;
+			summary = new StringBuffer()
+		}
+	}
+	*/
 
 }

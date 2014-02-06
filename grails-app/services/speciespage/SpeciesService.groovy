@@ -325,7 +325,7 @@ class SpeciesService {
             return [success:false, msg:"Invalid field"]
         }
         try {
-            SpeciesField speciesFieldInstance = converter.createSpeciesField(speciesInstance, field, value, [springSecurityService.currentUser.username], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_CREATION.value()]);
+            SpeciesField speciesFieldInstance = converter.createSpeciesField(speciesInstance, field, value, [springSecurityService.currentUser.username], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
             if(speciesFieldInstance) {
                 speciesInstance.addToFields(speciesFieldInstance);
                 //TODO:make sure this is run in only one user updates this species at a time
@@ -337,7 +337,7 @@ class SpeciesService {
                 }
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'description', content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
+                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'description', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -580,6 +580,25 @@ class SpeciesService {
             queryParams["featType"] = Species.class.getCanonicalName();
         }
 
+        if(params.daterangepicker_start && params.daterangepicker_end){
+            def df = new SimpleDateFormat("dd/MM/yyyy")
+            def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
+            def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
+            Calendar cal = Calendar.getInstance(); // locale-specific
+            cal.setTime(endDate)
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.MINUTE, 59);
+            endDate = new Date(cal.getTimeInMillis())
+
+            filterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
+            queryParams["daterangepicker_start"] =  startDate   
+            queryParams["daterangepicker_end"] =  endDate
+
+            activeFilters["daterangepicker_start"] = params.daterangepicker_start
+            activeFilters["daterangepicker_end"] =  params.daterangepicker_end
+        }
+
 
         if(params.webaddress) {
             def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
@@ -648,21 +667,6 @@ class SpeciesService {
                 return a.lastUpdated <=> b.lastUpdated;
             }
         } as Comparator )
-    }
-
-    boolean isSpeciesFieldContributor(SpeciesField speciesFieldInstance, SUser user) {
-        if(!user) return false;
-        return  SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN');
-    }
-
-    boolean isFieldContributor(Field fieldInstance, SUser user) {
-        if(!user) return false;
-        return  SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN');
-    }
-
-    boolean isContributor(SpeciesField speciesFieldInstance, Field fieldInstance, SUser user) {
-        if(!user) return false;
-        return ((speciesFieldInstance && isSpeciesFieldContributor(speciesFieldInstance, user)) || (fieldInstance && isFieldContributor(fieldInstance, user)) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'))
     }
 
     boolean hasContent(speciesFieldInstances) {

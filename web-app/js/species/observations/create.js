@@ -24,7 +24,8 @@ function addDirtyRows(e, args) {
         dirtyRows.push(args.row);
 };
 
-function initGrid(data, columns, sciNameColumn, commonNameColumn) {
+function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
+    $("#speciesGridSection").show();
     var options = {
         editable: true,
         enableAddRow: true,
@@ -34,12 +35,20 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         fullWidthRows:true,
         rowHeight:32
     };
+    
+    var headerFunction;
+    if(res === "species") {
+        headerFunction = getSpeciesHeaderMenuOptions;
+    }
+    else{
+        headerFunction = getHeaderMenuOptions;
+    }
 
-    function setUnEditableColumn(columns){
-    	var unEditableColumn = "Id"
-    	$.each(columns, function(index, column) {
-    		if(column.name === unEditableColumn){
-    			column.editor = null;
+function setUnEditableColumn(columns){
+        var unEditableColumn = "Id"
+            $.each(columns, function(index, column) {
+                if(column.name === unEditableColumn){
+                    column.editor = null;
     		}	
     	});
     }
@@ -79,7 +88,7 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
                     name:newColumnName,
                     field:newColumnName,
                     editor: Slick.Editors.Text,
-                    header:getHeaderMenuOptions()
+                    header:headerFunction()
                 }, options);
 
                 newColumn = options;
@@ -106,10 +115,9 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             menu.items[0].iconCssClass = (args.column.name === $("#sciNameColumn").val())?'icon-check':undefined
             menu.items[1].iconCssClass = (args.column.name === $("#commonNameColumn").val())?'icon-check':undefined
         });
-
+        
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
-            var name = args.column.name
-            
+            var name = args.column.name;
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
                     name = ''
@@ -126,13 +134,39 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         });
-
         grid.registerPlugin(headerMenuPlugin);
 
         
         
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
+
+        if(res === "species") {
+            var col = new Array();
+            var k = 0;
+            for(var i= 0; i < columns.length; i++) {
+                if(columns[i].name != "Media"){
+                    col[k] = columns[i];
+                    k=k+1;
+                }
+            }
+            populateTagHeaders(col);
+            $.ajax({
+                url:window.params.getDataColumnsDB,
+                dataType:'JSON',
+                success:function(data){
+                   updateMetadataValues();  
+                    $(".headerInfoTags").tagit({
+                        availableTags:data,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+                   
+                }
+            });
+        }
+
 
         if(sciNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
@@ -193,16 +227,17 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
 /**
  */
 function showGrid(){
-    var input = $("#checklistStartFile_path").val(); 
+    var input = $("#checklistStartFile_path").val();
+    var res = "checklist";
     if($('#textAreaSection').is(':visible')){
-        parseData(  window.params.content.url + input , {callBack:loadDataToGrid});
+        parseData(  window.params.content.url + input , {callBack:loadDataToGrid, res: res});
     }
     else{
-        parseData(  window.params.content.url + input , {callBack:initGrid});
+        parseData(  window.params.content.url + input , {callBack:initGrid, res: res });
     }
 }
 
-function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
+function loadDataToGrid(data, columns, res, sciNameColumn, commonNameColumn) {
     var cols = '', d = '';
     
     $.each(columns, function(i, n){
@@ -217,16 +252,15 @@ function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
         line = line.slice(1);
         d = d + '\n' + line
     });
-    
-    $("#checklistData").val(d);
-    $("#checklistColumns").val(cols.slice(1));
-   
-    loadTextToGrid(data, columns, sciNameColumn, commonNameColumn);
+        $("#checklistData").val(d);
+        $("#checklistColumns").val(cols.slice(1));
+
+    loadTextToGrid(data, columns, res, sciNameColumn, commonNameColumn);
 }
 
-function loadTextToGrid(data, columns, sciNameColumn, commonNameColumn) {
+function loadTextToGrid(data, columns, res, sciNameColumn, commonNameColumn) {
     $("#gridSection").show();
-    initGrid(data, columns, sciNameColumn, commonNameColumn)
+    initGrid(data, columns, res, sciNameColumn, commonNameColumn)
     $("#textAreaSection").hide();
     $("#addNames").hide();
     $("#parseNames").show();
@@ -822,7 +856,8 @@ $(document).ready(function(){
             alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
         }
     });
-	
+
+    
 });	
 
  function AutoCompleteEditor(args) {

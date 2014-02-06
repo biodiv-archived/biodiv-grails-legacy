@@ -1,4 +1,5 @@
-<% def allowedExtensions = allowedExtensions?:"[ 'pdf']"  %>
+<% def allowedExtensions = allowedExtensions?:"[ 'pdf']" 
+%>
 <uploader:uploader id="${name}_uploader"
 	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
 	multiple="false"
@@ -8,19 +9,19 @@
 
         <uploader:onComplete>
         //Available variables: id, fileName, responseJSON
-
+        
         if(responseJSON.success) {
-
-        $('#${name}_uploaded').show();
-        $('#${name}_file').attr('href',responseJSON.fileURL);
-        $('#${name}_file').html(fileName);
-        $('#${name}_path').val(responseJSON.filePath);
-        $('#${name}_name').val(fileName);
-
+            $('#${name}_uploaded').show();
+            $('#${name}_file').attr('href',responseJSON.fileURL);
+            $('#${name}_file').html(fileName);
+            $('#${name}_path').val(responseJSON.filePath);
+            $('#${name}_name').val(fileName);
+            $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
+            $('#headerMetadata').val(responseJSON.headerMetadata);
         }
 
         <g:if test="${uploadCallBack}">
-        ${uploadCallBack}
+            ${uploadCallBack}
         </g:if>			
 
         </uploader:onComplete>	
