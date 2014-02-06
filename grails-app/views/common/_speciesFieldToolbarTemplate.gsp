@@ -46,7 +46,7 @@
 		</div>
 		<div class="clearfix"></div>
 		<g:showSpeciesFieldAttribution
-			model="['speciesFieldInstance':speciesFieldInstance]" />
+			model="['speciesFieldInstance':speciesFieldInstance, 'isContributor':isContributor]" />
                 <g:if test="${speciesFieldInstance instanceof SpeciesField}">
         		<g:showSpeciesFieldHelp
                             model="['field':speciesFieldInstance.field]" />
