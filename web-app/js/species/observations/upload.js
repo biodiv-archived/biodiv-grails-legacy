@@ -70,7 +70,7 @@ function getSpeciesHeaderMenuOptions() {
 function populateTagHeaders(columns) {    
     var tableRow = '';
     for(i=0; i<columns.length; i++){
-        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell" align="center"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><td class="appendFlagCell" align="center"><input type="checkbox" class="appendFlag" name = "append" value = "appendFlag"></td><!--td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td--><td class="delimiterCell"><input type="text" class="delimiter" style="width:49px;"></td></tr>'
+        tableRow += '<tr><td class="columnName">'+columns[i].name+'</td><td class="dataColCell"></td><td class="headerFlagCell" align="center"><input type="checkbox" class="headerFlag" name = "header" value = "true"></td><td class="appendFlagCell" align="center"><input type="checkbox" class="appendFlag" name = "append" value = "true"></td><!--td class="groupRadioCell"><input type="radio" class="groupRadio" name="group'+i+'" value="1">1<input type="radio" class="groupRadio" name="group'+i+'" value="2">2<input type="radio" class="groupRadio" name="group'+i+'" value="3">3</td--><td class="delimiterCell"><input type="text" class="delimiter" style="width:49px;"></td></tr>'
     } 
     /*
     for (i=0;i<columns.length;i++){
@@ -153,29 +153,6 @@ function getTagsForHeaders() {
          });
         populateHeaderMetadata(headerName, headerInfo);
     });
-    /*
-       var table = $("#tableHeader");
-       for (var i = 0, row; row = table.rows[i]; i++) {
-//iterate through rows
-        //rows would be accessed using the "row" variable assigned in the for loop
-        for (var j = 0, col; col = row.cells[j]; j++) {
-            console.log(col);
-            //iterate through columns
-            //columns would be accessed using the "col" variable assigned in the for loop
-        }  
-    }
-
-    /*
-    var headerInfo = {};
-    var headerName = $('#headerOptions :selected').text();
-    headerInfo["dataColumns"] =  $( "#dataColumns :checked" ).map(function() {return this.value;}).get().join();
-    headerInfo["header"] =  $( "#headerFlag :checked" ).map(function() {return this.value;}).get().join();
-    headerInfo["group"] = $('[name="group"]:checked').val();
-    headerInfo["merge"] =  $( "#mergeFlag :checked" ).map(function() {return this.value;}).get().join();
-    populateHeaderMetadata(headerName, headerInfo);
-    //showOnUI(headerMarkers);
-    console.log(headerMarkers);
-    */
 }
 
 
@@ -184,7 +161,7 @@ function updateMetadataValues() {
     console.log("UPDATE METADATA");
     console.log(JSON.stringify(headerMetadata));
     
-    if(Object.keys(headerMetadata).length != 0){
+    //if(Object.keys(headerMetadata).length != 0){
         $("#tableHeader tr").each(function () {
             var taggedValues;
             $('td', this).each(function () {
@@ -194,8 +171,10 @@ function updateMetadataValues() {
                     console.log("======" + columnName);
                     console.log(" ====== "+ JSON.stringify(taggedValues));
                 }
+                //console.log("ABOVE THIS");
                 //if(taggedValues != undefined){
                 else if($(this).attr("class") == "dataColCell") {
+                    console.log("TAGIT HONA THA");
                     var preList='<ul class="headerInfoTags" >';
                     if(taggedValues != undefined){
                         var dataColumns = taggedValues["dataColumns"];
@@ -252,7 +231,7 @@ function updateMetadataValues() {
             });
 
         });
-    }
+    //}
     }
 
 function getHeaderMetadata() {
@@ -325,9 +304,12 @@ $('#uploadSpecies').click(function() {
         data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val(), 'writeContributor': 'true' },
         success : function(data) {
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
+            $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
             $("#uploadSpeciesDiv").hide();
             alert(data.msg);
             document.getElementById("downloadSpeciesFile").style.visibility = "visible";
+            document.getElementById("downloadErrorFile").style.visibility = "visible";
+
         },
         error: function(xhr, textStatus, errorThrown) {
             alert('Error uploading species!!');

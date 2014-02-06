@@ -143,6 +143,11 @@
                     <input type="text" name="downloadFile" value="" style="visibility:hidden;">
                     Download the uploaded sheet here <input class="btn btn-primary" type="submit" value="Download">
                 </form>
+                
+                <form id="downloadErrorFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
+                    <input type="text" name="downloadFile" value="" style="visibility:hidden;">
+                    Download the error file here <input class="btn btn-primary" type="submit" value="Download">
+                </form>
 
 
                 <div id="uploadConsole">

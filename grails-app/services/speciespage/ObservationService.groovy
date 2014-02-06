@@ -34,11 +34,13 @@ import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
 
+
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
+import java.net.URLDecoder;
 import org.apache.solr.common.util.DateUtil;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
@@ -1528,9 +1530,11 @@ class ObservationService extends AbstractObjectService {
                 case SPECIES_UPLOADED:
                 mailSubject = "Request to curate species"
                 bodyView = "/emailtemplates/speciesUploaded"
-                templateMap["link"] = otherParams["link"] 
+                templateMap["link"] = otherParams["link"]
+                templateMap["curator"] = otherParams["curator"]
+                templateMap["link"] = URLDecoder.decode(templateMap["link"])
+                println "========THE URL  =============" + templateMap["link"]
                 populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
-                println "==================================" + otherParams["link"]
                 toUsers = otherParams["usersMailList"]
                 /*otherParams["usersMailList"].each{ 
                     toUsers.add(it)

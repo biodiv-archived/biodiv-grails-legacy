@@ -337,6 +337,7 @@ class UFileController {
                 def cdMap = [:]
                 def gMap = [:]
                 def hMap = [:]
+                def aMap = [:]
                 if(conDel != ""){
                     println conDel
                     List conDelList = conDel.split(columnSep)
@@ -368,6 +369,13 @@ class UFileController {
                         else{
                             hMap[z[0]] = ""
                         }
+                        if(q[2].split("=").size() == 2){
+
+                            aMap[z[0]] = q[2].split("=")[1]	
+                        }
+                        else{
+                            aMap[z[0]] = ""
+                        }
                     }
                 }
                 fnList.each{ fn ->
@@ -382,6 +390,7 @@ class UFileController {
                         m["delimiter"] = cdMap[fn]
                         m["group"] = gMap[fn]
                         m["header"] = hMap[fn]
+                        m["append"] = aMap[fn]
                         res[fn] = m
                     }
                 }

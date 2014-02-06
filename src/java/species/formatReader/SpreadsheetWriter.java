@@ -195,6 +195,13 @@ public class SpreadsheetWriter {
                 includeHeadings = headerValues.get("header");
                 includeHeadings = includeHeadings.trim();
             }
+            
+            String append = "";
+            if(headerValues.get("append") != null){
+                append = headerValues.get("append");
+                append = append.trim();
+            }
+
             String delimiter = "";
             if(headerValues.get("delimiter") != null){
                 delimiter = headerValues.get("delimiter");
@@ -229,17 +236,17 @@ public class SpreadsheetWriter {
                         }
                         String contentFormat = m.get("contentFormat");
                         if(contentFormat != "") {
-                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";";
+                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";";
                             m.put("contentFormat", contentFormat);
                         }
                         else {
-                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";");
                         }
                     }else {
                         Map<String, String> m1 = new HashMap();
                         m1.put("fieldNames", headerName);
                         m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
-                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";");
 
 
                         reverseMarkers.put(nextVal, m1);
