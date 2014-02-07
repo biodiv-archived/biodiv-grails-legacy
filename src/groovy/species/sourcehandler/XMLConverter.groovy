@@ -382,7 +382,7 @@ class XMLConverter extends SourceConverter {
                 speciesFields.add(speciesField);
                 println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
-                log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS"
+                log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
             }			
         }
         return speciesFields;

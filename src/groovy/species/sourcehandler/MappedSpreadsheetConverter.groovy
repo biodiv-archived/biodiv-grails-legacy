@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import species.Species;
 import species.formatReader.SpreadsheetReader;
+import species.formatReader.SpreadsheetWriter;
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
 
@@ -69,18 +70,20 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			Node speciesElement = builder.createNode("species", ['rowIndex':currentRowIndex++]);
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
-				String delimiter = mappedField.get("content delimiter");
-				String customFormat = mappedField.get("content format");
-				if(fieldName && (customFormat || speciesContent.get(fieldName.toLowerCase()))) {
+				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
+				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
+				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
 					fieldName = fieldName.toLowerCase();
+					//String delimiter = delimiterMap.get(fieldName)
+					//Map customFormat = customFormatMap.get(fieldName)
 					Node field = new Node(speciesElement, "field");
 					Node concept = new Node(field, "concept", mappedField.get("concept"));
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
 					if (mappedField.get("category")?.equalsIgnoreCase("images")) {
-						Node images = getImages(imagesMetaData, fieldName, 'images', customFormat, delimiter, speciesContent, speciesElement, imagesDir);
+						Node images = getImages(imagesMetaData, fieldName, 'images', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir);
 					} else if (category.text().equalsIgnoreCase("icons")) {
-						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormat, delimiter, speciesContent, speciesElement, imagesDir);
+						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir);
 					} else if (category.text().equalsIgnoreCase("audio")) {
 						//						Node images = getAudio(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, audio);
@@ -90,11 +93,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
                         Node data = createDataNode(field, speciesContent.get(fieldName), speciesContent, mappedField);
 						createReferences(data, speciesContent, mappedField);
-					} else if(customFormat) {
-						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormat, speciesContent);
+					} else if(customFormatMap) {
+						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, speciesContent);
 						createDataNode(field, text, speciesContent, mappedField);
-					} else if(delimiter) {
+					} else if(delimiterMap) {
 						String text = speciesContent.get(fieldName);
+						def delimiter = delimiterMap.get(fieldName);
 						if(text) {
 							for(String part : text.split(delimiter)) {
 								if(part) {
@@ -126,13 +130,58 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			return speciesElement
 	}
 
-    private getCustomFormattedText(String fieldName, String customFormat, Map speciesContent) {
-		def result = getCustomFormat(customFormat);
-		int group = result.get("group") ? Integer.parseInt(result.get("group")?.toString()) : -1;
-		boolean includeHeadings = result.get("includeheadings") ? Boolean.parseBoolean(result.get("includeheadings")?.toString()).booleanValue() : false;
+	protected Map getCustomFormat(String customFormat) {
+		if(!customFormat) return [:];
+		
+		println "============= custmot >>>>>>>>>> " + customFormat
+		def fMap = [:]
+		customFormat.split(SpreadsheetWriter.columnSep).each { columnsInfo ->
+			def colMetaData = columnsInfo.split(SpreadsheetWriter.keyValueSep)
+			def colName = colMetaData[0]
+			def metaData = colMetaData[1]
+			def m = [:]
+			def attrList = metaData.split(';')
+				attrList.each{ attrInfo ->
+				def attr = attrInfo.split('=')
+				if(attr.size() > 1){
+					m[attr[0]] = attr[1]
+				}
+			}
+			fMap.put(colName, m)
+		}
+		
+		println "============= custmot map " + fMap
+		return fMap
+		
+	}
+
+	
+	private Map getCustomDelimiterMap(String text){
+		Map m = [:]
+		if(!text) return m;
+		
+		//println "============= custom delimiter text  >>>>>>>>>> " + text
+		text.split(SpreadsheetWriter.columnSep).each { colInfo ->
+			def delimiterInfo = colInfo.split(SpreadsheetWriter.keyValueSep)
+			if(delimiterInfo.size() > 1 && delimiterInfo[1] ){
+				m.put(delimiterInfo[0], delimiterInfo[1])
+			}
+		}
+		
+		//println "============== Delimeter map " + m 
+		return m
+	}
+	
+    private getCustomFormattedText(String fieldName, Map customFormatMap, Map speciesContent) {
+		//def result = getCustomFormat(customFormat);
+		
 		String con = "";
 		fieldName.split(",").eachWithIndex { t, index ->
 			String txt = speciesContent?.get(t.toLowerCase().trim());
+			println "        field name " + t + "   text " + txt
+			def customFormat = customFormatMap.get(t.toLowerCase().trim())
+			int group = customFormat.get("group") ? Integer.parseInt(result.get("group")?.toString()) : -1;
+			boolean includeHeadings = customFormat.get("includeheadings") ? Boolean.parseBoolean(customFormat.get("includeheadings")?.toString()).booleanValue() : false;
 			if(txt) {
 				if (index%group == 0) {
 
@@ -156,25 +205,30 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return con;
 	}
 
-	private Node getImages(List<Map> imagesMetaData, String fieldName, String fieldType, String customFormat, String delimiter, Map speciesContent, Node speciesElement, String imagesDir) {
+	private Node getImages(List<Map> imagesMetaData, String fieldName, String fieldType, Map customFormatMap, Map delimiterMap, Map speciesContent, Node speciesElement, String imagesDir) {
         log.debug "Getting images"
 		Node images = new Node(speciesElement, fieldType);
-		def result = getCustomFormat(customFormat);
-		int group = result.get("group") ? Integer.parseInt(result.get("group")?.toString()):-1
-		int location = result.get("location") ? Integer.parseInt(result.get("location")?.toString())-1:-1
-		int source = result.get("source") ? Integer.parseInt(result.get("source")?.toString())-1:-1
-		int caption = result.get("caption") ? Integer.parseInt(result.get("caption")?.toString())-1:-1
-		int attribution = result.get("attribution") ? Integer.parseInt(result.get("attribution")?.toString())-1:-1
-		int contributor = result.get("contributor") ? Integer.parseInt(result.get("contributor")?.toString())-1:-1
-		int license = result.get("license") ? Integer.parseInt(result.get("license")?.toString())-1:-1
-		int name = result.get("name") ? Integer.parseInt(result.get("name")?.toString())-1:-1
-		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
+		//def result = getCustomFormat(customFormat);
 		//String imagesmetadatasheet = result.get("imagesmetadatasheet") ?: null
-        
+        def customFormat, delimiter, group, location, source, caption, attribution, contributor, license, name, incremental
+		
 		if(imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
+				customFormat =  customFormatMap.get(t.trim().toLowerCase());
+				delimiter = delimiterMap.get(t.trim().toLowerCase());
+				group = customFormat.get("group") ? Integer.parseInt(customFormat.get("group")?.toString()):-1
+				location = customFormat.get("location") ? Integer.parseInt(customFormat.get("location")?.toString())-1:-1
+				source = customFormat.get("source") ? Integer.parseInt(customFormat.get("source")?.toString())-1:-1
+				caption = customFormat.get("caption") ? Integer.parseInt(customFormat.get("caption")?.toString())-1:-1
+				attribution = customFormat.get("attribution") ? Integer.parseInt(customFormat.get("attribution")?.toString())-1:-1
+				contributor = customFormat.get("contributor") ? Integer.parseInt(customFormat.get("contributor")?.toString())-1:-1
+				license = customFormat.get("license") ? Integer.parseInt(customFormat.get("license")?.toString())-1:-1
+				name = customFormat.get("name") ? Integer.parseInt(customFormat.get("name")?.toString())-1:-1
+				incremental = customFormat.get("incremental") ? new Boolean(customFormat.get("incremental")) : false
+		
+				
                 if(delimiter) {
                     txt.split(delimiter).each { loc ->
                         if(loc) {
@@ -188,6 +242,19 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		} else {
 			List<String> groupValues = new ArrayList<String>();
 			fieldName.split(",").eachWithIndex { t, index ->
+				customFormat =  customFormatMap.get(t.trim().toLowerCase());
+				delimiter = delimiterMap.get(t.trim().toLowerCase());
+				
+				group = customFormat.get("group") ? Integer.parseInt(customFormat.get("group")?.toString()):-1
+				location = customFormat.get("location") ? Integer.parseInt(customFormat.get("location")?.toString())-1:-1
+				source = customFormat.get("source") ? Integer.parseInt(customFormat.get("source")?.toString())-1:-1
+				caption = customFormat.get("caption") ? Integer.parseInt(customFormat.get("caption")?.toString())-1:-1
+				attribution = customFormat.get("attribution") ? Integer.parseInt(customFormat.get("attribution")?.toString())-1:-1
+				contributor = customFormat.get("contributor") ? Integer.parseInt(customFormat.get("contributor")?.toString())-1:-1
+				license = customFormat.get("license") ? Integer.parseInt(customFormat.get("license")?.toString())-1:-1
+				name = customFormat.get("name") ? Integer.parseInt(customFormat.get("name")?.toString())-1:-1
+				incremental = customFormat.get("incremental") ? new Boolean(customFormat.get("incremental")) : false
+		
 				try{
 				String txt = speciesContent.get(t.trim());
 				if (index != 0 && index % group == 0) {
