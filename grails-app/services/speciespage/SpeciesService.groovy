@@ -14,8 +14,12 @@ import species.License.LicenseType;
 import species.Contributor;
 import species.Field
 import species.Resource;
-import species.Species
+import species.Species;
+import species.License;
+import species.Reference;
 import species.SpeciesField;
+import species.SpeciesField.AudienceType;
+import species.SpeciesField.Status;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
@@ -312,6 +316,44 @@ class SpeciesService {
         }
     }
 
+    def updateReference(referenceId, long speciesFieldId, def value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        Reference oldReference;
+        if(referenceId) {
+            oldReference = Reference.read(referenceId);
+
+            if(!oldReference) {
+                return [success:false, msg:"Reference with id ${referenceId} is not found"]
+            } else if(oldReference.title == value) {
+                return [success:true, msg:"Nothing to change"]
+            }
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            if(oldReference)
+                speciesField.removeFromReferences(oldReference);
+            speciesField.addToReferences(new Reference(title:value));
+            msg = 'Successfully added reference';
+            content = speciesField.references;
+
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating reference"]
+            }
+            return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
+        }
+    }
+
     def addDescription(long speciesId, long fieldId, String value) { 
         if(!value || !fieldId || !speciesId) {
             return [success:false, msg:"Id or value cannot be empty"]
@@ -347,14 +389,14 @@ class SpeciesService {
     }
 
     def updateDescription(long id, String value) {
-        if(!value || id) {
+        if(!value || !id) {
             return [success:false, msg:"Id or value cannot empty"]
         }
         SpeciesField c = SpeciesField.get(id);
-        return updateDescription(c, value);
+        return updateSpeciesFieldDescription(c, value);
     }
     
-    def updateDescription(SpeciesField c, String value) {
+    def updateSpeciesFieldDescription(SpeciesField c, String value) {
         if(!c) {
             return [success:false, msg:"SpeciesField not found"]
         } else {
@@ -367,6 +409,105 @@ class SpeciesService {
             }
             return [success:true, msg:""]
         }
+    }
+
+    def updateLicense(long speciesFieldId, def value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            License c = (new XMLConverter()).getLicenseByType(value, false);
+            if(!c) {
+                return [success:false, msg:"Error while updating license"]
+            } else {
+                String msg = '';
+                def content;
+                speciesField.licenses.clear();
+                speciesField.addToLicenses(c);
+                msg = 'Successfully added license';
+                content = speciesField.licenses;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating license"]
+                }
+                return [success:true, id:speciesFieldId, msg:msg, content:content]
+            }
+        }
+    }
+
+    def updateAudienceType(long speciesFieldId, String value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            AudienceType c = (new XMLConverter()).getAudienceTypeByType(value);
+            if(!c) {
+                return [success:false, msg:"Error while updating audience type"]
+            } else {
+                String msg = '';
+                def content;
+                speciesField.audienceTypes.clear();
+                speciesField.addToAudienceTypes(c);
+                msg = 'Successfully added audience type';
+                content = speciesField.audienceTypes;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating audience type"]
+                }
+                return [success:true, id:speciesFieldId, msg:msg, content:content]
+            }
+        }
+    }
+
+    def updateStatus(long speciesFieldId, String value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            SpeciesField.Status c = getStatus(value);
+            if(!c) {
+                return [success:false, msg:"Error while updating status"]
+            } else {
+                String msg = '';
+                def content;
+                speciesField.status = c;
+                msg = 'Successfully added status';
+                content = speciesField.status;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating status"]
+                }
+                return [success:true, id:speciesFieldId, msg:msg, content:content]
+            }
+        }
+    }
+
+    private Status getStatus(String value) {
+        for(Status l : Status){
+			if(l.value().equalsIgnoreCase(value))
+				return l
+		}
     }
 
     private def createImagesXML(params) {

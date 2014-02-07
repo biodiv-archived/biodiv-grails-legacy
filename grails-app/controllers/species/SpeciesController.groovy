@@ -21,7 +21,7 @@ import org.apache.solr.common.util.NamedList
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
+import species.License;
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
 
@@ -322,8 +322,22 @@ class SpeciesController extends AbstractObjectController {
                     result.content = html;
                 }
 				break;
+            case 'license':
+				result = speciesService.updateLicense(speciesFieldId, value);
+				break;
+            case 'audienceType':
+				result = speciesService.updateAudienceType(speciesFieldId, value);
+				break;
+            case 'status':
+				result = speciesService.updateStatus(speciesFieldId, value);
+				break;
+            case "reference":
+				long cid = params.cid?params.long('cid'):null;
+				result = speciesService.updateReference(cid, speciesFieldId, value);
+				break;
+
             default :
-                result=[];
+                result=['success':false, msg:'Incorrect datatype'];
 		}
 
 		render result as JSON

@@ -380,6 +380,7 @@ function initEditableFields() {
                     return response.msg
                 } else {
                     $(this).next(".alert-error").hide();
+                    $(this).effect("highlight", {color: '#4BADF5'}, 2000);
                 }
             },
             error:function(response, newValue) {
@@ -400,10 +401,10 @@ function initEditableFields() {
         });
 
 
-        $ele.find(".editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find(".editField.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
-            $(this).next('.editable').editable('toggle');
+            $(this).next('.editField.editable').editable('toggle');
         });
     }
 
@@ -439,12 +440,19 @@ function initEditableFields() {
                     var speciesId = sourceData.speciesId?sourceData.speciesId:'';
                     var content = sourceData.content;
                     var data_type = 'text';
-                    html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                    if(sourceData.type == 'description') {
+                        data_type = 'wysihtml5';
+                        html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                    }
+
                     $.each(content, function(i, v) { 
                         switch(sourceData.type) {
                             case 'contributor' :
                             case 'attributor' :
                                 html.push (createContributor(v, sourceData, v));
+                                break;
+                            case 'reference' :
+                                html.push (createReference(v, sourceData));
                                 break;
                             case 'description' : 
                                 data_type = 'wysihtml5';
@@ -452,12 +460,21 @@ function initEditableFields() {
                                 break;
                         }
                     });
+                    
+                    if(sourceData.type != 'description'){
+                        html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" ] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                    }
+
+
                    
                     var $ul = $(this).parent().parent();
-                    $ul.empty().html(html.join(' '));
+                    $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
 
                     initEditables($ul);
                     initAddables($ul);
+                    initLicenseSelector($ul, licenseSelectorOptions, "CC BY");
+                    initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
+                    initStatusSelector($ul, statusSelectorOptions, "Under Validation");
                 } else {
                     $(this).html('Add'); 
                 }
@@ -485,6 +502,11 @@ function initEditableFields() {
         return '<li><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.name)+'</a></li>' ;
     }
 
+    function createReference(content, sourceData) {
+        return '<li><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.title)+'</a></li>' ;
+    }
+
+
     function createSpeciesFieldHtml(content, sourceData) {
         var toolbar = createMetadataToolbar(content);
         return '<div class="contributor_entry"><div href="#" class="editField description" data-type="wysihtml5" data-pk="'+content.id+'"  data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+content.description+'</div>'+toolbar+'</div>'; 
@@ -503,9 +525,126 @@ function initEditableFields() {
         return html.join(' ');
     }
 
+    var onSelectorSuccess = function(response, newValue) {
+        if(!response) {
+            return "Unknown error!";
+        }          
+
+        if(!response.success) {
+            $(this).next(".alert-error").html(response.msg).show();
+            return response.msg
+        } else {
+            $(this).next(".alert-error").hide();
+            $(this).effect("highlight", {color: '#4BADF5'}, 2000);
+        }
+    }
+
+    var onSelectorError =  function(response, newValue) {
+        var successHandler = this.success, errorHandler;
+        handleError(response, undefined, undefined, function(data){
+            $ele.find('.selector').editable('submit');
+            return "Please resubmit the form again";
+        }, function(data) {
+            if(data && data.status == 401) {
+                return "Please login and resubmit the changes"; 
+            } else if(response.status === 500) {
+                return 'Service unavailable. Please try later.';
+            } else {
+                return response.responseText;
+            }
+        });
+    }
+    var licenseSelectorOptions = [
+                {value:"CC BY" , text: 'CC BY'},
+                {value: "CC BY-NC", text: 'CC BY-NC'},
+                {value: "CC BY-ND", text: 'CC BY-ND'},
+                {value: "CC BY-NC-ND", text: 'CC BY-NC-ND'},
+                {value: "CC BY-NC-SA", text: 'CC BY-NC-SA'},
+                {value: "CC BY-SA", text: 'CC BY-SA'},
+                {value: "CC PUBLIC DOMAIN", text: 'CC Public Domain'},
+            ]
+    var audienceTypeSelectorOptions = [
+        {value: "Children", text:"Children"},
+        {value: "General Audience", text:"General Audience"},
+        {value: "Expert", text:"Expert"}
+    ]
+    var statusSelectorOptions = [
+        {value: "Under Creation", text:"Under Creation"},
+        {value: "Under Validation", text:"Under Validation"},
+        {value: "Validated", text:"Validated"},
+        {value: "Published", text:"Published"}
+    ]
+
+    function initLicenseSelector($ele, $selectorOptions, defaultValue) {
+        if($ele == undefined)
+            $ele = $(document);
+        $ele.find('.license.selector').editable({
+            value: defaultValue,    
+            showbuttons:false,
+            source: $selectorOptions,
+            success: onSelectorSuccess,
+            error:onSelectorError
+        });
+
+
+        $ele.find(".license.selector.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find('.editFieldButton').click(function(e){    
+            e.stopPropagation();
+            $(this).next('.license.selector.editable').editable('toggle');
+        });
+    }
+
+    function initAudienceTypeSelector($ele, $selectorOptions, defaultValue) {
+        if($ele == undefined)
+            $ele = $(document);
+        $ele.find('.audienceType.selector').editable({
+            value: defaultValue,    
+            showbuttons:false,
+            source: $selectorOptions,
+            success: onSelectorSuccess,
+            error:onSelectorError
+        });
+
+
+        $ele.find(".audienceType.selector.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find('.editFieldButton').click(function(e){    
+            e.stopPropagation();
+            $(this).next('.audienceType.selector.editable').editable('toggle');
+        });
+    }
+
+    function initStatusSelector($ele, $selectorOptions, defaultValue) {
+        if($ele == undefined)
+            $ele = $(document);
+        $ele.find('.status.selector').editable({
+            value: defaultValue,    
+            showbuttons:false,
+            source: $selectorOptions,
+            success: onSelectorSuccess,
+            error:onSelectorError
+        });
+
+
+        $ele.find(".status.selector.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find('.editFieldButton').click(function(e){    
+            e.stopPropagation();
+            $(this).next('.status.selector.editable').editable('toggle');
+        });
+    }
+
+
 
     initEditables();
     initAddables();
+    initLicenseSelector(undefined, licenseSelectorOptions, "CC BY");
+    initAudienceTypeSelector(undefined, audienceTypeSelectorOptions, "General Audience");
+    initStatusSelector(undefined, statusSelectorOptions, "Under Validation");
+}
+
+function selectLicense($this, i) {
+    $('#license_'+i).val($.trim($this.text()));
+    $('#selected_license_'+i).find('img:first').replaceWith($this.html());
+    return false;
 }
 
 $(document).ready(function() {

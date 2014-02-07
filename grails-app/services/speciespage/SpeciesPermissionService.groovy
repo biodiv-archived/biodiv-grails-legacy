@@ -77,7 +77,7 @@ class SpeciesPermissionService {
             List parentTaxons = taxonConcept.parentTaxon()
             def res = SpeciesPermission.withCriteria {
                 eq('author', user)
-                eq('permissionType', SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value())
+                inList('permissionType', [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(),SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value()])
                 inList('taxonConcept',  parentTaxons)
             }
             if(res && res.size() > 0)
