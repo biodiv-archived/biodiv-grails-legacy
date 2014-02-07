@@ -111,6 +111,13 @@
                         <th>Append</th>
                         <!--th>Group</th-->
                         <th>Delimiter</th>
+                        <th>Images</th>
+                        <th>Contributor</th>
+                        <th>Attributions</th>
+                        <th>Refrences</th>
+                        <th>License</th>
+                        <th>Audience</th>
+
                     </table>
 
 
@@ -142,6 +149,11 @@
                 <form id="downloadSpeciesFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
                     <input type="text" name="downloadFile" value="" style="visibility:hidden;">
                     Download the uploaded sheet here <input class="btn btn-primary" type="submit" value="Download">
+                </form>
+                
+                <form id="downloadErrorFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
+                    <input type="text" name="downloadFile" value="" style="visibility:hidden;">
+                    Download the error file here <input class="btn btn-primary" type="submit" value="Download">
                 </form>
 
 

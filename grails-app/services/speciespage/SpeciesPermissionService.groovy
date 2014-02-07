@@ -7,6 +7,9 @@ import java.util.Map;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
 import species.SpeciesPermission;
+import species.auth.Role;
+import species.auth.SUserRole;
+
 
 class SpeciesPermissionService {
 
@@ -62,4 +65,15 @@ class SpeciesPermissionService {
         }
         return true
     }
+
+    List<SUser> getSpeciesAdmin (){
+        def role = Role.findByAuthority("ROLE_SPECIES_ADMIN")
+        def suserRole = SUserRole.findAllByRole(role)
+        def speciesAdmins = []
+        suserRole.each{
+            speciesAdmins.add(it.sUser)
+        }
+        return speciesAdmins
+    }
+
 }

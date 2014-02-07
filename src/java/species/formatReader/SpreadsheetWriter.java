@@ -195,10 +195,53 @@ public class SpreadsheetWriter {
                 includeHeadings = headerValues.get("header");
                 includeHeadings = includeHeadings.trim();
             }
+            
+            String append = "";
+            if(headerValues.get("append") != null){
+                append = headerValues.get("append");
+                append = append.trim();
+            }
+
             String delimiter = "";
             if(headerValues.get("delimiter") != null){
                 delimiter = headerValues.get("delimiter");
                 delimiter = delimiter.trim();
+            }
+            
+            String images = "";
+            if(headerValues.get("images") != null){
+                images = headerValues.get("images");
+                images = images.trim();
+            }
+
+            String contributor = "";
+            if(headerValues.get("contributor") != null){
+                contributor = headerValues.get("contributor");
+                contributor = contributor.trim();
+            }
+
+            String attributions = "";
+            if(headerValues.get("attributions") != null){
+                attributions = headerValues.get("attributions");
+                attributions = attributions.trim();
+            }
+
+            String references = "";
+            if(headerValues.get("references") != null){
+                references = headerValues.get("references");
+                references = references.trim();
+            }
+            
+            String license = "";
+            if(headerValues.get("license") != null){
+                license = headerValues.get("license");
+                license = license.trim();
+            }
+            
+            String audience = "";
+            if(headerValues.get("audience") != null){
+                audience = headerValues.get("audience");
+                audience = audience.trim();
             }
 
             System.out.println("=======" + dataColumns);
@@ -229,17 +272,73 @@ public class SpreadsheetWriter {
                         }
                         String contentFormat = m.get("contentFormat");
                         if(contentFormat != "") {
-                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";";
+                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";";
                             m.put("contentFormat", contentFormat);
                         }
                         else {
-                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";");
                         }
+                        String imagesCol = m.get("images");
+                        if(imagesCol != "") {
+                            imagesCol += columnSep + headerName + keyValueSep  + images;
+                            m.put("images", imagesCol);
+                        }
+                        else {
+                            m.put("images",  headerName + keyValueSep + images);
+                        }
+                        String contributorCol = m.get("contributor");
+                        if(contributorCol != "") {
+                            contributorCol += columnSep + headerName + keyValueSep  + contributor;
+                            m.put("contributor", contributorCol);
+                        }
+                        else {
+                            m.put("contributor",  headerName + keyValueSep + contributor);
+                        }
+                        String attributionsCol = m.get("attributions");
+                        if(attributionsCol != "") {
+                            attributionsCol += columnSep + headerName + keyValueSep  + attributions;
+                            m.put("attributions", attributionsCol);
+                        }
+                        else {
+                            m.put("attributions",  headerName + keyValueSep + attributions);
+                        }
+                        String referencesCol = m.get("references");
+                        if(referencesCol != "") {
+                            referencesCol += columnSep + headerName + keyValueSep  + references;
+                            m.put("references", referencesCol);
+                        }
+                        else {
+                            m.put("references",  headerName + keyValueSep + references);
+                        }
+
+                        String licenseCol = m.get("license");
+                        if(licenseCol != "") {
+                            licenseCol += columnSep + headerName + keyValueSep  + license;
+                            m.put("license", licenseCol);
+                        }
+                        else {
+                            m.put("license",  headerName + keyValueSep + license);
+                        }
+                        String audienceCol = m.get("audience");
+                        if(audienceCol != "") {
+                            audienceCol += columnSep + headerName + keyValueSep  + audience;
+                            m.put("audience", audienceCol);
+                        }
+                        else {
+                            m.put("audience",  headerName + keyValueSep + audience);
+                        }
+
                     }else {
                         Map<String, String> m1 = new HashMap();
                         m1.put("fieldNames", headerName);
                         m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
-                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";");
+                        m1.put("images",  headerName + keyValueSep + images);
+                        m1.put("contributor",  headerName + keyValueSep + contributor);
+                        m1.put("attributions",  headerName + keyValueSep + attributions);
+                        m1.put("references",  headerName + keyValueSep + references);
+                        m1.put("license",  headerName + keyValueSep + license);
+                        m1.put("audience",  headerName + keyValueSep + audience);
 
 
                         reverseMarkers.put(nextVal, m1);
@@ -250,8 +349,9 @@ public class SpreadsheetWriter {
         }
 
         Row row = sheet.createRow(rownum++);
-        int numOfColumns = 6;
-        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT"};
+        
+        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT", "IMAGES", "CONTRIBUTOR", "ATTRIBUTIONS", "REFERENCES", "LICENSE","AUDIENCE"};
+        int numOfColumns = headerRowValues.length;
         for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
             Cell cell = row.createCell(cellNum);
             cell.setCellValue(headerRowValues[cellNum]);
@@ -274,6 +374,13 @@ public class SpreadsheetWriter {
             arr[3] = m2.get("fieldNames");
             arr[4] = m2.get("contentDelimiter");
             arr[5] = m2.get("contentFormat");
+            arr[6] = m2.get("images");
+            arr[7] = m2.get("contributor");
+            arr[8] = m2.get("attributions");
+            arr[9] = m2.get("references");
+            arr[10] = m2.get("license");
+            arr[11] = m2.get("audience");
+
             row = sheet.createRow(rownum++);
             for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
                 Cell cell = row.createCell(cellNum);

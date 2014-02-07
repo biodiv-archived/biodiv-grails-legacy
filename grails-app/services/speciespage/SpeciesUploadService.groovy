@@ -400,7 +400,7 @@ class SpeciesUploadService {
 				e.printStackTrace()
 			}
             println "==========SPECIES YE HAI =========== " + s
-			s.percentOfInfo = calculatePercentOfInfo(s);
+			//s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
 				s.errors.allErrors.each { 
