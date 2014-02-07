@@ -111,6 +111,13 @@
                         <th>Append</th>
                         <!--th>Group</th-->
                         <th>Delimiter</th>
+                        <th>Images</th>
+                        <th>Contributor</th>
+                        <th>Attributions</th>
+                        <th>Refrences</th>
+                        <th>License</th>
+                        <th>Audience</th>
+
                     </table>
 
 

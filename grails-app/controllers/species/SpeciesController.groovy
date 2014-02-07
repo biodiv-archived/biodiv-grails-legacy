@@ -617,6 +617,17 @@ class SpeciesController extends AbstractObjectController {
         render res as JSON
     }
 
+    def getLicenseList = {
+        log.debug params
+        render species.License.list().collect{it.name.toString()} as JSON
+    } 
+    
+    def getAudienceList = {
+        log.debug params
+        def audList = ['Children', 'General Audience', 'Expert', 'All']
+        render audList as JSON
+    }
+
     @Secured(['ROLE_SPECIES_ADMIN'])
 	def uploadTest = {
 		params.imagesDir = "/home/sandeept/species-online/3mapping"
