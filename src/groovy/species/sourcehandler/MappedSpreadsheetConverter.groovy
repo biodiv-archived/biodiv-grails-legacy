@@ -333,4 +333,60 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	def String getSummary(){
 		return summary.toString()
 	}
+	
+	protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
+		addMetaAttibute("contributor", data, speciesContent, mappedField, "contributor",)
+		addMetaAttibute("attributions", data, speciesContent, mappedField, "attribution")
+		addMetaAttibute("license", data, speciesContent, mappedField, "license", ",|;|\n")
+		addMetaAttibute("audience", data, speciesContent, mappedField, "audienceType")
+		addMetaAttibute("references", data, speciesContent, mappedField, "reference")
+		addMetaAttibute("images", data, speciesContent, mappedField, "image", "\n|\\s{3,}|,|;")
+	}
+	
+	private void addMetaAttibute(String fieldName, Node data, Map speciesContent, Map mappedField, String resultNodeName, String defaultDelimiter="\n"){
+		String fields = mappedField.get(fieldName)
+		boolean doProcess = false
+		Map fMap = [:]
+		if(fields){
+			fields.split(SpreadsheetWriter.columnSep).each { columnsInfo ->
+				def colMetaData = columnsInfo.split(SpreadsheetWriter.keyValueSep)
+				if(colMetaData.size() > 1){
+					def colName = colMetaData[0]
+					def infoColList = colMetaData[1].split(',').collect { it.trim().toLowerCase() }
+					fMap.put(colName, infoColList)
+					doProcess = true
+				}
+			}
+		}
+		
+		if(doProcess){
+			Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"))
+			fMap.keySet().each { key ->
+				String text = speciesContent.get(key)
+				String delimiter =  delimiterMap.get(key)?:defaultDelimiter;
+				
+				if(text){
+					if(resultNodeName == 'image'){
+						def imagesNode = data;
+						imagesNode = new Node(data, "images");
+						text.split(delimiter).each {
+							String loc = cleanLoc(it)
+							new Node(imagesNode, "image", loc);
+						}
+					}else{
+						text.split(delimiter).each {
+							if(resultNodeName == 'reference'){
+								Node refNode = new Node(data, "reference");
+								getReferenceNode(refNode, it);
+							}else{
+								new Node(data, fieldName, it);
+							}
+						}
+					}
+				}
+				
+			}
+		}
+	}
+	
 }

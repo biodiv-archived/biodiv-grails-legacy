@@ -167,11 +167,11 @@ class SourceConverter {
 		
 		String customFormat = mappedField.get("content format");
 		if(customFormat) {
-		def format = getCustomFormat(customFormat);
-		String action = format.get("action") ?:null;
-		if(action) {
-			new Node(data, "action", action);
-		}
+			def format = getCustomFormat(customFormat);
+			String action = format.get("action") ?:null;
+			if(action) {
+				new Node(data, "action", action);
+			}
 		}
 	}
 
@@ -187,7 +187,9 @@ class SourceConverter {
 		}
 	}
 	
-
+	
+	
+	
 
 	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="") {
 		log.debug "Creating images ${imageIds}"
@@ -447,7 +449,7 @@ class SourceConverter {
 		}
 	}
 
-    private getReferenceNode(Node refNode, String text) {
+    protected getReferenceNode(Node refNode, String text) {
 		if(text.startsWith("http://")) {
 			new Node(refNode, "url", text);
 		} else {
