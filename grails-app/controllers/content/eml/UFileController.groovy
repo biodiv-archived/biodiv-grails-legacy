@@ -332,12 +332,26 @@ class UFileController {
 			String fieldNames = sc["field name(s)"].toLowerCase()
             String conDel = sc["content delimiter"]
             String conFor = sc["content format"]
+            String imagesCol = sc["images"]
+            String contributorCol = sc["contributor"]
+            String attributionsCol = sc["attributions"]
+            String referencesCol = sc["references"]
+            String licenseCol = sc["license"]
+            String audienceCol = sc["audience"]
+
+
             if(fieldNames != ""){
                 List fnList = fieldNames.split(",")
                 def cdMap = [:]
                 def gMap = [:]
                 def hMap = [:]
                 def aMap = [:]
+                def imgMap = [:]
+                def contMap = [:]
+                def attrMap = [:]
+                def refMap = [:]
+                def licMap = [:]
+                def audMap = [:]
                 if(conDel != ""){
                     println conDel
                     List conDelList = conDel.split(columnSep)
@@ -352,6 +366,80 @@ class UFileController {
                         }
                     }
                 }
+                if(imagesCol != ""){
+                    List imgList = imagesCol.split(columnSep)
+                    imgList.each { il ->
+                        def z = il.split(keyValueSep)
+                        if(z.size()==2){
+                            imgMap[z[0]] = z[1]
+                        }
+                        else{
+                            imgMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(contributorCol != ""){
+                    List contList = contributorCol.split(columnSep)
+                    contList.each { cl ->
+                        def z = cl.split(keyValueSep)
+                        if(z.size()==2){
+                            contMap[z[0]] = z[1]
+                        }
+                        else{
+                            contMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(attributionsCol != ""){
+                    List attrList = attributionsCol.split(columnSep)
+                    attrList.each { al ->
+                        def z = al.split(keyValueSep)
+                        if(z.size()==2){
+                            attrMap[z[0]] = z[1]
+                        }
+                        else{
+                            attrMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(referencesCol != ""){
+                    List refList = referencesCol.split(columnSep)
+                    refList.each { rl ->
+                        def z = rl.split(keyValueSep)
+                        if(z.size()==2){
+                            refMap[z[0]] = z[1]
+                        }
+                        else{
+                            refMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(licenseCol != ""){
+                    List licList = licenseCol.split(columnSep)
+                    licList.each { ll ->
+                        def z = ll.split(keyValueSep)
+                        if(z.size()==2){
+                            licMap[z[0]] = z[1]
+                        }
+                        else{
+                            licMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(audienceCol != ""){
+                    List audList = audienceCol.split(columnSep)
+                    audList.each { al ->
+                        def z = al.split(keyValueSep)
+                        if(z.size()==2){
+                            audMap[z[0]] = z[1]
+                        }
+                        else{
+                            audMap[z[0]] = ""
+                        }
+                    }
+                }
+
+
                 if(conFor != ""){
                     List conForList = conFor.split(columnSep)
                     conForList.each { cfl ->
@@ -391,6 +479,12 @@ class UFileController {
                         m["group"] = gMap[fn]
                         m["header"] = hMap[fn]
                         m["append"] = aMap[fn]
+                        m["images"] = imgMap[fn]
+                        m["contributor"] = contMap[fn]
+                        m["attributions"] = attrMap[fn]
+                        m["references"] = refMap[fn]
+                        m["license"] = licMap[fn]
+                        m["audience"] = audMap[fn]
                         res[fn] = m
                     }
                 }
