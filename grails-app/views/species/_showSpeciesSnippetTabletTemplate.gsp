@@ -4,7 +4,7 @@
 <%
 def imagePath = '';
 def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-if(mainImage.fileName == speciesGroupIcon.fileName) 
+if(mainImage?.fileName == speciesGroupIcon.fileName) 
     imagePath = mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, '.png');
 else
     imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;

@@ -56,7 +56,6 @@ class SpeciesField implements Rateable {
 	static constraints = {
 		contributors validator : { val, obj ->
 			if(!val) {
-				println "++++++${obj}"
 				obj.addToContributors(Contributor.findByName('pearlsravanthi'));
 				//return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 				return true;

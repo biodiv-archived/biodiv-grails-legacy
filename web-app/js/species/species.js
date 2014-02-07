@@ -401,7 +401,7 @@ function initEditableFields() {
         });
 
 
-        $ele.find(".editField.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find(".editField.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.editField.editable').editable('toggle');
@@ -587,7 +587,7 @@ function initEditableFields() {
         });
 
 
-        $ele.find(".license.selector.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find(".license.selector.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.license.selector.editable').editable('toggle');
@@ -606,7 +606,7 @@ function initEditableFields() {
         });
 
 
-        $ele.find(".audienceType.selector.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find(".audienceType.selector.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.audienceType.selector.editable').editable('toggle');
@@ -625,7 +625,7 @@ function initEditableFields() {
         });
 
 
-        $ele.find(".status.selector.editable").before("<a class='pull-right editFieldButton'>Edit</a>");
+        $ele.find(".status.selector.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.status.selector.editable').editable('toggle');

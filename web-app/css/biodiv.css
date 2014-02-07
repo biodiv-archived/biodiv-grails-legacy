@@ -2579,3 +2579,13 @@ small {
 .editable-click, a.editable-click, a.editable-click:hover {
     border-bottom: none;
 }
+
+.addField {
+}
+
+.addField, .editFieldButton {
+    color:#12C;
+    cursor: pointer;
+    font-size:12px;
+    font-weight:normal;
+}

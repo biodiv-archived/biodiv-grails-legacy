@@ -2,7 +2,7 @@
 <g:if test="${speciesFieldInstance}">
 <g:if test="${speciesFieldInstance?.description}">
 <!--  content attribution -->
-<div class="attributionContent" style="display:none;">
+<div class="attributionContent" style="display:none;overflow:hidden;">
     <!-- attributions -->
     <g:if test="${speciesFieldInstance.attributors?.size() > 0}">
     <div class="prop span11">
