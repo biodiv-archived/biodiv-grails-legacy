@@ -174,7 +174,20 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                    $.ajax({
+                    $(".licenseInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+
+                    $(".audienceInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+                    /*$.ajax({
                         url:window.params.getLicenseFromDB,
                         dataType: 'JSON',
                         success:function(data){
@@ -199,7 +212,7 @@ function setUnEditableColumn(columns){
                             });
                         }
 
-                    });                    
+                    });*/                    
                 }
             });
 

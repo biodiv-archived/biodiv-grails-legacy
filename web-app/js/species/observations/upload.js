@@ -142,7 +142,24 @@ function getTagsForHeaders() {
                 //console.log(valData);
                 headerInfo["references"] =  valData;
             }
-
+            else if($(this).attr("class") == "licenseCell") {
+                var valArr = [];
+                $(this).find('span.tagit-label').each(function(i){
+                    valArr.push($(this).text()); // This is your rel value
+                });
+                var valData = valArr.join();
+                //console.log(valData);
+                headerInfo["license"] =  valData;
+            }
+            else if($(this).attr("class") == "audienceCell") {
+                var valArr = [];
+                $(this).find('span.tagit-label').each(function(i){
+                    valArr.push($(this).text()); // This is your rel value
+                });
+                var valData = valArr.join();
+                //console.log(valData);
+                headerInfo["audience"] =  valData;
+            }
 
             else if($(this).attr("class") == "headerFlagCell") {
                 headerInfo["header"] = ""
