@@ -265,11 +265,11 @@ public class SpreadsheetWriter {
                         }
                         String contentFormat = m.get("contentFormat");
                         if(contentFormat != "") {
-                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";";
+                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeheadings=" + includeHeadings +";" + "append=" + append + ";";
                             m.put("contentFormat", contentFormat);
                         }
                         else {
-                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";");
+                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeheadings=" + includeHeadings +";" + "append=" + append + ";");
                         }
                         String imagesCol = m.get("images");
                         if(imagesCol != "") {
@@ -325,7 +325,7 @@ public class SpreadsheetWriter {
                         Map<String, String> m1 = new HashMap();
                         m1.put("fieldNames", headerName);
                         m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
-                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";" + "append=" + append + ";");
+                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeheadings=" + includeHeadings +";" + "append=" + append + ";");
                         m1.put("images",  headerName + keyValueSep + images);
                         m1.put("contributor",  headerName + keyValueSep + contributor);
                         m1.put("attributions",  headerName + keyValueSep + attributions);
