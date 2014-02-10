@@ -154,7 +154,7 @@ function setUnEditableColumn(columns){
             for(var z= 0; z < col.length; z++) {
                 infoCol[z] = col[z].name;
             }
-
+            $('#columnOrder').val(infoCol);
 
             populateTagHeaders(col);
             $.ajax({
@@ -187,32 +187,7 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                    /*$.ajax({
-                        url:window.params.getLicenseFromDB,
-                        dataType: 'JSON',
-                        success:function(data){
-                            $(".licenseInfoTags").tagit({
-                                availableTags:data,
-                                fieldName: 'tags', 
-                                showAutocompleteOnFocus: true,
-                                allowSpaces: true
-                            });
-                        }
 
-                    });
-                     $.ajax({
-                        url:window.params.getAudienceFromDB,
-                        dataType: 'JSON',
-                        success:function(data){
-                            $(".audienceInfoTags").tagit({
-                                availableTags:data,
-                                fieldName: 'tags', 
-                                showAutocompleteOnFocus: true,
-                                allowSpaces: true
-                            });
-                        }
-
-                    });*/                    
                 }
             });
 

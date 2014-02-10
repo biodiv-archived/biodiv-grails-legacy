@@ -30,12 +30,12 @@ public class SpreadsheetWriter {
     static final String keyValueSep = "#11#";
     static final String columnSep = "#12#";
     
-    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail) {
+    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
         System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
-            writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail);
+            writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
             writeHeadersInFormat(wb, headerMarkers);
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
@@ -51,7 +51,7 @@ public class SpreadsheetWriter {
 
     }
 
-    public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail) {
+    public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
         System.out.println("================================" + writeContributor +"===" + contEmail );
         if(writeContributor.equals("true")){
             JSONObject r =  gridData.getJSONObject(0);
@@ -79,19 +79,12 @@ public class SpreadsheetWriter {
         }
         System.out.println("==NUM KEYS== " + numKeys);
         String[] keysArray = new String[numKeys];
-        int z = 0;
-        keys = rowData.keys();
-        while (keys.hasNext()) {
-            //System.out.println()
-            keysArray[z] = (String)keys.next();
-            z++;
+        //String[] keysArray = orderedArray;
+        for (int k = 0; k< numKeys; k++){
+            keysArray[k] = orderedArray.getString(k); 
         }
-        //rowIterator.hasNext();
         Row row = rowIterator.next();
-
-        //while( keys.hasNext() )
         for(int a = 0; a < numKeys; a++){
-            //String key = (String)keys.next();
             Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
             System.out.println("======PRINTING THIS TO HEADER CELL===== " + keysArray[a]);
             cell.setCellValue(keysArray[a]);

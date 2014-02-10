@@ -583,10 +583,12 @@ class SpeciesUploadService {
     }
 
     File saveModifiedSpeciesFile(params){
-        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers; 
+        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers +"================" + params.orderedArray; 
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
-        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers
+        def orderedArray = JSON.parse(params.orderedArray);
+        //def myarray = JSON.parse(params.myarray)
+        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers + "============"+ orderedArray; 
         String fileName = "speciesSpreadsheet.xlsx"
         String uploadDir = "species"
         //URL url = new URL(data.xlsxFileUrl);
@@ -598,7 +600,7 @@ class SpeciesUploadService {
         println "===XLSX FILE URL ======= " + xlsxFileUrl;
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new URL(xlsxFileUrl).openStream();
-        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail);
+        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
         return file
     }
 }

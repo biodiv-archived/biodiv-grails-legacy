@@ -103,7 +103,7 @@
                 </div>
                 
                 </table>            
-                <div id="tagHeaders" class="section checklist-slickgrid" style="display:none;">
+                <div id="tagHeaders" class="section checklist-slickgrid" style="clear:both;display:none;">
                     <table id="tableHeader" border="1">
                         <th>Column_Name</th>
                         <th>Data_Columns</th>
@@ -143,6 +143,9 @@
                 </div>
 
                 <div id="headerMetadata" style="display:none;">
+                    <input type="text" value="">
+                </div>
+                <div id="columnOrder" style="display:none;">
                     <input type="text" value="">
                 </div>
 

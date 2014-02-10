@@ -400,7 +400,10 @@ $('#downloadModifiedSpecies').click(function() {
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
     //console.log(grid.getData().length);
-    //console.log(gData);
+    console.log(gData);
+    var orderedArray = $('#columnOrder').val();
+    console.log(orderedArray);
+    orderedArray = JSON.stringify(orderedArray);
     //headerMarkers = JSON.stringify(headerMarkers);
     //Getting headerMetadata only
     //var headerMarkers = JSON.stringify($('#headerMetadata').val());
@@ -411,7 +414,7 @@ $('#downloadModifiedSpecies').click(function() {
         url : window.params.saveModifiedSpecies,
         type : 'post', 
         dataType: 'json',
-        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'writeContributor' : 'false' },
+        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'writeContributor' : 'false', 'orderedArray' : orderedArray },
         success : function(data) {
             //console.log(data.downloadFile);
             //var downloadUrl = window.params.downloadFile+"?downloadFile=" + encodeURIComponent(data.downloadFile);
