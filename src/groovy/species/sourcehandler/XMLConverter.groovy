@@ -249,7 +249,7 @@ class XMLConverter extends SourceConverter {
         for(Node fieldNode : speciesNodes.children()) {
             if(fieldNode.name().equals("field")) {
                 if(!isValidField(fieldNode)) {
-                    log.warn "NOT A VALID FIELD. IGNORING : "+fieldNode;
+                    log.warn "NOT A VALID FIELD. IGNORING : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>. "+fieldNode;
                     fieldNode.parent().remove(fieldNode);
                     continue;
                 }

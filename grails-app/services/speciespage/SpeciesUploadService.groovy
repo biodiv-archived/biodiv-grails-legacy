@@ -176,12 +176,7 @@ class SpeciesUploadService {
 		List<Species> species = new ArrayList<Species>();
 		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
 
-
 		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
-		
-		println "======================== map after read  " 
-		//println  converter.mappingConfig
-		println "================================================================="
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		List<Map> imagesMetaData;
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
@@ -248,15 +243,13 @@ class SpeciesUploadService {
 	}
 
 	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
-		println "============================================================================================================================="
-        converter.setLogAppender(fa);
+		converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		def speciesElements = [];
 		int noOfSpecies = content.size();
 		for(int i=0; i<noOfSpecies; i++) {
-			println "============================##############################################################################################================================"
-            if(speciesElements.size() == BATCH_SIZE) {
+			if(speciesElements.size() == BATCH_SIZE) {
 				def res = saveSpeciesElements(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
@@ -399,8 +392,7 @@ class SpeciesUploadService {
 				s.appendLogSummary(e.printStackTrace())
 				e.printStackTrace()
 			}
-            println "==========SPECIES YE HAI =========== " + s
-			//s.percentOfInfo = calculatePercentOfInfo(s);
+            //s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
 				s.errors.allErrors.each { 
@@ -417,8 +409,7 @@ class SpeciesUploadService {
 		//log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-        println "===========QQQQQQQQQQQQQQQQQQQQQQQ=================" + noOfInsertions
-		return noOfInsertions;
+        return noOfInsertions;
 	}
 
 	/**
@@ -501,21 +492,13 @@ class SpeciesUploadService {
 		//		int taxaHierarchies = TaxonomyRegistry.countByTaxonDefinitionAndClassification(s.taxonConcept, authClassification);
 		//TODO: int occRecords =
 		//TODO: observations =
-		println "======I M HERE======" + s
-        int textSize = 0;
+		int textSize = 0;
 		s.fields.each { field ->
 			textSize += field.description?.length();
 		}
 		int noOfMultimedia = s.resources?.size()?:0;
 		//int diffSources =
 		//TODO: int reviewedFields =
-		println "================= " + s.fields?.size()?:0
-		
-		println "================= " +  s.globalDistributionEntities?.size()?:0
-		println "================= " + s.globalEndemicityEntities?.size()?:0
-		println "================= " + s.indianDistributionEntities?.size()?:0
-		println "================= " + s.indianEndemicityEntities?.size()?:0
-		
 		int richness = (s.fields?.size()?:0 )+ (s.globalDistributionEntities?.size()?:0 )+ (s.globalEndemicityEntities?.size()?:0) + (s.indianDistributionEntities?.size()?:0) + (s.indianEndemicityEntities?.size()?:0);
 		richness += noOfMultimedia;
 		//richness += textSize;
@@ -569,7 +552,7 @@ class SpeciesUploadService {
 
     def List getDataColumns(){
     	List columnList = []
-    	Field.list(sort:"concept", order:"asc").each {
+    	Field.list(sort:"displayOrder", order:"asc").each {
     		def tmpList = []
     		tmpList << it.concept
     		if(it.category)

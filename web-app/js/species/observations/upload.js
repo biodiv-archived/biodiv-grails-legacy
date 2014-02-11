@@ -436,12 +436,15 @@ $('#uploadSpecies').click(function() {
     var gData = JSON.stringify(grid.getData());
     var hm = getHeaderMetadata();
     delete hm["undefined"];
+    var orderedArray = $('#columnOrder').val();
+    console.log(orderedArray);
+    orderedArray = JSON.stringify(orderedArray);
     var headerMarkers = JSON.stringify(hm);
     $.ajax({
         url : window.params.uploadSpecies,
         type : 'post', 
         dataType: 'json',
-        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val(), 'writeContributor': 'true' },
+        data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val(), 'writeContributor': 'true','orderedArray' : orderedArray },
         success : function(data) {
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
             $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
