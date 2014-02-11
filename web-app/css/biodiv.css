@@ -194,6 +194,10 @@ h6 {
 	background-color: #fefad5;
 }
 
+.initPropagation:hover{
+    cursor: pointer;    
+}
+
 .thumbnail .observation_story {
     /*display: table-cell;
     vertical-align: middle;*/

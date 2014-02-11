@@ -572,12 +572,12 @@ class SpeciesUploadService {
     }
 
     File saveModifiedSpeciesFile(params){
-        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers +"================" + params.orderedArray; 
+        //println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers +"================" + params.orderedArray; 
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
         //def myarray = JSON.parse(params.myarray)
-        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers + "============"+ orderedArray; 
+        //println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers + "============"+ orderedArray; 
         String fileName = "speciesSpreadsheet.xlsx"
         String uploadDir = "species"
         //URL url = new URL(data.xlsxFileUrl);

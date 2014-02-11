@@ -26,7 +26,7 @@ public class SpreadsheetWriter {
     static final String COLUMN_SEP = "#12#";
     
     public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
-        System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
+        //System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
@@ -47,7 +47,7 @@ public class SpreadsheetWriter {
     }
 
     public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
-        System.out.println("================================" + writeContributor +"===" + contEmail );
+        //System.out.println("================================" + writeContributor +"===" + contEmail );
         if(writeContributor.equals("true")){
             JSONObject r =  gridData.getJSONObject(0);
             if(!r.has("contributor")){
@@ -62,17 +62,17 @@ public class SpreadsheetWriter {
         int index = 0;
         int i = 0;
         boolean headerRow = true;
-        System.out.println("===JSON ARRAY LENGTH==============");
-        System.out.println(gridData.length());
+        //System.out.println("===JSON ARRAY LENGTH==============");
+        //System.out.println(gridData.length());
         int gDataSize = gridData.length();
         JSONObject rowData = gridData.getJSONObject(index);
         Iterator<String> keys = rowData.keys();
         int numKeys = 0;
         while(keys.hasNext()){
-            System.out.println("HERE " + (String)keys.next());
+            keys.next();
             numKeys++;
         }
-        System.out.println("==NUM KEYS== " + numKeys);
+        //System.out.println("==NUM KEYS== " + numKeys);
         String[] keysArray = new String[numKeys];
         //String[] keysArray = orderedArray;
         for (int k = 0; k< numKeys; k++){
@@ -81,7 +81,7 @@ public class SpreadsheetWriter {
         Row row = rowIterator.next();
         for(int a = 0; a < numKeys; a++){
             Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-            System.out.println("======PRINTING THIS TO HEADER CELL===== " + keysArray[a]);
+            //System.out.println("======PRINTING THIS TO HEADER CELL===== " + keysArray[a]);
             cell.setCellValue(keysArray[a]);
             i++;
         }
@@ -92,7 +92,7 @@ public class SpreadsheetWriter {
         }
 
         for (int k = 0; k < gDataSize; k++) {
-            System.out.println("REACHED FOR LOOP");
+            //System.out.println("REACHED FOR LOOP");
             rowData = gridData.getJSONObject(index);
             //mapRow.put(gridData.get(count));
             //rowIterator.hasNext();
@@ -107,15 +107,15 @@ public class SpreadsheetWriter {
                 }
             }
             i = 0;
-            System.out.println("============ "); 
-            System.out.println(gridData);
+            //System.out.println("============ "); 
+            //System.out.println(gridData);
 
             //for ( Map.Entry<String, String> entry : mapRow.entrySet()) {
             //while( keys.hasNext() ){
             for(int a = 0; a < numKeys; a++){
                 //String key = (String)keys.next();
                 Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-                System.out.println ("=====PRINTING THIS TO NORMAL CELL====== " + rowData.getString(keysArray[a]));
+                //System.out.println ("=====PRINTING THIS TO NORMAL CELL====== " + rowData.getString(keysArray[a]));
                 cell.setCellValue(rowData.getString(keysArray[a]));
                 i++;
             }  
@@ -141,7 +141,7 @@ public class SpreadsheetWriter {
     }
     
     public static void writeHeadersInFormat(Workbook wb, Map<String, Map<String,String> > headerMarkers) {
-        System.out.println("=CLASS===="+headerMarkers.getClass());
+        //System.out.println("=CLASS===="+headerMarkers.getClass());
         Object o = headerMarkers.remove("undefined");
         Sheet sheet = wb.getSheet("headerMetadata");
         if(sheet != null) {
@@ -157,15 +157,15 @@ public class SpreadsheetWriter {
             headerName = headerName.trim().toLowerCase();
             Map<String,String> headerValues = new HashMap();
             for(Map.Entry<String, String> en : entry.getValue().entrySet()) {
-                System.out.println("=======HERE======" + en.getKey());
+                //System.out.println("=======HERE======" + en.getKey());
                 if(en.getKey() != "undefined"){
                     headerValues.put(en.getKey(), en.getValue());
                 }
             }
-            System.out.println("==========NEW FUNC==============");
-            System.out.println(entry);
-            System.out.println("---------" + entry.getValue() + entry.getValue().getClass());
-            System.out.println("-------" + headerValues + headerValues.getClass());
+            //System.out.println("==========NEW FUNC==============");
+            //System.out.println(entry);
+            //System.out.println("---------" + entry.getValue() + entry.getValue().getClass());
+            //System.out.println("-------" + headerValues + headerValues.getClass());
             String dataColumns = "";
             if(headerValues.get("dataColumns") != null){
                 dataColumns = headerValues.get("dataColumns");
@@ -177,7 +177,7 @@ public class SpreadsheetWriter {
                 group = group.trim();
             }
 
-            System.out.println("====ERROR FINIDING==" + headerValues.get("group"));
+            //System.out.println("====ERROR FINIDING==" + headerValues.get("group"));
             String includeHeadings = "";
             if(headerValues.get("header") != null){
                 includeHeadings = headerValues.get("header");
@@ -232,13 +232,13 @@ public class SpreadsheetWriter {
                 audience = audience.trim();
             }
 
-            System.out.println("=======" + dataColumns);
+            //System.out.println("=======" + dataColumns);
             List<String> dcList = Arrays.asList(dataColumns.split(","));
             Iterator<String> dcIterator = dcList.iterator();
             while (dcIterator.hasNext()) {
                 String nextVal = dcIterator.next();
                 nextVal = nextVal.trim();
-                System.out.println("==THIS IS THE VALUE=== " + nextVal);
+                //System.out.println("==THIS IS THE VALUE=== " + nextVal);
                 if(!nextVal.equals("") && !nextVal.equals(null)){
                     if(reverseMarkers.containsKey(nextVal)){
                         Map<String, String> m = reverseMarkers.get(nextVal);
@@ -344,7 +344,7 @@ public class SpreadsheetWriter {
             Cell cell = row.createCell(cellNum);
             cell.setCellValue(headerRowValues[cellNum]);
         }
-        System.out.println("====REVERSE MARKERS=====" + reverseMarkers);
+        //System.out.println("====REVERSE MARKERS=====" + reverseMarkers);
         for(Map.Entry<String , Map<String,String> > entry : reverseMarkers.entrySet()) {
             String[] arr = new String[numOfColumns];
             String headerName = entry.getKey();
@@ -399,37 +399,37 @@ public class SpreadsheetWriter {
         for (int cellNum = 0; cellNum <= 2; cellNum++ ){
             Cell cell = row.createCell(cellNum);
             if(cellNum == 0) {
-                System.out.println("===HEADER NAME IN MARKER SHEET==== " );
+                //System.out.println("===HEADER NAME IN MARKER SHEET==== " );
 
                 cell.setCellValue("column_name");
             }
             else if (cellNum == 1) {
-                System.out.println("===TAGS IN MARKER SHEET==== " );
+                //System.out.println("===TAGS IN MARKER SHEET==== " );
                 cell.setCellValue("type");
             }
             else if (cellNum == 2) {
-                System.out.println("===VALUES IN MARKER SHEET==== " );
+                //System.out.println("===VALUES IN MARKER SHEET==== " );
                 cell.setCellValue("value");
             }
         }
         for(Map.Entry<String , Map<String,String> > entry : headerMarkers.entrySet()) {
             headerName = entry.getKey();
-            System.out.println("===HEADER NAME IN MARKER SHEET==== " + headerName );
+            //System.out.println("===HEADER NAME IN MARKER SHEET==== " + headerName );
             for(Map.Entry<String, String> en : entry.getValue().entrySet()) {
                 row = sheet.createRow(rownum++);
                 for (int cellNum = 0; cellNum <= 2; cellNum++ ){
                     Cell cell = row.createCell(cellNum);
                     if(cellNum == 0) {
-                        System.out.println("===HEADER NAME IN MARKER SHEET==== " + headerName );
+                        //System.out.println("===HEADER NAME IN MARKER SHEET==== " + headerName );
 
                         cell.setCellValue(headerName);
                     }
                     else if (cellNum == 1) {
-                        System.out.println("===TAGS IN MARKER SHEET==== " + en.getKey());
+                        //System.out.println("===TAGS IN MARKER SHEET==== " + en.getKey());
                         cell.setCellValue(en.getKey());
                     }
                     else if (cellNum == 2) {
-                        System.out.println("===VALUES IN MARKER SHEET==== " + en.getValue());
+                        //System.out.println("===VALUES IN MARKER SHEET==== " + en.getValue());
                         cell.setCellValue(en.getValue());
                     }
                 }

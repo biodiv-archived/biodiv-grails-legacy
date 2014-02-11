@@ -112,11 +112,11 @@
                         <!--th>Group</th-->
                         <th>Delimiter</th>
                         <th>Images</th>
-                        <th>Contributor</th>
-                        <th>Attributions</th>
+                        <th class="contributorCell">Contributor  &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
+                        <th class ="attributionsCell">Attributions &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
                         <th>Refrences</th>
-                        <th>License</th>
-                        <th>Audience</th>
+                        <th class="licenseCell">License &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
+                        <th class="audienceCell">Audience &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div></th>
 
                     </table>
 

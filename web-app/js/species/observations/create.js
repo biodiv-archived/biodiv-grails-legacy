@@ -162,6 +162,12 @@ function setUnEditableColumn(columns){
                 dataType:'JSON',
                 success:function(data){
                     updateMetadataValues();  
+                    $(".propagateDown").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
                     $(".headerInfoTags").tagit({
                         availableTags:data,
                         fieldName: 'tags', 
@@ -180,7 +186,11 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-
+                    /*
+                    $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: false});
+                    $(".licenseInfoTags").tagit("createTag", "brand-new-tag");
+                    $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: true});
+                    */
                     $(".audienceInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags', 

@@ -109,7 +109,7 @@ class UFileController {
                 xlsxFileUrl = url;
                 if(params.fromChecklist == "false") {
                     headerMetadata = getHeaderMetaDataInFormat(uploaded);
-                    println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
+                    //println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
                 }
                 res = convertExcelToCSV(uploaded, params)
                 if(res != null) {
@@ -273,16 +273,16 @@ class UFileController {
     }
 
     def downloadSpeciesFile = {
-        println "====FILE NAME =======" + params
+        //println "====FILE NAME =======" + params
         File f = new File(params.downloadFile);
         if (f.exists()) {
-            println "here here===================="
+            //println "here here===================="
             //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
             response.setContentType("application/octet-stream")
             response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
             response.outputStream << f.readBytes()
             response.outputStream.flush()
-            println "==YAHAN HUN == " 
+            //println "==YAHAN HUN == " 
         } 
     } 
 
@@ -490,7 +490,7 @@ class UFileController {
                 }
             }
         }
-        println "=======QQQQQQQQQQQQQQQ==========" + res
+        //println "=======QQQQQQQQQQQQQQQ==========" + res
         return res
 	}
 
