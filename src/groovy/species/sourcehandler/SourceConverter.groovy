@@ -450,6 +450,8 @@ class SourceConverter {
 	}
 
     protected getReferenceNode(Node refNode, String text) {
+		//println "=========getReferenceNode Ref node //////////////////////  " + text
+		
 		if(text.startsWith("http://")) {
 			new Node(refNode, "url", text);
 		} else {

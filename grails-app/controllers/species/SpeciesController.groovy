@@ -493,28 +493,23 @@ class SpeciesController extends AbstractObjectController {
         def res = ""
 
         if(params.xlsxFileUrl) {
-
             File speciesDataFile = speciesUploadService.saveModifiedSpeciesFile(params)
             println "=====THE FILE BEING UPLOADED====== " + speciesDataFile
 			
-			
 			if(speciesDataFile.exists()) {
-				//File mappingFile = new File(contentRootDir, "speciesaccount188_mapping.xlsx")
-				println "=============== start ing   "
 				res = speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-				println "=============== done "
 				res = res.log
 			} 
 			else {
-                res =  "not found"
+                res =  "Not found"
             }
             Date end = Calendar.getInstance().getTime();        
             // Using DateFormat format method we can create a string 
             // representation of a date with the defined format.
-            String reportDate_end = df.format(start);
+            String reportDate_end = df.format(end);
 
             //def endTime = new Date()
-            def mymsg =  " start Date  " + reportDate_start + "   end Date " + reportDate_end + "\n\n " + res
+            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res
             
             String fileName = "ErrorLog.txt"
             String uploadDir = "species"
@@ -616,18 +611,7 @@ class SpeciesController extends AbstractObjectController {
         List res = speciesUploadService.getDataColumns();
         render res as JSON
     }
-
-    def getLicenseList = {
-        log.debug params
-        render species.License.list().collect{it.name.toString()} as JSON
-    } 
     
-    def getAudienceList = {
-        log.debug params
-        def audList = ['Children', 'General Audience', 'Expert', 'All']
-        render audList as JSON
-    }
-
     @Secured(['ROLE_SPECIES_ADMIN'])
 	def uploadTest = {
 		params.imagesDir = "/home/sandeept/species-online/3mapping"

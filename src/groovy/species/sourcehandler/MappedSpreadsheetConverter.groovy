@@ -73,6 +73,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
 				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
+					myPrint("==================PROCESSING FILED NAME " + fieldName)
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
 					//Map customFormat = customFormatMap.get(fieldName)
@@ -91,8 +92,30 @@ class MappedSpreadsheetConverter extends SourceConverter {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
 					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
-                        Node data = createDataNode(field, speciesContent.get(fieldName), speciesContent, mappedField);
-						createReferences(data, speciesContent, mappedField);
+						fieldName.split(",").each { fieldNameToken -> 
+							fieldNameToken = fieldNameToken.trim().toLowerCase()
+							def delimiter = delimiterMap.get(fieldNameToken);
+							String text = speciesContent.get(fieldNameToken);
+							myPrint("=========== delimerte map " + delimiterMap)
+							if(text){
+								myPrint("text     " + text  + "   delimeter " + delimiter)
+								if(delimiter){
+									for(String part : text.split(delimiter)) {
+										if(part) {
+											part = part.trim();
+											myPrint("======= createing data node for ref " + fieldNameToken + "  actula text " + part)
+											Node data = createDataNode(field, part , speciesContent, mappedField);
+											myPrint("============ after ref creeate node " + data)
+											createReferences(data, speciesContent, mappedField);
+										}
+									}
+								}else{
+									Node data = createDataNode(field, text , speciesContent, mappedField);
+									myPrint("=====ELSE PART======= after ref creeate node " + data)
+									createReferences(data, speciesContent, mappedField);
+								}
+							}
+						}
 					} else if(customFormatMap) {
 						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, speciesContent);
 						createDataNode(field, text, speciesContent, mappedField);
@@ -132,11 +155,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
 	protected Map getCustomFormat(String customFormat) {
 		if(!customFormat) return [:];
-		
-		println "============= custmot >>>>>>>>>> " + customFormat
 		def fMap = [:]
-		customFormat.split(SpreadsheetWriter.columnSep).each { columnsInfo ->
-			def colMetaData = columnsInfo.split(SpreadsheetWriter.keyValueSep)
+		customFormat.split(SpreadsheetWriter.COLUMN_SEP).each { columnsInfo ->
+			def colMetaData = columnsInfo.split(SpreadsheetWriter.KEYVALUE_SEP)
 			def colName = colMetaData[0]
 			def metaData = colMetaData[1]
 			def m = [:]
@@ -149,10 +170,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			}
 			fMap.put(colName, m)
 		}
-		
-		println "============= custmot map " + fMap
 		return fMap
-		
 	}
 
 	
@@ -160,15 +178,13 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		Map m = [:]
 		if(!text) return m;
 		
-		//println "============= custom delimiter text  >>>>>>>>>> " + text
-		text.split(SpreadsheetWriter.columnSep).each { colInfo ->
-			def delimiterInfo = colInfo.split(SpreadsheetWriter.keyValueSep)
+		text.split(SpreadsheetWriter.COLUMN_SEP).each { colInfo ->
+			def delimiterInfo = colInfo.split(SpreadsheetWriter.KEYVALUE_SEP)
 			if(delimiterInfo.size() > 1 && delimiterInfo[1] ){
 				m.put(delimiterInfo[0], delimiterInfo[1])
 			}
 		}
 		
-		//println "============== Delimeter map " + m 
 		return m
 	}
 	
@@ -178,7 +194,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		String con = "";
 		fieldName.split(",").eachWithIndex { t, index ->
 			String txt = speciesContent?.get(t.toLowerCase().trim());
-			println "        field name " + t + "   text " + txt
+			myPrint("    >>>>>>>>>>    field name ==== " + t + " and TEXT " + txt)
 			def customFormat = customFormatMap.get(t.toLowerCase().trim())
 			int group = customFormat.get("group") ? Integer.parseInt(result.get("group")?.toString()) : -1;
 			boolean includeHeadings = customFormat.get("includeheadings") ? Boolean.parseBoolean(customFormat.get("includeheadings")?.toString()).booleanValue() : false;
@@ -217,6 +233,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
 				customFormat =  customFormatMap.get(t.trim().toLowerCase());
+				
 				delimiter = delimiterMap.get(t.trim().toLowerCase());
 				group = customFormat.get("group") ? Integer.parseInt(customFormat.get("group")?.toString()):-1
 				location = customFormat.get("location") ? Integer.parseInt(customFormat.get("location")?.toString())-1:-1
@@ -236,6 +253,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
                         }
                     }
                 } else {
+						println "= creating images "
 						createImages(images, txt, imagesMetaData, imagesDir);
                 }
 			}
@@ -348,8 +366,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		boolean doProcess = false
 		Map fMap = [:]
 		if(fields){
-			fields.split(SpreadsheetWriter.columnSep).each { columnsInfo ->
-				def colMetaData = columnsInfo.split(SpreadsheetWriter.keyValueSep)
+			fields.split(SpreadsheetWriter.COLUMN_SEP).each { columnsInfo ->
+				def colMetaData = columnsInfo.split(SpreadsheetWriter.KEYVALUE_SEP)
 				if(colMetaData.size() > 1){
 					def colName = colMetaData[0]
 					def infoColList = colMetaData[1].split(',').collect { it.trim().toLowerCase() }
@@ -360,33 +378,47 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		}
 		
 		if(doProcess){
+			List processedInfoColumn = []
+			myPrint("=======ADD meta attribute " + fieldName + "  fields " + fields + " fMap " + fMap)
 			Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"))
 			fMap.keySet().each { key ->
-				String text = speciesContent.get(key)
-				String delimiter =  delimiterMap.get(key)?:defaultDelimiter;
-				
-				if(text){
-					if(resultNodeName == 'image'){
-						def imagesNode = data;
-						imagesNode = new Node(data, "images");
-						text.split(delimiter).each {
-							String loc = cleanLoc(it)
-							new Node(imagesNode, "image", loc);
-						}
-					}else{
-						text.split(delimiter).each {
-							if(resultNodeName == 'reference'){
-								Node refNode = new Node(data, "reference");
-								getReferenceNode(refNode, it);
+				//if column has text then only proceed
+				if(speciesContent.get(key)){
+					def infoColList = fMap.get(key)
+					infoColList.each { infoCol ->
+						String text = speciesContent.get(infoCol)
+						String delimiter =  delimiterMap.get(infoCol)?:defaultDelimiter;
+						//if meta attribute has text and that column is not processed then only adding
+						if(text &&  !processedInfoColumn.contains(infoCol)){
+							processedInfoColumn << infoCol
+							if(resultNodeName == 'image'){
+								def imagesNode = data;
+								imagesNode = new Node(data, "images");
+								text.split(delimiter).each {
+									String loc = cleanLoc(it)
+									new Node(imagesNode, "image", loc);
+								}
 							}else{
-								new Node(data, fieldName, it);
+								myPrint("========= <<<<<<<<<<<<<<<<  meta data >>>>>>>>>>>>>>> ==== " + text + "   fieldname " +  fieldName)
+								text.split(delimiter).each {
+									if(resultNodeName == 'reference'){
+										Node refNode = new Node(data, "reference");
+										getReferenceNode(refNode, it);
+									}else{
+										new Node(data, fieldName, it);
+									}
+								}
 							}
 						}
 					}
 				}
-				
 			}
 		}
+	}
+	
+	
+	def myPrint(str){
+		println str
 	}
 	
 }

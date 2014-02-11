@@ -47,8 +47,8 @@ class UFileController {
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
-    static String columnSep = SpreadsheetWriter.columnSep
-    static String keyValueSep = SpreadsheetWriter.keyValueSep
+    static String columnSep = SpreadsheetWriter.COLUMN_SEP
+    static String keyValueSep = SpreadsheetWriter.KEYVALUE_SEP
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
