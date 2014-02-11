@@ -133,7 +133,6 @@ h6 {
         padding:0px 0px;
         position:relative;
 }
-
 .snippet.tablet .caption .story-footer {
         left:0px;
 }
@@ -193,6 +192,10 @@ h6 {
 
 .thumbnail:hover {
 	background-color: #fefad5;
+}
+
+.initPropagation:hover{
+    cursor: pointer;    
 }
 
 .thumbnail .observation_story {

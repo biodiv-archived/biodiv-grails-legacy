@@ -47,8 +47,8 @@ class UFileController {
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
-    static String columnSep = SpreadsheetWriter.columnSep
-    static String keyValueSep = SpreadsheetWriter.keyValueSep
+    static String columnSep = SpreadsheetWriter.COLUMN_SEP
+    static String keyValueSep = SpreadsheetWriter.KEYVALUE_SEP
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
@@ -109,7 +109,7 @@ class UFileController {
                 xlsxFileUrl = url;
                 if(params.fromChecklist == "false") {
                     headerMetadata = getHeaderMetaDataInFormat(uploaded);
-                    println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
+                    //println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
                 }
                 res = convertExcelToCSV(uploaded, params)
                 if(res != null) {
@@ -273,16 +273,16 @@ class UFileController {
     }
 
     def downloadSpeciesFile = {
-        println "====FILE NAME =======" + params
+        //println "====FILE NAME =======" + params
         File f = new File(params.downloadFile);
         if (f.exists()) {
-            println "here here===================="
+            //println "here here===================="
             //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
             response.setContentType("application/octet-stream")
             response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
             response.outputStream << f.readBytes()
             response.outputStream.flush()
-            println "==YAHAN HUN == " 
+            //println "==YAHAN HUN == " 
         } 
     } 
 
@@ -332,11 +332,26 @@ class UFileController {
 			String fieldNames = sc["field name(s)"].toLowerCase()
             String conDel = sc["content delimiter"]
             String conFor = sc["content format"]
+            String imagesCol = sc["images"]
+            String contributorCol = sc["contributor"]
+            String attributionsCol = sc["attributions"]
+            String referencesCol = sc["references"]
+            String licenseCol = sc["license"]
+            String audienceCol = sc["audience"]
+
+
             if(fieldNames != ""){
                 List fnList = fieldNames.split(",")
                 def cdMap = [:]
                 def gMap = [:]
                 def hMap = [:]
+                def aMap = [:]
+                def imgMap = [:]
+                def contMap = [:]
+                def attrMap = [:]
+                def refMap = [:]
+                def licMap = [:]
+                def audMap = [:]
                 if(conDel != ""){
                     println conDel
                     List conDelList = conDel.split(columnSep)
@@ -351,6 +366,80 @@ class UFileController {
                         }
                     }
                 }
+                if(imagesCol != ""){
+                    List imgList = imagesCol.split(columnSep)
+                    imgList.each { il ->
+                        def z = il.split(keyValueSep)
+                        if(z.size()==2){
+                            imgMap[z[0]] = z[1]
+                        }
+                        else{
+                            imgMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(contributorCol != ""){
+                    List contList = contributorCol.split(columnSep)
+                    contList.each { cl ->
+                        def z = cl.split(keyValueSep)
+                        if(z.size()==2){
+                            contMap[z[0]] = z[1]
+                        }
+                        else{
+                            contMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(attributionsCol != ""){
+                    List attrList = attributionsCol.split(columnSep)
+                    attrList.each { al ->
+                        def z = al.split(keyValueSep)
+                        if(z.size()==2){
+                            attrMap[z[0]] = z[1]
+                        }
+                        else{
+                            attrMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(referencesCol != ""){
+                    List refList = referencesCol.split(columnSep)
+                    refList.each { rl ->
+                        def z = rl.split(keyValueSep)
+                        if(z.size()==2){
+                            refMap[z[0]] = z[1]
+                        }
+                        else{
+                            refMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(licenseCol != ""){
+                    List licList = licenseCol.split(columnSep)
+                    licList.each { ll ->
+                        def z = ll.split(keyValueSep)
+                        if(z.size()==2){
+                            licMap[z[0]] = z[1]
+                        }
+                        else{
+                            licMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(audienceCol != ""){
+                    List audList = audienceCol.split(columnSep)
+                    audList.each { al ->
+                        def z = al.split(keyValueSep)
+                        if(z.size()==2){
+                            audMap[z[0]] = z[1]
+                        }
+                        else{
+                            audMap[z[0]] = ""
+                        }
+                    }
+                }
+
+
                 if(conFor != ""){
                     List conForList = conFor.split(columnSep)
                     conForList.each { cfl ->
@@ -368,6 +457,13 @@ class UFileController {
                         else{
                             hMap[z[0]] = ""
                         }
+                        if(q[2].split("=").size() == 2){
+
+                            aMap[z[0]] = q[2].split("=")[1]	
+                        }
+                        else{
+                            aMap[z[0]] = ""
+                        }
                     }
                 }
                 fnList.each{ fn ->
@@ -382,12 +478,19 @@ class UFileController {
                         m["delimiter"] = cdMap[fn]
                         m["group"] = gMap[fn]
                         m["header"] = hMap[fn]
+                        m["append"] = aMap[fn]
+                        m["images"] = imgMap[fn]
+                        m["contributor"] = contMap[fn]
+                        m["attributions"] = attrMap[fn]
+                        m["references"] = refMap[fn]
+                        m["license"] = licMap[fn]
+                        m["audience"] = audMap[fn]
                         res[fn] = m
                     }
                 }
             }
         }
-        println "=======QQQQQQQQQQQQQQQ==========" + res
+        //println "=======QQQQQQQQQQQQQQQ==========" + res
         return res
 	}
 

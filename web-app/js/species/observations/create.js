@@ -150,21 +150,57 @@ function setUnEditableColumn(columns){
                     k=k+1;
                 }
             }
+            var infoCol = new Array();
+            for(var z= 0; z < col.length; z++) {
+                infoCol[z] = col[z].name;
+            }
+            $('#columnOrder').val(infoCol);
+
             populateTagHeaders(col);
             $.ajax({
                 url:window.params.getDataColumnsDB,
                 dataType:'JSON',
                 success:function(data){
-                   updateMetadataValues();  
+                    updateMetadataValues();  
+                    $(".propagateDown").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
                     $(".headerInfoTags").tagit({
                         availableTags:data,
                         fieldName: 'tags', 
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                   
+                    $(".extraInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+                    $(".licenseInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+                    /*
+                    $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: false});
+                    $(".licenseInfoTags").tagit("createTag", "brand-new-tag");
+                    $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: true});
+                    */
+                    $(".audienceInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true
+                    });
+
                 }
             });
+
         }
 
 

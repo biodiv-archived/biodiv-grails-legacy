@@ -103,7 +103,7 @@
                 </div>
                 
                 </table>            
-                <div id="tagHeaders" class="section checklist-slickgrid" style="display:none;">
+                <div id="tagHeaders" class="section checklist-slickgrid" style="clear:both;display:none;">
                     <table id="tableHeader" border="1">
                         <th>Column_Name</th>
                         <th>Data_Columns</th>
@@ -111,6 +111,13 @@
                         <th>Append</th>
                         <!--th>Group</th-->
                         <th>Delimiter</th>
+                        <th>Images</th>
+                        <th class="contributorCell">Contributor  &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
+                        <th class ="attributionsCell">Attributions &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
+                        <th>Refrences</th>
+                        <th class="licenseCell">License &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
+                        <th class="audienceCell">Audience &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div></th>
+
                     </table>
 
 
@@ -138,10 +145,18 @@
                 <div id="headerMetadata" style="display:none;">
                     <input type="text" value="">
                 </div>
+                <div id="columnOrder" style="display:none;">
+                    <input type="text" value="">
+                </div>
 
                 <form id="downloadSpeciesFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
                     <input type="text" name="downloadFile" value="" style="visibility:hidden;">
                     Download the uploaded sheet here <input class="btn btn-primary" type="submit" value="Download">
+                </form>
+                
+                <form id="downloadErrorFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
+                    <input type="text" name="downloadFile" value="" style="visibility:hidden;">
+                    Download the error file here <input class="btn btn-primary" type="submit" value="Download">
                 </form>
 
 
