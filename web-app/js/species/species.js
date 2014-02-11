@@ -453,7 +453,7 @@ function initGalleryTabs() {
             initLicenseSelector($ul, licenseSelectorOptions, "CC BY");
             initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
             initStatusSelector($ul, statusSelectorOptions, "Under Validation");
-            rate($ul);
+            rate($ul.find('.star_rating'));
  
         } else {
             $(this).html('Add'); 
