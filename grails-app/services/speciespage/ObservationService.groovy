@@ -1532,7 +1532,7 @@ class ObservationService extends AbstractObjectService {
                 bodyView = "/emailtemplates/speciesUploaded"
                 templateMap["link"] = otherParams["link"]
                 templateMap["curator"] = otherParams["curator"]
-                templateMap["link"] = URLDecoder.decode(templateMap["link"])
+                //templateMap["link"] = URLDecoder.decode(templateMap["link"])
                 //println "========THE URL  =============" + templateMap["link"]
                 populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
                 toUsers = otherParams["usersMailList"]

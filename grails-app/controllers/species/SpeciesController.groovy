@@ -520,20 +520,17 @@ class SpeciesController extends AbstractObjectController {
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
         println "===Upload called =====================" + params
-        //def startTime = new Date()
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
-        // Get the date today using Calendar object.
-        Date start = Calendar.getInstance().getTime();        
-        // Using DateFormat format method we can create a string 
-        // representation of a date with the defined format.
-        String reportDate_start = df.format(start);
-
-        // Print what date is today!
-        //System.out.println("Report Date: " + reportDate);
         def res = ""
 
         if(params.xlsxFileUrl) {
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+            // Get the date today using Calendar object.
+            Date start = Calendar.getInstance().getTime();        
+            // Using DateFormat format method we can create a string 
+            // representation of a date with the defined format.
+            String reportDate_start = df.format(start);
+
             File speciesDataFile = speciesUploadService.saveModifiedSpeciesFile(params)
             println "=====THE FILE BEING UPLOADED====== " + speciesDataFile
 			
