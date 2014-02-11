@@ -400,9 +400,9 @@ $('#downloadModifiedSpecies').click(function() {
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
     //console.log(grid.getData().length);
-    console.log(gData);
+    //console.log(gData);
     var orderedArray = $('#columnOrder').val();
-    console.log(orderedArray);
+    //console.log(orderedArray);
     orderedArray = JSON.stringify(orderedArray);
     //headerMarkers = JSON.stringify(headerMarkers);
     //Getting headerMetadata only
@@ -459,4 +459,43 @@ $('#uploadSpecies').click(function() {
 
 });
 
+$(".propagateButton").click(function(){
+    //console.log("entered here");
+    //console.log($(this));
+    var pEle = $(this).parents("th");
+    var pClass = $(pEle).attr("class");
+    //console.log(pEle);
+    //console.log(pClass);
+    var valArr = [];
+    $(pEle).find('span.tagit-label').each(function(i){
+        valArr.push($(this).text()); // This is your rel value
+    });
+    //console.log(valArr);
+    //can be done without iterating table,look for selector based on parents class as it will be same in that column
+    $("td."+pClass).find("ul").tagit( {showAutocompleteOnFocus: false});
+    $.each(valArr, function( index, value ) {
+        $("td."+pClass).find("ul").tagit("createTag", value);//select ul in this and create new tags//createTag
+    });
+    $("td."+pClass).find("ul").tagit( {showAutocompleteOnFocus: true});
+    $(pEle).find("div").hide();
+    /*
+       $("#tableHeader tr").each(function () {
+       $('td', this).each(function () {
+        if($(this).attr("class") == pClass){
+    //showAutoCompleteon focus ---false
+    $.each(valArr, function( index, value ) {
+    //createTag
+    });
+    //showAutoCompleteon focus ---true
+    }
+    });
 
+    });
+    */
+
+});
+
+$(".initPropagation").click(function(){
+    var parentEle = $(this).parent("th");
+    $(parentEle).find("div").toggle();
+});
