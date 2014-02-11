@@ -446,7 +446,6 @@ function initGalleryTabs() {
 
             var $ul = $(this).parent().parent();
 
-console.log($ul);
             $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
             $ul.find('.attributionContent').show();
             initEditables($ul);
@@ -454,6 +453,8 @@ console.log($ul);
             initLicenseSelector($ul, licenseSelectorOptions, "CC BY");
             initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
             initStatusSelector($ul, statusSelectorOptions, "Under Validation");
+            rate($ul);
+ 
         } else {
             $(this).html('Add'); 
         }
