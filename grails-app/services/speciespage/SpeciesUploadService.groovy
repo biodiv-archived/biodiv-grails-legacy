@@ -249,11 +249,8 @@ class SpeciesUploadService {
 		def speciesElements = [];
 		int noOfSpecies = content.size();
 		
-		println "================================= in save species ===== " + noOfSpecies
-		Thread.dumpStack()
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
-				println "==============================REGULAR  BATCH === in save species ===== "
 				def res = saveSpeciesElements(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
@@ -269,7 +266,6 @@ class SpeciesUploadService {
 		
 		//saving last batch
 		if(speciesElements.size() > 0) {
-			println "==============================LAST BATCH === in save species ===== " 
 			def res = saveSpeciesElements(speciesElements)
 			noOfInsertions += res.noOfInsertions;
 			converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
@@ -400,7 +396,6 @@ class SpeciesUploadService {
             //s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
-				println "====================== Error   saving"
 				s.errors.allErrors.each { 
 					log.error it
 					s.appendLogSummary(it)
