@@ -352,16 +352,46 @@ function initGalleryTabs() {
         }	
     });
 }
-function initEditableFields() {
+
 
     $.fn.editable.defaults.mode = 'inline';
+
+    function onEditableSuccess(response, newValue) {
+        if(!response) {
+            return "Unknown error!";
+        }          
+
+        if(!response.success) {
+            $(this).next(".alert-error").html(response.msg).show();
+            return response.msg
+        } else {
+            $(this).next(".alert-error").hide();
+            $(this).effect("highlight", {color: '#4BADF5'}, 2000);
+        }
+    }
+
+    function onEditableError(response, newValue) {
+        var successHandler = this.success, errorHandler;
+        handleError(response, undefined, undefined, function(data){
+            $ele.find('.editField').editable('submit');
+            return "Please resubmit the form again";
+        }, function(data) {
+            if(data && data.status == 401) {
+                return "Please login and resubmit the changes"; 
+            } else if(response.status === 500) {
+                return 'Service unavailable. Please try later.';
+            } else {
+                return response.responseText;
+            }
+        });
+    }
 
     function initEditables($ele) {
         if($ele == undefined)
             $ele = $(document);
         $ele.find('.editField').editable({
             disabled:window.is_species_admin?!window.is_species_admin:true,
-            wysihtml5 : {
+/*            wysihtml5 : {
                 "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
             "emphasis": true, //Italics, bold, etc. Default true
             "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
@@ -369,35 +399,9 @@ function initEditableFields() {
             "link": true, //Button to insert a link. Default true
             "image": true, //Button to insert an image. Default true,
             "color": false //Button to change color of font
-            },
-            success: function(response, newValue) {
-                if(!response) {
-                    return "Unknown error!";
-                }          
-
-                if(!response.success) {
-                    $(this).next(".alert-error").html(response.msg).show();
-                    return response.msg
-                } else {
-                    $(this).next(".alert-error").hide();
-                    $(this).effect("highlight", {color: '#4BADF5'}, 2000);
-                }
-            },
-            error:function(response, newValue) {
-                var successHandler = this.success, errorHandler;
-                handleError(response, undefined, undefined, function(data){
-                    $ele.find('.editField').editable('submit');
-                    return "Please resubmit the form again";
-                }, function(data) {
-                    if(data && data.status == 401) {
-                        return "Please login and resubmit the changes"; 
-                    } else if(response.status === 500) {
-                        return 'Service unavailable. Please try later.';
-                    } else {
-                        return response.responseText;
-                    }
-                });
-            }
+            },*/
+            success: onEditableSuccess,
+            error:onEditableError
         });
 
 
@@ -408,11 +412,75 @@ function initEditableFields() {
         });
     }
 
+    function onAddableDisplay(value, sourceData, response) {
+        var html = [];
+        if(sourceData && sourceData.content) {
+            var speciesId = sourceData.speciesId?sourceData.speciesId:'';
+            var content = sourceData.content;
+            var data_type = 'text';
+            if(sourceData.type == 'description') {
+                data_type = 'wysihtml5';
+                html.push ('<li><i class="icon-plus"></i><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+            }
+
+            $.each(content, function(i, v) { 
+                switch(sourceData.type) {
+                    case 'contributor' :
+                    case 'attributor' :
+                        html.push (createContributor(v, sourceData, v));
+                        break;
+                    case 'reference' :
+                        html.push (createReference(v, sourceData));
+                        break;
+                    case 'description' : 
+                        data_type = 'wysihtml5';
+                        html.push (v);//createSpeciesFieldHtml(v, sourceData));
+                        break;
+                }
+            });
+
+            if(sourceData.type != 'description'){
+                html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" ] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+            }
+
+
+            var $ul = $(this).parent().parent();
+
+console.log($ul);
+            $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
+            $ul.find('.attributionContent').show();
+            initEditables($ul);
+            initAddables($ul);
+            initLicenseSelector($ul, licenseSelectorOptions, "CC BY");
+            initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
+            initStatusSelector($ul, statusSelectorOptions, "Under Validation");
+        } else {
+            $(this).html('Add'); 
+        }
+        return 'Successfully added data';
+    }
+
+    function onAddableError(response, newValue) {
+        var successHandler = this.success, errorHandler;
+        handleError(response, undefined, undefined, function(data){
+            $ele.find('.addField').editable('submit');
+            return "Please resubmit the form again";
+        }, function(data) {
+            if(data && data.status == 401) {
+                return "Please login and resubmit the changes"; 
+            } else if(response.status === 500) {
+                return 'Service unavailable. Please try later.';
+            } else {
+                return response.responseText;
+            }
+        })
+    }
+
     function initAddables($ele) {
         if($ele == undefined)
             $ele = $(document);
         $ele.find('.addField').editable({
-            wysihtml5 : {
+/*            wysihtml5 : {
                 "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
                 "emphasis": true, //Italics, bold, etc. Default true
                 "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
@@ -420,7 +488,7 @@ function initEditableFields() {
                 "link": true, //Button to insert a link. Default true
                 "image": true, //Button to insert an image. Default true,
                 "color": false //Button to change color of font
-            },
+            },*/
             success: function(response, newValue) {
                 if(!response) {
                     return "Unknown error!";
@@ -431,71 +499,11 @@ function initEditableFields() {
                     return response.msg
                 } else {
                     $(this).next(".alert-error").hide();
-                    console.log(response.content);
                 }
             },
-            display: function(value, sourceData, response) {
-                var html = [];
-                if(sourceData && sourceData.content) {
-                    var speciesId = sourceData.speciesId?sourceData.speciesId:'';
-                    var content = sourceData.content;
-                    var data_type = 'text';
-                    if(sourceData.type == 'description') {
-                        data_type = 'wysihtml5';
-                        html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
-                    }
-
-                    $.each(content, function(i, v) { 
-                        switch(sourceData.type) {
-                            case 'contributor' :
-                            case 'attributor' :
-                                html.push (createContributor(v, sourceData, v));
-                                break;
-                            case 'reference' :
-                                html.push (createReference(v, sourceData));
-                                break;
-                            case 'description' : 
-                                data_type = 'wysihtml5';
-                                html.push (v);//createSpeciesFieldHtml(v, sourceData));
-                                break;
-                        }
-                    });
-                    
-                    if(sourceData.type != 'description'){
-                        html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" ] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
-                    }
-
-
-                   
-                    var $ul = $(this).parent().parent();
-                    $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
-
-                    initEditables($ul);
-                    initAddables($ul);
-                    initLicenseSelector($ul, licenseSelectorOptions, "CC BY");
-                    initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
-                    initStatusSelector($ul, statusSelectorOptions, "Under Validation");
-                } else {
-                    $(this).html('Add'); 
-                }
-                return 'Successfully added data';
-            },
-            error:function(response, newValue) {
-                var successHandler = this.success, errorHandler;
-                handleError(response, undefined, undefined, function(data){
-                         $ele.find('.addField').editable('submit');
-                        return "Please resubmit the form again";
-                    }, function(data) {
-                    if(data && data.status == 401) {
-                        return "Please login and resubmit the changes"; 
-                    } else if(response.status === 500) {
-                        return 'Service unavailable. Please try later.';
-                    } else {
-                        return response.responseText;
-                    }
-                })
-            }
-        })
+            display: onAddableDisplay,
+            error:onAddableError
+       })
     }
 
     function createContributor(content, sourceData) {
@@ -633,6 +641,7 @@ function initEditableFields() {
     }
 
 
+function initEditableFields() {
 
     initEditables();
     initAddables();

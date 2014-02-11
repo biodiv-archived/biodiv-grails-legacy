@@ -19,7 +19,9 @@
             <g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 
             <g:if test="${isSpeciesContributor}">
+            <div>
             <a href="#" class="addField"  data-pk="${concept.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+        </div>
             </g:if>
             <g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
             <g:showSpeciesField
@@ -33,13 +35,15 @@
             <g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
 
             <div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory">
-
                 <h6>
-                <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
-                                </h6>
- <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
-                <i class="icon-plus"></i>
-                 <a href="#" class="addField"  data-pk="${category.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+                    <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
+                </h6>
+                <div>
+                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
+                <div>
+                    <i class="icon-plus"></i>
+                    <a href="#" class="addField"  data-pk="${category.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+                </div>
                 </g:if>
 
 
@@ -86,6 +90,7 @@
                 </div>
                 </div>
                 <br/>
+            </div>
             </div>
             </g:if>
             </s:hasContent>

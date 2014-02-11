@@ -1,12 +1,13 @@
 <s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
     <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
-</s:isSpeciesFieldContributor>
-<div class="contributor_entry">
+    </s:isSpeciesFieldContributor>
+    <div class="contributor_entry">
         <g:if test="${speciesFieldInstance?.field?.subCategory}">
         <h6 style="margin-bottom: 0px">
             ${speciesFieldInstance?.field?.subCategory}
         </h6>
         <g:if test="${isSpeciesContributor}">
+        <i class="icon-plus"></i>
         <a href="#" class="addField"  data-pk="${fieldInstance.id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
         </g:if>
         </g:if>
@@ -73,63 +74,63 @@
             </g:if>
             <!-- content -->
 
+<div class="${isSpeciesFieldContributor?'editField ':' '} description" data-type="wysihtml5"
+    data-pk="${speciesFieldInstance.id}"
+    data-url="${uGroup.createLink(controller:'species', action:'update') }"
+    data-name="description" data-original-title="Edit description">
+    <g:each in="${speciesFieldInstance?.description.split('\n')}"
+    var="para">
+    <g:if test="${para}">
+    <p>
+    ${para.trim()}
+    </p>
+    </g:if>
 
-            <div class="${isSpeciesFieldContributor?'editField ':' '} description" data-type="wysihtml5"
-                data-pk="${speciesFieldInstance.id}"
-                data-url="${uGroup.createLink(controller:'species', action:'update') }"
-                data-name="description" data-original-title="Edit description">
-                <g:each in="${speciesFieldInstance?.description.split('\n')}"
-                var="para">
-                <g:if test="${para}">
-                <p>
-                ${para.trim()}
-                </p>
-                </g:if>
+    </g:each>
 
-                </g:each>
-            </div>
-            <!-- description -->
-            <g:if
-            test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Distribution Geographic Entity') && speciesInstance.globalDistributionEntities.size()>0}">
-            <div>
-                <h6 style="margin-bottom: 0px">
-                    ${speciesFieldInstance?.field?.subCategory}
-                </h6>
-            </div>
+</div>
+<!-- description -->
+<g:if
+test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Distribution Geographic Entity') && speciesInstance.globalDistributionEntities.size()>0}">
+<div>
+    <h6 style="margin-bottom: 0px">
+        ${speciesFieldInstance?.field?.subCategory}
+    </h6>
+</div>
 
-            <g:each in="${speciesInstance.globalDistributionEntities}">
-            <p>
-            <span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
-            </span>
-            </p>
-            </g:each>
-            </g:if>
-            <g:elseif
-            test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Endemicity Geographic Entity') && speciesInstance.globalEndemicityEntities.size() > 0}">
-            <div>
-                <h6 style="margin-bottom: 0px">
-                    ${speciesFieldInstance?.field?.subCategory}
-                </h6>
-            </div>
+<g:each in="${speciesInstance.globalDistributionEntities}">
+<p>
+<span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
+</span>
+</p>
+</g:each>
+</g:if>
+<g:elseif
+test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Endemicity Geographic Entity') && speciesInstance.globalEndemicityEntities.size() > 0}">
+<div>
+    <h6 style="margin-bottom: 0px">
+        ${speciesFieldInstance?.field?.subCategory}
+    </h6>
+</div>
 
-            <g:each in="${speciesInstance.globalEndemicityEntities}">
-            <p>
-            <span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
-            </span>
-            </p>
-            </g:each>
-            </g:elseif>
-            <g:elseif
-            test="${!speciesFieldInstance?.description && !speciesFieldInstance?.field?.subCategory}">
+<g:each in="${speciesInstance.globalEndemicityEntities}">
+<p>
+<span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
+</span>
+</p>
+</g:each>
+</g:elseif>
+<g:elseif
+test="${!speciesFieldInstance?.description && !speciesFieldInstance?.field?.subCategory}">
 
-            </g:elseif>
+</g:elseif>
 
-            <g:showSpeciesFieldToolbar
-            model="['speciesFieldInstance':speciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
-            <g:if test="${speciesFieldInstance != null}">
-            <comment:showCommentPopup
-            model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
-            </g:if>
+<g:showSpeciesFieldToolbar
+model="['speciesFieldInstance':speciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
+<g:if test="${speciesFieldInstance != null}">
+<comment:showCommentPopup
+model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
+</g:if>
 
 
         </div>

@@ -49,10 +49,12 @@ class SpeciesController extends AbstractObjectController {
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
 		params.action="list"
+
 		if(params.loadMore?.toBoolean()){
 			render(template:"/species/showSpeciesListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            println model
 			render (view:"list", model:model)
 			return;
 		} else{

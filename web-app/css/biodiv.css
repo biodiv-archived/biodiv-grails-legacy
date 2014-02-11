@@ -2589,3 +2589,20 @@ small {
     font-size:12px;
     font-weight:normal;
 }
+
+.editable-container.editable-inline {
+    width:95%;
+}
+
+.editable-container.editable-inline .editable-input {
+    width:87%;
+}
+.editable-container.editable-inline .editable-input .input-medium {
+    width:96%;
+}
+
+.wysihtml5-sandbox {
+    width:100%;
+}
+
+
