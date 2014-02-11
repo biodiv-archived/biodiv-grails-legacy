@@ -21,7 +21,10 @@ import org.apache.solr.common.util.NamedList
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import species.License;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.io.FileOutputStream;
+
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
 
@@ -35,10 +38,14 @@ class SpeciesController extends AbstractObjectController {
 	def speciesService;
 	def speciesPermissionService;
 	def observationService;
-	def userGroupService
-    def springSecurityService;
+	def userGroupService;
+	def springSecurityService;
+	
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    
+    String contentRootDir = config.speciesPortal.content.rootDir
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -511,60 +518,83 @@ class SpeciesController extends AbstractObjectController {
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
         println "===Upload called =====================" + params
-		def startTime = new Date()
-		def res = ""
-		
+        //def startTime = new Date()
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+        // Get the date today using Calendar object.
+        Date start = Calendar.getInstance().getTime();        
+        // Using DateFormat format method we can create a string 
+        // representation of a date with the defined format.
+        String reportDate_start = df.format(start);
+
+        // Print what date is today!
+        //System.out.println("Report Date: " + reportDate);
+        def res = ""
+
         if(params.xlsxFileUrl) {
-            
             File speciesDataFile = speciesUploadService.saveModifiedSpeciesFile(params)
             println "=====THE FILE BEING UPLOADED====== " + speciesDataFile
 			
-			
 			if(speciesDataFile.exists()) {
-				//File mappingFile = new File(contentRootDir, "speciesaccount188_mapping.xlsx")
-				println "=============== start ing   "
 				res = speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-				println "=============== done "
 				res = res.log
-			}
+			} 
 			else {
-				res =  "not found"
-			}
-			
-			def endTime = new Date()
-			def mymsg =  " start time  " + startTime + "   end time " + endTime + "\n\n " + res
+                res =  "Not found"
+            }
+            Date end = Calendar.getInstance().getTime();        
+            // Using DateFormat format method we can create a string 
+            // representation of a date with the defined format.
+            String reportDate_end = df.format(end);
 
-            /*
+            //def endTime = new Date()
+            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res
+            
+            String fileName = "ErrorLog.txt"
+            String uploadDir = "species"
+            //URL url = new URL(data.xlsxFileUrl);
+            File errorFile = observationService.createFile(fileName , uploadDir, contentRootDir);
+			FileOutputStream fop = new FileOutputStream(errorFile);
+			byte[] contentInBytes = mymsg.getBytes();
+			fop.write(contentInBytes);
+			fop.flush();
+			fop.close();
             def otherParams = [:]
             def usersMailList = []
-            def suser = SUser.get(3L)
+            usersMailList = speciesPermissionService.getSpeciesAdmin()
+            println "================ " + usersMailList
+            //def suser = SUser.get(3L)
 
-            usersMailList.add(suser)
-            usersMailList.add(SUser.get(4L))
+            //usersMailList.add(suser)
+            //usersMailList.add(SUser.get(4L))
             println "======" + usersMailList
             
-            def sp = Species.get(6L)
-            
-            speciesList.each{ sp ->
+            def sp = new Species()
+
+            /*
+            speciesList.each{ sp -> 
                 curators = speciesPermissionService.getCurators(sp)
-                curators.each { cu ->
+                curators.each { cu - >
                     usersMailList.add(cu)
                 }
             }
-            
+            */
             otherParams["usersMailList"] = usersMailList
             def linkParams = [:]
-            linkParams["daterangepicker_start"] = startTime
-            linkParams["daterangepicker_end"] = endTime
+            linkParams["daterangepicker_start"] = reportDate_start
+            linkParams["daterangepicker_end"] = reportDate_end
             String link = observationService.generateLink("species", "list", linkParams)
             otherParams["link"] = link
             //FOR EACH SPECIES UPLOADED send mail
             //how to send the link generated
             //what about activity feed
-            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,sp,null,null,null,otherParams)
-            */
+            usersMailList.each{ user ->
+                otherParams["curator"] = user.name
+                observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,sp,null,null,null,otherParams)
+            }
 			
-			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath()] as JSON, contentType:'text/html')
+			sp = null
+			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath(), errorFile: errorFile.getAbsolutePath()] as JSON, contentType:'text/html')
 			
         }
 			
@@ -621,7 +651,7 @@ class SpeciesController extends AbstractObjectController {
         List res = speciesUploadService.getDataColumns();
         render res as JSON
     }
-
+    
     @Secured(['ROLE_SPECIES_ADMIN'])
 	def uploadTest = {
 		params.imagesDir = "/home/sandeept/species-online/3mapping"

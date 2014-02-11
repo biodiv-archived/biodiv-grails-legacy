@@ -176,12 +176,7 @@ class SpeciesUploadService {
 		List<Species> species = new ArrayList<Species>();
 		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
 
-
 		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
-		
-		println "======================== map after read  " 
-		//println  converter.mappingConfig
-		println "================================================================="
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		List<Map> imagesMetaData;
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
@@ -248,15 +243,17 @@ class SpeciesUploadService {
 	}
 
 	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
-		println "============================================================================================================================="
-        converter.setLogAppender(fa);
+		converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		def speciesElements = [];
 		int noOfSpecies = content.size();
+		
+		println "================================= in save species ===== " + noOfSpecies
+		Thread.dumpStack()
 		for(int i=0; i<noOfSpecies; i++) {
-			println "============================##############################################################################################================================"
-            if(speciesElements.size() == BATCH_SIZE) {
+			if(speciesElements.size() == BATCH_SIZE) {
+				println "==============================REGULAR  BATCH === in save species ===== "
 				def res = saveSpeciesElements(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
@@ -272,6 +269,7 @@ class SpeciesUploadService {
 		
 		//saving last batch
 		if(speciesElements.size() > 0) {
+			println "==============================LAST BATCH === in save species ===== " 
 			def res = saveSpeciesElements(speciesElements)
 			noOfInsertions += res.noOfInsertions;
 			converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
@@ -399,10 +397,10 @@ class SpeciesUploadService {
 				s.appendLogSummary(e.printStackTrace())
 				e.printStackTrace()
 			}
-            println "==========SPECIES YE HAI =========== " + s
-			s.percentOfInfo = calculatePercentOfInfo(s);
+            //s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
+				println "====================== Error   saving"
 				s.errors.allErrors.each { 
 					log.error it
 					s.appendLogSummary(it)
@@ -417,8 +415,7 @@ class SpeciesUploadService {
 		//log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-        println "===========QQQQQQQQQQQQQQQQQQQQQQQ=================" + noOfInsertions
-		return noOfInsertions;
+        return noOfInsertions;
 	}
 
 	/**
@@ -501,15 +498,14 @@ class SpeciesUploadService {
 		//		int taxaHierarchies = TaxonomyRegistry.countByTaxonDefinitionAndClassification(s.taxonConcept, authClassification);
 		//TODO: int occRecords =
 		//TODO: observations =
-		println "======I M HERE======" + s
-        int textSize = 0;
+		int textSize = 0;
 		s.fields.each { field ->
 			textSize += field.description?.length();
 		}
 		int noOfMultimedia = s.resources?.size()?:0;
 		//int diffSources =
 		//TODO: int reviewedFields =
-		int richness = s.fields?.size()?:0 + s.globalDistributionEntities?.size()?:0 + s.globalEndemicityEntities?.size()?:0 + s.indianDistributionEntities?.size()?:0 + s.indianEndemicityEntities?.size()?:0;
+		int richness = (s.fields?.size()?:0 )+ (s.globalDistributionEntities?.size()?:0 )+ (s.globalEndemicityEntities?.size()?:0) + (s.indianDistributionEntities?.size()?:0) + (s.indianEndemicityEntities?.size()?:0);
 		richness += noOfMultimedia;
 		//richness += textSize;
 		return richness;
@@ -562,7 +558,7 @@ class SpeciesUploadService {
 
     def List getDataColumns(){
     	List columnList = []
-    	Field.list(sort:"concept", order:"asc").each {
+    	Field.list(sort:"displayOrder", order:"asc").each {
     		def tmpList = []
     		tmpList << it.concept
     		if(it.category)
@@ -576,10 +572,12 @@ class SpeciesUploadService {
     }
 
     File saveModifiedSpeciesFile(params){
-        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers; 
+        println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers +"================" + params.orderedArray; 
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
-        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers
+        def orderedArray = JSON.parse(params.orderedArray);
+        //def myarray = JSON.parse(params.myarray)
+        println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers + "============"+ orderedArray; 
         String fileName = "speciesSpreadsheet.xlsx"
         String uploadDir = "species"
         //URL url = new URL(data.xlsxFileUrl);
@@ -591,7 +589,7 @@ class SpeciesUploadService {
         println "===XLSX FILE URL ======= " + xlsxFileUrl;
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new URL(xlsxFileUrl).openStream();
-        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail);
+        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
         return file
     }
 }

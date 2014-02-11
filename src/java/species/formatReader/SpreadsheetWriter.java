@@ -1,41 +1,36 @@
 package species.formatReader;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.*;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.codehaus.groovy.grails.web.json.JSONArray;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.ss.usermodel.DataFormatter;
-
 public class SpreadsheetWriter {
 
-    static final String keyValueSep = "#11#";
-    static final String columnSep = "#12#";
+    static final String KEYVALUE_SEP = "#11#";
+    static final String COLUMN_SEP = "#12#";
     
-    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail) {
+    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
         System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
-            writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail);
+            writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
             writeHeadersInFormat(wb, headerMarkers);
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
@@ -51,7 +46,7 @@ public class SpreadsheetWriter {
 
     }
 
-    public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail) {
+    public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
         System.out.println("================================" + writeContributor +"===" + contEmail );
         if(writeContributor.equals("true")){
             JSONObject r =  gridData.getJSONObject(0);
@@ -79,19 +74,12 @@ public class SpreadsheetWriter {
         }
         System.out.println("==NUM KEYS== " + numKeys);
         String[] keysArray = new String[numKeys];
-        int z = 0;
-        keys = rowData.keys();
-        while (keys.hasNext()) {
-            //System.out.println()
-            keysArray[z] = (String)keys.next();
-            z++;
+        //String[] keysArray = orderedArray;
+        for (int k = 0; k< numKeys; k++){
+            keysArray[k] = orderedArray.getString(k); 
         }
-        //rowIterator.hasNext();
         Row row = rowIterator.next();
-
-        //while( keys.hasNext() )
         for(int a = 0; a < numKeys; a++){
-            //String key = (String)keys.next();
             Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
             System.out.println("======PRINTING THIS TO HEADER CELL===== " + keysArray[a]);
             cell.setCellValue(keysArray[a]);
@@ -195,10 +183,53 @@ public class SpreadsheetWriter {
                 includeHeadings = headerValues.get("header");
                 includeHeadings = includeHeadings.trim();
             }
+            
+            String append = "";
+            if(headerValues.get("append") != null){
+                append = headerValues.get("append");
+                append = append.trim();
+            }
+
             String delimiter = "";
             if(headerValues.get("delimiter") != null){
                 delimiter = headerValues.get("delimiter");
                 delimiter = delimiter.trim();
+            }
+            
+            String images = "";
+            if(headerValues.get("images") != null){
+                images = headerValues.get("images");
+                images = images.trim();
+            }
+
+            String contributor = "";
+            if(headerValues.get("contributor") != null){
+                contributor = headerValues.get("contributor");
+                contributor = contributor.trim();
+            }
+
+            String attributions = "";
+            if(headerValues.get("attributions") != null){
+                attributions = headerValues.get("attributions");
+                attributions = attributions.trim();
+            }
+
+            String references = "";
+            if(headerValues.get("references") != null){
+                references = headerValues.get("references");
+                references = references.trim();
+            }
+            
+            String license = "";
+            if(headerValues.get("license") != null){
+                license = headerValues.get("license");
+                license = license.trim();
+            }
+            
+            String audience = "";
+            if(headerValues.get("audience") != null){
+                audience = headerValues.get("audience");
+                audience = audience.trim();
             }
 
             System.out.println("=======" + dataColumns);
@@ -221,25 +252,81 @@ public class SpreadsheetWriter {
                         }
                         String contentDelimiter = m.get("contentDelimiter");
                         if(contentDelimiter != "") {
-                            contentDelimiter += columnSep + headerName + keyValueSep + delimiter;
+                            contentDelimiter += COLUMN_SEP + headerName + KEYVALUE_SEP + delimiter;
                             m.put("contentDelimiter", contentDelimiter);
                         }
                         else {
-                            m.put("contentDelimiter", headerName + keyValueSep + delimiter);
+                            m.put("contentDelimiter", headerName + KEYVALUE_SEP + delimiter);
                         }
                         String contentFormat = m.get("contentFormat");
                         if(contentFormat != "") {
-                            contentFormat += columnSep + headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";";
+                            contentFormat += COLUMN_SEP + headerName + KEYVALUE_SEP + "Group=" + group +";" + "includeheadings=" + includeHeadings +";" + "append=" + append + ";";
                             m.put("contentFormat", contentFormat);
                         }
                         else {
-                            m.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                            m.put("contentFormat",  headerName + KEYVALUE_SEP + "Group=" + group +";" + "includeheadings=" + includeHeadings +";" + "append=" + append + ";");
                         }
+                        String imagesCol = m.get("images");
+                        if(imagesCol != "") {
+                            imagesCol += COLUMN_SEP + headerName + KEYVALUE_SEP  + images;
+                            m.put("images", imagesCol);
+                        }
+                        else {
+                            m.put("images",  headerName + KEYVALUE_SEP + images);
+                        }
+                        String contributorCol = m.get("contributor");
+                        if(contributorCol != "") {
+                            contributorCol += COLUMN_SEP + headerName + KEYVALUE_SEP  + contributor;
+                            m.put("contributor", contributorCol);
+                        }
+                        else {
+                            m.put("contributor",  headerName + KEYVALUE_SEP + contributor);
+                        }
+                        String attributionsCol = m.get("attributions");
+                        if(attributionsCol != "") {
+                            attributionsCol += COLUMN_SEP + headerName + KEYVALUE_SEP  + attributions;
+                            m.put("attributions", attributionsCol);
+                        }
+                        else {
+                            m.put("attributions",  headerName + KEYVALUE_SEP + attributions);
+                        }
+                        String referencesCol = m.get("references");
+                        if(referencesCol != "") {
+                            referencesCol += COLUMN_SEP + headerName + KEYVALUE_SEP  + references;
+                            m.put("references", referencesCol);
+                        }
+                        else {
+                            m.put("references",  headerName + KEYVALUE_SEP + references);
+                        }
+
+                        String licenseCol = m.get("license");
+                        if(licenseCol != "") {
+                            licenseCol += COLUMN_SEP + headerName + KEYVALUE_SEP  + license;
+                            m.put("license", licenseCol);
+                        }
+                        else {
+                            m.put("license",  headerName + KEYVALUE_SEP + license);
+                        }
+                        String audienceCol = m.get("audience");
+                        if(audienceCol != "") {
+                            audienceCol += COLUMN_SEP + headerName + KEYVALUE_SEP  + audience;
+                            m.put("audience", audienceCol);
+                        }
+                        else {
+                            m.put("audience",  headerName + KEYVALUE_SEP + audience);
+                        }
+
                     }else {
                         Map<String, String> m1 = new HashMap();
                         m1.put("fieldNames", headerName);
-                        m1.put("contentDelimiter", headerName + keyValueSep + delimiter);
-                        m1.put("contentFormat",  headerName + keyValueSep + "Group=" + group +";" + "includeHeadings=" + includeHeadings +";");
+                        m1.put("contentDelimiter", headerName + KEYVALUE_SEP + delimiter);
+                        m1.put("contentFormat",  headerName + KEYVALUE_SEP + "Group=" + group +";" + "includeheadings=" + includeHeadings +";" + "append=" + append + ";");
+                        m1.put("images",  headerName + KEYVALUE_SEP + images);
+                        m1.put("contributor",  headerName + KEYVALUE_SEP + contributor);
+                        m1.put("attributions",  headerName + KEYVALUE_SEP + attributions);
+                        m1.put("references",  headerName + KEYVALUE_SEP + references);
+                        m1.put("license",  headerName + KEYVALUE_SEP + license);
+                        m1.put("audience",  headerName + KEYVALUE_SEP + audience);
 
 
                         reverseMarkers.put(nextVal, m1);
@@ -250,8 +337,9 @@ public class SpreadsheetWriter {
         }
 
         Row row = sheet.createRow(rownum++);
-        int numOfColumns = 6;
-        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT"};
+        
+        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT", "IMAGES", "CONTRIBUTOR", "ATTRIBUTIONS", "REFERENCES", "LICENSE","AUDIENCE"};
+        int numOfColumns = headerRowValues.length;
         for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
             Cell cell = row.createCell(cellNum);
             cell.setCellValue(headerRowValues[cellNum]);
@@ -274,6 +362,13 @@ public class SpreadsheetWriter {
             arr[3] = m2.get("fieldNames");
             arr[4] = m2.get("contentDelimiter");
             arr[5] = m2.get("contentFormat");
+            arr[6] = m2.get("images");
+            arr[7] = m2.get("contributor");
+            arr[8] = m2.get("attributions");
+            arr[9] = m2.get("references");
+            arr[10] = m2.get("license");
+            arr[11] = m2.get("audience");
+
             row = sheet.createRow(rownum++);
             for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
                 Cell cell = row.createCell(cellNum);

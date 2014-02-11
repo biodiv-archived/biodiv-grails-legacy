@@ -11,6 +11,8 @@ import species.Field;
 import species.SpeciesField;
 import species.Species;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import species.auth.Role;
+import species.auth.SUserRole;
 
 class SpeciesPermissionService {
 
@@ -102,6 +104,16 @@ class SpeciesPermissionService {
             }
             return flag;
         }
+    }
+    
+    List<SUser> getSpeciesAdmin (){
+        def role = Role.findByAuthority("ROLE_SPECIES_ADMIN")
+        def suserRole = SUserRole.findAllByRole(role)
+        def speciesAdmins = []
+        suserRole.each{
+            speciesAdmins.add(it.sUser)
+        }
+        return speciesAdmins
     }
 
 }

@@ -733,11 +733,12 @@ class SpeciesService {
             endDate = new Date(cal.getTimeInMillis())
 
             filterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
+            countFilterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
             queryParams["daterangepicker_start"] =  startDate   
             queryParams["daterangepicker_end"] =  endDate
 
-            activeFilters["daterangepicker_start"] = params.daterangepicker_start
-            activeFilters["daterangepicker_end"] =  params.daterangepicker_end
+            //activeFilters["daterangepicker_start"] = params.daterangepicker_start
+            //activeFilters["daterangepicker_end"] =  params.daterangepicker_end
         }
 
 

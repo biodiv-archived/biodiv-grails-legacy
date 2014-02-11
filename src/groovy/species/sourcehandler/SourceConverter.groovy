@@ -211,31 +211,21 @@ class SourceConverter {
         }
     }
 
-    protected Map getCustomFormat(String customFormat) {
-        if(!customFormat) return [:];
-        Map m = new HashMap()
-		//SpreadsheetWriter.keyValueSep
-		//SpreadsheetWriter.columnSep
-        println "============= custmot >>>>>>>>>> " + customFormat
-		def columnList = customFormat.split(SpreadsheetWriter.columnSep).each { cols ->
-			cols.split(SpreadsheetWriter.keyValueSep).each { columnInfo ->
-				def colName = columnInfo[0]
-				def colAttrs = columnInfo[1]
-				colAttrs.split(";").each { pair ->
-					def tmppairval = pair.split("=")
-					if(tmppairval.size() > 1){
-						m.put(tmppairval[0], tmppairval[1])
-					}
-
-				} 
+	
+	protected Map getCustomFormat(String customFormat) {
+		if(!customFormat) return [:];
+		return customFormat.split(';').inject([:]) { map, token ->
+			token = token.toLowerCase();
+			token.split('=').with {
+				map[it[0]] = it[1];
 			}
-
+			map
 		}
-
-		return m
-		
 	}
-
+	
+	
+	
+	
 
 	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="") {
 		log.debug "Creating images ${imageIds}"
@@ -524,6 +514,5 @@ class SourceConverter {
             }
         }
     }
-
 
 }
