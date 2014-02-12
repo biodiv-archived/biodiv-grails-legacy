@@ -631,7 +631,7 @@ class SpeciesService {
         String countFilterQuery = " where s.id is not null " //dummy statement
 
         def queryParams = [:]
-
+        def activeFilters = [:]
         queryParams.max = Math.min(params.max ? params.int('max') : 42, 100);
         queryParams.offset = params.offset ? params.int('offset') : 0
 
@@ -723,6 +723,7 @@ class SpeciesService {
 
         if(params.daterangepicker_start && params.daterangepicker_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
+            println "=================== "+ params.daterangepicker_start + params.daterangepicker_end
             def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
             def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
             Calendar cal = Calendar.getInstance(); // locale-specific
@@ -732,11 +733,11 @@ class SpeciesService {
             cal.set(Calendar.MINUTE, 59);
             endDate = new Date(cal.getTimeInMillis())
 
-            filterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
-            countFilterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
+            filterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
+            countFilterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
             queryParams["daterangepicker_start"] =  startDate   
             queryParams["daterangepicker_end"] =  endDate
-
+            println "================" + startDate + endDate
             //activeFilters["daterangepicker_start"] = params.daterangepicker_start
             //activeFilters["daterangepicker_end"] =  params.daterangepicker_end
         }
@@ -790,6 +791,12 @@ class SpeciesService {
             count += c[1];
             if (c[0] >0)
                 speciesCountWithContent += c[1];
+        }
+        if(params.daterangepicker_start){
+            queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
+        }
+        if(params.daterangepicker_end){
+            queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
         }
         return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
         //else {

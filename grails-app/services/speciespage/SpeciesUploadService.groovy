@@ -579,11 +579,11 @@ class SpeciesUploadService {
         File file = observationService.createFile(fileName , uploadDir, contentRootDir);
         //FileUtils.copyURLToFile(url, f);
         println "===NEW MODIFIED SPECIES FILE=== " + file
-        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim();
+        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
-        println "===XLSX FILE URL ======= " + xlsxFileUrl;
+        println "=== ==== XLSX FILE URL ======= " + xlsxFileUrl;
         String contEmail = springSecurityService.currentUser.email;
-        InputStream input = new URL(xlsxFileUrl).openStream();
+        InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
         return file
     }
