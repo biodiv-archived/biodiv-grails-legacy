@@ -168,7 +168,7 @@ class SpeciesController extends AbstractObjectController {
 				}
 				finalLoc.put ("field", field);
                 if(user && speciesPermissionService.isSpeciesContributor(speciesInstance, user)) {
-                    finalLoc.put('hasContent', true);
+                    finalLoc.put('isContributor', true);
                 }
 			}
 		}
@@ -196,6 +196,10 @@ class SpeciesController extends AbstractObjectController {
                             map.get(sField.field.concept).put('hasContent', true);
                             finalLoc.put('hasContent', true);
                     }
+                    if( finalLoc.get('isContributor')) {
+                            map.get(sField.field.concept).put('isContributor', true);
+                    }
+
                     //subcategory
 					if(sField.field.subCategory && finalLoc.containsKey(sField.field.subCategory)) {
 						finalLoc = finalLoc.get(sField.field.subCategory);
@@ -204,6 +208,11 @@ class SpeciesController extends AbstractObjectController {
                             map.get(sField.field.concept).get(sField.field.category).put('hasContent', true);
                             finalLoc.put('hasContent', true);
                         }
+                        if(finalLoc.get('isContributor')) {
+                            map.get(sField.field.concept).put('isContributor', true);
+                            map.get(sField.field.concept).get(sField.field.category).put('isContributor', true);
+                        }
+
 					}
 				}
 			}
@@ -225,7 +234,7 @@ class SpeciesController extends AbstractObjectController {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
 			for(category in concept.value.clone()) {
-				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent")  || category.key.equalsIgnoreCase('Species Resources'))  {
+				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
 					boolean show = false;
@@ -253,7 +262,7 @@ class SpeciesController extends AbstractObjectController {
                 }
 
 				for(subCategory in category.value.clone()) {
-					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent')) continue;
+					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor")  ) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
 					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||

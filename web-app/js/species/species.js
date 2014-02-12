@@ -390,7 +390,6 @@ function initGalleryTabs() {
         if($ele == undefined)
             $ele = $(document);
         $ele.find('.editField').editable({
-            disabled:window.is_species_admin?!window.is_species_admin:true,
 /*            wysihtml5 : {
                 "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
             "emphasis": true, //Italics, bold, etc. Default true
@@ -403,7 +402,6 @@ function initGalleryTabs() {
             success: onEditableSuccess,
             error:onEditableError
         });
-
 
         $ele.find(".editField.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
@@ -420,7 +418,7 @@ function initGalleryTabs() {
             var data_type = 'text';
             if(sourceData.type == 'description') {
                 data_type = 'wysihtml5';
-                html.push ('<li><i class="icon-plus"></i><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                html.push ('<li></i><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
             }
 
             $.each(content, function(i, v) { 
@@ -454,7 +452,6 @@ function initGalleryTabs() {
             initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
             initStatusSelector($ul, statusSelectorOptions, "Under Validation");
             rate($ul.find('.star_rating'));
- 
         } else {
             $(this).html('Add'); 
         }
@@ -642,13 +639,24 @@ function initGalleryTabs() {
     }
 
 
-function initEditableFields() {
+function initEditableFields(e) {
+    if($(document).find('.editFieldButton').length == 0) {
+        initEditables();
+        initAddables();
+        initLicenseSelector(undefined, licenseSelectorOptions, "CC BY");
+        initAudienceTypeSelector(undefined, audienceTypeSelectorOptions, "General Audience");
+        initStatusSelector(undefined, statusSelectorOptions, "Under Validation");
+        $('.emptyField').show();
 
-    initEditables();
-    initAddables();
-    initLicenseSelector(undefined, licenseSelectorOptions, "CC BY");
-    initAudienceTypeSelector(undefined, audienceTypeSelectorOptions, "General Audience");
-    initStatusSelector(undefined, statusSelectorOptions, "Under Validation");
+        $('#editSpecies').text('Exit Edit Mode');
+    } else {
+    /*    $('.editable').editable('disable');
+        $('.addField').hide();
+        $('.editFieldButton').hide();
+    */  
+        window.location.reload(true);
+    }
+    e.stopPropagation();
 }
 
 function selectLicense($this, i) {
@@ -679,7 +687,6 @@ $(document).ready(function() {
 
 
     initGalleryTabs();
-    initEditableFields();
 
     try {
         $(".contributor_ellipsis").trunk8();

@@ -9,8 +9,8 @@
     <!-- speciesConcept section -->
 
     <div
-        class="speciesConcept <%=concept.key.equals(grailsApplication.config.speciesPortal.fields.OVERVIEW)?'defaultSpeciesConcept':''%>"
-        id="speciesConcept${conceptCounter}" <%=sparse?'':'style=\"display:none\"'%>>
+        class="speciesConcept <%=concept.key.equals(grailsApplication.config.speciesPortal.fields.OVERVIEW)?'defaultSpeciesConcept':''%>   ${concept.value.hasContent?'':'emptyField'}"
+        id="speciesConcept${conceptCounter}" <%=sparse|| concept.value.hasContent?'':'style=\"display:none\"'%>>
         <a class="speciesFieldHeader" data-toggle="collapse" data-parent="#speciesConcept${conceptCounter++}"  href="#speciesField${conceptCounter}_${fieldCounter}"> <h5>${concept.key}</h5></a> 
 
         <!-- speciesField section -->
@@ -34,14 +34,13 @@
             <s:hasContent model="['map':category.value]">
             <g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
 
-            <div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory">
+            <div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory ${category.value.hasContent?'':'emptyField'}" <%=category.value.hasContent?'':'style=\"display:none\"'%> >
                 <h6>
                     <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
                 </h6>
                 <div>
                 <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
                 <div>
-                    <i class="icon-plus"></i>
                     <a href="#" class="addField"  data-pk="${category.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
                 </div>
                 </g:if>
@@ -79,7 +78,7 @@
                     model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance')?.getAt(0), 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
                     </g:if>
                     <g:elseif
-                    test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance') && !it.key.equals('hasContent')}">
+                    test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance') && !it.key.equals('hasContent') && !it.key.equals('isContributor') }">
 
                     <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
                     <g:showSpeciesField

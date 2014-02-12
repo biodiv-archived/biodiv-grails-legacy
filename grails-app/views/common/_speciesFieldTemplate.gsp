@@ -1,17 +1,20 @@
+<div>
 <s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
     <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
     </s:isSpeciesFieldContributor>
-    <div class="contributor_entry">
         <g:if test="${speciesFieldInstance?.field?.subCategory}">
         <h6 style="margin-bottom: 0px">
             ${speciesFieldInstance?.field?.subCategory}
         </h6>
         <g:if test="${isSpeciesContributor}">
-        <i class="icon-plus"></i>
+        <div>
         <a href="#" class="addField"  data-pk="${fieldInstance.id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+    </div>
         </g:if>
         </g:if>
 
+
+    <div class="contributor_entry">
         <!-- buttons -->
         <div class="pull-right">
         </div>
@@ -136,4 +139,4 @@ model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
         </div>
 
 
-
+    </div>

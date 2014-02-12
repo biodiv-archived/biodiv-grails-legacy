@@ -2600,7 +2600,7 @@ small {
 .editable-container.editable-inline .editable-input {
     width:87%;
 }
-.editable-container.editable-inline .editable-input .input-medium {
+.editable-container.editable-inline .editable-input .input-medium,.editable-container.editable-inline .editable-input .input-large  {
     width:96%;
 }
 

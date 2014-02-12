@@ -170,7 +170,7 @@ class SpeciesTagLib {
 
     def hasContent = {attrs, body ->
         def map = attrs.model.map;
-        if(map instanceof Map && map.hasContent) {
+        if(map instanceof Map && (map.hasContent || map.isContributor)) {
             out << body();
         }
     }
