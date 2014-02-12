@@ -20,7 +20,7 @@
 
             <g:if test="${isSpeciesContributor}">
             <div>
-            <a href="#" class="addField"  data-pk="${concept.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+            <a href="#" class="addField"  data-pk="${concept.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description" data-inputclass="mywysihtml5"></a>
         </div>
             </g:if>
             <g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
@@ -41,7 +41,7 @@
                 <div>
                 <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
                 <div>
-                    <a href="#" class="addField"  data-pk="${category.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+                    <a href="#" class="addField"  data-pk="${category.value.get('field').id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description" data-inputclass="wysihtml5" data-inputclass="mywysihtml5"></a>
                 </div>
                 </g:if>
 

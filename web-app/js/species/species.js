@@ -400,7 +400,8 @@ function initGalleryTabs() {
             "color": false //Button to change color of font
             },*/
             success: onEditableSuccess,
-            error:onEditableError
+            error:onEditableError,
+            onblur: 'ignore'
         });
 
         $ele.find(".editField.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
@@ -477,7 +478,7 @@ function initGalleryTabs() {
     function initAddables($ele) {
         if($ele == undefined)
             $ele = $(document);
-        $ele.find('.addField').editable({
+        var editor = $ele.find('.addField').editable({
 /*            wysihtml5 : {
                 "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
                 "emphasis": true, //Italics, bold, etc. Default true
@@ -500,8 +501,20 @@ function initGalleryTabs() {
                 }
             },
             display: onAddableDisplay,
-            error:onAddableError
+            error:onAddableError,
+            onblur:'ignore'
        })
+
+        $ele.find('.addField').each(function(){
+            if($(this).attr('data-type') != 'wysihtml5') {
+                $(this).editable('show');
+                /*.on('shown', function(e, editable) {
+
+                        console.log('onshown')
+                        $('.wysihtml5-sandbox').css({'width':'100%', 'height':'100px', 'margin-bottom':'5px'});
+                });;*/
+            }
+        });
     }
 
     function createContributor(content, sourceData) {

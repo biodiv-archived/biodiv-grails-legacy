@@ -8,7 +8,7 @@
         </h6>
         <g:if test="${isSpeciesContributor}">
         <div>
-        <a href="#" class="addField"  data-pk="${fieldInstance.id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description"></a>
+        <a href="#" class="addField"  data-pk="${fieldInstance.id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description" data-inputclass="mywysihtml5"></a>
     </div>
         </g:if>
         </g:if>
