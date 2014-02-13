@@ -425,7 +425,9 @@ function initGalleryTabs() {
         })
     }
 
-    function onAddableDisplay(value, sourceData, response) {
+    function onAddableDisplay(value, sourceData, response, context) {
+        var me = $(this);
+        if(context) me = context
         console.log('onAddableDisplay');
         var html = [];
         if(sourceData && sourceData.content) {
@@ -458,7 +460,7 @@ function initGalleryTabs() {
             }
 
 
-            var $ul = $(this).parent().parent();
+            var $ul = me.parent().parent();
 
             $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
             $ul.find('.attributionContent').show();
@@ -469,7 +471,7 @@ function initGalleryTabs() {
             initStatusSelector($ul, statusSelectorOptions, "Under Validation");
             rate($ul.find('.star_rating'));
         } else {
-            $(this).html('Add'); 
+            me.html('Add'); 
         }
         return 'Successfully added data';
     }
@@ -510,7 +512,7 @@ function initGalleryTabs() {
             onblur:'ignore'
        })
 
-        $('.addField,.ck_desc_add').before("<a class='pull-right addFieldButton'><i class='icon-add'></i>Add</a>");
+        $ele.find('.ck_desc_add').before("<a class='pull-right addFieldButton'><i class='icon-add'></i>Add</a>");
         $ele.find('.addFieldButton').click(function(e){    
             e.stopPropagation();
             var $textarea = $(this).nextAll('textarea');
