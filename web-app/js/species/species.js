@@ -200,7 +200,7 @@ function loadIFrame() {
 
 function initGalleryTabs() {
     var tabs = $("#resourceTabs").tabs();
-
+    if(tabs.length == 0) return;
     if($("#resourceTabs-1 img").length > 0) {
 
         //TODO:load gallery  images by ajax call getting response in json  
