@@ -1,26 +1,26 @@
-<div>
+<div class="speciesField">
 <s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
     <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
     </s:isSpeciesFieldContributor>
         <g:if test="${speciesFieldInstance?.field?.subCategory}">
-        <h6 style="margin-bottom: 0px">
-            ${speciesFieldInstance?.field?.subCategory}
-        </h6>
-        <g:if test="${isSpeciesContributor}">
-        <div class="contributor_entry">
-            <textarea id="description_${fieldInstance.id}" 
-                name="description_${fieldInstance.id}" 
-                class="ck_desc_add"  
-                data-pk="${fieldInstance.id}" 
-                data-type="ckeditor" 
-                data-url="${uGroup.createLink(controller:'species', action:'update') }" 
-                data-name="newdescription" 
-                data-speciesId = "${speciesInstance.id}" 
-                data-original-title="Add new description" 
-                data-placeholder="Add new description" style="display:none;">
-            </textarea>
-        </div>
-        </g:if>
+            <h6 style="margin-bottom: 0px">
+                ${speciesFieldInstance?.field?.subCategory}
+            </h6>
+            <g:if test="${isSpeciesContributor}">
+                <div class="contributor_entry">
+                    <textarea id="description_${fieldInstance.id}" 
+                        name="description_${fieldInstance.id}" 
+                        class="ck_desc_add"  
+                        data-pk="${fieldInstance.id}" 
+                        data-type="ckeditor" 
+                        data-url="${uGroup.createLink(controller:'species', action:'update') }" 
+                        data-name="newdescription" 
+                        data-speciesId = "${speciesInstance.id}" 
+                        data-original-title="Add new description" 
+                        data-placeholder="Add new description" style="display:none;">
+                    </textarea>
+                </div>
+            </g:if>
         </g:if>
 
 
