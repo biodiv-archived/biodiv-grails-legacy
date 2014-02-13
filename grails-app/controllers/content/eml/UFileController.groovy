@@ -138,7 +138,7 @@ class UFileController {
 	 */
 	@Secured(['ROLE_USER'])
 	def upload = {
-		log.debug "&&&&&&&&&&&&&&&&&&& <><><<>>params in upload of file" +  params
+		log.debug params
 		try {
 
 			//IE handling: for IE qqfile sends the whole file
@@ -308,7 +308,7 @@ class UFileController {
         def res = [:]
         if(completeContent.size() == 3 ){
             sheetContent = completeContent.get(2)
-            println "==SHEET CONTENT ======== " + sheetContent
+            //println "==SHEET CONTENT ======== " + sheetContent
         }
         else{
             println " ======NO HEADER METADATA=== "
@@ -353,9 +353,9 @@ class UFileController {
                 def licMap = [:]
                 def audMap = [:]
                 if(conDel != ""){
-                    println conDel
+                    //println conDel
                     List conDelList = conDel.split(columnSep)
-                    println "===CDLIST = " + conDelList
+                    //println "===CDLIST = " + conDelList
                     conDelList.each { cdl ->
                         def z = cdl.split(keyValueSep)
                         if(z.size()==2){
@@ -501,10 +501,10 @@ class UFileController {
         def res = [:]
         if(completeContent.size() == 3 ){
             sheetContent = completeContent.get(2)
-            println "==SHEET CONTENT ======== " + sheetContent
+            //println "==SHEET CONTENT ======== " + sheetContent
         }
         else{
-            println " ======NO HEADER METADATA=== "
+            //println " ======NO HEADER METADATA=== "
             return res
         }
         int contentSize = sheetContent.size();
@@ -512,16 +512,16 @@ class UFileController {
         while(index < contentSize){
             String mapKey = sheetContent.get(index).get("column_name");
             def mapValue = [:]
-            println "=====MAP KEY === " + mapKey
+            //println "=====MAP KEY === " + mapKey
             for(int k = index; k < (index + numAttributes) ; k++){
                 mapValue[sheetContent.get(k).get("type")] = sheetContent.get(k).get("value")
             }
-            println "======MAP VALUE ==== " + mapValue
+            //println "======MAP VALUE ==== " + mapValue
             index = index + numAttributes
             res.put(mapKey, mapValue)
-            println "=======RES IN MIDDLE ==== " + res
+            //println "=======RES IN MIDDLE ==== " + res
         }
-        println "===RESULT ======= " + res
+        //println "===RESULT ======= " + res
         return res
     }
 

@@ -94,18 +94,17 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
 						fieldName.split(",").each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
-							def delimiter = delimiterMap.get(fieldNameToken);
+							String delimiter = delimiterMap.get(fieldNameToken);
 							String text = speciesContent.get(fieldNameToken);
-							myPrint("=========== delimerte map " + delimiterMap)
+							myPrint(">>>>>>>>>>>>>>>> ZZZZ <<<<<<<<<<<<<<<<<<< =========== delimerte map " + delimiterMap)
 							if(text){
-								myPrint("text     " + text  + "   delimeter " + delimiter)
 								if(delimiter){
-									for(String part : text.split(delimiter)) {
+									text.split(delimiter).each { part ->
 										if(part) {
 											part = part.trim();
-											myPrint("======= createing data node for ref " + fieldNameToken + "  actula text " + part)
+											myPrint(">>>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<<<< ======= createing data aaaaaaaaa node for ref " + fieldNameToken + "  actula text " + part)
 											Node data = createDataNode(field, part , speciesContent, mappedField);
-											myPrint("============ after ref creeate node " + data)
+											myPrint(">>>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<<<< ============ after ref creeate node " + data)
 											createReferences(data, speciesContent, mappedField);
 										}
 									}
@@ -153,6 +152,19 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			return speciesElement
 	}
 
+	protected void createReferences(Node dataNode, Map speciesContent, Map mappedField) {
+        log.debug "Creating References"
+        Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
+        def referenceFields = mappedField.get("field name(s)");		
+        if(referenceFields) {
+            referenceFields.split(",").each { referenceField ->
+                String references = speciesContent.get(referenceField.toLowerCase().trim());
+                String delimiter  = delimiterMap.get(referenceField.toLowerCase().trim()) ?: "\n";
+                createReferences(dataNode, references, delimiter);
+            }
+        }
+    }
+
 	protected Map getCustomFormat(String customFormat) {
 		if(!customFormat) return [:];
 		def fMap = [:]
@@ -175,17 +187,24 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
 	
 	private Map getCustomDelimiterMap(String text){
-		Map m = [:]
+		Map m = new HashMap<String, String>()
 		if(!text) return m;
 		
 		text.split(SpreadsheetWriter.COLUMN_SEP).each { colInfo ->
 			def delimiterInfo = colInfo.split(SpreadsheetWriter.KEYVALUE_SEP)
 			if(delimiterInfo.size() > 1 && delimiterInfo[1] ){
-				m.put(delimiterInfo[0], delimiterInfo[1])
+				m.put(delimiterInfo[0].trim(), getSafeDelimiter(delimiterInfo[1].trim()))
 			}
 		}
 		
 		return m
+	}
+
+	private String getSafeDelimiter(String str){
+		if(str == '|' || str == '$'){
+			return "\\" + str
+		}
+		return str
 	}
 	
     private getCustomFormattedText(String fieldName, Map customFormatMap, Map speciesContent) {

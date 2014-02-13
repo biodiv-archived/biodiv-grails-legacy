@@ -431,8 +431,8 @@ class SourceConverter {
     }
 
     protected void createReferences(Node field, String text, String delimiter="\\\n") {
-        log.debug "Creating references ${text}"
-        List<String> attrs = getAttributionsList(text);
+        log.debug "Creating references delimiter ${delimiter}   === text == ${text}"
+        List<String> attrs = getAttributionsList(text, delimiter);
         if(text && !text.equals("")) {
             int i=0;
             for(String ref : text.split(delimiter)) {
@@ -456,12 +456,11 @@ class SourceConverter {
         }
     }
 
-    protected List<String> getAttributionsList(String text) {
+    protected List<String> getAttributionsList(String text, String delimiter="\\\n") {
 
         if(text && !text.equals("")) {
-
             List<String> newAttrsList = new ArrayList();
-            text.split("\\\n").each {
+            text.split(delimiter).each {
                 if(it.matches("^\\d+\\..*")) {
                     it = it.split("^\\d+\\.", 2);
                     newAttrsList.add(it[1].trim());
@@ -473,7 +472,7 @@ class SourceConverter {
         }
     }
 
-    protected void createReferences(Node dataNode, speciesContent, mappedField) {
+    protected void createReferences(Node dataNode, Map speciesContent, Map mappedField) {
         log.debug "Creating References"
         def referenceFields = mappedField.get("field name(s)");		
         if(referenceFields) {

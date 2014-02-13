@@ -528,7 +528,6 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
-        println "===Upload called =====================" + params
         def res = ""
 
         if(params.xlsxFileUrl) {
