@@ -52,7 +52,12 @@ function parseCSVData(data, options) {
  
     var rowData = new Array();
     var columns = new Array();
-    var lines = data.replace('\r','').split('\n');
+    if(options.res === "species") {
+        var lines = data.split('\r\r\n\n');
+    }
+    else {
+        var lines = data.replace('\r','').split('\n');
+    }
     var printedLines = 0;
     var headerCount = 0;
     var error = '';
@@ -77,7 +82,7 @@ function parseCSVData(data, options) {
         headerCount = headers.length;
         $.each(headers, function(headerCount, header) {
             var columnName = header;
-            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, width: 150, header: headerFunction()});
+            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 150, header: headerFunction()});
         });
     }
             } else if (lineCount >= options.startLine) {
