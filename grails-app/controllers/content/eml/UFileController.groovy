@@ -543,7 +543,7 @@ class UFileController {
             def  joinedHeader = headerNameList.join(",")
 
             //println "=========JOINED HEADER ===== " + joinedHeader;
-            bw.write(joinedHeader + "\n")
+            bw.write(joinedHeader + "\r\r\n\n")
 
             spread.each { rowMap->  
                 //println "====SIZE ROW MAP== " + rowMap.size();
@@ -557,7 +557,7 @@ class UFileController {
                 //println "====ROW VALUES === "+ rowValues;
                 def joinedContent = rowValues.join(",")
                 //println "=========JOINED CONTENT === " + joinedContent;
-                bw.write(joinedContent + "\n")
+                bw.write(joinedContent + "\r\r\n\n")
             }
         }
         bw.close();
