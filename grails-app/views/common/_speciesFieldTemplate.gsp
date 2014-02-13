@@ -7,9 +7,19 @@
             ${speciesFieldInstance?.field?.subCategory}
         </h6>
         <g:if test="${isSpeciesContributor}">
-        <div>
-        <a href="#" class="addField"  data-pk="${fieldInstance.id}" data-type="wysihtml5" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="newdescription" data-params="{'speciesId':${speciesInstance.id}}" data-original-title="Add new description" data-placeholder="Add new description" data-inputclass="mywysihtml5"></a>
-    </div>
+        <div class="contributor_entry">
+            <textarea id="description_${fieldInstance.id}" 
+                name="description_${fieldInstance.id}" 
+                class="ck_desc_add"  
+                data-pk="${fieldInstance.id}" 
+                data-type="ckeditor" 
+                data-url="${uGroup.createLink(controller:'species', action:'update') }" 
+                data-name="newdescription" 
+                data-speciesId = "${speciesInstance.id}" 
+                data-original-title="Add new description" 
+                data-placeholder="Add new description" style="display:none;">
+            </textarea>
+        </div>
         </g:if>
         </g:if>
 
@@ -76,11 +86,26 @@
             </ul>
             </g:if>
             <!-- content -->
+            <textarea id="description_${speciesFieldInstance.id}" name="description_${speciesFieldInstance.id}" 
+                class="ck_desc"
+                data-pk="${speciesFieldInstance.id}"
+                data-type="ckeditor"
+                data-url="${uGroup.createLink(controller:'species', action:'update') }"
+                data-name="description" 
+                placeholder="Write a small descripiton about the field." style="display:none;">
+                <g:each in="${speciesFieldInstance?.description.split('\n')}"
+                var="para">
+                <g:if test="${para}">           
+                <p>
+                ${para.trim()} 
+                </p>
+                </g:if>        
 
-<div class="${isSpeciesFieldContributor?'editField ':' '} description" data-type="wysihtml5"
-    data-pk="${speciesFieldInstance.id}"
-    data-url="${uGroup.createLink(controller:'species', action:'update') }"
-    data-name="description" data-original-title="Edit description">
+                </g:each>      
+
+            </textarea>        
+
+            <div class="description" >
     <g:each in="${speciesFieldInstance?.description.split('\n')}"
     var="para">
     <g:if test="${para}">

@@ -200,7 +200,7 @@ function loadIFrame() {
 
 function initGalleryTabs() {
     var tabs = $("#resourceTabs").tabs();
-
+    if(tabs.length == 0) return;
     if($("#resourceTabs-1 img").length > 0) {
 
         //TODO:load gallery  images by ajax call getting response in json  
@@ -386,40 +386,55 @@ function initGalleryTabs() {
         });
     }
 
+    function initEditor($ele) {
+        if($ele.length>0 && $ele.attr('data-type') == 'ckeditor') {
+            var textareaId = $ele.attr('id');
+            var editor = CKEDITOR.instances[textareaId];
+            if(editor) {
+                if(editor.container.isVisible()) {
+                    editor.container.hide();
+                } else {
+                    editor.container.show();
+                }
+            } else {
+                CKEDITOR.replace(textareaId, config);
+            }
+        } else {
+            $ele.editable('toggle');
+        }
+    }
+
     function initEditables($ele) {
-        if($ele == undefined)
-            $ele = $(document);
+        if($ele == undefined) $ele = $(document);
         $ele.find('.editField').editable({
-/*            wysihtml5 : {
-                "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-            "emphasis": true, //Italics, bold, etc. Default true
-            "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-            "html": true, //Button which allows you to edit the generated HTML. Default false
-            "link": true, //Button to insert a link. Default true
-            "image": true, //Button to insert an image. Default true,
-            "color": false //Button to change color of font
-            },*/
             success: onEditableSuccess,
             error:onEditableError,
             onblur: 'ignore'
         });
 
-        $ele.find(".editField.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
+        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
-            $(this).next('.editField.editable').editable('toggle');
-        });
+
+            var $textarea = $(this).nextAll('textarea');
+            var $editable = $(this).next('.editField.editable')
+            if($textarea)
+                initEditor($textarea);
+            else
+                initEditor($editable);
+        })
     }
 
     function onAddableDisplay(value, sourceData, response) {
+        console.log('onAddableDisplay');
         var html = [];
         if(sourceData && sourceData.content) {
             var speciesId = sourceData.speciesId?sourceData.speciesId:'';
             var content = sourceData.content;
             var data_type = 'text';
             if(sourceData.type == 'description') {
-                data_type = 'wysihtml5';
-                html.push ('<li></i><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-params="[speciesId:'+speciesId+'"] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                data_type = 'ckeditor';
+                html.push ('<li></i><a href="#" class="ck_desc_add" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-speciesId:'+speciesId+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
             }
 
             $.each(content, function(i, v) { 
@@ -432,14 +447,14 @@ function initGalleryTabs() {
                         html.push (createReference(v, sourceData));
                         break;
                     case 'description' : 
-                        data_type = 'wysihtml5';
+                        data_type = 'ckeditor';
                         html.push (v);//createSpeciesFieldHtml(v, sourceData));
                         break;
                 }
             });
 
             if(sourceData.type != 'description'){
-                html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" ] data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" ]  data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
             }
 
 
@@ -476,18 +491,8 @@ function initGalleryTabs() {
     }
 
     function initAddables($ele) {
-        if($ele == undefined)
-            $ele = $(document);
-        var editor = $ele.find('.addField').editable({
-/*            wysihtml5 : {
-                "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-                "emphasis": true, //Italics, bold, etc. Default true
-                "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                "html": true, //Button which allows you to edit the generated HTML. Default false
-                "link": true, //Button to insert a link. Default true
-                "image": true, //Button to insert an image. Default true,
-                "color": false //Button to change color of font
-            },*/
+        if($ele == undefined) $ele = $(document);
+        $ele.find('.addField').editable({
             success: function(response, newValue) {
                 if(!response) {
                     return "Unknown error!";
@@ -505,14 +510,20 @@ function initGalleryTabs() {
             onblur:'ignore'
        })
 
-        $ele.find('.addField').each(function(){
-            if($(this).attr('data-type') != 'wysihtml5') {
-                $(this).editable('show');
-                /*.on('shown', function(e, editable) {
+        $('.addField,.ck_desc_add').before("<a class='pull-right addFieldButton'><i class='icon-add'></i>Add</a>");
+        $ele.find('.addFieldButton').click(function(e){    
+            e.stopPropagation();
+            var $textarea = $(this).nextAll('textarea');
+            if($textarea)
+                initEditor($textarea);
+        })
 
-                        console.log('onshown')
-                        $('.wysihtml5-sandbox').css({'width':'100%', 'height':'100px', 'margin-bottom':'5px'});
-                });;*/
+        $ele.find('.addField').each(function(){
+            console.log($(this))
+            if($(this).attr('data-type') == 'ckeditor') {
+                //initEditor($(this));
+            } else {
+                $(this).editable('show');
             }
         });
     }
@@ -528,7 +539,7 @@ function initGalleryTabs() {
 
     function createSpeciesFieldHtml(content, sourceData) {
         var toolbar = createMetadataToolbar(content);
-        return '<div class="contributor_entry"><div href="#" class="editField description" data-type="wysihtml5" data-pk="'+content.id+'"  data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+content.description+'</div>'+toolbar+'</div>'; 
+        return '<div class="contributor_entry"><div href="#" class="ck_desc" data-type="ckeditor" data-pk="'+content.id+'"  data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+content.description+'</div>'+toolbar+'</div>'; 
     }
 
     function createMetadataToolbar(content, sourceData) {
@@ -654,6 +665,7 @@ function initGalleryTabs() {
 
 function initEditableFields(e) {
     if($(document).find('.editFieldButton').length == 0) {
+        
         initEditables();
         initAddables();
         initLicenseSelector(undefined, licenseSelectorOptions, "CC BY");
@@ -661,7 +673,7 @@ function initEditableFields(e) {
         initStatusSelector(undefined, statusSelectorOptions, "Under Validation");
         $('.emptyField').show();
 
-        $('#editSpecies').text('Exit Edit Mode');
+        $('#editSpecies').html('<i class="icon-edit"></i>Exit Edit Mode');
     } else {
     /*    $('.editable').editable('disable');
         $('.addField').hide();

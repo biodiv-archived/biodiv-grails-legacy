@@ -155,6 +155,15 @@
         });
 
         </r:script>
+            <script type='text/javascript'> 
+                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+                CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );                               
+
+                var config = { extraPlugins: 'confighelper,inlinesave', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic', 'Inlinesave' ]]};
+            </script>
+
+
+
     </head>
 
     <body>
