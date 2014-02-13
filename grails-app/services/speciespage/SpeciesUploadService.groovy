@@ -254,6 +254,7 @@ class SpeciesUploadService {
 				def res = saveSpeciesElements(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
+				converter.addToSummary(res.summary);
 				speciesElements.clear();
 				cleanUpGorm();
 			}
@@ -269,6 +270,7 @@ class SpeciesUploadService {
 			def res = saveSpeciesElements(speciesElements)
 			noOfInsertions += res.noOfInsertions;
 			converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
+			converter.addToSummary(res.summary);
 			speciesElements.clear();
 			cleanUpGorm();
 		}
@@ -304,7 +306,7 @@ class SpeciesUploadService {
 	private Map saveSpeciesElements(List speciesElements) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
-
+		
 		List<Species> species = new ArrayList<Species>();
 
 
@@ -325,17 +327,20 @@ class SpeciesUploadService {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
+			converter.addToSummary(e.printStackTrace())
 		}catch (org.springframework.dao.DataIntegrityViolationException e) {
 			log.error "DataIntegrityViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
+			converter.addToSummary(e.printStackTrace())
 		} catch(ConstraintViolationException e) {
 			log.error "ConstraintViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
+			converter.addToSummary(e.printStackTrace())
 		}
 
-		return ['noOfInsertions':noOfInsertions, 'species':species];
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary()];
 	}
 
 	/** 
@@ -567,17 +572,12 @@ class SpeciesUploadService {
     }
 
     File saveModifiedSpeciesFile(params){
-        //println "======PARAMS ========= " + params.gridData + "----------- " + params.headerMarkers +"================" + params.orderedArray; 
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
-        //def myarray = JSON.parse(params.myarray)
-        //println "=====AFTER JSON PARSE ======= " + gData + "--------== " + headerMarkers + "============"+ orderedArray; 
         String fileName = "speciesSpreadsheet.xlsx"
         String uploadDir = "species"
-        //URL url = new URL(data.xlsxFileUrl);
         File file = observationService.createFile(fileName , uploadDir, contentRootDir);
-        //FileUtils.copyURLToFile(url, f);
         println "===NEW MODIFIED SPECIES FILE=== " + file
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();

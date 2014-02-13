@@ -11,6 +11,10 @@ import species.formatReader.SpreadsheetWriter;
 class SourceConverter {
     protected Map licenseUrlMap;
     private static final log = LogFactory.getLog(this);
+	
+	//to keep track of current species index. used for reporting error.
+	private int currentRowIndex = 1;
+	private StringBuffer summary;
 
     protected SourceConverter() {
         licenseUrlMap = new HashMap();
@@ -21,6 +25,8 @@ class SourceConverter {
         licenseUrlMap.put(LicenseType.CC_BY_NC_ND, "http://creativecommons.org/licenses/by-nc-nd/3.0/");
         licenseUrlMap.put(LicenseType.CC_BY_NC_SA, "http://creativecommons.org/licenses/by-nc-sa/3.0/");
         licenseUrlMap.put(LicenseType.CC_BY_SA, "http://creativecommons.org/licenses/by-sa/3.0/ ");
+		
+		summary = new StringBuffer() 
     }
 
     protected Node createFieldNode(Field field) {
@@ -513,5 +519,17 @@ class SourceConverter {
             }
         }
     }
+
+	//////////////////////// custom log related ////////////////////	
+	def addToSummary(String str){
+		if(str){
+			summary.append(str+ System.getProperty("line.separator"))
+		}
+	}
+	
+	def String getSummary(){
+		return summary.toString()
+	}
+
 
 }
