@@ -72,7 +72,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				String fieldName = mappedField.get("field name(s)")
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
-				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
+				if(fieldName && (processCustomFormat(customFormatMap) || speciesContent.get(fieldName.toLowerCase()))) {
 					myPrint("==================PROCESSING FILED NAME " + fieldName)
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
@@ -115,13 +115,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 								}
 							}
 						}
-					} else if(customFormatMap) {
-						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, speciesContent);
+					} else if(processCustomFormat(customFormatMap)) {
+						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, delimiterMap, speciesContent);
 						createDataNode(field, text, speciesContent, mappedField);
 					} else if(delimiterMap) {
-						String text = speciesContent.get(fieldName);
-						def delimiter = delimiterMap.get(fieldName);
-						if(text) {
+						fieldName.split(",").each { fieldNameToken -> 
+							fieldNameToken = fieldNameToken.trim().toLowerCase()
+							String text = speciesContent.get(fieldNameToken);
+							def delimiter = delimiterMap.get(fieldNameToken);
+							if(text) {
 							for(String part : text.split(delimiter)) {
 								if(part) {
 									part = part.trim();
@@ -142,7 +144,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 										createDataNode(field, part, speciesContent, mappedField);
 									}
 								}
-							}
+							}}
 						}
 					} else {
 						createDataNode(field, speciesContent.get(fieldName), speciesContent, mappedField);
@@ -185,6 +187,18 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return fMap
 	}
 
+	/**
+		if all values are default then not processing	
+	*/
+	private boolean processCustomFormat(Map m ){
+		m.keySet().each { fieldName ->
+			def customInfoMap = m[fieldName]
+			if(customInfoMap["Group"]  || customInfoMap["includeheadings"]){
+				return true
+			}
+		}
+		return false
+	}
 	
 	private Map getCustomDelimiterMap(String text){
 		Map m = new HashMap<String, String>()
@@ -207,16 +221,19 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return str
 	}
 	
-    private getCustomFormattedText(String fieldName, Map customFormatMap, Map speciesContent) {
+    private getCustomFormattedText(String fieldName, Map customFormatMap, Map delimiterMap, Map speciesContent) {
 		//def result = getCustomFormat(customFormat);
 		
 		String con = "";
 		fieldName.split(",").eachWithIndex { t, index ->
-			String txt = speciesContent?.get(t.toLowerCase().trim());
+			t = t.toLowerCase().trim()
+			String txt = speciesContent?.get(t);
 			myPrint("    >>>>>>>>>>    field name ==== " + t + " and TEXT " + txt)
-			def customFormat = customFormatMap.get(t.toLowerCase().trim())
+			def customFormat = customFormatMap.get(t)
+			myPrint("    >>>>>>>>>>    field name and customFormatMap ==== " + customFormatMap)
 			int group = customFormat.get("group") ? Integer.parseInt(result.get("group")?.toString()) : -1;
 			boolean includeHeadings = customFormat.get("includeheadings") ? Boolean.parseBoolean(customFormat.get("includeheadings")?.toString()).booleanValue() : false;
+			String delimiter = delimiterMap.get(t)
 			if(txt) {
 				if (index%group == 0) {
 
