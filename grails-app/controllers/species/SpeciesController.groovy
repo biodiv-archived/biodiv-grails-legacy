@@ -308,57 +308,66 @@ class SpeciesController extends AbstractObjectController {
 			render ([success:false, msg:'Either field name or field id is missing'] as JSON)
 			return;
 		}
+        try {
+            def result;
+            long speciesFieldId = params.pk ? params.long('pk'):null;
+            def value = params.value;
 
-		def result;
-		long speciesFieldId = params.pk ? params.long('pk'):null;
-		def value = params.value;
+            switch(params.name) {
+                case "contributor":
+                    long cid = params.cid?params.long('cid'):null;
+                    result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    break;
+                case "attributor":
+                    long cid = params.cid?params.long('cid'):null;
+                    result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    break;
+                case "description":
+                    result = speciesService.updateDescription(speciesFieldId, value);
+                    break;
+                case "newdescription":
+                    long speciesId = params.speciesid? params.long('speciesid') : null;
+                    long fieldId = speciesFieldId;
+                    println speciesId
+                    println fieldId
+                    println value
+                    result = speciesService.addDescription(speciesId, fieldId, value);
+                    def html = [];
+                    if(result.speciesInstance) {
+                        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.species, springSecurityService.currentUser);
 
-		switch(params.name) {
-			case "contributor":
-				long cid = params.cid?params.long('cid'):null;
-				result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
-				break;
-			case "attributor":
-				long cid = params.cid?params.long('cid'):null;
-				result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
-				break;
-			case "description":
-				result = speciesService.updateDescription(speciesFieldId, value);
-				break;
-            case "newdescription":
-                long speciesId = params.speciesId? params.long('speciesId') : null;
-                long fieldId = speciesFieldId;
-        		result = speciesService.addDescription(speciesId, fieldId, value);
-                def html = [];
-                if(result.speciesInstance) {
-                    boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.species, springSecurityService.currentUser);
-
-                    result.content.each {sf ->
-                        boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
-                        html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
+                        result.content.each {sf ->
+                            boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
+                            html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
+                        }
+                        result.content = html;
                     }
-                    result.content = html;
-                }
-				break;
-            case 'license':
-				result = speciesService.updateLicense(speciesFieldId, value);
-				break;
-            case 'audienceType':
-				result = speciesService.updateAudienceType(speciesFieldId, value);
-				break;
-            case 'status':
-				result = speciesService.updateStatus(speciesFieldId, value);
-				break;
-            case "reference":
-				long cid = params.cid?params.long('cid'):null;
-				result = speciesService.updateReference(cid, speciesFieldId, value);
-				break;
+                    break;
+                case 'license':
+                    result = speciesService.updateLicense(speciesFieldId, value);
+                    break;
+                case 'audienceType':
+                    result = speciesService.updateAudienceType(speciesFieldId, value);
+                    break;
+                case 'status':
+                    result = speciesService.updateStatus(speciesFieldId, value);
+                    break;
+                case "reference":
+                    long cid = params.cid?params.long('cid'):null;
+                    result = speciesService.updateReference(cid, speciesFieldId, value);
+                    break;
 
-            default :
-                result=['success':false, msg:'Incorrect datatype'];
-		}
+                default :
+                    result=['success':false, msg:'Incorrect datatype'];
+            }
 
-		render result as JSON
+		    render result as JSON
+            return;
+        } catch(Exception e) {
+    		render ([success:false, msg:e.getMessage()] as JSON)
+			return;
+        }
+
 	}
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
