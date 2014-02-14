@@ -199,8 +199,10 @@ function setUnEditableColumn(columns){
                     });
                     var headerMetadata = getHeaderMetadata();
                     if(Object.keys(headerMetadata).length == 0){
-                        tagMetadatas(data);
-                        alert("Your columns have been automatically marked.Please Verify");
+                        var res = tagMetadatas(data);
+                        if(res == true){
+                            alert("Your columns have been automatically marked.Please Verify");
+                        }
                     }
                 }
             });
