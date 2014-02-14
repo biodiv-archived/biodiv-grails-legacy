@@ -394,6 +394,26 @@ $('#tagHeadersButton').click(function() {
     
 });
 
+function tagMetadatas(data){
+    $("#tableHeader tr").each(function () {
+        var columnName;
+        $('td', this).each(function () {
+            if($(this).attr("class") == "columnName"){
+                columnName = $(this).text().toLowerCase();
+            }
+            else if($(this).attr("class") == "dataColCell") {
+                var temp = $(this);
+                $.each(data, function( index, value ) {
+                    if(columnName == value.toLowerCase().trim()){
+                        $(temp).find("ul").tagit( {showAutocompleteOnFocus: false});
+                        $(temp).find("ul").tagit("createTag", value); 
+                        $(temp).find("ul").tagit( {showAutocompleteOnFocus: true});
+                    }
+                });
+            }
+        });
+    });
+}
 
 $('#downloadModifiedSpecies').click(function() {
     getTagsForHeaders();
