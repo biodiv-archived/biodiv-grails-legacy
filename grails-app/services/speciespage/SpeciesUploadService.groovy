@@ -269,7 +269,7 @@ class SpeciesUploadService {
 		if(speciesElements.size() > 0) {
 			def res = saveSpeciesElements(speciesElements)
 			noOfInsertions += res.noOfInsertions;
-			converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
+			converter.addToSummary(res.species.collect{it.sLog?.toString()}.join("\n"))
 			converter.addToSummary(res.summary);
 			speciesElements.clear();
 			cleanUpGorm();
@@ -322,6 +322,7 @@ class SpeciesUploadService {
 				//addedSpecies = saveSpeciesBatch(species);
 				//noOfInsertions += addedSpecies.size()
 			//}
+				//converter.addToSummary("Saved ${noOfInsertions} species till now")
 
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
@@ -398,7 +399,7 @@ class SpeciesUploadService {
 				s.appendLogSummary(e.printStackTrace())
 				e.printStackTrace()
 			}
-            //s.percentOfInfo = calculatePercentOfInfo(s);
+            s.percentOfInfo = calculatePercentOfInfo(s);
 
 			if(!s.save()) {
 				s.errors.allErrors.each { 
@@ -448,7 +449,9 @@ class SpeciesUploadService {
 					taxonConcept.attach();
 				}
 				groupHandlerService.updateGroup(taxonConcept);
+				log.info "post processed spcecies ${s}"
 			}
+			
 			//}
 		} catch(e) {
 			log.error "$e.message"
