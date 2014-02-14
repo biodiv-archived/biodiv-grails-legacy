@@ -372,6 +372,7 @@ $('#tagHeadersButton').click(function() {
 });
 
 function tagMetadatas(data){
+    var res = false;
     $("#tableHeader tr").each(function () {
         var columnName;
         $('td', this).each(function () {
@@ -385,11 +386,13 @@ function tagMetadatas(data){
                         $(temp).find("ul").tagit( {showAutocompleteOnFocus: false});
                         $(temp).find("ul").tagit("createTag", value); 
                         $(temp).find("ul").tagit( {showAutocompleteOnFocus: true});
+                        res = true;
                     }
                 });
             }
         });
     });
+    return res;
 }
 
 $('#downloadModifiedSpecies').click(function() {
