@@ -197,7 +197,11 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                    tagMetadatas(data);
+                    var headerMetadata = getHeaderMetadata();
+                    if(Object.keys(headerMetadata).length == 0){
+                        tagMetadatas(data);
+                        alert("Your columns have been automatically marked.Please Verify");
+                    }
                 }
             });
 

@@ -74,7 +74,8 @@ class ObservationService extends AbstractObjectService {
     def speciesPermissionService;
 
     static final String OBSERVATION_ADDED = "observationAdded";
-    static final String SPECIES_UPLOADED = "speciesUploaded"
+    static final String SPECIES_CONTRIBUTOR = "speciesContributor";
+    static final String SPECIES_CURATORS = "speciesCurators"
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
     static final String SPECIES_AGREED_ON = "speciesAgreedOn";
     static final String SPECIES_NEW_COMMENT = "speciesNewComment";
@@ -1527,18 +1528,26 @@ class ObservationService extends AbstractObjectService {
                 toUsers.add(getOwner(obv))
                 break
                 
-                case SPECIES_UPLOADED:
+                case SPECIES_CURATORS:
                 mailSubject = "Request to curate species"
-                bodyView = "/emailtemplates/speciesUploaded"
+                bodyView = "/emailtemplates/speciesCurators"
                 templateMap["link"] = otherParams["link"]
                 templateMap["curator"] = otherParams["curator"]
                 //templateMap["link"] = URLDecoder.decode(templateMap["link"])
                 //println "========THE URL  =============" + templateMap["link"]
                 populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
                 toUsers = otherParams["usersMailList"]
-                /*otherParams["usersMailList"].each{ 
-                    toUsers.add(it)
-                }*/
+                break
+                
+                case SPECIES_CONTRIBUTOR:
+                mailSubject = "Species uploaded"
+                bodyView = "/emailtemplates/speciesContributor"
+                templateMap["link"] = otherParams["link"]
+                def user = springSecurityService.currentUser;                
+                templateMap["contributor"] = user.name
+                templateMap["uploadCount"] = otherParams["uploadCount"]
+                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                toUsers.add(user)
                 break
 
                 case OBSERVATION_FLAGGED :

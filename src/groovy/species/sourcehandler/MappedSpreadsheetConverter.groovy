@@ -101,7 +101,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 											part = part.trim();
 											myPrint(">>>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<<<< ======= createing data aaaaaaaaa node for ref " + fieldNameToken + "  actula text " + part)
 											Node data = createDataNode(field, part , speciesContent, mappedField);
-											myPrint(">>>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<<<< ============ after ref creeate node " + data)
+											//myPrint(">>>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<<<< ============ after ref creeate node " + data)
 											createReferences(data, speciesContent, mappedField);
 										}
 									}
@@ -422,7 +422,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		if(doProcess){
 			List processedInfoColumn = []
-			myPrint("=======ADD meta attribute " + fieldName + "  fields " + fields + " fMap " + fMap)
+			//myPrint("=======ADD meta attribute  for field " + fieldName + "  fields " + fields + " fMap " + fMap)
 			Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"))
 			fMap.keySet().each { key ->
 				//if column has text then only proceed
@@ -448,7 +448,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 										Node refNode = new Node(data, "reference");
 										getReferenceNode(refNode, it);
 									}else{
-										new Node(data, fieldName, it);
+										new Node(data, resultNodeName, it);
 									}
 								}
 							}

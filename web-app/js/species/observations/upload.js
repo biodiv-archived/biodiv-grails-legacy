@@ -206,9 +206,6 @@ function getTagsForHeaders() {
 
 function updateMetadataValues() {
     var headerMetadata = getHeaderMetadata();
-    //console.log("UPDATE METADATA");
-    //console.log(JSON.stringify(headerMetadata));
-
     //if(Object.keys(headerMetadata).length != 0){
     $("#tableHeader tr").each(function () {
         var taggedValues;
@@ -216,19 +213,13 @@ function updateMetadataValues() {
             if($(this).attr("class") == "columnName"){
                 var columnName = $(this).text();
                     taggedValues = headerMetadata[columnName];
-                    //console.log("======" + columnName);
-                    //console.log(" ====== "+ JSON.stringify(taggedValues));
                 }
-                //console.log("ABOVE THIS");
-                //if(taggedValues != undefined){
                 else if($(this).attr("class") == "dataColCell") {
-                    //console.log("TAGIT HONA THA");
                     var preList='<ul class="headerInfoTags" >';
                     if(taggedValues != undefined){
                         var dataColumns = taggedValues["dataColumns"];
                         if(dataColumns!== ""){
                             var dataColArr = dataColumns.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(dataColArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -240,14 +231,12 @@ function updateMetadataValues() {
 
                 }
             else if($(this).attr("class") == "imagesCell" || $(this).attr("class") == "contributorCell" || $(this).attr("class") == "attributionsCell" || $(this).attr("class") == "referencesCell") {
-                //console.log("TAGIT HONA THA");
                 var preList='<ul class="extraInfoTags" >';
                 if(taggedValues != undefined){
                     if($(this).attr("class") == "imagesCell"){
                         var images = taggedValues["images"];
                         if(images!== ""){
                             var imagesArr = images.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(imagesArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -257,7 +246,6 @@ function updateMetadataValues() {
                         var contributor = taggedValues["contributor"];
                         if(contributor!== ""){
                             var contributorArr = contributor.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(contributorArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -267,7 +255,6 @@ function updateMetadataValues() {
                         var attributions = taggedValues["attributions"];
                         if(attributions!== ""){
                             var attributionsArr = attributions.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(attributionsArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -277,7 +264,6 @@ function updateMetadataValues() {
                         var references = taggedValues["references"];
                         if(references!== ""){
                             var referencesArr = references.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(referencesArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -291,13 +277,11 @@ function updateMetadataValues() {
             }
             
             else if($(this).attr("class") == "licenseCell") {
-                    //console.log("TAGIT HONA THA");
                     var preList='<ul class="licenseInfoTags" >';
                     if(taggedValues != undefined){
                         var license = taggedValues["license"];
                         if(license!== ""){
                             var licenseArr = license.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(licenseArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -310,13 +294,11 @@ function updateMetadataValues() {
             }
 
             else if($(this).attr("class") == "audienceCell") {
-                    //console.log("TAGIT HONA THA");
                     var preList='<ul class="audienceInfoTags" >';
                     if(taggedValues != undefined){
                         var audience = taggedValues["audience"];
                         if(audience!== ""){
                             var audienceArr = audience.split(",");
-                            //APPEND EACH VALUE TO UL COMPONENT
                             $.each(audienceArr, function( index, value ) {
                                 preList += '<li>'+value+'</li>'
                             });
@@ -364,22 +346,17 @@ function updateMetadataValues() {
                         $(this).children(".delimiter").val(delimiter);
                     }
                 }
-                //}
             });
 
         });
-    //}
-    }
+}
 
 function getHeaderMetadata() {
     var headerMetadata = $('#headerMetadata').val();
-    //var headerMetadataParse = $.parseJSON(headerMetadata);
-    //console.log("after parse" + headerMetadataParse);
     return headerMetadata;
 }
 
 function saveHeaderMetadata(headerMetadata) {
-    //headerMetadata = JSON.stringify(headerMetadata);
     $('#headerMetadata').val(headerMetadata);
 }
 
@@ -457,7 +434,6 @@ $('#uploadSpecies').click(function() {
     var hm = getHeaderMetadata();
     delete hm["undefined"];
     var orderedArray = $('#columnOrder').val();
-    console.log(orderedArray);
     orderedArray = JSON.stringify(orderedArray);
     var headerMarkers = JSON.stringify(hm);
     $.ajax({
@@ -468,11 +444,12 @@ $('#uploadSpecies').click(function() {
         success : function(data) {
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
             $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
+            $("#filterLink").attr("href", data.filterLink);
             $("#uploadSpeciesDiv").hide();
             alert(data.msg);
             document.getElementById("downloadSpeciesFile").style.visibility = "visible";
             document.getElementById("downloadErrorFile").style.visibility = "visible";
-
+            $("#filterLinkSpan").show();
         },
         error: function(xhr, textStatus, errorThrown) {
             alert('Error uploading species!!');
