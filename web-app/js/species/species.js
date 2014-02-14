@@ -433,7 +433,7 @@ function initGalleryTabs() {
         if(sourceData && sourceData.content) {
             var speciesId = sourceData.speciesId?sourceData.speciesId:'';
             var content = sourceData.content;
-            var data_type = 'text';
+            var data_type = 'textarea';
             if(sourceData.type == 'description') {
                 data_type = 'ckeditor';
                 html.push ('<li></i><a href="#" class="ck_desc_add" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-speciesId:'+speciesId+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
@@ -512,7 +512,7 @@ function initGalleryTabs() {
             onblur:'ignore'
        })
 
-        $ele.find('.ck_desc_add').before("<a class='pull-right addFieldButton'><i class='icon-add'></i>Add</a>");
+        $ele.find('.ck_desc_add').before("<a class='addFieldButton'><i class='icon-add'></i>Add</a>");
         $ele.find('.addFieldButton').click(function(e){    
             e.stopPropagation();
             var $textarea = $(this).nextAll('textarea');
@@ -521,7 +521,6 @@ function initGalleryTabs() {
         })
 
         $ele.find('.addField').each(function(){
-            console.log($(this))
             if($(this).attr('data-type') == 'ckeditor') {
                 //initEditor($(this));
             } else {
@@ -531,11 +530,11 @@ function initGalleryTabs() {
     }
 
     function createContributor(content, sourceData) {
-        return '<li><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.name)+'</a></li>' ;
+        return '<li><a href="#" class="editField" data-type="textarea" data-rows="2" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.name)+'</a></li>' ;
     }
 
     function createReference(content, sourceData) {
-        return '<li><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.title)+'</a></li>' ;
+        return '<li><a href="#" class="editField" data-type="textarea" data-rows="2" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.title)+'</a></li>' ;
     }
 
 
