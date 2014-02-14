@@ -167,7 +167,8 @@
                     { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
                     { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
                     { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-                    { name: 'insert', items: [ 'Image', 'Table'] }
+                    { name: 'insert', items: [ 'Image', 'Table'] },
+                    {name: 'save', items:['Inlinesave']}
                     ],
                         filebrowserImageBrowseUrl: '/biodiv/ck/ofm?fileConnector=/biodiv/ck/ofm/filemanager&type=Image&viewMode=grid',
                         filebrowserImageUploadUrl: '/biodiv/ck/standard/uploader?Type=Image',
