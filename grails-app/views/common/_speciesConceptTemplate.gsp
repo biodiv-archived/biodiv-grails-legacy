@@ -50,19 +50,19 @@
                 </h6>
                 <div>
                 <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
-                <div class="contributor_entry">
-                <textarea id="description_${category.value.get('field').id}" 
-                    name="description_${category.value.get('field').id}"
-                    class="ck_desc_add"  
-                    data-pk="${category.value.get('field').id}" 
-                    data-type="ckeditor" 
-                    data-url="${uGroup.createLink(controller:'species', action:'update') }" 
-                    data-name="newdescription" 
-                    data-speciesId = "${speciesInstance.id}" 
-                    data-original-title="Add new description" 
-                    data-placeholder="Add new description" style="display:none;">
-                </textarea>
-            </div>
+                <div class="speciesField">
+                    <textarea id="description_${category.value.get('field').id}" 
+                        name="description_${category.value.get('field').id}"
+                        class="ck_desc_add"  
+                        data-pk="${category.value.get('field').id}" 
+                        data-type="ckeditor" 
+                        data-url="${uGroup.createLink(controller:'species', action:'update') }" 
+                        data-name="newdescription" 
+                        data-speciesId = "${speciesInstance.id}" 
+                        data-original-title="Add new description" 
+                        data-placeholder="Add new description" style="display:none;">
+                    </textarea>
+                </div>
 
                 </g:if>
 

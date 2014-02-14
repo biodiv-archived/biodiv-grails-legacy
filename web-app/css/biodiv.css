@@ -1983,12 +1983,14 @@ li#userOrEmail-new {
 	}
 }
 
-.contributor_entry {
+.contributor_entry, .speciesField span.cke_skin_kama {
+        border: 1px solid #D3D3D3;
 	border-color: #CECECE;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
 	margin-bottom: 10px;
+        
 }
 
 .contributor_entry .toolbar {
@@ -2586,7 +2588,7 @@ small {
 .addField {
 }
 
-.addField, .editFieldButton {
+.addField, .editFieldButton, .addFieldButton {
     color:#12C;
     cursor: pointer;
     font-size:12px;

@@ -157,9 +157,23 @@
         </r:script>
             <script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
-                CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );                               
+                CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );               
 
-                var config = { extraPlugins: 'confighelper,inlinesave', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic', 'Inlinesave' ]]};
+                var config = { extraPlugins: 'confighelper,inlinesave', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
+                    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
+                    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                    '/',
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+                    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                    { name: 'insert', items: [ 'Image', 'Table'] }
+                    ],
+                        filebrowserImageBrowseUrl: '/biodiv/ck/ofm?fileConnector=/biodiv/ck/ofm/filemanager&type=Image&viewMode=grid',
+                        filebrowserImageUploadUrl: '/biodiv/ck/standard/uploader?Type=Image',
+                        height: '400px'
+                };
+
             </script>
 
 
@@ -199,7 +213,6 @@
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
                         <s:hasContent model="['map':concept.value]">
-                        <br/>
                         <g:if
                         test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)}">
                         </g:if>
@@ -214,7 +227,6 @@
                         <g:showSpeciesConcept
                         model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, 'isSpeciesContributor':isSpeciesContributor]" />
                         </li>
-                        <br/>
                         <%conceptCounter++%>
                         </g:else>
                         </s:hasContent>
