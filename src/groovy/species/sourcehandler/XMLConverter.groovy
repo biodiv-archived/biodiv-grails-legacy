@@ -230,14 +230,17 @@ class XMLConverter extends SourceConverter {
                     s.reprImage = null;
                     return s;
                 } else {
-                    log.error "TaxonConcept is not found"
+					log.error "TaxonConcept is not found"
+					addToSummary("TaxonConcept is not found")
                 }
             } else {
                 log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
+				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
             }
         } catch(Exception e) {
             log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
             e.printStackTrace();
+			addToSummary(e.printStackTrace());
         }
     }
 
@@ -249,7 +252,7 @@ class XMLConverter extends SourceConverter {
         for(Node fieldNode : speciesNodes.children()) {
             if(fieldNode.name().equals("field")) {
                 if(!isValidField(fieldNode)) {
-                    log.warn "NOT A VALID FIELD. IGNORING : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>. "+fieldNode;
+                    log.warn "NOT A VALID FIELD. IGNORING : "+fieldNode;
                     fieldNode.parent().remove(fieldNode);
                     continue;
                 }

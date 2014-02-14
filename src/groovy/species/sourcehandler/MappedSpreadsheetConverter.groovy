@@ -23,12 +23,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	public List<Map> imagesMetaData;
 	public List<Map> mappingConfig;
 	
-	//to keep track of current species index. used for reporting error.
-	private int currentRowIndex = 1;
-	private StringBuffer summary; 
+	
 	public MappedSpreadsheetConverter() {
 		imagesMetaData = [];
-		summary = new StringBuffer()
 	}
 
 	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo, String imagesDir="") {
@@ -72,8 +69,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				String fieldName = mappedField.get("field name(s)")
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
-				if(fieldName && (processCustomFormat(customFormatMap) || speciesContent.get(fieldName.toLowerCase()))) {
-					myPrint("==================PROCESSING FILED NAME " + fieldName)
+				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
+					myPrint("================== PROCESSING FILED NAME == " + fieldName)
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
 					//Map customFormat = customFormatMap.get(fieldName)
@@ -110,44 +107,48 @@ class MappedSpreadsheetConverter extends SourceConverter {
 									}
 								}else{
 									Node data = createDataNode(field, text , speciesContent, mappedField);
-									myPrint("=====ELSE PART======= after ref creeate node " + data)
+									//myPrint("=====ELSE PART======= after ref creeate node " + data)
 									createReferences(data, speciesContent, mappedField);
 								}
 							}
 						}
-					} else if(processCustomFormat(customFormatMap)) {
-						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, delimiterMap, speciesContent);
-						createDataNode(field, text, speciesContent, mappedField);
-					} else if(delimiterMap) {
+					} else if(ignoreCustomFormat(mappedField)) {
+						// Here honouring delimiter if given but ingnoring custom format 
 						fieldName.split(",").each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
 							String text = speciesContent.get(fieldNameToken);
 							def delimiter = delimiterMap.get(fieldNameToken);
 							if(text) {
-							for(String part : text.split(delimiter)) {
-								if(part) {
-									part = part.trim();
-									if(category.text().equalsIgnoreCase("common name")) {
-										String[] commonNames = part.split(":");
-										if(commonNames.length == 2) {
-											commonNames[1].split(",|;").each {
-												Node data = createDataNode(field, it, speciesContent, mappedField);
-												Node language = new Node(data, "language");
-												Node name = new Node(language, "name", commonNames[0]);
-											}
-										} else {
-											commonNames[0].split(",|;").each {
-												createDataNode(field, it, speciesContent, mappedField);
+								if(delimiter){
+									for(String part : text.split(delimiter)) {
+										if(part) {
+											part = part.trim();
+											if(category.text().equalsIgnoreCase("common name")) {
+												String[] commonNames = part.split(":");
+												if(commonNames.length == 2) {
+													commonNames[1].split(",|;").each {
+														Node data = createDataNode(field, it, speciesContent, mappedField);
+														Node language = new Node(data, "language");
+														Node name = new Node(language, "name", commonNames[0]);
+													}
+												} else {
+													commonNames[0].split(",|;").each {
+														createDataNode(field, it, speciesContent, mappedField);
+													}
+												}
+											} else {
+												createDataNode(field, part, speciesContent, mappedField);
 											}
 										}
-									} else {
-										createDataNode(field, part, speciesContent, mappedField);
 									}
+								}else{
+									createDataNode(field, text, speciesContent, mappedField);
 								}
-							}}
+							}
 						}
 					} else {
-						createDataNode(field, speciesContent.get(fieldName), speciesContent, mappedField);
+						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, delimiterMap, speciesContent);
+						createDataNode(field, text, speciesContent, mappedField);
 					}
 				}
 			}
@@ -188,16 +189,19 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 
 	/**
-		if all values are default then not processing	
-	*/
-	private boolean processCustomFormat(Map m ){
-		m.keySet().each { fieldName ->
-			def customInfoMap = m[fieldName]
-			if(customInfoMap["Group"]  || customInfoMap["includeheadings"]){
-				return true
-			}
-		}
-		return false
+	 * Ignore custom format for following field
+	 * @param mappedFieldString
+	 * @return
+	 */
+	private boolean ignoreCustomFormat(Map mappedFieldString){
+		String concept = mappedFieldString.get("concept").trim()
+		String category = mappedFieldString.get("category").trim()
+
+		boolean ignore = (concept.equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING))
+		ignore = (ignore || concept.equalsIgnoreCase((String)fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION))
+	    ignore = (ignore || ( concept.equalsIgnoreCase((String)fieldsConfig.OVERVIEW) && category.equalsIgnoreCase("SubSpecies Varieties Races")))
+				
+		return ignore
 	}
 	
 	private Map getCustomDelimiterMap(String text){
@@ -221,9 +225,18 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return str
 	}
 	
+	/**
+	 * 
+	 * @param fieldName
+	 * @param customFormatMap
+	 * @param delimiterMap
+	 * @param speciesContent
+	 * @return 
+	 * 
+	 * TODO : Handle delimiter for each field
+	 */
+	
     private getCustomFormattedText(String fieldName, Map customFormatMap, Map delimiterMap, Map speciesContent) {
-		//def result = getCustomFormat(customFormat);
-		
 		String con = "";
 		fieldName.split(",").eachWithIndex { t, index ->
 			t = t.toLowerCase().trim()
@@ -233,24 +246,29 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			myPrint("    >>>>>>>>>>    field name and customFormatMap ==== " + customFormatMap)
 			int group = customFormat.get("group") ? Integer.parseInt(result.get("group")?.toString()) : -1;
 			boolean includeHeadings = customFormat.get("includeheadings") ? Boolean.parseBoolean(customFormat.get("includeheadings")?.toString()).booleanValue() : false;
-			String delimiter = delimiterMap.get(t)
+			boolean noCustomFormating = (group == -1 && !includeHeadings)
+			//String delimiter = delimiterMap.get(t)
 			if(txt) {
-				if (index%group == 0) {
-
-					if(group > 1)
-						txt = "<h6>"+txt+"</h6>";
-					else {
+				if(noCustomFormating){
+					con += txt
+				}else {
+					if (index%group == 0) {
+	
+						if(group > 1)
+							txt = "<h6>"+txt+"</h6>";
+						else {
+							txt = "<p>"+txt+"</p>";
+							if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt;
+						}
+						if(con)
+							con += txt;
+						else con = txt;
+	
+					} else {
 						txt = "<p>"+txt+"</p>";
 						if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt;
-					}
-					if(con)
 						con += txt;
-					else con = txt;
-
-				} else {
-					txt = "<p>"+txt+"</p>";
-					if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt;
-					con += txt;
+					}
 				}
 			}
 		}
@@ -289,7 +307,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
                         }
                     }
                 } else {
-						println "= creating images "
 						createImages(images, txt, imagesMetaData, imagesDir);
                 }
 			}
@@ -377,16 +394,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
             LOG.addAppender(fa);
         }
     }
-	
-	def addToSummary(String str){
-		if(str){
-			summary.append(str+ System.getProperty("line.separator"))
-		}
-	}
-	
-	def String getSummary(){
-		return summary.toString()
-	}
 	
 	protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
 		addMetaAttibute("contributor", data, speciesContent, mappedField, "contributor",)

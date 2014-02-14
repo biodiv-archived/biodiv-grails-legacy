@@ -189,9 +189,6 @@ modules = {
 	species_list {
 		dependsOn 'observations_list'
 
-        resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
-        resource url:'/js/galleria/1.2.7/plugins/flickr/galleria.flickr.min.js'
-
 	}
 
 	search {
