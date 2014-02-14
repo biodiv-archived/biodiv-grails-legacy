@@ -197,7 +197,7 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-
+                    tagMetadatas(data);
                 }
             });
 
