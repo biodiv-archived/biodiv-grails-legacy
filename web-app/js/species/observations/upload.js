@@ -434,7 +434,6 @@ $('#uploadSpecies').click(function() {
     var hm = getHeaderMetadata();
     delete hm["undefined"];
     var orderedArray = $('#columnOrder').val();
-    console.log(orderedArray);
     orderedArray = JSON.stringify(orderedArray);
     var headerMarkers = JSON.stringify(hm);
     $.ajax({
@@ -445,11 +444,12 @@ $('#uploadSpecies').click(function() {
         success : function(data) {
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
             $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
+            $("#filterLink").attr("href", data.filterLink);
             $("#uploadSpeciesDiv").hide();
             alert(data.msg);
             document.getElementById("downloadSpeciesFile").style.visibility = "visible";
             document.getElementById("downloadErrorFile").style.visibility = "visible";
-
+            $("#filterLinkSpan").show();
         },
         error: function(xhr, textStatus, errorThrown) {
             alert('Error uploading species!!');
