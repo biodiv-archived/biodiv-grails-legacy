@@ -13,7 +13,7 @@ class SourceConverter {
     private static final log = LogFactory.getLog(this);
 	
 	//to keep track of current species index. used for reporting error.
-	private int currentRowIndex = 1;
+	public int currentRowIndex = 1;
 	private StringBuffer summary;
 
     protected SourceConverter() {
