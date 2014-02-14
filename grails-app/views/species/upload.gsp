@@ -105,7 +105,7 @@
                 </table>            
                 <div id="tagHeaders" class="section checklist-slickgrid" style="clear:both;display:none;">
                     <table id="tableHeader" border="1">
-                        <th>Column_Name</th>
+                        <th class="columnName">Column_Name</th>
                         <th>Data_Columns</th>
                         <th>Header</th>
                         <th>Append</th>
@@ -158,8 +158,7 @@
                     <input type="text" name="downloadFile" value="" style="visibility:hidden;">
                     Download the error file here <input class="btn btn-primary" type="submit" value="Download">
                 </form>
-
-
+                <span id="filterLinkSpan" style="display:none;">You may view your contribution <a href="" id="filterLink"> here </a>.</span>
                 <div id="uploadConsole">
 
                 </div>

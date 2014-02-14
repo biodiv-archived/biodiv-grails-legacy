@@ -553,7 +553,6 @@ class SpeciesController extends AbstractObjectController {
 			
 			if(speciesDataFile.exists()) {
 				res = speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-				res = res.log
 			} 
 			else {
                 res =  "Not found"
@@ -564,7 +563,7 @@ class SpeciesController extends AbstractObjectController {
             String reportDate_end = df.format(end);
 
             //def endTime = new Date()
-            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res
+            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res.log
             
             String fileName = "ErrorLog.txt"
             String uploadDir = "species"
@@ -595,22 +594,27 @@ class SpeciesController extends AbstractObjectController {
                 }
             }
             */
-            otherParams["usersMailList"] = usersMailList
+            //otherParams["usersMailList"] = usersMailList
             def linkParams = [:]
             linkParams["daterangepicker_start"] = reportDate_start
             linkParams["daterangepicker_end"] = reportDate_end
+            linkParams["sort"] = "lastUpdated"
             String link = observationService.generateLink("species", "list", linkParams)
             otherParams["link"] = link
             //FOR EACH SPECIES UPLOADED send mail
             //how to send the link generated
             //what about activity feed
             usersMailList.each{ user ->
+                def uml =[]
+                uml.add(user)
                 otherParams["curator"] = user.name
-                observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,sp,null,null,null,otherParams)
+                otherParams["usersMailList"] = uml
+                observationService.sendNotificationMail(observationService.SPECIES_CURATORS,sp,null,null,null,otherParams)
             }
-			
+            otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
+		    observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
 			sp = null
-			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath(), errorFile: errorFile.getAbsolutePath()] as JSON, contentType:'text/html')
+			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath(), filterLink: link, errorFile: errorFile.getAbsolutePath()] as JSON, contentType:'text/html')
 			
         }
 			
