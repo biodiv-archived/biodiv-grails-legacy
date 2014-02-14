@@ -436,7 +436,7 @@ function initGalleryTabs() {
             var data_type = 'textarea';
             if(sourceData.type == 'description') {
                 data_type = 'ckeditor';
-                html.push ('<li></i><a href="#" class="ck_desc_add" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-speciesId:'+speciesId+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                html.push ('<li></i><a href="#" class="ck_desc_add" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-speciesId:"'+speciesId+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
             }
 
             $.each(content, function(i, v) { 
