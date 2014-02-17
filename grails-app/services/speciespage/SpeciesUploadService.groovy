@@ -65,7 +65,7 @@ class SpeciesUploadService {
 	def springSecurityService
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
-	static int BATCH_SIZE = 5;
+	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
     String contentRootDir = config.speciesPortal.content.rootDir
 
@@ -249,6 +249,8 @@ class SpeciesUploadService {
 		def speciesElements = [];
 		int noOfSpecies = content.size();
 		
+		log.info " CONTENT SIZE " + noOfSpecies
+		
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
 				def res = saveSpeciesElements(speciesElements)
@@ -276,9 +278,9 @@ class SpeciesUploadService {
 		}
 
 		
-		println "================================ LOG SUMMARY======================"
+		log.info "================================ LOG SUMMARY======================"
 		println  converter.getSummary()
-		println "=================================================================="
+		log.info "=================================================================="
 		
 		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		log.info "Total number of species that got added : ${noOfInsertions}"
@@ -309,7 +311,6 @@ class SpeciesUploadService {
 		
 		List<Species> species = new ArrayList<Species>();
 
-
 		int noOfInsertions = 0;
 		try {
 			//Species.withTransaction { status ->
@@ -328,17 +329,17 @@ class SpeciesUploadService {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
-			converter.addToSummary(e.printStackTrace())
+			converter.addToSummary(e)
 		}catch (org.springframework.dao.DataIntegrityViolationException e) {
 			log.error "DataIntegrityViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
-			converter.addToSummary(e.printStackTrace())
+			converter.addToSummary(e)
 		} catch(ConstraintViolationException e) {
 			log.error "ConstraintViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
-			converter.addToSummary(e.printStackTrace())
+			converter.addToSummary(e)
 		}
 
 		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary()];
@@ -396,7 +397,7 @@ class SpeciesUploadService {
 
 				//externalLinksService.updateExternalLinks(taxonConcept);
 			} catch(e) {
-				s.appendLogSummary(e.printStackTrace())
+				s.appendLogSummary(e)
 				e.printStackTrace()
 			}
             s.percentOfInfo = calculatePercentOfInfo(s);

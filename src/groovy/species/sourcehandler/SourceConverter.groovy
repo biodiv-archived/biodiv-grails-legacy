@@ -521,8 +521,13 @@ class SourceConverter {
     }
 
 	//////////////////////// custom log related ////////////////////	
-	def addToSummary(String str){
+	def addToSummary(def str){
 		if(str){
+			if(str instanceof Exception){
+				StringWriter errors = new StringWriter();
+				str.printStackTrace(new PrintWriter(errors));
+				str = errors.toString()
+			}
 			summary.append(str+ System.getProperty("line.separator"))
 		}
 	}
