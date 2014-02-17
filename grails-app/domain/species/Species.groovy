@@ -253,11 +253,19 @@ class Species implements Rateable {
 //		}
 //	}
 	
-	def appendLogSummary(String s){
-		if(!sLog)
-			sLog = new StringBuffer()
+	def appendLogSummary(def str){
+		if(!str) return
 		
-		sLog.append(s + System.getProperty("line.separator"));
+		if(!sLog){
+			sLog = new StringBuffer()
+		}
+		
+		if(str instanceof Exception){
+			StringWriter errors = new StringWriter();
+			str.printStackTrace(new PrintWriter(errors));
+			str  = errors.toString();
+		}
+		sLog.append(str+ System.getProperty("line.separator"))
 	}
 	/*
 	private class SpeciesLog {

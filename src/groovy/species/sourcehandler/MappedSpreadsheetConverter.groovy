@@ -70,7 +70,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
 				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
-					myPrint("================== PROCESSING FILED NAME == " + fieldName)
+					myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
 					//Map customFormat = customFormatMap.get(fieldName)
@@ -286,29 +286,31 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			//TODO:This is getting repeated for every row in spreadsheet costly
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
-				customFormat =  customFormatMap.get(t.trim().toLowerCase());
+				if(txt){
+					customFormat =  customFormatMap.get(t.trim().toLowerCase());
 				
-				delimiter = delimiterMap.get(t.trim().toLowerCase());
-				group = customFormat.get("group") ? Integer.parseInt(customFormat.get("group")?.toString()):-1
-				location = customFormat.get("location") ? Integer.parseInt(customFormat.get("location")?.toString())-1:-1
-				source = customFormat.get("source") ? Integer.parseInt(customFormat.get("source")?.toString())-1:-1
-				caption = customFormat.get("caption") ? Integer.parseInt(customFormat.get("caption")?.toString())-1:-1
-				attribution = customFormat.get("attribution") ? Integer.parseInt(customFormat.get("attribution")?.toString())-1:-1
-				contributor = customFormat.get("contributor") ? Integer.parseInt(customFormat.get("contributor")?.toString())-1:-1
-				license = customFormat.get("license") ? Integer.parseInt(customFormat.get("license")?.toString())-1:-1
-				name = customFormat.get("name") ? Integer.parseInt(customFormat.get("name")?.toString())-1:-1
-				incremental = customFormat.get("incremental") ? new Boolean(customFormat.get("incremental")) : false
+					delimiter = delimiterMap.get(t.trim().toLowerCase());
+					group = customFormat.get("group") ? Integer.parseInt(customFormat.get("group")?.toString()):-1
+					location = customFormat.get("location") ? Integer.parseInt(customFormat.get("location")?.toString())-1:-1
+					source = customFormat.get("source") ? Integer.parseInt(customFormat.get("source")?.toString())-1:-1
+					caption = customFormat.get("caption") ? Integer.parseInt(customFormat.get("caption")?.toString())-1:-1
+					attribution = customFormat.get("attribution") ? Integer.parseInt(customFormat.get("attribution")?.toString())-1:-1
+					contributor = customFormat.get("contributor") ? Integer.parseInt(customFormat.get("contributor")?.toString())-1:-1
+					license = customFormat.get("license") ? Integer.parseInt(customFormat.get("license")?.toString())-1:-1
+					name = customFormat.get("name") ? Integer.parseInt(customFormat.get("name")?.toString())-1:-1
+					incremental = customFormat.get("incremental") ? new Boolean(customFormat.get("incremental")) : false
 		
 				
-                if(delimiter) {
-                    txt.split(delimiter).each { loc ->
-                        if(loc) {
-                            createImages(images, loc, imagesMetaData, imagesDir);
-                        }
-                    }
-                } else {
+                	if(delimiter) {
+                    	txt.split(delimiter).each { loc ->
+                        	if(loc) {
+                            	createImages(images, loc, imagesMetaData, imagesDir);
+                        	}
+                    	}
+                	} else {
 						createImages(images, txt, imagesMetaData, imagesDir);
-                }
+                	}
+				}
 			}
 		} else {
 			List<String> groupValues = new ArrayList<String>();
@@ -328,17 +330,20 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 				try{
 				String txt = speciesContent.get(t.trim());
-				if (index != 0 && index % group == 0) {
-					populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental, imagesDir);
-					groupValues = new ArrayList<String>();
+				if(txt && txt.trim()){
+					if (index != 0 && index % group == 0) {
+						populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental, imagesDir);
+						groupValues = new ArrayList<String>();
+					}
+					groupValues.add(txt);
 				}
-				groupValues.add(txt);
 				}catch(e) {
 					e.printStackTrace()
 				}
 			}
-			populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental, imagesDir);
-		}
+			if(!groupValues.isEmpty()){
+				populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental, imagesDir);
+		}	}
 		return images;
 	}
 

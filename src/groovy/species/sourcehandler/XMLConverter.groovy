@@ -101,7 +101,9 @@ class XMLConverter extends SourceConverter {
 
             //sciName is must for the species to be populated
             Node speciesNameNode = species.field.find {it.subcategory.text().equalsIgnoreCase(fieldsConfig.SCIENTIFIC_NAME);}
-            def speciesName = getData(speciesNameNode?.data);
+
+            //XXX: sending just the first element need to decide on this if list has multiple elements
+            def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
             if(speciesName) {
                 //getting classification hierarchies and saving these taxon definitions
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
@@ -112,7 +114,6 @@ class XMLConverter extends SourceConverter {
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
                 s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName);
-
                 if(s.taxonConcept) {
 
                     s.title = s.taxonConcept.italicisedForm;
@@ -137,7 +138,7 @@ class XMLConverter extends SourceConverter {
                                 e.printStackTrace();
                                 log.error "Could not delete species ${existingSpecies.id} : "+e.getMessage();
 								s.appendLogSummary("Could not delete species ${existingSpecies.id} : "+e.getMessage())
-								s.appendLogSummary(e.printStackTrace());
+								s.appendLogSummary(e);
 								return;
                             }
                         } else if(defaultSaveAction == SaveAction.MERGE){
@@ -235,12 +236,12 @@ class XMLConverter extends SourceConverter {
                 }
             } else {
                 log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
-				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
+				
             }
         } catch(Exception e) {
             log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
             e.printStackTrace();
-			addToSummary(e.printStackTrace());
+			addToSummary(e);
         }
     }
 
