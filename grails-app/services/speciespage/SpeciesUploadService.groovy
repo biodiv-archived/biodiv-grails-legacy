@@ -562,10 +562,10 @@ class SpeciesUploadService {
 
     def List getDataColumns(){
     	List columnList = []
-    	Field.list(sort:"displayOrder", order:"asc").each {
-    		def tmpList = []
+    	Field.findAllByCategoryNotEqual("Catalogue of Life Taxonomy Hierarchy", [sort:"displayOrder", order:"asc"]).each {
+			def tmpList = []
     		tmpList << it.concept
-    		if(it.category)
+			if(it.category)
     			tmpList << it.category
     		if(it.subCategory)
     			tmpList << it.subCategory

@@ -1,6 +1,7 @@
 import species.Field;
 import species.auth.SUser;
 import species.Contributor;
+import species.formatReader.*;
 
 def addNewField(){
 	def f = new Field(concept:'Information Listing',category:'Images', description:'Place holder for images', displayOrder:83)
@@ -31,8 +32,21 @@ def getContNotPresent(){
     } 
 }
 
+def makeFieldGeneric(){
+	def fList = Field.findAllBySubCategory('Indian Distribution Geographic Entity')
+	Field.withTransaction { 
+		fList.each {
+			println 'changing for field ' + it 
+			it.subCategory = 'Local Distribution Geographic Entity'
+			it.save(flush:true)
+		}
+	}
+}
+
+makeFieldGeneric()
+
 //getContNotPresent()
 
-addNewField()
+//addNewField()
 
 
