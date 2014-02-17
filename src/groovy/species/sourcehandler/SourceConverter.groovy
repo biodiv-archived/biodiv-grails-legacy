@@ -236,7 +236,11 @@ class SourceConverter {
 	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="") {
 		log.debug "Creating images ${imageIds}"
 		
-		if(!imageIds) return;
+		if(!imageIds){
+			addToSummary("In ImageMetadata sheet either 'id' header missing or values are blank within the column ")
+			return;
+		}
+		
 		
 		Node images = new Node(speciesElement, "images");
 		imageMetaData.each { imageData ->
@@ -270,9 +274,14 @@ class SourceConverter {
 	}
 
 	protected void createImages(Node images, String imageId, List<Map> imageMetaData, String imagesDir="") {
+		log.debug "Creating images ${imageId}"
+		if(!imageId){
+			addToSummary("In ImageMetadata sheet either 'id' header missing or values are blank within the column ")
+			return
+		}
 		imageMetaData.each { imageData ->
 			String refKey = imageData.get("id");
-			if(refKey.trim().equals(imageId.trim())) {
+			if(refKey && refKey.trim().equals(imageId.trim())) {
 				Node image = new Node(images, "image");
 				String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
 				File file = new File(imagesDir, cleanLoc(loc));

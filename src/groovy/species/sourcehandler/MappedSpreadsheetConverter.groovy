@@ -286,9 +286,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			//TODO:This is getting repeated for every row in spreadsheet costly
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
-				if(txt){
+				if(txt && txt.trim()){
 					customFormat =  customFormatMap.get(t.trim().toLowerCase());
-				
 					delimiter = delimiterMap.get(t.trim().toLowerCase());
 					group = customFormat.get("group") ? Integer.parseInt(customFormat.get("group")?.toString()):-1
 					location = customFormat.get("location") ? Integer.parseInt(customFormat.get("location")?.toString())-1:-1
@@ -303,13 +302,13 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				
                 	if(delimiter) {
                     	txt.split(delimiter).each { loc ->
-                        	if(loc) {
-                            	createImages(images, loc, imagesMetaData, imagesDir);
-                        	}
+							createImages(images, loc, imagesMetaData, imagesDir);
                     	}
                 	} else {
 						createImages(images, txt, imagesMetaData, imagesDir);
                 	}
+				}else{
+					addToSummary("In data sheet values are blank within the reference column ")
 				}
 			}
 		} else {
@@ -336,6 +335,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 						groupValues = new ArrayList<String>();
 					}
 					groupValues.add(txt);
+				}else{
+					addToSummary("In data sheet values are blank within the reference column ")
 				}
 				}catch(e) {
 					e.printStackTrace()

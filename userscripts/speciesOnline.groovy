@@ -8,6 +8,12 @@ def addNewField(){
 	f.save(flush:true)
 }
 
+def addMetadataField(){
+	def f = new Field(concept:'Meta data', category:'Meta data', description:'Place holder for marking meta data', displayOrder:84)
+	f.save(flush:true)
+}
+
+
 def getContNotPresent(){
     def allCont = []
     def contList = Contributor.list()
@@ -43,7 +49,8 @@ def makeFieldGeneric(){
 	}
 }
 
-makeFieldGeneric()
+//makeFieldGeneric()
+addMetadataField()
 
 //getContNotPresent()
 
