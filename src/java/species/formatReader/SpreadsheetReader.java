@@ -88,18 +88,21 @@ public class SpreadsheetReader {
 			if (row.getRowNum() <= headerRowNo)
 				continue;
 			Map rowData = new LinkedHashMap();
-			for (int i = 0; i < headerList.size(); i++) {
+			boolean validRow = false;
+                        for (int i = 0; i < headerList.size(); i++) {
 				Map headerConfig = (Map) headerList.get(i);
 				String key = (String) headerConfig.get("name");
 				int index = Integer.parseInt((String) headerConfig
-						.get("position"));
-				String value = getCellText(row.getCell(index, Row.CREATE_NULL_AS_BLANK));
-				// String validTagName =
-				// DocumentUtils.convertToValidXMLTagName(key);
-				rowData.put(key, value);
-			}
-			content.add(rowData);
-		}
+                                        .get("position"));
+                                String value = getCellText(row.getCell(index, Row.CREATE_NULL_AS_BLANK));
+                                // String validTagName =
+                                // DocumentUtils.convertToValidXMLTagName(key);
+                                validRow = validRow || !value.equals("");
+                                rowData.put(key, value);
+                        }
+                        if(validRow)
+                            content.add(rowData);
+                }
         if (content.size() == 0){
             Map rowData = new LinkedHashMap();
             for (int i = 0; i < headerList.size(); i++) {

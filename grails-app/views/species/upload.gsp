@@ -124,7 +124,7 @@
                     %{-- <button id="tagHeadersButton">Mark this Header</button> --}%
                     <button class="btn btn-primary" id="downloadModifiedSpecies" style="margin-top: 8px">Download</button>
                 </div>
-
+                
                 <div class="section" style="margin-top: 0px; margin-bottom: 40px;clear:both;">
 
                     <a href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
@@ -133,6 +133,7 @@
                     <a id="uploadSpecies"
                         class="btn btn-primary" style="float: right; margin-right: 5px;">
                         Upload Species</a>
+                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img src="http://viola.usc.edu/wp-content/plugins/nice-login-register-widget/images/loading_transparent.gif"></div>
                     <span class="policy-text"> By submitting this form for
                         uploading species data you agree to our <a href="/terms">Terms
                             and Conditions</a> on the use of our site </span>

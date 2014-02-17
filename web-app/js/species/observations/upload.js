@@ -431,6 +431,7 @@ $('#downloadModifiedSpecies').click(function() {
 });
 
 $('#uploadSpecies').click(function() {
+    $("#speciesLoader").show();
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
@@ -448,6 +449,7 @@ $('#uploadSpecies').click(function() {
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
             $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
             $("#filterLink").attr("href", data.filterLink);
+            $("#speciesLoader").hide();
             $("#uploadSpeciesDiv").hide();
             alert(data.msg);
             document.getElementById("downloadSpeciesFile").style.visibility = "visible";
