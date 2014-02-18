@@ -31,7 +31,7 @@ class Species implements Rateable {
 	Date dateCreated;
 	Date lastUpdated;
 	Habitat habitat;
-	StringBuffer sLog;
+	StringBuilder sLog;
 	
 	def grailsApplication; 
 	def springSecurityService;
@@ -253,28 +253,28 @@ class Species implements Rateable {
 //		}
 //	}
 	
-	def appendLogSummary(def str){
+	public void appendLogSummary(def str){
 		if(!str) return
 		
 		if(!sLog){
-			sLog = new StringBuffer()
+			sLog = new StringBuilder()
 		}
 		
 		if(str instanceof Exception){
-			StringWriter errors = new StringWriter();
-			str.printStackTrace(new PrintWriter(errors));
-			str  = errors.toString();
+			//StringWriter errors = new StringWriter();
+			//str.printStackTrace(new PrintWriter(errors));
+			str = str.getMessage()//errors.toString();
 		}
 		sLog.append(str+ System.getProperty("line.separator"))
 	}
 	/*
 	private class SpeciesLog {
 		int uploadRowIndex;
-		StringBuffer summary;
+		StringBuilder summary;
 		
 		public SpeciesLog(){
 			uploadRowIndex = 0;
-			summary = new StringBuffer()
+			summary = new StringBuilder()
 		}
 	}
 	*/

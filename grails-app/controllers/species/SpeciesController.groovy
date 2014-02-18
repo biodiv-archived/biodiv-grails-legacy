@@ -563,17 +563,14 @@ class SpeciesController extends AbstractObjectController {
             String reportDate_end = df.format(end);
 
             //def endTime = new Date()
-            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res.log
-            
+            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res.summary
+            def mylog = " Start Date  " + start + "   End Date " + end + "\n\n " + res.log
             String fileName = "ErrorLog.txt"
             String uploadDir = "species"
             //URL url = new URL(data.xlsxFileUrl);
             File errorFile = observationService.createFile(fileName , uploadDir, contentRootDir);
-			FileOutputStream fop = new FileOutputStream(errorFile);
-			byte[] contentInBytes = mymsg.getBytes();
-			fop.write(contentInBytes);
-			fop.flush();
-			fop.close();
+			errorFile.write(mylog)
+
             def otherParams = [:]
             def usersMailList = []
             usersMailList = speciesPermissionService.getSpeciesAdmin()

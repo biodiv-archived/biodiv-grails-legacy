@@ -64,7 +64,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int i=0;
 		
 			//log.debug speciesContent;
-			Node speciesElement = builder.createNode("species", ['rowIndex':currentRowIndex++]);
+			addToSummary("Creating XML for row " + currentRowIndex++)
+			Node speciesElement = builder.createNode("species", ['rowIndex':currentRowIndex]);
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
@@ -308,7 +309,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 						createImages(images, txt, imagesMetaData, imagesDir);
                 	}
 				}else{
-					addToSummary("In data sheet values are blank within the reference column ")
+					addToSummary("In data sheet values are blank within marked image column ")
 				}
 			}
 		} else {
@@ -336,7 +337,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					}
 					groupValues.add(txt);
 				}else{
-					addToSummary("In data sheet values are blank within the reference column ")
+					addToSummary("In data sheet values are blank within marked image column")
 				}
 				}catch(e) {
 					e.printStackTrace()

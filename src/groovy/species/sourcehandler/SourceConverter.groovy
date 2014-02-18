@@ -14,7 +14,8 @@ class SourceConverter {
 	
 	//to keep track of current species index. used for reporting error.
 	public int currentRowIndex = 1;
-	private StringBuffer summary;
+	private StringBuilder summary;
+	private StringBuilder shortSummary;
 
     protected SourceConverter() {
         licenseUrlMap = new HashMap();
@@ -26,7 +27,8 @@ class SourceConverter {
         licenseUrlMap.put(LicenseType.CC_BY_NC_SA, "http://creativecommons.org/licenses/by-nc-sa/3.0/");
         licenseUrlMap.put(LicenseType.CC_BY_SA, "http://creativecommons.org/licenses/by-sa/3.0/ ");
 		
-		summary = new StringBuffer() 
+		summary = new StringBuilder()
+		shortSummary = new StringBuilder()
     }
 
     protected Node createFieldNode(Field field) {
@@ -530,20 +532,32 @@ class SourceConverter {
     }
 
 	//////////////////////// custom log related ////////////////////	
-	def addToSummary(def str){
+	public void addToSummary(def str){
 		if(str){
+			String shortSumm 
+			String summ 
 			if(str instanceof Exception){
 				StringWriter errors = new StringWriter();
 				str.printStackTrace(new PrintWriter(errors));
-				str = errors.toString()
+				summ = errors.toString()
+				shortSumm = str.getMessage()
 			}
-			summary.append(str+ System.getProperty("line.separator"))
+			summary.append(summ?:str + System.getProperty("line.separator"))
+			shortSummary.append(shortSumm?:str + System.getProperty("line.separator"))
 		}
 	}
 	
-	def String getSummary(){
-		return summary.toString()
+	public void addToLogs(String str){
+		if(str)
+			summary.append(str + System.getProperty("line.separator"))
+	}
+	
+	public String getSummary(){
+		return shortSummary.toString()
 	}
 
+	public String getLogs(){
+		return summary.toString()
+	}
 
 }

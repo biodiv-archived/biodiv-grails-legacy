@@ -183,7 +183,7 @@ class SpeciesUploadService {
 			converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 		}
 
-		return ['uploadCount' : saveSpecies(converter, content, imagesDir), 'log':converter.getSummary()];
+		return ['uploadCount' : saveSpecies(converter, content, imagesDir), 'summary':converter.getSummary(), 'log':converter.getLogs()];
 	}
 
 	/**
@@ -257,6 +257,7 @@ class SpeciesUploadService {
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
 				converter.addToSummary(res.summary);
+				converter.addToLogs(res.log);
 				speciesElements.clear();
 				cleanUpGorm();
 			}
@@ -273,13 +274,14 @@ class SpeciesUploadService {
 			noOfInsertions += res.noOfInsertions;
 			converter.addToSummary(res.species.collect{it.sLog?.toString()}.join("\n"))
 			converter.addToSummary(res.summary);
+			converter.addToLogs(res.log);
 			speciesElements.clear();
 			cleanUpGorm();
 		}
 
 		
-		log.info "================================ LOG SUMMARY======================"
-		println  converter.getSummary()
+		log.info "================================ LOG ============================="
+		println  converter.getLogs()
 		log.info "=================================================================="
 		
 		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
@@ -342,7 +344,7 @@ class SpeciesUploadService {
 			converter.addToSummary(e)
 		}
 
-		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary()];
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs()];
 	}
 
 	/** 

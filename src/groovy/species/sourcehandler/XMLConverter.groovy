@@ -236,7 +236,7 @@ class XMLConverter extends SourceConverter {
                 }
             } else {
                 log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
-				
+				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
             }
         } catch(Exception e) {
             log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
