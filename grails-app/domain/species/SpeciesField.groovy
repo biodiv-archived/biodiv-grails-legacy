@@ -51,6 +51,7 @@ class SpeciesField implements Rateable {
 	static mapping = {
 		description type:"text";
 		tablePerHierarchy true;
+		references cascade: "all-delete-orphan"
 	}
 	
 	static constraints = {

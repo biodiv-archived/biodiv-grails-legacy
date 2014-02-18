@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.FetchMode;
 
 import species.Classification
 import species.CommonNames
@@ -313,6 +314,12 @@ class XMLConverter extends SourceConverter {
              sFields = SpeciesField.withCriteria() {
                 eq("field", field)
                 eq('species', s)
+				fetchMode 'references', FetchMode.JOIN
+				fetchMode 'contributors', FetchMode.JOIN
+				fetchMode 'licenses', FetchMode.JOIN
+				fetchMode 'audienceTypes', FetchMode.JOIN
+				fetchMode 'resources', FetchMode.JOIN
+				fetchMode 'attributors', FetchMode.JOIN
             }
         }
 
@@ -382,9 +389,8 @@ class XMLConverter extends SourceConverter {
                 speciesField.audienceTypes?.clear()
                 speciesField.attributors?.clear()
                 speciesField.resources?.clear()
-                speciesField.references?.clear()
+				speciesField.references?.clear()
             }
-
             if(speciesField && contributors) {
                 contributors.each { speciesField.addToContributors(it); }
                 licenses.each { speciesField.addToLicenses(it); }
@@ -392,8 +398,8 @@ class XMLConverter extends SourceConverter {
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  speciesField.addToResources(it); }
                 references.each { println it; speciesField.addToReferences(it); }
-                speciesFields.add(speciesField);
-                println "----${speciesField.field.category}......${speciesField.contributors}"
+				speciesFields.add(speciesField);
+				println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
                 log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
             }			
