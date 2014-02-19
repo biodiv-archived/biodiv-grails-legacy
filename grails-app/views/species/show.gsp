@@ -155,7 +155,9 @@
         });
 
         </r:script>
-            <script type='text/javascript'> 
+
+        <%String space = speciesInstance.taxonConcept.canonicalForm%>
+            <r:script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
                 CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );               
 
@@ -170,12 +172,13 @@
                     { name: 'insert', items: [ 'Image', 'Table'] },
                     {name: 'save', items:['Inlinesave']}
                     ],
-                        filebrowserImageBrowseUrl: '/biodiv/ck/ofm?fileConnector=/biodiv/ck/ofm/filemanager&type=Image&viewMode=grid',
-                        filebrowserImageUploadUrl: '/biodiv/ck/standard/uploader?Type=Image',
+                    filebrowserImageBrowseUrl: "/biodiv/ck/biodivofm?fileConnector=/biodiv/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
+                    //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
+
                         height: '400px'
                 };
 
-            </script>
+            </r:script>
 
 
 

@@ -168,7 +168,7 @@ class SpeciesController extends AbstractObjectController {
 				}
 				finalLoc.put ("field", field);
                 if(user && speciesPermissionService.isSpeciesContributor(speciesInstance, user)) {
-                    finalLoc.put('isContributor', true);
+                    finalLoc.put('isContributor', 1);
                 }
 			}
 		}
@@ -196,8 +196,9 @@ class SpeciesController extends AbstractObjectController {
                             map.get(sField.field.concept).put('hasContent', true);
                             finalLoc.put('hasContent', true);
                     }
-                    if( finalLoc.get('isContributor')) {
-                            map.get(sField.field.concept).put('isContributor', true);
+                    if( finalLoc.get('isContributor') && isContentContributor(sField)) {
+                            finalLoc.put('isContributor', 2)
+                            map.get(sField.field.concept).put('isContributor', 1);
                     }
 
                     //subcategory
@@ -208,21 +209,22 @@ class SpeciesController extends AbstractObjectController {
                             map.get(sField.field.concept).get(sField.field.category).put('hasContent', true);
                             finalLoc.put('hasContent', true);
                         }
-                        if(finalLoc.get('isContributor')) {
-                            map.get(sField.field.concept).put('isContributor', true);
-                            map.get(sField.field.concept).get(sField.field.category).put('isContributor', true);
+                        if(finalLoc.get('isContributor') && isContentContributor(sField)){
+                            finalLoc.put('isContributor', 2)
+                            map.get(sField.field.concept).put('isContributor', 1);
+                            map.get(sField.field.concept).get(sField.field.category).put('isContributor', 1);
                         }
 
 					}
 				}
 			}
-			if(finalLoc.containsKey('field')) {
+			if(finalLoc.containsKey('field')) { 
 				def t = finalLoc.get('speciesFieldInstance');
 				if(!t) {
 					t = [];
 					finalLoc.put('speciesFieldInstance', t);
-				}
-				t.add(sField);
+				} 
+				t.add(sField); 
                 //TODO:do an insertion sort instead of sorting collection again and again
             //    speciesService.sortAsPerRating(t);
 			}
@@ -260,6 +262,12 @@ class SpeciesController extends AbstractObjectController {
                     map.get(concept.key).get(category.key).put('hasContent', true);
                     map.get(concept.key).put('hasContent', true);
                 }
+                if(category.value.get('isContributor')) {
+                    int val = category.value.get('isContributor')
+                    map.get(concept.key).get(category.key).put('isContributor', val);
+                    map.get(concept.key).put('isContributor', val);
+                }
+
 
 				for(subCategory in category.value.clone()) {
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor")  ) continue;
@@ -278,11 +286,26 @@ class SpeciesController extends AbstractObjectController {
                         map.get(concept.key).get(category.key).put('hasContent', true);
                         map.get(concept.key).put('hasContent', true);
                     }
+
+                    if(subCategory.value.get('isContributor')) { 
+                        int val = subCategory.value.get('isContributor')
+                        map.get(concept.key).get(category.key).put('isContributor', val);
+                        map.get(concept.key).put('isContributor', val);
+                    }
 				}
 			}
 		}
 		return map;
 	}
+
+    private boolean isContentContributor(SpeciesField sField) {
+        for(c1 in sField.contributors) {
+            if(c1.name == springSecurityService.currentUser.username) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	@Secured(['ROLE_USER'])
 	def edit = {
@@ -328,9 +351,6 @@ class SpeciesController extends AbstractObjectController {
                 case "newdescription":
                     long speciesId = params.speciesid? params.long('speciesid') : null;
                     long fieldId = speciesFieldId;
-                    println speciesId
-                    println fieldId
-                    println value
                     result = speciesService.addDescription(speciesId, fieldId, value);
                     def html = [];
                     if(result.speciesInstance) {

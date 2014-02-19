@@ -1,3 +1,5 @@
+import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
+
 class UrlMappings {
 
 	static mappings = {
@@ -150,6 +152,20 @@ class UrlMappings {
 			controller='document'
 			action='browser'
 		}
+
+         def prefix = "/${CkeditorConfig.getConnectorsPrefix()}";
+         def uploadPrefix = CkeditorConfig.getUploadPrefix();
+
+         // Open File Manager
+         //using ofm index page
+         delegate.(prefix + "/biodivofm") (controller: "biodivOpenFileManagerConnector", action: "index")
+         delegate.(prefix + "/biodivofm/filemanager") (controller: "biodivOpenFileManagerConnector", action: "fileManager")
+
+         // Images outside the web-app dir
+         if (uploadPrefix) { 
+             delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
+         }
+
 
     }
 }
