@@ -46,8 +46,9 @@ class BiodivOpenFileManagerConnectorController extends OpenFileManagerConnectorC
         def type = params.type 
         //HACK to handle module level folders
         def spaceAndModule = params.space
-        def arr = spaceAndModule.split(File.separator);
         def space,module;
+        if(spaceAndModule) {
+        def arr = spaceAndModule.split(File.separator);
         if(arr.length == 2) {
             space = arr[0];
             params.space = space;
@@ -57,6 +58,7 @@ class BiodivOpenFileManagerConnectorController extends OpenFileManagerConnectorC
             space = arr[0]
             params.space = space;
             params.module = '';
+        }
         }
 
         def showThumbs = params.showThumbs == 'true'
@@ -68,6 +70,12 @@ class BiodivOpenFileManagerConnectorController extends OpenFileManagerConnectorC
             baseDir = baseDir + PathUtils.checkSlashes(module, "L+ R-")
         }
 
+        def f = new File(baseDir)
+        if (!f.exists()) {
+            f.mkdirs()
+        }
+
+
          if (log.isDebugEnabled()) {
             log.debug "=============================================="
             log.debug params
@@ -78,7 +86,6 @@ class BiodivOpenFileManagerConnectorController extends OpenFileManagerConnectorC
             log.debug "showThumbs = ${showThumbs}"
             log.debug "=============================================="
         }
-println mode        
         def resp
         switch (mode) {
             case 'getinfo':
@@ -130,8 +137,6 @@ println mode
             baseDir = servletContext.getRealPath(baseUrl)
             baseDir = PathUtils.checkSlashes(baseDir, "R+")
         }
-println "=========================="
-println baseDir
         def f = new File(baseDir)
         if (!f.exists()) {
             f.mkdirs()
@@ -146,19 +151,12 @@ println baseDir
     }
 
     private getFolder(baseDir, baseUrl, module, path, showThumbs) {
-        println "***************************"
-        println baseDir
-        println baseUrl
-        println path
-        println "***************************"
         def resp = [:]
         def currentDir = new File(baseDir + PathUtils.checkSlashes(path, "L- R+"))
-        println currentDir 
         if (currentDir.exists()) {
             currentDir.eachFile { file ->
                 if (!file.name.startsWith('.')) {
                     def fname = path + file.name
-                    println fname
                     resp["\"${fname}\""] = getFileInfo(baseDir, baseUrl, fname, showThumbs)
                 }
             }
