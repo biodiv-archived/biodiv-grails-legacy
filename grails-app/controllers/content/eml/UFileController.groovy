@@ -525,41 +525,75 @@ class UFileController {
         return res
     }
 
-
     private Map convertExcelToCSV(File uploaded, params ) {
-        def spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath).get(0)
+        def compContent
+        def spread
         File outCSVFile = observationService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
-
+        boolean isSimpleSheet = detectSheetType(uploaded)
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
-        if(spread.size() != 0){
-            int  size = spread.get(0).size()
-            int count = 0;
-            //println  "============ "  + spread.class + "  ---- " + spread; 
+        if(isSimpleSheet == false){
+            compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+            spread = compContent.get(0)
             def headerNameList = spread.get(0).collect {
                 StringEscapeUtils.escapeCsv(it.getKey());
             }
-            //println "=====ROW HEADER SIZE==== " + headerNameList.size()
             def  joinedHeader = headerNameList.join(",")
-
-            //println "=========JOINED HEADER ===== " + joinedHeader;
             bw.write(joinedHeader + "\r\r\n\n")
 
             spread.each { rowMap->  
-                //println "====SIZE ROW MAP== " + rowMap.size();
-                //println "========%%%%%%%%% " + rowMap.class + " --- " + rowMap;
                 List rowValues = []
                 rowMap.each{
                     rowValues << StringEscapeUtils.escapeCsv(it.getValue());
-                    //'"' + it.getValue() + '"';
-                    //sanitizeForCsv(it.getValue()) ;
                 }
-                //println "====ROW VALUES === "+ rowValues;
                 def joinedContent = rowValues.join(",")
-                //println "=========JOINED CONTENT === " + joinedContent;
                 bw.write(joinedContent + "\r\r\n\n")
             }
+        }else{
+            compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath, 0)
+            def conceptRow = compContent.get(0)
+            def categoryRow = compContent.get(1)
+            def subcategoryRow = compContent.get(2)
+            def headerRow = []
+            def index = 0
+            conceptRow.each{
+                def hName
+                if(index != 0){
+                    hName = conceptRow.get(index).toLowerCase()
+                    def val1 = categoryRow.get(index).toLowerCase()
+                    if(val1 != ""){
+                        hName = hName + "|" + val1
+                    }
+                    def val2 = subcategoryRow.get(index).toLowerCase()
+                    if(val2 != ""){
+                        hName = hName + "|" + val2
+                    }
+                    headerRow << StringEscapeUtils.escapeCsv(hName)
+
+                }
+                index = index + 1
+            }
+            def  joinedHeader = headerRow.join(",")
+            bw.write(joinedHeader + "\r\r\n\n")
+            def counter = 0
+            compContent.each{ stringRow ->
+                if(counter >= 4){
+                    List rowValues = []
+                    def k = 0;
+                    stringRow.each{
+                        if(k != 0){
+                            rowValues << StringEscapeUtils.escapeCsv(it);
+                        }
+                        k++;
+                    }
+                    def joinedContent = rowValues.join(",")
+                    bw.write(joinedContent + "\r\r\n\n")
+                }
+                counter = counter + 1
+            }
+            
         }
+
         bw.close();
         String relPath = outCSVFile.absolutePath.replace(contentRootDir, "")
         def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
@@ -568,6 +602,27 @@ class UFileController {
         res.put("relPath" , relPath)
         res.put("url" , url)
         return res
+    }
+
+    private boolean detectSheetType(File uploaded){
+        def compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+        boolean isSimpleSheet = true
+        if(compContent.size() > 2){
+            isSimpleSheet = false
+            return isSimpleSheet
+		}
+        else{
+            def spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath, 0)
+            if(spread.get(0).get(0).toLowerCase() == "concept" && spread.get(1).get(0).toLowerCase() == "category" && spread.get(2).get(0).toLowerCase() == "subcategory" && spread.get(3).get(0).toLowerCase() == "description"){
+                isSimpleSheet = true
+                return isSimpleSheet
+            }
+            else{
+                isSimpleSheet = false
+                return isSimpleSheet
+            }
+        }
+
     }
 
     private String fileExtension(String fileName) {
