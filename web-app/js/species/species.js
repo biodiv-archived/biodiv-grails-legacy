@@ -512,7 +512,8 @@ function initGalleryTabs() {
             onblur:'ignore'
        })
 
-        $ele.find('.ck_desc_add').before("<a class='addFieldButton'><i class='icon-add'></i>Add</a>");
+        if($ele.find('.addFieldButton,a.ck_desc_add').length == 0)
+               $ele.find('.ck_desc_add').before("<a class='addFieldButton'><i class='icon-add'></i>Add</a>");
         $ele.find('.addFieldButton').click(function(e){    
             e.stopPropagation();
             var $textarea = $(this).nextAll('textarea');

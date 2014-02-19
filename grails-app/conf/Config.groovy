@@ -437,8 +437,9 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
     development {
-             grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
         speciesPortal {
+	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "saturn.strandls.com"
         }
@@ -460,7 +461,8 @@ environments {
 
         ckeditor {
             upload {
-                basedir = "/newsletters/"
+                baseurl = "/"
+                basedir = "${speciesPortal.app.rootDir}/"
                 image.browser = true
                 image.upload = true    
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -477,10 +479,10 @@ environments {
         error   'org.codehaus.groovy.grails.web.pages', //  GSP
                 'org.codehaus.groovy.grails.web.sitemesh', //  layouts
                 'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                'org.codehaus.groovy.grails.web.mapping', // URL mapping
                 'org.codehaus.groovy.grails.commons', // core / classloading
                 'org.codehaus.groovy.grails.plugins', // plugins
                 'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+                'org.codehaus.groovy.grails.web.mapping', // URL mapping
                 'org.hibernate',
                 'net.sf.ehcache.hibernate',
                 'org.springframework.security',
@@ -574,7 +576,7 @@ environments {
                 ckeditor {
                     upload {
                     baseurl = "/newsletters"
-                    basedir = "/data/species/newsletters/"
+                    basedir = "${app.rootDir}/newsletters/"
                     image.browser = true
                     image.upload = true    
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -650,7 +652,7 @@ environments {
                 ckeditor {
                     upload {
                     baseurl = "/newsletters"
-                    basedir = "/data/pambaTest/species/newsletters/"
+                    basedir = "${app.rootDir}/newsletters/"
                     image.browser = true
                     image.upload = true    
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -724,7 +726,7 @@ environments {
         ckeditor {
             upload {
                 baseurl = "/newsletters"
-                basedir = "/data/species/newsletters/"
+                basedir = "${app.rootDir}/newsletters/"
                 image.browser = true
                 image.upload = true    
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
