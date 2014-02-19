@@ -2,7 +2,7 @@
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-<div class="sidebar_section  <%=sparse?'':'menubutton'%>">
+<div class="sidebar_section  <%=sparse?'':'menubutton'%>  ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
     <g:set var="fieldCounter" value="${1}" />
     <a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
@@ -40,7 +40,6 @@
             </g:if>
             <g:else>
             <g:each in="${concept.value}" var="category">
-
             <s:hasContent model="['map':category.value]">
             <g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
 

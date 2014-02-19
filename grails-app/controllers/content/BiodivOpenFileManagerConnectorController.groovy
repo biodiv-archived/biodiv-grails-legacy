@@ -32,7 +32,7 @@ class BiodivOpenFileManagerConnectorController extends OpenFileManagerConnectorC
             params.module = '';
         }
 
-        render (controller: "", view: "/biodivofm/ofm")
+        render  view: "/biodivofm/ofm"
     }
 
     /**

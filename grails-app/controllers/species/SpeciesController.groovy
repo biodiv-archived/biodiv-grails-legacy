@@ -260,6 +260,11 @@ class SpeciesController extends AbstractObjectController {
                     map.get(concept.key).get(category.key).put('hasContent', true);
                     map.get(concept.key).put('hasContent', true);
                 }
+                if(category.value.get('isContributor')) {
+                    map.get(concept.key).get(category.key).put('isContributor', true);
+                    map.get(concept.key).put('isContributor', true);
+                }
+
 
 				for(subCategory in category.value.clone()) {
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor")  ) continue;
@@ -277,6 +282,11 @@ class SpeciesController extends AbstractObjectController {
                     if(subCategory.value.get('hasContent')) { 
                         map.get(concept.key).get(category.key).put('hasContent', true);
                         map.get(concept.key).put('hasContent', true);
+                    }
+
+                    if(subCategory.value.get('isContributor')) { 
+                        map.get(concept.key).get(category.key).put('isContributor', true);
+                        map.get(concept.key).put('isContributor', true);
                     }
 				}
 			}
@@ -328,9 +338,6 @@ class SpeciesController extends AbstractObjectController {
                 case "newdescription":
                     long speciesId = params.speciesid? params.long('speciesid') : null;
                     long fieldId = speciesFieldId;
-                    println speciesId
-                    println fieldId
-                    println value
                     result = speciesService.addDescription(speciesId, fieldId, value);
                     def html = [];
                     if(result.speciesInstance) {
