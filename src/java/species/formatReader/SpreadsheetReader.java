@@ -135,27 +135,25 @@ public class SpreadsheetReader {
 		}
 		return null;
 	}
-	
-	private static List<List<String>> readSpreadSheet(Workbook wb, int sheetNo) {
-		List<List<String>> content = new ArrayList<List<String>>();
 
-		Sheet sheet = wb.getSheetAt(sheetNo);
-		
-		for (Row row : sheet) {
-			List<String> rowData = new ArrayList<String>();
-			 
-			 int lastCellNum = row.getLastCellNum();
-	         for(int i = 0; i <= lastCellNum; i++) {
-	        	 Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-            	 String cellVal = getCellText(cell);
-            	 rowData.add(cellVal);
-	         }
-			content.add(rowData);
-		}
-		return content;
-	}
-	
-	private static String getCellText(Cell cell) {
+        private static List<List<String>> readSpreadSheet(Workbook wb, int sheetNo) {
+            List<List<String>> content = new ArrayList<List<String>>();
+            Sheet sheet = wb.getSheetAt(sheetNo);
+            Row r = sheet.getRow(0);
+            int lastCellNum = r.getLastCellNum();
+            for (Row row : sheet) {
+                List<String> rowData = new ArrayList<String>();
+                for(int i = 0; i < lastCellNum; i++) {
+                    Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
+                    String cellVal = getCellText(cell);
+                    rowData.add(cellVal);
+                }
+                content.add(rowData);
+            }
+            return content;
+        }
+
+        private static String getCellText(Cell cell) {
 		// return cell.getRichStringCellValue().getString();
 		String text = formatter.formatCellValue(cell).trim();
 		// if(text.isEmpty()) return null;

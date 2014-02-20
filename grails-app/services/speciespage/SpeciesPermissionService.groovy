@@ -79,7 +79,7 @@ class SpeciesPermissionService {
             List parentTaxons = taxonConcept.parentTaxon()
             def res = SpeciesPermission.withCriteria {
                 eq('author', user)
-                inList('permissionType', [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(),SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value()])
+                inList('permissionType', [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(),SpeciesPermission.PermissionType.ROLE_CURATOR.value()])
                 inList('taxonConcept',  parentTaxons)
             }
             if(res && res.size() > 0)
@@ -92,18 +92,14 @@ class SpeciesPermissionService {
 
     boolean isSpeciesFieldContributor(SpeciesField speciesFieldInstance, SUser user) {
         if(!user) return false;
-        if(SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'))
-            return true;
-        else {
-            boolean flag = false;
-            speciesFieldInstance.contributors.each { c ->
-                if(c.name == user.username) {
-                    flag = true;
-                    return
-                }
+        boolean flag = false;
+        speciesFieldInstance.contributors.each { c ->
+            if(c.name == user.username) {
+                flag = true;
+                return
             }
-            return flag;
         }
+        return flag;
     }
     
     List<SUser> getSpeciesAdmin (){

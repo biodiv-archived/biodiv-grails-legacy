@@ -2,7 +2,7 @@
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-<div class="sidebar_section  <%=sparse?'':'menubutton'%>">
+<div class="sidebar_section  <%=sparse?'':'menubutton'%>  ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
     <g:set var="fieldCounter" value="${1}" />
     <a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
@@ -18,7 +18,7 @@
             class="speciesField collapse in">
             <g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 
-            <g:if test="${isSpeciesContributor}">
+            <g:if test="${isSpeciesContributor && concept.value.isContributor!=2}">
             <div class="contributor_entry">
                <textarea id="description_${concept.value.get('field').id}" 
                     name="description_${concept.value.get('field').id}"
@@ -40,7 +40,6 @@
             </g:if>
             <g:else>
             <g:each in="${concept.value}" var="category">
-
             <s:hasContent model="['map':category.value]">
             <g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
 
@@ -49,7 +48,8 @@
                     <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
                 </h6>
                 <div>
-                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor}">
+                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor && category.value.isContributor!=2}">
+                        
                 <div class="speciesField">
                     <textarea id="description_${category.value.get('field').id}" 
                         name="description_${category.value.get('field').id}"
