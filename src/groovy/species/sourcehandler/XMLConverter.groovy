@@ -32,6 +32,8 @@ import species.groups.SpeciesGroup;
 import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
+import species.auth.SUser
+
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
 
@@ -326,7 +328,7 @@ class XMLConverter extends SourceConverter {
         for(Node dataNode : fieldNode.data) {
             String data = getData(dataNode);
             data = cleanData(data, s.taxonConcept, synonyms);
-            List<Contributor> contributors = getContributors(dataNode, true);
+            List<SUser> contributors = getUserContributors(dataNode);
             List<License> licenses = getLicenses(dataNode, false);
             List<AudienceType> audienceTypes = getAudienceTypes(dataNode, true);
             List<Resource> resources = getResources(dataNode, imagesNode, iconsNode, audiosNode, videosNode);
@@ -532,6 +534,20 @@ class XMLConverter extends SourceConverter {
         }
         return contributors;
     }
+	
+	private List<SUser> getUserContributors(Node dataNode) {
+		List<SUser> contributors = new ArrayList<SUser>();
+		dataNode.contributor.each {
+			String contributorEmail = it.text()?.trim();
+			SUser contributor = SUser.findByEmail(contributorEmail)
+			if(contributor) {
+				contributors.add(contributor);
+			} else {
+				log.warn "NOT A VALID CONTIBUTOR : "+contributorEmail;
+			}
+		}
+		return contributors;
+	}
 
     /**
      * 

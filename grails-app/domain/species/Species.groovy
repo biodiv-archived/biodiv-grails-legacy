@@ -265,7 +265,7 @@ class Species implements Rateable {
 			//str.printStackTrace(new PrintWriter(errors));
 			str = str.getMessage()//errors.toString();
 		}
-		sLog.append(str+ System.getProperty("line.separator"))
+		sLog.append("" + str + System.getProperty("line.separator"))
 	}
 	/*
 	private class SpeciesLog {
