@@ -2615,5 +2615,6 @@ small {
     white-space: normal;
 }
 
-.wysihtml5 {
+.hidePoint {
+    display:none;
 }

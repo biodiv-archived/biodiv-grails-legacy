@@ -1573,15 +1573,8 @@ border-bottom:3px solid #45a989;
 background-color: #fafafa;
 border-bottom:3px solid #003846;
 }
+
 /* CSS for Species iframe*/
-iframe {
-    margin-left: -300px;
-    width: 977px;
-    height: 1700px;
-    margin-top: -120px;
-    z-index: 100000;
-    border:none;
-}
 #node-1719 iframe {
     height: 3350px;
 }

@@ -428,7 +428,6 @@ function initGalleryTabs() {
     function onAddableDisplay(value, sourceData, response, context) {
         var me = $(this);
         if(context) me = context
-        console.log('onAddableDisplay');
         var html = [];
         if(sourceData && sourceData.content) {
             var speciesId = sourceData.speciesId?sourceData.speciesId:'';
@@ -667,13 +666,13 @@ function initGalleryTabs() {
 
 function initEditableFields(e) {
     if($(document).find('.editFieldButton').length == 0) {
-        
         initEditables();
         initAddables();
         initLicenseSelector(undefined, licenseSelectorOptions, "CC BY");
         initAudienceTypeSelector(undefined, audienceTypeSelectorOptions, "General Audience");
         initStatusSelector(undefined, statusSelectorOptions, "Under Validation");
         $('.emptyField').show();
+        $('.hidePoint').show();
 
         $('#editSpecies').html('<i class="icon-edit"></i>Exit Edit Mode');
     } else {

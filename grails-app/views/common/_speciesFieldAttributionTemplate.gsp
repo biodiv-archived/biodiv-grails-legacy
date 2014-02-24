@@ -17,7 +17,7 @@
                 </g:if>
                 </g:each>
                 <g:if test="${isSpeciesContributor}">
-                <li>
+                <li class="hidePoint">
                     <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
                 </li>
                 </g:if>
@@ -28,7 +28,7 @@
     <div class="prop span11">
         <div class="name" style="float:none;">Attributions</div>
             <ul>
-                <li>
+                <li class="hidePoint">
                 <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
                 </li>
             </ul>
@@ -47,7 +47,7 @@
                 </g:if>
                 </g:each>
                 <g:if test="${isSpeciesContributor}">
-                <li> 
+                <li class="hidePoint"> 
                 <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Add contributor name" data-placeholder="Add contributor"></a>
                 </li>
                 </g:if>
@@ -124,7 +124,7 @@
     <div class="prop span11">
         <div class="name" style="float:none;">References</div>
             <ul>
-                <li>
+                <li class="hidePoint">
                 <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></a>
                 </li>
             </ul>
