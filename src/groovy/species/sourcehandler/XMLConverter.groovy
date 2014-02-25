@@ -381,7 +381,8 @@ class XMLConverter extends SourceConverter {
 
             if(!speciesField) {
                 log.debug "Adding new field to species ${s}"
-                speciesField = sFieldClass.newInstance(field:field, description:data);
+				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
+                speciesField = sFieldClass.newInstance(field:field, description:data, uploadTime:new Date(), uploader:new SUser());
             } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
