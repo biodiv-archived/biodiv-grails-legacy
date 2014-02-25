@@ -130,6 +130,10 @@ class SpeciesTagLib {
 	def showDownloadAction = {attrs, body->
 		out << render(template:"/species/showDownloadAction", model:attrs.model);
 	}
+	
+	def rollBackTable = {attrs, body->
+		out << render(template:"/species/speciesBulkUploadTableTemplate", model:attrs.model);
+	}
 
     def hasPermission = {attrs, body ->
         SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;

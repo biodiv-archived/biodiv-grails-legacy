@@ -154,13 +154,38 @@ def populateSfieldContributor(){
 
 
 
+//---------------------------
+
+def updateObservationResource(){
+	int i = 0
+	def ds = ctx.getBean("dataSource")
+	def sql =  Sql.newInstance(ds);
+	def query = "select o.author_id as aid, o.created_on as cdate, r.resource_id as rid from observation o, observation_resource r where o.id = r.observation_id"
+	sql.rows(query).each{
+		println " updating resource " + it.rid + " count " + i++ 
+		sql.executeUpdate( 'UPDATE resource set uploader_id = ?, upload_time = ?  where id = ?',  [it.aid, it.cdate, it.rid])
+	 }
+}
 
 
 
-makeFieldGeneric()
-addMetadataField()
-addNewField()
+//makeFieldGeneric()
+//addMetadataField()
+//addNewField()
 //populateUserInContributor()
 //populateUserInContributor1()
 //populateSfieldContributor()
 
+
+/*
+update species_field_suser set contributors_idx = 0;
+delete from species_field_contributor where species_field_contributors_id is null;
+alter table species_field_contributor drop column species_field_contributors_id;
+drop table species_taxonomy_registry ;
+*/
+
+
+//adding soure info
+updateObservationResource()
+//update species_field set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+//update resource set uploader_id = 1, upload_time = '1970-01-01 00:00:00' where uploader_id is null;

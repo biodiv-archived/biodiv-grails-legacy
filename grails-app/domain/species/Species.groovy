@@ -48,7 +48,7 @@ class Species implements Rateable {
 		globalEndemicityEntities:GeographicEntity, 
 		indianDistributionEntities:GeographicEntity, 
 		indianEndemicityEntities:GeographicEntity, 
-		taxonomyRegistry:TaxonomyRegistry, 
+		//taxonomyRegistry:TaxonomyRegistry, 
 		resources:Resource,
 		userGroups:UserGroup];
  

@@ -3,8 +3,10 @@ package species
 import org.grails.rateable.*
 import species.auth.SUser
 
-class SpeciesField implements Rateable {
+class SpeciesField extends Sourcedata implements Rateable {
 
+	def activityFeedService
+	
 	public enum Status {
 		UNDER_CREATION("Under Creation"),
 		PUBLISHED("Published"),
@@ -68,5 +70,9 @@ class SpeciesField implements Rateable {
 				return ['species.field.empty', 'licenses',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 			}
 		}
+	}
+	
+	def beforeDelete(){
+		activityFeedService.deleteFeed(this)
 	}
 }

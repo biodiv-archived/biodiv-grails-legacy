@@ -5,6 +5,7 @@
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.participation.SpeciesBulkUpload"%>
 <html>
 <head>
 
@@ -90,6 +91,7 @@
 			</div>
 			<%
 				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
+				def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
 			%>
 
                         <div id="userprofilenavbar" class="navbar">
@@ -202,6 +204,16 @@
                                     <obv:downloadTable model="[downloadLogList:downloadLogList]" />
                                 </div>
                                 </g:if>
+                                
+                                <g:if test="${!speciesBulkUploadList.isEmpty()}">
+                                <div id="uploads" class="section" style="clear: both;overflow:auto;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"></span> Species Bulk Uploads
+                                    </h6>
+                                    <s:rollBackTable model="[uploadList:speciesBulkUploadList]" />
+                                </div>
+                                </g:if>
+                                
                             </div>
 			<div id="groups" class="super-section" style="clear: both;">
 				<h5>

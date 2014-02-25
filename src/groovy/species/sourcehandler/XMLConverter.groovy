@@ -223,7 +223,7 @@ class XMLConverter extends SourceConverter {
                     }
 
                     //adding taxonomy classifications
-                    taxonHierarchy.each { s.addToTaxonomyRegistry(it); }
+                    taxonHierarchy.each {it.save();}
 
                     //					if(defaultSaveAction == SaveAction.MERGE){
                     //						log.info "Merging with already existing species information : "+existingSpecies.id;
