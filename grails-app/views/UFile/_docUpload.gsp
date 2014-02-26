@@ -17,6 +17,7 @@
             $('#${name}_path').val(responseJSON.filePath);
             $('#${name}_name').val(fileName);
             $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
+            $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
             $('#headerMetadata').val(responseJSON.headerMetadata);
         }
 

@@ -1,8 +1,8 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.ImageUtils"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
-<%@ page import="species.Species"%>
-<%@ page import="species.groups.SpeciesGroup"%>
+<%@page import="species.Species"%>
+<%@page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>
 <html>
     <head>
@@ -17,7 +17,10 @@
                 <uGroup:rightSidebar/>
                     <div class="super-section span12" style="margin-left: 0px;">
                         <div class="section">
-
+                            <!--div class="control-group">
+                                <input type="radio" name="isSimpleSheet" value="true" checked="checked">Simple Sheet &nbsp; &nbsp;&nbsp;
+                                <input type="radio" name="isSimpleSheet" value="false">Mapped Sheet
+                            </div-->
                             <div
                                 class="control-group">
                                 <label class="control-label span2" for="speciesFile"> Species File <span
@@ -127,7 +130,7 @@
                 
                 <div class="section" style="margin-top: 0px; margin-bottom: 40px;clear:both;">
 
-                    <a href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
+                    <a id="speciesUploadCancel" href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
                         style="float: right; margin-right: 5px;"> Cancel </a>
 
                     <a id="uploadSpecies"
@@ -143,6 +146,9 @@
                     <input type="text" value="">
                 </div>
 
+                <div id="isSimpleSheet" style="display:none;">
+                    <input type="text" value="">
+                </div>
                 <div id="headerMetadata" style="display:none;">
                     <input type="text" value="">
                 </div>

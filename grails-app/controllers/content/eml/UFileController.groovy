@@ -111,6 +111,7 @@ class UFileController {
             String fileExt = fileExtension(originalFilename);
             def res;
             def xlsxFileUrl = null;
+            def isSimpleSheet;
             //Conversion of excel to csv 
             //FIND out a proper method to detect excel
             def headerMetadata;
@@ -122,6 +123,7 @@ class UFileController {
                 }
                 res = convertExcelToCSV(uploaded, params)
                 if(res != null) {
+                    isSimpleSheet = res.get("isSimpleSheet")
                     relPath = res.get("relPath")
                     url = res.get("url")
                     File temp = uploaded
@@ -133,7 +135,7 @@ class UFileController {
             }
             println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
             //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
-			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata] as JSON, contentType:'text/html')
+			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
@@ -610,6 +612,7 @@ class UFileController {
         res.put("outCSVFile" , outCSVFile)
         res.put("relPath" , relPath)
         res.put("url" , url)
+        res.put("isSimpleSheet", isSimpleSheet)
         return res
     }
 

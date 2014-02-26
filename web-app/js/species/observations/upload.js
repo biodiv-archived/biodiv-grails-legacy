@@ -498,6 +498,18 @@ $(".propagateButton").click(function(){
 
 });
 
+function automaticPropagate(){
+    if($("#isSimpleSheet").val() == true){
+        var classArr = ["contributorCell", "attributionsCell", "licenseCell"]
+        var tagArr = ["contributor", "attributions", "license"]
+        $.each(classArr, function(index, value){
+            $("td."+ value).find("ul").tagit( {showAutocompleteOnFocus: false});
+                $("td."+ value).find("ul").tagit("createTag", tagArr[index]);
+            $("td."+ value).find("ul").tagit( {showAutocompleteOnFocus: true});
+        });
+    }
+}
+
 $(".initPropagation").click(function(){
     var parentEle = $(this).parent("th");
     $(parentEle).find("div").toggle();

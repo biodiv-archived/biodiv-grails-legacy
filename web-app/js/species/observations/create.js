@@ -197,6 +197,7 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
+                    automaticPropagate();
                     var headerMetadata = getHeaderMetadata();
                     if(Object.keys(headerMetadata).length == 0){
                         var res = tagMetadatas(data);
