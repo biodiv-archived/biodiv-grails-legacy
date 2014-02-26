@@ -163,9 +163,9 @@ public class SpreadsheetWriter {
                 }
             }
             //System.out.println("==========NEW FUNC==============");
-            //System.out.println(entry);
+            System.out.println(headerName);
             //System.out.println("---------" + entry.getValue() + entry.getValue().getClass());
-            //System.out.println("-------" + headerValues + headerValues.getClass());
+            System.out.println("-------==============" + headerValues + headerValues.getClass());
             String dataColumns = "";
             if(headerValues.get("dataColumns") != null){
                 dataColumns = headerValues.get("dataColumns");
@@ -173,6 +173,7 @@ public class SpreadsheetWriter {
             }
             String group = "";
             if(headerValues.get("group") != null){
+                System.out.println(headerValues.get("group"));
                 group = headerValues.get("group");
                 group = group.trim();
             }

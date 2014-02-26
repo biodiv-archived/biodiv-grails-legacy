@@ -430,7 +430,7 @@ $('#downloadModifiedSpecies').click(function() {
 
 });
 
-$('#uploadSpecies').click(function() {
+function uploadSpecies(){
     $("#speciesLoader").show();
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
@@ -457,11 +457,22 @@ $('#uploadSpecies').click(function() {
             $("#filterLinkSpan").show();
         },
         error: function(xhr, textStatus, errorThrown) {
+            $("#speciesLoader").hide();
             alert('Error uploading species!!');
             console.log(xhr);
         }
+        $("#uploadSpecies").removeClass('disabled');
     });
+}
 
+$('#uploadSpecies').click(function() {
+    if($(this).hasClass('disabled')) {
+        alert("Uploading is in progress. Please submit after it is over.");
+        event.preventDefault();
+        return false; 		 		
+    }
+    $(this).addClass('disabled');
+    uploadSpecies();
 });
 
 $(".propagateButton").click(function(){
@@ -483,20 +494,6 @@ $(".propagateButton").click(function(){
     });
     $("td."+pClass).find("ul").tagit( {showAutocompleteOnFocus: true});
     $(pEle).find("div").hide();
-    /*
-       $("#tableHeader tr").each(function () {
-       $('td', this).each(function () {
-        if($(this).attr("class") == pClass){
-    //showAutoCompleteon focus ---false
-    $.each(valArr, function( index, value ) {
-    //createTag
-    });
-    //showAutoCompleteon focus ---true
-    }
-    });
-
-    });
-    */
 
 });
 
