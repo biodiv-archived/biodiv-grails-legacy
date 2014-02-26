@@ -54,5 +54,12 @@ class SpeciesBulkUpload {
 		}
 	}
 	
+	def updateStatus(Status status){
+		this.status = status
+		if(!this.save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+	}
+	
 	
 }

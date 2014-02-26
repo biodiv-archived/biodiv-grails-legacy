@@ -455,13 +455,14 @@ function uploadSpecies(){
             document.getElementById("downloadSpeciesFile").style.visibility = "visible";
             document.getElementById("downloadErrorFile").style.visibility = "visible";
             $("#filterLinkSpan").show();
+            $("#uploadSpecies").removeClass('disabled');
         },
         error: function(xhr, textStatus, errorThrown) {
             $("#speciesLoader").hide();
             alert('Error uploading species!!');
-            console.log(xhr);
+            $("#uploadSpecies").removeClass('disabled');
         }
-        $("#uploadSpecies").removeClass('disabled');
+        
     });
 }
 

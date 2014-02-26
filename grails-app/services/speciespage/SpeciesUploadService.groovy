@@ -264,7 +264,7 @@ class SpeciesUploadService {
 		
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
-				def res = saveSpeciesElements(speciesElements)
+				def res = saveSpeciesElementsWrapper(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
 				converter.addToSummary(res.summary);
@@ -281,7 +281,7 @@ class SpeciesUploadService {
 		
 		//saving last batch
 		if(speciesElements.size() > 0) {
-			def res = saveSpeciesElements(speciesElements)
+			def res = saveSpeciesElementsWrapper(speciesElements)
 			noOfInsertions += res.noOfInsertions;
 			converter.addToSummary(res.species.collect{it.sLog?.toString()}.join("\n"))
 			converter.addToSummary(res.summary);
@@ -629,11 +629,7 @@ class SpeciesUploadService {
 			return "Roll back in progres..."
 		}
 		
-		sbu.status = SpeciesBulkUpload.Status.RUNNING
-		if(!sbu.save(flush:true)){
-			sbu.errors.allErrors.each { log.error it }
-		}
-		
+		sbu.updateStatus(SpeciesBulkUpload.Status.RUNNING)
 		log.debug "Changed to running status"
 		
 		SUser user = sbu.author
@@ -651,6 +647,7 @@ class SpeciesUploadService {
 		
 		if(!sFields){
 			log.debug "Nothing to rollback"
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback"
 		}
 		
@@ -658,36 +655,23 @@ class SpeciesUploadService {
 		log.debug "species list " + sList
 		
 		SpeciesField.withTransaction{   
-				sFields.each { sf ->
-	//				try{
-						log.info "Deleting ${sf}"
-						sf.delete()
-	//				}catch (Exception e) {
-	//					e.printStackTrace()
-	//				}
-				}
-				
-				sList.each { s->
-					rollBackSpeciesUpdate(s, sFields, user)
-				}
-				
-				sbu.status = SpeciesBulkUpload.Status.ROLLBACK
-				if(!sbu.save()){
-					sbu.errors.allErrors.each { log.error it }
-				}
-				
+			sFields.each { sf ->
+					log.info "Deleting ${sf}"
+					sf.delete()
+			}
+			sList.each { s->
+				rollBackSpeciesUpdate(s, sFields, user)
+			}
+			
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 		}
 		
 		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
 			return "Successfully Rollbacked"
 		}else{
-			sbu.status = SpeciesBulkUpload.Status.FAILED
-			if(!sbu.save()){
-				sbu.errors.allErrors.each { log.error it }
-			}
+			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
 			return "Roll back failed..."
 		}
-		
 	}
 	
 	private Collection<Species> getAffectedSpecies(List sFields){
