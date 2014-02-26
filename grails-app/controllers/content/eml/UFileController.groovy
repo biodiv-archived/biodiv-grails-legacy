@@ -11,6 +11,13 @@ import java.util.ArrayList;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.io.FileUtils;
 import java.net.URL;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.DataFormatter;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -34,6 +41,7 @@ import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
 
+
 class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -49,6 +57,7 @@ class UFileController {
     static String outputCSVFile = "output.csv" 
     static String columnSep = SpreadsheetWriter.COLUMN_SEP
     static String keyValueSep = SpreadsheetWriter.KEYVALUE_SEP
+    static String headerSheetName = "headerMetadata"
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
@@ -306,9 +315,10 @@ class UFileController {
 		def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
         def sheetContent
         def res = [:]
-        if(completeContent.size() == 3 ){
+        InputStream inp = new FileInputStream(uploaded);
+		Workbook wb = WorkbookFactory.create(inp);
+        if(wb.getSheet(headerSheetName)){
             sheetContent = completeContent.get(2)
-            //println "==SHEET CONTENT ======== " + sheetContent
         }
         else{
             println " ======NO HEADER METADATA=== "
@@ -490,7 +500,6 @@ class UFileController {
                 }
             }
         }
-        //println "=======QQQQQQQQQQQQQQQ==========" + res
         return res
 	}
 
@@ -607,7 +616,9 @@ class UFileController {
     private boolean detectSheetType(File uploaded){
         def compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
         boolean isSimpleSheet = true
-        if(compContent.size() > 2){
+        InputStream inp = new FileInputStream(uploaded);
+		Workbook wb = WorkbookFactory.create(inp);
+        if(wb.getSheet(headerSheetName)){
             isSimpleSheet = false
             return isSimpleSheet
 		}
