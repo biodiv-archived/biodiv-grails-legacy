@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
+import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
+import species.participation.UserToken;
 
 class SpeciesController extends AbstractObjectController {
 
@@ -714,4 +716,37 @@ class SpeciesController extends AbstractObjectController {
         
         
 	}
+
+    def inviteCurator = {
+        println "invite curator called==================================" + params
+        List members = Utils.getUsersList(params.curatorUserIds);
+        println "======================= " + members
+        def selectedNodes = [4]
+        def msg = speciesPermissionService.sendSpeciesCuratorInvitation(selectedNodes, members, Utils.getDomainName(request), params.message)
+        render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+		return
+    }
+
+    def confirmCuratorInviteRequest = {
+        println "========RAECHED CONFIRMATION ========= " + params
+        //add the curator
+        if(params.userId && params.taxonConcept){
+            def user = SUser.get(params.userId.toLong())
+            def taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
+            speciesPermissionService.addCurator(user, taxonConcept)
+            def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
+            if(conf) {
+                log.debug "Deleting confirmation code and usertoken params";
+                conf.delete();
+                UserToken.get(params.tokenId.toLong())?.delete();
+            }
+            flash.message="Successfully added ${user} as a curator to ${taxonConcept.name}"
+        }else{
+            flash.error="Couldn't add ${user} as curator to ${taxonConcept.name} because of missing information."            
+        }
+        def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
+        println "=====REDIRECT WALA URL ========== " + url
+        redirect url: url
+		return;
+    }
 }
