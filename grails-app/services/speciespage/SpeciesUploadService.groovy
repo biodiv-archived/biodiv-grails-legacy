@@ -624,6 +624,18 @@ class SpeciesUploadService {
 			return "Already roll backed " 
 		}
 		
+		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+			log.error "Roll back in progres..." + sbu
+			return "Roll back in progres..."
+		}
+		
+		sbu.status = SpeciesBulkUpload.Status.RUNNING
+		if(!sbu.save(flush:true)){
+			sbu.errors.allErrors.each { log.error it }
+		}
+		
+		log.debug "Changed to running status"
+		
 		SUser user = sbu.author
 		Date start = sbu.startDate
 		Date end = sbu.endDate
@@ -645,29 +657,37 @@ class SpeciesUploadService {
 		Collection<Species> sList = getAffectedSpecies(sFields)
 		log.debug "species list " + sList
 		
-		SpeciesField.withTransaction{
-			sFields.each { sf ->
-				try{
-					log.info "Deleting ${sf}"
-					sf.delete()
-				}catch (Exception e) {
-					e.printStackTrace()
+		SpeciesField.withTransaction{   
+				sFields.each { sf ->
+	//				try{
+						log.info "Deleting ${sf}"
+						sf.delete()
+	//				}catch (Exception e) {
+	//					e.printStackTrace()
+	//				}
 				}
-			}
-		//}
+				
+				sList.each { s->
+					rollBackSpeciesUpdate(s, sFields, user)
+				}
+				
+				sbu.status = SpeciesBulkUpload.Status.ROLLBACK
+				if(!sbu.save()){
+					sbu.errors.allErrors.each { log.error it }
+				}
+				
+		}
 		
-		//Species.withTransaction{
-			sList.each { s->
-				rollBackSpeciesUpdate(s, sFields, user)
-			}
-		
-			sbu.status = SpeciesBulkUpload.Status.ROLLBACK
+		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			return "Successfully Rollbacked"
+		}else{
+			sbu.status = SpeciesBulkUpload.Status.FAILED
 			if(!sbu.save()){
 				sbu.errors.allErrors.each { log.error it }
 			}
+			return "Roll back failed..."
 		}
 		
-		return "Successfully Rollbacked"
 	}
 	
 	private Collection<Species> getAffectedSpecies(List sFields){
@@ -676,7 +696,7 @@ class SpeciesUploadService {
 	}
  
 	
-	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user){
+	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user) throws Exception {
 		List sFieldIds = SpeciesField.findAllBySpecies(s).collect{ it.id}
 		
 		//All species field deleted before this function call

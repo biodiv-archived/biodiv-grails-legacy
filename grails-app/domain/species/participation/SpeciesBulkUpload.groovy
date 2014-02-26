@@ -12,7 +12,9 @@ class SpeciesBulkUpload {
 	
 	public enum Status {
 		ROLLBACK("ROLLBACK"),
-		UPLOADED("UPLOADED")
+		UPLOADED("UPLOADED"),
+		RUNNING("RUNNING"),
+		FAILED("FAILED")
 		
 		private String value;
 
