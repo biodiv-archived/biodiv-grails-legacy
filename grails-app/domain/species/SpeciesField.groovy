@@ -1,9 +1,12 @@
 package species
 
 import org.grails.rateable.*
+import species.auth.SUser
 
-class SpeciesField implements Rateable {
+class SpeciesField extends Sourcedata implements Rateable {
 
+	def activityFeedService
+	
 	public enum Status {
 		UNDER_CREATION("Under Creation"),
 		PUBLISHED("Published"),
@@ -42,10 +45,10 @@ class SpeciesField implements Rateable {
 	String description;
 	Date dateCreated
 	Date lastUpdated
-    List<Contributor> contributors;
+    List<SUser> contributors;
     List<Contributor> attributors;
 	
-	static hasMany = [contributors:Contributor, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
+	static hasMany = [contributors:SUser, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
 	static mapping = {
@@ -57,7 +60,7 @@ class SpeciesField implements Rateable {
 	static constraints = {
 		contributors validator : { val, obj ->
 			if(!val) {
-				obj.addToContributors(Contributor.findByName('pearlsravanthi'));
+				obj.addToContributors(SUser.findByUsername('pearlsravanthi'));
 				//return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 				return true;
 			}
@@ -67,5 +70,9 @@ class SpeciesField implements Rateable {
 				return ['species.field.empty', 'licenses',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 			}
 		}
+	}
+	
+	def beforeDelete(){
+		activityFeedService.deleteFeed(this)
 	}
 }

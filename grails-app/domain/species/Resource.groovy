@@ -6,7 +6,7 @@ import species.utils.ImageType;
 import species.utils.Utils;
 import org.grails.rateable.*
 
-class Resource implements Rateable {
+class Resource extends Sourcedata implements Rateable {
 	
 	public enum ResourceType {
 		ICON("Icon"),

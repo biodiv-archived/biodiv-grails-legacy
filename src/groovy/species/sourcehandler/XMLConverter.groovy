@@ -32,6 +32,8 @@ import species.groups.SpeciesGroup;
 import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
+import species.auth.SUser
+
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
 
@@ -221,7 +223,7 @@ class XMLConverter extends SourceConverter {
                     }
 
                     //adding taxonomy classifications
-                    taxonHierarchy.each { s.addToTaxonomyRegistry(it); }
+                    taxonHierarchy.each {it.save();}
 
                     //					if(defaultSaveAction == SaveAction.MERGE){
                     //						log.info "Merging with already existing species information : "+existingSpecies.id;
@@ -326,7 +328,7 @@ class XMLConverter extends SourceConverter {
         for(Node dataNode : fieldNode.data) {
             String data = getData(dataNode);
             data = cleanData(data, s.taxonConcept, synonyms);
-            List<Contributor> contributors = getContributors(dataNode, true);
+            List<SUser> contributors = getUserContributors(dataNode);
             List<License> licenses = getLicenses(dataNode, false);
             List<AudienceType> audienceTypes = getAudienceTypes(dataNode, true);
             List<Resource> resources = getResources(dataNode, imagesNode, iconsNode, audiosNode, videosNode);
@@ -379,7 +381,8 @@ class XMLConverter extends SourceConverter {
 
             if(!speciesField) {
                 log.debug "Adding new field to species ${s}"
-                speciesField = sFieldClass.newInstance(field:field, description:data);
+				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
+                speciesField = sFieldClass.newInstance(field:field, description:data, uploadTime:new Date(), uploader:new SUser());
             } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
@@ -532,6 +535,20 @@ class XMLConverter extends SourceConverter {
         }
         return contributors;
     }
+	
+	private List<SUser> getUserContributors(Node dataNode) {
+		List<SUser> contributors = new ArrayList<SUser>();
+		dataNode.contributor.each {
+			String contributorEmail = it.text()?.trim();
+			SUser contributor = SUser.findByEmail(contributorEmail)
+			if(contributor) {
+				contributors.add(contributor);
+			} else {
+				log.warn "NOT A VALID CONTIBUTOR : "+contributorEmail;
+			}
+		}
+		return contributors;
+	}
 
     /**
      * 
