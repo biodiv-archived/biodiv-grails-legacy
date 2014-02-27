@@ -592,7 +592,7 @@ class SpeciesUploadService {
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
-        String fileName = "speciesSpreadsheet.xlsx"
+        String fileName = "speciesSpreadsheet.xls"
         String uploadDir = "species"
         File file = observationService.createFile(fileName , uploadDir, contentRootDir);
         println "===NEW MODIFIED SPECIES FILE=== " + file
