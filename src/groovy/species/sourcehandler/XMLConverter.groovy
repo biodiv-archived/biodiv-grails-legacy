@@ -178,36 +178,38 @@ class XMLConverter extends SourceConverter {
                             } else if(category && category.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
                                 //synonyms.each { s.addToSynonyms(it); }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToGlobalDistributionEntities(it);
-                                    }
-                                }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToGlobalEndemicityEntities(it);
-                                    }
-                                }
-                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToIndianDistributionEntities(it);
-                                    }
-                                }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToIndianEndemicityEntities(it);
-                                    }
-                                }
-
-                            } else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
+                            }
+//							 else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToGlobalDistributionEntities(it);
+//                                    }
+//                                }
+//                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToGlobalEndemicityEntities(it);
+//                                    }
+//                                }
+//                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToIndianDistributionEntities(it);
+//                                    }
+//                                }
+//                            }	else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToIndianEndemicityEntities(it);
+//                                    }
+//                                }
+//
+//                            } 
+							else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
                                 //ignore
                                 println "ignoring hierarchy" 
                             } else {
@@ -380,10 +382,10 @@ class XMLConverter extends SourceConverter {
             }
 
             if(!speciesField) {
-                log.debug "Adding new field to species ${s}"
+                log.debug "Adding new field to species ${s} ===  " + "  field " + field + "  data " + data
 				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
                 speciesField = sFieldClass.newInstance(field:field, description:data);
-            } else {
+		    } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
                 //TODO: Will have to clean up orphaned entries from following tables
@@ -394,7 +396,8 @@ class XMLConverter extends SourceConverter {
                 speciesField.resources?.clear()
 				speciesField.references?.clear()
             }
-            if(speciesField && contributors) {
+			
+		    if(speciesField && contributors) {
                 contributors.each { speciesField.addToContributors(it); }
                 licenses.each { speciesField.addToLicenses(it); }
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }

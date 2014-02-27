@@ -211,4 +211,4 @@ drop table species_taxonomy_registry ;
 //update taxonomy_definition set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
 //update common_names set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
 //update taxonomy_registry set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
-updateNameContributor()
+//updateNameContributor()
