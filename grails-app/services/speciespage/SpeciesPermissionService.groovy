@@ -77,6 +77,7 @@ class SpeciesPermissionService {
         else {
             def taxonConcept = speciesInstance.taxonConcept;
             List parentTaxons = taxonConcept.parentTaxon()
+            parentTaxons.add(taxonConcept);
             def res = SpeciesPermission.withCriteria {
                 eq('author', user)
                 inList('permissionType', [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(),SpeciesPermission.PermissionType.ROLE_CURATOR.value()])
@@ -94,7 +95,7 @@ class SpeciesPermissionService {
         if(!user) return false;
         boolean flag = false;
         speciesFieldInstance.contributors.each { c ->
-            if(c.name == user.username) {
+            if(c.id == user.id) {
                 flag = true;
                 return
             }

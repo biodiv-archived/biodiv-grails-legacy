@@ -38,7 +38,9 @@ class Species implements Rateable {
 	def dataSource
 	def activityFeedService
 	def speciesService;
-	
+    def externalLinksService;
+    def speciesUploadService;
+
 	private static final log = LogFactory.getLog(this);
 	
 	def fieldsConfig = ConfigurationHolder.config.speciesPortal.fields
@@ -219,7 +221,20 @@ class Species implements Rateable {
 		def query = "select count(*) from Observation obv where obv.maxVotedReco.taxonConcept.id = :taxOnConceptId and obv.isDeleted = false "
 		return Species.executeQuery(query, ['taxOnConceptId':taxonConcept.id])[0]
 	}
-	
+
+    def beforeUpdate() {
+        /*try {
+            if(this.taxonConcept && externalLinksService.updateExternalLinks(this.taxonConcept)) {
+                this.taxonConcept = TaxonomyDefinition.get(this.taxonConcept.id);
+            }
+        } catch(e) {
+            this.appendLogSummary(e)
+            e.printStackTrace()
+        }*/
+        println "before species update"
+        this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
+    }
+
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}

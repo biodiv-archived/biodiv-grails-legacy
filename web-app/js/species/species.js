@@ -462,6 +462,13 @@ function initGalleryTabs() {
                     onEditableSuccess.call($f, data, jqXHR);
                     if(data.success == true) {
                         if(data.type == 'description' || data.type == 'newdescription') {
+                            var textareaId = $f.attr('id');
+                            var editor = CKEDITOR.instances[textareaId];
+                            if(editor) {
+                                console.log('destroying ckeditor');
+                                editor.destroy(false);
+                            }
+
                             onAddableDisplay(undefined, data, jqXHR, $f.parent());
                         } else
                             onAddableDisplay(undefined, data, jqXHR, $f);
@@ -592,8 +599,6 @@ function initGalleryTabs() {
     function createSynonym(content, sourceData) {
         return '<li><div class="span3"><a href="#" class="synRel span3 selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{sid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
     }
-
-
 
     function createSpeciesFieldHtml(content, sourceData) {
         var toolbar = createMetadataToolbar(content);

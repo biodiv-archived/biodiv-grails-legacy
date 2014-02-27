@@ -508,7 +508,7 @@ class SpeciesUploadService {
 	 how many different sources contribute information
 	 whether information has been reviewed or not
 	 */
-	protected float calculatePercentOfInfo(Species s) {
+	float calculatePercentOfInfo(Species s) {
 		//		int synonyms = Synonyms.countByTaxonConcept(s.taxonConcept);
 		//		int commonNames = CommonNames.countByTaxonConcept(s.taxonConcept);
 		//		def authClassification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)

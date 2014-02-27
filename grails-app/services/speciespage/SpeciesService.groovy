@@ -270,6 +270,53 @@ class SpeciesService {
             return [success:false, msg:"Field content cannot be empty"]
         }
 
+        SUser oldContrib;
+        if(contributorId) {
+            oldContrib = SUser.read(contributorId);
+
+            if(!oldContrib) {
+                return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+            } else if(oldContrib.email == value) {
+                return [success:true, msg:"Nothing to change"]
+            }
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            SUser c = SUser.findByEmail(value);
+            if(!c) {
+                return [success:false, msg:"Error while updating ${type}. No registered user with email ${value} found"]
+            } else {
+                String msg = '';
+                def content;
+                if(oldContrib)
+                    speciesField.removeFromContributors(oldContrib);
+                speciesField.addToContributors(c);
+                msg = 'Successfully added contributor';
+                content = speciesField.contributors;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating ${type}"]
+                }
+                return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
+            }
+        }
+    }
+
+    def updateAttributor(contributorId, long speciesFieldId, def value, String type) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
         Contributor oldContrib;
         if(contributorId) {
             oldContrib = Contributor.read(contributorId);
@@ -297,21 +344,11 @@ class SpeciesService {
             } else {
                 String msg = '';
                 def content;
-                if(type == 'contributor') {
-                    if(oldContrib)
-                        speciesField.removeFromContributors(oldContrib);
-                    speciesField.addToContributors(c);
-                    msg = 'Successfully added contributor';
-                    content = speciesField.contributors;
-                } else if (type == 'attributor') {
-                    if(oldContrib)
+                   if(oldContrib)
                         speciesField.removeFromAttributors(oldContrib);
                     speciesField.addToAttributors(c);
                     msg = 'Successfully added attributor';
                     content = speciesField.attributors;
-                } else {
-                    return [success:false, msg:"Error while updating ${type}"]
-                }
 
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
@@ -382,7 +419,7 @@ class SpeciesService {
             return [success:false, msg:"Invalid field"]
         }
         try {
-            SpeciesField speciesFieldInstance = converter.createSpeciesField(speciesInstance, field, value, [springSecurityService.currentUser.username], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
+            SpeciesField speciesFieldInstance = converter.createSpeciesField(speciesInstance, field, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
             if(speciesFieldInstance) {
                 speciesInstance.addToFields(speciesFieldInstance);
                 //TODO:make sure this is run in only one user updates this species at a time
@@ -593,6 +630,43 @@ class SpeciesService {
     }
 
     def deleteContributor(contributorId, long speciesFieldId, String type) {
+        SUser oldContrib;
+        if(contributorId) {
+            oldContrib = SUser.read(contributorId);
+        }
+        if(!oldContrib) {
+            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+        } 
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete this ${type}"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            speciesField.removeFromContributors(oldContrib);
+            if(speciesField.contributors.size() == 0) {
+                msg = 'There should be atleast one contributor';
+                return [success:false, msg:msg]
+            } else {
+                msg = 'Successfully removed contributor';
+                content = speciesField.contributors;
+            }
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating ${type}"]
+            }
+            return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
+        }
+    }
+
+    def deleteAttributor(contributorId, long speciesFieldId, String type) {
         Contributor oldContrib;
         if(contributorId) {
             oldContrib = Contributor.read(contributorId);
@@ -613,22 +687,9 @@ class SpeciesService {
         SpeciesField.withTransaction { status ->
             String msg = '';
             def content;
-            if(type == 'contributor') {
-                speciesField.removeFromContributors(oldContrib);
-                if(speciesField.contributors.size() == 0) {
-                    msg = 'There should be atleast one contributor';
-                    return [success:false, msg:msg]
-                } else {
-                    msg = 'Successfully removed contributor';
-                    content = speciesField.contributors;
-                }
-            } else if (type == 'attributor') {
-                speciesField.removeFromAttributors(oldContrib);
-                msg = 'Successfully removed attributor';
-                content = speciesField.attributors;
-            } else {
-                return [success:false, msg:"Error while updating ${type}"]
-            }
+            speciesField.removeFromAttributors(oldContrib);
+            msg = 'Successfully removed attributor';
+            content = speciesField.attributors;
 
             if(!speciesField.save()) {
                 speciesField.errors.each { log.error it }
@@ -681,12 +742,15 @@ class SpeciesService {
             def field = speciesField.field;
             SpeciesField.withTransaction {
                 try {
+                    speciesInstance.removeFromFields(speciesField);
                     speciesField.delete(failOnError:true);
                     List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                     sortAsPerRating(sameFieldSpeciesFieldInstances);
                     return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
                 } catch(e) {
-                    return [success:false, msg:"Error while deleting field"]
+                    e.printStackTrace();
+                    log.error e.getMessage();
+                    return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
                 }
             }
        } else {
@@ -719,7 +783,9 @@ class SpeciesService {
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
             } 
             catch(e) {
-                return [success:false, msg:"Error while deleting synonym"]
+                e.printStackTrace();
+                log.error e.getMessage();
+                return [success:false, msg:"Error while deleting synonym: ${e.getMessage()}"]
             }
         }
     }
