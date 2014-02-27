@@ -23,6 +23,7 @@ import species.SpeciesField.Status;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
+import species.Synonyms;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -58,6 +59,7 @@ class SpeciesService {
     def namesIndexerService;
     def observationService;
     def springSecurityService;
+    def speciesPermissionService;
 
     static int BATCH_SIZE = 10;
     int noOfFields = Field.count();
@@ -284,6 +286,10 @@ class SpeciesService {
             return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
         }
 
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
         SpeciesField.withTransaction { status ->
             Contributor c = (new XMLConverter()).getContributorByName(value, true);
             if(!c) {
@@ -337,6 +343,11 @@ class SpeciesService {
             return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
         }
 
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+
         SpeciesField.withTransaction { status ->
             String msg = '';
             def content;
@@ -363,6 +374,10 @@ class SpeciesService {
         Species speciesInstance = Species.get(speciesId);
         Field field = Field.read(fieldId);
 
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to add"]
+        }
+
         if(!field) {
             return [success:false, msg:"Invalid field"]
         }
@@ -379,7 +394,7 @@ class SpeciesService {
                 }
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'description', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -399,6 +414,8 @@ class SpeciesService {
     def updateSpeciesFieldDescription(SpeciesField c, String value) {
         if(!c) {
             return [success:false, msg:"SpeciesField not found"]
+        } else if(!speciesPermissionService.isSpeciesFieldContributor(c, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
         } else {
             SpeciesField.withTransaction {
                 c.description = value.trim()
@@ -420,6 +437,11 @@ class SpeciesService {
         if(!speciesField) {
             return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
         }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
 
         SpeciesField.withTransaction { status ->
             License c = (new XMLConverter()).getLicenseByType(value, false);
@@ -452,6 +474,11 @@ class SpeciesService {
             return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
         }
 
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+
         SpeciesField.withTransaction { status ->
             AudienceType c = (new XMLConverter()).getAudienceTypeByType(value);
             if(!c) {
@@ -483,6 +510,11 @@ class SpeciesService {
             return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
         }
 
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+
         SpeciesField.withTransaction { status ->
             SpeciesField.Status c = getStatus(value);
             if(!c) {
@@ -508,6 +540,188 @@ class SpeciesService {
 			if(l.value().equalsIgnoreCase(value))
 				return l
 		}
+    }
+
+    def updateSynonym(def synonymId, def speciesId, String relationship, String value) {
+        if(!value || !relationship) {
+            return [success:false, msg:"Synonym value or relationship content cannot be empty"]
+        }
+        Species speciesInstance = Species.get(speciesId);
+   
+        if(!speciesInstance) {
+            return [success:false, msg:"Species with id ${speciesId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+
+            if(!oldSynonym) {
+                return [success:false, msg:"${type.capitalize()} with id ${synonymId} is not found"]
+            } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
+                return [success:true, msg:"Nothing to change"]
+            }
+        }
+
+        Species.withTransaction { status ->
+            if(oldSynonym) {
+                oldSynonym.delete();
+            } 
+            XMLConverter converter = new XMLConverter();
+
+            NodeBuilder builder = NodeBuilder.newInstance();
+            def synonym = builder.createNode("synonym");
+            Node data = new Node(synonym, 'data', value)
+            new Node(data, "relationship", relationship);
+ 
+            List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
+            
+            if(!synonyms) {
+                return [success:false, msg:"Error while updating synonym"]
+            } else {
+                String msg = '';
+                def content;
+                msg = 'Successfully updated synonym';
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
+            }
+        }
+    }
+
+    def deleteContributor(contributorId, long speciesFieldId, String type) {
+        Contributor oldContrib;
+        if(contributorId) {
+            oldContrib = Contributor.read(contributorId);
+        }
+        if(!oldContrib) {
+            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+        } 
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete this ${type}"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            if(type == 'contributor') {
+                speciesField.removeFromContributors(oldContrib);
+                if(speciesField.contributors.size() == 0) {
+                    msg = 'There should be atleast one contributor';
+                    return [success:false, msg:msg]
+                } else {
+                    msg = 'Successfully removed contributor';
+                    content = speciesField.contributors;
+                }
+            } else if (type == 'attributor') {
+                speciesField.removeFromAttributors(oldContrib);
+                msg = 'Successfully removed attributor';
+                content = speciesField.attributors;
+            } else {
+                return [success:false, msg:"Error while updating ${type}"]
+            }
+
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating ${type}"]
+            }
+            return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
+        }
+    }
+
+    def deleteReference(referenceId, long speciesFieldId) {
+
+        Reference oldReference;
+        if(referenceId) {
+            oldReference = Reference.read(referenceId);
+        }
+        if(!oldReference) {
+            return [success:false, msg:"Reference with id ${referenceId} is not found"]
+        } 
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete this reference"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            speciesField.removeFromReferences(oldReference);
+            msg = 'Successfully removed reference';
+            content = speciesField.references;
+
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating reference"]
+            }
+            return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
+        }
+    }
+
+    def deleteDescription(long id) {
+        SpeciesField speciesField = SpeciesField.get(id);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesField not found"]
+        } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            def speciesInstance = speciesField.species;
+            def field = speciesField.field;
+            SpeciesField.withTransaction {
+                try {
+                    speciesField.delete(failOnError:true);
+                    List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                    sortAsPerRating(sameFieldSpeciesFieldInstances);
+                    return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+                } catch(e) {
+                    return [success:false, msg:"Error while deleting field"]
+                }
+            }
+       } else {
+            return [success:false, msg:"You don't have persmission to delete this field"]
+        }
+    }
+
+    def deleteSynonym(def synonymId, def speciesId) {
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+        }
+        if(!oldSynonym) {
+            return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+        } 
+
+        Species speciesInstance = Species.get(speciesId);
+      
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete synonym"]
+        }
+
+        Synonyms.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldSynonym.delete(failOnError:true)
+                msg = 'Successfully removed synonym';
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
+            } 
+            catch(e) {
+                return [success:false, msg:"Error while deleting synonym"]
+            }
+        }
     }
 
     private def createImagesXML(params) {

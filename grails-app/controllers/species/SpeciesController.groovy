@@ -40,7 +40,6 @@ class SpeciesController extends AbstractObjectController {
 	def observationService;
 	def userGroupService;
 	def springSecurityService;
-	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -339,14 +338,26 @@ class SpeciesController extends AbstractObjectController {
             switch(params.name) {
                 case "contributor":
                     long cid = params.cid?params.long('cid'):null;
-                    result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteContributor(cid, speciesFieldId, params.name);
+                    } else {
+                        result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    }
                     break;
                 case "attributor":
                     long cid = params.cid?params.long('cid'):null;
-                    result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteContributor(cid, speciesFieldId, params.name);
+                    } else {
+                        result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    }
                     break;
                 case "description":
-                    result = speciesService.updateDescription(speciesFieldId, value);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteDescription(speciesFieldId);
+                    } else {
+                        result = speciesService.updateDescription(speciesFieldId, value);
+                    }
                     break;
                 case "newdescription":
                     long speciesId = params.speciesid? params.long('speciesid') : null;
@@ -374,7 +385,21 @@ class SpeciesController extends AbstractObjectController {
                     break;
                 case "reference":
                     long cid = params.cid?params.long('cid'):null;
-                    result = speciesService.updateReference(cid, speciesFieldId, value);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteReference(cid, speciesFieldId);
+                    } else {
+                        result = speciesService.updateReference(cid, speciesFieldId, value);
+                    }
+                    break;
+                case 'synonym':
+                    long sid = params.sid?params.long('sid'):null;
+                    String relationship = params.relationship?:null;
+
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteSynonym(sid, speciesFieldId);
+                    } else {
+                        result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value);
+                    }
                     break;
 
                 default :
@@ -384,6 +409,8 @@ class SpeciesController extends AbstractObjectController {
 		    render result as JSON
             return;
         } catch(Exception e) {
+            e.printStackTrace();
+            log.error e.getMessage();
     		render ([success:false, msg:e.getMessage()] as JSON)
 			return;
         }

@@ -32,6 +32,29 @@ class Synonyms {
 		String value() {
 			return this.value;
 		}
+
+		static def toList() {
+            return [
+                AMBIGUOUS_SYNONYM,
+                ANAMORPH,
+                BASIONYM,
+                HETEROTYPIC_SYNONYM,
+                JUNIOR_SYNONYM,
+                MISAPPLIED_NAME,
+                NOMENCLATURAL_SYNONYM,
+                OBJECTIVE_SYNONYM,
+                SENIOR_SYNONYM,
+                SUBJECTIVE_SYNONYM,
+                SYNONYM,
+                TELEOMORPH,
+                UNAVAILABLE_NAME,
+                VALID_NAME,
+                ACCEPTED_NAME,
+                PROTONYM,
+                OTHERS
+
+            ]
+        }
 	};
 
 	String name;
@@ -52,6 +75,7 @@ class Synonyms {
     }
 	
 	static mapping = {
+        sort id:'asc'
 		version false;
 	}
 }

@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.Synonyms"%>
 <%--<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>--%>
 
 <div id='searchToggleBox' class="input-append">
@@ -84,8 +85,40 @@ $(document).ready(function() {
                     'domain':document.domain,
                     'geoserverHost':document.domain,
                     'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
+                },
+                'ck':{
+                    
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });
+        
+        var licenseSelectorOptions = [
+        {value:"CC BY" , text: 'CC BY'},
+        {value: "CC BY-NC", text: 'CC BY-NC'},
+        {value: "CC BY-ND", text: 'CC BY-ND'},
+        {value: "CC BY-NC-ND", text: 'CC BY-NC-ND'},
+        {value: "CC BY-NC-SA", text: 'CC BY-NC-SA'},
+        {value: "CC BY-SA", text: 'CC BY-SA'},
+        {value: "CC PUBLIC DOMAIN", text: 'CC Public Domain'},
+        ];
+        var audienceTypeSelectorOptions = [
+        {value: "Children", text:"Children"},
+        {value: "General Audience", text:"General Audience"},
+        {value: "Expert", text:"Expert"}
+        ];
+        var statusSelectorOptions = [
+        {value: "Under Creation", text:"Under Creation"},
+        {value: "Under Validation", text:"Under Validation"},
+        {value: "Validated", text:"Validated"},
+        {value: "Published", text:"Published"}
+        ];
+
+
+        var synRelSelectorOptions = [];
+        <g:each in="${Synonyms.RelationShip.toList()}" var="rel">
+        synRelSelectorOptions.push({value:"${rel.value()}", text:"${rel.value()}"});
+        </g:each>
+
+
 </g:javascript>

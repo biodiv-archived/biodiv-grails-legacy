@@ -2593,11 +2593,12 @@ small {
 .addField {
 }
 
-.addField, .editFieldButton, .addFieldButton {
+.addField, .editFieldButton, .deleteFieldButton, .addFieldButton {
     color:#12C;
     cursor: pointer;
     font-size:12px;
     font-weight:normal;
+    margin-right:5px;
 }
 
 .editable-container.editable-inline {

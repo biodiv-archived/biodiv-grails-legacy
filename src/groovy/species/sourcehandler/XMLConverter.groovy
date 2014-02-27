@@ -1176,7 +1176,7 @@ println imageNode;
      * @param fieldNode
      * @return
      */
-    private List<Synonyms> createSynonyms(Node fieldNode, TaxonomyDefinition taxonConcept) {
+    List<Synonyms> createSynonyms(Node fieldNode, TaxonomyDefinition taxonConcept) {
         log.debug "Creating synonyms";
         List<Synonyms> synonyms = new ArrayList<Synonyms>();
         //List<SpeciesField> sfields = createSpeciesFields(fieldNode, Synonyms.class, null, null, null, null,null);

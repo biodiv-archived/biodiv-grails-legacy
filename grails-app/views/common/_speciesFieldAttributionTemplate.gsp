@@ -11,7 +11,7 @@
                 <g:each in="${speciesFieldInstance.attributors}" var="r">
                 <g:if test="${r}">
                 <li>
-                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name" title="Click to edit">${r.name}
+                <a href="#" class="${isSpeciesContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name" title="Click to edit">${r.name}
                 </a>
                 </li>
                 </g:if>
@@ -42,7 +42,7 @@
                 in="${ speciesFieldInstance?.contributors}" var="contributor">
                 <g:if test="${contributor}">
                 <li>
-                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${contributor.id}}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Edit contributor name" title="Click to edit">${contributor.name}</a>
+                <a href="#" class="${isSpeciesContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${contributor.id}}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Edit contributor name" title="Click to edit">${contributor.name}</a>
                 </li> 
                 </g:if>
                 </g:each>
@@ -60,7 +60,7 @@
         <div class="name span2" style="margin-left:0px;">Status</div>
         <div class="value">
             
-            <a href="#" class="status ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status" data-original-title="Edit status">
+            <a href="#" class="status ${isSpeciesContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status" data-original-title="Edit status">
                 ${speciesFieldInstance?.status?.value()}</a>
 
         </div>
@@ -73,7 +73,7 @@
             in="${ speciesFieldInstance?.audienceTypes}"
             var="audienceType">
 
-            <a href="#" class="audienceType ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="audienceType" data-original-title="Edit Audience Type"> ${audienceType.value}</a>
+            <a href="#" class="audienceType ${isSpeciesContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="audienceType" data-original-title="Edit Audience Type"> ${audienceType.value}</a>
             </g:each>
         </div>
     </div>
@@ -83,7 +83,7 @@
         <div class="span2 name" style="margin-left:0px;">Licenses</div>
         <div class="value"><g:each status="i"
             in="${speciesFieldInstance?.licenses}" var="license">
-            <a href="#" class="license ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="license" data-original-title="Edit license">${license.name}</a>
+            <a href="#" class="license ${isSpeciesContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="license" data-original-title="Edit license">${license.name}</a>
             </g:each>
         </div>
     </div>
@@ -99,7 +99,7 @@
                 <g:each in="${speciesFieldInstance.references}" var="r">
                 <li title="${r.title?:r.url}">
                 
-                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Edit reference" title="Click to edit">
+                <a href="#" class="${isSpeciesContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Edit reference" title="Click to edit">
                 <g:if
                 test="${r.url}">
                  ${r.title?r.title:r.url}
