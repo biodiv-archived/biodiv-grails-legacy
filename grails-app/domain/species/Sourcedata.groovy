@@ -9,7 +9,9 @@ abstract class Sourcedata {
 	def springSecurityService
 	
     static constraints = {
-		// uploader and uploadTime should not be null by default
+		//XXX its null here. but setting appropriate value in before insert
+		uploader nullable:true;
+		uploadTime nullable:true;
     }
 	
 	def beforeInsert(){

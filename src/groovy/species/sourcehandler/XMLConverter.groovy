@@ -382,7 +382,7 @@ class XMLConverter extends SourceConverter {
             if(!speciesField) {
                 log.debug "Adding new field to species ${s}"
 				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
-                speciesField = sFieldClass.newInstance(field:field, description:data, uploadTime:new Date(), uploader:new SUser());
+                speciesField = sFieldClass.newInstance(field:field, description:data);
             } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
@@ -1133,7 +1133,7 @@ println imageNode;
             }
 
             if(!sfield) {
-                log.debug "Saving common name : "+n.text();
+                log.debug "Saving common name :"+n.text();
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
@@ -1142,10 +1142,15 @@ println imageNode;
                 else {
                     log.warn "NOT A SUPPORTED LANGUAGE: " + n.language;
                 }
+				
                 if(!sfield.save(flush:true)) {
-                    sfield.errors.each { log.error it }
+					sfield.errors.each { log.error it }
                 }
             }
+			
+			//adding contributors to common name
+			sfield.updateContributors(getUserContributors(n))
+			
             commonNames.add(sfield);
         }
         return commonNames;
@@ -1204,7 +1209,9 @@ println imageNode;
                 def parsedNames = namesParser.parse([cleanName]);
                 def sfield = saveSynonym(parsedNames[0], rel, taxonConcept);
                 if(sfield) {
-                    synonyms.add(sfield);
+					//adding contributors
+					sfield.updateContributors(getUserContributors(n))
+		            synonyms.add(sfield);
                 }
             } else {
                 log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
@@ -1392,8 +1399,11 @@ println imageNode;
                         if(!taxon.save()) {
                             taxon.errors.each { log.error it }
                         }
+						taxon.updateContributors(getUserContributors(fieldNode.data))
                     } else if(taxon.name != parsedName.name) {
-                        saveSynonym(parsedName, getRelationship(null), taxon);
+                        def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+						if(synonym)
+							synonym.updateContributors(getUserContributors(fieldNode.data))
                     }
 
 
@@ -1413,6 +1423,7 @@ println imageNode;
 
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
+						registry.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(registry);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;
@@ -1421,6 +1432,7 @@ println imageNode;
                         } else {
                             log.debug "Saved taxon registry entity : "+ent;
                         }
+						ent.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(ent);
                     }
 

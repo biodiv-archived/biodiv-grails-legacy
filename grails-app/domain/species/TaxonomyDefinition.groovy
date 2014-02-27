@@ -5,7 +5,7 @@ import java.util.List;
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
 
-class TaxonomyDefinition {
+class TaxonomyDefinition extends NamesSorucedata {
 
 	public enum TaxonomyRank {
 		KINGDOM("Kingdom"),
@@ -132,4 +132,5 @@ class TaxonomyDefinition {
 	   }
 	   return result;
    }
+   
 }
