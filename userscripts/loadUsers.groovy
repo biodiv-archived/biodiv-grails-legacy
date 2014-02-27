@@ -9,24 +9,25 @@ import species.auth.SUser;
 //SUser.executeUpdate("delete SUser s");
 def defaultRoleNames = ['ROLE_USER']
 
-new File("/home/sravanthi/git/biodiv/users.tsv").splitEachLine("\\t") {
+new File("/home/cepf/git/biodiv/contributor.txt").splitEachLine("\\t") {
 	def fields = it;
 	def user = new SUser (
-			username : fields[1].trim(),
-			name : fields[1].trim(),
+			username : fields[2].trim(),
+			name : fields[0].trim(),
 			password : fields[2].trim(),
 			enabled : true,
 			accountExpired : false,
 			accountLocked : false,
 			passwordExpired : false,
-			email : fields[3].trim(),
-			dateCreated : new Date(Long.parseLong(fields[9].trim())*1000),
-			lastLoginDate : new Date(Long.parseLong(fields[11].trim())*1000),
-			profilePic:fields[15]);
+			email : fields[1].trim()
+			//dateCreated : new Date(Long.parseLong(fields[9].trim())*1000),
+			//lastLoginDate : new Date(Long.parseLong(fields[11].trim())*1000),
+			//profilePic:fields[15]
+		);
 		
-		if(fields[13] && fields[13] != '\\N') {			
-			user.timezone = Float.parseFloat(fields[13].trim())
-		}
+//		if(fields[13] && fields[13] != '\\N') {			
+//			user.timezone = Float.parseFloat(fields[13].trim())
+//		}
 
 	SUser.withTransaction {
 		if(!user.save(flush: true) ){

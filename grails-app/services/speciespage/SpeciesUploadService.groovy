@@ -23,6 +23,7 @@ import species.Field
 import species.Resource;
 import species.Species
 import species.SpeciesField;
+import species.GeographicEntity;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.KeyStoneDataConverter
@@ -41,8 +42,18 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
+import species.auth.SUser
 import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
+
+import species.participation.Featured
+import species.participation.Recommendation
+import species.participation.SpeciesBulkUpload
+import species.CommonNames
+import species.Synonyms
+import species.TaxonomyRegistry
+import species.SpeciesPermission
+import species.groups.SpeciesGroupMapping
 
 class SpeciesUploadService {
 
@@ -253,7 +264,7 @@ class SpeciesUploadService {
 		
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
-				def res = saveSpeciesElements(speciesElements)
+				def res = saveSpeciesElementsWrapper(speciesElements)
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
 				converter.addToSummary(res.summary);
@@ -270,7 +281,7 @@ class SpeciesUploadService {
 		
 		//saving last batch
 		if(speciesElements.size() > 0) {
-			def res = saveSpeciesElements(speciesElements)
+			def res = saveSpeciesElementsWrapper(speciesElements)
 			noOfInsertions += res.noOfInsertions;
 			converter.addToSummary(res.species.collect{it.sLog?.toString()}.join("\n"))
 			converter.addToSummary(res.summary);
@@ -581,7 +592,7 @@ class SpeciesUploadService {
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
-        String fileName = "speciesSpreadsheet.xlsx"
+        String fileName = "speciesSpreadsheet.xls"
         String uploadDir = "species"
         File file = observationService.createFile(fileName , uploadDir, contentRootDir);
         println "===NEW MODIFIED SPECIES FILE=== " + file
@@ -593,4 +604,147 @@ class SpeciesUploadService {
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
         return file
     }
+	
+	//////////////////////////////////////// ROLL BACK //////////////////////////////
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String notes = null){
+		SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, notes)
+		
+	}
+	
+	def String rollBackUpload(params){
+		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
+		
+		if(sbu.author != springSecurityService.currentUser ){
+			log.error "Authentication failed for user " + springSecurityService.currentUser
+			return "Authentication failed for user "
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			log.error "Already roll backed " + sbu
+			return "Already roll backed " 
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+			log.error "Roll back in progres..." + sbu
+			return "Roll back in progres..."
+		}
+		
+		sbu.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		log.debug "Changed to running status"
+		
+		SUser user = sbu.author
+		Date start = sbu.startDate
+		Date end = sbu.endDate
+		
+		//based on time stamp and user contributor get all the species fields and delete one by one
+		List sFields = SpeciesField.withCriteria(){
+			and{
+				eq('uploader', user)
+				between("lastUpdated", start, end)
+			}
+		}
+		log.debug "sFields " + sFields
+		
+		if(!sFields){
+			log.debug "Nothing to rollback"
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+			return "Nothing to rollback"
+		}
+		
+		Collection<Species> sList = getAffectedSpecies(sFields)
+		log.debug "species list " + sList
+		
+		SpeciesField.withTransaction{   
+			sFields.each { sf ->
+					log.info "Deleting ${sf}"
+					sf.delete()
+			}
+			sList.each { s->
+				rollBackSpeciesUpdate(s, sFields, user)
+			}
+			
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			return "Successfully Rollbacked"
+		}else{
+			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
+			return "Roll back failed..."
+		}
+	}
+	
+	private Collection<Species> getAffectedSpecies(List sFields){
+		def sList = sFields.collect{it.species}
+		return sList.unique() 
+	}
+ 
+	
+	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user) throws Exception {
+		List sFieldIds = SpeciesField.findAllBySpecies(s).collect{ it.id}
+		
+		//All species field deleted before this function call
+		boolean canDelete = sFieldIds.isEmpty();
+		
+		if(canDelete){
+			log.debug "Deleting species ${s} "
+			deleteSpecies(s, user)
+			return
+		}
+		
+		log.debug "Removing species field from species ${s}"
+		sFields.each { sf ->
+			s.removeFromFields(sf)
+			def ge = GeographicEntity.read(sf.id) 
+			if(ge){
+				s.removeFromGlobalDistributionEntities(ge)
+				s.removeFromGlobalEndemicityEntities(ge)
+				s.removeFromIndianDistributionEntities(ge)
+				s.removeFromIndianEndemicityEntities(ge)
+			}
+		}
+		
+		if(!s.save()){
+			s.errors.allErrors.each { log.error it }
+		}
+	}
+	
+	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
+		try{
+			Featured.deleteFeatureOnObv(s, user)
+			s.userGroups.each { ug ->
+				ug.removeFromSpecies(s)
+				ug.save()
+			}
+			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
+				reco.taxonConcept = null
+				reco.save()
+			}
+//			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
+//				cn.delete()
+//			}
+//			Synonyms.findAllByTaxonConcept(s.taxonConcept).each { sn ->
+//				sn.delete()
+//			}
+//			TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).each { tr ->
+//				tr.delete()
+//			}
+//			SpeciesGroupMapping.findAllByTaxonConcept(s.taxonConcept).each { sgm ->
+//				sgm.delete()
+//			}
+			SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
+				sp.delete()
+			}
+			
+			s.resources?.clear()
+			s.delete()
+			log.debug "Deleted ${s}"
+			return true
+		}catch (Exception e) {
+			log.error "Error in Deleting ${s}"
+			e.printStackTrace()
+			throw e
+		}
+		return false
+	}		
 }

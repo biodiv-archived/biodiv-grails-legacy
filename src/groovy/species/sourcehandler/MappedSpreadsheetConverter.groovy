@@ -403,11 +403,11 @@ class MappedSpreadsheetConverter extends SourceConverter {
     }
 	
 	protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
-		addMetaAttibute("contributor", data, speciesContent, mappedField, "contributor",)
-		addMetaAttibute("attributions", data, speciesContent, mappedField, "attribution")
+		addMetaAttibute("contributor", data, speciesContent, mappedField, "contributor", ",|;|\n")
+		addMetaAttibute("attributions", data, speciesContent, mappedField, "attribution", "\n")
 		addMetaAttibute("license", data, speciesContent, mappedField, "license", ",|;|\n")
-		addMetaAttibute("audience", data, speciesContent, mappedField, "audienceType")
-		addMetaAttibute("references", data, speciesContent, mappedField, "reference")
+		addMetaAttibute("audience", data, speciesContent, mappedField, "audienceType", ",|;|\n")
+		addMetaAttibute("references", data, speciesContent, mappedField, "reference", "\n")
 		addMetaAttibute("images", data, speciesContent, mappedField, "image", "\n|\\s{3,}|,|;")
 	}
 	
@@ -429,15 +429,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		if(doProcess){
 			List processedInfoColumn = []
-			//myPrint("=======ADD meta attribute  for field " + fieldName + "  fields " + fields + " fMap " + fMap)
-			Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"))
+			//myPrint("=======ADD meta attribute  for field " + fieldName + "  fields " + fields + " fMap " + fMap + " content delim  " + mappedField.get("content delimiter"))
 			fMap.keySet().each { key ->
 				//if column has text then only proceed
 				if(speciesContent.get(key)){
 					def infoColList = fMap.get(key)
 					infoColList.each { infoCol ->
 						String text = speciesContent.get(infoCol)
-						String delimiter =  delimiterMap.get(infoCol)?:defaultDelimiter;
+						String delimiter =  defaultDelimiter;
 						//if meta attribute has text and that column is not processed then only adding
 						if(text &&  !processedInfoColumn.contains(infoCol)){
 							processedInfoColumn << infoCol
@@ -449,7 +448,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 									new Node(imagesNode, "image", loc);
 								}
 							}else{
-								//myPrint("========= <<<<<<<<<<<<<<<<  meta data >>>>>>>>>>>>>>> ==== " + text + "   fieldname " +  fieldName)
+								myPrint("========= <<<<<<<<<<<<<<<<  meta data >>>>>>>>>>>>>>> ==== " + text + "   fieldname " +  fieldName + " delimiter " + delimiter)
 								text.split(delimiter).each {
 									if(resultNodeName == 'reference'){
 										Node refNode = new Node(data, "reference");

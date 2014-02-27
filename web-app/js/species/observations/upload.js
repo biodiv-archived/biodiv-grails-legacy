@@ -430,7 +430,7 @@ $('#downloadModifiedSpecies').click(function() {
 
 });
 
-$('#uploadSpecies').click(function() {
+function uploadSpecies(){
     $("#speciesLoader").show();
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
@@ -455,13 +455,25 @@ $('#uploadSpecies').click(function() {
             document.getElementById("downloadSpeciesFile").style.visibility = "visible";
             document.getElementById("downloadErrorFile").style.visibility = "visible";
             $("#filterLinkSpan").show();
+            $("#uploadSpecies").removeClass('disabled');
         },
         error: function(xhr, textStatus, errorThrown) {
+            $("#speciesLoader").hide();
             alert('Error uploading species!!');
-            console.log(xhr);
+            $("#uploadSpecies").removeClass('disabled');
         }
+        
     });
+}
 
+$('#uploadSpecies').click(function() {
+    if($(this).hasClass('disabled')) {
+        alert("Uploading is in progress. Please submit after it is over.");
+        event.preventDefault();
+        return false; 		 		
+    }
+    $(this).addClass('disabled');
+    uploadSpecies();
 });
 
 $(".propagateButton").click(function(){
@@ -483,22 +495,20 @@ $(".propagateButton").click(function(){
     });
     $("td."+pClass).find("ul").tagit( {showAutocompleteOnFocus: true});
     $(pEle).find("div").hide();
-    /*
-       $("#tableHeader tr").each(function () {
-       $('td', this).each(function () {
-        if($(this).attr("class") == pClass){
-    //showAutoCompleteon focus ---false
-    $.each(valArr, function( index, value ) {
-    //createTag
-    });
-    //showAutoCompleteon focus ---true
-    }
-    });
-
-    });
-    */
 
 });
+
+function automaticPropagate(){
+    if($("#isSimpleSheet").val() == true){
+        var classArr = ["contributorCell", "attributionsCell", "licenseCell"]
+        var tagArr = ["contributor", "attributions", "license"]
+        $.each(classArr, function(index, value){
+            $("td."+ value).find("ul").tagit( {showAutocompleteOnFocus: false});
+                $("td."+ value).find("ul").tagit("createTag", tagArr[index]);
+            $("td."+ value).find("ul").tagit( {showAutocompleteOnFocus: true});
+        });
+    }
+}
 
 $(".initPropagation").click(function(){
     var parentEle = $(this).parent("th");

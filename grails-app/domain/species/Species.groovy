@@ -48,7 +48,7 @@ class Species implements Rateable {
 		globalEndemicityEntities:GeographicEntity, 
 		indianDistributionEntities:GeographicEntity, 
 		indianEndemicityEntities:GeographicEntity, 
-		taxonomyRegistry:TaxonomyRegistry, 
+		//taxonomyRegistry:TaxonomyRegistry, 
 		resources:Resource,
 		userGroups:UserGroup];
  
@@ -265,7 +265,7 @@ class Species implements Rateable {
 			//str.printStackTrace(new PrintWriter(errors));
 			str = str.getMessage()//errors.toString();
 		}
-		sLog.append(str+ System.getProperty("line.separator"))
+		sLog.append("" + str + System.getProperty("line.separator"))
 	}
 	/*
 	private class SpeciesLog {
