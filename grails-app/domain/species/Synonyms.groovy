@@ -1,6 +1,6 @@
 package species
 
-class Synonyms {
+class Synonyms extends NamesSorucedata {
 
 	public enum RelationShip {
 		

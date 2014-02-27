@@ -178,36 +178,38 @@ class XMLConverter extends SourceConverter {
                             } else if(category && category.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
                                 //synonyms.each { s.addToSynonyms(it); }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToGlobalDistributionEntities(it);
-                                    }
-                                }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToGlobalEndemicityEntities(it);
-                                    }
-                                }
-                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToIndianDistributionEntities(it);
-                                    }
-                                }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-                                countryGeoEntities.each {
-                                    if(it.species == null) {
-                                        s.addToIndianEndemicityEntities(it);
-                                    }
-                                }
-
-                            } else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
+                            }
+//							 else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToGlobalDistributionEntities(it);
+//                                    }
+//                                }
+//                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToGlobalEndemicityEntities(it);
+//                                    }
+//                                }
+//                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToIndianDistributionEntities(it);
+//                                    }
+//                                }
+//                            }	else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+//                                countryGeoEntities.each {
+//                                    if(it.species == null) {
+//                                        s.addToIndianEndemicityEntities(it);
+//                                    }
+//                                }
+//
+//                            } 
+							else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
                                 //ignore
                                 println "ignoring hierarchy" 
                             } else {
@@ -380,10 +382,10 @@ class XMLConverter extends SourceConverter {
             }
 
             if(!speciesField) {
-                log.debug "Adding new field to species ${s}"
+                log.debug "Adding new field to species ${s} ===  " + "  field " + field + "  data " + data
 				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
-                speciesField = sFieldClass.newInstance(field:field, description:data, uploadTime:new Date(), uploader:new SUser());
-            } else {
+                speciesField = sFieldClass.newInstance(field:field, description:data);
+		    } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
                 //TODO: Will have to clean up orphaned entries from following tables
@@ -394,7 +396,8 @@ class XMLConverter extends SourceConverter {
                 speciesField.resources?.clear()
 				speciesField.references?.clear()
             }
-            if(speciesField && contributors) {
+			
+		    if(speciesField && contributors) {
                 contributors.each { speciesField.addToContributors(it); }
                 licenses.each { speciesField.addToLicenses(it); }
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
@@ -1133,7 +1136,7 @@ println imageNode;
             }
 
             if(!sfield) {
-                log.debug "Saving common name : "+n.text();
+                log.debug "Saving common name :"+n.text();
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
@@ -1142,10 +1145,15 @@ println imageNode;
                 else {
                     log.warn "NOT A SUPPORTED LANGUAGE: " + n.language;
                 }
+				
                 if(!sfield.save(flush:true)) {
-                    sfield.errors.each { log.error it }
+					sfield.errors.each { log.error it }
                 }
             }
+			
+			//adding contributors to common name
+			sfield.updateContributors(getUserContributors(n))
+			
             commonNames.add(sfield);
         }
         return commonNames;
@@ -1204,7 +1212,9 @@ println imageNode;
                 def parsedNames = namesParser.parse([cleanName]);
                 def sfield = saveSynonym(parsedNames[0], rel, taxonConcept);
                 if(sfield) {
-                    synonyms.add(sfield);
+					//adding contributors
+					sfield.updateContributors(getUserContributors(n))
+		            synonyms.add(sfield);
                 }
             } else {
                 log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
@@ -1392,8 +1402,11 @@ println imageNode;
                         if(!taxon.save()) {
                             taxon.errors.each { log.error it }
                         }
+						taxon.updateContributors(getUserContributors(fieldNode.data))
                     } else if(taxon.name != parsedName.name) {
-                        saveSynonym(parsedName, getRelationship(null), taxon);
+                        def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+						if(synonym)
+							synonym.updateContributors(getUserContributors(fieldNode.data))
                     }
 
 
@@ -1413,6 +1426,7 @@ println imageNode;
 
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
+						registry.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(registry);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;
@@ -1421,6 +1435,7 @@ println imageNode;
                         } else {
                             log.debug "Saved taxon registry entity : "+ent;
                         }
+						ent.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(ent);
                     }
 
