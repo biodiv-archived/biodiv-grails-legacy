@@ -151,6 +151,7 @@ class XMLConverter extends SourceConverter {
                             s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
+							s.appendLogSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
                             return;
                         }
                     }
@@ -165,6 +166,7 @@ class XMLConverter extends SourceConverter {
                         if(fieldNode.name().equals("field")) {
                             if(!isValidField(fieldNode)) {
                                 log.warn "NOT A VALID FIELD : "+fieldNode;
+								addToSummary("NOT A VALID FIELD : "+fieldNode)
                                 continue;
                             }
 
@@ -179,36 +181,36 @@ class XMLConverter extends SourceConverter {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
                                 //synonyms.each { s.addToSynonyms(it); }
                             }
-//							 else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-//                                countryGeoEntities.each {
-//                                    if(it.species == null) {
-//                                        s.addToGlobalDistributionEntities(it);
-//                                    }
-//                                }
-//                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-//                                countryGeoEntities.each {
-//                                    if(it.species == null) {
-//                                        s.addToGlobalEndemicityEntities(it);
-//                                    }
-//                                }
-//                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-//                                countryGeoEntities.each {
-//                                    if(it.species == null) {
-//                                        s.addToIndianDistributionEntities(it);
-//                                    }
-//                                }
-//                            }	else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-//                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-//                                countryGeoEntities.each {
-//                                    if(it.species == null) {
-//                                        s.addToIndianEndemicityEntities(it);
-//                                    }
-//                                }
-//
-//                            } 
+							 else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+                                countryGeoEntities.each {
+                                    if(it.species == null) {
+                                        s.addToGlobalDistributionEntities(it);
+                                    }
+                                }
+                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+                                countryGeoEntities.each {
+                                    if(it.species == null) {
+                                        s.addToGlobalEndemicityEntities(it);
+                                    }
+                                }
+                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+                                countryGeoEntities.each {
+                                    if(it.species == null) {
+                                        s.addToIndianDistributionEntities(it);
+                                    }
+                                }
+                            }	else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+                                List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+                                countryGeoEntities.each {
+                                    if(it.species == null) {
+                                        s.addToIndianEndemicityEntities(it);
+                                    }
+                                }
+
+                            } 
 							else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
                                 //ignore
                                 println "ignoring hierarchy" 
@@ -259,6 +261,7 @@ class XMLConverter extends SourceConverter {
             if(fieldNode.name().equals("field")) {
                 if(!isValidField(fieldNode)) {
                     log.warn "NOT A VALID FIELD. IGNORING : "+fieldNode;
+					addToSummary("NOT A VALID FIELD. IGNORING : "+fieldNode)
                     fieldNode.parent().remove(fieldNode);
                     continue;
                 }
@@ -309,6 +312,7 @@ class XMLConverter extends SourceConverter {
         Field field = getField(fieldNode, false);
         if(field == null) {
             log.warn "NO SUCH FIELD : "+field?.name;
+			addToSummary("NO SUCH FIELD : "+field?.name)
             return;
         }
       
@@ -408,6 +412,7 @@ class XMLConverter extends SourceConverter {
 				println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
                 log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
+				s.appendLogSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }			
         }
         return speciesFields;
@@ -534,6 +539,7 @@ class XMLConverter extends SourceConverter {
                 contributors.add(contributor);
             } else {
                 log.warn "NOT A VALID CONTIBUTOR : "+contributorName;
+				addToSummary("NOT A VALID CONTIBUTOR : "+contributorName)
             }
         }
         return contributors;
@@ -548,6 +554,7 @@ class XMLConverter extends SourceConverter {
 				contributors.add(contributor);
 			} else {
 				log.warn "NOT A VALID CONTIBUTOR : "+contributorEmail;
+				addToSummary("NOT A VALID CONTIBUTOR : "+contributorEmail)
 			}
 		}
 		return contributors;
@@ -587,6 +594,7 @@ class XMLConverter extends SourceConverter {
                 licenses.add(license);
             } else {
                 log.warn "NOT A SUPPORTED LICENSE TYPE: "+licenseType;
+				addToSummary("NOT A SUPPORTED LICENSE TYPE: "+licenseType)
             }
         }
 
@@ -647,6 +655,7 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.add(audienceType);
             } else {
                 log.warn "NOT A SUPPORTED AUDIENCE TYPE: "+audienceType;
+				addToSummary("NOT A SUPPORTED AUDIENCE TYPE: "+audienceType)
             }
         }
         return audienceTypes;
@@ -752,6 +761,7 @@ class XMLConverter extends SourceConverter {
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
+				addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
             }
             log.debug "in dir : "+root.absolutePath;
 
@@ -762,6 +772,7 @@ class XMLConverter extends SourceConverter {
                     ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                 } catch(FileNotFoundException e) {
                     log.error "File not found : "+tempFile.absolutePath;
+					addToSummary("File not found : "+tempFile.absolutePath)
                 }
             }
 
@@ -808,6 +819,7 @@ class XMLConverter extends SourceConverter {
             return res;
         } else {
             log.error "File not found : "+tempFile?.absolutePath;
+			addToSummary("File not found : "+tempFile?.absolutePath)
         }
     }
 
@@ -968,6 +980,7 @@ println imageNode;
                     resources.add(res);
                 } else {
                     log.error "IMAGE NOT FOUND : "+imageNode
+					addToSummary("IMAGE NOT FOUND : "+imageNode)
                 }
 
             } else {
@@ -980,6 +993,7 @@ println imageNode;
                     }
                 } else {
                     log.error "COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}"
+					addToSummary("COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}")
                 }
             }
         }
@@ -1144,6 +1158,7 @@ println imageNode;
                     sfield.language = lang;
                 else {
                     log.warn "NOT A SUPPORTED LANGUAGE: " + n.language;
+					addToSummary("NOT A SUPPORTED LANGUAGE: " + n.language)
                 }
 				
                 if(!sfield.save(flush:true)) {
@@ -1218,6 +1233,7 @@ println imageNode;
                 }
             } else {
                 log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
+				addToSummary("NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text())
             }
         }
         return synonyms;
@@ -1253,6 +1269,7 @@ println imageNode;
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
+			addToSummary("Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name)
         }
 
     }
@@ -1301,9 +1318,11 @@ println imageNode;
                     }
                 } else {
                     log.warn "NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text();
+					s.appendLogSummary("NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text())
                 }
             } else {
                 log.error " NO COUNTRY IS SPECIFIED in $c"
+				s.appendLogSummary(" NO COUNTRY IS SPECIFIED in $c")
             }
         }
         return geographicEntities;
@@ -1442,6 +1461,7 @@ println imageNode;
 
                 } else {
                     log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
+					addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                 }
             }
         }
