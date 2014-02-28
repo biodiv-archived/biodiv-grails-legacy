@@ -773,18 +773,15 @@ class SpeciesController extends AbstractObjectController {
 	}
 
     def inviteCurator = {
-        println "invite curator called==================================" + params
+        log.debug " inviting curators " + params
         List members = Utils.getUsersList(params.curatorUserIds);
-        println "======================= " + members
-        def selectedNodes = [4]
+        def selectedNodes = params.selectedNodes
         def msg = speciesPermissionService.sendSpeciesCuratorInvitation(selectedNodes, members, Utils.getDomainName(request), params.message)
         render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 		return
     }
 
     def confirmCuratorInviteRequest = {
-        println "========RAECHED CONFIRMATION ========= " + params
-        //add the curator
         if(params.userId && params.taxonConcept){
             def user = SUser.get(params.userId.toLong())
             def taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
@@ -800,7 +797,6 @@ class SpeciesController extends AbstractObjectController {
             flash.error="Couldn't add ${user} as curator to ${taxonConcept.name} because of missing information."            
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
-        println "=====REDIRECT WALA URL ========== " + url
         redirect url: url
 		return;
     }

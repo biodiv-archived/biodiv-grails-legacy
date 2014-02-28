@@ -25,14 +25,14 @@ $(document).ready(function() {
     	loadui:'block',
    		treeGrid: true,
    		ExpandColumn : 'name',
-   		ExpandColClick  : true,
+   		ExpandColClick  : false,
    		treeGridModel: 'adjacency',
         postData:{n_level:-1, expand_species:'${expandSpecies?:false}', expand_all:'${expandAll?:false}', speciesid:'${speciesId}', classSystem:$.trim($('#taxaHierarchy option:selected').val())},
         sortable:false,
         loadComplete:function(data) {
         	var postData = $("#taxonHierarchy").getGridParam('postData');
 			postData["expand_species"] = false;
-        	postData["expand_all"] = false;
+                        postData["expand_all"] = false;
 	    },
 	    loadError : function(xhr, status, error) {
 	    	if(xhr.status == 401) {
@@ -55,12 +55,14 @@ $(document).ready(function() {
 	});
 	 $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
 	$('.ui-jqgrid-hdiv').hide();
-	$('#taxonHierarchy').parents('div.ui-jqgrid-bdiv').css("max-height","425px");
+        $('#taxonHierarchy').parents('div.ui-jqgrid-bdiv').css("max-height","425px");
 });
+
+
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	var cells = $(opts).find('cell')
-	var taxonId = $.trim($(cells[0]).text())
+        var taxonId = $.trim($(cells[0]).text())
 	var speciesId = $.trim($(cells[4]).text())
 	var level = $(cells[6]).text()
 	var levelTxt;
@@ -93,9 +95,10 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
 		
 		if(${expandAllIcon == false?false:true}) {
-			el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
+                el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
 		}
-		el+= "</span>"
+                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'><input class='taxDefIdCheck' type='checkbox' value='werw' onClick='setTaxonId(this,\""+cellVal.rowId+"\")'></span>"
+
 	}
 	return el;	   
 }			
