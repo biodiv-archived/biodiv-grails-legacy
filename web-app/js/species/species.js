@@ -749,7 +749,7 @@ function refreshEditables($e) {
         rate($e.find('.star_rating'));
 }
 
-initEditableFields();
+//initEditableFields();
 
 function selectLicense($this, i) {
     $('#license_'+i).val($.trim($this.text()));

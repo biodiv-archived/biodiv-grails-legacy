@@ -804,4 +804,11 @@ class SpeciesController extends AbstractObjectController {
         redirect url: url
 		return;
     }
+
+   def speciesPermission = {
+        def s = (new SpeciesPermission(['author':springSecurityService.currentUser, 'permissionType':SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(), 'taxonConcept':TaxonomyDefinition.get(1912L)]))
+        if(!s.save(flush:true))
+					s.errors.each { log.error it }
+        render "done"
+    }
 }
