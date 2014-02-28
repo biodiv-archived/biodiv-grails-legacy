@@ -133,13 +133,23 @@ class BootStrap {
 	def initEmailConfirmationService() {
 		emailConfirmationService.onConfirmation = { email, uid, confirmationToken ->
 			log.info("User with id $uid has confirmed their email address $email")
-			def userToken = UserToken.findByToken(uid);
+            def userToken = UserToken.findByToken(uid);
 			if(userToken) {
 				userToken.params.tokenId = userToken.id.toString();
 				userToken.params.confirmationToken = confirmationToken;
 				def userGroupController = new UserGroupController();
-				def userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
-				return [url: userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)]
+				def userGroup = null
+                if(userToken.params.userGroupInstanceId){
+                    userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
+                }
+                def url
+                if(userToken.controller == "userGroup" || userToken.controller == "userGroupGeneric"){
+                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+                }else{
+                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+
+                }
+                return [url: url]
 			} else {
 				//TODO
 			}

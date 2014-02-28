@@ -2,6 +2,7 @@ package species.participation
 
 import java.util.Map;
 
+import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
@@ -49,7 +50,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 				body( bodyArgs)
 			}
 		} catch (Throwable t) {
-			if (Environment.current == Environment.DEVELOPMENT) {
+			if(Environment.current == Environment.DEVELOPMENT) {
 				log.warn "Mail sending failed but you're in development mode so I'm ignoring this fact, you can confirm using the link shown in the previous log output"
 				log.error "Mail send failed", t
 			} else {
@@ -71,6 +72,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 			}
 			// Tell application it's ok
 			// @todo auto sense number of args
+            println "======CONF DETAILS=============== " + conf.emailAddress + conf.userToken + "=======" + confirmationToken
 			def result = onConfirmation?.clone().call(conf.emailAddress, conf.userToken, confirmationToken)
 			//conf.delete()
 			return [valid: true, action:result, email: conf.emailAddress, token:conf.userToken]

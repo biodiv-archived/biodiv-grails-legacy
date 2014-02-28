@@ -132,6 +132,13 @@ var updateEditorContent = function() {
     }
 }
 
+var setTaxonId = function(el, rowId){
+    var last = rowId.substring(rowId.lastIndexOf("_") + 1, rowId.length);
+    $(el).parent("span").find(".taxDefIdVal").val(last);
+    console.log("m here on check box");
+    console.log($(el).parent("span").find(".taxDefIdVal").val());
+}
+
 var expandAll = function(gridId, rowId, force) {
     var grid = $("#"+gridId);
     var rowData = grid.getRowData(rowId);
