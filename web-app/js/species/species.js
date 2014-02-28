@@ -369,8 +369,13 @@ function initGalleryTabs() {
         }          
 
         if(!response.success) {
-            $(this).next(".alert-error").html(response.msg).show();
-            return response.msg
+            var $a = $(this).next(".alert-error")
+            if( $a.length == 0) {
+                $(this).after('<div class="alert-error">'+response.msg+'</div>');
+            } else {
+                $a.html(response.msg).show();
+            }            
+            return '';//response.msg
         } else {
             $(this).next(".alert-error").hide();
             $(this).effect("highlight", {color: '#4BADF5'}, 2000);
@@ -394,7 +399,7 @@ function initGalleryTabs() {
     }
 
     function initEditor($ele) {
-        if($ele.length>0 && $ele.attr('data-type') == 'ckeditor') {
+        if($ele.length > 0 && $ele.attr('data-type') == 'ckeditor') {
             var textareaId = $ele.attr('id');
             var editor = CKEDITOR.instances[textareaId];
             if(editor) {
@@ -413,37 +418,85 @@ function initGalleryTabs() {
 
     function initEditables($ele) {
         if($ele == undefined) $ele = $(document);
-        $ele.find('.editField').editable({
+        var editor = $ele.find('.editField').editable({
+            params: function(params) {
+                console.log('editable');
+                if(params.name == 'synonym') {
+                    //collecting additional params like relationship for synonym
+                    console.log($ele);
+                    var o = $(this).parent().parent().find('.synRel.selector').editable('getValue');
+                    if(o) params.relationship = o.relationship;
+                }
+                console.log(params);
+                return params;
+            },
+
             success: onEditableSuccess,
             error:onEditableError,
             onblur: 'ignore'
         });
 
-        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
+        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
 
             var $textarea = $(this).nextAll('textarea');
-            var $editable = $(this).next('.editField.editable')
-            if($textarea)
+            var $editable = $(this).nextAll('.editField.editable')
+            if($textarea.length != 0)
                 initEditor($textarea);
             else
                 initEditor($editable);
         })
+        $ele.find('.deleteFieldButton').click(function(e) {
+            var $f =  $(this).nextAll('.editField.editable');
+            var $textarea = $(this).nextAll('textarea');
+
+            if($textarea.length != 0)
+                $f = $textarea
+
+            var d = $f.data();
+            var params = {};
+            if(d.params)
+                $.extend(params, $.fn.editableutils.tryParseJson(d.params, true));
+            $.extend(params, {'name':d.name, 'pk':d.pk, 'act':'delete'});
+            
+            $.ajax({
+                url:d.url?d.url:window.params.species.updateUrl,
+                type:'POST',
+                data:params,
+                context:$f,
+                success : function( data, textStatus, jqXHR) {
+                    onEditableSuccess.call($f, data, jqXHR);
+                    if(data.success == true) {
+                        if(data.type == 'description' || data.type == 'newdescription') {
+                            var textareaId = $f.attr('id');
+                            var editor = CKEDITOR.instances[textareaId];
+                            if(editor) {
+                                console.log('destroying ckeditor');
+                                editor.destroy(false);
+                            }
+
+                            onAddableDisplay(undefined, data, jqXHR, $f.parent());
+                        } else
+                            onAddableDisplay(undefined, data, jqXHR, $f);
+                    }
+                }
+            });
+        });
     }
 
     function onAddableDisplay(value, sourceData, response, context) {
         var me = $(this);
         if(context) me = context
-        console.log('onAddableDisplay');
         var html = [];
         if(sourceData && sourceData.content) {
             var speciesId = sourceData.speciesId?sourceData.speciesId:'';
             var content = sourceData.content;
             var data_type = 'textarea';
-            if(sourceData.type == 'description') {
+            if(sourceData.type == 'description' || sourceData.type == 'newdescription') {
                 data_type = 'ckeditor';
-                html.push ('<li></i><a href="#" class="ck_desc_add" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-speciesId:"'+speciesId+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+                if(content.length == 0 )
+                    html.push ('<li><textarea id="description_'+sourceData.id+'"  name="description_'+sourceData.id+'" class="ck_desc_add" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-speciesId="'+speciesId+'" data-url="'+window.params.species.updateUrl+'" data-name="newdescription" data-original-title="Add '+sourceData.type+' name" style="display:none;"/></li>'); 
             }
 
             $.each(content, function(i, v) { 
@@ -456,29 +509,33 @@ function initGalleryTabs() {
                         html.push (createReference(v, sourceData));
                         break;
                     case 'description' : 
+                    case 'newdescription' : 
                         data_type = 'ckeditor';
                         html.push (v);//createSpeciesFieldHtml(v, sourceData));
+                        break;
+                    case 'synonym' : 
+                        data_type = 'text';
+                        html.push (createSynonym(v, sourceData));
                         break;
                 }
             });
 
-            if(sourceData.type != 'description'){
-                html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" ]  data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name">Add</a></li>'); 
+            var $ul = me.parent().parent();
+
+            if(sourceData.type == 'synonym') {
+                html.push('<li><div class="span3"><a href="#" class="synRel add_selector selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a></div><div class="span8"><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></div></li>');
+                $ul = me.parent().parent().parent();
+
+            } else if(sourceData.type != 'description' && sourceData.type != 'newdescription'){
+                html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></li>'); 
             }
 
 
-            var $ul = me.parent().parent();
-
             $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
             $ul.find('.attributionContent').show();
-            initEditables($ul);
-            initAddables($ul);
-            initLicenseSelector($ul, licenseSelectorOptions, "CC BY");
-            initAudienceTypeSelector($ul, audienceTypeSelectorOptions, "General Audience");
-            initStatusSelector($ul, statusSelectorOptions, "Under Validation");
-            rate($ul.find('.star_rating'));
+            refreshEditables($ul);
         } else {
-            me.html('Add'); 
+            //me.html('Add'); 
         }
         return 'Successfully added data';
     }
@@ -502,30 +559,31 @@ function initGalleryTabs() {
     function initAddables($ele) {
         if($ele == undefined) $ele = $(document);
         $ele.find('.addField').editable({
-            success: function(response, newValue) {
-                if(!response) {
-                    return "Unknown error!";
-                }          
-
-                if(!response.success) {
-                    $(this).next(".alert-error").html(response.msg).show();
-                    return response.msg
-                } else {
-                    $(this).next(".alert-error").hide();
+            params: function(params) {
+                if(params.name == 'synonym') {
+                    //collecting additional params like relationship for synonym
+                    var o = $(this).parent().parent().find('.synRel.selector').editable('getValue');
+                    if(o) params.relationship = o.relationship;
                 }
+                console.log(params);
+                return params;
             },
+            success: onEditableSuccess,
             display: onAddableDisplay,
             error:onAddableError,
             onblur:'ignore'
        })
 
-        if($ele.find('.addFieldButton,a.ck_desc_add').length == 0)
+        if($ele.find('.addFieldButton').length == 0)
                $ele.find('.ck_desc_add').before("<a class='addFieldButton'><i class='icon-add'></i>Add</a>");
+
         $ele.find('.addFieldButton').click(function(e){    
             e.stopPropagation();
             var $textarea = $(this).nextAll('textarea');
             if($textarea)
                 initEditor($textarea);
+            else
+                console.log('no textarea found');
         })
 
         $ele.find('.addField').each(function(){
@@ -545,6 +603,9 @@ function initGalleryTabs() {
         return '<li><a href="#" class="editField" data-type="textarea" data-rows="2" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ $.fn.editableutils.escape(content.title)+'</a></li>' ;
     }
 
+    function createSynonym(content, sourceData) {
+        return '<li><div class="span3"><a href="#" class="synRel span3 selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{sid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
+    }
 
     function createSpeciesFieldHtml(content, sourceData) {
         var toolbar = createMetadataToolbar(content);
@@ -564,7 +625,7 @@ function initGalleryTabs() {
         return html.join(' ');
     }
 
-    var onSelectorSuccess = function(response, newValue) {
+    /*var onSelectorSuccess = function(response, newValue) {
         if(!response) {
             return "Unknown error!";
         }          
@@ -576,7 +637,7 @@ function initGalleryTabs() {
             $(this).next(".alert-error").hide();
             $(this).effect("highlight", {color: '#4BADF5'}, 2000);
         }
-    }
+    }*/
 
     var onSelectorError =  function(response, newValue) {
         var successHandler = this.success, errorHandler;
@@ -593,27 +654,6 @@ function initGalleryTabs() {
             }
         });
     }
-    var licenseSelectorOptions = [
-                {value:"CC BY" , text: 'CC BY'},
-                {value: "CC BY-NC", text: 'CC BY-NC'},
-                {value: "CC BY-ND", text: 'CC BY-ND'},
-                {value: "CC BY-NC-ND", text: 'CC BY-NC-ND'},
-                {value: "CC BY-NC-SA", text: 'CC BY-NC-SA'},
-                {value: "CC BY-SA", text: 'CC BY-SA'},
-                {value: "CC PUBLIC DOMAIN", text: 'CC Public Domain'},
-            ]
-    var audienceTypeSelectorOptions = [
-        {value: "Children", text:"Children"},
-        {value: "General Audience", text:"General Audience"},
-        {value: "Expert", text:"Expert"}
-    ]
-    var statusSelectorOptions = [
-        {value: "Under Creation", text:"Under Creation"},
-        {value: "Under Validation", text:"Under Validation"},
-        {value: "Validated", text:"Validated"},
-        {value: "Published", text:"Published"}
-    ]
-
     function initLicenseSelector($ele, $selectorOptions, defaultValue) {
         if($ele == undefined)
             $ele = $(document);
@@ -621,7 +661,7 @@ function initGalleryTabs() {
             value: defaultValue,    
             showbuttons:false,
             source: $selectorOptions,
-            success: onSelectorSuccess,
+            success: onEditableSuccess,
             error:onSelectorError
         });
 
@@ -640,7 +680,7 @@ function initGalleryTabs() {
             value: defaultValue,    
             showbuttons:false,
             source: $selectorOptions,
-            success: onSelectorSuccess,
+            success: onEditableSuccess,
             error:onSelectorError
         });
 
@@ -659,7 +699,7 @@ function initGalleryTabs() {
             value: defaultValue,    
             showbuttons:false,
             source: $selectorOptions,
-            success: onSelectorSuccess,
+            success: onEditableSuccess,
             error:onSelectorError
         });
 
@@ -671,18 +711,27 @@ function initGalleryTabs() {
         });
     }
 
+    function initSynRelSelector($ele, $selectorOptions, defaultValue) {
+        if($ele == undefined)
+            $ele = $(document);
+        $ele.find('.synRel.selector').editable({
+            value: defaultValue,    
+            showbuttons:false,
+            source: $selectorOptions,
+            error:onSelectorError,
+            onblur: 'ignore',
+            send:'never'
+        });
+
+        $ele.find('.synRel.add_selector').editable('toggle');
+
+    }
+
+
 
 function initEditableFields(e) {
     if($(document).find('.editFieldButton').length == 0) {
-        
-        initEditables();
-        initAddables();
-        initLicenseSelector(undefined, licenseSelectorOptions, "CC BY");
-        initAudienceTypeSelector(undefined, audienceTypeSelectorOptions, "General Audience");
-        initStatusSelector(undefined, statusSelectorOptions, "Under Validation");
-        $('.emptyField').show();
-
-        $('#editSpecies').html('<i class="icon-edit"></i>Exit Edit Mode');
+        refreshEditables();
     } else {
     /*    $('.editable').editable('disable');
         $('.addField').hide();
@@ -692,6 +741,22 @@ function initEditableFields(e) {
     }
     e.stopPropagation();
 }
+
+function refreshEditables($e) {
+    initEditables($e);
+    initAddables($e);
+    initLicenseSelector($e, licenseSelectorOptions, "CC BY");
+    initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
+    initStatusSelector($e, statusSelectorOptions, "Under Validation");
+    initSynRelSelector($e, synRelSelectorOptions, "Synonym");
+    $('.emptyField').show();
+    $('.hidePoint').show();
+    $('#editSpecies').html('<i class="icon-edit"></i>Exit Edit Mode');
+    if($e)
+        rate($e.find('.star_rating'));
+}
+
+initEditableFields();
 
 function selectLicense($this, i) {
     $('#license_'+i).val($.trim($this.text()));

@@ -1,43 +1,56 @@
 <%@ page import="species.Species"%>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<r:require modules="species"/>
-<g:set var="entityName"
-	value="${message(code: 'species.label', default: 'Species')}" />
-<title><g:message code="default.create.label"
-		args="[entityName]" />
-</title>
-</head>
-<body>
-	<div class="nav">
-		<span class="menuButton"><a class="home"
-			href="${createLink(uri: '/')}"><g:message
-					code="default.home.label" />
-		</a>
-		</span> <span class="menuButton"><g:link class="list" action="list">
-				<g:message code="default.list.label" args="[entityName]" />
-			</g:link>
-		</span>
-	</div>
-	<div class="body">
-		<h1>
-			<g:message code="default.create.label" args="[entityName]" />
-		</h1>
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
-		<g:hasErrors bean="${speciesInstance}">
-			<div class="errors">
-				<g:renderErrors bean="${speciesInstance}" as="list" />
-			</div>
-		</g:hasErrors>
-		<fileuploader:form upload="docs" successAction="upload"
-			successController="spreadsheet" errorAction="error"
-			errorController="test"/>
-	</div>
-</body>
+    <head>
+        <g:set var="title" value="Species"/>
+        <g:render template="/common/titleTemplate" model="['title':title]"/>
+        <r:require modules="observations_create"/>
+    </head>
+    <body>
+
+        <div class="observation_create">
+            <h1> Add Species </h1>
+            <g:hasErrors bean="${speciesInstance}">
+            <i class="icon-warning-sign"></i>
+            <span class="label label-important"> <g:message
+                code="fix.errors.before.proceeding" default="Fix errors" /> </span>
+            <%--<g:renderErrors bean="${speciesInstance}" as="list" />--%>
+            </g:hasErrors>
+
+            <form id="addSpecies" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+
+                <div class="span12 super-section" style="clear:both;">
+                    <label class="control-label span3" for="name">Species</label> 
+                    <div class="span8">
+                        <input id="species" 
+                        data-provide="typeahead" type="text" class="input-block-level"
+                        name="species" value="${species}"
+                        placeholder="Add species name" />
+                    </div>
+                </div>   
+                <div class="span12 submitButtons">
+
+                    <g:if test="${speciesInstance?.id}">
+                    <a href="${uGroup.createLink(controller:params.controller, action:'show', id:speciesInstance.id)}" class="btn"
+                        style="float: right; margin-right: 30px;"> Cancel </a>
+                    </g:if>
+                    <g:else>
+                    <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
+                        style="float: right; margin-right: 30px;"> Cancel </a>
+                    </g:else>
+                    <a id="addSpeciesSubmit" class="btn btn-primary"
+                        style="float: right; margin-right: 5px;"> Add Species </a>
+
+                </div>
+
+            </form>
+        </div>
+
+    </body>
+    <r:script>
+    $(document).ready(function() {
+        $('#addSpeciesSubmit').click(function() {
+            $('#addSpecies').submit();        
+        });
+    });
+    </r:script>
 </html>

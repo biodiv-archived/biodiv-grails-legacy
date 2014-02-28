@@ -99,17 +99,45 @@ class SpeciesController extends AbstractObjectController {
 		return [speciesInstance: speciesInstance]
 	}
 
-	@Secured(['ROLE_USER'])
-	def save = {
-		def speciesInstance = new Species(params)
-		if (speciesInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
-			redirect(action: "show", id: speciesInstance.id)
-		}
-		else {
-			render(view: "create", model: [speciesInstance: speciesInstance])
-		}
-	}
+    @Secured(['ROLE_USER'])
+    def save = {
+        def speciesInstance = new Species();
+
+        if(params.species) {
+            String speciesName = params.species;
+            XMLConverter converter = new XMLConverter();
+            speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+            if(speciesInstance.taxonConcept) {
+
+                speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
+
+                //taxonconcept is being used as guid
+                speciesInstance.guid = converter.constructGUID(speciesInstance);
+
+                //a species page with guid as taxon concept is considered as duplicate
+                Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
+
+                //either overwrite or merge if an existing species exists
+                if(existingSpecies) {
+                    speciesInstance = existingSpecies;
+                    redirect(action: "show", id: speciesInstance.id)
+                    return;
+                } else { 
+                    if (speciesInstance.save(flush: true)) {
+                        flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
+                        redirect(action: "show", id: speciesInstance.id)
+                        return;
+                    } else {
+                        flash.message = "Error while saving species"
+                    }
+                }
+            }
+            else {
+                flash.message = "Error while saving species"
+            }
+        }
+        render(view: "create", model: [speciesInstance: speciesInstance])
+    }
 
 	def show = {
 		//cache "content"
@@ -197,14 +225,18 @@ class SpeciesController extends AbstractObjectController {
                             map.get(sField.field.concept).put('hasContent', true);
                             finalLoc.put('hasContent', true);
                     }
+                    println sField
                     if( finalLoc.get('isContributor') && isContentContributor(sField)) {
+                        println "******************"+finalLoc
                             finalLoc.put('isContributor', 2)
-                            map.get(sField.field.concept).put('isContributor', 1);
+                            //if(!map.get(sField.field.concept).containsKey('isContributor'))
+                            //    map.get(sField.field.concept).put('isContributor', 1);
                     }
 
                     //subcategory
 					if(sField.field.subCategory && finalLoc.containsKey(sField.field.subCategory)) {
 						finalLoc = finalLoc.get(sField.field.subCategory);
+                        println finalLoc
                         if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                             map.get(sField.field.concept).put('hasContent', true);
                             map.get(sField.field.concept).get(sField.field.category).put('hasContent', true);
@@ -212,8 +244,12 @@ class SpeciesController extends AbstractObjectController {
                         }
                         if(finalLoc.get('isContributor') && isContentContributor(sField)){
                             finalLoc.put('isContributor', 2)
-                            map.get(sField.field.concept).put('isContributor', 1);
-                            map.get(sField.field.concept).get(sField.field.category).put('isContributor', 1);
+                            /*if(!map.get(sField.field.concept).containsKey('isContributor'))
+                                map.get(sField.field.concept).put('isContributor', 1);
+                            if(!map.get(sField.field.concept).get(sField.field.category).containsKey('isContributor'))
+
+                                map.get(sField.field.concept).get(sField.field.category).put('isContributor', 1);
+                            */
                         }
 
 					}
@@ -265,8 +301,8 @@ class SpeciesController extends AbstractObjectController {
                 }
                 if(category.value.get('isContributor')) {
                     int val = category.value.get('isContributor')
-                    map.get(concept.key).get(category.key).put('isContributor', val);
-                    map.get(concept.key).put('isContributor', val);
+                    if(!map.get(concept.key).containsKey('isContributor'))
+                        map.get(concept.key).put('isContributor', val);
                 }
 
 
@@ -276,8 +312,9 @@ class SpeciesController extends AbstractObjectController {
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
 					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||
 					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
-					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
-					subCategory.value.get('speciesFieldInstance')) {
+					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)) {
+
+                    println "*****"+subCategory
                         if(subCategory.value.get('speciesFieldInstance')) {
                             speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get(subCategory.key).get('speciesFieldInstance'));
                         }
@@ -290,8 +327,10 @@ class SpeciesController extends AbstractObjectController {
 
                     if(subCategory.value.get('isContributor')) { 
                         int val = subCategory.value.get('isContributor')
-                        map.get(concept.key).get(category.key).put('isContributor', val);
-                        map.get(concept.key).put('isContributor', val);
+                        if(!map.get(concept.key).get(category.key).containsKey('isContributor'))
+                            map.get(concept.key).get(category.key).put('isContributor', val);
+                        if(!map.get(concept.key).containsKey('isContributor'))
+                            map.get(concept.key).put('isContributor', val);
                     }
 				}
 			}
@@ -301,7 +340,7 @@ class SpeciesController extends AbstractObjectController {
 
     private boolean isContentContributor(SpeciesField sField) {
         for(c1 in sField.contributors) {
-            if(c1.name == springSecurityService.currentUser.username) {
+            if(c1.id == springSecurityService.currentUser.id) {
                 return true;
             }
         }
@@ -340,14 +379,26 @@ class SpeciesController extends AbstractObjectController {
             switch(params.name) {
                 case "contributor":
                     long cid = params.cid?params.long('cid'):null;
-                    result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteContributor(cid, speciesFieldId, params.name);
+                    } else {
+                        result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    }
                     break;
                 case "attributor":
                     long cid = params.cid?params.long('cid'):null;
-                    result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteAttributor(cid, speciesFieldId, params.name);
+                    } else {
+                        result = speciesService.updateAttributor(cid, speciesFieldId, value, params.name);
+                    }
                     break;
                 case "description":
-                    result = speciesService.updateDescription(speciesFieldId, value);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteDescription(speciesFieldId);
+                    } else {
+                        result = speciesService.updateDescription(speciesFieldId, value);
+                    }
                     break;
                 case "newdescription":
                     long speciesId = params.speciesid? params.long('speciesid') : null;
@@ -355,7 +406,7 @@ class SpeciesController extends AbstractObjectController {
                     result = speciesService.addDescription(speciesId, fieldId, value);
                     def html = [];
                     if(result.speciesInstance) {
-                        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.species, springSecurityService.currentUser);
+                        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.speciesInstance, springSecurityService.currentUser);
 
                         result.content.each {sf ->
                             boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
@@ -375,7 +426,21 @@ class SpeciesController extends AbstractObjectController {
                     break;
                 case "reference":
                     long cid = params.cid?params.long('cid'):null;
-                    result = speciesService.updateReference(cid, speciesFieldId, value);
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteReference(cid, speciesFieldId);
+                    } else {
+                        result = speciesService.updateReference(cid, speciesFieldId, value);
+                    }
+                    break;
+                case 'synonym':
+                    long sid = params.sid?params.long('sid'):null;
+                    String relationship = params.relationship?:null;
+
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteSynonym(sid, speciesFieldId);
+                    } else {
+                        result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value);
+                    }
                     break;
 
                 default :
@@ -385,6 +450,8 @@ class SpeciesController extends AbstractObjectController {
 		    render result as JSON
             return;
         } catch(Exception e) {
+            e.printStackTrace();
+            log.error e.getMessage();
     		render ([success:false, msg:e.getMessage()] as JSON)
 			return;
         }

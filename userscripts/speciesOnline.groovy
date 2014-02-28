@@ -169,6 +169,20 @@ def updateObservationResource(){
 
 
 
+def updateNameContributor(){
+	int i = 0
+	def ds = ctx.getBean("dataSource")
+	def sql =  Sql.newInstance(ds);
+	['common_names', 'synonyms', 'taxonomy_definition', 'taxonomy_registry'].each { t -> 
+		def query = "select id as id from " + t + " order by id "
+		sql.rows(query).each{
+			println " adding contri " + it.id + " count " + i++
+			sql.executeUpdate( 'insert into ' + t + '_suser values(?, 1)',  [it.id])
+		}
+	}
+}
+
+
 //makeFieldGeneric()
 //addMetadataField()
 //addNewField()
@@ -186,6 +200,15 @@ drop table species_taxonomy_registry ;
 
 
 //adding soure info
-updateObservationResource()
+//updateObservationResource()
 //update species_field set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
 //update resource set uploader_id = 1, upload_time = '1970-01-01 00:00:00' where uploader_id is null;
+
+
+
+//adding namessourceinfo {have to add contributors}
+//update synonyms set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+//update taxonomy_definition set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+//update common_names set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+//update taxonomy_registry set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+//updateNameContributor()

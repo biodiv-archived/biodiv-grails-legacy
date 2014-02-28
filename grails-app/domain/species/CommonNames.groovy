@@ -1,6 +1,6 @@
 package species
 
-class CommonNames {
+class CommonNames extends NamesSorucedata {
 
 	String name;
 	Language language;
@@ -14,4 +14,5 @@ class CommonNames {
 	static mapping = {
 		version false;
 	}
+
 }

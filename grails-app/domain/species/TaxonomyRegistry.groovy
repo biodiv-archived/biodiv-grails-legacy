@@ -2,7 +2,7 @@ package species
 
 import java.util.List;
 
-class TaxonomyRegistry {
+class TaxonomyRegistry extends NamesSorucedata {
 
 	TaxonomyDefinition taxonDefinition;
 	TaxonomyRegistry parentTaxon;

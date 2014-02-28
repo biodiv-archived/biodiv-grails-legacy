@@ -50,14 +50,30 @@
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
         <h5>Synonyms</h5>
     </a> 
-    <div id="synonyms" class="speciesField collapse in">
-        <table>
+    <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
             <g:each in="${synonyms}" var="synonym">
-            <tr><td class="prop">
-                    <span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td class='sci_name'> ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'}  </td></tr>
+            <li>
+            <div class="span3">
+                <a href="#" class="synRel  ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">
+                    ${synonym?.relationship?.value()}</a> 
+            </div>
+            <div class="span8">
+                <a href="#" class="sci_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-params="{sid:${synonym.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'} </a>
+            </div>    
+            </li>
             </g:each>
-        </table>
-    </div>
+            <g:if test="${isSpeciesContributor}">
+            <li>
+            <div class="span3">
+                <a href="#" class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a>
+            </div>
+            <div class="span8">
+                <a href="#" class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></a>
+            </div>
+            </li>
+            </g:if>
+
+    </ul>
     <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_SYNONYMS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 </div>
 <br/>

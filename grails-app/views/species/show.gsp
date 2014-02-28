@@ -172,7 +172,7 @@
                     { name: 'insert', items: [ 'Image', 'Table'] },
                     {name: 'save', items:['Inlinesave']}
                     ],
-                    filebrowserImageBrowseUrl: "/biodiv/ck/biodivofm?fileConnector=/biodiv/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/biodivofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                         height: '400px'
@@ -210,7 +210,7 @@
 
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance]"/>
                 <div class="span12" style="margin-left:0px">
-                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields]"/>
+                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
 
 
 
