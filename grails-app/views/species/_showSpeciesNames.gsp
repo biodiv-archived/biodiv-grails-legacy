@@ -45,7 +45,7 @@
 
 <!-- Synonyms -->
 <%def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) %>
-<g:if test="${synonyms }">
+<g:if test="${synonyms}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
         <h5>Synonyms</h5>
@@ -78,6 +78,25 @@
 </div>
 <br/>
 </g:if>
+<g:elseif test="${isSpeciesContributor}">
+<div class="sidebar_section">
+    <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
+        <h5>Synonyms</h5>
+    </a> 
+    <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
+           <li>
+            <div class="span3">
+                <a href="#" class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a>
+            </div>
+            <div class="span8">
+                <a href="#" class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></a>
+            </div>
+            </li>
+
+    </ul>
+</div>
+<br/>
+</g:elseif>
 
 <!-- Common Names -->
 <%
