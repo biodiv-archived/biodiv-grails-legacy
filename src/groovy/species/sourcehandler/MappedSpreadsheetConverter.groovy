@@ -392,6 +392,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			if(license != -1 && groupValues.get(license)) new Node(image, "license", groupValues.get(license));
 		} else {
             log.error "Image is not present at ${imagesLocation}"
+			addToSummary("Image is not present at ${imagesLocation}")
         }
 	}
 

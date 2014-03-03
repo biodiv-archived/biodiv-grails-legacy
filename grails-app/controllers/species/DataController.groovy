@@ -297,9 +297,11 @@ class DataController {
 	private void populateSpeciesDetails(Long speciesTaxonId, Map result) {
 		if(result.rank == TaxonomyRank.SPECIES.ordinal()) {
 			def species = getSpecies(speciesTaxonId);
-			result.put("speciesid", species.id)
-			result.put('name', species.title)
-			result.put('count', 1);
+			if(species){
+				result.put("speciesid", species.id)
+				result.put('name', species.title)
+				result.put('count', 1);
+			}
 		}
 	}
 	/**
