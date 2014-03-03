@@ -135,6 +135,8 @@ class SpeciesPermissionService {
     }
 
     def sendSpeciesCuratorInvitation(selectedNodes, members, domain, message=null) {
+        def rankLevel
+        def rankArray = ["Kingdom", "Phylum", "Class", "Order", "Family", "Sub Family", "Genus", "Sub Genus", "Species"]
         String mailSubject = "Invitation for curatorship"
         String msg = ""
         String usernameFieldName = 'name'
@@ -147,22 +149,26 @@ class SpeciesPermissionService {
                 if(curatorFor) {
                     if(curatorFor.intersect(allParents)) {
                         //he is already curator of a parent node, no need to add for child node
-                        msg += " ${mem.name} is already a curator for ${sn.name} ";
+                        rankLevel = rankArray[sn.rank]
+                        msg += " ${mem.name} is already a curator of " + rankLevel + " : ${sn.name} ";
                         return msg
                     }
                     else {
+                        rankLevel = rankArray[sn.rank]
                         def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmCuratorInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString()]);
                         userToken.save(flush: true)
-                        emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem,taxon:sn, domain:domain, view:'/emailtemplates/requestPermission'], userToken.token);
-                        msg += " Successfully sent invitation to ${mem.name} for curatorship of ${sn.name} "                        
+                        emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem,taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission'], userToken.token);
+                        
+                        msg += " Successfully sent invitation to ${mem.name} for curatorship of " + rankLevel + " : ${sn.name} "                        
                     }
 
                 }
                 else{
+                    rankLevel = rankArray[sn.rank]
                     def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmCuratorInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString()]);
                     userToken.save(flush: true)
-                    emailConfirmationService.sendConfirmation(mem.email, mailSubject ,  [curator: mem, ,taxon:sn , domain: domain, view:'/emailtemplates/requestPermission'], userToken.token);
-                    msg += " Successfully sent invitation to ${mem.name} for curatorship of ${sn.name} "
+                    emailConfirmationService.sendConfirmation(mem.email, mailSubject ,  [curator: mem, ,taxon:sn , domain: domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission'], userToken.token);
+                    msg += " Successfully sent invitation to ${mem.name} for curatorship of " + rankLevel + " : ${sn.name} "                
                 }
 
             }
