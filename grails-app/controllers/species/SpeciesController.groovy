@@ -674,14 +674,8 @@ class SpeciesController extends AbstractObjectController {
             def usersMailList = []
             usersMailList = speciesPermissionService.getSpeciesAdmin()
             println "================ " + usersMailList
-            //def suser = SUser.get(3L)
-
-            //usersMailList.add(suser)
-            //usersMailList.add(SUser.get(4L))
             println "======" + usersMailList
-            
             def sp = new Species()
-
             /*
             speciesList.each{ sp -> 
                 curators = speciesPermissionService.getCurators(sp)
@@ -695,11 +689,9 @@ class SpeciesController extends AbstractObjectController {
             linkParams["daterangepicker_start"] = reportDate_start
             linkParams["daterangepicker_end"] = reportDate_end
             linkParams["sort"] = "lastUpdated"
+            linkParams["user"] = springSecurityService.currentUser
             String link = observationService.generateLink("species", "list", linkParams)
             otherParams["link"] = link
-            //FOR EACH SPECIES UPLOADED send mail
-            //how to send the link generated
-            //what about activity feed
             usersMailList.each{ user ->
                 def uml =[]
                 uml.add(user)

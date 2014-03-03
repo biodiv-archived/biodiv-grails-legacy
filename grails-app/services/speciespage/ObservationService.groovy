@@ -2172,7 +2172,7 @@ class ObservationService extends AbstractObjectService {
 
     def getUserGroup(params) {
 
-        if(params.userGroup && params.userGroup.instanceOf(UserGroup)) {
+        if(params.userGroup && params.userGroup instanceof UserGroup) {
             return params.userGroup
         }
 

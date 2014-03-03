@@ -115,6 +115,7 @@ class SourceConverter {
                 new Node(image, "license", imageData.get("license"));
             } else {
                 log.warn("No reference key for image : "+imageData);
+				addToSummary("No reference key for image : "+imageData)
             }
         }
     }//

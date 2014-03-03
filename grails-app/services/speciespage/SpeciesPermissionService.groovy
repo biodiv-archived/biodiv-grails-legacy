@@ -135,6 +135,7 @@ class SpeciesPermissionService {
     }
 
     def sendSpeciesCuratorInvitation(selectedNodes, members, domain, message=null) {
+        String mailSubject = "Invitation for curatorship"
         String msg = ""
         String usernameFieldName = 'name'
         def selNodes = selectedNodes.split(",")
@@ -152,7 +153,7 @@ class SpeciesPermissionService {
                     else {
                         def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmCuratorInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString()]);
                         userToken.save(flush: true)
-                        emailConfirmationService.sendConfirmation(mem.email,"Invite for Curatorship",  [curator: mem, domain:domain, view:'/emailtemplates/requestPermission'], userToken.token);
+                        emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem,taxon:sn, domain:domain, view:'/emailtemplates/requestPermission'], userToken.token);
                         msg += " Successfully sent invitation to ${mem.name} for curatorship of ${sn.name} "                        
                     }
 
@@ -160,7 +161,7 @@ class SpeciesPermissionService {
                 else{
                     def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmCuratorInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString()]);
                     userToken.save(flush: true)
-                    emailConfirmationService.sendConfirmation(mem.email,"Invite for Curatorship",  [curator: mem, domain: domain, view:'/emailtemplates/requestPermission'], userToken.token);
+                    emailConfirmationService.sendConfirmation(mem.email, mailSubject ,  [curator: mem, ,taxon:sn , domain: domain, view:'/emailtemplates/requestPermission'], userToken.token);
                     msg += " Successfully sent invitation to ${mem.name} for curatorship of ${sn.name} "
                 }
 
