@@ -442,6 +442,17 @@ class SpeciesController extends AbstractObjectController {
                         result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value);
                     }
                     break;
+                case 'commonname':
+                    long cid = params.cid?params.long('cid'):null;
+                    String language = params.language?:null;
+
+                    if(params.act == 'delete') {
+                        result = speciesService.deleteCommonname(cid, speciesFieldId);
+                    } else {
+                        result = speciesService.updateCommonname(cid, speciesFieldId, language, value);
+                    }
+                    break;
+
 
                 default :
                     result=['success':false, msg:'Incorrect datatype'];

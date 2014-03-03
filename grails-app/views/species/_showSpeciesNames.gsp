@@ -122,22 +122,31 @@ list.sort();
 <g:if test="${names}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
-    <div id="commonNames" class="speciesField collapse in">
-
-        <table>
-            <g:each in="${names}">
-            <tr><td class="prop">
-                    <span class="grid_3 name">${it.key} </span></td> 
-                <td><g:each in="${it.value}"  status="i" var ="n">
-                    <g:if test="${n.language?.isDirty}">${n.language.name+ " : "} </g:if>${n.name}<g:if test="${i < it.value.size()-1}">,</g:if>
-                    </g:each></td>
-                </tr>
-                </g:each>
-            </table>
+    <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
+        <g:each in="${names}">
+        <li>
+        <div class="span3">
+            <a href="#" class="lang add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
+                ${it.key}</a>
+        </div> 
+        <div class="span8">
+            <g:each in="${it.value}"  status="i" var ="n">
+                <g:if test="${n.language?.isDirty}">${n.language.name+ " : "} </g:if>
+                
+                <a href="#" class="common_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-params="{cid:${n.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">  
+                    ${n.name}</a>
+                
+                <g:if test="${i < it.value.size()-1}">,</g:if>
+            </g:each>
         </div>
-        <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_COMMON_NAMES, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
-    </div>
-    <br/>
-    </g:if>
-    <!-- Common Names End-->
+        </li>
+        </g:each>
+    </ul>
+    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_COMMON_NAMES, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
+</div>
+<br/>
+</g:if>
+<g:elseif test="${isSpeciesContributor}">
+</g:elseif>
+<!-- Common Names End-->
 
