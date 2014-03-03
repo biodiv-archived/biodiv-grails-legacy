@@ -96,9 +96,10 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		
 		if(${expandAllIcon == false?false:true}) {
                 el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
-		}
-                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'><input class='taxDefIdCheck' type='checkbox' value='werw' onClick='setTaxonId(this,\""+cellVal.rowId+"\")'></span>"
-
+                }
+                if("${speciesInstance}".length == 0){
+                    el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'><input class='taxDefIdCheck' type='checkbox' value='werw' onClick='setTaxonId(this,\""+cellVal.rowId+"\")'></span>"
+                }
 	}
 	return el;	   
 }			
