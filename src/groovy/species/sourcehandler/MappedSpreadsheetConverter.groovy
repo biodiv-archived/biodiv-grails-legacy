@@ -12,6 +12,7 @@ import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
+import species.utils.Utils;
 
 class MappedSpreadsheetConverter extends SourceConverter {
 
@@ -272,7 +273,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 							txt = "<h6>"+txt+"</h6>";
 						else {
 							txt = "<p>"+txt+"</p>";
-							if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt;
+							if(includeHeadings) txt = "<h6>"+Utils.getTitleCase(t.trim())+"</h6>"+txt;
 						}
 						if(con)
 							con += txt;
@@ -280,7 +281,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 					} else {
 						txt = "<p>"+txt+"</p>";
-						if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt;
+						if(includeHeadings) txt = "<h6>"+Utils.getTitleCase(t.trim())+"</h6>"+txt;
 						con += txt;
 					}
 				}

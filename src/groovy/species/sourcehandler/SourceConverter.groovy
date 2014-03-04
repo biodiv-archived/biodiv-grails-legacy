@@ -1,10 +1,10 @@
 package species.sourcehandler
 
 import java.util.Map;
-
+import grails.util.Environment;
 import org.apache.commons.logging.LogFactory;
-import species.Field;
 
+import species.Field;
 import species.License.LicenseType;
 import species.formatReader.SpreadsheetWriter;
 
@@ -564,6 +564,8 @@ class SourceConverter {
 	
 	
 	def myPrint(str){
-		println str
+		if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
+			println str
+		}
 	}
 }
