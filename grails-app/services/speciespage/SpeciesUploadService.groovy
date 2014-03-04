@@ -456,16 +456,15 @@ class SpeciesUploadService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			//TaxonomyDefinition.withTransaction { status ->
-			for(Species s : species) {
-				def taxonConcept = s.taxonConcept;
-				if(!taxonConcept.isAttached()) {
-					taxonConcept.attach();
+			//TaxonomyDefinition.withNewSession{
+				for(Species s : species) {
+					def taxonConcept = s.taxonConcept;
+					if(!taxonConcept.isAttached()) {
+						taxonConcept.attach();
+					}
+					groupHandlerService.updateGroup(taxonConcept);
+					log.info "post processed spcecies ${s}"
 				}
-				groupHandlerService.updateGroup(taxonConcept);
-				log.info "post processed spcecies ${s}"
-			}
-			
 			//}
 		} catch(e) {
 			log.error "$e.message"
