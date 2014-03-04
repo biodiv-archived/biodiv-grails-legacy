@@ -170,7 +170,7 @@ list.sort();
         </div> 
         <div class="span8">
             <div style="float:left;"> 
-                <a href="#" class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-params="{cid:${n.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">  
+                <a href="#" class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">  
                     </a>
             </div>
         </div>

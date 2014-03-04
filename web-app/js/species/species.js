@@ -589,7 +589,7 @@ function initGalleryTabs() {
        })
 
         if($ele.find('.addFieldButton').length == 0)
-               $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='Add'><i class='icon-plus'></i></a>");
+               $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='Add'><i class='icon-plus'></i>Add</a>");
 
         $ele.find('.addFieldButton').click(function(e){    
             e.stopPropagation();
