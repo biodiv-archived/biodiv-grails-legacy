@@ -41,28 +41,7 @@ function getSpeciesHeaderMenuOptions() {
     return {
         menu: {
             items: [
-            {
-                title: "Scientific Name",
-                command: "sciNameColumn"
-            },
-            {
-                title: "Common Name",
-                command: "commonNameColumn"
-            }
-            /*
-            ,
-            {
-                title: "New Header",
-                command: "newHeader"
-            }
-
-            ,
-            {
-                iconCssClass: "icon-help",
-                title: "Help",
-                command: "help"
-            }*/
-            ]
+                ]
         }
     }
 }
