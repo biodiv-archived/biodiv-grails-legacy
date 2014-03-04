@@ -418,25 +418,26 @@ function initGalleryTabs() {
 
     function initEditables($ele) {
         if($ele == undefined) $ele = $(document);
-        var editor = $ele.find('.editField').editable({
+        $ele.find('.editField').editable({
             params: function(params) {
                 console.log('editable');
                 if(params.name == 'synonym') {
                     //collecting additional params like relationship for synonym
-                    console.log($ele);
                     var o = $(this).parent().parent().find('.synRel.selector').editable('getValue');
                     if(o) params.relationship = o.relationship;
+                } else if(params.name == 'commonname') {
+                    //collecting additional params like language for commonname
+                    var o = $(this).closest('li').find('.lang.selector').editable('getValue');
+                    if(o) params.language = o.language;
                 }
-                console.log(params);
                 return params;
             },
-
             success: onEditableSuccess,
             error:onEditableError,
             onblur: 'ignore'
         });
 
-        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
+        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton' title='Delete'><i class='icon-trash'></i></a><a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
 
@@ -517,6 +518,11 @@ function initGalleryTabs() {
                         data_type = 'text';
                         html.push (createSynonym(v, sourceData));
                         break;
+                    case 'commonname' : 
+                        data_type = 'text';
+                        html.push (createCommonname(v, sourceData));
+                        break;
+
                 }
             });
 
@@ -525,6 +531,10 @@ function initGalleryTabs() {
             if(sourceData.type == 'synonym') {
                 html.push('<li><div class="span3"><a href="#" class="synRel add_selector selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a></div><div class="span8"><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></div></li>');
                 $ul = me.parent().parent().parent();
+
+            } else if(sourceData.type == 'commonname') {
+                html.push('<li><div class="span3"><a href="#" class="lang add_selector selector" data-type="select" data-name="language" data-original-title="Edit Commonname Language"></a></div><div class="span8"><div><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></div></div></li>');
+                $ul = me.parent().parent().parent().parent();
 
             } else if(sourceData.type != 'description' && sourceData.type != 'newdescription'){
                 html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></li>'); 
@@ -565,7 +575,11 @@ function initGalleryTabs() {
                     var o = $(this).parent().parent().find('.synRel.selector').editable('getValue');
                     if(o) params.relationship = o.relationship;
                 }
-                console.log(params);
+                else if(params.name == 'commonname') {
+                    //collecting additional params like language for commonname
+                    var o = $(this).closest('li').find('.lang.selector').editable('getValue');
+                    if(o) params.language = o.language;
+                }
                 return params;
             },
             success: onEditableSuccess,
@@ -575,7 +589,7 @@ function initGalleryTabs() {
        })
 
         if($ele.find('.addFieldButton').length == 0)
-               $ele.find('.ck_desc_add').before("<a class='addFieldButton'><i class='icon-add'></i>Add</a>");
+               $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='Add'><i class='icon-plus'></i></a>");
 
         $ele.find('.addFieldButton').click(function(e){    
             e.stopPropagation();
@@ -605,6 +619,10 @@ function initGalleryTabs() {
 
     function createSynonym(content, sourceData) {
         return '<li><div class="span3"><a href="#" class="synRel span3 selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{sid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
+    }
+
+    function createCommonname(content, sourceData) {
+        return '<li><div class="span3"><a href="#" class="lang span3 selector" data-type="select" data-name="language" data-original-title="Edit Common name Language">'+content.language.name+'</a></div><div class="span8"><div style="float:left"><a href="#" class="common_name editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.name+'</a>,</div></div></li>' ;
     }
 
     function createSpeciesFieldHtml(content, sourceData) {
@@ -666,7 +684,7 @@ function initGalleryTabs() {
         });
 
 
-        $ele.find(".license.selector.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
+        $ele.find(".license.selector.editable").before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.license.selector.editable').editable('toggle');
@@ -685,7 +703,7 @@ function initGalleryTabs() {
         });
 
 
-        $ele.find(".audienceType.selector.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
+        $ele.find(".audienceType.selector.editable").before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.audienceType.selector.editable').editable('toggle');
@@ -704,7 +722,7 @@ function initGalleryTabs() {
         });
 
 
-        $ele.find(".status.selector.editable").before("<a class='pull-right editFieldButton'><i class='icon-edit'></i>Edit</a>");
+        $ele.find(".status.selector.editable").before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.status.selector.editable').editable('toggle');
@@ -726,6 +744,23 @@ function initGalleryTabs() {
         $ele.find('.synRel.add_selector').editable('toggle');
 
     }
+    
+    function initLangSelector($ele, $selectorOptions, defaultValue) {
+        if($ele == undefined)
+            $ele = $(document);
+        $ele.find('.lang.selector').editable({
+            value: defaultValue,    
+            showbuttons:false,
+            source: $selectorOptions,
+            error:onSelectorError,
+            onblur: 'ignore',
+            send:'never'
+        });
+
+        $ele.find('.lang.add_selector').editable('toggle');
+
+    }
+
 
 
 
@@ -749,6 +784,7 @@ function refreshEditables($e) {
     initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
     initStatusSelector($e, statusSelectorOptions, "Under Validation");
     initSynRelSelector($e, synRelSelectorOptions, "Synonym");
+    initLangSelector($e, langSelectorOptions, "English");
     $('.emptyField').show();
     $('.hidePoint').show();
     $('#editSpecies').html('<i class="icon-edit"></i>Exit Edit Mode');

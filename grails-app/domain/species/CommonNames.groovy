@@ -13,6 +13,8 @@ class CommonNames extends NamesSorucedata {
 
 	static mapping = {
 		version false;
+        language sort:'name asc'
 	}
 
+    static fetchMode = [language:'eager']
 }

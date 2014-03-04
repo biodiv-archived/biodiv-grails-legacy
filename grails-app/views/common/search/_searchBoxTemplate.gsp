@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Synonyms"%>
+<%@page import="species.Language"%>
 <%--<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>--%>
 
 <div id='searchToggleBox' class="input-append">
@@ -121,10 +122,15 @@ $(document).ready(function() {
         ];
 
 
-        var synRelSelectorOptions = [];
+        var synRelSelectorOptions = [], langSelectorOptions = [];
         <g:each in="${Synonyms.RelationShip.toList()}" var="rel">
         synRelSelectorOptions.push({value:"${rel.value()}", text:"${rel.value()}"});
         </g:each>
+        var langSelectorOptions = [];
+        <g:each in="${Language.list()}" var="lang">
+        langSelectorOptions.push({value:"${lang.name}", text:"${lang.name}"});
+        </g:each>
+
 
 
 </g:javascript>
