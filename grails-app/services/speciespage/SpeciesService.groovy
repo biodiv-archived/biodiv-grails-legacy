@@ -1003,7 +1003,7 @@ class SpeciesService {
 
         if(params.daterangepicker_start && params.daterangepicker_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
-            println "=================== "+ params.daterangepicker_start + params.daterangepicker_end
+            params.daterangepicker_start + params.daterangepicker_end
             def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
             def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
             Calendar cal = Calendar.getInstance(); // locale-specific
@@ -1017,7 +1017,6 @@ class SpeciesService {
             countFilterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
             queryParams["daterangepicker_start"] =  startDate   
             queryParams["daterangepicker_end"] =  endDate
-            println "================" + startDate + endDate
             //activeFilters["daterangepicker_start"] = params.daterangepicker_start
             //activeFilters["daterangepicker_end"] =  params.daterangepicker_end
         }
@@ -1033,6 +1032,17 @@ class SpeciesService {
                 countFilterQuery += " and userGroup=:userGroup "
             }
         }
+		
+		if(params.user){
+			def userInstance = params.user.toLong()
+			if(userInstance){
+				queryParams['user'] = userInstance
+				query += " join s.fields as f "
+				filterQuery += " and f.uploader.id=:user "
+				countQuery += " join s.fields as f "
+				countFilterQuery += " and f.uploader.id=:user "
+			}
+		}
 
         query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
         countQuery += countFilterQuery + " group by s.percentOfInfo"

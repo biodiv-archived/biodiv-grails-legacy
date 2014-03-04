@@ -120,30 +120,24 @@ class MappedSpreadsheetConverter extends SourceConverter {
 							String text = speciesContent.get(fieldNameToken);
 							def delimiter = delimiterMap.get(fieldNameToken);
 							if(text) {
+								boolean isCommonName = category.text().equalsIgnoreCase("common name")
 								if(delimiter){
 									for(String part : text.split(delimiter)) {
 										if(part) {
 											part = part.trim();
-											if(category.text().equalsIgnoreCase("common name")) {
-												String[] commonNames = part.split(":");
-												if(commonNames.length == 2) {
-													commonNames[1].split(",|;").each {
-														Node data = createDataNode(field, it, speciesContent, mappedField);
-														Node language = new Node(data, "language");
-														Node name = new Node(language, "name", commonNames[0]);
-													}
-												} else {
-													commonNames[0].split(",|;").each {
-														createDataNode(field, it, speciesContent, mappedField);
-													}
-												}
+											if(isCommonName){
+												createCommonNameNode(part, field, speciesContent, mappedField)
 											} else {
 												createDataNode(field, part, speciesContent, mappedField);
 											}
 										}
 									}
 								}else{
-									createDataNode(field, text, speciesContent, mappedField);
+									if(isCommonName){
+										createCommonNameNode(text, field, speciesContent, mappedField)
+									}else{
+										createDataNode(field, text, speciesContent, mappedField);
+									}
 								}
 							}
 						}
@@ -154,6 +148,25 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				}
 			}
 			return speciesElement
+	}
+
+	private createCommonNameNode(String part, Node field, Map speciesContent, Map mappedField) {
+		myPrint("=========== creating common names " + part)
+		String[] commonNames = part.split(":");
+
+		if(commonNames.length == 2) {
+			myPrint("=========== creating common names " + part)
+			commonNames[1].split(",|;").each {
+				myPrint("=========== lang " + it  + " val " + commonNames[0])
+				Node data = createDataNode(field, it, speciesContent, mappedField);
+				Node language = new Node(data, "language");
+				Node name = new Node(language, "name", commonNames[0]);
+			}
+		} else {
+			commonNames[0].split(",|;").each {
+				createDataNode(field, it, speciesContent, mappedField);
+			}
+		}
 	}
 
 	protected void createReferences(Node dataNode, Map speciesContent, Map mappedField) {
@@ -467,8 +480,5 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 	
 	
-	def myPrint(str){
-		println str
-	}
 	
 }

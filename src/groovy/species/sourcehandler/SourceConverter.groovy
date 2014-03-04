@@ -561,4 +561,9 @@ class SourceConverter {
 		return summary.toString()
 	}
 
+	
+	
+	def myPrint(str){
+		println str
+	}
 }
