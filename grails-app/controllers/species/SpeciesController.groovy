@@ -636,102 +636,12 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
-        def res = ""
-
-        if(params.xlsxFileUrl) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
-            // Get the date today using Calendar object.
-            Date start = Calendar.getInstance().getTime();        
-            // Using DateFormat format method we can create a string 
-            // representation of a date with the defined format.
-            String reportDate_start = df.format(start);
-
-            File speciesDataFile = speciesUploadService.saveModifiedSpeciesFile(params)
-            println "=====THE FILE BEING UPLOADED====== " + speciesDataFile
-			
-			if(speciesDataFile.exists()) {
-				res = speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-			} 
-			else {
-                res =  "Not found"
-            }
-            Date end = Calendar.getInstance().getTime();        
-            // Using DateFormat format method we can create a string 
-            // representation of a date with the defined format.
-            String reportDate_end = df.format(end);
-
-            //def endTime = new Date()
-            def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res.summary
-            def mylog = " Start Date  " + start + "   End Date " + end + "\n\n " + res.log
-            String fileName = "ErrorLog.txt"
-            String uploadDir = "species"
-            //URL url = new URL(data.xlsxFileUrl);
-            File errorFile = observationService.createFile(fileName , uploadDir, contentRootDir);
-			errorFile.write(mylog)
-
-            def otherParams = [:]
-            def usersMailList = []
-            usersMailList = speciesPermissionService.getSpeciesAdmin()
-            println "================ " + usersMailList
-            println "======" + usersMailList
-            def sp = new Species()
-            /*
-            speciesList.each{ sp -> 
-                curators = speciesPermissionService.getCurators(sp)
-                curators.each { cu - >
-                    usersMailList.add(cu)
-                }
-            }
-            */
-            //otherParams["usersMailList"] = usersMailList
-            def linkParams = [:]
-            linkParams["daterangepicker_start"] = reportDate_start
-            linkParams["daterangepicker_end"] = reportDate_end
-            linkParams["sort"] = "lastUpdated"
-            linkParams["user"] = springSecurityService.currentUser
-            String link = observationService.generateLink("species", "list", linkParams)
-            otherParams["link"] = link
-            usersMailList.each{ user ->
-                def uml =[]
-                uml.add(user)
-                otherParams["curator"] = user.name
-                otherParams["usersMailList"] = uml
-                observationService.sendNotificationMail(observationService.SPECIES_CURATORS,sp,null,null,null,otherParams)
-            }
-			
-			//creating roll back entry
-			speciesUploadService.createRollBackEntry(start, end, speciesDataFile.getAbsolutePath())
-			
-			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
-		    observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
-			sp = null
-			render(text: [success:true,msg:mymsg, downloadFile: speciesDataFile.getAbsolutePath(), filterLink: link, errorFile: errorFile.getAbsolutePath()] as JSON, contentType:'text/html')
-			
-        }
-			
-            
-			/*
-            def otherParams = [:]
-            def usersMailList = []
-            speciesList.each{ sp ->
-                curators = speciesPermissionService.getCurators(sp)
-                curators.each { cu ->
-                    usersMailList.add(cu)
-                }
-            }
-            otherParams["usersMailList"] = usersMailList
-            def linkParams = [:]
-            linkParams["daterangepicker_start"] = startTime
-            linkParams["daterangepicker_end"] = endTime
-            String link = observationService.generateLink("species", "list", linkParams)
-            otherParams["link"] = link
-            //FOR EACH SPECIES UPLOADED send mail
-            //how to send the link generated
-            //what about activity feed
-            observationService.sendNotificationMail(observationService.SPECIES_UPLOADED,speciesList[0],null,null,null,otherParams)
-            return render(text: [success:true,msg:"SUCCESSFULLY UPLOADED", downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
-            */
+		log.debug params
+		
+		if(params.xlsxFileUrl){
+			def result = speciesUploadService.upload(params)
+			render(text:result as JSON, contentType:'text/html')
+		} 
     }
     
 	

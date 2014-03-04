@@ -438,8 +438,10 @@ function uploadSpecies(){
         },
         error: function(xhr, textStatus, errorThrown) {
             $("#speciesLoader").hide();
-            alert('Error uploading species!!');
+            alert('Error while uploading species!!');
             $("#uploadSpecies").removeClass('disabled');
+            var msg = $.parseJSON(xhr.responseText);
+			alert(msg);
         }
         
     });
