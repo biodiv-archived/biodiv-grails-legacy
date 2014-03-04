@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 import species.Field;
 import species.UserGroupTagLib;
+import species.CommonNames;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
@@ -181,6 +182,10 @@ class BootStrap {
                 return ['createdOn':it.createdOn, 'notes': it.notes, 'userGroupId':it.userGroup.id, 'userGroupName':it.userGroup.name, 'userGroupUrl':userGroupService.userGroupBasedLink(['mapping':'userGroup', 'controller':'userGroup', 'action':'show', 'userGroup':it.userGroup])]
             else
                 return ['createdOn':it.createdOn, 'notes': it.notes]
+        }
+
+        JSON.registerObjectMarshaller(CommonNames) {
+            return ['id':it.id, 'name':it.name, 'language': ['id':it.language.id, 'name':it.language.name], 'taxonConcept':['id':it.taxonConcept.id]]
         }
     }
 

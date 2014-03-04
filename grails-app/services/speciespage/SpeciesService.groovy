@@ -24,6 +24,8 @@ import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
 import species.Synonyms;
+import species.CommonNames;
+import species.Language;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -598,7 +600,7 @@ class SpeciesService {
             oldSynonym = Synonyms.read(synonymId);
 
             if(!oldSynonym) {
-                return [success:false, msg:"${type.capitalize()} with id ${synonymId} is not found"]
+                return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:"Nothing to change"]
             }
@@ -625,6 +627,59 @@ class SpeciesService {
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
+            }
+        }
+    }
+
+    def updateCommonname(def cnId, def speciesId, String language, String value) {
+        if(!value || !language) {
+            return [success:false, msg:"Common name or language content cannot be empty"]
+        }
+        Species speciesInstance = Species.get(speciesId);
+   
+        if(!speciesInstance) {
+            return [success:false, msg:"Species with id ${speciesId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        CommonNames oldCommonname;
+        Language lang = Language.getLanguage(language);
+        if(cnId) {
+            oldCommonname = CommonNames.read(cnId);
+
+            if(!oldCommonname) {
+                return [success:false, msg:"Commonname with id ${cnId} is not found"]
+            } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
+                return [success:true, msg:"Nothing to change"]
+            }
+        }
+
+        Species.withTransaction { status ->
+            if(oldCommonname) {
+                oldCommonname.delete();
+            } 
+            XMLConverter converter = new XMLConverter();
+
+            NodeBuilder builder = NodeBuilder.newInstance();
+            def cn = builder.createNode("commonname");
+            Node data = new Node(cn, 'data', value)
+            Node l = new Node(data, "language");
+            new Node(l, 'name', language);
+            new Node(data, "contributor", springSecurityService.currentUser.email);
+ 
+            List<CommonNames> commonnames = converter.createCommonNames(cn, speciesInstance.taxonConcept);
+            
+            if(!commonnames) {
+                return [success:false, msg:"Error while updating common name"]
+            } else {
+                String msg = '';
+                def content;
+                msg = 'Successfully updated common name';
+                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content]
             }
         }
     }
@@ -786,6 +841,38 @@ class SpeciesService {
                 e.printStackTrace();
                 log.error e.getMessage();
                 return [success:false, msg:"Error while deleting synonym: ${e.getMessage()}"]
+            }
+        }
+    }
+
+    def deleteCommonname(def cnId, def speciesId) {
+        CommonNames oldCommonname;
+        if(cnId) {
+            oldCommonname = CommonNames.read(cnId);
+        }
+        if(!oldCommonname) {
+            return [success:false, msg:"Common name with id ${cnId} is not found"]
+        } 
+
+        Species speciesInstance = Species.get(speciesId);
+      
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete commonname"]
+        }
+
+        CommonNames.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldCommonname.delete(failOnError:true)
+                msg = 'Successfully removed common name';
+                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content]
+            } 
+            catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                return [success:false, msg:"Error while deleting common name: ${e.getMessage()}"]
             }
         }
     }
