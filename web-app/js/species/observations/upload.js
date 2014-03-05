@@ -438,14 +438,21 @@ function uploadSpecies(){
         },
         error: function(xhr, textStatus, errorThrown) {
             $("#speciesLoader").hide();
-            alert('Error uploading species!!');
+            alert('Error while uploading species!!');
             $("#uploadSpecies").removeClass('disabled');
+            var msg = $.parseJSON(xhr.responseText);
+            alert(msg);
         }
-        
+
     });
 }
 
 $('#uploadSpecies').click(function() {
+    var check = validateContLic();
+    if(check == false){
+        alert("Please provide Contributor, Attributions and License for all the marked columns and try again!!");
+        return;
+    }
     if($(this).hasClass('disabled')) {
         alert("Uploading is in progress. Please submit after it is over.");
         event.preventDefault();
@@ -456,36 +463,75 @@ $('#uploadSpecies').click(function() {
 });
 
 $(".propagateButton").click(function(){
-    //console.log("entered here");
-    //console.log($(this));
     var pEle = $(this).parents("th");
     var pClass = $(pEle).attr("class");
-    //console.log(pEle);
-    //console.log(pClass);
     var valArr = [];
     $(pEle).find('span.tagit-label').each(function(i){
         valArr.push($(this).text()); // This is your rel value
     });
-    //console.log(valArr);
-    //can be done without iterating table,look for selector based on parents class as it will be same in that column
-    $("td."+pClass).find("ul").tagit( {showAutocompleteOnFocus: false});
-    $.each(valArr, function( index, value ) {
-        $("td."+pClass).find("ul").tagit("createTag", value);//select ul in this and create new tags//createTag
-    });
-    $("td."+pClass).find("ul").tagit( {showAutocompleteOnFocus: true});
+     $("#tableHeader tr").each(function () {
+            var dataCol = "";
+            $('td', this).each(function () {
+                if($(this).attr("class") == "dataColCell") {
+                    var valArr1 = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr1.push($(this).text()); // This is your rel value
+                    });
+                    dataCol = valArr1.join();
+                }
+                else if($(this).attr("class") == pClass){
+                    if(dataCol.length != 0){
+                        var temp = this
+                        $(temp).find("ul").tagit( {showAutocompleteOnFocus: false});
+                        $.each(valArr, function( index, value ) {
+                            $(temp).find("ul").tagit("createTag", value);//select ul in this and create new tags//createTag
+                        });
+                        $(temp).find("ul").tagit( {showAutocompleteOnFocus: true});
+                    }
+                }
+            });
+     }); 
     $(pEle).find("div").hide();
 
 });
 
 function automaticPropagate(){
     if($("#isSimpleSheet").val() == true){
-        var classArr = ["contributorCell", "attributionsCell", "licenseCell"]
-        var tagArr = ["contributor", "attributions", "license"]
-        $.each(classArr, function(index, value){
-            $("td."+ value).find("ul").tagit( {showAutocompleteOnFocus: false});
-                $("td."+ value).find("ul").tagit("createTag", tagArr[index]);
-            $("td."+ value).find("ul").tagit( {showAutocompleteOnFocus: true});
+        $("#tableHeader tr").each(function () {
+            var dataCol = "";
+            $('td', this).each(function () {
+                if($(this).attr("class") == "dataColCell") {
+                    var valArr = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr.push($(this).text()); // This is your rel value
+                    });
+                    dataCol = valArr.join();
+                }
+                else if($(this).attr("class") == "contributorCell"){
+                    if(dataCol.length != 0){
+                        $(this).find("ul").tagit( {showAutocompleteOnFocus: false});
+                        $(this).find("ul").tagit("createTag", "contributor");
+                        $(this).find("ul").tagit( {showAutocompleteOnFocus: true});
+                    }
+                }
+                else if($(this).attr("class") == "attributionsCell"){
+                    if(dataCol.length != 0){
+                        $(this).find("ul").tagit( {showAutocompleteOnFocus: false});
+                        $(this).find("ul").tagit("createTag", "attributions");
+                        $(this).find("ul").tagit( {showAutocompleteOnFocus: true});
+                    }
+                }
+                else if($(this).attr("class") == "licenseCell"){
+                    if(dataCol.length != 0){
+                        $(this).find("ul").tagit( {showAutocompleteOnFocus: false});
+                        $(this).find("ul").tagit("createTag", "license");
+                        $(this).find("ul").tagit( {showAutocompleteOnFocus: true});
+                    }
+                }
+            });
+
         });
+
     }
 }
 
@@ -493,3 +539,68 @@ $(".initPropagation").click(function(){
     var parentEle = $(this).parent("th");
     $(parentEle).find("div").toggle();
 });
+
+function validateContLic(){
+    var check = true;
+    var rowCount = 1;
+    var map = new Object(); 
+    $("#tableHeader tr").each(function () {
+        var dataCol = "";
+        $('td', this).each(function () {
+            if($(this).attr("class") == "dataColCell") {
+                var valArr = [];
+                $(this).find('span.tagit-label').each(function(i){
+                    valArr.push($(this).text()); // This is your rel value
+                });
+                dataCol = valArr.join();
+            }
+            else if($(this).attr("class") == "contributorCell"){
+                if(dataCol.length != 0){
+                    var valArr = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr.push($(this).text()); // This is your rel value
+                    });
+                    var valData = valArr.join();
+                    if(valData.length == 0 ){
+                        check = false;
+                        //map["check"] = check;
+                        //map["rowCount"] = rowCount;
+                        return check;
+                    }
+                }
+            }
+            else if($(this).attr("class") == "attributionsCell"){
+                if(dataCol.length != 0){
+                    var valArr = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr.push($(this).text()); // This is your rel value
+                    });
+                    var valData = valArr.join();
+                    if(valData.length == 0 ){
+                        check = false;
+                        //map["check"] = check;
+                        //map["rowCount"] = rowCount;
+                        return check;                    
+                    }
+                }
+            }
+            else if($(this).attr("class") == "licenseCell"){
+                if(dataCol.length != 0){
+                    var valArr = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr.push($(this).text()); // This is your rel value
+                    });
+                    var valData = valArr.join();
+                    if(valData.length == 0 ){
+                        check = false;
+                        //map["check"] = check;
+                        //map["rowCount"] = rowCount;
+                        return check;                    
+                    }
+                }
+            }
+        });
+        rowCount = rowCount + 1;
+    });
+    return check;
+}

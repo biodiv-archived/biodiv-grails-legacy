@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -18,14 +19,16 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.codehaus.groovy.grails.web.json.JSONArray;
+import org.codehaus.groovy.grails.web.json.JSONElement;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
 public class SpreadsheetWriter {
 
     static final String KEYVALUE_SEP = "#11#";
     static final String COLUMN_SEP = "#12#";
+    static final String FIELD_SEP = "#13#";
     
-    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, Map headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
+    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, JSONElement headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
         //System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
             Workbook wb = WorkbookFactory.create(inp);
@@ -48,7 +51,7 @@ public class SpreadsheetWriter {
 
     public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
         //System.out.println("================================" + writeContributor +"===" + contEmail );
-        if(writeContributor.equals("true")){
+        /*if(writeContributor.equals("true")){
             JSONObject r =  gridData.getJSONObject(0);
             if(!r.has("contributor")){
                 for(int k = 0; k < gridData.length();k++){
@@ -56,7 +59,7 @@ public class SpreadsheetWriter {
                     r1.put("contributor", contEmail);
                 }
             }
-        }
+        }*/
         Sheet sheet = wb.getSheetAt(sheetNo);
         Iterator<Row> rowIterator = sheet.iterator();
         int index = 0;
@@ -69,10 +72,9 @@ public class SpreadsheetWriter {
         Iterator<String> keys = rowData.keys();
         int numKeys = 0;
         while(keys.hasNext()){
-            keys.next();
+            String kk = keys.next();
             numKeys++;
         }
-        //System.out.println("==NUM KEYS== " + numKeys);
         String[] keysArray = new String[numKeys];
         //String[] keysArray = orderedArray;
         for (int k = 0; k< numKeys; k++){
@@ -140,7 +142,8 @@ public class SpreadsheetWriter {
         return;
     }
     
-    public static void writeHeadersInFormat(Workbook wb, Map<String, Map<String,String> > headerMarkers) {
+    public static void writeHeadersInFormat(Workbook wb, JSONElement headerMarkers1) {
+    	JSONObject headerMarkers = (JSONObject) headerMarkers1;
         //System.out.println("=CLASS===="+headerMarkers.getClass());
         Object o = headerMarkers.remove("undefined");
         Sheet sheet = wb.getSheet("headerMetadata");
@@ -149,17 +152,19 @@ public class SpreadsheetWriter {
             wb.removeSheetAt(sindex);
         }
         sheet = wb.createSheet("headerMetadata");
-        Map <String, Map<String,String>> reverseMarkers = new HashMap();
+        Map <String, Map<String,String>> reverseMarkers = new HashMap<String, Map<String, String>>();
         int rownum = 0;
 
-        for(Map.Entry<String , Map<String,String> > entry : headerMarkers.entrySet()) {
+        for(Object entry1 : headerMarkers.entrySet()) {
+        	Entry<String, Map<String, String>> entry = (Entry<String, Map<String, String>>) entry1;
             String headerName = entry.getKey();
             headerName = headerName.trim().toLowerCase();
-            Map<String,String> headerValues = new HashMap();
+            Map<String,String> headerValues = new HashMap<String, String>();
             for(Map.Entry<String, String> en : entry.getValue().entrySet()) {
                 //System.out.println("=======HERE======" + en.getKey());
                 if(en.getKey() != "undefined"){
-                    headerValues.put(en.getKey(), en.getValue());
+                	String val = (en.getValue() instanceof String ? en.getValue() : null);
+                    headerValues.put(en.getKey(), val);
                 }
             }
             //System.out.println("==========NEW FUNC==============");
@@ -245,7 +250,7 @@ public class SpreadsheetWriter {
                         Map<String, String> m = reverseMarkers.get(nextVal);
                         String fieldNames = m.get("fieldNames");
                         if(fieldNames != "") {
-                            fieldNames += "," + headerName;
+                            fieldNames += FIELD_SEP + headerName;
                             m.put("fieldNames", fieldNames);
                         }
                         else {

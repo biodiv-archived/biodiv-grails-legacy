@@ -82,7 +82,7 @@ function parseCSVData(data, options) {
         headerCount = headers.length;
         $.each(headers, function(headerCount, header) {
             var columnName = header;
-            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 150, header: headerFunction()});
+            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, resizable : true, minWidth: 60, header: headerFunction()});
         });
     }
             } else if (lineCount >= options.startLine) {

@@ -83,14 +83,23 @@ function setUnEditableColumn(columns){
             var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
             if(newColumn) return;
             else {
-                options = $.extend({}, {
-                    id:newColumnName,
-                    name:newColumnName,
-                    field:newColumnName,
-                    editor: Slick.Editors.Text,
-                    header:headerFunction()
-                }, options);
-
+                if(res === "species"){
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.Text,
+                    }, options);
+                }
+                else{
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.Text,
+                        header:headerFunction()
+                    }, options);
+                }
                 newColumn = options;
 
                 if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
@@ -164,7 +173,7 @@ function setUnEditableColumn(columns){
                     updateMetadataValues();  
                     $(".propagateDown").tagit({
                         availableTags:infoCol,
-                        fieldName: 'tags', 
+                        fieldName: 'tags',
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
@@ -182,7 +191,7 @@ function setUnEditableColumn(columns){
                     });
                     $(".licenseInfoTags").tagit({
                         availableTags:infoCol,
-                        fieldName: 'tags', 
+                        fieldName: 'tags',
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
@@ -197,11 +206,11 @@ function setUnEditableColumn(columns){
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                    automaticPropagate();
                     var headerMetadata = getHeaderMetadata();
                     if(Object.keys(headerMetadata).length == 0){
                         var res = tagMetadatas(data);
                         if(res == true){
+                            automaticPropagate();
                             alert("Your columns have been automatically marked.Please Verify");
                         }
                     }
@@ -386,6 +395,7 @@ function progressHandlingFunction(e){
  * upload_resource & FilePicker
  */
 function filePick() {
+    console.log("efsefseftesse");
     var onSuccess = function(FPFiles){
         $.each(FPFiles, function(){
             $('<input>').attr({

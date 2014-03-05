@@ -34,6 +34,7 @@ import species.sourcehandler.SourceConverter;
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
+import java.text.DateFormat
 import java.text.SimpleDateFormat;
 import species.sourcehandler.exporter.DwCAExporter
 import org.apache.log4j.PatternLayout;
@@ -74,6 +75,8 @@ class SpeciesUploadService {
 	def namesIndexerService;
 	def observationService;
 	def springSecurityService
+	def speciesPermissionService;
+	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static int BATCH_SIZE = 10;
@@ -171,6 +174,74 @@ class SpeciesUploadService {
 	}
 	
 	
+	
+	
+	Map upload(params){
+		if(!params.xlsxFileUrl){
+			return ['success':false, 'msg': 'File not found !!!' ]
+		}
+		
+		
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		
+		Date start = new Date()
+		String reportDate_start = df.format(start);
+
+		File speciesDataFile = saveModifiedSpeciesFile(params)
+		log.debug "THE FILE BEING UPLOADED " + speciesDataFile
+		
+		if(!speciesDataFile.exists()){
+			return ['success':false, 'msg': 'File not found !!!' ]
+		}
+		
+		def res = uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);Date end = new Date();
+		
+		//writing summary and log after upload
+		String reportDate_end = df.format(end);
+		def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res.summary
+		def mylog = " Start Date  " + start + "   End Date " + end + "\n\n " + res.log
+		String fileName = "ErrorLog.txt"
+		String uploadDir = "species"
+		File errorFile = observationService.createFile(fileName , uploadDir, contentRootDir);
+		errorFile.write(mylog)
+		
+		//Every thing is fine then sending mail
+		String link
+		if(res.success){
+			def otherParams = [:]
+			def usersMailList = []
+			usersMailList = speciesPermissionService.getSpeciesAdmin()
+			log.debug "user mail list " + usersMailList
+			def sp = new Species()
+			
+			def linkParams = [:]
+			linkParams["daterangepicker_start"] = reportDate_start
+			linkParams["daterangepicker_end"] = reportDate_end
+			linkParams["sort"] = "lastUpdated"
+			linkParams["user"] = springSecurityService.currentUser
+			link = observationService.generateLink("species", "list", linkParams)
+			otherParams["link"] = link
+			usersMailList.each{ user ->
+				def uml =[]
+				uml.add(user)
+				otherParams["curator"] = user.name
+				otherParams["usersMailList"] = uml
+				observationService.sendNotificationMail(observationService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+			}
+			
+			//sending mail to species contributor
+			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
+			observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
+		}else{
+			msg = "ERROR WHILE UPLOADING SPECIES " + "\n\n" + mymsg
+		}
+		
+		//creating roll back entry
+		createRollBackEntry(start, end, speciesDataFile.getAbsolutePath())
+		
+		return [success:res.success, msg:mymsg, downloadFile:speciesDataFile.getAbsolutePath(), filterLink: link, errorFile: errorFile.getAbsolutePath()]
+	}
+	
 	/**
 	 * 
 	 * @param file
@@ -182,19 +253,34 @@ class SpeciesUploadService {
 	 * @return
 	 */
 	Map uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="") {
-        log.info "Uploading mapped spreadsheet : "+file;
-
-		List<Species> species = new ArrayList<Species>();
-		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
-
-		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
-		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
-		List<Map> imagesMetaData;
-		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
-			converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+		Map result = ['success':false]
+		MappedSpreadsheetConverter converter
+		def uploadCount = 0
+		try {
+			log.info "Uploading mapped spreadsheet : "+file;
+	
+			List<Species> species = new ArrayList<Species>();
+			converter = new MappedSpreadsheetConverter();
+	
+			converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
+			List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
+			List<Map> imagesMetaData;
+			if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
+				converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+			}
+			uploadCount = saveSpecies(converter, content, imagesDir)
+			result['success'] = true
+			
+		} catch (Exception e) {
+			log.error e.message
+			e.printStackTrace()
 		}
-
-		return ['uploadCount' : saveSpecies(converter, content, imagesDir), 'summary':converter.getSummary(), 'log':converter.getLogs()];
+		
+		result['uploadCount'] = uploadCount
+		result['summary'] = converter ? converter.getSummary():""
+		result['log'] = converter ? converter.getLogs() : ""
+		
+		return result
 	}
 
 	/**
@@ -594,10 +680,10 @@ class SpeciesUploadService {
         String fileName = "speciesSpreadsheet.xls"
         String uploadDir = "species"
         File file = observationService.createFile(fileName , uploadDir, contentRootDir);
-        println "===NEW MODIFIED SPECIES FILE=== " + file
+        log.debug "===NEW MODIFIED SPECIES FILE=== " + file
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
-        println "=== ==== XLSX FILE URL ======= " + xlsxFileUrl;
+        log.debug "=== ==== XLSX FILE URL ======= " + xlsxFileUrl;
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
