@@ -91,7 +91,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
 					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
-						fieldName.split(",").each { fieldNameToken -> 
+						fieldName.split(SpreadsheetWriter.FIELD_SEP).each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
 							String delimiter = delimiterMap.get(fieldNameToken);
 							String text = speciesContent.get(fieldNameToken);
@@ -116,7 +116,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 						}
 					} else if(ignoreCustomFormat(mappedField)) {
 						// Here honouring delimiter if given but ingnoring custom format 
-						fieldName.split(",").each { fieldNameToken -> 
+						fieldName.split(SpreadsheetWriter.FIELD_SEP).each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
 							String text = speciesContent.get(fieldNameToken);
 							def delimiter = delimiterMap.get(fieldNameToken);
@@ -175,7 +175,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
         Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
         def referenceFields = mappedField.get("field name(s)");		
         if(referenceFields) {
-            referenceFields.split(",").each { referenceField ->
+            referenceFields.split(SpreadsheetWriter.FIELD_SEP).each { referenceField ->
                 String references = speciesContent.get(referenceField.toLowerCase().trim());
                 String delimiter  = delimiterMap.get(referenceField.toLowerCase().trim()) ?: "\n";
                 createReferences(dataNode, references, delimiter);
@@ -253,7 +253,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
     private getCustomFormattedText(String fieldName, Map customFormatMap, Map delimiterMap, Map speciesContent) {
 		String con = "";
-		fieldName.split(",").eachWithIndex { t, index ->
+		fieldName.split(SpreadsheetWriter.FIELD_SEP).eachWithIndex { t, index ->
 			t = t.toLowerCase().trim()
 			String txt = speciesContent?.get(t);
 			myPrint("    >>>>>>>>>>    field name ==== " + t + " and TEXT " + txt)
@@ -265,7 +265,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			//String delimiter = delimiterMap.get(t)
 			if(txt) {
 				if(noCustomFormating){
-					con += txt
+					con += (txt + "<br>")
 				}else {
 					if (index%group == 0) {
 	
@@ -299,7 +299,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		if(imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
-			fieldName.split(",").eachWithIndex { t, index ->
+			fieldName.split(SpreadsheetWriter.FIELD_SEP).eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
 				if(txt && txt.trim()){
 					customFormat =  customFormatMap.get(t.trim().toLowerCase());
@@ -328,7 +328,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			}
 		} else {
 			List<String> groupValues = new ArrayList<String>();
-			fieldName.split(",").eachWithIndex { t, index ->
+			fieldName.split(SpreadsheetWriter.FIELD_SEP).eachWithIndex { t, index ->
 				customFormat =  customFormatMap.get(t.trim().toLowerCase());
 				delimiter = delimiterMap.get(t.trim().toLowerCase());
 				

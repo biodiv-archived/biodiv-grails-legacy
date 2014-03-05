@@ -494,7 +494,7 @@ class SourceConverter {
         log.debug "Creating References"
         def referenceFields = mappedField.get("field name(s)");		
         if(referenceFields) {
-            referenceFields.split(",").each { referenceField ->
+            referenceFields.split(SpreadsheetWriter.FIELD_SEP).each { referenceField ->
                 String references = speciesContent.get(referenceField.toLowerCase());
                 String delimiter = mappedField.get("content delimiter") ?: "\n";
                 createReferences(dataNode, references, delimiter);
