@@ -1446,7 +1446,7 @@ println imageNode;
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
 						registry.updateContributors(getUserContributors(fieldNode.data))
-                        taxonEntities.add(registry);
+                        taxonEntities.add(registry.taxonDefinition);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;
                         if(!ent.save()) {

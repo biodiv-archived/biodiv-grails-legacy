@@ -161,6 +161,7 @@ list.sort();
 <br/>
 </g:if>
 <g:elseif test="${isSpeciesContributor}">
+<div class="sidebar_section">
     <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
         <li>
@@ -170,12 +171,13 @@ list.sort();
         </div> 
         <div class="span8">
             <div style="float:left;"> 
-                <a href="#" class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">  
+                <a href="#" class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add common name" data-placeholder="Add Common name">  
                     </a>
             </div>
         </div>
         </li>
     </ul>
+</div>
 </g:elseif>
 <!-- Common Names End-->
 
