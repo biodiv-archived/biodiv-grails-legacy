@@ -73,9 +73,7 @@ public class SpreadsheetWriter {
         while(keys.hasNext()){
             String kk = keys.next();
             numKeys++;
-            System.out.println(" >>>>>>>>>>>>>>> key " + kk + "   num " + numKeys );
         }
-        System.out.println("==NUM KEYS== " + numKeys);
         String[] keysArray = new String[numKeys];
         //String[] keysArray = orderedArray;
         for (int k = 0; k< numKeys; k++){
@@ -165,7 +163,6 @@ public class SpreadsheetWriter {
                 //System.out.println("=======HERE======" + en.getKey());
                 if(en.getKey() != "undefined"){
                 	String val = (en.getValue() instanceof String ? en.getValue() : null);
-                	System.out.println("=======key and value ======" + en.getKey() + "    value " + val);
                     headerValues.put(en.getKey(), val);
                 }
             }
