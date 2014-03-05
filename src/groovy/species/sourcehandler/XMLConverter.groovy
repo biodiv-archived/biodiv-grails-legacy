@@ -853,7 +853,7 @@ class XMLConverter extends SourceConverter {
                 }
                 try {
                     tempFile = HttpUtils.download(sourceUrl, tempdir, false);
-                } catch (FileNotFoundException e) {
+                } catch (Exception e) {
                     log.error e.getMessage();
                     tempFile = null;
                 }
