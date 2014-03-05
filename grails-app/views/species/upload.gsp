@@ -26,7 +26,7 @@
                                 <label class="control-label span2" for="speciesFile"> Species File <span
                                         class="req">*</span></label>
                                 <div class="controls span9" style="">
-                                    <% def allowedExtensions = '[ "xls", "xlsx", "csv"]'  %>
+                                    <% def allowedExtensions = '[ "xls", "xlsx"]'  %>
                                     <g:render template='/UFile/docUpload'
                                     model="['name': 'speciesfile', 'path': speciesFile?.path, 'size':speciesFile?.size,'allowedExtensions':allowedExtensions, 'fileParams':['uploadDir':'species','fileConvert' : true,'fromChecklist' : false], uploadCallBack:'viewGrid()']" />
                                     <div class="help-inline">
@@ -136,7 +136,7 @@
                     <a id="uploadSpecies"
                         class="btn btn-primary" style="float: right; margin-right: 5px;">
                         Upload Species</a>
-                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img src="http://viola.usc.edu/wp-content/plugins/nice-login-register-widget/images/loading_transparent.gif"></div>
+                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img src="/images/rotate.gif"></div>
                     <span class="policy-text"> By submitting this form for
                         uploading species data you agree to our <a href="/terms">Terms
                             and Conditions</a> on the use of our site </span>

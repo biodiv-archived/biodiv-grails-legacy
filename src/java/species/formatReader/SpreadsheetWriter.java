@@ -26,6 +26,7 @@ public class SpreadsheetWriter {
 
     static final String KEYVALUE_SEP = "#11#";
     static final String COLUMN_SEP = "#12#";
+    static final String FIELD_SEP = "#13#";
     
     public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, JSONElement headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
         //System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
@@ -249,7 +250,7 @@ public class SpreadsheetWriter {
                         Map<String, String> m = reverseMarkers.get(nextVal);
                         String fieldNames = m.get("fieldNames");
                         if(fieldNames != "") {
-                            fieldNames += "," + headerName;
+                            fieldNames += FIELD_SEP + headerName;
                             m.put("fieldNames", fieldNames);
                         }
                         else {

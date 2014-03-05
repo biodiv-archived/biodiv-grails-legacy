@@ -57,6 +57,7 @@ class UFileController {
     static String outputCSVFile = "output.csv" 
     static String columnSep = SpreadsheetWriter.COLUMN_SEP
     static String keyValueSep = SpreadsheetWriter.KEYVALUE_SEP
+    static String fieldSep = SpreadsheetWriter.FIELD_SEP
     static String headerSheetName = "headerMetadata"
 
 	AjaxUploaderService ajaxUploaderService
@@ -353,7 +354,7 @@ class UFileController {
 
 
             if(fieldNames != ""){
-                List fnList = fieldNames.split(",")
+                List fnList = fieldNames.split(fieldSep)
                 def cdMap = [:]
                 def gMap = [:]
                 def hMap = [:]

@@ -174,28 +174,24 @@ function setUnEditableColumn(columns){
                     $(".propagateDown").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags',
-                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
                     $(".headerInfoTags").tagit({
                         availableTags:data,
                         fieldName: 'tags', 
-                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
                     $(".extraInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags', 
-                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
                     $(".licenseInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags',
-                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
@@ -207,15 +203,14 @@ function setUnEditableColumn(columns){
                     $(".audienceInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags', 
-                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
-                    automaticPropagate();
                     var headerMetadata = getHeaderMetadata();
                     if(Object.keys(headerMetadata).length == 0){
                         var res = tagMetadatas(data);
                         if(res == true){
+                            automaticPropagate();
                             alert("Your columns have been automatically marked.Please Verify");
                         }
                     }
