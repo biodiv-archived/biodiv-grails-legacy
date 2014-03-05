@@ -78,6 +78,7 @@ class Utils {
 	 * @return
 	 */
 	static String cleanName(String name) {
+        if(!name) return null;
 		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
 	}
 

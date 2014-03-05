@@ -1374,6 +1374,8 @@ println imageNode;
 
         List<String> names = new ArrayList<String>();
         List<TaxonomyDefinition> parsedNames;
+        List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
+
         fieldNodes.each { fieldNode ->
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
@@ -1384,13 +1386,16 @@ println imageNode;
                 name = cleanSciName(name);
             }
             if(name) {
-                names.add(name);
+                names.putAt(rank, name);
             }
+            sortedFieldNodes.putAt(rank, fieldNode)
         }
         parsedNames = namesParser.parse(names);
+        fieldNodes = sortedFieldNodes;
 
         int i=0;
         fieldNodes.each { fieldNode ->
+            if(fieldNode) {
             log.debug "Adding taxonomy registry from node: "+fieldNode;
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             String name = getData(fieldNode.data);
@@ -1446,7 +1451,7 @@ println imageNode;
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
 						registry.updateContributors(getUserContributors(fieldNode.data))
-                        taxonEntities.add(registry.taxonDefinition);
+                        taxonEntities.add(registry);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;
                         if(!ent.save()) {
@@ -1463,6 +1468,7 @@ println imageNode;
                     log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
 					addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                 }
+            }
             }
         }
         //		if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {
