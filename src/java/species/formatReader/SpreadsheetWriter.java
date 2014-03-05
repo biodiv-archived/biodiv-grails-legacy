@@ -50,7 +50,7 @@ public class SpreadsheetWriter {
 
     public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
         //System.out.println("================================" + writeContributor +"===" + contEmail );
-        if(writeContributor.equals("true")){
+        /*if(writeContributor.equals("true")){
             JSONObject r =  gridData.getJSONObject(0);
             if(!r.has("contributor")){
                 for(int k = 0; k < gridData.length();k++){
@@ -58,7 +58,7 @@ public class SpreadsheetWriter {
                     r1.put("contributor", contEmail);
                 }
             }
-        }
+        }*/
         Sheet sheet = wb.getSheetAt(sheetNo);
         Iterator<Row> rowIterator = sheet.iterator();
         int index = 0;

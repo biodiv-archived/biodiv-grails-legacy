@@ -441,13 +441,18 @@ function uploadSpecies(){
             alert('Error while uploading species!!');
             $("#uploadSpecies").removeClass('disabled');
             var msg = $.parseJSON(xhr.responseText);
-			alert(msg);
+            alert(msg);
         }
-        
+
     });
 }
 
 $('#uploadSpecies').click(function() {
+    var check = validateContLic();
+    if(check == false){
+        alert("Please provide Contributor and License for all the marked columns and try again!!");
+        return;
+    }
     if($(this).hasClass('disabled')) {
         alert("Uploading is in progress. Please submit after it is over.");
         event.preventDefault();
@@ -495,3 +500,55 @@ $(".initPropagation").click(function(){
     var parentEle = $(this).parent("th");
     $(parentEle).find("div").toggle();
 });
+
+function validateContLic(){
+    var check = true;
+    var rowCount = 1;
+    var map = new Object(); 
+    $("#tableHeader tr").each(function () {
+        var dataCol = ""
+        $('td', this).each(function () {
+            if($(this).attr("class") == "dataColCell") {
+                var valArr = [];
+                $(this).find('span.tagit-label').each(function(i){
+                    valArr.push($(this).text()); // This is your rel value
+                });
+                dataCol = valArr.join();
+            }
+            else if($(this).attr("class") == "contributorCell"){
+                if(dataCol.length != 0){
+                    var valArr = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr.push($(this).text()); // This is your rel value
+                    });
+                    var valData = valArr.join();
+                    if(valData.length == 0 ){
+                        console.log("contributor nai hai " + dataCol); 
+                        check = false;
+                        //map["check"] = check;
+                        //map["rowCount"] = rowCount;
+                        return check;
+                    }
+                }
+            }
+            else if($(this).attr("class") == "licenseCell"){
+                if(dataCol.length != 0){
+                    var valArr = [];
+                    $(this).find('span.tagit-label').each(function(i){
+                        valArr.push($(this).text()); // This is your rel value
+                    });
+                    var valData = valArr.join();
+                    if(valData.length == 0 ){
+                        console.log("license nai hai " + dataCol);
+                        check = false;
+                        //map["check"] = check;
+                        //map["rowCount"] = rowCount;
+                        return check;                    
+                    }
+                }
+            }
+        });
+        rowCount = rowCount + 1;
+    });
+    return check;
+}

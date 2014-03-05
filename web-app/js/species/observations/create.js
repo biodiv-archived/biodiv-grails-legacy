@@ -83,14 +83,23 @@ function setUnEditableColumn(columns){
             var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
             if(newColumn) return;
             else {
-                options = $.extend({}, {
-                    id:newColumnName,
-                    name:newColumnName,
-                    field:newColumnName,
-                    editor: Slick.Editors.Text,
-                    header:headerFunction()
-                }, options);
-
+                if(res === "species"){
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.Text,
+                    }, options);
+                }
+                else{
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.Text,
+                        header:headerFunction()
+                    }, options);
+                }
                 newColumn = options;
 
                 if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
@@ -164,25 +173,29 @@ function setUnEditableColumn(columns){
                     updateMetadataValues();  
                     $(".propagateDown").tagit({
                         availableTags:infoCol,
-                        fieldName: 'tags', 
+                        fieldName: 'tags',
+                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
                     $(".headerInfoTags").tagit({
                         availableTags:data,
                         fieldName: 'tags', 
+                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
                     $(".extraInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags', 
+                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
                     $(".licenseInfoTags").tagit({
                         availableTags:infoCol,
-                        fieldName: 'tags', 
+                        fieldName: 'tags',
+                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
@@ -194,6 +207,7 @@ function setUnEditableColumn(columns){
                     $(".audienceInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags', 
+                        restricted:true,
                         showAutocompleteOnFocus: true,
                         allowSpaces: true
                     });
@@ -386,6 +400,7 @@ function progressHandlingFunction(e){
  * upload_resource & FilePicker
  */
 function filePick() {
+    console.log("efsefseftesse");
     var onSuccess = function(FPFiles){
         $.each(FPFiles, function(){
             $('<input>').attr({
