@@ -677,13 +677,18 @@ class SpeciesUploadService {
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
-        String fileName = "speciesSpreadsheet.xls"
+        String fileName = "speciesSpreadsheet"
         String uploadDir = "species"
-        File file = observationService.createFile(fileName , uploadDir, contentRootDir);
-        log.debug "===NEW MODIFIED SPECIES FILE=== " + file
+        def ext = params.xlsxFileUrl.split("\\.");
+        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+        println "=========THE SPLITED LIST ================ " + ext
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
-        log.debug "=== ==== XLSX FILE URL ======= " + xlsxFileUrl;
+        println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+        fileName = fileName + "."+ext[1];
+        println "===FILE NAME CREATED ================ " + fileName
+        File file = observationService.createFile(fileName , uploadDir, contentRootDir);
+        println "=== NEW MODIFIED SPECIES FILE === " + file
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);

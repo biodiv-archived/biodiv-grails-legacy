@@ -375,6 +375,13 @@ function tagMetadatas(data){
 }
 
 $('#downloadModifiedSpecies').click(function() {
+    if($(this).hasClass('disabled')) {
+        alert("Looks like some other work is in progress.Please wait and try again!!");
+        event.preventDefault();
+        return false; 		 		
+    }
+    $(this).addClass('disabled');
+    $("#uploadSpecies").addClass('disabled');
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
     var gData = JSON.stringify(grid.getData());
@@ -399,10 +406,14 @@ $('#downloadModifiedSpecies').click(function() {
             //var downloadUrl = window.params.downloadFile+"?downloadFile=" + encodeURIComponent(data.downloadFile);
             $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
             $("#downloadSpeciesFile").submit();
+            $("#downloadModifiedSpecies").removeClass('disabled');
+            $("#uploadSpecies").removeClass('disabled');
 
         },
         error: function(xhr, textStatus, errorThrown) {
             alert('Error downloading file!!');
+            $("#downloadModifiedSpecies").removeClass('disabled');
+            $("#uploadSpecies").removeClass('disabled');
             console.log(xhr);
         }
     });
@@ -435,10 +446,12 @@ function uploadSpecies(){
             document.getElementById("downloadErrorFile").style.visibility = "visible";
             $("#filterLinkSpan").show();
             $("#uploadSpecies").removeClass('disabled');
+            $("#downloadModifiedSpecies").removeClass('disabled');
         },
         error: function(xhr, textStatus, errorThrown) {
             $("#speciesLoader").hide();
             $("#uploadSpecies").removeClass('disabled');
+            $("#downloadModifiedSpecies").removeClass('disabled');
             alert('Error while uploading species !!!');
             var msg = $.parseJSON(xhr.responseText);
             alert(msg);
@@ -454,11 +467,12 @@ $('#uploadSpecies').click(function() {
         return;
     }
     if($(this).hasClass('disabled')) {
-        alert("Uploading is in progress. Please submit after it is over.");
+        alert("Looks like some other work is in progress.Please wait and try again!!");
         event.preventDefault();
         return false; 		 		
     }
     $(this).addClass('disabled');
+    $("#downloadModifiedSpecies").addClass('disabled');
     uploadSpecies();
 });
 
