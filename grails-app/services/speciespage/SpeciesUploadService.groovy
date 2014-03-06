@@ -710,8 +710,8 @@ class SpeciesUploadService {
 		}
 		
 		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
-			log.error "Roll back in progres..." + sbu
-			return "Roll back in progres..."
+			log.error "Roll back in progress..." + sbu
+			return "Roll back in progress..."
 		}
 		
 		sbu.updateStatus(SpeciesBulkUpload.Status.RUNNING)

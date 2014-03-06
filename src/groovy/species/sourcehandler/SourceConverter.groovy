@@ -252,6 +252,7 @@ class SourceConverter {
 				Node image = new Node(images, "image");		
 				String imagePath =  imageData.get("image")?:refKey;
 				File file = new File(imagesDir, imagePath);
+				myPrint("Absolute file path for image " + file.getAbsolutePath())
 				new Node(image, "refKey", refKey);
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source"));
@@ -289,6 +290,8 @@ class SourceConverter {
 				String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
 				File file = new File(imagesDir, cleanLoc(loc));
 				new Node(image, "refKey", refKey);
+				myPrint(" image location " + loc)
+				myPrint("Absolute file path for image " + file.getAbsolutePath())
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source")?:imageData.get("url"));
 				new Node(image, "caption", imageData.get("possiblecaption")?:imageData.get("caption"));
