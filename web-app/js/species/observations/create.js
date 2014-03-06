@@ -175,25 +175,65 @@ function setUnEditableColumn(columns){
                         availableTags:infoCol,
                         fieldName: 'tags',
                         showAutocompleteOnFocus: true,
-                        allowSpaces: true
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
                     });
                     $(".headerInfoTags").tagit({
                         availableTags:data,
                         fieldName: 'tags', 
                         showAutocompleteOnFocus: true,
-                        allowSpaces: true
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(data.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
                     });
                     $(".extraInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags', 
                         showAutocompleteOnFocus: true,
-                        allowSpaces: true
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
                     });
                     $(".licenseInfoTags").tagit({
                         availableTags:infoCol,
                         fieldName: 'tags',
                         showAutocompleteOnFocus: true,
-                        allowSpaces: true
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
                     });
                     /*
                     $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: false});
@@ -204,7 +244,17 @@ function setUnEditableColumn(columns){
                         availableTags:infoCol,
                         fieldName: 'tags', 
                         showAutocompleteOnFocus: true,
-                        allowSpaces: true
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
                     });
                     var headerMetadata = getHeaderMetadata();
                     if(Object.keys(headerMetadata).length == 0){
