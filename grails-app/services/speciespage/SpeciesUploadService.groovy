@@ -680,10 +680,13 @@ class SpeciesUploadService {
         String fileName = "speciesSpreadsheet"
         String uploadDir = "species"
         def ext = params.xlsxFileUrl.split("\\.");
+        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+        println "=========THE SPLITED LIST ================ " + ext
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
         log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
         fileName = fileName + "."+ext[1];
+        println "===FILE NAME CREATED ================ " + fileName
         File file = observationService.createFile(fileName , uploadDir, contentRootDir);
         log.debug "=== NEW MODIFIED SPECIES FILE === " + file
         String contEmail = springSecurityService.currentUser.email;
