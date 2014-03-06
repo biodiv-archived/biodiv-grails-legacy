@@ -503,7 +503,7 @@ function initGalleryTabs() {
             $.each(content, function(i, v) { 
                 switch(sourceData.type) {
                     case 'contributor' :
-                    case 'attributor' :
+                    case 'attribution' :
                         html.push (createContributor(v, sourceData, v));
                         break;
                     case 'reference' :
@@ -680,15 +680,17 @@ function initGalleryTabs() {
             showbuttons:false,
             source: $selectorOptions,
             success: onEditableSuccess,
-            error:onSelectorError
+            error:onSelectorError,
+            onblur:'ignore'
         });
 
 
-        $ele.find(".license.selector.editable").before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
+        $ele.find(".license.selector.editable").editable('toggle');
+        /*.before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.license.selector.editable').editable('toggle');
-        });
+        });*/
     }
 
     function initAudienceTypeSelector($ele, $selectorOptions, defaultValue) {
@@ -699,15 +701,17 @@ function initGalleryTabs() {
             showbuttons:false,
             source: $selectorOptions,
             success: onEditableSuccess,
-            error:onSelectorError
+            error:onSelectorError,
+            onblur:'ignore'
         });
 
 
-        $ele.find(".audienceType.selector.editable").before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
+        $ele.find(".audienceType.selector.editable").editable('toggle');
+        /*.before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.audienceType.selector.editable').editable('toggle');
-        });
+        });*/
     }
 
     function initStatusSelector($ele, $selectorOptions, defaultValue) {
@@ -718,15 +722,17 @@ function initGalleryTabs() {
             showbuttons:false,
             source: $selectorOptions,
             success: onEditableSuccess,
-            error:onSelectorError
+            error:onSelectorError,
+            onblur:'ignore'
         });
 
 
-        $ele.find(".status.selector.editable").before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
+        $ele.find(".status.selector.editable").editable('toggle');
+        /*.before("<a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
             $(this).next('.status.selector.editable').editable('toggle');
-        });
+        });*/
     }
 
     function initSynRelSelector($ele, $selectorOptions, defaultValue) {
@@ -782,7 +788,7 @@ function refreshEditables($e) {
     initAddables($e);
     initLicenseSelector($e, licenseSelectorOptions, "CC BY");
     initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
-    initStatusSelector($e, statusSelectorOptions, "Under Validation");
+    //initStatusSelector($e, statusSelectorOptions, "Under Validation");
     initSynRelSelector($e, synRelSelectorOptions, "Synonym");
     initLangSelector($e, langSelectorOptions, "English");
     $('.emptyField').show();
