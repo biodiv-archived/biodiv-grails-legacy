@@ -385,7 +385,7 @@ class SpeciesController extends AbstractObjectController {
                         result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
                     }
                     break;
-                case "attributor":
+                case "attribution":
                     long cid = params.cid?params.long('cid'):null;
                     if(params.act == 'delete') {
                         result = speciesService.deleteAttributor(cid, speciesFieldId, params.name);

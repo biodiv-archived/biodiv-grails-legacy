@@ -127,7 +127,7 @@ $(document).ready(function() {
         synRelSelectorOptions.push({value:"${rel.value()}", text:"${rel.value()}"});
         </g:each>
         var langSelectorOptions = [];
-        <g:each in="${Language.list()}" var="lang">
+        <g:each in="${Language.findAllByIsDirty(Boolean.FALSE)}" var="lang">
         langSelectorOptions.push({value:"${lang.name}", text:"${lang.name}"});
         </g:each>
 
