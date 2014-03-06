@@ -79,7 +79,7 @@
 <br/>
 </g:if>
 <g:elseif test="${isSpeciesContributor}">
-<div class="sidebar_section">
+<div class="sidebar_section emptyField" style="display:none;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
         <h5>Synonyms</h5>
     </a> 
@@ -161,7 +161,7 @@ list.sort();
 <br/>
 </g:if>
 <g:elseif test="${isSpeciesContributor}">
-<div class="sidebar_section">
+<div class="sidebar_section emptyField" style="display:none;">
     <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
         <li>

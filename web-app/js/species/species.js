@@ -503,7 +503,7 @@ function initGalleryTabs() {
             $.each(content, function(i, v) { 
                 switch(sourceData.type) {
                     case 'contributor' :
-                    case 'attributor' :
+                    case 'attribution' :
                         html.push (createContributor(v, sourceData, v));
                         break;
                     case 'reference' :
@@ -782,7 +782,7 @@ function refreshEditables($e) {
     initAddables($e);
     initLicenseSelector($e, licenseSelectorOptions, "CC BY");
     initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
-    initStatusSelector($e, statusSelectorOptions, "Under Validation");
+    //initStatusSelector($e, statusSelectorOptions, "Under Validation");
     initSynRelSelector($e, synRelSelectorOptions, "Synonym");
     initLangSelector($e, langSelectorOptions, "English");
     $('.emptyField').show();

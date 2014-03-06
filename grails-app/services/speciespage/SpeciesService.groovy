@@ -349,7 +349,7 @@ class SpeciesService {
                    if(oldContrib)
                         speciesField.removeFromAttributors(oldContrib);
                     speciesField.addToAttributors(c);
-                    msg = 'Successfully added attributor';
+                    msg = 'Successfully added attribution';
                     content = speciesField.attributors;
 
                 if(!speciesField.save()) {
@@ -743,7 +743,7 @@ class SpeciesService {
             String msg = '';
             def content;
             speciesField.removeFromAttributors(oldContrib);
-            msg = 'Successfully removed attributor';
+            msg = 'Successfully removed attribution';
             content = speciesField.attributors;
 
             if(!speciesField.save()) {

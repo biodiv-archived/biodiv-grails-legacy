@@ -11,14 +11,14 @@
                 <g:each in="${speciesFieldInstance.attributors}" var="r">
                 <g:if test="${r}">
                 <li>
-                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name" title="Click to edit">${r.name}
+                <a href="#" class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2"  data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attribution" data-original-title="Edit attribution" title="Click to edit">${r.name}
                 </a>
                 </li>
                 </g:if>
                 </g:each>
                 <g:if test="${isSpeciesFieldContributor}">
                 <li class="hidePoint">
-                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
+                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attribution" data-original-title="Add attribution" data-placeholder="Add attribution"></a>
                 </li>
                 </g:if>
             </ul>
@@ -29,7 +29,7 @@
         <div class="name" style="float:none;">Attributions</div>
             <ul>
                 <li class="hidePoint">
-                <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Add attributor name" data-placeholder="Add attributor"></a>
+                <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attribution" data-original-title="Add attribution" data-placeholder="Add attribution"></a>
                 </li>
             </ul>
     </div>

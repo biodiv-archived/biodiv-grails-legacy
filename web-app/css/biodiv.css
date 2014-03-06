@@ -1958,44 +1958,51 @@ li#userOrEmail-new {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-	select {
-		display: inline-block;
-		width: 210px;
-		height: 18px;
-		padding: 4px;
-		margin-bottom: 9px;
-		font-size: 13px;
-		line-height: 18px;
-		color: #555555;
-		border: 1px solid #ccc;
-		-webkit-border-radius: 3px;
-		-moz-border-radius: 3px;
-		border-radius: 3px;
-	}
-	select {
-		height: 28px;
-		/* In IE7, the height of the select element cannot be changed by height, only font-size /
-*margin-top: 4px;
-/ For IE7, add top margin to align select with labels */
-		line-height: 11px;
-	}
-	select {
-		width: 220px;
-		background-color: #ffffff;
-	}
-	select[multiple],select[size] {
-		height: auto;
-	}
-}
+    select {
+        display: inline-block;
+        width: 210px;
+        height: 18px;
+        padding: 4px;
+        margin-bottom: 9px;
+        font-size: 13px;
+        line-height: 18px;
+        color: #555555;
+        border: 1px solid #ccc;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+    select {
+        height: 28px;
+        /* In IE7, the height of the select element cannot be changed by height, only font-size /
+         *margin-top: 4px;
+         / For IE7, add top margin to align select with labels */
+line-height: 11px;
+        }
+        select {
+            width: 220px;
+            background-color: #ffffff;
+        }
+        select[multiple],select[size] {
+            height: auto;
+        }
+    }
 
-.contributor_entry, .speciesField span.cke_skin_kama {
+.contributor_entry {
         border: 1px solid #D3D3D3;
 	border-color: #CECECE;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
 	margin-bottom: 10px;
-        
+}
+
+.speciesField span.cke_skin_kama {
+	background-color: rgb(106, 201, 162, 0.15);
+	background-color: rgba(106, 201, 162, 0.15);
+	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr='#266AC9A2',endColorstr='#266AC9A2')";	/* IE8 */
+	filter: progid : DXImageTransform.Microsoft.gradient(startColorstr = '#266AC9A2', endColorstr = '#266AC9A2' );/* IE6 & 7 */
+	zoom: 1;
 }
 
 .contributor_entry .toolbar {
@@ -2619,3 +2626,4 @@ small {
 .hidePoint {
     display:none;
 }
+
