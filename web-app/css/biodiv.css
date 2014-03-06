@@ -2615,6 +2615,7 @@ small {
 .editable-container.editable-inline .editable-input {
     width:87%;
 }
+
 .editable-container.editable-inline .editable-input input.input-medium,.editable-container.editable-inline .editable-input textarea.input-large  {
     width:96%;
 }
@@ -2626,7 +2627,11 @@ small {
 .hidePoint {
     display:none;
 }
+
 .speciesField .description {
     padding:5px;
     margin:0px;
 }
+
+#synonyms li:nth-child(even),#commonNames li:nth-child(even)  {background-color: #e6e6e6; overflow:hidden;}
+#synonyms li:nth-child(odd),#commonNames li:nth-child(odd) {background-color: #FFF; overflow:hidden;}

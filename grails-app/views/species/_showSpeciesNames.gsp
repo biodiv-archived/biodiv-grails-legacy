@@ -50,7 +50,7 @@
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
         <h5>Synonyms</h5>
     </a> 
-    <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
+    <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;padding:0px;">
             <g:each in="${synonyms}" var="synonym">
             <li>
             <div class="span3">
@@ -122,7 +122,7 @@ list.sort();
 <g:if test="${names}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
-    <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
+    <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;padding:0px;">
         <g:each in="${names}">
         <li>
         <div class="span3">
