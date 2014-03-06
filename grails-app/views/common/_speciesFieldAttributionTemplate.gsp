@@ -58,10 +58,11 @@
     <g:if test="${speciesFieldInstance?.status}">
     <div class="prop span11">
         <div class="name span2" style="margin-left:0px;">Status</div>
-        <div class="value">
+        <div class="value pull-left">
             
-            <a href="#" class="status ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status" data-original-title="Edit status">
-                ${speciesFieldInstance?.status?.value()}</a>
+            <!--a href="#" class="status ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status" data-original-title="Edit status">
+                ${speciesFieldInstance?.status?.value()}</a-->
+                ${speciesFieldInstance?.status?.value()}
 
         </div>
     </div>
@@ -69,7 +70,7 @@
     <g:if test="${speciesFieldInstance?.audienceTypes}">
     <div class="prop span11">
         <div class="span2 name" style="margin-left:0px;">Audiences</div>
-        <div class="value"><g:each
+        <div class="value pull-left"><g:each
             in="${ speciesFieldInstance?.audienceTypes}"
             var="audienceType">
 
@@ -81,7 +82,7 @@
     <g:if test="${speciesFieldInstance?.licenses?.size() > 0}">
     <div class="prop span11">
         <div class="span2 name" style="margin-left:0px;">Licenses</div>
-        <div class="value"><g:each status="i"
+        <div class="value pull-left"><g:each status="i"
             in="${speciesFieldInstance?.licenses}" var="license">
             <a href="#" class="license ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="license" data-original-title="Edit license">${license.name}</a>
             </g:each>
