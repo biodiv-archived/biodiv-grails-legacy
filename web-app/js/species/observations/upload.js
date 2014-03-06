@@ -446,12 +446,14 @@ function uploadSpecies(){
             document.getElementById("downloadErrorFile").style.visibility = "visible";
             $("#filterLinkSpan").show();
             $("#uploadSpecies").removeClass('disabled');
+            $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
             $("#downloadModifiedSpecies").removeClass('disabled');
         },
         error: function(xhr, textStatus, errorThrown) {
             $("#speciesLoader").hide();
             $("#uploadSpecies").removeClass('disabled');
             $("#downloadModifiedSpecies").removeClass('disabled');
+            $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
             alert('Error while uploading species !!!');
             var msg = $.parseJSON(xhr.responseText);
             alert(msg);
@@ -460,7 +462,8 @@ function uploadSpecies(){
     });
 }
 
-$('#uploadSpecies').click(function() {
+var uploadSpeciesWrapper = function() {
+    $('#uploadSpecies').unbind('click');
     var check = validateContLic();
     if(check == false){
         alert("Please provide Contributor, Attributions and License for all the marked columns and try again!!");
@@ -474,7 +477,9 @@ $('#uploadSpecies').click(function() {
     $(this).addClass('disabled');
     $("#downloadModifiedSpecies").addClass('disabled');
     uploadSpecies();
-});
+}
+
+$('#uploadSpecies').click(uploadSpeciesWrapper);
 
 $(".propagateButton").click(function(){
     var pEle = $(this).parents("th");
