@@ -418,6 +418,12 @@ class XMLConverter extends SourceConverter {
         return speciesFields;
     } 
 
+	private String getData(NodeList dataNodes) {
+		log.error "It should be one node only but got list of nodes " + dataNodes
+		if(!dataNodes) return "";
+		return getData(dataNodes[0]);
+	}
+	
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
@@ -544,6 +550,10 @@ class XMLConverter extends SourceConverter {
         }
         return contributors;
     }
+	
+	private List<SUser> getUserContributors(NodeList dataNodes ) {
+		return getUserContributors(dataNodes[0])
+	}
 	
 	private List<SUser> getUserContributors(Node dataNode) {
 		List<SUser> contributors = new ArrayList<SUser>();

@@ -467,6 +467,7 @@ var uploadSpeciesWrapper = function() {
     var check = validateContLic();
     if(check == false){
         alert("Please provide Contributor, Attributions and License for all the marked columns and try again!!");
+        $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
         return;
     }
     if($(this).hasClass('disabled')) {
