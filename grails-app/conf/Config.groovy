@@ -304,6 +304,7 @@ speciesPortal {
 		INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY = "Local Endemicity Geographic Entity"
 		GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Global Distribution Geographic Entity"
 		GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY = "Global Endemicity Geographic Entity"
+		META_DATA = "Meta data"
 		TAXONOMIC_HIERARCHY = "Taxonomy Hierarchy"
 		FAMILY = "Family"
 		GENUS = "Genus"
@@ -441,7 +442,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            //names.parser.serverURL = "saturn.strandls.com"
+            names.parser.serverURL = "saturn.strandls.com"
         }
         google.analytics.enabled = false
         grails.resources.debug = false
