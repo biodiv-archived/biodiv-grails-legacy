@@ -218,7 +218,7 @@ class SpeciesUploadService {
 			linkParams["daterangepicker_start"] = reportDate_start
 			linkParams["daterangepicker_end"] = reportDate_end
 			linkParams["sort"] = "lastUpdated"
-			linkParams["user"] = springSecurityService.currentUser
+			linkParams["user"] = springSecurityService.currentUser?.id
 			link = observationService.generateLink("species", "list", linkParams)
 			otherParams["link"] = link
 			usersMailList.each{ user ->

@@ -1119,17 +1119,18 @@ class SpeciesService {
                 countFilterQuery += " and userGroup=:userGroup "
             }
         }
-		
-		if(params.user){
-			def userInstance = params.user.toLong()
-			if(userInstance){
-				queryParams['user'] = userInstance
-				query += " join s.fields as f "
-				filterQuery += " and f.uploader.id=:user "
-				countQuery += " join s.fields as f "
-				countFilterQuery += " and f.uploader.id=:user "
-			}
-		}
+
+//		XXX: to be corrected		
+//		if(params.user){
+//			def userInstance = params.user.toLong()
+//			if(userInstance){
+//				queryParams['user'] = userInstance
+//				query += " join s.fields as f "
+//				filterQuery += " and f.uploader.id=:user "
+//				countQuery += " join s.fields as f "
+//				countFilterQuery += " and f.uploader.id=:user "
+//			}
+//		}
 
         query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
         countQuery += countFilterQuery + " group by s.percentOfInfo"

@@ -402,7 +402,7 @@ class XMLConverter extends SourceConverter {
             }
 			
 		    if(speciesField && contributors) {
-                contributors.each { speciesField.addToContributors(it); }
+                contributors.each {speciesField.addToContributors(it); }
                 licenses.each { speciesField.addToLicenses(it); }
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }

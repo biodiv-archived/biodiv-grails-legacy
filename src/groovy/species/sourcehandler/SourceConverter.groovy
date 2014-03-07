@@ -469,7 +469,7 @@ class SourceConverter {
                     //					new Node(refNode, "url", ref);
                     //				} else {
                     def refNode = new Node(field, "reference")
-                    new Node(refNode, "title", attrs?attrs.get(i):"");
+                    getReferenceNode(refNode, attrs?attrs.get(i):"");
                     //				}
                     i++;
                 }
@@ -567,8 +567,8 @@ class SourceConverter {
 	
 	
 	def myPrint(str){
-		if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
+		//if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
 			println str
-		}
+		//}
 	}
 }
