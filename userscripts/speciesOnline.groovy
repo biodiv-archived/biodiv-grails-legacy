@@ -79,7 +79,7 @@ def populateUserInContributor1(){
 	def m = [:]
 	def dMap = [:]
 	Contributor.withTransaction {
-		new File("/home/cepf/git/biodiv/contributormap.csv").splitEachLine(",") {
+		new File("/home/sandeept/git/biodiv/contributormap.csv").splitEachLine(",") {
 			println "data   " + it
 			def fields = it;
 			def contId = fields[0].trim().toLong()
@@ -114,7 +114,7 @@ def populateUserInContributor1(){
 //3. populate sField to contributor table
 def populateSfieldContributor(){
 	def dMap = [:]
-	new File("/home/cepf/git/biodiv/contributormap.csv").splitEachLine(",") {
+	new File("/home/sandeept/git/biodiv/contributormap.csv").splitEachLine(",") {
 		println "data   " + it
 		def fields = it;
 		def contId = fields[0].trim().toLong()
@@ -186,6 +186,7 @@ def updateNameContributor(){
 //makeFieldGeneric()
 //addMetadataField()
 //addNewField()
+
 //populateUserInContributor()
 //populateUserInContributor1()
 //populateSfieldContributor()
@@ -193,7 +194,7 @@ def updateNameContributor(){
 
 /*
 update species_field_suser set contributors_idx = 0;
-delete from species_field_contributor where species_field_contributors_id is null;
+delete from species_field_contributor where species_field_contributors_id is not null;
 alter table species_field_contributor drop column species_field_contributors_id;
 drop table species_taxonomy_registry ;
 */

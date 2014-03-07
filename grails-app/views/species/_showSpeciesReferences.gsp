@@ -30,8 +30,6 @@ references = refs.values();
     <g:each in="${references}" var="r">
 
     <li class="linktext">
-    <a href="#" class="${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${r.speciesField.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Edit reference">
-    
     <g:if test="${r.url}">
 
      ${r.title?r.title:r.url}
