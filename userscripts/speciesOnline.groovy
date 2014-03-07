@@ -52,7 +52,7 @@ def makeFieldGeneric(){
 
 
 def mySave(obj){
-	if(!obj.save()){
+	if(!obj.save(flush:true)){
 		obj.errors.allErrors.each { println it }
 	}
 }
@@ -79,7 +79,7 @@ def populateUserInContributor1(){
 	def m = [:]
 	def dMap = [:]
 	Contributor.withTransaction {
-		new File("/home/sandeept/git/biodiv/contributormap.csv").splitEachLine(",") {
+		new File("/home/cepf/git/biodiv/contributormap.csv").splitEachLine(",") {
 			println "data   " + it
 			def fields = it;
 			def contId = fields[0].trim().toLong()
@@ -114,7 +114,7 @@ def populateUserInContributor1(){
 //3. populate sField to contributor table
 def populateSfieldContributor(){
 	def dMap = [:]
-	new File("/home/sandeept/git/biodiv/contributormap.csv").splitEachLine(",") {
+	new File("/home/cepf/git/biodiv/contributormap.csv").splitEachLine(",") {
 		println "data   " + it
 		def fields = it;
 		def contId = fields[0].trim().toLong()

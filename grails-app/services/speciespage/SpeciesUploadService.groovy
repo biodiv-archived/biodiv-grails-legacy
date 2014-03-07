@@ -233,7 +233,7 @@ class SpeciesUploadService {
 			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
 			observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
 		}else{
-			msg = "ERROR WHILE UPLOADING SPECIES " + "\n\n" + mymsg
+			mymsg = "ERROR WHILE UPLOADING SPECIES " + "\n\n" + mymsg
 		}
 		
 		//creating roll back entry

@@ -419,7 +419,7 @@ class XMLConverter extends SourceConverter {
     } 
 
 	private String getData(NodeList dataNodes) {
-		log.error "It should be one node only but got list of nodes " + dataNodes
+		log.info "It should be one node only but got list of nodes " + dataNodes
 		if(!dataNodes) return "";
 		return getData(dataNodes[0]);
 	}
@@ -552,6 +552,7 @@ class XMLConverter extends SourceConverter {
     }
 	
 	private List<SUser> getUserContributors(NodeList dataNodes ) {
+		log.info "It should be one node only but got list of nodes " + dataNodes
 		return getUserContributors(dataNodes[0])
 	}
 	
