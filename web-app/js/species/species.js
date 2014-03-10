@@ -362,6 +362,13 @@ function initGalleryTabs() {
 
 
     $.fn.editable.defaults.mode = 'inline';
+    $.fn.editableform.template = '\
+        <form class="form-inline editableform">\
+        <div class="control-group">\
+        <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom"></div></div>\
+        <div class="editable-error-block"></div>\
+        </div> \
+        </form>';
 
     function onEditableSuccess(response, newValue) {
         if(!response) {

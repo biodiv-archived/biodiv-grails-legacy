@@ -54,7 +54,13 @@
                     <div class="stats_number">${ActivityFeed.count()}</div>
                 </div>
 
-                        </div>
+            </div>
+
+            <div class="navblock" style="margin-top:20px;">
+            <obv:featured 
+                model="['controller':'featured', 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance, hideShowAll:true]" />
+            </div>
+
         </div>
     </body>
 </html>

@@ -1,5 +1,5 @@
 <g:if test="${category.value.get('speciesFieldInstance')}">
-<g:showSpeciesFieldToolbar model="${category.value[0]}" />
+<g:showSpeciesFieldToolbar model="model="['speciesFieldInstance':category.value.get('speciesFieldInstance')[0], 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
 <%
 def references = speciesInstance.fields.collect{it.references};
 Map refs = new LinkedHashMap();
