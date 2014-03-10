@@ -13,9 +13,14 @@
 
     <body>
         <div id="home" class="observation  span12">
-            <center>
-                <b>Welcome to ${grailsApplication.config.speciesPortal.app.siteName}</b>
-            </center>
+
+            <div class="navblock" style="margin-top:20px;">
+                <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;">Welcome to ${grailsApplication.config.speciesPortal.app.siteName}</h2>
+                <p style="line-height:1.5">${grailsApplication.config.speciesPortal.app.homepageDescription}
+                <a href="about">More ...</a>
+                </p>
+            </div>
+        
             <div class="navblock" style="margin-top:20px;">
                 <div id="species_entry" class="entry" onclick="location.href='${createLink(controller:'species', action:'list', absolute:true)}'";></div>
                 <div id="observations" class="entry" onclick="location.href='${createLink(controller:'observation', action:'list', absolute:true)}'"></div>
