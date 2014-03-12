@@ -11,10 +11,13 @@ class SpeciesBulkUpload {
 	private static log = LogFactory.getLog(this);
 	
 	public enum Status {
-		ROLLBACK("ROLLBACK"),
-		UPLOADED("UPLOADED"),
+		SCHEDULED("SCHEDULED"),
 		RUNNING("RUNNING"),
-		FAILED("FAILED")
+		ABORTED("ABORTED"),
+		FAILED("FAILED"),
+		UPLOADED("UPLOADED"),
+		ROLLBACK("ROLLBACK")
+		
 		
 		private String value;
 
@@ -32,10 +35,15 @@ class SpeciesBulkUpload {
 	String notes;
 	Status status;
 	String filePath;
-	
+	String errorFilePath
+	String imagesDir
 	static belongsTo = [author:SUser];
 	
     static constraints = {
+		filePath nullable:true
+		errorFilePath nullable:true
+		imagesDir nullable:true
+		endDate nullable:true
 		notes nullable:true, blank: true, size:0..400
     }
 	static mapping = {
@@ -43,8 +51,8 @@ class SpeciesBulkUpload {
 		notes type:'text';
     }
 	
-	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String notes=null, Status status = Status.UPLOADED){
-		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, status:status, notes:notes)
+	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, Status status = Status.SCHEDULED){
+		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes)
 		if(!sbu.save(flush:true)){
 			sbu.errors.allErrors.each { println it }
 			return null
@@ -55,7 +63,14 @@ class SpeciesBulkUpload {
 	}
 	
 	def updateStatus(Status status){
+		refresh()
+		
 		this.status = status
+		
+		if((status == Status.ABORTED) ||(status == Status.FAILED) || (status == Status.UPLOADED)){
+			this.endDate = new Date()
+		}
+		
 		if(!this.save(flush:true)){
 			this.errors.allErrors.each { log.error it }
 		}

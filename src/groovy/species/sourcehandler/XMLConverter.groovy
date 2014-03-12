@@ -98,8 +98,6 @@ class XMLConverter extends SourceConverter {
             log.info "Creating/Updating species"
             log.debug species;
             s = new Species();
-			s.appendLogSummary("ROW   " + species.attributes()['rowIndex']?:0)
-
             removeInvalidNode(species);
 
             //sciName is must for the species to be populated
@@ -107,6 +105,7 @@ class XMLConverter extends SourceConverter {
 
             //XXX: sending just the first element need to decide on this if list has multiple elements
             def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
+			addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
             if(speciesName) {
                 //getting classification hierarchies and saving these taxon definitions
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
@@ -130,18 +129,16 @@ class XMLConverter extends SourceConverter {
                     //either overwrite or merge if an existing species exists
                     if(existingSpecies) {
                         if(defaultSaveAction == SaveAction.OVERWRITE || existingSpecies.percentOfInfo == 0){
-                            log.info "Deleting old version of species : "+existingSpecies.id;
+                            log.info "Cleraring old version of species : "+existingSpecies.id;
                             try {
-                                s.id = existingSpecies.id;
-                                if(!existingSpecies.delete(flush:true)) {
-                                    existingSpecies.errors.allErrors.each { log.error it }
-                                }
+								existingSpecies.clearBasicContent()
+								s = existingSpecies;
                             }
                             catch(org.springframework.dao.DataIntegrityViolationException e) {
                                 e.printStackTrace();
-                                log.error "Could not delete species ${existingSpecies.id} : "+e.getMessage();
-								s.appendLogSummary("Could not delete species ${existingSpecies.id} : "+e.getMessage())
-								s.appendLogSummary(e);
+                                log.error "Could not clear species ${existingSpecies.id} : "+e.getMessage();
+								addToSummary("Could not clear species ${existingSpecies.id} : "+e.getMessage())
+								addToSummary(e);
 								return;
                             }
                         } else if(defaultSaveAction == SaveAction.MERGE){
@@ -151,7 +148,7 @@ class XMLConverter extends SourceConverter {
                             s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
-							s.appendLogSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
+							addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
                             return;
                         }
                     }
@@ -412,7 +409,7 @@ class XMLConverter extends SourceConverter {
 				println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
                 log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
-				s.appendLogSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
+				addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }			
         }
         return speciesFields;
@@ -552,7 +549,7 @@ class XMLConverter extends SourceConverter {
     }
 	
 	private List<SUser> getUserContributors(NodeList dataNodes ) {
-		log.info "It should be one node only but got list of nodes " + dataNodes
+		//log.info "It should be one node only but got list of nodes " + dataNodes
 		return getUserContributors(dataNodes[0])
 	}
 	
@@ -1329,11 +1326,11 @@ println imageNode;
                     }
                 } else {
                     log.warn "NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text();
-					s.appendLogSummary("NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text())
+					addToSummary("NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text())
                 }
             } else {
                 log.error " NO COUNTRY IS SPECIFIED in $c"
-				s.appendLogSummary(" NO COUNTRY IS SPECIFIED in $c")
+				addToSummary(" NO COUNTRY IS SPECIFIED in $c")
             }
         }
         return geographicEntities;
@@ -1591,11 +1588,21 @@ println imageNode;
      * @return
      */
     static Species findDuplicateSpecies(s) {
-        def species = Species.findByGuid(s.guid);
+        def species = Species.withCriteria() {
+                eq("guid", s.guid);
+				fetchMode 'userGroups', FetchMode.JOIN
+				fetchMode 'resources', FetchMode.JOIN
+				fetchMode 'fields', FetchMode.JOIN
+				fetchMode 'globalDistributionEntities', FetchMode.JOIN
+				fetchMode 'globalEndemicityEntities', FetchMode.JOIN
+				fetchMode 'indianDistributionEntities', FetchMode.JOIN
+				fetchMode 'indianEndemicityEntities', FetchMode.JOIN
         //		if(!species.isAttached()) {
         //			species.attach();
         //		}
-        return species
+        }
+		if(species)
+			return species[0]
     }
 
     /**

@@ -365,13 +365,13 @@ function setFollowButton(){
 /*
  * To roll back species bulk upload session
  */
-function rollBack(comp, url){
+function updateBulkUploadStatus(comp, url, action){
+	if(!confirm(action + ' requested. Do you want to proceed ?')){
+		return false;
+	}
 	$.ajax({
         url : url,
         success : function(data) {
-        	if(data.success){
-        		$(comp).text('RollBack');
-        	}
         	alert(data.msg);
         },
         error: function(xhr, textStatus, errorThrown) {
@@ -379,3 +379,4 @@ function rollBack(comp, url){
         }
     });
 }
+
