@@ -42,7 +42,7 @@ class ChartController {
 	*/
 	def basicStat = {
 		log.debug params
-		def retMap = [observationCount:chartService.getObservationCount(params), speciesCount:chartService.getSpeciesCount(params), checklistsCount:chartService.getChecklistCount(params), documentCount:chartService.getDocumentCount(params), userCount:chartService.getUserCount(params), activityCount:chartService.getActivityFeedCount(params)]
+		def retMap = [observationCount:chartService.getObservationCount(params), speciesCount:chartService.getSpeciesCount(params), checklistsCount:chartService.getChecklistCount(params), documentCount:chartService.getDocumentCount(params), userCount:chartService.getUserCount(params)]
 		render retMap as JSON
 	}  
 }
