@@ -634,17 +634,6 @@ class SpeciesController extends AbstractObjectController {
 	//
 	//	}
 
-	@Secured(['ROLE_SPECIES_ADMIN'])
-	def upload = {
-		log.debug params
-		
-		if(params.xlsxFileUrl){
-			def result = speciesUploadService.upload(params)
-			render(text:result as JSON, contentType:'text/html')
-		} 
-    }
-    
-	
 	@Secured(['ROLE_ADMIN'])
 	def requestExport = {
 		log.debug "Export of species requested" + params
@@ -656,20 +645,19 @@ class SpeciesController extends AbstractObjectController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////Online upload //////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
+
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def uploadOnline = {
-		if(params.fileName) {
-			String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
-			File speciesFile = new File(contentRootDir, params.fileName)
-			if(/*contributors && */speciesFile.exists()) {
-				File mappingFile = new File(contentRootDir, params.uFile.path[1])
-				speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-				render "Done mapped species upload"
-			}
+	def upload = {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			def res = speciesUploadService.basicUploadValidation(params)
+			log.debug "Starting bulk upload"
+			res = speciesUploadService.upload(res.sBulkUploadEntry)
+			render(text:res as JSON, contentType:'text/html')
 		}
 	}
-
-    def getDataColumns = {
+	
+	def getDataColumns = {
         List res = speciesUploadService.getDataColumns();
         render res as JSON
     }
@@ -677,14 +665,17 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_SPECIES_ADMIN'])
 	def rollBackUpload = {
 		log.debug params
-		//def mySession = sessionFactory.currentSession
-		//println mySession.getFlushMode() 
-		//mySession.setFlushMode(FlushMode.COMMIT)
-		//println mySession.getFlushMode()
 		def m = [success:true, msg:speciesUploadService.rollBackUpload(params)]
 		render m as JSON
 	}
 
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def abortBulkUpload = {
+		log.debug params
+		def m = [success:true, msg:speciesUploadService.abortBulkUpload(params)]
+		render m as JSON
+	}
+	
     def inviteCurator = {
         log.debug " inviting curators " + params
         List members = Utils.getUsersList(params.curatorUserIds);

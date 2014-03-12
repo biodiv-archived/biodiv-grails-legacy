@@ -436,27 +436,25 @@ function uploadSpecies(){
         dataType: 'json',
         data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val(), 'writeContributor': 'true','orderedArray' : orderedArray },
         success : function(data) {
-            $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
-            $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
-            $("#filterLink").attr("href", data.filterLink);
+           // $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
+           // $("#downloadErrorFile input[name='downloadFile']").val(data.errorFile);
+           // $("#filterLink").attr("href", data.filterLink);
             $("#speciesLoader").hide();
-            $("#uploadSpeciesDiv").hide();
+           // $("#uploadSpeciesDiv").hide();
             alert(data.msg);
-            document.getElementById("downloadSpeciesFile").style.visibility = "visible";
-            document.getElementById("downloadErrorFile").style.visibility = "visible";
-            $("#filterLinkSpan").show();
+           // document.getElementById("downloadSpeciesFile").style.visibility = "visible";
+           // document.getElementById("downloadErrorFile").style.visibility = "visible";
+            //$("#filterLinkSpan").show();
             $("#uploadSpecies").removeClass('disabled');
             $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
-            $("#downloadModifiedSpecies").removeClass('disabled');
+            //$("#downloadModifiedSpecies").removeClass('disabled');
         },
         error: function(xhr, textStatus, errorThrown) {
             $("#speciesLoader").hide();
             $("#uploadSpecies").removeClass('disabled');
             $("#downloadModifiedSpecies").removeClass('disabled');
             $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
-            alert('Error while uploading species !!!');
-            var msg = $.parseJSON(xhr.responseText);
-            alert(msg);
+            alert('Bulk upload in progres. Please visit your profile page to view status.');
         }
 
     });

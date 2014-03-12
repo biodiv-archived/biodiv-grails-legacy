@@ -65,7 +65,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int i=0;
 		
 			//log.debug speciesContent;
-			addToSummary("Creating XML for row " + currentRowIndex++)
+			addToSummary("Creating XML for species row " + currentRowIndex++)
 			Node speciesElement = builder.createNode("species", ['rowIndex':currentRowIndex]);
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")

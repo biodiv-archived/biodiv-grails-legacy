@@ -213,3 +213,8 @@ drop table species_taxonomy_registry ;
 //update common_names set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
 //update taxonomy_registry set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
 //updateNameContributor()
+
+
+//speciesbulkupload drop constrain
+//ALTER TABLE  species_bulk_upload  ALTER COLUMN file_path drop not NULL;
+//ALTER TABLE  species_bulk_upload  ALTER COLUMN end_date drop not NULL;
