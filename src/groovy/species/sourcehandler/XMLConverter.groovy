@@ -343,7 +343,7 @@ class XMLConverter extends SourceConverter {
             //TODO:HACK just for keystone
             String dt = data.replaceAll("</?p>","");
             for (sField in sFields) {
-                if(isDuplicateSpeciesField(sField, contributors, dt)) {
+                if(isDuplicateSpeciesField(sField, contributors, attributors,  dt)) {
                     log.debug "Found already existing species fields for field ${field} ${sField}"
                     temp << sField;
                 }
@@ -416,7 +416,7 @@ class XMLConverter extends SourceConverter {
     } 
 
 	private String getData(NodeList dataNodes) {
-		log.info "It should be one node only but got list of nodes " + dataNodes
+		//log.info "It should be one node only but got list of nodes " + dataNodes
 		if(!dataNodes) return "";
 		return getData(dataNodes[0]);
 	}
@@ -428,17 +428,18 @@ class XMLConverter extends SourceConverter {
     }
 
     /**
-    * A field is duplicate if atleast one of the contributors is same.
+    * A field is duplicate if contributor and attributor are exactly same.
     * 
     **/
-    private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, data) {
-        for(c1 in sField.contributors) {
-            for(c2 in contributors) {
-                if(c1.id == c2.id) {
-                    return true;
-                }
-            }
-        }
+    private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, attributors, data) {
+		return (new HashSet(sField.contributors) == new HashSet(contributors)) && (new HashSet(sField.attributors) == new HashSet(attributors))
+//        for(c1 in sField.contributors) {
+//            for(c2 in contributors) {
+//                if(c1.id == c2.id) {
+//                    return true;
+//                }
+//            }
+//        }
 
         /**
         * Hack to find duplicate where conributor is not specified or specified to be dummy
