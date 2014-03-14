@@ -24,8 +24,8 @@
 						<sUser:ifOwns model="['user':user]">
 							<td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.filePath])}">Download</a></td>
 							<td><g:if test="${uploadLog.errorFilePath}"><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.errorFilePath])}">Download</a></g:if></td>
-							<td><a class="btn btn-mini btn-danger" href="#" onclick="updateBulkUploadStatus($(this), '${uGroup.createLink(action:'abortBulkUpload', controller:'species', id:uploadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', 'Abort')">Abort</a></td>
-							<td><g:if test="${uploadLog.status.value() != 'RUNNING'}"><a class="btn btn-mini  btn-danger" href="#" onclick="updateBulkUploadStatus($(this), '${uGroup.createLink(action:'rollBackUpload', controller:'species', id:uploadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', 'Rollback')">Rollback</a></g:if></td>
+							<td><g:if test="${uploadLog.status.value() == 'RUNNING'}"><a class="btn btn-mini btn-danger" href="#" onclick="updateBulkUploadStatus($(this), '${uGroup.createLink(action:'abortBulkUpload', controller:'species', id:uploadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', 'Abort')">Abort</a></g:if></td>
+							<td><g:if test="${(uploadLog.status.value() != 'RUNNING') && (uploadLog.status.value() != 'ROLLBACK')}"><a class="btn btn-mini  btn-danger" href="#" onclick="updateBulkUploadStatus($(this), '${uGroup.createLink(action:'rollBackUpload', controller:'species', id:uploadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', 'Rollback')">Rollback</a></g:if></td>
 						</sUser:ifOwns>
 					</tr>
 				</g:each>

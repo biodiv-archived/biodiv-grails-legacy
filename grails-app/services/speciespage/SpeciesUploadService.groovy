@@ -76,6 +76,7 @@ class SpeciesUploadService {
 	def observationService;
 	def springSecurityService
 	def speciesPermissionService;
+	def SUserService;
 	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -216,11 +217,10 @@ class SpeciesUploadService {
 			usersMailList = speciesPermissionService.getSpeciesAdmin()
 			log.debug "user mail list " + usersMailList
 			def sp = new Species()
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 			
 			def linkParams = [:]
-			linkParams["daterangepicker_start"] = df.format(sBulkUploadEntry.startDate)
-			linkParams["daterangepicker_end"] = df.format(sBulkUploadEntry.endDate)
+			linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
+			linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
 			linkParams["sort"] = "lastUpdated"
 			linkParams["user"] = springSecurityService.currentUser?.id
 			link = observationService.generateLink("species", "list", linkParams)
@@ -365,6 +365,7 @@ class SpeciesUploadService {
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
+				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				speciesElements.clear();
 				cleanUpGorm();
 			}
@@ -723,7 +724,7 @@ class SpeciesUploadService {
 	def String abortBulkUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if(sbu.author != springSecurityService.currentUser ){
+		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
 			return "Authentication failed for user. Please login."
 		}
@@ -741,7 +742,7 @@ class SpeciesUploadService {
 	def String rollBackUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if(sbu.author != springSecurityService.currentUser ){
+		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
 			return "Authentication failed for user. Please login."
 		}

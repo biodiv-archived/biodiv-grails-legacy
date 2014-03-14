@@ -662,14 +662,14 @@ class SpeciesController extends AbstractObjectController {
         render res as JSON
     }
     
-    @Secured(['ROLE_SPECIES_ADMIN'])
+    @Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
 	def rollBackUpload = {
 		log.debug params
 		def m = [success:true, msg:speciesUploadService.rollBackUpload(params)]
 		render m as JSON
 	}
 
-	@Secured(['ROLE_SPECIES_ADMIN'])
+	@Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
 	def abortBulkUpload = {
 		log.debug params
 		def m = [success:true, msg:speciesUploadService.abortBulkUpload(params)]

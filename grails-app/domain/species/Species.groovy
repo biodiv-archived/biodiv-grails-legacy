@@ -222,7 +222,7 @@ class Species implements Rateable {
 		return Species.executeQuery(query, ['taxOnConceptId':taxonConcept.id])[0]
 	}
 
-    def beforeUpdate() {
+    def beforeUpdate(){
         /*try {
             if(this.taxonConcept && externalLinksService.updateExternalLinks(this.taxonConcept)) {
                 this.taxonConcept = TaxonomyDefinition.get(this.taxonConcept.id);
@@ -231,7 +231,6 @@ class Species implements Rateable {
             this.appendLogSummary(e)
             e.printStackTrace()
         }*/
-        println "before species update"
         this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
     }
 
