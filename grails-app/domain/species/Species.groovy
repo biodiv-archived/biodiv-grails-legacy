@@ -222,7 +222,7 @@ class Species implements Rateable {
 		return Species.executeQuery(query, ['taxOnConceptId':taxonConcept.id])[0]
 	}
 
-    def beforeUpdate() {
+    def beforeUpdate(){
         /*try {
             if(this.taxonConcept && externalLinksService.updateExternalLinks(this.taxonConcept)) {
                 this.taxonConcept = TaxonomyDefinition.get(this.taxonConcept.id);
@@ -231,7 +231,6 @@ class Species implements Rateable {
             this.appendLogSummary(e)
             e.printStackTrace()
         }*/
-        println "before species update"
         this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
     }
 
@@ -282,16 +281,33 @@ class Species implements Rateable {
 		}
 		sLog.append("" + str + System.getProperty("line.separator"))
 	}
-	/*
-	private class SpeciesLog {
-		int uploadRowIndex;
-		StringBuilder summary;
+	
+	public String fetchLogSummary(){
+		return fetchSpeciesCall() + "\n" + ( sLog ?  sLog.toString() : "")
+	}
+	
+	/**
+	 * In overwrite action clearing basic content
+	 * Not deleting species because it may be part of user group and activity feed.
+	 * Also not touching synonyms, common names and taxon registry
+	 * @return
+	 */
+	def clearBasicContent(){
+		resources?.clear();
+		fields.each { sf -> 
+			removeFromFields(sf)
+			def ge = GeographicEntity.read(sf.id)
+			if(ge){
+				s.removeFromGlobalDistributionEntities(ge)
+				s.removeFromGlobalEndemicityEntities(ge)
+				s.removeFromIndianDistributionEntities(ge)
+				s.removeFromIndianEndemicityEntities(ge)
+			}
+		}
 		
-		public SpeciesLog(){
-			uploadRowIndex = 0;
-			summary = new StringBuilder()
+		if(!save()){
+			errors.allErrors.each { log.error it }
 		}
 	}
-	*/
 
 }
