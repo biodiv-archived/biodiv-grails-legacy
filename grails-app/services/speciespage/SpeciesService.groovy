@@ -26,6 +26,7 @@ import species.groups.SpeciesGroup;
 import species.Synonyms;
 import species.CommonNames;
 import species.Language;
+import species.Classification;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -45,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
 import species.groups.UserGroup;
+import species.TaxonomyRegistry;
 
 class SpeciesService {
 
@@ -616,6 +618,7 @@ class SpeciesService {
             def synonym = builder.createNode("synonym");
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
+            new Node(data, "contributor", springSecurityService.currentUser.email);
  
             List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
             
@@ -875,6 +878,29 @@ class SpeciesService {
                 return [success:false, msg:"Error while deleting common name: ${e.getMessage()}"]
             }
         }
+    }
+    
+    def createSpecies(String speciesName, List taxonRegistryNames) {
+        def speciesInstance = new Species();
+        List<TaxonomyRegistry> taxonRegistry;
+
+        XMLConverter converter = new XMLConverter();
+        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+        if(speciesInstance.taxonConcept) {
+
+            speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
+            //taxonconcept is being used as guid
+            speciesInstance.guid = converter.constructGUID(speciesInstance);
+
+            //a species page with guid as taxon concept is considered as duplicate
+            Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
+            speciesInstance = existingSpecies;
+            
+            //save taxonomy hierarchy
+            def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, springSecurityService.currentUser)
+            taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true); 
+        }
+        return ['speciesInstance':speciesInstance, 'taxonRegistry':taxonRegistry];
     }
 
     private def createImagesXML(params) {

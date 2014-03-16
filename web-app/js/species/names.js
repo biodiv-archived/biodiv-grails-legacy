@@ -23,12 +23,28 @@
                        return;
                    }
                    request.nameFilter = _options.nameFilter;
-                   lastXhr = $.getJSON( window.params.recommendation.suggest, request, function( data, status, xhr ) {
+
+                   lastXhr = $.ajax({
+                       url:  window.params.recommendation.suggest,
+                           dataType: "json",
+                           data: {
+                                term : request.term,
+                                rank : $(this)[0].element.data('rank')
+                           },
+                           success: function(data, status, xhr) {
+                               cache[_options.nameFilter][ term ] = data;
+                               if ( xhr === lastXhr ) {
+                                   response( data );
+                               }
+
+                           }
+                   });
+                   /*lastXhr = $.getJSON( window.params.recommendation.suggest, request, function( data, status, xhr ) {
                        cache[_options.nameFilter][ term ] = data;
                        if ( xhr === lastXhr ) {
                            response( data );
                        }
-                   });
+                   });*/
                },
                focus: _options.focus,
                select: _options.select,

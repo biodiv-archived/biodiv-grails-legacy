@@ -15,6 +15,7 @@ import org.apache.lucene.util.Version
 import species.Species
 import species.Language
 import species.TaxonomyDefinition
+import species.TaxonomyDefinition.TaxonomyRank;
 import species.participation.Recommendation
 import species.search.Lookup
 import species.search.Record
@@ -157,28 +158,14 @@ class NamesIndexerService {
 	}
 
 	
-	def getFormattedResult(lookupResults, inputTerm){
+	def getFormattedResult(List<LookupResult> lookupResults, inputTerm){
 		def result = new ArrayList();
 		lookupResults.each { lookupResult ->
 			def term = lookupResult.key;
 			def record = lookupResult.value;
 			//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
 			//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
-			int index = record.originalName.toLowerCase().indexOf(inputTerm.toLowerCase());
-
-			//TODO:StringBuilder
-			String name = new String();
-			for(int i=0; i<record.originalName.size(); i++) {
-				if(i == index) {
-					name += "<b>"
-				}
-				name += record.originalName.charAt(i);
-				if(i == index+inputTerm.length()-1) {
-					name += "</b>"
-				}
-			}
-
-			String highlightedName = name.toString();
+			String highlightedName = getLabel(record.originalName, inputTerm);
 			String icon = record.icon;
 			if(icon) {
 				icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
@@ -190,6 +177,25 @@ class NamesIndexerService {
 		return result;
 	}
 	
+    String getLabel(String originalName , String inputTerm) {
+        int index = originalName.toLowerCase().indexOf(inputTerm.toLowerCase());
+
+        //TODO:StringBuilder
+        String name = new String();
+        for(int i=0; i<originalName.size(); i++) {
+            if(i == index) {
+                name += "<b>"
+            }
+            name += originalName.charAt(i);
+            if(i == index+inputTerm.length()-1) {
+                name += "</b>"
+            }
+        }
+
+        return name.toString();
+    }
+
+
 	/**
 	 *
 	 * @param query
@@ -198,11 +204,18 @@ class NamesIndexerService {
 	def suggest(params){
 		log.info "Suggest name using params : "+params
 		def result = new ArrayList();
-		if(params.term) {
-			int max = params.max ?: 5;
-			List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, max, params.nameFilter);
+		int max = params.max ? params.int('max'): 5;
+        int rank = params.rank ? params.int('rank'):TaxonomyRank.SPECIES.ordinal();
+        String term = params.term?:''
+		if(term && rank == TaxonomyRank.SPECIES.ordinal()) {
+			List<LookupResult> lookupResults = lookup.lookup(term.toLowerCase(), true, max, params.nameFilter);
 			result = getFormattedResult(lookupResults,  params.term)
-		}
+		} else {
+            List<LookupResult> lookupResults = TaxonomyDefinition.findAllByRankAndCanonicalFormIlike(rank, params.term+'%', [max:max, sort:'canonicalForm', offset:0]); 
+            lookupResults.each { taxonDefinition ->
+                result << ['value':taxonDefinition.canonicalForm, 'label':taxonDefinition.canonicalForm, 'category':TaxonomyRank.list()[rank].value()]
+            }
+        }
 		log.debug "suggestion : "+result;
 		return result;
 	}

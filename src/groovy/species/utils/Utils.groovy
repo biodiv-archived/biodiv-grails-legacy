@@ -82,6 +82,18 @@ class Utils {
 		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
 	}
 
+    static String cleanSciName(String scientificName) {
+        def cleanSciName = Utils.cleanName(scientificName);
+        if(cleanSciName =~ /s\.\s*str\./) {
+            cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
+        }
+
+        if(cleanSciName.indexOf(' ') == -1) {
+            cleanSciName = cleanSciName.toLowerCase().capitalize();
+        }
+        return cleanSciName;
+    }
+
 	static String generateSafeFileName(String name) {
 		//returning random integer (between 1-1000) as file name along with original extension
 		return "" + (FILE_NAME_GENEROTR.nextInt(1000-1+1)+1) + getCleanFileExtension(name) 

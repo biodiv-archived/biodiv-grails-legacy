@@ -1343,7 +1343,7 @@ println imageNode;
      * Creating the given classification entries hierarchy.
      * Saves any new taxondefinition found 
      */
-    private List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
+     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
         log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         def taxonHierarchies = new ArrayList();
@@ -1388,13 +1388,15 @@ println imageNode;
         List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
 
         fieldNodes.each { fieldNode ->
+            println fieldNode
+            println fieldNode.data
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
-                def cleanSciName = cleanSciName(scientificName);
+                def cleanSciName = Utils.cleanSciName(scientificName);
                 name = cleanSciName
             } else {
-                name = cleanSciName(name);
+                name = Utils.cleanSciName(name);
             }
             if(name) {
                 names.putAt(rank, name);
@@ -1560,7 +1562,7 @@ println imageNode;
      * @return
      */
     TaxonomyDefinition getTaxonConceptFromName(String sciName) {
-        def cleanSciName = cleanSciName(sciName);
+        def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
             List name = namesParser.parse([cleanSciName])
@@ -1617,18 +1619,6 @@ println imageNode;
         //				synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
         //				taxonomyRegistry;
 
-    }
-
-    private String cleanSciName(String scientificName) {
-        def cleanSciName = Utils.cleanName(scientificName);
-        if(cleanSciName =~ /s\.\s*str\./) {
-            cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
-        }
-
-        if(cleanSciName.indexOf(' ') == -1) {
-            cleanSciName = cleanSciName.toLowerCase().capitalize();
-        }
-        return cleanSciName;
     }
 
     /**

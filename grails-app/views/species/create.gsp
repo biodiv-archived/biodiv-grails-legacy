@@ -1,4 +1,6 @@
 <%@ page import="species.Species"%>
+<%@ page import="species.TaxonomyDefinition"%>
+<%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <html>
     <head>
         <g:set var="title" value="Species"/>
@@ -19,13 +21,34 @@
             <form id="addSpecies" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
 
                 <div class="span12 super-section" style="clear:both;">
-                    <label class="control-label span3" for="name">Species</label> 
-                    <div class="span8">
-                        <input id="species" 
-                        data-provide="typeahead" type="text" class="input-block-level"
-                        name="species" value="${species}"
-                        placeholder="Add species name" />
+
+                    <div class="control-group">
+                        <label class="control-label span3" for="name">Species</label> 
+                        <div class="span8">
+                            <input id="species" 
+                            data-provide="typeahead" type="text" class="input-block-level"
+                            name="species" value="${species}"
+                            placeholder="Add species name" />
+                            <div class="alert hide"></div>
+                            <input type="hidden" name="canName" id="canName" value=""/>
+                            <div id="nameSuggestions" style="display: block;position:relative;"></div>
+                        </div>
+                    </div>   
+                    <div id="taxonHierachy" class="control-group" style="display:none;">
+                        <label
+                            class="control-label span3">Taxon Hierarchy</label> 
+                        <div class = "span8">
+                            <div id="existingHierarchies"><div>Following hierarchies already exist for the given species name.</div></div>
+                            <g:each in="${TaxonomyRank.list()}" var="taxonRank">
+                            <g:if test="${taxonRank.ordinal() != TaxonomyRank.SPECIES.ordinal()}">
+                            <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
+                            type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
+                            placeholder="Add ${taxonRank.value()}" />
+                            </g:if>
+                            </g:each>
+                        </div>
                     </div>
+
                 </div>   
                 <div class="span12 submitButtons">
 
@@ -37,8 +60,12 @@
                     <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
                         style="float: right; margin-right: 30px;"> Cancel </a>
                     </g:else>
+                    <a id="validateSpeciesSubmit" class="btn btn-primary"
+                        style="float: right; margin-right: 5px;"> Validate Species </a>
+
+
                     <a id="addSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Add Species </a>
+                        style="float: right; margin-right: 5px;display:none;"> Add Species </a>
 
                 </div>
 
@@ -48,8 +75,71 @@
     </body>
     <r:script>
     $(document).ready(function() {
+        $("#species").autofillNames({
+            'appendTo' : '#nameSuggestions',
+            'nameFilter':'scientificNames',
+            focus: function( event, ui ) {
+                $("#canName").val("");
+                $("#species").val( ui.item.label.replace(/<.*?>/g,"") );
+                $("#nameSuggestions li a").css('border', 0);
+                return false;
+            },
+            select: function( event, ui ) {
+                $("#species").val( ui.item.label.replace(/<.*?>/g,"") );
+                $("#canName").val( ui.item.value );
+                $("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
+                return false;
+            },open: function(event, ui) {
+                $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+            }
+        });
+
+        $(".taxonRank").autofillNames();
+
+
+
+        $('#validateSpeciesSubmit').click(function() {
+            //Did u mean species 
+            $.ajax({
+                url:'/species/validate',
+                data:{'name':$('#species').val()},
+                dataType:'json',
+                success:function(data) {
+                console.log(data);
+                    if(data.success == true) {
+                        if(data.id) {
+                        data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
+                        }
+                        $('#species').next('.alert').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+                        //$('#validateSpeciesSubmit').hide()
+                        var $ul = $('<ul></ul>');
+                        $('#existingHierarchies').empty().append($ul);
+                        if(data.taxonRegistry) {
+                            $.each(data.taxonRegistry, function(index, value) {
+                                var $c = $('<li></li>');
+                                $ul.append($c);
+                                var $u = $('<ul><b>'+index+'</b></ul>');
+                                $c.append($u);
+                                $.each(value[0], function(i, v) {
+                                    $u.append('<li>'+v.rank+':'+v.name+'</li>');
+                                });
+                            });
+                        }
+                        $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
+                        $('#taxonHierachy').show();
+                        $('#addSpeciesSubmit').show();
+                    } else {
+                        $('#species').next('.alert').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                    }
+                }
+                
+            });
+            //get COL hierarchy 
+            // get and autofill author contrib hierarchy
+        });
+
         $('#addSpeciesSubmit').click(function() {
-            $('#addSpecies').submit();        
+            $('#addSpecies').submit();
         });
     });
     </r:script>

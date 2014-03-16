@@ -443,7 +443,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            names.parser.serverURL = "saturn.strandls.com"
+            //names.parser.serverURL = "saturn.strandls.com"
         }
         google.analytics.enabled = false
         grails.resources.debug = false
