@@ -137,6 +137,7 @@ modules = {
 		resource url:'/js/jquery/jquery.exif.js'
 		resource url:'/js/species/observations/create.js'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
+        resource url:'http://api.filepicker.io/v1/filepicker.js'
 	}
 
 	observations_list { 
@@ -161,13 +162,12 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
-
 		resource url:'/js/species/species.js'
 
 	}
 
 	species_show {
-		dependsOn 'species, maps, gallery, comment, activityfeed'
+		dependsOn 'species, maps, gallery, comment, activityfeed, observations_create'
 
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
@@ -186,6 +186,7 @@ modules = {
 		resource url:'/js/wysihtml5.js'
         resource url:'/js/species/speciesPermission.js'
         resource url:'/js/species/membership.js'
+        //resource url:'http://malsup.github.com/jquery.form.js'
 	}
 	
 	species_list {

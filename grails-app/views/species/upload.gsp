@@ -136,7 +136,7 @@
                     <a id="uploadSpecies"
                         class="btn btn-primary" style="float: right; margin-right: 5px;">
                         Upload Species</a>
-                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img src="/images/rotate.gif"></div>
+                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img class="uploadingSpecies" src="../images/rotate.gif"></div>
                     <span class="policy-text"> By submitting this form for
                         uploading species data you agree to our <a href="/terms">Terms
                             and Conditions</a> on the use of our site </span>

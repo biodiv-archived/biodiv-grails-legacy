@@ -26,9 +26,14 @@
             <ul>
                 <li><a href="#resourceTabs-1">Images</a></li>
                 <li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
+                <g:if test="${isSpeciesContributor}">
+                    <li><a href="#resourceTabs-2">Upload Images</a></li>
+                </g:if>
+                <!--li><a href="#resourceTabs-4"> Pull Observation Image</a></li-->
+
             </ul>
             <div id="resourceTabs-1">
-                <a class="myeditable" href="#">Contribute Images</a>
+                <!--a class="myeditable" href="#">Contribute Images</a-->
                 <g:set var="images" value="${speciesInstance.getImages()}"/>
                 <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
                     <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE, images.size()]]]"/>
@@ -45,13 +50,35 @@
 
                     </div>
                 </div>
-
-
                 <div id="resourceTabs-3">						
                     <div id="gallery3"></div>
                     <div id="flickrBranding"></div><br/>
                     <div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
                 </div>
+
+
+                <div id="resourceTabs-2">
+                    <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+                        <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
+                        <g:render template="/observation/addPhoto" model="['observationInstance':speciesInstance]"/>
+                        <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
+                            style="float: right; margin-right: 5px;"> Upload Images </a>
+
+                    </form>
+                </div>
+                
+                <%--
+                <div id="resourceTabs-4">
+                    <form id="pullObvImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+                        <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
+                        <g:render template="/observation/addPhoto" model="['observationInstance':speciesInstance]"/>
+                        <a id="pullObvImagesBtn" class="btn btn-primary"
+                            style="float: right; margin-right: 5px;"> Pull Images </a>
+
+                    </form>
+                </div>
+                --%>
+
             </div>
         </div>
 

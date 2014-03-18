@@ -152,7 +152,7 @@
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
                 showSpeciesField($(".defaultSpeciesField").attr("id"))
             }
-        });
+            });
 
         </r:script>
 
@@ -208,7 +208,7 @@
                     model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
                 </div>
 
-                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance]"/>
+                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
                 <div class="span12" style="margin-left:0px">
                     <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
 
@@ -279,6 +279,21 @@
                     </div>
 
                 </div>
+                <%
+
+                def obvTmpFileName = (speciesInstance) ? (speciesInstance.fetchSpeciesImageDir().getAbsolutePath()) : false 
+                def obvDir = obvTmpFileName ?  obvTmpFileName.substring(obvTmpFileName.lastIndexOf("/"), obvTmpFileName.size()) : ""
+                %>
+                <form id="upload_resource" 
+                    title="Add a photo for this observation"
+                    method="post"
+                    class="${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}">
+
+                    <span class="msg" style="float: right"></span>
+                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                    <input type="hidden" name='obvDir' value="${obvDir}" />
+                    <input type="hidden" name='resType' value='${speciesInstance.class.name}'>
+                </form>
 
 
 
@@ -286,8 +301,9 @@
 
             <g:javascript>
             $(document).ready(function() {
-            window.params.carousel = {maxHeight:150, maxWidth:210}
-            window.params.species.name = "${speciesName}"
+                window.params.carousel = {maxHeight:150, maxWidth:210}
+                window.params.species.name = "${speciesName}"
+                
             });
             </g:javascript>	
 

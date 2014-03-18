@@ -59,3 +59,24 @@ $("#inviteCuratorButton").click(function(){
         } 
     });	
 });
+
+var uploadSpeciesImageOptions = { 
+    success: onSpeciesImageUploadSuccess  // post-submit callback 
+};
+
+$("#uploadSpeciesImagesBtn").click(function(){
+    console.log("called upload images form");
+    $("#uploadSpeciesImagesForm").ajaxSubmit({
+        success: onSpeciesImageUploadSuccess
+    });
+    $("#uploadSpeciesImagesForm").replaceWith( "<span>Images Uploaded Succesfully, Please refresh the page to see the newly uploaded image in the gallery!!</span>" );
+    $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html("Images Uploaded Succesfully, Please refresh the page to see the newly uploaded image in the gallery!!");
+    return false;
+});
+
+function onSpeciesImageUploadSuccess(responseText, statusText, xhr, $form){
+    console.log("call back called");
+    $("#uploadSpeciesImagesForm").replaceWith( "<span>Loaded Succesfully</span>" ); 
+    console.log("DONE DONE ");
+    return true;
+}

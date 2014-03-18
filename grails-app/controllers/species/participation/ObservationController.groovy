@@ -373,9 +373,20 @@ class ObservationController extends AbstractObjectController {
 				def rs = [:]
 				//Utils.populateHttpServletRequestParams(request, rs);
 				def resourcesInfo = [];
-				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-				File obvDir 
-				
+                println "============PARAMS ============= " + params
+                def rootDir
+                switch(params.resType) {
+                    case Observation.class.name:
+                        rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+                        println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
+                    break;
+
+                    case Species.class.name:
+                        rootDir = grailsApplication.config.speciesPortal.resources.rootDir
+                        println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + rootDir
+                    break;
+                }
+                File obvDir 
 
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
@@ -420,6 +431,7 @@ class ObservationController extends AbstractObjectController {
 					else {
 						if(!obvDir) {
 							if(!params.obvDir) {
+                                println "===================if "
 								obvDir = new File(rootDir);
 								if(!obvDir.exists()) {
 									obvDir.mkdir();
@@ -427,9 +439,11 @@ class ObservationController extends AbstractObjectController {
 								obvDir = new File(obvDir, UUID.randomUUID().toString());
 								obvDir.mkdir();
 							} else {
+                                println "else========"
 								obvDir = new File(rootDir, params.obvDir);
 								obvDir.mkdir();
 							}
+                            println "=========OIBV DIR =========== " + obvDir
 						}
 
 						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
@@ -439,7 +453,7 @@ class ObservationController extends AbstractObjectController {
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                         //context specific baseUrl for location picker script to work
-						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
+						def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
 						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
