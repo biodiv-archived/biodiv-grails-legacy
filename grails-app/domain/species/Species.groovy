@@ -40,6 +40,8 @@ class Species implements Rateable {
 	def speciesService;
     def externalLinksService;
     def speciesUploadService;
+    
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	private static final log = LogFactory.getLog(this);
 	
@@ -235,24 +237,41 @@ class Species implements Rateable {
         this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
     }
 
-	def beforeDelete(){
-		activityFeedService.deleteFeed(this)
-	}
-	
-	def fetchList(params, action){
-		return speciesService.getSpeciesList(params, action)
-	}
-	
+    def beforeDelete(){
+        activityFeedService.deleteFeed(this)
+    }
+
+    def fetchList(params, action){
+        return speciesService.getSpeciesList(params, action)
+    }
+
     List featuredNotes() {
         return Featured.featuredNotes(this);
     }
 
-		
-//	def onAddActivity(af, flushImmidiatly=true){
-//		lastUpdated = new Date();
-//		saveConcurrently(null, flushImmidiatly);
-//	}
-//	
+    def fetchSpeciesImageDir(){
+        if(!this.taxonConcept){
+            return null
+        }
+        def resourcesRootDir = config.speciesPortal.resources.rootDir;
+        String sname = resourcesRootDir + "/" +this.taxonConcept.canonicalForm
+        File f = new File(sname)
+        if(f.exists()){
+            return f
+        }
+        else{
+            if(f.mkdirs()){
+                return f
+            }
+        }
+
+    }
+
+    //	def onAddActivity(af, flushImmidiatly=true){
+    //		lastUpdated = new Date();
+    //		saveConcurrently(null, flushImmidiatly);
+    //	}
+    //	
 //	private saveConcurrently(f = {}, flushImmidiatly=true){
 //		try{
 //			if(f) f()
