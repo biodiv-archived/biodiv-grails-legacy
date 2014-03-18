@@ -168,6 +168,7 @@ else {
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
     app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
     app.siteCode = 'ibp'
 
     app.twitterUrl = "https://twitter.com/thewesternghats"
@@ -442,7 +443,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            names.parser.serverURL = "saturn.strandls.com"
+            //names.parser.serverURL = "saturn.strandls.com"
         }
         google.analytics.enabled = false
         grails.resources.debug = false

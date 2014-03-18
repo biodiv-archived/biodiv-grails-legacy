@@ -141,12 +141,22 @@ class AbstractObjectService {
         }
         else {    
         }
+
         def featured = []
         def count = 0;
-        def queryParams = ["type": type]
-        queryParams["type1"] = type1
-        def countQuery = "select count(*) from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
-        def query = "from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
+        def queryParams = [:];
+        def countQuery,query;
+        if(type) {
+            queryParams["type"] = type
+            queryParams["type1"] = type1
+
+            countQuery = "select count(*) from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
+        
+            query = "from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
+        } else {
+            countQuery = "select count(*) from Featured feat "
+            query = "from Featured feat "
+        }
 
         if(ugId) {
             queryParams["ugId"] = ugId
@@ -165,7 +175,6 @@ class AbstractObjectService {
 
         log.debug "FeaturedQuery:"+ query + " params: "+queryParams
         featured = Featured.executeQuery(query, queryParams);
-
         def observations = [:]
         featured.each {
             def observation = activityFeedService.getDomainObject(it.objectType,it.objectId)
@@ -182,10 +191,10 @@ class AbstractObjectService {
         def result = []
         def i = 0;
         observations.each {key,value ->
-            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value]);
+            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':getTargetController(key)]);
         }
 		
-        return['observations':result,'count':count[0]]
+        return['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
                 		
     }
 

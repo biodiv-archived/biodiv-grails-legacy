@@ -1,5 +1,5 @@
 <g:if test="${category.value.get('speciesFieldInstance')}">
-<g:showSpeciesFieldToolbar model="${category.value[0]}" />
+<g:showSpeciesFieldToolbar model="model="['speciesFieldInstance':category.value.get('speciesFieldInstance')[0], 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
 <%
 def references = speciesInstance.fields.collect{it.references};
 Map refs = new LinkedHashMap();
@@ -30,8 +30,6 @@ references = refs.values();
     <g:each in="${references}" var="r">
 
     <li class="linktext">
-    <a href="#" class="${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${r.speciesField.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Edit reference">
-    
     <g:if test="${r.url}">
 
      ${r.title?r.title:r.url}

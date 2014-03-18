@@ -7,6 +7,9 @@ import org.apache.commons.logging.LogFactory;
 import species.Field;
 import species.License.LicenseType;
 import species.formatReader.SpreadsheetWriter;
+import species.auth.SUser;
+import species.TaxonomyDefinition;
+import species.TaxonomyDefinition.TaxonomyRank;
 
 class SourceConverter {
     protected Map licenseUrlMap;
@@ -79,6 +82,24 @@ class SourceConverter {
         Node data = new Node(field, "data", text);
         attachMetadata(data, speciesContent, mappedField);
         return data;
+    }
+
+    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor) {
+        NodeBuilder builder = NodeBuilder.newInstance();
+        List nodes = [];
+        names.eachWithIndex { name, index ->
+            if(name) {
+                Node field = builder.createNode("field");
+                new Node(field, "category", classification);
+                new Node(field, "subcategory", TaxonomyRank.list()[index].value());
+
+                Node data = new Node(field, "data", name);
+                new Node(data, "contributor", contributor.email);
+                
+                nodes << field;
+            }
+        }
+        return nodes;
     }
 
     protected void attachMetadata(Node data, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
@@ -567,8 +588,9 @@ class SourceConverter {
 	
 	
 	def myPrint(str){
-		//if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
+		if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
 			println str
-		//}
+		}
 	}
 }
+

@@ -403,7 +403,9 @@ class ChartService {
 		return ActivityFeed.createCriteria().count{
 			and{
 				eq('isShowable', true)
-				between('lastUpdated', startDate, endDate)
+				if(startDate && endDate){
+					between('lastUpdated', startDate, endDate)
+				}
 				if(feedType){
 					eq('activityType', feedType)
 				}
@@ -654,4 +656,15 @@ class ChartService {
 		return count
 	}
 
+	
+	def long getActivityFeedCount(params){
+		def userGroup, typeToIdFilterMap
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroup])
+			
+		}
+		
+		return getActivityCount(null, null, typeToIdFilterMap, userGroup)
+	}
 }

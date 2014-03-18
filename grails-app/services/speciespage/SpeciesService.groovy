@@ -2,6 +2,7 @@ package speciespage
 
 
 import java.util.List
+import java.text.DateFormat
 import org.apache.solr.common.util.DateUtil;
 import org.apache.commons.logging.LogFactory
 import org.apache.solr.common.SolrException;
@@ -26,6 +27,7 @@ import species.groups.SpeciesGroup;
 import species.Synonyms;
 import species.CommonNames;
 import species.Language;
+import species.Classification;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -46,6 +48,7 @@ import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
+import species.TaxonomyRegistry;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -61,6 +64,7 @@ class SpeciesService extends AbstractObjectService  {
     def observationService;
     def speciesPermissionService;
 
+	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
     int noOfFields = Field.count();
 
@@ -614,6 +618,7 @@ class SpeciesService extends AbstractObjectService  {
             def synonym = builder.createNode("synonym");
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
+            new Node(data, "contributor", springSecurityService.currentUser.email);
  
             List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
             
@@ -874,6 +879,29 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
     }
+    
+    def createSpecies(String speciesName, List taxonRegistryNames) {
+        def speciesInstance = new Species();
+        List<TaxonomyRegistry> taxonRegistry;
+
+        XMLConverter converter = new XMLConverter();
+        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+        if(speciesInstance.taxonConcept) {
+
+            speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
+            //taxonconcept is being used as guid
+            speciesInstance.guid = converter.constructGUID(speciesInstance);
+
+            //a species page with guid as taxon concept is considered as duplicate
+            Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
+            speciesInstance = existingSpecies;
+            
+            //save taxonomy hierarchy
+            def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, springSecurityService.currentUser)
+            taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true); 
+        }
+        return ['speciesInstance':speciesInstance, 'taxonRegistry':taxonRegistry];
+    }
 
     private def createImagesXML(params) {
         NodeBuilder builder = NodeBuilder.newInstance();
@@ -1087,23 +1115,12 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         if(params.daterangepicker_start && params.daterangepicker_end){
-            def df = new SimpleDateFormat("dd/MM/yyyy")
-            params.daterangepicker_start + params.daterangepicker_end
-            def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
-            def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
-            Calendar cal = Calendar.getInstance(); // locale-specific
-            cal.setTime(endDate)
-            cal.set(Calendar.HOUR_OF_DAY, 23);
-            cal.set(Calendar.MINUTE, 59);
-            cal.set(Calendar.MINUTE, 59);
-            endDate = new Date(cal.getTimeInMillis())
-
+			def startDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_start))
+            def endDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_end))
             filterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
             countFilterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
             queryParams["daterangepicker_start"] =  startDate   
             queryParams["daterangepicker_end"] =  endDate
-            //activeFilters["daterangepicker_start"] = params.daterangepicker_start
-            //activeFilters["daterangepicker_end"] =  params.daterangepicker_end
         }
 
 

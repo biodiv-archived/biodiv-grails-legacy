@@ -24,6 +24,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
+import species.NamesParser
 
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
@@ -101,42 +102,46 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def save = {
-        def speciesInstance = new Species();
-
         if(params.species) {
-            String speciesName = params.species;
-            XMLConverter converter = new XMLConverter();
-            speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+            Map list = params.taxonRegistry?:[];
+            List t = [];
+            list.each { key, value ->
+                if(value) {
+                    t.putAt(Integer.parseInt(key).intValue(), value);
+                }
+            }
+            
+            t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
+
+            try {
+            def result = speciesService.createSpecies(params.species, t);
+            Species speciesInstance = result.speciesInstance;
+            def taxonRegistry = result.taxonRegistry;
             if(speciesInstance.taxonConcept) {
+                //dont accept a species page without any hierarchy
+                if(!taxonRegistry) {
+                    flash.message = "Cannot create a page without any hierarchy"
+                    redirect(action: "create")
+                    return;
+                } 
 
-                speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
-
-                //taxonconcept is being used as guid
-                speciesInstance.guid = converter.constructGUID(speciesInstance);
-
-                //a species page with guid as taxon concept is considered as duplicate
-                Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
-
-                //either overwrite or merge if an existing species exists
-                if(existingSpecies) {
-                    speciesInstance = existingSpecies;
+                if (speciesInstance.save(flush:true)) {
+                    flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
                     redirect(action: "show", id: speciesInstance.id)
                     return;
-                } else { 
-                    if (speciesInstance.save(flush: true)) {
-                        flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
-                        redirect(action: "show", id: speciesInstance.id)
-                        return;
-                    } else {
-                        flash.message = "Error while saving species"
-                    }
+                } else {
+                    flash.message = "Error while saving species"
                 }
             }
             else {
                 flash.message = "Error while saving species"
             }
+            } catch(e) {
+                e.printStackTrace();
+                flash.message = "Error while saving species ${e.getMessage()}"
+            }
         }
-        render(view: "create", model: [speciesInstance: speciesInstance])
+        render(view: "create")
     }
 
 	def show = {
@@ -634,17 +639,6 @@ class SpeciesController extends AbstractObjectController {
 	//
 	//	}
 
-	@Secured(['ROLE_SPECIES_ADMIN'])
-	def upload = {
-		log.debug params
-		
-		if(params.xlsxFileUrl){
-			def result = speciesUploadService.upload(params)
-			render(text:result as JSON, contentType:'text/html')
-		} 
-    }
-    
-	
 	@Secured(['ROLE_ADMIN'])
 	def requestExport = {
 		log.debug "Export of species requested" + params
@@ -656,35 +650,37 @@ class SpeciesController extends AbstractObjectController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////Online upload //////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
+
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def uploadOnline = {
-		if(params.fileName) {
-			String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
-			File speciesFile = new File(contentRootDir, params.fileName)
-			if(/*contributors && */speciesFile.exists()) {
-				File mappingFile = new File(contentRootDir, params.uFile.path[1])
-				speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
-				render "Done mapped species upload"
-			}
+	def upload = {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			def res = speciesUploadService.basicUploadValidation(params)
+			log.debug "Starting bulk upload"
+			res = speciesUploadService.upload(res.sBulkUploadEntry)
+			render(text:res as JSON, contentType:'text/html')
 		}
 	}
-
-    def getDataColumns = {
+	
+	def getDataColumns = {
         List res = speciesUploadService.getDataColumns();
         render res as JSON
     }
     
-    @Secured(['ROLE_SPECIES_ADMIN'])
+    @Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
 	def rollBackUpload = {
 		log.debug params
-		//def mySession = sessionFactory.currentSession
-		//println mySession.getFlushMode() 
-		//mySession.setFlushMode(FlushMode.COMMIT)
-		//println mySession.getFlushMode()
 		def m = [success:true, msg:speciesUploadService.rollBackUpload(params)]
 		render m as JSON
 	}
 
+	@Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
+	def abortBulkUpload = {
+		log.debug params
+		def m = [success:true, msg:speciesUploadService.abortBulkUpload(params)]
+		render m as JSON
+	}
+	
     def inviteCurator = {
         log.debug " inviting curators " + params
         List members = Utils.getUsersList(params.curatorUserIds);
@@ -729,4 +725,55 @@ class SpeciesController extends AbstractObjectController {
         speciesService.updateSpecies(params, species)
         println "============DONE DONE ==================="
     }
+   @Secured(['ROLE_USER'])
+   def validate = {
+       def result = [:];
+       if(params.name) {
+           def cleanSciName = Utils.cleanSciName(params.name);
+
+           if(cleanSciName) {
+               try {
+                   NamesParser namesParser = new NamesParser();
+                   List<TaxonomyDefinition> name = namesParser.parse([cleanSciName])
+                   println name[0];
+                   if(name[0].binomialForm) { //TODO:check its not uninomial
+                       def taxonCriteria = TaxonomyDefinition.createCriteria();
+                       TaxonomyDefinition taxon = taxonCriteria.get {
+                           eq("rank", TaxonomyRank.SPECIES.ordinal());
+                           ilike("canonicalForm", name[0].canonicalForm);
+                       }
+
+                       if(!taxon) {
+                           result = ['success':true, 'msg':'New taxon concept. Thanks for adding a new concept.']
+                       } else {
+                           //CHK if a species page exists for this concept
+                           Species species = Species.findByTaxonConcept(taxon);
+                           def taxonRegistry = taxon.parentTaxonRegistry();
+                           if(species) {
+                               result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title];
+                           } else {
+                               result = ['success':true, 'msg':'New species page for an existing concept'];
+                           }
+                           result['taxonRegistry'] = [:];
+                           taxonRegistry.each {classification, hierarchy ->
+                               if(!result['taxonRegistry'][classification.name])
+                                   result['taxonRegistry'][classification.name] = [];
+                               result['taxonRegistry'][classification.name] << hierarchy
+                           }
+                       }
+                   } else {
+                       result = ['success':false, 'msg':'Not a valid name.']
+                   }
+               } catch(e) {
+                   result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}"]
+               }
+           } else {
+                result = ['success':false, 'msg':"Error while cleaning name"]
+           }
+
+       } else {
+           result = ['success':false, 'msg':'Not a valid name.']
+       }
+       render result as JSON
+   }
 }

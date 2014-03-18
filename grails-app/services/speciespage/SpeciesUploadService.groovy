@@ -76,6 +76,7 @@ class SpeciesUploadService {
 	def observationService;
 	def springSecurityService
 	def speciesPermissionService;
+	def SUserService;
 	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -174,36 +175,39 @@ class SpeciesUploadService {
 	}
 	
 	
-	
-	
-	Map upload(params){
+	Map basicUploadValidation(params){
 		if(!params.xlsxFileUrl){
-			return ['success':false, 'msg': 'File not found !!!' ]
+			return ['msg': 'File not found !!!' ]
 		}
 		
-		
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		
-		Date start = new Date()
-		String reportDate_start = df.format(start);
-
 		File speciesDataFile = saveModifiedSpeciesFile(params)
 		log.debug "THE FILE BEING UPLOADED " + speciesDataFile
 		
 		if(!speciesDataFile.exists()){
-			return ['success':false, 'msg': 'File not found !!!' ]
+			return ['msg': 'File not found !!!' ]
 		}
 		
-		def res = uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(),speciesDataFile.getAbsolutePath(), 2,0,0,0,params.imagesDir?1:-1, params.imagesDir);Date end = new Date();
+		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir)
 		
-		//writing summary and log after upload
-		String reportDate_end = df.format(end);
-		def mymsg =  " Start Date  " + start + "   End Date " + end + "\n\n " + res.summary
-		def mylog = " Start Date  " + start + "   End Date " + end + "\n\n " + res.log
-		String fileName = "ErrorLog.txt"
-		String uploadDir = "species"
-		File errorFile = observationService.createFile(fileName , uploadDir, contentRootDir);
+		return ['msg': 'Bulk upload in progres. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
+		
+	}
+	
+	Map upload(SpeciesBulkUpload sBulkUploadEntry){
+		def speciesDataFile = sBulkUploadEntry.filePath
+		def imagesDir = sBulkUploadEntry.imagesDir
+		sBulkUploadEntry.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		
+		def res = uploadMappedSpreadsheet(speciesDataFile, speciesDataFile, 2,0,0,0, imagesDir?1:-1, imagesDir, sBulkUploadEntry)
+		
+		//writing log after upload
+		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
+		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " + res.log
+		File errorFile = observationService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		errorFile.write(mylog)
+		
+		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
+		sBulkUploadEntry.save()
 		
 		//Every thing is fine then sending mail
 		String link
@@ -215,8 +219,8 @@ class SpeciesUploadService {
 			def sp = new Species()
 			
 			def linkParams = [:]
-			linkParams["daterangepicker_start"] = reportDate_start
-			linkParams["daterangepicker_end"] = reportDate_end
+			linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
+			linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
 			linkParams["sort"] = "lastUpdated"
 			linkParams["user"] = springSecurityService.currentUser?.id
 			link = observationService.generateLink("species", "list", linkParams)
@@ -232,14 +236,15 @@ class SpeciesUploadService {
 			//sending mail to species contributor
 			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
 			observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
-		}else{
-			mymsg = "ERROR WHILE UPLOADING SPECIES " + "\n\n" + mymsg
 		}
 		
-		//creating roll back entry
-		createRollBackEntry(start, end, speciesDataFile.getAbsolutePath())
-		
-		return [success:res.success, msg:mymsg, downloadFile:speciesDataFile.getAbsolutePath(), filterLink: link, errorFile: errorFile.getAbsolutePath()]
+		def msg = ""
+		if(sBulkUploadEntry.status == SpeciesBulkUpload.Status.UPLOADED){
+			msg = "Species uploaded Successfully. Please visit your profile page to view summary."
+		}else{
+			msg = "Species upload " + sBulkUploadEntry.status.value().toLowerCase() + ". Please visit your profile page to view summary."
+		}
+		return [success:res.success, downloadFile:speciesDataFile, filterLink: link, msg:msg]
 	}
 	
 	/**
@@ -252,7 +257,7 @@ class SpeciesUploadService {
 	 * @param contentHeaderRowNo
 	 * @return
 	 */
-	Map uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="") {
+	Map uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="", SpeciesBulkUpload sBulkUploadEntry=null) {
 		Map result = ['success':false]
 		MappedSpreadsheetConverter converter
 		def uploadCount = 0
@@ -268,7 +273,7 @@ class SpeciesUploadService {
 			if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 				converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 			}
-			uploadCount = saveSpecies(converter, content, imagesDir)
+			uploadCount = saveSpecies(converter, content, imagesDir, sBulkUploadEntry)
 			result['success'] = true
 			
 		} catch (Exception e) {
@@ -339,7 +344,7 @@ class SpeciesUploadService {
 		return saveSpecies(species);
 	}
 
-	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
+	int saveSpecies(SourceConverter converter, List content, String imagesDir="", SpeciesBulkUpload sBulkUploadEntry=null) {
 		converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
@@ -347,14 +352,20 @@ class SpeciesUploadService {
 		int noOfSpecies = content.size();
 		
 		log.info " CONTENT SIZE " + noOfSpecies
-		
+		boolean isAborted = false
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
+				if(shouldAbortUpload(sBulkUploadEntry)){
+					isAborted = true
+					log.debug "Aborting bulk upload"
+					break;
+				}
+				
 				def res = saveSpeciesElementsWrapper(speciesElements)
 				noOfInsertions += res.noOfInsertions;
-				converter.addToSummary(res.species.collect{it.sLog.toString()}.join("\n"))
 				converter.addToSummary(res.summary);
-				converter.addToLogs(res.log);
+				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
+				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				speciesElements.clear();
 				cleanUpGorm();
 			}
@@ -366,16 +377,17 @@ class SpeciesUploadService {
 		}
 		
 		//saving last batch
-		if(speciesElements.size() > 0) {
+		if(speciesElements.size() > 0 && !isAborted) {
 			def res = saveSpeciesElementsWrapper(speciesElements)
 			noOfInsertions += res.noOfInsertions;
-			converter.addToSummary(res.species.collect{it.sLog?.toString()}.join("\n"))
 			converter.addToSummary(res.summary);
-			converter.addToLogs(res.log);
+			converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 			speciesElements.clear();
 			cleanUpGorm();
 		}
-
+		
+		sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
+			
 		
 		log.info "================================ LOG ============================="
 		println  converter.getLogs()
@@ -386,6 +398,13 @@ class SpeciesUploadService {
 		return noOfInsertions;
 	}
 
+	
+	private boolean shouldAbortUpload(SpeciesBulkUpload sbu){
+		sbu.refresh()
+		log.debug "Current status " + sbu.status 
+		return (sbu.status == SpeciesBulkUpload.Status.ABORTED)
+	}
+	
 	private Map saveSpeciesElementsWrapper(List speciesElements) {
 		def res = saveSpeciesElements(speciesElements)
 		if(res.noOfInsertions == speciesElements.size()){
@@ -495,22 +514,23 @@ class SpeciesUploadService {
                 }
 
 				//externalLinksService.updateExternalLinks(taxonConcept);
+				
+				s.percentOfInfo = calculatePercentOfInfo(s);
+				if(!s.save()) {
+					s.errors.allErrors.each {
+						log.error it
+						s.appendLogSummary(it)
+					}
+				} else {
+					noOfInsertions++;
+					//addedSpecies.add(s);
+				}
+				
 			} catch(e) {
 				s.appendLogSummary(e)
 				e.printStackTrace()
 			}
-            s.percentOfInfo = calculatePercentOfInfo(s);
-
-			if(!s.save()) {
-				s.errors.allErrors.each { 
-					log.error it
-					s.appendLogSummary(it)
-				}
-			} else {
-				noOfInsertions++;
-				//addedSpecies.add(s);
-			}
-
+            
 		}
 
 		//log.debug "Saved species batch with insertions : "+noOfInsertions
@@ -696,27 +716,45 @@ class SpeciesUploadService {
     }
 	
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
-	def createRollBackEntry(Date startDate, Date endDate, String filePath, String notes = null){
-		SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, notes)
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes)
 		
+	}
+	
+	def String abortBulkUpload(params){
+		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
+		
+		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+			log.error "Authentication failed for user " + springSecurityService.currentUser
+			return "Authentication failed for user. Please login."
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+			log.debug "Aborting in progress..." + sbu
+			sbu.updateStatus(SpeciesBulkUpload.Status.ABORTED)
+			return "Sent request for abort."
+		}else{
+			log.error "Already uploaded or aborted or roll backed " + sbu
+			return "Nothing to abort."
+		}
 	}
 	
 	def String rollBackUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if(sbu.author != springSecurityService.currentUser ){
+		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
-			return "Authentication failed for user "
+			return "Authentication failed for user. Please login."
 		}
 		
 		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
 			log.error "Already roll backed " + sbu
-			return "Already roll backed " 
+			return "Already rolled back." 
 		}
 		
 		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
 			log.error "Roll back in progress..." + sbu
-			return "Roll back in progress..."
+			return "Rollback in progress..."
 		}
 		
 		sbu.updateStatus(SpeciesBulkUpload.Status.RUNNING)
@@ -738,7 +776,7 @@ class SpeciesUploadService {
 		if(!sFields){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
-			return "Nothing to rollback"
+			return "Nothing to rollback."
 		}
 		
 		Collection<Species> sList = getAffectedSpecies(sFields)
@@ -757,10 +795,10 @@ class SpeciesUploadService {
 		}
 		
 		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
-			return "Successfully Rollbacked"
+			return "Successfully Rolled back."
 		}else{
 			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
-			return "Roll back failed..."
+			return "Rollback failed..."
 		}
 	}
 	

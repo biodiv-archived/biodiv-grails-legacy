@@ -28,16 +28,22 @@ $(document).ready(function() {
 });
 </r:script>
 
-<div id="carousel_${id}" class="jcarousel-skin-ie7">
+<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;">
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
+    <g:if test="${controller.toLowerCase().equals('featured')}">
+        <h4>Featured Content</h4>
+    </g:if>
+    <g:else>
         <h4>Featured ${controller.toLowerCase().capitalize()}</h4>
+    </g:else>
     </g:if>
 	<ul style="list-style:none; width:100%; margin-left:0px;">
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
             <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
                 <li style="float: left; list-style: none;">
-                <g:render template="/${resultController?:controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:resultController?:'observation']"/>
+
+                <g:render template="/${relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller]"/>
                 </li>
             </g:each>
         </ul>
