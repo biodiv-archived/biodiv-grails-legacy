@@ -539,6 +539,12 @@ textarea#featureNotes {
         -moz-box-sizing: border-box;
         box-sizing: border-box;
 }
+
+#speciesImage-tabs>.active>a, #speciesImage-tabs>.active>a:hover, #speciesImage-tabs>.active>a:focus {
+   border:1px solid #6ac9a2;
+   border-bottom: 0px;
+}
+
 #action-tabs>.active>a, #action-tabs>.active>a:hover, #action-tabs>.active>a:focus {
    border:1px solid #6ac9a2;
    border-bottom: 0px;
@@ -2512,6 +2518,19 @@ small {
 .table-column .title {
     max-width:300px;
     word-wrap:break-word;
+}
+
+.speciesImage-wrapper .tab-pane {
+    border:1px solid #6ac9a2;
+    overflow:hidden;
+}
+
+.speciesImage-wrapper li {
+    margin-bottom:0px;
+}
+
+.speciesImage-wrapper li.active {
+    margin-bottom:-1px;
 }
 
 .groups-wrapper .tab-pane {

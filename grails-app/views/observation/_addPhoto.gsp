@@ -52,7 +52,7 @@
                 <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList().first()]"/>
                 </g:if>
                 <g:if test="${observationInstance instanceof Species}">
-                <div >
+                <div class="imageMetadataDiv" >
                 <i class="imageMetadataInfo icon-edit"></i>
                 <div class="imageMetadataForm" style="display:none;">
                     <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="Contributor">
