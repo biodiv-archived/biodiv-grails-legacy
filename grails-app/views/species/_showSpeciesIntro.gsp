@@ -56,17 +56,18 @@
                     <div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
                 </div>
 
+                <g:if test="${isSpeciesContributor}">
 
                 <div id="resourceTabs-2">
                     <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                         <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
-                        <g:render template="/observation/addPhoto" model="['observationInstance':speciesInstance]"/>
+                        < obv:addPhoto model="['resInstance':speciesInstance, 'resourceListType' : 'ofSpecies']"/>
                         <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
                             style="float: right; margin-right: 5px;"> Upload Images </a>
 
                     </form>
                 </div>
-                
+                </g:if> 
                 <%--
                 <div id="resourceTabs-4">
                     <form id="pullObvImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
