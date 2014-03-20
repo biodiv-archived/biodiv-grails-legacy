@@ -494,6 +494,7 @@ class SpeciesController extends AbstractObjectController {
                     }
                     result.content = html.join();
                 }
+                result['act'] = params.act;
                 break;
                 default :
                 result=['success':false, msg:'Incorrect datatype'];

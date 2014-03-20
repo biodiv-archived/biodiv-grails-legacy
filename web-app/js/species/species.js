@@ -875,7 +875,7 @@ var initEdit = function($ele) {
             $.each($form.find('.ck_desc'), function(index, textarea) {
                 CKEDITOR.instances[$(textarea).attr('id')].destroy();
             });
-            if(options.act == 'add' || options.act == 'delete') {
+            if(data.act == 'add' || data.act == 'delete') {
                 $newEle = $container.html(data.content).show();
             } else {
                 $newEle = $(data.content).replaceAll($container).show();
@@ -1026,7 +1026,6 @@ var initEdit = function($ele) {
             var $form = $(this);
 
             if(!options) options = {}
-            options['name'] = 'speciesField';
             $form.find('textarea[name="description"]').val(e.data.editor.getData());
             console.log(options);
             $form.ajaxSubmit({

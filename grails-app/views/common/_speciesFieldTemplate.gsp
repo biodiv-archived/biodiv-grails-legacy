@@ -3,7 +3,7 @@
 </s:isSpeciesFieldContributor>
 
 
-<div class="speciesField ${speciesFieldInstance.description?'':'dummy hide'}" data-act ="${speciesFieldInstance.description?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
+<div class="speciesField ${speciesFieldInstance.description?'':'dummy hide'}" data-name="speciesField" data-act ="${speciesFieldInstance.description?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
     <div class="contributor_entry">
         <!-- buttons -->
         <div class="pull-right">
