@@ -116,12 +116,12 @@
                 <span class="msg" style="float: right"></span>
                 <input id="videoUrl" type="hidden" name='videoUrl'value="" />
                 <input type="hidden" name='obvDir' value="${obvDir}" />
+                <input type="hidden" name='resType' value='${observationInstance.class.name}'>
             </form>
 
         </div>
     </div>
 
-<script type="text/javascript" src="http://api.filepicker.io/v1/filepicker.js"></script>
 <r:script>	
     var add_file_button = '<li id="add_file" class="addedResource" style="display:none;z-index:10;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
@@ -136,7 +136,6 @@ $(document).ready(function(){
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
     %>
-    filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
 });
 
 

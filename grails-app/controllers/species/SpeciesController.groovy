@@ -753,6 +753,14 @@ class SpeciesController extends AbstractObjectController {
         render "done"
     }
 
+    def uploadImage = {
+        println "====SPECIES IMAGE UPLOAD ============= " + params
+        //pass that same species
+        def species = Species.get(params.speciesId.toLong())
+        println "===UPLOADING FOR THIS SPECIES ============== " + species  
+        speciesService.updateSpecies(params, species)
+        println "============DONE DONE ==================="
+    }
    @Secured(['ROLE_USER'])
    def validate = {
        def result = [:];

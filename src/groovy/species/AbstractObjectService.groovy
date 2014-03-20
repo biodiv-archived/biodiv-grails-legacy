@@ -11,6 +11,9 @@ import species.Resource.ResourceType;
 import species.participation.Featured;
 import species.auth.SUser;
 import species.participation.Checklists;
+import species.sourcehandler.XMLConverter;
+import species.participation.Observation;
+import species.Species;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -196,5 +199,105 @@ class AbstractObjectService {
     }
 
 
+     /**
+     * 
+     */
+    private def createResourcesXML(params) {
+        NodeBuilder builder = NodeBuilder.newInstance();
+        XMLConverter converter = new XMLConverter();
+        def resources = builder.createNode("resources");
+        Node images = new Node(resources, "images");
+        Node videos = new Node(resources, "videos");
+        
+        String uploadDir = ""
+        if( params.speciesId == null ){
+            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
+            println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + uploadDir
+        }
+        else{
+            uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
+            println '============== 11111111111111111111111111' + uploadDir 
+        }
+        List files = [];
+        List titles = [];
+        List licenses = [];
+        List type = [];
+        List url = []
+        List source = [];
+        List ratings = [];
+        List contributor = [];
+        params.each { key, val ->
+            int index = -1;
+            if(key.startsWith('file_')) {
+                index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+
+            }
+            if(index != -1) {
+                files.add(val);
+                titles.add(params.get('title_'+index));
+                licenses.add(params.get('license_'+index));
+                type.add(params.get('type_'+index));
+                url.add(params.get('url_'+index));
+                source.add(params.get('source_'+index));
+                ratings.add(params.get('rating_'+index));
+                if( params.speciesId != null ){
+                    contributor.add(params.get('contributor_'+index));
+                }
+            }
+        }
+        files.eachWithIndex { file, key ->
+            Node image;
+            if(file) {
+                if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
+                    image = new Node(images, "image");
+                    File f = new File(uploadDir, file);
+                    new Node(image, "fileName", f.absolutePath);
+                } else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
+                    image = new Node(videos, "video");
+                    new Node(image, "fileName", file);
+                    new Node(image, "source", url.getAt(key));
+                }				
+                new Node(image, "caption", titles.getAt(key));
+                new Node(image, "license", licenses.getAt(key));
+                new Node(image, "rating", ratings.getAt(key));
+                new Node(image, "user", springSecurityService.currentUser?.id);
+
+                if( params.speciesId == null ){
+                    new Node(image, "contributor", params.author.username); 
+                }
+                else{
+                    new Node(image, "contributor", contributor.getAt(key));
+                    if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
+                        println "=====ITS A IMAGE ======= " + source.getAt(key)
+                        new Node(image, "source", source.getAt(key));
+                    }
+                }
+            } else {
+                log.warn("No reference key for image : "+key);
+            } 
+        }
+
+        return resources;
+    }
+
+    private List<Resource> saveResources(instance, resourcesXML) {
+        XMLConverter converter = new XMLConverter();
+        def rootDir
+        switch(instance.class.name) {
+            case Observation.class.name:
+            rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+            println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
+            break;
+
+            case Species.class.name:
+            rootDir = grailsApplication.config.speciesPortal.resources.rootDir
+            println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + rootDir
+            break;
+        }
+        converter.setResourcesRootDir(rootDir);
+        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
+        relImagesContext = new File(relImagesContext).getParent();
+        return converter.createMedia(resourcesXML, relImagesContext);
+    }
 
 }

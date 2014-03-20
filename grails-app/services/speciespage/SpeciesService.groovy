@@ -47,24 +47,22 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
 import species.groups.UserGroup;
+import species.AbstractObjectService;
 import species.TaxonomyRegistry;
 import org.hibernate.FetchMode;
 
-class SpeciesService {
+class SpeciesService extends AbstractObjectService  {
 
     private static log = LogFactory.getLog(this);
 
     static transactional = false
 
-    def grailsApplication;
     def groupHandlerService;
     def namesLoaderService;
-    def sessionFactory;
     def externalLinksService;
     def speciesSearchService;
     def namesIndexerService;
     def observationService;
-    def springSecurityService;
     def speciesPermissionService;
 
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
@@ -1404,5 +1402,24 @@ println speciesField.references.size();
 		}
 		return false;
 	}
+    
+    def updateSpecies(params, species){
+        def resourcesXML = createResourcesXML(params);
+        println "=====RES XML =========== " + resourcesXML
+        def resources = saveResources(species, resourcesXML);
+        println "=========RESOURCES ========== " + resources
+        species.resources?.clear();
+        resources.each { resource ->
+            println "======ADDING RESOURCE = ======= " + resource
+            species.addToResources(resource);
+        }
+        if(!species.save(flush:true)){
+            species.errors.allErrors.each { log.error it } 
+        }
+        species.resources.each{
+            println "==================== " + it
+        } 
+        
+    }
 
 }

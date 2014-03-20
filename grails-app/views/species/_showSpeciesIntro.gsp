@@ -28,7 +28,7 @@
                 <li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
             </ul>
             <div id="resourceTabs-1">
-                <a class="myeditable" href="#">Contribute Images</a>
+                <!--a class="myeditable" href="#">Contribute Images</a-->
                 <g:set var="images" value="${speciesInstance.getImages()}"/>
                 <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
                     <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE, images.size()]]]"/>
@@ -45,13 +45,11 @@
 
                     </div>
                 </div>
-
-
                 <div id="resourceTabs-3">						
                     <div id="gallery3"></div>
                     <div id="flickrBranding"></div><br/>
                     <div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
-                </div>
+                </div> 
             </div>
         </div>
 

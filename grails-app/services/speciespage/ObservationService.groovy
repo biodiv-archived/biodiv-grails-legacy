@@ -105,6 +105,8 @@ class ObservationService extends AbstractObjectService {
      */
     void updateObservation(params, observation){
         //log.debug "Updating obv with params ${params}"
+        
+        println "===========PARAMS FROM OBV SERV = ============ " + params
         if(params.author)  {
             observation.author = params.author;
         }
@@ -145,7 +147,7 @@ class ObservationService extends AbstractObjectService {
 
         def resourcesXML = createResourcesXML(params);
         def resources = saveResources(observation, resourcesXML);
-
+        
         observation.resource?.clear();
         resources.each { resource ->
             observation.addToResource(resource);
@@ -484,13 +486,7 @@ class ObservationService extends AbstractObjectService {
     /**
      * 
      */
-    private List<Resource> saveResources(Observation observation, resourcesXML) {
-        XMLConverter converter = new XMLConverter();
-        converter.setResourcesRootDir(grailsApplication.config.speciesPortal.observations.rootDir);
-        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(grailsApplication.config.speciesPortal.observations.rootDir.toString(), "")?:""
-        relImagesContext = new File(relImagesContext).getParent();
-        return converter.createMedia(resourcesXML, relImagesContext);
-    }
+    
 
     /**
      * 
@@ -521,61 +517,7 @@ class ObservationService extends AbstractObjectService {
         return null;
     }
 
-    /**
-     * 
-     */
-    private def createResourcesXML(params) {
-        NodeBuilder builder = NodeBuilder.newInstance();
-        XMLConverter converter = new XMLConverter();
-        def resources = builder.createNode("resources");
-        Node images = new Node(resources, "images");
-        Node videos = new Node(resources, "videos");
-        String uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
-        List files = [];
-        List titles = [];
-        List licenses = [];
-        List type = [];
-        List url = []
-        List ratings = [];
-        params.each { key, val ->
-            int index = -1;
-            if(key.startsWith('file_')) {
-                index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
-
-            }
-            if(index != -1) {
-                files.add(val);
-                titles.add(params.get('title_'+index));
-                licenses.add(params.get('license_'+index));
-                type.add(params.get('type_'+index));
-                url.add(params.get('url_'+index));
-                ratings.add(params.get('rating_'+index));
-            }
-        }
-        files.eachWithIndex { file, key ->
-            Node image;
-            if(file) {
-                if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
-                    image = new Node(images, "image");
-                    File f = new File(uploadDir, file);
-                    new Node(image, "fileName", f.absolutePath);
-                } else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
-                    image = new Node(videos, "video");
-                    new Node(image, "fileName", file);
-                    new Node(image, "source", url.getAt(key));
-                }				
-                new Node(image, "caption", titles.getAt(key));
-                new Node(image, "contributor", params.author.username);
-                new Node(image, "license", licenses.getAt(key));
-                new Node(image, "rating", ratings.getAt(key));
-                new Node(image, "user", springSecurityService.currentUser?.id);
-            } else {
-                log.warn("No reference key for image : "+key);
-            } 
-        }
-
-        return resources;
-    }
+   
 
     Map findAllTagsSortedByObservationCount(int max){
         def sql =  Sql.newInstance(dataSource);
