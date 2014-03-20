@@ -60,6 +60,13 @@ $("#inviteCuratorButton").click(function(){
     });	
 });
 
+$("#addSpeciesImagesBtn").click(function(){
+    $(".speciesImage-wrapper").toggle();
+    $('html, body').animate({
+        scrollTop: $(".speciesImage-wrapper").offset().top
+    }, 1000);
+});
+
 var uploadSpeciesImageOptions = { 
     success: onSpeciesImageUploadSuccess  // post-submit callback 
 };

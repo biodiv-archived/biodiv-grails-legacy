@@ -78,7 +78,11 @@
             padding:16px 0px;
             background-color : #fff;
             }
-
+            .resources .addedResource {
+            height: 315px;
+            max-height:315px;
+            }
+            
         </style>
 
         <!--[if lt IE 8]><style>
@@ -156,7 +160,7 @@
 
         </r:script>
 
-        <%String space = speciesInstance.taxonConcept.canonicalForm%>
+        <%String space = speciesInstance.taxonConcept.canonicalForm%>319px
             <r:script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
                 CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );               
@@ -178,7 +182,7 @@
                         height: '400px'
                 };
 
-            </r:script>
+            </r:script>319px
 
 
 

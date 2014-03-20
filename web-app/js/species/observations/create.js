@@ -709,7 +709,7 @@ $(document).ready(function(){
             rate($ratingContainer)
         })
 
-        $("#imagesList li:last" ).before (metadataEle);
+        $("#imagesList li:first" ).after (metadataEle);
         $("#add_file" ).fadeIn(3000);
         $("#image-resources-msg").parent(".resources").removeClass("error");
         $("#image-resources-msg").html("");

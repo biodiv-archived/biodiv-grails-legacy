@@ -20,6 +20,21 @@
             <g:else>
             <g:set var= "res" value="${observationInstance?.resources}" />
             </g:else>
+            <li id="add_file" class="addedResource" style="z-index:40">
+            <div id="add_file_container">
+                <div id="add_image"></div> 
+                <div style="text-align:center;">
+                    or
+                </div> 
+                <div id="add_video" class="editable"></div>
+            </div>
+            <div class="progress">
+                <div id="translucent_box"></div>
+                <div id="progress_bar"></div>
+                <div id="progress_msg"></div>
+            </div>
+
+            </li>
             <g:each in="${res}" var="r">
             <li class="addedResource thumbnail">
             <%
@@ -53,8 +68,8 @@
                 </g:if>
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
-                <i class="imageMetadataInfo icon-edit"></i>
-                <div class="imageMetadataForm" style="display:none;">
+                    <%--<i class="imageMetadataInfo icon-edit"></i>--%>
+                <div class="imageMetadataForm" >
                     <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="Contributor">
                     <input name="source_${i}" type="text" value="${r.url}" placeholder="Source">
                     <input name="title_${i}" type="text" value="${r.description}" placeholder="Caption">
@@ -68,22 +83,7 @@
             </li>
             <g:set var="i" value="${i+1}" />
             </g:each>
-            <li id="add_file" class="addedResource" style="z-index:40">
-            <div id="add_file_container">
-                <div id="add_image"></div> 
-                <div style="text-align:center;">
-                    or
-                </div> 
-                <div id="add_video" class="editable"></div>
-            </div>
-            <div class="progress">
-                <div id="translucent_box"></div>
-                <div id="progress_bar"></div>
-                <div id="progress_msg"></div>
-            </div>
-
-            </li>
-        </ul>
+                    </ul>
         <div id="image-resources-msg" class="help-inline">
             <g:renderErrors bean="${observationInstance}" as="list"
             field="resource" />
@@ -115,8 +115,7 @@
             </a>
             <g:if test="${observationInstance instanceof Species}">
             <div >
-            <i class="imageMetadataInfo icon-edit"></i>
-                <div class="imageMetadataForm" style="display:none;">
+                <div class="imageMetadataForm" >
                     <input name="contributor_${i}" type="text" value="" placeholder="Contributor">
                     <input name="source_${i}" type="text" value="" placeholder="Source">
                     <input name="title_${i}" type="text" value="" placeholder="Caption">
