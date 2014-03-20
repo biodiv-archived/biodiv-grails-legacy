@@ -329,7 +329,6 @@ h6 {
 
 div.errors {
 	border: 1px solid red;
-	color: #cc0000;
 	word-wrap: break-word;
 }
 
@@ -1994,7 +1993,7 @@ line-height: 11px;
         }
     }
 
-.contributor_entry {
+.contributor_entry, .speciesField .editableform {
         border: 1px solid #D3D3D3;
 	border-color: #CECECE;
 	border-radius: 5px;

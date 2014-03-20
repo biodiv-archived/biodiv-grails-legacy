@@ -361,7 +361,7 @@ function initGalleryTabs() {
 
     $.fn.editable.defaults.mode = 'inline';
     $.fn.editableform.template = '\
-        <form class="form-horizontal editableform contributor_entry">\
+        <form class="form-horizontal editableform">\
         <div class="control-group">\
         <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right"><button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button></div></div>\
         <div class="editable-error-block"></div>\
@@ -777,9 +777,7 @@ function initGalleryTabs() {
 
 function initEditableFields(e) {
     if($(document).find('.editFieldButton').length == 0) {
-        //refreshEditables();
-        initEdit();
-        $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+        refreshEditables($('body'));
     } else {
     /*    $('.editable').editable('disable');
         $('.addField').hide();
@@ -791,8 +789,6 @@ function initEditableFields(e) {
 }
 
 function refreshEditables($e) {
-    console.log('refreshing');
-    console.log($e);
     initEdit($e);
     /*initEditables($e);
     initAddables($e);
@@ -804,7 +800,7 @@ function refreshEditables($e) {
     initLangSelector($e, langSelectorOptions, "English");
     */
     $('.emptyField').show();
-    $('.hidePoint').show();
+    //$('.hidePoint').show();
     $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
     if($e) rate($e.find('.star_rating'));
 }
@@ -814,7 +810,6 @@ var initEdit = function($ele) {
     if(!$ele) $ele = $('body');
 
     var init = function($sf) {
-        console.log('inoit edit');
         $sf.find(".dummy.speciesField").before("<a class='addFieldButton btn btn-success' title='Add'><i class='icon-plus'></i>Add</a>");
         $sf.find(".ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
 
@@ -834,9 +829,8 @@ var initEdit = function($ele) {
         e.stopPropagation();
         $(this).hide();
         //TODO:little messy structure
-        var $container = $(this).next('.dummy.speciesField');
-        $container.show();
-        var $conEntry = $container.find('.contributor_entry');
+        var $container = $(this).next('.dummy.speciesField').show();
+        var $conEntry = $container.children('.contributor_entry');
         initEditableForm($container, $conEntry, $container.data());
     };
 
@@ -859,8 +853,11 @@ var initEdit = function($ele) {
 
 
     var onUpdateSuccess = function(data) {
+        //$container is always the speciesField element
         var $container = $(this);
-        var $form = $(this).find('form.editable-input');
+        var $form = $container.children('form.editableform');
+        
+        var $errorBlock = $form? $form.find('.editable-error-block') : $container.append('<div></div>');
 
         if(data.errors && data.errors.length > 0) {
             data.msg += "<div class='alert-error'>Please fix following errors</div><ul class='alert-error'>";
@@ -869,23 +866,40 @@ var initEdit = function($ele) {
             });
             data.msg += "</ul>"
         }
+
         if(data.success == true) {
             var $newEle;
+
             //destroying all ckeditor instances
             $.each($form.find('.ck_desc'), function(index, textarea) {
+                console.log('destroying ckeditor instance');
+                console.log($(textarea));
                 CKEDITOR.instances[$(textarea).attr('id')].destroy();
             });
-            if(data.act == 'add' || data.act == 'delete') {
-                $newEle = $container.html(data.content).show();
+
+            if(data.act == 'add') {
+                //replaces dummy field
+                $newEle = $(data.content).replaceAll($container).show();
+                //$newEle = $container.html(data.content).show();
+            } else if(data.act == 'delete') {
+                if($container.nextAll('speciesField.contributor_entry').length == 0) {
+                    //put add button on empty container when user deletes a last item
+                    $newEle = $container.html(data.content).show();
+                } else {
+                    $container.remove();
+                }
             } else {
                 $newEle = $(data.content).replaceAll($container).show();
             }
-            $form.hide().find('.editable-error-block').removeClass('alert-error').addClass('alert-info').html(data.msg);
+
+            $form.hide();
+            $errorBlock.removeClass('alert-error').addClass('alert-info').html(data.msg);
+            $container.removeClass('errors');
             refreshEditables($newEle);
-            //$newEle.effect("highlight", {color: '#4BADF5'}, 2000);
+            $newEle.effect("highlight", {color: '#4BADF5'}, 5000);
         } else {
-            $form.find('.editable-error-block').removeClass('alert-info').addClass('alert-error').html(data.msg);
-            $container.addClass('error');
+            $errorBlock.removeClass('alert-info').addClass('alert-error').html(data.msg);
+            $container.addClass('errors');
         }
     }
 
@@ -936,22 +950,22 @@ var initEdit = function($ele) {
                 });
 
                 $container.append($form);
-
-                var editor = renderCKEditor($conEntry.find('.ck_desc'), $editableInput);
-
-                //Submit
-                $form.on('submit', {'editor':editor}, onFormSubmit);
-
-                //Cancel
-                $form.find('.editable-cancel').click(function(){
-                    //can even remove form
-                    $form.hide();
-                    $conEntry.show();
-                });
-
             }
             $conEntry.hide();
             $form.show();
+
+            var editor = renderCKEditor($conEntry.find('.ck_desc'), $editableInput);
+
+            //Submit
+            $form.on('submit', {'editor':editor}, onFormSubmit);
+
+            //Cancel
+            $form.find('.editable-cancel').click(function(){
+                //can even remove form
+                $form.hide();
+                $conEntry.show();
+            });
+
         }
 
         var renderEditField = function($editField) {
@@ -1005,7 +1019,6 @@ var initEdit = function($ele) {
             $textarea.attr('id', id);
 
             $textarea = $textarea.prependTo($editableInput);
-            console.log($textarea);
             var editor = CKEDITOR.instances[id];
             if(editor) {
                 //TODO: instead of destroying look for ways of using the same form and editor
@@ -1013,7 +1026,6 @@ var initEdit = function($ele) {
                 //if(editor.container.isVisible()) {
                 //    editor.container.hide();
                 //} else {
-                //editor = CKEDITOR.replace(id, config);
                     editor.container.show();
                // }
             } else {
@@ -1027,7 +1039,6 @@ var initEdit = function($ele) {
 
             if(!options) options = {}
             $form.find('textarea[name="description"]').val(e.data.editor.getData());
-            console.log(options);
             $form.ajaxSubmit({
                 url:window.params.species.updateUrl,
                 type:'POST',

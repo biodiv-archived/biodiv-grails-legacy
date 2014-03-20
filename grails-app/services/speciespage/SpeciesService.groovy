@@ -307,7 +307,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully added species field", id:field.id, type:'add', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id, errors:errors]
+                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -317,7 +317,10 @@ class SpeciesService extends AbstractObjectService  {
     }       
 
     SpeciesField createNewSpeciesField(Species speciesInstance, Field fieldInstance, String value) {
-            return (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
+            def newSpeciesFieldInstance = (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
+            newSpeciesFieldInstance.species = speciesInstance;
+            newSpeciesFieldInstance.field = fieldInstance;
+            return newSpeciesFieldInstance;
     }
 
     /**
@@ -443,9 +446,11 @@ println speciesField.references.size();
                 try {
                     speciesInstance.removeFromFields(speciesField);
                     speciesField.delete(failOnError:true);
-                    List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
-                    sortAsPerRating(sameFieldSpeciesFieldInstances);
-                    return [success:true, msg:"Successfully updated speciesField", id:field.id, content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+                    //List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                    //sortAsPerRating(sameFieldSpeciesFieldInstances);
+                    //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
+                    def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
+                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance]
                 } catch(e) {
                     e.printStackTrace();
                     log.error e.getMessage();

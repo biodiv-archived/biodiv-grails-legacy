@@ -64,7 +64,6 @@ class SpeciesController extends AbstractObjectController {
 			render(template:"/species/showSpeciesListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
-            println model
 			render (view:"list", model:model)
 			return;
 		} else{
@@ -230,17 +229,19 @@ class SpeciesController extends AbstractObjectController {
                 if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                     finalLoc.put('hasContent', true);
                 }
+                if(finalLoc.get('isContributor') && isContentContributor(sField) && !sField.field.category) {
+                        finalLoc.put('isContributor', 2)
+                }
                 //category
+                
                 if(finalLoc.containsKey(sField.field.category)) {
                     finalLoc = finalLoc.get(sField.field.category);
                     if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                             map.get(sField.field.concept).put('hasContent', true);
                             finalLoc.put('hasContent', true);
                     }
-                    if( finalLoc.get('isContributor') && isContentContributor(sField)) {
-                            finalLoc.put('isContributor', 2)
-                            //if(!map.get(sField.field.concept).containsKey('isContributor'))
-                            //    map.get(sField.field.concept).put('isContributor', 1);
+                    if(finalLoc.get('isContributor') && isContentContributor(sField) && !sField.field.subCategory) {
+                        finalLoc.put('isContributor', 2)
                     }
 
                     //subcategory
@@ -260,8 +261,8 @@ class SpeciesController extends AbstractObjectController {
                                 map.get(sField.field.concept).get(sField.field.category).put('isContributor', 1);
                             */
                         }
-
 					}
+
 				}
 			}
 			if(finalLoc.containsKey('field')) { 
@@ -275,7 +276,6 @@ class SpeciesController extends AbstractObjectController {
             //    speciesService.sortAsPerRating(t);
 			}
 		}
-       
         //remove empty information hierarchy
 		for(concept in map.clone()) {
             if(concept.value.get('speciesFieldInstance')) {
@@ -311,7 +311,7 @@ class SpeciesController extends AbstractObjectController {
                 if(category.value.get('isContributor')) {
                     int val = category.value.get('isContributor')
                     if(!map.get(concept.key).containsKey('isContributor'))
-                        map.get(concept.key).put('isContributor', val);
+                        map.get(concept.key).put('isContributor', 1);
                 }
 
 
@@ -335,14 +335,16 @@ class SpeciesController extends AbstractObjectController {
 
                     if(subCategory.value.get('isContributor')) { 
                         int val = subCategory.value.get('isContributor')
+
                         if(!map.get(concept.key).get(category.key).containsKey('isContributor'))
-                            map.get(concept.key).get(category.key).put('isContributor', val);
+                            map.get(concept.key).get(category.key).put('isContributor', 1);
                         if(!map.get(concept.key).containsKey('isContributor'))
-                            map.get(concept.key).put('isContributor', val);
+                            map.get(concept.key).put('isContributor', 1);
                     }
 				}
 			}
 		}
+
 		return map;
 	}
 
@@ -467,16 +469,6 @@ class SpeciesController extends AbstractObjectController {
                     long speciesId = params.speciesid? params.long('speciesid') : null;
                     long fieldId = speciesFieldId;
                     result = speciesService.addSpeciesField(speciesId, fieldId, params);
-                    List html = [];
-                    if(result.speciesInstance) {
-                        //boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.speciesInstance, springSecurityService.currentUser);
-
-                        result.content.each {sf ->
-                            boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
-                            html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
-                        }
-                        result.content = html.join();
-                    }
                 } else {
                     SpeciesField speciesField = SpeciesField.get(speciesFieldId);
                     /*createCriteria().get{
@@ -487,14 +479,15 @@ class SpeciesController extends AbstractObjectController {
                         return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
                     }
                     result = speciesService.updateSpeciesField(speciesField, params);
-                    List html = [];
-                    result.content.each {sf ->
-                        boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
-                        html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
-                    }
-                    result.content = html.join();
                 }
                 result['act'] = params.act;
+                List html = [];
+                result.content.each {sf ->
+                    boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
+                    html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
+                }
+                result.content = html.join();
+
                 break;
                 default :
                 result=['success':false, msg:'Incorrect datatype'];
@@ -772,7 +765,6 @@ class SpeciesController extends AbstractObjectController {
                try {
                    NamesParser namesParser = new NamesParser();
                    List<TaxonomyDefinition> name = namesParser.parse([cleanSciName])
-                   println name[0];
                    if(name[0].binomialForm) { //TODO:check its not uninomial
                        def taxonCriteria = TaxonomyDefinition.createCriteria();
                        TaxonomyDefinition taxon = taxonCriteria.get {
