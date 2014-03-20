@@ -363,9 +363,9 @@ function initGalleryTabs() {
 
     $.fn.editable.defaults.mode = 'inline';
     $.fn.editableform.template = '\
-        <form class="form-inline editableform">\
+        <form class="form-horizontal editableform contributor_entry">\
         <div class="control-group">\
-        <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom"></div></div>\
+        <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right"><button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button></div></div>\
         <div class="editable-error-block"></div>\
         </div> \
         </form>';
@@ -779,7 +779,9 @@ function initGalleryTabs() {
 
 function initEditableFields(e) {
     if($(document).find('.editFieldButton').length == 0) {
-        refreshEditables();
+        //refreshEditables();
+        initEdit();
+        $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
     } else {
     /*    $('.editable').editable('disable');
         $('.addField').hide();
@@ -787,25 +789,276 @@ function initEditableFields(e) {
     */  
         window.location.reload(true);
     }
-    e.stopPropagation();
+    if(e) e.stopPropagation();
 }
 
 function refreshEditables($e) {
-    initEditables($e);
+    console.log('refreshing');
+    console.log($e);
+    initEdit($e);
+    /*initEditables($e);
     initAddables($e);
     initLicenseSelector($e, licenseSelectorOptions, "CC BY");
     initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
     //initStatusSelector($e, statusSelectorOptions, "Under Validation");
+    
     initSynRelSelector($e, synRelSelectorOptions, "Synonym");
     initLangSelector($e, langSelectorOptions, "English");
+    */
     $('.emptyField').show();
     $('.hidePoint').show();
-    $('#editSpecies').html('<i class="icon-edit"></i>Exit Edit Mode');
-    if($e)
-        rate($e.find('.star_rating'));
+    $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+    if($e) rate($e.find('.star_rating'));
 }
 
-//initEditableFields();
+var initEdit = function($ele) {
+
+    if(!$ele) $ele = $('body');
+
+    var init = function($sf) {
+        console.log('inoit edit');
+        $sf.find(".dummy.speciesField").before("<a class='addFieldButton btn btn-success' title='Add'><i class='icon-plus'></i>Add</a>");
+        $sf.find(".ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+
+        $sf.find('.addFieldButton').click(onAdd);
+        $sf.find('.editFieldButton').click(onEdit);
+        $sf.find('.deleteFieldButton').click(onDelete);
+    }
+
+    var onEdit = function(e){    
+        e.stopPropagation();
+        var $conEntry = $(this).parent();
+        var $container = $conEntry.parent();
+        initEditableForm($container, $conEntry, $container.data());
+    };
+
+    var onAdd = function(e){    
+        e.stopPropagation();
+        $(this).hide();
+        //TODO:little messy structure
+        var $container = $(this).next('.dummy.speciesField');
+        $container.show();
+        var $conEntry = $container.find('.contributor_entry');
+        initEditableForm($container, $conEntry, $container.data());
+    };
+
+    var initEditableForm = function($container, $conEntry, options) {
+        var initForm = function() {
+            console.log(options);
+            $conEntry.find('.attributionContent').show();
+
+            $('.editableform').hide();
+
+            var $form = $container.find('.editableform');
+
+            if($form.length == 0) {
+                var $form = $($.fn.editableform.template);
+                var $editableInput = $form.find('.editable-input').css({'display':'block'});
+
+                var $editable = $conEntry.find('.editField, .selector, .addField');
+                $.each($editable, function (index, value) {
+                    var $editField = $(value);
+
+                    var data = $editField.data();
+                    var v = data.value?data.value:$editField.text().trim();
+
+                    var $html = renderEditField($editField);
+                    var $existingEle = $editableInput.find(data.type+'[name='+data.name+']');
+                    if($existingEle.length == 0) {
+                        $editableInput.append($html);
+                    } else {
+                        v = $existingEle.val() + '\n' + v;
+                        $existingEle.val(v);
+                    }
+                });
+
+                $container.append($form);
+
+                var editor = renderCKEditor($conEntry.find('.ck_desc'), $editableInput);
+
+                //Submit
+                $form.on('submit', {'editor':editor}, onFormSubmit);
+
+                //Cancel
+                $form.find('.editable-cancel').click(function(){
+                    //can even remove form
+                    $form.hide();
+                    $conEntry.show();
+                });
+
+            }
+            $conEntry.hide();
+            $form.show();
+        }
+
+        var renderEditField = function($editField) {
+            var data = $editField.data();
+            var value = data.value?data.value:$editField.text().trim();
+            var $html = new Array();
+            $html.push('<div class="control-group">');
+            var name = data.name.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+                return letter.toUpperCase();
+            });
+            $html.push('<label class="control-label '+data.name+'">'+name+'</label><div class="controls">');
+            switch(data.type) {
+                case 'text' : 
+                    $html.push('<input class="input-block-level" type="'+data.type+'" name="'+data.name+'" value="'+value+'" placeholder="'+(data.placeholder?data.placeholder:data.originalTitle)+'" title="'+data.originalTitle+'"/>');
+                    break;
+                case 'textarea' :
+                    $html.push('<textarea class="input-block-level" rows="'+data.rows+'" name="'+data.name+'" placeholder="'+(data.placeholder?data.placeholder:data.originalTitle)+'" title="'+data.originalTitle+'">'+value+'</textarea>');
+                    break;
+                case 'select' :
+                    $html.push('<select name="'+data.name+'">');
+                    var $selectorOptions;
+                    if(data.name === 'license') {
+                        $selectorOptions = licenseSelectorOptions
+                    } else if (data.name === 'audienceType') {
+                        $selectorOptions = audienceTypeSelectorOptions
+                    } else if (data.name === 'status') {
+                        $selectorOptions = statusSelectorOptions
+                    }
+                    $.each($selectorOptions, function(index, v) {
+                        var selected = (value == v.text)
+                        if(selected)
+                        $html.push('<option value="'+v.value+'" selected>'+v.text+'</option>');
+                        else 
+                        $html.push('<option value="'+v.value+'" >'+v.text+'</option>');
+                    });
+                    $html.push('</select>');
+                    break;
+                case 'ckeditor' :
+                    break;
+            }
+            $html.push('</div></div>');
+
+            return $html.join(' ');
+        }
+
+        var renderCKEditor = function($textarea, $editableInput) {
+            $textarea = $textarea.clone();
+            //changing id while adding it to the form
+            var id = $textarea.attr('id');
+            id = id+"_e"
+            $textarea.attr('id', id);
+
+            $textarea = $textarea.prependTo($editableInput);
+            console.log($textarea);
+            var editor = CKEDITOR.instances[id];
+            if(editor) {
+                //TODO: instead of destroying look for ways of using the same form and editor
+                //editor.destroy()
+                //if(editor.container.isVisible()) {
+                //    editor.container.hide();
+                //} else {
+                //editor = CKEDITOR.replace(id, config);
+                    editor.container.show();
+               // }
+            } else {
+                editor = CKEDITOR.replace(id, config);
+            }
+            return editor
+        }
+
+        var onFormSubmit =  function(e) {
+            var $form = $(this);
+
+            if(!options) options = {}
+            options['name'] = 'speciesField';
+            $form.find('textarea[name="description"]').val(e.data.editor.getData());
+            console.log(options);
+            $form.ajaxSubmit({
+                url:window.params.species.updateUrl,
+                type:'POST',
+                data:options,
+                success:function(data) {
+                if(data.errors && data.errors.length > 0) {
+                    data.msg += "<div class='alert-error'>Please fix following errors</div><ul class='alert-error'>";
+                    $.each(data.errors, function(i, v) {
+                        data.msg += "<li>"+v+"</li>"
+                    });
+                    data.msg += "</ul>"
+                }
+                if(data.success == true) {
+                    var $newEle;
+                    //destroying all ckeditor instances
+                    $.each($form.find('.ck_desc'), function(index, textarea) {
+                        CKEDITOR.instances[$(textarea).attr('id')].destroy();
+                    });
+                    if(options.act == 'add') {
+                        $newEle = $container.html(data.content).show();
+                    } else {
+                        $newEle = $(data.content).replaceAll($container).show();
+                    }
+                    $form.hide().find('.editable-error-block').removeClass('alert-error').addClass('alert-info').html(data.msg);
+console.log($newEle);
+                    refreshEditables($newEle);
+                    //$newEle.effect("highlight", {color: '#4BADF5'}, 2000);
+                } else {
+                    $form.find('.editable-error-block').removeClass('alert-info').addClass('alert-error').html(data.msg);
+                    $conEntry.addClass('error');
+                }
+            }, error:function(response, status, error) {
+                var successHandler = this.success, errorHandler;
+                handleError(response, undefined, undefined, function(data){
+                    $form.submit();
+                    return "Please resubmit the form again";
+                }, function(data) {
+                    if(data && data.status == 401) {
+                        return "Please login and resubmit the changes"; 
+                    } else if(response.status === 500) {
+                        return 'Service unavailable. Please try later.';
+                    } else {
+                        return response.responseText;
+                    }
+                });
+            }
+            });
+            return false;
+        }
+        initForm();
+    }
+    var onDelete = function($ele) {
+        $ele.find('.deleteFieldButton').click(function(e) {
+            var $f =  $(this).nextAll('.editField.editable');
+            var $textarea = $(this).nextAll('textarea');
+
+            if($textarea.length != 0)
+            $f = $textarea
+
+            var d = $f.data();
+            var params = {};
+            if(d.params) $.extend(params, $.fn.editableutils.tryParseJson(d.params, true));
+            $.extend(params, {'name':d.name, 'pk':d.pk, 'act':'delete'});
+
+            $.ajax({
+                url:d.url?d.url:window.params.species.updateUrl,
+                type:'POST',
+                data:params,
+                context:$f,
+                success : onDeleteSuccess 
+            });
+        });
+    }
+    var onDeleteSuccess = function( data, textStatus, jqXHR) {
+        onEditableSuccess.call($f, data, jqXHR);
+        if(data.success == true) {
+            if(data.type == 'description' || data.type == 'newdescription') {
+                var textareaId = $f.attr('id');
+                var editor = CKEDITOR.instances[textareaId];
+                if(editor) {
+                    console.log('destroying ckeditor');
+                    editor.destroy(false);
+                }
+
+                onAddableDisplay(undefined, data, jqXHR, $f.parent());
+            } else
+                onAddableDisplay(undefined, data, jqXHR, $f);
+        }
+    }
+    init($ele);
+}
+
+initEditableFields();
 
 function selectLicense($this, i) {
     $('#license_'+i).val($.trim($this.text()));

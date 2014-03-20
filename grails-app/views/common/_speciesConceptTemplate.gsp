@@ -19,19 +19,7 @@
             <g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 
             <g:if test="${isSpeciesContributor && concept.value.isContributor!=2}">
-            <div>
-               <textarea id="description_${concept.value.get('field').id}" 
-                    name="description_${concept.value.get('field').id}"
-                    class="ck_desc_add"  
-                    data-pk="${concept.value.get('field').id}" 
-                    data-type="ckeditor" 
-                    data-url="${uGroup.createLink(controller:'species', action:'update') }" 
-                    data-name="newdescription" 
-                    data-speciesId = "${speciesInstance.id}" 
-                    data-original-title="Add new description" 
-                    data-placeholder="Add new description" style="display:none;">
-                </textarea>
-            </div>
+            <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:concept.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance, isSpeciesContributor:isSpeciesContributor]"/>
             </g:if>
             <g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
             <g:showSpeciesField
@@ -50,20 +38,7 @@
                 <div>
                 <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor && category.value.isContributor!=2}">
                         
-                <div class="speciesField">
-                    <textarea id="description_${category.value.get('field').id}" 
-                        name="description_${category.value.get('field').id}"
-                        class="ck_desc_add"  
-                        data-pk="${category.value.get('field').id}" 
-                        data-type="ckeditor" 
-                        data-url="${uGroup.createLink(controller:'species', action:'update') }" 
-                        data-name="newdescription" 
-                        data-speciesId = "${speciesInstance.id}" 
-                        data-original-title="Add new description" 
-                        data-placeholder="Add new description" style="display:none;">
-                    </textarea>
-                </div>
-
+                <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:category.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
                 </g:if>
 
 
@@ -108,20 +83,9 @@
                         </h6>
                         <div>
                             <g:if test="${isSpeciesContributor && it.value.isContributor != 2}">
-                            <div>
-                                <textarea id="description_${it.value.field.id}" 
-                                    name="description_${it.value.field.id}" 
-                                    class="ck_desc_add"  
-                                    data-pk="${it.value.field.id}" 
-                                    data-type="ckeditor" 
-                                    data-url="${uGroup.createLink(controller:'species', action:'update') }" 
-                                    data-name="newdescription" 
-                                    data-speciesId = "${speciesInstance.id}" 
-                                    data-original-title="Add new description" 
-                                    data-placeholder="Add new description" style="display:none;">
-                                </textarea>
-                            </div>
-                            </g:if>
+
+                                <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:it.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
+                           </g:if>
                         </div>
                         </g:if>
                         <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">

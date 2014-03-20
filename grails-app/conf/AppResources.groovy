@@ -72,7 +72,7 @@ modules = {
 		resource url:'/js/daterangepicker.js'
 		resource url:'/js/stats.js'
 		resource url:'/js/jquery.tablesorter.js'
-		resource url:'/js/bootstrap-editable.min.js'
+		resource url:'/js/bootstrap-editable.js'
 		resource url:'/js/species/posting.js'
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'

@@ -48,6 +48,7 @@ import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
 import species.groups.UserGroup;
 import species.TaxonomyRegistry;
+import org.hibernate.FetchMode;
 
 class SpeciesService {
 
@@ -271,6 +272,196 @@ class SpeciesService {
         return false;
     }
 
+    /**
+    * Add Species Field
+    */
+    def addSpeciesField(long speciesId, long fieldId, params) {
+        if(!fieldId || !speciesId) {
+            return [success:false, msg:"Id or value cannot be empty"]
+        }
+        XMLConverter converter = new XMLConverter();
+
+        Species speciesInstance = Species.get(speciesId);
+        Field field = Field.read(fieldId);
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to add"]
+        }
+
+        if(!field) {
+            return [success:false, msg:"Invalid field"]
+        }
+        try {
+            SpeciesField speciesFieldInstance = createNewSpeciesField(speciesInstance, field, null);
+            if(speciesFieldInstance) {
+                //updating metadata for the species field
+                def result = updateSpeciesFieldInstance(speciesFieldInstance, params);
+                def errors = result.errors;
+                speciesInstance.addToFields(speciesFieldInstance);
+
+                //TODO:make sure this is run in only one user updates this species at a time
+                Species.withTransaction {
+                    if(!speciesInstance.save()) {
+                        speciesInstance.errors.each { errors << it; log.error it }
+                        return [success:false, msg:"Error while adding species field", errors:errors]
+                    }
+                }
+
+                List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                sortAsPerRating(sameFieldSpeciesFieldInstances);
+                return [success:true, msg:"Successfully added species field", id:field.id, type:'add', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id, errors:errors]
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            return [success:false, msg:"Error while adding species field"]
+        }
+        return [success:false, msg:"Error while adding species field"]
+    }       
+
+    SpeciesField createNewSpeciesField(Species speciesInstance, Field fieldInstance, String value) {
+            return (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
+    }
+
+    /**
+    * Update Species Field
+    */
+    def updateSpeciesField(SpeciesField speciesField, params) {
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        try {
+            def result;
+            SpeciesField.withTransaction { status ->
+                result = updateSpeciesFieldInstance(speciesField, params); 
+                if(!speciesField.save()) {
+                    speciesField.errors.each { result.errors << it }
+                    return [success:false, msg:"Error while updating species field", errors:result.errors]
+                } 
+            }
+            log.debug "Successfully updated species field";
+            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField]
+        } catch(Exception e) {
+            e.printStackTrace();
+            return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
+        }
+    }
+
+    private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
+        if(!params.description) {
+            return [success:false, msg:"Description cant be empty. Please delete the field if you dont want to have any description"]
+        }
+
+        List errors = [];
+        String msg;
+        if(!params.contributor) {
+            params.contributor = springSecurityService.currentUser.email;
+        }
+
+        //contributors
+        speciesField.contributors.clear();
+        params.contributor.split("\\r?\\n|,").each { l ->
+            SUser c = SUser.findByEmail(l);
+            if(!c) {
+                errors <<  "No registered user with email ${l} found"
+            } else {
+                speciesField.addToContributors(c);
+            }
+        } 
+
+        //attributions
+        speciesField.attributors?.clear();
+        params.attribution?.split("\\r?\\n").each { l ->
+            Contributor c = (new XMLConverter()).getContributorByName(l, true);
+            if(!c) {
+                errors <<  "Error while adding attribution ${l}"
+            } else {
+                speciesField.addToAttributors(c);
+            }
+        }   
+
+        //reference
+        if(speciesField.references?.size() > 0) {
+            /* HACK:As reference has all-delete-orphan... a clear on this collection is failing 
+             * java.lang.UnsupportedOperationException: queued clear cannot be used with orphan delete
+             * This is fixed in grails 2 http://jira.grails.org/browse/GRAILS-6734
+             * For now doing hack by executing basic sql
+             */
+println "deleting old references"
+            SpeciesField.executeUpdate('delete Reference r where r.speciesField = :speciesField', ['speciesField':speciesField]);
+println speciesField.references.size();
+//            speciesField.references?.clear();
+        }
+        params.reference?.split("\\r?\\n").each { l ->
+            if(l && l.trim()) {
+                speciesField.addToReferences(new Reference(title:l));
+            } else {
+                errors << "Reference cant be empty"
+            }
+        }   
+
+        //license
+        speciesField.licenses.clear();
+        params.license.split("\\r?\\n|,").each { l ->
+            License c = (new XMLConverter()).getLicenseByType(l, false);
+            if(!c) { 
+                errors << "Error while updating license"
+            } else {
+                speciesField.addToLicenses(c);
+            }
+        }
+
+        //audienceType
+        speciesField.audienceTypes.clear();
+        params.audienceType.split("\\r?\\n|,").each { l ->
+            AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
+            if(!c) {
+                errors << "Error while updating audience type"
+            } else {
+                speciesField.addToAudienceTypes(c);
+            }
+        }
+
+        //description
+        speciesField.description = params.description;
+
+        log.warn errors
+        return [errors:errors]
+    }
+
+
+    /**
+    * Delete species field
+    */
+    def deleteSpeciesField(long id) {
+        SpeciesField speciesField = SpeciesField.get(id);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesField not found"]
+        } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            def speciesInstance = speciesField.species;
+            def field = speciesField.field;
+            SpeciesField.withTransaction {
+                try {
+                    speciesInstance.removeFromFields(speciesField);
+                    speciesField.delete(failOnError:true);
+                    List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                    sortAsPerRating(sameFieldSpeciesFieldInstances);
+                    return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+                } catch(e) {
+                    e.printStackTrace();
+                    log.error e.getMessage();
+                    return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
+                }
+            }
+       } else {
+            return [success:false, msg:"You don't have persmission to delete this field"]
+        }
+    }
+
+    /**
+    * Update methods for individual metadata fields
+    */
     def updateContributor(contributorId, long speciesFieldId, def value, String type) {
         if(!value) {
             return [success:false, msg:"Field content cannot be empty"]
@@ -485,7 +676,6 @@ class SpeciesService {
             return [success:false, msg:"You don't have permission to update"]
         }
 
-
         SpeciesField.withTransaction { status ->
             License c = (new XMLConverter()).getLicenseByType(value, false);
             if(!c) {
@@ -689,6 +879,9 @@ class SpeciesService {
         }
     }
 
+    /**
+    * Delete methods for individual metadata fields
+    */
     def deleteContributor(contributorId, long speciesFieldId, String type) {
         SUser oldContrib;
         if(contributorId) {
@@ -794,28 +987,7 @@ class SpeciesService {
     }
 
     def deleteDescription(long id) {
-        SpeciesField speciesField = SpeciesField.get(id);
-        if(!speciesField) {
-            return [success:false, msg:"SpeciesField not found"]
-        } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            def speciesInstance = speciesField.species;
-            def field = speciesField.field;
-            SpeciesField.withTransaction {
-                try {
-                    speciesInstance.removeFromFields(speciesField);
-                    speciesField.delete(failOnError:true);
-                    List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
-                    sortAsPerRating(sameFieldSpeciesFieldInstances);
-                    return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
-                } catch(e) {
-                    e.printStackTrace();
-                    log.error e.getMessage();
-                    return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
-                }
-            }
-       } else {
-            return [success:false, msg:"You don't have persmission to delete this field"]
-        }
+        return deleteSpeciesField(id);
     }
 
     def deleteSynonym(def synonymId, def speciesId) {
@@ -882,6 +1054,9 @@ class SpeciesService {
         }
     }
     
+    /**
+    * Create Species given species name and atleast one taxon hierarchy
+    */
     def createSpecies(String speciesName, List taxonRegistryNames) {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
@@ -905,6 +1080,9 @@ class SpeciesService {
         return ['speciesInstance':speciesInstance, 'taxonRegistry':taxonRegistry];
     }
 
+    /**
+    * Create resources XML
+    */
     private def createImagesXML(params) {
         NodeBuilder builder = NodeBuilder.newInstance();
         XMLConverter converter = new XMLConverter();
@@ -958,9 +1136,6 @@ class SpeciesService {
         return resources;
     }
 
-    /**
-     * 
-     */
     private List<Resource> saveResources(Node resourcesXML, String relImagesContext) {
         XMLConverter converter = new XMLConverter();
         converter.setResourcesRootDir(grailsApplication.config.speciesPortal.resources.rootDir);
@@ -971,14 +1146,11 @@ class SpeciesService {
     /////////////////////////////// Export ////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
-
     def requestExport(params){
         log.debug(params)
         log.debug "creating species download request"
         DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
     }
-
-
 
     def export(params, dl){
         log.debug(params)
@@ -987,8 +1159,6 @@ class SpeciesService {
         log.debug " Species total $speciesInstanceList.size "
         return exportSpeciesData(speciesInstanceList, null)
     }
-
-
 
     def getSpeciesList(params, String action){
         if("search".equalsIgnoreCase(action)){
@@ -1013,7 +1183,8 @@ class SpeciesService {
     }
 
     /**
-     */
+    * get species list query
+    */
     def _getSpeciesListQuery(params) {
         params.startsWith = params.startsWith?:"A-Z"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
@@ -1158,7 +1329,8 @@ class SpeciesService {
     }
 
     /**
-     */
+    * get species list 
+    */
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
@@ -1200,6 +1372,9 @@ class SpeciesService {
         //}
     }
 
+    /**
+    *
+    */
     private sortAsPerRating(List fields) {
         if(!fields) return;
         fields.sort( { a, b -> 
@@ -1211,8 +1386,11 @@ class SpeciesService {
                 return a.lastUpdated <=> b.lastUpdated;
             }
         } as Comparator )
-    }
+    } 
 
+    /**
+    *
+    */
     boolean hasContent(speciesFieldInstances) {
         if(!speciesFieldInstances) return false;
         if(speciesFieldInstances.instanceOf(SpeciesField)) {

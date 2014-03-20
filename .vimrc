@@ -187,3 +187,9 @@ au BufNewFile,BufRead *.groovy imap <silent> <S-F8> <Esc><S-F8>a
 "to kill running grails application and start app again
 nmap <F5> :wa<CR> :silent !pkill -f grails<CR> :call system("screen -X stuff 'ra\n'")<CR>
 
+inoremap <F6> <C-O>za
+nnoremap <F6> za
+onoremap <F6> <C-C>za
+vnoremap <F6> zf
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space> zf

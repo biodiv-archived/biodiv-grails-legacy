@@ -12,6 +12,10 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
+<%@page import="species.Synonyms"%>
+<%@page import="species.Language"%>
+<%@page import="species.License"%>
+<%@page import="species.SpeciesField"%>
 
 <html>
     <head>
@@ -175,7 +179,11 @@
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/biodivofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
-                        height: '400px'
+                    height: '300px',
+                    ignoreEmptyParagraph: false,
+                    autoParagraph:false,
+                    fillEmptyBlocks:false,
+                    uiColor:'#AADC6F'
                 };
 
             </r:script>
@@ -228,8 +236,7 @@
                         <g:else>
                         <li class="nav ui-state-default">
                         </g:else>
-                        <g:showSpeciesConcept
-                        model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, 'isSpeciesContributor':isSpeciesContributor]" />
+                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor]" />
                         </li>
                         <%conceptCounter++%>
                         </g:else>
@@ -289,6 +296,31 @@
             window.params.carousel = {maxHeight:150, maxWidth:210}
             window.params.species.name = "${speciesName}"
             });
+            var licenseSelectorOptions = [];
+            <g:each in="${License.LicenseType.toList()}" var="l">
+            licenseSelectorOptions.push({value:"${l.value()}", text:"${l.value()}"});
+            </g:each>
+
+            var audienceTypeSelectorOptions = [];
+            <g:each in="${SpeciesField.AudienceType.toList()}" var="l">
+            audienceTypeSelectorOptions.push({value:"${l.value()}", text:"${l.value()}"});
+            </g:each>
+
+            var statusSelectorOptions = [];
+            <g:each in="${SpeciesField.Status.toList()}" var="l">
+            statusSelectorOptions.push({value:"${l.value()}", text:"${l.value()}"});
+            </g:each>
+
+            var synRelSelectorOptions = [], langSelectorOptions = [];
+            <g:each in="${Synonyms.RelationShip.toList()}" var="rel">
+            synRelSelectorOptions.push({value:"${rel.value()}", text:"${rel.value()}"});
+            </g:each>
+            var langSelectorOptions = [];
+            <g:each in="${Language.findAllByIsDirty(Boolean.FALSE)}" var="lang">
+            langSelectorOptions.push({value:"${lang.name}", text:"${lang.name}"});
+            </g:each>
+
+
             </g:javascript>	
 
         </body>

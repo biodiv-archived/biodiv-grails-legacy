@@ -315,7 +315,7 @@ class XMLConverter extends SourceConverter {
       
         List sFields = [];
         
-         if(s.isAttached()) {
+         if(s.isAttached() && field) {
              sFields = SpeciesField.withCriteria() {
                 eq("field", field)
                 eq('species', s)
@@ -406,12 +406,12 @@ class XMLConverter extends SourceConverter {
                 resources.each {  speciesField.addToResources(it); }
                 references.each { println it; speciesField.addToReferences(it); }
 				speciesFields.add(speciesField);
-				println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
                 log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
 				addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }			
         }
+        println speciesFields
         return speciesFields;
     } 
 
