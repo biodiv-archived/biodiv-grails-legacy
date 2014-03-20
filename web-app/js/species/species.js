@@ -840,6 +840,71 @@ var initEdit = function($ele) {
         initEditableForm($container, $conEntry, $container.data());
     };
 
+    var onDelete = function(e) {
+        e.stopPropagation();
+        var $conEntry = $(this).parent();
+        var $container = $conEntry.parent();
+
+        var options = $container.data();
+        options['act'] = 'delete';
+        $.ajax({
+            url:options.url?options.url:window.params.species.updateUrl,
+            type:'POST',
+            data:options,
+            context:$container,
+            success : onUpdateSuccess,
+            error : onUpdateError
+        });
+    }
+
+
+    var onUpdateSuccess = function(data) {
+        var $container = $(this);
+        var $form = $(this).find('form.editable-input');
+
+        if(data.errors && data.errors.length > 0) {
+            data.msg += "<div class='alert-error'>Please fix following errors</div><ul class='alert-error'>";
+            $.each(data.errors, function(i, v) {
+                data.msg += "<li>"+v+"</li>"
+            });
+            data.msg += "</ul>"
+        }
+        if(data.success == true) {
+            var $newEle;
+            //destroying all ckeditor instances
+            $.each($form.find('.ck_desc'), function(index, textarea) {
+                CKEDITOR.instances[$(textarea).attr('id')].destroy();
+            });
+            if(options.act == 'add' || options.act == 'delete') {
+                $newEle = $container.html(data.content).show();
+            } else {
+                $newEle = $(data.content).replaceAll($container).show();
+            }
+            $form.hide().find('.editable-error-block').removeClass('alert-error').addClass('alert-info').html(data.msg);
+            refreshEditables($newEle);
+            //$newEle.effect("highlight", {color: '#4BADF5'}, 2000);
+        } else {
+            $form.find('.editable-error-block').removeClass('alert-info').addClass('alert-error').html(data.msg);
+            $container.addClass('error');
+        }
+    }
+
+    var onUpdateError = function(response, status, error) {
+        var successHandler = this.success, errorHandler;
+        handleError(response, undefined, undefined, function(data){
+            return "Please resubmit the form again";
+        }, function(data) {
+            if(data && data.status == 401) {
+                return "Please login and resubmit the changes"; 
+            } else if(response.status === 500) {
+                return 'Service unavailable. Please try later.';
+            } else {
+                return response.responseText;
+            }
+        });
+    }
+
+
     var initEditableForm = function($container, $conEntry, options) {
         var initForm = function() {
             console.log(options);
@@ -968,90 +1033,13 @@ var initEdit = function($ele) {
                 url:window.params.species.updateUrl,
                 type:'POST',
                 data:options,
-                success:function(data) {
-                if(data.errors && data.errors.length > 0) {
-                    data.msg += "<div class='alert-error'>Please fix following errors</div><ul class='alert-error'>";
-                    $.each(data.errors, function(i, v) {
-                        data.msg += "<li>"+v+"</li>"
-                    });
-                    data.msg += "</ul>"
-                }
-                if(data.success == true) {
-                    var $newEle;
-                    //destroying all ckeditor instances
-                    $.each($form.find('.ck_desc'), function(index, textarea) {
-                        CKEDITOR.instances[$(textarea).attr('id')].destroy();
-                    });
-                    if(options.act == 'add') {
-                        $newEle = $container.html(data.content).show();
-                    } else {
-                        $newEle = $(data.content).replaceAll($container).show();
-                    }
-                    $form.hide().find('.editable-error-block').removeClass('alert-error').addClass('alert-info').html(data.msg);
-console.log($newEle);
-                    refreshEditables($newEle);
-                    //$newEle.effect("highlight", {color: '#4BADF5'}, 2000);
-                } else {
-                    $form.find('.editable-error-block').removeClass('alert-info').addClass('alert-error').html(data.msg);
-                    $conEntry.addClass('error');
-                }
-            }, error:function(response, status, error) {
-                var successHandler = this.success, errorHandler;
-                handleError(response, undefined, undefined, function(data){
-                    $form.submit();
-                    return "Please resubmit the form again";
-                }, function(data) {
-                    if(data && data.status == 401) {
-                        return "Please login and resubmit the changes"; 
-                    } else if(response.status === 500) {
-                        return 'Service unavailable. Please try later.';
-                    } else {
-                        return response.responseText;
-                    }
-                });
-            }
+                context:$container,
+                success : onUpdateSuccess,
+                error: onUpdateError
             });
             return false;
         }
         initForm();
-    }
-    var onDelete = function($ele) {
-        $ele.find('.deleteFieldButton').click(function(e) {
-            var $f =  $(this).nextAll('.editField.editable');
-            var $textarea = $(this).nextAll('textarea');
-
-            if($textarea.length != 0)
-            $f = $textarea
-
-            var d = $f.data();
-            var params = {};
-            if(d.params) $.extend(params, $.fn.editableutils.tryParseJson(d.params, true));
-            $.extend(params, {'name':d.name, 'pk':d.pk, 'act':'delete'});
-
-            $.ajax({
-                url:d.url?d.url:window.params.species.updateUrl,
-                type:'POST',
-                data:params,
-                context:$f,
-                success : onDeleteSuccess 
-            });
-        });
-    }
-    var onDeleteSuccess = function( data, textStatus, jqXHR) {
-        onEditableSuccess.call($f, data, jqXHR);
-        if(data.success == true) {
-            if(data.type == 'description' || data.type == 'newdescription') {
-                var textareaId = $f.attr('id');
-                var editor = CKEDITOR.instances[textareaId];
-                if(editor) {
-                    console.log('destroying ckeditor');
-                    editor.destroy(false);
-                }
-
-                onAddableDisplay(undefined, data, jqXHR, $f.parent());
-            } else
-                onAddableDisplay(undefined, data, jqXHR, $f);
-        }
     }
     init($ele);
 }

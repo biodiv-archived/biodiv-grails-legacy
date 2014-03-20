@@ -445,7 +445,7 @@ println speciesField.references.size();
                     speciesField.delete(failOnError:true);
                     List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                     sortAsPerRating(sameFieldSpeciesFieldInstances);
-                    return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+                    return [success:true, msg:"Successfully updated speciesField", id:field.id, content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
                 } catch(e) {
                     e.printStackTrace();
                     log.error e.getMessage();

@@ -462,7 +462,7 @@ class SpeciesController extends AbstractObjectController {
                 break;
                 case 'speciesField':
                 if(params.act == 'delete') {
-                    result = speciesService.deleteDescription(speciesFieldId);
+                    result = speciesService.deleteSpeciesField(speciesFieldId);
                 } else if(params.act == 'add') {
                     long speciesId = params.speciesid? params.long('speciesid') : null;
                     long fieldId = speciesFieldId;
