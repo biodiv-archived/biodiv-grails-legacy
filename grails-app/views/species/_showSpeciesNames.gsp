@@ -54,21 +54,21 @@
             <g:each in="${synonyms}" var="synonym">
             <li>
             <div class="span3">
-                <a href="#" class="synRel  ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">
-                    ${synonym?.relationship?.value()}</a> 
+                <span class="synRel  ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">
+                    ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
-                <a href="#" class="sci_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-params="{sid:${synonym.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'} </a>
+                <span class="sci_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'} </span>
             </div>    
             </li>
             </g:each>
             <g:if test="${isSpeciesContributor}">
             <li>
             <div class="span3">
-                <a href="#" class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a>
+                <span class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></span>
             </div>
             <div class="span8">
-                <a href="#" class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></a>
+                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></span>
             </div>
             </li>
             </g:if>
@@ -86,10 +86,10 @@
     <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
            <li>
             <div class="span3">
-                <a href="#" class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a>
+                <span class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></span>
             </div>
             <div class="span8">
-                <a href="#" class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></a>
+                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></span>
             </div>
             </li>
 
@@ -126,15 +126,13 @@ list.sort();
         <g:each in="${names}">
         <li>
         <div class="span3">
-            <a href="#" class="lang ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
-                ${it.key}</a>
+            <span class="lang ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
+                ${it.key}</span>
         </div> 
-        <div class="span8">
+        <div class="span8" style="display:table;">
             <g:each in="${it.value}"  status="i" var ="n">
-                <div style="float:left;"> 
-                <a href="#" class="common_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-params="{cid:${n.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">  
-                    ${n.name}</a>
-                <g:if test="${i < it.value.size()-1}">,</g:if>
+                <div class="entry pull-left" style="display:table-row;"> 
+                <span class="common_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
                 </div>
             </g:each>
         </div>
@@ -144,13 +142,13 @@ list.sort();
         <g:if test="${isSpeciesContributor}">
             <li>
                 <div class="span3">
-                    <a href="#" class="lang add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
-                        </a>
+                    <span class="lang add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
+                        </span>
                 </div> 
-                <div class="span8">
-                    <div style="float:left;"> 
-                        <a href="#" class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
-                            </a>
+                <div class="span8" style="display:table;">
+                    <div style="display:table-row;"> 
+                        <span class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
+                            </span>
                     </div>
                 </div>
             </li>
@@ -166,13 +164,13 @@ list.sort();
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
         <li>
         <div class="span3">
-            <a href="#" class="lang add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
-                </a>
+            <span class="lang add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
+                </span>
         </div> 
-        <div class="span8">
-            <div style="float:left;"> 
-                <a href="#" class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
-                    </a>
+        <div class="span8" style="display:table;">
+            <div style="display:table-row;"> 
+                <span class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
+                    </span>
             </div>
         </div>
         </li>

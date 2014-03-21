@@ -824,6 +824,7 @@ println speciesField.references.size();
                 def content;
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                println content;
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
             }
         }
@@ -1074,12 +1075,16 @@ println speciesField.references.size();
 
             //a species page with guid as taxon concept is considered as duplicate
             Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
-            speciesInstance = existingSpecies;
+            if(existingSpecies) {
+				existingSpecies.clearBasicContent()
+                speciesInstance = existingSpecies;
+            }
             
             //save taxonomy hierarchy
             def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, springSecurityService.currentUser)
             taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true); 
         }
+        println speciesInstance
         return ['speciesInstance':speciesInstance, 'taxonRegistry':taxonRegistry];
     }
 

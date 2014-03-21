@@ -182,8 +182,8 @@
                     height: '300px',
                     ignoreEmptyParagraph: false,
                     autoParagraph:false,
-                    fillEmptyBlocks:false,
-                    uiColor:'#AADC6F'
+                    fillEmptyBlocks:false
+                    //uiColor:'#AADC6F'
                 };
 
             </r:script>

@@ -114,28 +114,29 @@ class SpeciesController extends AbstractObjectController {
             t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
-            def result = speciesService.createSpecies(params.species, t);
-            Species speciesInstance = result.speciesInstance;
-            def taxonRegistry = result.taxonRegistry;
-            if(speciesInstance.taxonConcept) {
-                //dont accept a species page without any hierarchy
-                if(!taxonRegistry) {
-                    flash.message = "Cannot create a page without any hierarchy"
-                    redirect(action: "create")
-                    return;
-                } 
+                def result = speciesService.createSpecies(params.species, t);
+                println result
+                Species speciesInstance = result.speciesInstance;
+                def taxonRegistry = result.taxonRegistry;
+                if(speciesInstance.taxonConcept) {
+                    //dont accept a species page without any hierarchy
+                    if(!taxonRegistry) {
+                        flash.message = "Cannot create a page without any hierarchy"
+                        redirect(action: "create")
+                        return;
+                    } 
 
-                if (speciesInstance.save(flush:true)) {
-                    flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
-                    redirect(action: "show", id: speciesInstance.id)
-                    return;
-                } else {
+                    if (speciesInstance.save(flush:true)) {
+                        flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
+                        redirect(action: "show", id: speciesInstance.id)
+                        return;
+                    } else {
+                        flash.message = "Error while saving species"
+                    }
+                }
+                else {
                     flash.message = "Error while saving species"
                 }
-            }
-            else {
-                flash.message = "Error while saving species"
-            }
             } catch(e) {
                 e.printStackTrace();
                 flash.message = "Error while saving species ${e.getMessage()}"

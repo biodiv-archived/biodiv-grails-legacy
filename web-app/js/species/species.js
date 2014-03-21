@@ -360,7 +360,7 @@ function initGalleryTabs() {
 
 
     $.fn.editable.defaults.mode = 'inline';
-    $.fn.editableform.template = '\
+    $.fn.neweditableform_template = '\
         <form class="form-horizontal editableform">\
         <div class="control-group">\
         <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right"><button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button></div></div>\
@@ -425,24 +425,27 @@ function initGalleryTabs() {
         if($ele == undefined) $ele = $(document);
         $ele.find('.editField').editable({
             params: function(params) {
-                console.log('editable');
                 if(params.name == 'synonym') {
                     //collecting additional params like relationship for synonym
                     var o = $(this).parent().parent().find('.synRel.selector').editable('getValue');
                     if(o) params.relationship = o.relationship;
+                    params.sid = $(this).data('sid');
                 } else if(params.name == 'commonname') {
                     //collecting additional params like language for commonname
                     var o = $(this).closest('li').find('.lang.selector').editable('getValue');
                     if(o) params.language = o.language;
+                    params.cid = $(this).data('cid');
                 }
                 return params;
             },
+            inputClass:'input-block-level',
+            display: onAddableDisplay,
             success: onEditableSuccess,
             error:onEditableError,
             onblur: 'ignore'
         });
 
-        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton' title='Delete'><i class='icon-trash'></i></a><a class='pull-right editFieldButton' title='Edit'><i class='icon-edit'></i></a>");
+        $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
         $ele.find('.editFieldButton').click(function(e){    
             e.stopPropagation();
 
@@ -464,6 +467,9 @@ function initGalleryTabs() {
             var params = {};
             if(d.params)
                 $.extend(params, $.fn.editableutils.tryParseJson(d.params, true));
+            if(d.cid) params.cid = d.cid;
+            if(d.sid) params.sid = d.sid;
+
             $.extend(params, {'name':d.name, 'pk':d.pk, 'act':'delete'});
             
             $.ajax({
@@ -546,9 +552,9 @@ function initGalleryTabs() {
             }
 
 
-            $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 2000);
+            $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 5000);
             $ul.find('.attributionContent').show();
-            refreshEditables($ul);
+            initNameEditables($ul);
         } else {
             //me.html('Add'); 
         }
@@ -587,6 +593,7 @@ function initGalleryTabs() {
                 }
                 return params;
             },
+            inputClass:'input-block-level',
             success: onEditableSuccess,
             display: onAddableDisplay,
             error:onAddableError,
@@ -623,11 +630,12 @@ function initGalleryTabs() {
     }
 
     function createSynonym(content, sourceData) {
-        return '<li><div class="span3"><a href="#" class="synRel span3 selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{sid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
+        console.log(content);
+        return '<li><div class="span3"><a href="#" class="synRel span3 selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-sid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
     }
 
     function createCommonname(content, sourceData) {
-        return '<li><div class="span3"><a href="#" class="lang span3 selector" data-type="select" data-name="language" data-original-title="Edit Common name Language">'+content.language.name+'</a></div><div class="span8"><div style="float:left"><a href="#" class="common_name editField" data-type="text" data-pk="'+sourceData.id+'" data-params="{cid:'+content.id+'}" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.name+'</a>,</div></div></li>' ;
+        return '<li><div class="span3"><a href="#" class="lang span3 selector" data-type="select" data-name="language" data-original-title="Edit Common name Language">'+content.language.name+'</a></div><div class="span8" style="display:table"><div style="display:table-row;"><a href="#" class="common_name editField" data-type="text" data-pk="'+sourceData.id+'" data-cid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.name+'</a>,</div></div></li>' ;
     }
 
     function createSpeciesFieldHtml(content, sourceData) {
@@ -684,6 +692,7 @@ function initGalleryTabs() {
             value: defaultValue,    
             showbuttons:false,
             source: $selectorOptions,
+            inputClass:'input-block-level',
             success: onEditableSuccess,
             error:onSelectorError,
             onblur:'ignore'
@@ -705,6 +714,7 @@ function initGalleryTabs() {
             value: defaultValue,    
             showbuttons:false,
             source: $selectorOptions,
+            inputClass:'input-block-level',
             success: onEditableSuccess,
             error:onSelectorError,
             onblur:'ignore'
@@ -728,6 +738,7 @@ function initGalleryTabs() {
             source: $selectorOptions,
             success: onEditableSuccess,
             error:onSelectorError,
+            inputClass:'input-block-level',
             onblur:'ignore'
         });
 
@@ -748,6 +759,7 @@ function initGalleryTabs() {
             showbuttons:false,
             source: $selectorOptions,
             error:onSelectorError,
+            inputClass:'input-block-level',
             onblur: 'ignore',
             send:'never'
         });
@@ -764,6 +776,7 @@ function initGalleryTabs() {
             showbuttons:false,
             source: $selectorOptions,
             error:onSelectorError,
+            inputClass:'input-block-level',
             onblur: 'ignore',
             send:'never'
         });
@@ -778,6 +791,7 @@ function initGalleryTabs() {
 function initEditableFields(e) {
     if($(document).find('.editFieldButton').length == 0) {
         refreshEditables($('body'));
+        initNameEditables($('#synonyms,#commonNames'));
     } else {
     /*    $('.editable').editable('disable');
         $('.addField').hide();
@@ -788,18 +802,21 @@ function initEditableFields(e) {
     if(e) e.stopPropagation();
 }
 
-function refreshEditables($e) {
-    initEdit($e);
-    /*initEditables($e);
+function initNameEditables($e) {
+    initEditables($e);
     initAddables($e);
-    initLicenseSelector($e, licenseSelectorOptions, "CC BY");
-    initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
-    //initStatusSelector($e, statusSelectorOptions, "Under Validation");
-    
     initSynRelSelector($e, synRelSelectorOptions, "Synonym");
     initLangSelector($e, langSelectorOptions, "English");
-    */
-    $('.emptyField').show();
+    $('#commonNames .entry').removeClass('pull-left');
+}
+
+function refreshEditables($e) {
+    initEdit($e);
+    //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
+    //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
+    //initStatusSelector($e, statusSelectorOptions, "Under Validation");
+ 
+   $('.emptyField').show();
     //$('.hidePoint').show();
     $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
     if($e) rate($e.find('.star_rating'));
@@ -872,8 +889,6 @@ var initEdit = function($ele) {
 
             //destroying all ckeditor instances
             $.each($form.find('.ck_desc'), function(index, textarea) {
-                console.log('destroying ckeditor instance');
-                console.log($(textarea));
                 CKEDITOR.instances[$(textarea).attr('id')].destroy();
             });
 
@@ -929,7 +944,7 @@ var initEdit = function($ele) {
             var $form = $container.find('.editableform');
 
             if($form.length == 0) {
-                var $form = $($.fn.editableform.template);
+                var $form = $($.fn.neweditableform_template);
                 var $editableInput = $form.find('.editable-input').css({'display':'block'});
 
                 var $editable = $conEntry.find('.editField, .selector, .addField');
@@ -1054,7 +1069,7 @@ var initEdit = function($ele) {
     init($ele);
 }
 
-initEditableFields();
+//initEditableFields();
 
 function selectLicense($this, i) {
     $('#license_'+i).val($.trim($this.text()));
