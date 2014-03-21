@@ -115,7 +115,6 @@ class SpeciesController extends AbstractObjectController {
 
             try {
                 def result = speciesService.createSpecies(params.species, t);
-                println result
                 Species speciesInstance = result.speciesInstance;
                 def taxonRegistry = result.taxonRegistry;
                 if(speciesInstance.taxonConcept) {
@@ -127,7 +126,13 @@ class SpeciesController extends AbstractObjectController {
                     } 
 
                     if (speciesInstance.save(flush:true)) {
-                        flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
+                        //Saving current user as contributor for the species
+                        if(!speciesPermissionService.addContributor(springSecurityService.currentUser, speciesInstance)){
+
+                            flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
+                        } else {
+                            flash.message = "Successfully created species."
+                        }
                         redirect(action: "show", id: speciesInstance.id)
                         return;
                     } else {

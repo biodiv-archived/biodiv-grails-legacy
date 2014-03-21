@@ -15,6 +15,7 @@ import species.auth.Role;
 import species.auth.SUserRole;
 import species.participation.UserToken;
 import species.SpeciesPermission;
+import species.SpeciesPermission.PermissionType;
 
 class SpeciesPermissionService {
 
@@ -49,41 +50,67 @@ class SpeciesPermissionService {
         return result
     }
 
-    boolean addContributor(SUser author, List<Species> species) {
-        def result = addUsers(author, species, PermissionType.ROLE_CONTRIBUTOR)
-        return result        
+    int addContributors(Species speciesInstance, List<SUser> contributors) {
+        if(!speciesInstance || !contributors) return 0;
+        int n = 0;
+        contributors.each { c ->
+            addContributor(c, speciesInstance) ? n++ : '';
+        }
+        return n;
     }
 
-    private boolean addUsers(SUser author, List<Species> species, permissionType) {
+    int addContributor(SUser author, List<Species> species) {
+        return addUsers(author, species, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR)
+    }
+
+    boolean addContributor(SUser author, Species species) {
+        return addUser(author, species, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR)
+    }
+
+    private int addUsers(SUser author, List<Species> species, SpeciesPermission.PermissionType permissionType) {
+        int n = 0
         species.each { spec -> 
-            def taxon = spec.taxonConcept
+            addUser(author, spec, permissionType)? n++ :''
+        }
+        return n
+    }
+
+    private boolean addUser(SUser author, Species species, SpeciesPermission.PermissionType permissionType) {
+        return addTaxonUser(author, species.taxonConcept, permissionType);
+    }
+
+    private boolean addTaxonUser(SUser user, TaxonomyDefinition taxonConcept, SpeciesPermission.PermissionType permissionType){
+        if(!isTaxonContributor(taxonConcept, user, [permissionType])) {
             try{
-                def sp = new SpeciesPermission(author: author, taxonConcept: taxon, permissionType: permissionType);
-                if(!sp.save(flush:true)){
-                    sp.errors.allErrors.each { log.error it }
+                def newCon = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
+                if(!newCon.save(flush:true)){
+                    newCon.errors.allErrors.each { log.error it }
                     return false
                 }
+                return true;
             } catch (Exception e) {
-                status = false;
-                msg = "Error: ${e.getMessage()}";
-                e.printStackTrace()
-                log.error e.getMessage();
-            } 
-        }
-        return true
+                log.error "error adding new contributor ${e.getMessage()}"
+                return false;
+            }
+        } else 
+            return true;
     }
 
-    boolean isSpeciesContributor(Species speciesInstance, SUser user) {
+    boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
+        return isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes);
+    }
+
+    boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes) {
         if(!user) return false;
         if(SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')) 
             return true;
         else {
-            def taxonConcept = speciesInstance.taxonConcept;
             List parentTaxons = taxonConcept.parentTaxon()
             parentTaxons.add(taxonConcept);
+            def permissions = permissionTypes.collect {it.value()};
             def res = SpeciesPermission.withCriteria {
                 eq('author', user)
-                inList('permissionType', [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(),SpeciesPermission.PermissionType.ROLE_CURATOR.value()])
+                inList('permissionType', permissions)
                 inList('taxonConcept',  parentTaxons)
             }
             if(res && res.size() > 0)
@@ -182,31 +209,13 @@ class SpeciesPermissionService {
             try{
                 def newCu = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CURATOR.toString())
                 if(!newCu.save(flush:true)){
-                    newCu.errors.allErrors.each { println it }
+                    newCu.errors.allErrors.each { log.error it }
                     return null
                 }
 
             }catch (org.springframework.dao.DataIntegrityViolationException e) {
-                println "error adding new CURATOR " + e
+                log.error "error adding new CURATOR " + e.getMessage()
             }
         }
     }
-
-    void addContributor(SUser user, TaxonomyDefinition taxonConcept){
-        def con = SpeciesPermission.findWhere(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
-        if(!con){
-            try{
-                def newCon = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
-                if(!newCon.save(flush:true)){
-                    newCon.errors.allErrors.each { println it }
-                    return null
-                }
-
-            }catch (org.springframework.dao.DataIntegrityViolationException e) {
-                println "error adding new CONTRIBUTOR " + e
-            }
-        }
-    }
-
-
 }

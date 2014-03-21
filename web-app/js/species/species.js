@@ -630,12 +630,11 @@ function initGalleryTabs() {
     }
 
     function createSynonym(content, sourceData) {
-        console.log(content);
-        return '<li><div class="span3"><a href="#" class="synRel span3 selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="editField" data-type="text" data-pk="'+sourceData.id+'" data-sid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
+        return '<li><div class="span3"><a href="#" class="synRel span3 '+(content.isContributor?'selector':'')+'" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="'+(content.isContributor?'editField':'')+'" data-type="text" data-pk="'+sourceData.id+'" data-sid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
     }
 
     function createCommonname(content, sourceData) {
-        return '<li><div class="span3"><a href="#" class="lang span3 selector" data-type="select" data-name="language" data-original-title="Edit Common name Language">'+content.language.name+'</a></div><div class="span8" style="display:table"><div style="display:table-row;"><a href="#" class="common_name editField" data-type="text" data-pk="'+sourceData.id+'" data-cid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.name+'</a>,</div></div></li>' ;
+        return '<li><div class="span3"><a href="#" class="lang span3 '+(content.isContributor?'selector':'')+'" data-type="select" data-name="language" data-original-title="Edit Common name Language">'+content.language.name+'</a></div><div class="span8" style="display:table"><div style="display:table-row;"><a href="#" class="common_name '+(content.isContributor?'editField':'')+' " data-type="text" data-pk="'+sourceData.id+'" data-cid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.name+'</a>,</div></div></li>' ;
     }
 
     function createSpeciesFieldHtml(content, sourceData) {

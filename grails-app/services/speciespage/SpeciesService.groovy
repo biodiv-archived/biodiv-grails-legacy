@@ -800,6 +800,8 @@ println speciesField.references.size();
                 return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:"Nothing to change"]
+            } else if(!oldSynonym.isContributor()) {
+                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
             }
         }
 
@@ -853,6 +855,8 @@ println speciesField.references.size();
                 return [success:false, msg:"Commonname with id ${cnId} is not found"]
             } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
                 return [success:true, msg:"Nothing to change"]
+            } else if(!oldCommonname.isContributor()) {
+                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
             }
         }
 
@@ -1003,6 +1007,10 @@ println speciesField.references.size();
             return [success:false, msg:"Synonym with id ${synonymId} is not found"]
         } 
 
+        if(!oldSynonym.isContributor()) {
+                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+        }
+
         Species speciesInstance = Species.get(speciesId);
       
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
@@ -1034,6 +1042,10 @@ println speciesField.references.size();
         if(!oldCommonname) {
             return [success:false, msg:"Common name with id ${cnId} is not found"]
         } 
+
+        if(!oldCommonname.isContributor()) {
+            return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+        }
 
         Species speciesInstance = Species.get(speciesId);
       

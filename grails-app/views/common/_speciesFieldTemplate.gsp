@@ -1,5 +1,7 @@
 <s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
-    <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
+    <g:if test="${isSpeciesContributor}">
+        <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
+    </g:if>
 </s:isSpeciesFieldContributor>
 
 

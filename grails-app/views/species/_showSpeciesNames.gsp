@@ -54,11 +54,11 @@
             <g:each in="${synonyms}" var="synonym">
             <li>
             <div class="span3">
-                <span class="synRel  ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">
+                <span class="synRel  ${isSpeciesContributor && synonym.isContributor() ?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">
                     ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
-                <span class="sci_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'} </span>
+                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'} </span>
             </div>    
             </li>
             </g:each>
@@ -126,13 +126,13 @@ list.sort();
         <g:each in="${names}">
         <li>
         <div class="span3">
-            <span class="lang ${isSpeciesContributor?'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
+            <span class="lang ${isSpeciesContributor && n.isContributor() ? 'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
                 ${it.key}</span>
         </div> 
         <div class="span8" style="display:table;">
             <g:each in="${it.value}"  status="i" var ="n">
                 <div class="entry pull-left" style="display:table-row;"> 
-                <span class="common_name ${isSpeciesContributor?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
+                <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
                 </div>
             </g:each>
         </div>
