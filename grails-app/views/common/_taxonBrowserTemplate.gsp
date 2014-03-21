@@ -19,28 +19,27 @@ $(document).ready(function() {
    			{name:'classSystem', index:'classSystem', hidden:true}
    		],   		
    		width: "${width?:'100%'}",
-    	height: "${height?:'100%'}", 
-    	autowidth:true,   
-    	scrollOffset: 0,
-    	loadui:'block',
+                height: "${height?:'100%'}", 
+                autowidth:true,   
+                scrollOffset: 0,
+                loadui:'block',
    		treeGrid: true,
    		ExpandColumn : 'name',
    		ExpandColClick  : false,
    		treeGridModel: 'adjacency',
-        postData:{n_level:-1, expand_species:'${expandSpecies?:false}', expand_all:'${expandAll?:false}', speciesid:'${speciesId}', classSystem:$.trim($('#taxaHierarchy option:selected').val())},
-        sortable:false,
-        loadComplete:function(data) {
-        	var postData = $("#taxonHierarchy").getGridParam('postData');
+                postData:{n_level:-1, expand_species:'${expandSpecies?:false}', expand_all:'${expandAll?:false}', speciesid:'${speciesId}', classSystem:$.trim($('#taxaHierarchy option:selected').val())},
+                sortable:false,
+                loadComplete:function(data) {
+        	        var postData = $("#taxonHierarchy").getGridParam('postData');
 			postData["expand_species"] = false;
                         postData["expand_all"] = false;
-	    },
-	    loadError : function(xhr, status, error) {
-	    	if(xhr.status == 401) {
+	        },
+	        loadError : function(xhr, status, error) {
+	    	    if(xhr.status == 401) {
 	    		show_login_dialog();
 	    	} else {	    
 	    		alert(error);
 	    	}
-	    	
 	    } 
 	});
 
@@ -50,10 +49,11 @@ $(document).ready(function() {
 		postData["expand_all"] = ${expandAll?:false};
 		var selectedClassification = $('#taxaHierarchy option:selected').val();
 		postData["classSystem"] = $.trim(selectedClassification);
-        $('#taxonHierarchy').trigger("reloadGrid");
-        $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
+                $('#taxonHierarchy').trigger("reloadGrid");
+                $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
 	});
-	 $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
+
+	$('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
 	$('.ui-jqgrid-hdiv').hide();
         $('#taxonHierarchy').parents('div.ui-jqgrid-bdiv').css("max-height","425px");
 });
@@ -106,7 +106,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 </r:script>
 
 
-<div class="taxonomyBrowser sidebar_section" style="position: relative;">
+<div class="taxonomyBrowser sidebar_section" style="position: relative;"data-name="classification" data-speciesid="${speciesInstance?.id}">
         <h5>Classifications</h5>	
 		<g:if test="${speciesInstance}">
 			<g:set var="classifications" value="${speciesInstance.classifications()}" />

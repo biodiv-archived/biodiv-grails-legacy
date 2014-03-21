@@ -126,7 +126,8 @@ list.sort();
         <g:each in="${names}">
         <li>
         <div class="span3">
-            <span class="lang ${isSpeciesContributor && n.isContributor() ? 'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
+            <!-- TODO: language selector shd be seperated out -->
+            <span class="lang ${isSpeciesContributor ? 'selector':''}" data-type="select" data-name="language" data-original-title="Edit common name language">
                 ${it.key}</span>
         </div> 
         <div class="span8" style="display:table;">
