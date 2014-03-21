@@ -1545,8 +1545,11 @@ class ObservationService extends AbstractObjectService {
                 templateMap["link"] = otherParams["link"]
                 def user = springSecurityService.currentUser;                
                 templateMap["contributor"] = user.name
-                templateMap["uploadCount"] = otherParams["uploadCount"]
-                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                templateMap["speciesCreated"] = otherParams["speciesCreated"]
+				templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
+				templateMap["stubsCreated"] = otherParams["stubsCreated"]
+				templateMap["uploadCount"] = otherParams["uploadCount"]
+				populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
                 toUsers.add(user)
                 break
 
