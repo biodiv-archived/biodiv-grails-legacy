@@ -127,7 +127,7 @@ class SpeciesController extends AbstractObjectController {
 
                     if (speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
-                        if(!speciesPermissionService.addContributor(springSecurityService.currentUser, speciesInstance)){
+                        if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
 
                             flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
                         } else {

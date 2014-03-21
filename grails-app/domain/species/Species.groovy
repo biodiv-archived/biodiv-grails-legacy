@@ -237,7 +237,7 @@ class Species implements Rateable {
         this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
     }
 
-    def afterUpdate() {
+    def afterInsert() {
    
         HashSet contributors = new HashSet();
 
@@ -247,7 +247,7 @@ class Species implements Rateable {
         contributors.addAll(CommonNames.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
         
         //Saving current user as contributor for the species
-        speciesPermissionService.addContributors(this, contributors);
+        speciesPermissionService.addContributors(this, new ArrayList(contributors));
     }
 
     def beforeDelete(){

@@ -54,7 +54,7 @@ class SpeciesPermissionService {
         if(!speciesInstance || !contributors) return 0;
         int n = 0;
         contributors.each { c ->
-            addContributor(c, speciesInstance) ? n++ : '';
+            addContributorToSpecies(c, speciesInstance) ? n++ : '';
         }
         return n;
     }
@@ -63,7 +63,7 @@ class SpeciesPermissionService {
         return addUsers(author, species, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR)
     }
 
-    boolean addContributor(SUser author, Species species) {
+    boolean addContributorToSpecies(SUser author, Species species) {
         return addUser(author, species, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR)
     }
 

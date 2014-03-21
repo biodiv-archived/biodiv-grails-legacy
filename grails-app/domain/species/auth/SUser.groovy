@@ -167,9 +167,14 @@ class SUser {
 			uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
 		}
 		uGroups.each {
+            try{
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
 				userGroups.add(it)
 			}
+            } catch(e) {
+                e.printStackTrace()
+                log.error e.getMessage();
+            }
 		}
 		//userGroups.asList().sort(true, { a, b -> a.name <=> b.name } as Comparator)
 		return userGroups;
