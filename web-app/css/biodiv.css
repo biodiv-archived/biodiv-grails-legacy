@@ -2654,3 +2654,7 @@ small {
 #synonyms li:nth-child(even),#commonNames li:nth-child(even)  {background-color: #e6e6e6; overflow:hidden;}
 
 #synonyms li:nth-child(odd),#commonNames li:nth-child(odd) {background-color: #FFF; overflow:hidden;}
+
+.bodymarker {
+    position:relative;
+}

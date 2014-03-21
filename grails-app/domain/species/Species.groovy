@@ -242,12 +242,12 @@ class Species implements Rateable {
         HashSet contributors = new HashSet();
 
         //TODO:looks like this is gonna be heavy on every save ... gotta change
-        contributors.addAll(this.field?.collect { it.contributors })
+        contributors.addAll(this.fields?.collect { it.contributors })
         contributors.addAll(Synonyms.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
         contributors.addAll(CommonNames.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
         
         //Saving current user as contributor for the species
-        speciesPermissionService.addContributors(speciesInstance, contributors);
+        speciesPermissionService.addContributors(this, contributors);
     }
 
     def beforeDelete(){

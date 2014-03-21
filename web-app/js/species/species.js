@@ -827,7 +827,7 @@ var initEdit = function($ele) {
 
     var init = function($sf) {
         $sf.find(".dummy.speciesField").before("<a class='addFieldButton btn btn-success' title='Add'><i class='icon-plus'></i>Add</a>");
-        $sf.find(".ck_desc,.taxonomyBrowser").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+        $sf.find(".ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
 
         $sf.find('.addFieldButton').click(onAdd);
         $sf.find('.editFieldButton').click(onEdit);

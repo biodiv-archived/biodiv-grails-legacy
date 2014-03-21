@@ -106,7 +106,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 </r:script>
 
 
-<div class="taxonomyBrowser sidebar_section" style="position: relative;"data-name="classification" data-speciesid="${speciesInstance?.id}">
+<div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
         <h5>Classifications</h5>	
 		<g:if test="${speciesInstance}">
 			<g:set var="classifications" value="${speciesInstance.classifications()}" />
@@ -138,4 +138,6 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		</div>
 	
 	<table id="taxonHierarchy"></table>
+        
+        <g:render template="/common/createTaxonRegistryTemplate"/>
 </div>

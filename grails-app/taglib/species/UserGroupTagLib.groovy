@@ -271,7 +271,7 @@ class UserGroupTagLib {
     } 
 	def getCurrentUserUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
-		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
+		def userGroups = [];//user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again

@@ -807,7 +807,10 @@ println speciesField.references.size();
 
         Species.withTransaction { status ->
             if(oldSynonym) {
-                oldSynonym.delete();
+                def result = deleteSynonym(oldSynonym, speciesInstance);
+                if(!result.success) {
+                    return [success:false, msg:"Error while updating synonym. Error: ${result.msg})"]
+                }
             } 
             XMLConverter converter = new XMLConverter();
 
@@ -998,21 +1001,25 @@ println speciesField.references.size();
         return deleteSpeciesField(id);
     }
 
-    def deleteSynonym(def synonymId, def speciesId) {
+    def deleteSynonym(long synonymId, long speciesId) {
         Synonyms oldSynonym;
         if(synonymId) {
             oldSynonym = Synonyms.read(synonymId);
         }
+        Species speciesInstance = Species.get(speciesId);
+
+        return deleteSynonym(oldSynonym, speciesInstance);
+    }
+    
+    def deleteSynonym(Synonyms oldSynonym, Species speciesInstance) {
         if(!oldSynonym) {
             return [success:false, msg:"Synonym with id ${synonymId} is not found"]
         } 
 
         if(!oldSynonym.isContributor()) {
-                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+            return [success:false, msg:"You don't have permission to update as you are not a contributor."]
         }
 
-        Species speciesInstance = Species.get(speciesId);
-      
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
             return [success:false, msg:"You don't have permission to delete synonym"]
         }
@@ -1021,10 +1028,19 @@ println speciesField.references.size();
             String msg = '';
             def content;
             try{
-                oldSynonym.delete(failOnError:true)
+                oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                
+                if(oldSynonym.contributors.size() == 0) {
+                    oldSynonym.delete(failOnError:true)
+                } else {
+                    if(!oldSynonym.save()) {
+                        oldSynonym.errors.each { log.error it }
+                        return [success:false, msg:"Error while deleting synonym"]
+                    }
+                }
                 msg = 'Successfully removed synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1039,6 +1055,12 @@ println speciesField.references.size();
         if(cnId) {
             oldCommonname = CommonNames.read(cnId);
         }
+
+        Species speciesInstance = Species.get(speciesId);
+        return deleteCommonname(oldCommonname, speciesInstance);
+    } 
+    
+    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance) {
         if(!oldCommonname) {
             return [success:false, msg:"Common name with id ${cnId} is not found"]
         } 
@@ -1047,8 +1069,6 @@ println speciesField.references.size();
             return [success:false, msg:"You don't have permission to update as you are not a contributor."]
         }
 
-        Species speciesInstance = Species.get(speciesId);
-      
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
             return [success:false, msg:"You don't have permission to delete commonname"]
         }
@@ -1057,10 +1077,20 @@ println speciesField.references.size();
             String msg = '';
             def content;
             try{
-                oldCommonname.delete(failOnError:true)
+                oldCommonname.removeFromContributors(springSecurityService.currentUser);
+                
+                if(oldCommonname.contributors.size() == 0) {
+                    oldCommonname.delete(failOnError:true)
+                } else {
+                    if(!oldCommonname.save()) {
+                        oldCommonname.errors.each { log.error it }
+                        return [success:false, msg:"Error while deleting common name"]
+                    }
+                }
+
                 msg = 'Successfully removed common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content]
             } 
             catch(e) {
                 e.printStackTrace();
