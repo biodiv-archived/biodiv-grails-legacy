@@ -66,10 +66,7 @@
 
 					<div class="controls">
 						
-						
-						<ckeditor:editor name="newsitem" height="400px" userSpace="${params.webaddress }">
-							${newsletterInstance?.newsitem}
-						</ckeditor:editor>
+                                            <textarea name="newsitem" id="newsitem">	${newsletterInstance?.newsitem}</textarea>
 						
 						<g:hasErrors bean="${newsletterInstance}" field="newsitem">
 							<div class="help-inline">

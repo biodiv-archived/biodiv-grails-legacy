@@ -463,7 +463,6 @@ environments {
 
         ckeditor {
             upload {
-                baseurl = "/"
                 basedir = "${speciesPortal.app.rootDir}/"
                 image.browser = true
                 image.upload = true    
@@ -577,7 +576,6 @@ environments {
 
                 ckeditor {
                     upload {
-                         baseurl = "/"
                         basedir = "${speciesPortal.app.rootDir}/"
                     image.browser = true
                     image.upload = true    
@@ -653,7 +651,6 @@ environments {
 
                 ckeditor {
                     upload {
-                        baseurl = "/"
                         basedir = "${speciesPortal.app.rootDir}/"
 
                     image.browser = true
@@ -728,7 +725,6 @@ environments {
 
         ckeditor {
             upload {
-                baseurl = "/"
                 basedir = "${speciesPortal.app.rootDir}/"
 
 
