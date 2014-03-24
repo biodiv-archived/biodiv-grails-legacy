@@ -5,7 +5,6 @@
 <r:script>
 $(document).ready(function() {
 	
-	
   	$('#taxonHierarchy').jqGrid({
 		url:'${uGroup.createLink(controller:'data', action:'listHierarchy', userGroupWebaddress:params.webaddress)}',
 		datatype: "xml",
@@ -138,6 +137,12 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		</div>
 	
 	<table id="taxonHierarchy"></table>
-        
-        <g:render template="/common/createTaxonRegistryTemplate"/>
+        <form class="form-horizontal editableform">
+            <div class="control-group">
+                <div><div class="editable-input">
+                    <g:render template="/common/createTaxonRegistryTemplate"/> 
+                </div><div class="editable-buttons editable-buttons-bottom pull-right"><button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button></div></div>
+                <div class="editable-error-block"></div>
+            </div> 
+        </form>  
 </div>

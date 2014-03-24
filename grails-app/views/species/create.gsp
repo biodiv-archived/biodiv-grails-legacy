@@ -34,7 +34,7 @@
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
                         </div>
                     </div>   
-                    <g:render template="/common/createTaxonRegistry"/>
+                    <g:render template="/common/createTaxonRegistryTemplate"/>
 
 
                 </div>   
@@ -114,7 +114,7 @@
                             });
                         }
                         $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
-                        $('#taxonHierachy').show();
+                        $('#taxonHierachyInput').show();
                         $('#addSpeciesSubmit').show();
                     } else {
                         $('#species').next('.alert').removeClass('alert-info hide').addClass('alert-error').text(data.msg);

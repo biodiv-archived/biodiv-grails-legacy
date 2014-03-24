@@ -140,7 +140,7 @@
             src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
 
         <r:script>
-        google.load("search", "1");
+        //google.load("search", "1");
         Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 
         $(document).ready(function(){
