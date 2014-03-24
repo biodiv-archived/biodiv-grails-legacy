@@ -7,15 +7,20 @@
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
+            <g:if test="${observationInstance.geoPrivacy}">
+            	Geoprivacy enabled
+            </g:if>
+            <g:else>
                 <g:if test="${observationInstance.placeName != ''}">
-                <g:set var="location" value="${observationInstance.placeName}"/>
+                	<g:set var="location" value="${observationInstance.placeName}"/>
                 </g:if>
                 <g:else>
-                <g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
+                	<g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
                 </g:else>
                 <div class="value ellipsis multiline" title="${location}">
-                ${location}
-            </div>
+                	${location}
+            	</div>
+            </g:else>
             </td>
         </tr>
         <tr>

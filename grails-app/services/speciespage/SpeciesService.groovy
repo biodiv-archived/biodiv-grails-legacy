@@ -1012,7 +1012,7 @@ class SpeciesService {
             queryParams.offset = 0
         }
 
-        queryParams.sort = params.sort?:"percentOfInfo"
+        queryParams.sort = params.sort?:"lastrevised"
         if(queryParams.sort.equals('lastrevised')) {
             queryParams.sort = 'lastUpdated'
 
