@@ -264,6 +264,7 @@ class ObservationController extends AbstractObjectController {
 	 * @return
 	 */
 	def getPrevNextObservations(int pos, String userGroupWebaddress) {
+		if(pos == null) pos = 0;
 		String listKey = "obv_ids_list";
 		String listParamsKey = "obv_ids_list_params"
 		if(userGroupWebaddress) {

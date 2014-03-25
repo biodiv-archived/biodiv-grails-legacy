@@ -2179,7 +2179,7 @@ class ObservationService extends AbstractObjectService {
             return params.userGroup
         }
 
-        if(params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress) {
+        if(params.webaddress || (params.userGroup && (params.userGroup instanceof String || params.userGroup instanceof Long ))) {
             def userGroupController = new UserGroupController();
             return userGroupController.findInstance(params.userGroup, params.webaddress);
         }
