@@ -1487,8 +1487,11 @@ class ObservationService extends AbstractObjectService {
                 templateMap["link"] = otherParams["link"]
                 def user = springSecurityService.currentUser;                
                 templateMap["contributor"] = user.name
-                templateMap["uploadCount"] = otherParams["uploadCount"]
-                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                templateMap["speciesCreated"] = otherParams["speciesCreated"]
+				templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
+				templateMap["stubsCreated"] = otherParams["stubsCreated"]
+				templateMap["uploadCount"] = otherParams["uploadCount"]
+				populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
                 toUsers.add(user)
                 break
 
@@ -2118,7 +2121,7 @@ class ObservationService extends AbstractObjectService {
             return params.userGroup
         }
 
-        if(params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress) {
+        if(params.webaddress || (params.userGroup && (params.userGroup instanceof String || params.userGroup instanceof Long ))) {
             def userGroupController = new UserGroupController();
             return userGroupController.findInstance(params.userGroup, params.webaddress);
         }

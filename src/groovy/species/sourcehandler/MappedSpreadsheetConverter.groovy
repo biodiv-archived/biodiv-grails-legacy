@@ -23,10 +23,11 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 	public List<Map> imagesMetaData;
 	public List<Map> mappingConfig;
-	
+	public String imagesDir;
 	
 	public MappedSpreadsheetConverter() {
 		imagesMetaData = [];
+		this.imagesDir = "";
 	}
 
 	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo, String imagesDir="") {
@@ -34,6 +35,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);				
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 			imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+			this.imagesDir = imagesDir
 		}
 		return convertSpecies(content, mappingConfig, imagesMetaData, imagesDir);
 	}
@@ -459,8 +461,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 								def imagesNode = data;
 								imagesNode = new Node(data, "images");
 								text.split(delimiter).each {
-									String loc = cleanLoc(it)
-									new Node(imagesNode, "image", loc);
+									createImages(imagesNode, it, imagesMetaData, this.imagesDir);
 								}
 							}else{
 								myPrint("========= <<<<<<<<<<<<<<<<  meta data >>>>>>>>>>>>>>> ==== " + text + "   fieldname " +  fieldName + " delimiter " + delimiter)

@@ -113,7 +113,7 @@ def doCrop(){
 
 //doCrop();
 
-ImageUtils.createScaledImages(new File('/home/rahulk/Downloads/450px-Haliastur_indus_-Cherai_Beach,_Kochi,_Kerala,_India-8.jpg'), new File('/home/rahulk/Downloads') )
+ImageUtils.createScaledImages(new File('/home/sandeept/git/biodiv/app-conf/img/Acacia auriculiformis/5_Kaggli-like_leaf.tif'), new File('/home/sandeept/Desktop/') )
 println "=========== DONE!!";
 
 /*

@@ -47,9 +47,9 @@
 						<tr class="prop">
 							<td valign="top"
 								class="value ${hasErrors(bean: newsletterInstance, field: 'newsitem', 'errors')}">
-								<ckeditor:editor name="newsitem" height="400px" userSpace="${params.webaddress }">
+								<textarea name="newsitem" id="newsitem">
 									${newsletterInstance?.newsitem}
-								</ckeditor:editor>
+								</textarea>
 							</td>
 						</tr>
 
@@ -82,5 +82,29 @@
 			</form>
 		</div>
 	</div>
+
+            <r:script type='text/javascript'> 
+                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+
+                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
+                    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
+                    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                    '/',
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+                    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                    { name: 'insert', items: [ 'Image', 'Table'] }
+                    ],
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
+                    filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${params.webaddress}",
+
+                        height: '400px'
+                };
+
+		$(document).ready(function(){
+                    CKEDITOR.replace('newsitem', config);
+		});
+	</r:script>
 </body>
 </html>

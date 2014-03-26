@@ -1323,7 +1323,8 @@ function AugmentedMap(map_div, options) {
              units: "m", // set the resolution units
              mapExtent: getMapExtent(),
              maxExtent: getMaxExtent(),
-             restrictedExtent: getRestrictedExtent() // restrict the extent of the map to India
+             restrictedExtent: getRestrictedExtent(), // restrict the extent of the map to India
+             theme:null
             }
         );
 
@@ -2111,7 +2112,7 @@ function showLayersExplorer(layers_explorer_div, map) {
 
 function getFullMapOptions(options) {
     var fullOptions = {
-
+    		theme:null,
             tiled: options.tiled || false,
             popup_enabled: options.popup_enabled || false,
             toolbar_enabled: options.toolbar_enabled || false,

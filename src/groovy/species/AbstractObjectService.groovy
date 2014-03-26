@@ -80,9 +80,12 @@ class AbstractObjectService {
             def obj = param['observation'];
             if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
             if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
-            if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy) item.geoPrivacy = obj.geoPrivacy
             if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
             if(obj.hasProperty('fromDate') && obj.fromDate) item.observedOn = obj.fromDate.getTime();
+			if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy){
+				item.geoPrivacy = obj.geoPrivacy
+				item.geoPrivacyAdjust = obj.fetchGeoPrivacyAdjustment()
+			}
 			urlList << item;
 		}
 		return urlList

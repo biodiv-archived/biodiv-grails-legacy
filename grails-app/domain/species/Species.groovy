@@ -342,5 +342,35 @@ class Species implements Rateable {
 			errors.allErrors.each { log.error it }
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param start
+	 * @param end
+	 * @return species list summary on given time period
+	 */
+	static Map fetchSpeciesSummary(start, end){
+		def allSpeciesUpdateCount = Species.createCriteria().count {
+			and{
+				between("lastUpdated", start, end)
+			}
+		}
+		
+		def speciesUpdateCount = Species.createCriteria().count {
+			and{
+				gt('percentOfInfo', new Float(0.0))
+				between("lastUpdated", start, end)
+				lt("dateCreated", start)
+			}
+		}
+		
+		def speciesCreateCount = Species.createCriteria().count {
+			and{
+				gt('percentOfInfo', new Float(0.0))
+				between("dateCreated", start, end)
+			}
+		}
+		
+		return ['allSpeciesUpdated':allSpeciesUpdateCount, 'speciesUpdated':speciesUpdateCount, 'speciesCreated':speciesCreateCount, 'stubsCreated':(allSpeciesUpdateCount - speciesUpdateCount - speciesCreateCount)]
+	}
 }
