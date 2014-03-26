@@ -112,3 +112,6 @@ ALTER TABLE flag ADD CONSTRAINT flag_author_type_id UNIQUE (author_id, object_id
 ALTER TABLE flag ALTER COLUMN object_id SET NOT NULL;
 ALTER TABLE flag ALTER COLUMN object_type SET NOT NULL;
 
+
+UPDATE resource SET context ='SPECIES' where id in (select resource_id from species_resource);
+UPDATE resource SET context ='OBSERVATION' where id in (select resource_id from observation_resource);

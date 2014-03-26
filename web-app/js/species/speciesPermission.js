@@ -67,23 +67,62 @@ $("#addSpeciesImagesBtn").click(function(){
     }, 1000);
 });
 
+function onSpeciesImageUploadSuccess(type){
+    var msgText
+    if(type == "imageUpload"){
+        $("#uploadSpeciesImagesForm").replaceWith( "<span>Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!</span>" );
+        msgText = "Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!"
+    }
+    else{
+        msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
+    }
+    $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(msgText);
+    $('html, body').animate({
+        scrollTop: $(".alertMsg").offset().top
+    }, 1000);
+    return true;
+}
+/*
 var uploadSpeciesImageOptions = { 
-    success: onSpeciesImageUploadSuccess  // post-submit callback 
+    success: onSpeciesImageUploadSuccess(type)  // post-submit callback 
 };
-
+*/
 $("#uploadSpeciesImagesBtn").click(function(){
-    console.log("called upload images form");
-    $("#uploadSpeciesImagesForm").ajaxSubmit({
-        success: onSpeciesImageUploadSuccess
-    });
-    $("#uploadSpeciesImagesForm").replaceWith( "<span>Images Uploaded Succesfully, Please refresh the page to see the newly uploaded image in the gallery!!</span>" );
-    $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html("Images Uploaded Succesfully, Please refresh the page to see the newly uploaded image in the gallery!!");
+    $("#uploadSpeciesImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("imageUpload")});
     return false;
 });
 
-function onSpeciesImageUploadSuccess(responseText, statusText, xhr, $form){
-    console.log("call back called");
-    $("#uploadSpeciesImagesForm").replaceWith( "<span>Loaded Succesfully</span>" ); 
-    console.log("DONE DONE ");
-    return true;
+$("#pullObvImagesBtn").click(function(){
+    $("#pullObvImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("pulledImage")});
+    return false;
+});
+
+function getNextRelatedObvImages(speciesId, url, resourceListType){
+    var offset = $("#relatedImagesOffset").val();
+    $.ajax({
+        url: url,
+        dataType: "json",
+        data: {speciesId:speciesId, offset: offset ,resourceListType: resourceListType},	
+        success: function(data) {
+            var addPhotoHtmlData = $(data.addPhotoHtml);
+            if(data.relatedObvCount == 0){
+                $("#relatedObvLoadMore").replaceWith("<span>No More to Load</span>");
+            } 
+            $("#speciesImage-tab0 #imagesList" ).append(addPhotoHtmlData);
+            $("#relatedImagesOffset").val(parseInt(offset) + 1);
+            
+            /*
+            if(data.remainingCommentCount == 0){
+                $(targetComp).children('a').hide();	
+            }else{
+                $(targetComp).children('a').text("Show " + data.remainingCommentCount + " older comments >>");
+            }
+            feedPostProcess();
+            */
+        }, error: function(xhr, status, error) {
+            alert(xhr.responseText);
+        }
+    });
 }
+
+

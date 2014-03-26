@@ -33,6 +33,30 @@ class Resource extends Sourcedata implements Rateable {
             }
         }
 	}
+
+    public enum ResourceContext {
+        OBSERVATION("OBSERVATION"),
+        SPECIES("SPECIES"),
+        DOCUMENT("DOCUMENT");
+        
+        private String value;
+
+        ResourceContext(String value) {
+            this.value = value;
+        }
+
+        String value() {
+            return this.value;
+        }
+
+        static def toList() {
+            return [ OBSERVATION,SPECIES,DOCUMENT ]
+        }
+
+        public String toString() {
+            return this.value();
+        }
+    }
 	
 	ResourceType type;
 	String url; //TODO validate as url
@@ -41,7 +65,8 @@ class Resource extends Sourcedata implements Rateable {
 	String mimeType; //TODO:validate
     int rating = 0;
 	String baseUrl; 
-	def grailsApplication
+	ResourceContext context;
+    def grailsApplication
 
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
 	static belongsTo = [SpeciesField, Observation];

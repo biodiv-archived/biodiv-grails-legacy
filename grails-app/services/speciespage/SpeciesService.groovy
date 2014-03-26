@@ -1226,11 +1226,31 @@ class SpeciesService extends AbstractObjectService  {
 	}
     
     def updateSpecies(params, species){
-        def resourcesXML = createResourcesXML(params);
-        println "=====RES XML =========== " + resourcesXML
-        def resources = saveResources(species, resourcesXML);
-        println "=========RESOURCES ========== " + resources
-        species.resources?.clear();
+        def resources = []
+        if(params.resourceListType == "ofSpecies"){
+            println "=====PARAMS ========== " + params
+            def resourcesXML = createResourcesXML(params);
+            println "=====RES XML =========== " + resourcesXML
+            resources = saveResources(species, resourcesXML);
+            println "=========RESOURCES ========== " + resources
+            species.resources?.clear();
+        }
+        else if(params.resourceListType == "fromRelatedObv"){
+            def resId = []
+            params.each { key, val ->
+                int index = -1;
+                if(key.startsWith('pullImage_')) {
+                    index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+                }
+                if(index != -1) {
+                    resId.add(params.get('resId_'+index));    
+                }
+            }
+            println "======RES ID ========= " + resId
+            resId.each{
+                resources.add(Resource.get(it.toLong()))
+            }
+        }
         resources.each { resource ->
             println "======ADDING RESOURCE = ======= " + resource
             species.addToResources(resource);

@@ -433,6 +433,40 @@ class ObservationService extends AbstractObjectService {
         }
         return ["observations":result, "count":count]
     }
+    
+    Map getRelatedObvForSpecies(resInstance, int limit, int offset){
+        def taxonConcept = resInstance.taxonConcept
+        println "=======taxonConcept ===== " + taxonConcept
+        List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+        println "==========scientificNameRecos======= " + scientificNameRecos
+        def resList = []
+        println "========MAX OFFSET ============== " + limit + "%%%%%"+  offset 
+        if(scientificNameRecos){
+            def resIdList = Observation.executeQuery ('''
+                select r.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by r.id asc
+                ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit, offset: offset]);
+
+             /*
+            def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
+            def hqlQuery = sessionFactory.currentSession.createQuery(query) 
+            hqlQuery.setMaxResults(limit);
+            hqlQuery.setFirstResult(offset);
+            def queryParams = [:]
+            queryParams["scientificNameRecos"] = scientificNameRecos
+            queryParams["isDeleted"] = false
+            hqlQuery.setProperties(queryParams);
+            def resIdList = hqlQuery.list();
+            */
+            resIdList.each{
+                resList.add(Resource.get(it));
+            }
+            def resListSize = resList.size()
+            println "===============RES LIST COMPLETE =========== " + resList + "====" + resListSize
+            return ['resList': resList, 'count' : resListSize ]
+        } else{
+            return ['resList': resList, 'count': 0]
+        }
+    }
 
     Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
         def taxonConcept = TaxonomyDefinition.read(taxonConceptId);

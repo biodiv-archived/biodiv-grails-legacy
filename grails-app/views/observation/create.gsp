@@ -38,8 +38,8 @@
                 <div class="span12 super-section">
                     <div class="section">
                         <h3>What did you observe?</h3>
-
-                        <g:render template="addPhoto" model="['observationInstance':observationInstance]"/>
+                        <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'ofObv']"></obv:addPhotoWrapper>
+                        <!--g:render template="addPhoto" model="['observationInstance':observationInstance]"/-->
                          <div class="section" style="margin:0px;">
                             <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>

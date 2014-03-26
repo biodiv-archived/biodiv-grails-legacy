@@ -4,23 +4,16 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.Species"%>
 
-<div>
-    <i class="icon-picture"></i><span>Upload photos of a
-        single observation and species and rate images inorder to order them.</span>
-
-
-    <div
-        class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
-        <ul id="imagesList" class="thumbwrap thumbnails"
-            style='list-style: none; margin-left: 0px;'>
-            <g:set var="i" value="${1}" />
-            <g:if test="${observationInstance instanceof Observation}">
-            <g:set var= "res" value="${observationInstance?.resource}" />
+            <g:if test="${resourceListType == 'fromRelatedObv'}">
+                <g:set var="i" value="${1+offset}"/>
             </g:if>
             <g:else>
-            <g:set var= "res" value="${observationInstance?.resources}" />
+                <g:set var="i" value="${1}"/>
             </g:else>
+            <g:set var= "res" value="${resList}" />
+            <g:if test="${resourceListType != 'fromRelatedObv'}">
             <li id="add_file" class="addedResource" style="z-index:40">
+            
             <div id="add_file_container">
                 <div id="add_image"></div> 
                 <div style="text-align:center;">
@@ -35,12 +28,13 @@
             </div>
 
             </li>
+            </g:if>
             <g:each in="${res}" var="r">
             <li class="addedResource thumbnail">
             <%
             def imagePath = '';
             if(r) {
-            if(observationInstance instanceof Observation){
+            if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString()){
                 imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
             }else{
                 def spFolder = grailsApplication.config.speciesPortal.resources.rootDir
@@ -61,18 +55,21 @@
                 <input name="file_${i}" type="hidden" value='${r.fileName}' />
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
-                
+                <input name="resContext__${i}" type="hidden" value='${r.context.value()}'/>
                 <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
                 <g:if test="${r.type == ResourceType.IMAGE}">
                 <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList().first()]"/>
                 </g:if>
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
-                    <%--<i class="imageMetadataInfo icon-edit"></i>--%>
                 <div class="imageMetadataForm" >
                     <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="Contributor">
                     <input name="source_${i}" type="text" value="${r.url}" placeholder="Source">
                     <input name="title_${i}" type="text" value="${r.description}" placeholder="Caption">
+                    <g:if test="${resourceListType == 'fromRelatedObv'}">
+                        <input name="pullImage_${i}" type="checkbox" value="true" style="float:right; margin-right:-48px; margin-top:-23px;" >
+                        <input name="resId_${i}" type="hidden" value='${r.id}'/>
+                    </g:if>
                 </div>
             </div>
             </g:if>
@@ -83,13 +80,7 @@
             </li>
             <g:set var="i" value="${i+1}" />
             </g:each>
-                    </ul>
-        <div id="image-resources-msg" class="help-inline">
-            <g:renderErrors bean="${observationInstance}" as="list"
-            field="resource" />
-        </div>
-    </div>
-</div>
+            
 <!--====== Template ======-->
 <script id="metadataTmpl" type="text/x-jquery-tmpl">
     <li class="addedResource thumbnail addedResource_{{>i}}">
@@ -116,12 +107,16 @@
             <g:if test="${observationInstance instanceof Species}">
             <div >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_${i}" type="text" value="" placeholder="Contributor">
-                    <input name="source_${i}" type="text" value="" placeholder="Source">
-                    <input name="title_${i}" type="text" value="" placeholder="Caption">
+                    <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
+                    <input name="source_{{>i}}" type="text" value="" placeholder="Source">
+                    <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
+                    <input name="resContext_{{>i}}" type="hidden" value"SPECIES">
                 </div>
             </div>
             </g:if>
+            <g:else>
+                <input name="resContext_{{>i}}" type="hidden" value"OBSERVATION">
+            </g:else>
                 <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span>Choose a license</span>
                 <g:each in="${species.License.list()}" var="l">
@@ -139,12 +134,4 @@
     </li>
 
 </script>
-<r:script>
-    $(document).ready(function(){
-    filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
-        $(".imageMetadataInfo").click(function(){
-            console.log("clicked");
-            $(this).closest("div").find(".imageMetadataForm").toggle();
-        });
-    });
-</r:script>
+

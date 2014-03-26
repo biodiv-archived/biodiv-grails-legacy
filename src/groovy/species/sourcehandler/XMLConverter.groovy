@@ -791,7 +791,7 @@ class XMLConverter extends SourceConverter {
 
             if(!res) {
                 log.debug "Creating new resource"
-                res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
+                res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text(), context:imageNode.resContext?.text());
                 res.url = sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
