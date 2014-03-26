@@ -1,8 +1,11 @@
-<div class="speciesField">
-    <s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
+<s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
+    <g:if test="${isSpeciesContributor}">
         <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
-    </s:isSpeciesFieldContributor>
+    </g:if>
+</s:isSpeciesFieldContributor>
 
+
+<div class="speciesField ${speciesFieldInstance.description?'':'dummy hide'}" data-name="speciesField" data-act ="${speciesFieldInstance.description?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
     <div class="contributor_entry">
         <!-- buttons -->
         <div class="pull-right">
@@ -65,14 +68,14 @@
             </ul>
             </g:if>
             <!-- content -->
-            <textarea id="description_${speciesFieldInstance.id}" name="description_${speciesFieldInstance.id}" 
+            <textarea id="description_${speciesFieldInstance.id?speciesFieldInstance.id:'f'+speciesFieldInstance.field.id}" name="description" 
                 class="${isSpeciesFieldContributor?'ck_desc':''}"
                 data-pk="${speciesFieldInstance.id}"
                 data-type="ckeditor"
                 data-url="${uGroup.createLink(controller:'species', action:'update') }"
                 data-name="description" 
                 placeholder="Write a small descripiton about the field." style="display:none;">
-                <g:each in="${speciesFieldInstance?.description.split('\n')}"
+                <g:each in="${speciesFieldInstance?.description?.split('\n')}"
                 var="para">
                 <g:if test="${para}">           
                 <p>
@@ -85,7 +88,7 @@
             </textarea>        
 
             <div class="description" >
-    <g:each in="${speciesFieldInstance?.description.split('\n')}"
+    <g:each in="${speciesFieldInstance?.description?.split('\n')}"
     var="para">
     <g:if test="${para}">
     <p>
@@ -133,7 +136,7 @@ test="${!speciesFieldInstance?.description && !speciesFieldInstance?.field?.subC
 </g:elseif>
 
 <g:showSpeciesFieldToolbar
-model="['speciesFieldInstance':speciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
+model="['speciesFieldInstance':speciesFieldInstance, 'isSpeciesFieldContributor':isSpeciesFieldContributor, 'isCurator':isCurator]" />
 <g:if test="${speciesFieldInstance != null}">
 <comment:showCommentPopup
 model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />

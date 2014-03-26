@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 import species.Field;
 import species.UserGroupTagLib;
+import species.Synonyms;
 import species.CommonNames;
 import species.TaxonomyDefinition;
 import species.auth.Role
@@ -185,8 +186,12 @@ class BootStrap {
                 return ['createdOn':it.createdOn, 'notes': it.notes]
         }
 
+        JSON.registerObjectMarshaller(Synonyms) {
+            return ['id':it.id, 'name':it.name,  'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, relationship: ['name':it.relationship.value()], 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor()]
+        }
+
         JSON.registerObjectMarshaller(CommonNames) {
-            return ['id':it.id, 'name':it.name, 'language': ['id':it.language.id, 'name':it.language.name], 'taxonConcept':['id':it.taxonConcept.id]]
+            return ['id':it.id, 'name':it.name, 'language': ['id':it.language.id, 'name':it.language.name], 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ]
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {

@@ -38,10 +38,10 @@ CKEDITOR.plugins.add( 'inlinesave',{
                 }//addData
             }
         });
-        editor.ui.addButton( 'Inlinesave', {
+        /*editor.ui.addButton( 'Inlinesave', {
             label: 'Save',
             command: 'inlinesave',
             icon: this.path + 'images/inlinesave.png'
-        } );
+        } );*/
     }
 });

@@ -22,6 +22,15 @@ class SpeciesField extends Sourcedata implements Rateable {
 		String value() {
 			return this.value;
 		}
+
+		static def toList() {
+			return [
+				UNDER_CREATION,
+				PUBLISHED,
+				UNDER_VALIDATION,
+				VALIDATED 
+            ]
+		}
 	}
 	
 	public enum AudienceType {
@@ -38,6 +47,14 @@ class SpeciesField extends Sourcedata implements Rateable {
 		public String value() {
 			return this.value;
 		}
+
+        static def toList() {
+			return [
+	            CHILDREN,
+                GENERAL_PUBLIC,
+                EXPERT_USERS
+            ]
+        }
 	}
 	
 	Status status = Status.UNDER_CREATION;
@@ -58,11 +75,11 @@ class SpeciesField extends Sourcedata implements Rateable {
 	}
 	
 	static constraints = {
+        description blank:false, nullable:false
 		contributors validator : { val, obj ->
 			if(!val) {
-				obj.addToContributors(SUser.findByUsername('pearlsravanthi'));
-				//return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
-				return true;
+				//obj.addToContributors(SUser.findByUsername('pearlsravanthi'));
+				return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 			}
 		}
 		licenses validator : { val, obj ->

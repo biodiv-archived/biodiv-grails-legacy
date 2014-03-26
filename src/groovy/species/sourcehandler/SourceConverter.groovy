@@ -68,7 +68,7 @@ class SourceConverter {
     }
 
     protected Node createDataNode(Node field, String text, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
-        if(!text) return;
+        if(!field) return;
 
         Node data = new Node(field, "data", text);
         attachMetadata(data, contributors, attributions, licenses, audiences, status);

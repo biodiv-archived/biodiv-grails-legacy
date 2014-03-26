@@ -32,5 +32,18 @@ abstract class NamesSorucedata extends Sourcedata {
 			this.errors.allErrors.each { log.error it }
 		}
 	}
-	
+
+    boolean isContributor(SUser user) {
+        if(!user) user = springSecurityService.currentUser;
+        return this.contributors.contains(springSecurityService.currentUser);
+        /*
+        boolean success = false;
+        this.contributors.each { c->
+           if(c.email == springSecurityService.currentUser.email) {
+               success = true;
+               return
+           }
+       }
+        return success;*/
+    }
 }

@@ -34,20 +34,8 @@
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
                         </div>
                     </div>   
-                    <div id="taxonHierachy" class="control-group" style="display:none;">
-                        <label
-                            class="control-label span3">Taxon Hierarchy</label> 
-                        <div class = "span8">
-                            <div id="existingHierarchies"><div>Following hierarchies already exist for the given species name.</div></div>
-                            <g:each in="${TaxonomyRank.list()}" var="taxonRank">
-                            <g:if test="${taxonRank.ordinal() != TaxonomyRank.SPECIES.ordinal()}">
-                            <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
-                            type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
-                            placeholder="Add ${taxonRank.value()}" />
-                            </g:if>
-                            </g:each>
-                        </div>
-                    </div>
+                    <g:render template="/common/createTaxonRegistryTemplate"/>
+
 
                 </div>   
                 <div class="span12 submitButtons">
@@ -126,7 +114,7 @@
                             });
                         }
                         $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
-                        $('#taxonHierachy').show();
+                        $('#taxonHierachyInput').show();
                         $('#addSpeciesSubmit').show();
                     } else {
                         $('#species').next('.alert').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
