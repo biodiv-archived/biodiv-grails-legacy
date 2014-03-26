@@ -2112,7 +2112,7 @@ class ObservationService extends AbstractObjectService {
                     case "138" : features['Soil'] = it.getProperty("feature");break;
                     case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
                     case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
-                    case "136" : features['Tahsil'] = obv.geoPrivacy?"":it.getProperty("feature");break;
+                    case "136" : features['Tahsil'] = it.getProperty("feature");break;
                 }
             };
             sql.close();

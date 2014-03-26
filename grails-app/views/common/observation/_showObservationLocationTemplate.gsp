@@ -43,7 +43,7 @@
                 %>
                 ${(geoPrivacyAdjustment != 0) ? 'Geoprivacy enabled' : latitude.toFloat() + ',' + longitude.toFloat()}
 
-                <input id='areas' type='hidden' name='areas' value='${areas}'/>
+				<input id='areas' type='hidden' name='areas' value='${areas}'/>
 
                 <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"/>
                 <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"/>
