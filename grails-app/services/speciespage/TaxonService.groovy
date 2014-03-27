@@ -777,16 +777,22 @@ class TaxonService {
     def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor) {
         List errors = [];
         if(!classification) {
-            return [success:false, msg:"Not a valid classification ${params.classification}."]
+            return [success:false, msg:"Not a valid classification ${classification?.name}."]
         }
 
         def taxonRegistry = addTaxonEntries(speciesName, (new XMLConverter()), taxonRegistryNames, classification.name, contributor);
         if(taxonRegistry) {
+            int maxRank = 0;
+            TaxonomyRegistry reg;
             taxonRegistry.each { 
                 if(it.errors.getErrorCount() > 0)
                     errors.addAll(it.errors.collect {it.toString()})
+                if(it.taxonDefinition.rank > maxRank) {
+                    reg = it;
+                    maxRank = it.taxonDefinition.rank;
+                }
             }
-            return ['success':true, msg:'Successfully added hierarchy', 'taxonRegistry':taxonRegistry, errors:errors]
+            return ['success':true, msg:'Successfully added hierarchy', 'reg' : reg, errors:errors]
         }
         return ['success':false, msg:'Error while adding hierarchy', errors:errors]
     }
@@ -795,10 +801,18 @@ class TaxonService {
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor)
         return converter.getClassifications(taxonRegistryNodes, speciesName, true); 
     }
- 
-    def deleteTaxonEntries(TaxonomyRegistry reg) {
-        def result = [];
-        def errors = [];
+
+    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
+        return deleteTaxonEntries(reg, force);
+    }
+
+    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+        String msg = '';
+        def content;
+        List errors = [];
+        Map r = [errors:errors];
+
+        List toDelete = [];
 
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
@@ -808,66 +822,91 @@ class TaxonService {
             return [success:false, msg:"You don't have permission to delete as you are not a contributor.", errors:errors]
         }
 
-        TaxonomyRegistry.withTransaction { status ->
-            String msg = '';
-            def content;
-            def r = [:];
-            if(reg.parentTaxon) {
-                println reg.parentTaxon;
-                r = deleteTaxonEntries(reg.parentTaxon);
-                println r;
+        def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
+            projections {
+                count('id')
             }
-            try {
-                //recursive call for hierarchy
-                if(r.success || reg.parentTaxon == null) {
-                    def contributor = springSecurityService.currentUser;
-                    println reg.contributors
+            taxonDefinition {
+                eq('id', reg.taxonDefinition.id)
+            }
+            like('path', '%_'+reg.taxonDefinition.id)
+        }
+
+        if(force == false && otherHierarchiesCount[0] == 1) {
+            //if this is the only hierarchy for the species ... then dont delete it.
+            return [success:false, msg:"Cannot remove hierarchy as its the only one available for the species", errors:errors]
+        }
+
+        try {
+            if(reg) {
+                def contributor = springSecurityService.currentUser;
+                while(reg != null) {
+                    println reg;
                     def c = TaxonomyRegistry.withCriteria () {
                         projections {
                             count('id')
                         }
                         eq('parentTaxon', reg)
                         contributors {
-                            eq('id', contributor)
+                            eq('id', contributor.id)
                         }
                     }
-                    if(c > 1) {
+                    if(c[0] > 1) {
                         //there is another hierarchy sharing same nodes and with same contributor.
                         // so leaving this portion untouched
                         r.success = true;
                         r.msg = 'Successfully removed registry';
-                        r.errors = errors
-                        return r;
+                        r.errors << errors
+                        break;
                     }
-                    reg.removeFromContributors(contributor);
+                    //reg.removeFromContributors(contributor);
 
-                    if(reg.contributors.size() == 0) {
-                        reg.delete(failOnError:true)
-                    } else if(!reg.save()) {
-                        println "save"
-                        reg.errors.each { errors << it; log.error it }
-                        r.success = false;
-                        r.msg = "Error while deleting registry ${reg.path}"
-                        r.errors = errors
-                        return r;
+                    toDelete << reg;
+                        //reg.delete(failOnError:true)
+                    reg = reg.parentTaxon;
+                } 
+                
+                int maxRank = 0, regId;
+                TaxonomyRegistry.withTransaction { status ->
+                    toDelete.each { r2 ->
+
+                        if(r2.taxonDefinition.rank > maxRank) {
+                            regId = r2.id;
+                            maxRank = r2.taxonDefinition.rank;
+                        }
+
+                        r2.removeFromContributors(contributor);
+
+                        if(r2.contributors.size() == 0) {
+                            r2.delete(failOnError:true)
+                        } else if(!r2.save()) {
+                            r2.errors.each { errors << it; log.error it }
+                            r.success = false;
+                            r.msg = "Error while deleting registry ${r2.path}"
+                            r.errors << errors
+                            throw new RuntimeException(r.msg + r.errors)
+                            return r;
+                        } 
                     }
-                    r.success = true;
-                    r.msg = 'Successfully removed registry';
-                    r.errors = errors
-                    return r;
-                } else {
-                    return r;
                 }
-            } 
-            catch(e) {
-                e.printStackTrace();
-                log.error e.getMessage();
-                r.success = false;
-                r.msg = "Error while deleting registry ${e.getMessage()}"
-                r.errors = errors
+                r.success = true;
+                r.msg = 'Successfully removed registry';
+                r.errors << errors
+                r.regId = regId
+                return r;
+            } else {
                 return r;
             }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            r.success = false;
+            r.msg = "Error while deleting registry ${e.getMessage()}"
+            r.errors = errors
+            return r;
         }
+
     }
 
     /**

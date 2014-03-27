@@ -5,10 +5,10 @@
 (function ($) {
     "use strict";
 
-    var SpeciesField = function (div, selector, options) {
+    var SpeciesField = function (div, editSelector, addSelector, options) {
         this.init($(div), options);
         //nothing shown after init
-        this.initEditables(selector);
+        this.initEditables(editSelector, addSelector);
     };
 
     $.fn.editableutils.inherit(SpeciesField, $.fn.speciesComponents.abstracttype);
@@ -27,7 +27,7 @@
         var args = arguments;
         return this.each(function () {
             var $this = $(this);
-            new SpeciesField(this, '.ck_desc', options);
+            new SpeciesField(this, '.ck_desc', 'dummy.speciesField', options);
         });
     };
 

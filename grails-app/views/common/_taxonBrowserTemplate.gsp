@@ -20,12 +20,12 @@ expandSpecies:true
     <h5>Classifications</h5>	
 
     <div id="taxaHierarchy">
-        <g:if test="${speciesInstance}">
         <g:set var="classifications" value="${speciesInstance.classifications()}" />
+        <g:if test="${speciesInstance && classifications}">
         <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
             <g:each in="${classifications}" var="classification">
             <option value="${classification[0]}">
-            ${classification[1].name} ${classification[2].toString()}
+                ${classification[1].name} ${classification[2].toString()}
             </option>
             </g:each>
         </select>
@@ -38,52 +38,40 @@ expandSpecies:true
                     id="cInfo"></span>
                 <g:each in="${classifications}" var="classification">
                 <p id="c-${classification[1].id}" style="display: none;">
-                ${classification[1].citation}
+                ${classification[1].citation?:classification[2].toString()}
+
                 </p>
                 </g:each>
 
             </div>
         </div>
 
+        <table id="taxonHierarchy" class="editField emptyField"></table>
 
         </g:if>
         <g:else>
-        <g:set var="classifications" value="${Classification.list()}" />
-        <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
-            <g:each in="${classifications}" var="classification">
-            <option value="${classification.id}">
-            ${classification.name}
-            </option>
-            </g:each>
-        </select>
-        <div class="attributionBlock">
-            <span class="ui-icon-info ui-icon-control " title="Show details"
-                style="position: absolute; top: 0; right: 0; margin: 10px;"></span>
-            <div class="ui-corner-all toolbarIconContent attribution"
-                style="display: none;">
-                <a class="ui-icon ui-icon-close" style="float: right;"></a> <span
-                    id="cInfo"></span>
-                <g:each in="${classifications}" var="classification">
-                <p id="c-${classification.id}" style="display: none;">
-                ${classification.citation}
-                </p>
-                </g:each>
-
-            </div>
-        </div>
+       <table id="taxonHierarchy" class="emptyField"></table>
         </g:else>
-        <table id="taxonHierarchy"></table>
+
     </div>
     <form id="taxonHierarchyForm" class="form-horizontal editableform hide">
         <div class="control-group">
             <div>
                 <div class="editable-input">
                     <g:each in="${TaxonomyRank.list()}" var="taxonRank">
-                    <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
-                    type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
-                    placeholder="Add ${taxonRank.value()}" />
+                    <g:if test="${taxonRank.ordinal() == TaxonomyRank.SPECIES.ordinal()}">
+                        <input type="hidden"  data-rank ="${taxonRank.ordinal()}"
+                            type="text" name="taxonRegistry.${taxonRank.ordinal()}" 
+                            value="${speciesInstance.taxonConcept.name}"
+                            placeholder="Add ${taxonRank.value()}" readonly/>
+                    </g:if>
+                    <g:else>
+                        <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
+                            type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
+                            placeholder="Add ${taxonRank.value()}" />
+                    </g:else>
                     </g:each>
-                    <input type="hidden" name="species" value="${speciesInstance.taxonConcept.name}"/>
+                    <input class='classification' type="hidden" name="classification" value="${Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY).id}" readonly/>
                 </div>
                 <div class="editable-buttons editable-buttons-bottom pull-right">
                     <button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button>

@@ -21,9 +21,9 @@
             }
         },
 
-        initEditables : function(selector) {
-            this.$element.find(".dummy.speciesField").before("<a class='addFieldButton btn btn-success' title='Add'><i class='icon-plus'></i>Add</a>");
-            this.$element.find(selector).before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+        initEditables : function(editSelector, addSelector) {
+            this.$element.find(addSelector).before("<a class='addFieldButton btn btn-success' title='Add'><i class='icon-plus'></i>Add</a>");
+            this.$element.find(editSelector).before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
 
             this.$element.find('.addFieldButton').click($.proxy(this.onAdd, this));
             this.$element.find('.editFieldButton').click($.proxy(this.onEdit, this));
