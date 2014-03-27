@@ -64,6 +64,7 @@ class SpeciesService extends AbstractObjectService  {
     def namesIndexerService;
     def observationService;
     def speciesPermissionService;
+    def taxonService;
 
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
@@ -1106,9 +1107,12 @@ println speciesField.references.size();
     def createSpecies(String speciesName, List taxonRegistryNames) {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
+        List errors = [];
+        Map result = [errors:errors];
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+        
         if(speciesInstance.taxonConcept) {
 
             speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
@@ -1121,13 +1125,22 @@ println speciesField.references.size();
 				existingSpecies.clearBasicContent()
                 speciesInstance = existingSpecies;
             }
-            
+
+            if(!taxonService.validateHierarchy(taxonRegistryNames)) {
+                if(!speciesInstance.fetchTaxonomyRegistry()) {
+                    return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                }
+            }
+ 
             //save taxonomy hierarchy
-            def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, springSecurityService.currentUser)
-            taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true); 
+            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+            result = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+
+            result.speciesInstance = speciesInstance;
+            result.taxonRegistry = taxonRegistry;
+            result.errors = errors;
         }
-        println speciesInstance
-        return ['speciesInstance':speciesInstance, 'taxonRegistry':taxonRegistry];
+       return result;
     }
 
     /**

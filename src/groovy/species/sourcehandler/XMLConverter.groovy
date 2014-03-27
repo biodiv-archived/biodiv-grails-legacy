@@ -1376,7 +1376,7 @@ println imageNode;
      * @param scientificName
      * @return
      */
-    private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
+    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
         log.debug "Getting classification hierarchy : "+classification.name;
 
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();

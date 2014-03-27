@@ -71,7 +71,6 @@
         initEditableForm : function($container, $conEntry, options) {
             var $sf = this;
             if(!options) options = {};
-            console.log(options);
 
             $conEntry.find('.attributionContent').show();
 

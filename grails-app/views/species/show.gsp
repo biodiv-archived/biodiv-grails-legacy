@@ -338,6 +338,10 @@
             langSelectorOptions.push({value:"${lang.name}", text:"${lang.name}"});
             </g:each>
 
+            var taxonRanks = [];
+            <g:each in="${TaxonomyRank.list()}" var="t">
+            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            </g:each>
 
             </g:javascript>	
 

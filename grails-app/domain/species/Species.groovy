@@ -144,7 +144,6 @@ class Species implements Rateable {
 		return this.title;
 	}
 
-
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
 		resources.each {
@@ -165,7 +164,6 @@ class Species implements Rateable {
 		return res;
 	}
 	
-
 	String notes() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
@@ -187,7 +185,6 @@ class Species implements Rateable {
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
 	}	
-
     
     //TODO:remove this function after getting icons for all groups
 	Resource fetchSpeciesGroupIcon(ImageType type) {
@@ -200,18 +197,18 @@ class Species implements Rateable {
 	}
 	
 	def classifications() {
-		def classifications = new HashSet();
-		def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
-		classifications.add(combinedHierarchy);
+		def classifications = []
+		//def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
+		//classifications.add([0, combinedHierarchy);
 		def reg = TaxonomyRegistry.findAllByTaxonDefinition(this.taxonConcept);
 		reg.each {
 			if(it.path.split('_').length >= 6) {
-				classifications.add(it.classification);
+				classifications.add([it.id, it.classification, it.contributors]);
 			}
 		}
 		//Ordering has to figured out. Sort is a vague criteria. 
 		//Added just to get Author contributed as first result if present 
-		classifications = classifications.sort {it.name};
+		classifications = classifications.sort {return it[1].name};
 		
 		return classifications;
 	}
