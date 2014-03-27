@@ -74,7 +74,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 										
 	<div class="alertMsg alert alert-info"
 		style="clear: both; margin: 0px; text-align: center;">
-		The TreesIndia@IBP is organizing a "Neighbourhood Trees Campaign" from Earth day 22nd April to 30th. Participate in running the campaign by filling <a href="https://docs.google.com/forms/d/1qRWjfUyXKcmDeSsW7fXm78BLJPFEseV1JfL_MYxqUDc/viewform">this form</a>.
+		The TreesIndia@IBP is organizing a "Neighbourhood Trees Campaign" from Earth day 22nd-27th April. Participate in running the campaign by filling <a href="https://docs.google.com/forms/d/1qRWjfUyXKcmDeSsW7fXm78BLJPFEseV1JfL_MYxqUDc/viewform">this form</a>.
 	</div>
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"

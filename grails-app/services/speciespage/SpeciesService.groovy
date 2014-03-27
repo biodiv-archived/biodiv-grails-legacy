@@ -965,7 +965,7 @@ class SpeciesService {
 
 
     def getSpeciesList(params, String action){
-        if("search".equalsIgnoreCase(action)){
+        if(Utils.isSearchAction(params, action)){
             return search(params)
         }else{
             return _getSpeciesList(params)

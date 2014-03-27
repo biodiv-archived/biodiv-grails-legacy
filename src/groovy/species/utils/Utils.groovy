@@ -431,6 +431,15 @@ class Utils {
 		return retMap
 	}
 	
+	/**
+	 * On browser if you are on list page and doing some advance search result came from search while url still shows 'list' action
+	 * this leading to wrong result in ResourceFetcher (i.e download/export post/unpost) this function is take care of all such cases
+	 * @param params
+	 * @return
+	 */
+	public static boolean isSearchAction(params, String action = null){
+		return ("search".equalsIgnoreCase(action) || "search".equalsIgnoreCase(params.action) ||  params.aq || params.query ) 
+	}
 	
 }
 
