@@ -235,16 +235,19 @@ class Species implements Rateable {
     }
 
     def afterInsert() {
-   
-        HashSet contributors = new HashSet();
-
-        //TODO:looks like this is gonna be heavy on every save ... gotta change
-        contributors.addAll(this.fields?.collect { it.contributors })
-        contributors.addAll(Synonyms.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
-        contributors.addAll(CommonNames.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
-        
-        //Saving current user as contributor for the species
-        speciesPermissionService.addContributors(this, new ArrayList(contributors));
+		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
+		//http://jira.grails.org/browse/GRAILS-4453
+		Species.withNewSession{
+	        HashSet contributors = new HashSet();
+	
+	        //TODO:looks like this is gonna be heavy on every save ... gotta change
+			this.fields?.each { contributors.addAll(it.contributors)}
+	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+	        
+	        //Saving current user as contributor for the species
+	        speciesPermissionService.addContributors(this, new ArrayList(contributors));
+		}
     }
 
     def beforeDelete(){
@@ -339,5 +342,35 @@ class Species implements Rateable {
 			errors.allErrors.each { log.error it }
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param start
+	 * @param end
+	 * @return species list summary on given time period
+	 */
+	static Map fetchSpeciesSummary(start, end){
+		def allSpeciesUpdateCount = Species.createCriteria().count {
+			and{
+				between("lastUpdated", start, end)
+			}
+		}
+		
+		def speciesUpdateCount = Species.createCriteria().count {
+			and{
+				gt('percentOfInfo', new Float(0.0))
+				between("lastUpdated", start, end)
+				lt("dateCreated", start)
+			}
+		}
+		
+		def speciesCreateCount = Species.createCriteria().count {
+			and{
+				gt('percentOfInfo', new Float(0.0))
+				between("dateCreated", start, end)
+			}
+		}
+		
+		return ['allSpeciesUpdated':allSpeciesUpdateCount, 'speciesUpdated':speciesUpdateCount, 'speciesCreated':speciesCreateCount, 'stubsCreated':(allSpeciesUpdateCount - speciesUpdateCount - speciesCreateCount)]
+	}
 }

@@ -775,10 +775,10 @@ class XMLConverter extends SourceConverter {
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-            if(!imageFile.exists()) {
+			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-                    ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+					ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                 } catch(FileNotFoundException e) {
                     log.error "File not found : "+tempFile.absolutePath;
 					addToSummary("File not found : "+tempFile.absolutePath)
@@ -824,7 +824,7 @@ class XMLConverter extends SourceConverter {
 
             //s.addToResources(res);
             imageNode.appendNode("resource", res);
-            log.debug "Successfully created resource";
+            log.debug "Successfully created resource " + res;
             return res;
         } else {
             log.error "File not found : "+tempFile?.absolutePath;
@@ -838,7 +838,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     File getImageFile(Node imageNode, String imagesDir="") {
-        String fileName = imageNode?.fileName?.text()?.trim();
+		String fileName = imageNode?.fileName?.text()?.trim();
         String sourceUrl = imageNode.source?.text();
         if(!fileName && !sourceUrl) return;
 
@@ -962,11 +962,10 @@ class XMLConverter extends SourceConverter {
     private List<Resource> getResources(Node dataNode, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
         List<Resource> resources = new ArrayList<Resource>();
         List<Resource> res =  getImages(dataNode.images?.image, imagesNode);
-        if(res) resources.addAll(res);
-        res =  getImages(dataNode.icons?.icon, iconsNode);
-        if(res) resources.addAll(res);
-
-        log.debug "Getting resources for dataNode : "+resources;
+		if(res) resources.addAll(res);
+		res =  getImages(dataNode.icons?.icon, iconsNode);
+		if(res) resources.addAll(res);
+		log.debug "Getting resources for dataNode : "+resources;
         return resources;
     }
 
@@ -977,7 +976,7 @@ class XMLConverter extends SourceConverter {
         imagesRefNode.each {
             String fileName = it?.text()?.trim();
             def imageNode = imagesNode.image.find { it?.refKey?.text()?.trim() == fileName };
-println imageNode;
+			myPrint("========== image node  " + imageNode);
 
             if(imageNode) {
                 def res;
@@ -997,8 +996,8 @@ println imageNode;
                 if(tempFile) {
                     //check if the fileName is a physical file on disk and create a resource from it
                     def resource = createImage(it, s.taxonConcept.canonicalForm, ResourceType.IMAGE);
-                    if(resource) {
-                        return [resource];
+				    if(resource) {
+                        resources.add(resource)
                     }
                 } else {
                     log.error "COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}"
@@ -1006,7 +1005,7 @@ println imageNode;
                 }
             }
         }
-        return resources;
+		return resources;
     }
 
     //	private List<Resource> getIcons(Node dataNode, Node iconsNode) {
