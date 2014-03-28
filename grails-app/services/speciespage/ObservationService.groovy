@@ -2093,7 +2093,7 @@ class ObservationService extends AbstractObjectService {
      * used for download and post in bulk
      */
     def getObservationList(params, max, offset, action){
-		if("search".equalsIgnoreCase(action)){
+		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
             def res = []

@@ -333,7 +333,7 @@ class DocumentService {
 	 */
 	Map getFilteredDocuments(params, max, offset) {
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
-		if(!params.aq){
+		if(Utils.isSearchAction(params)){
 			res.putAll(getDocsFromDB(params, max, offset))
 		}else{
 			//returning docs from solr search

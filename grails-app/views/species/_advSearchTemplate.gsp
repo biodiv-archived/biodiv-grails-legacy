@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <div class="block-tagadelic">
 	<form id="advSearchForm" method="get" 		
-		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search') }"
+		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search', userGroup:userGroupInstance) }"
 		title="Advanced Search" class="searchbox">
 		<label class="control-label" for="name">Species</label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"

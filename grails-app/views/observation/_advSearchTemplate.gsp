@@ -3,7 +3,7 @@
 <div  class="block-tagadelic ">
 
 	<form id="advSearchForm" method="get"  title="Advanced Search"
-		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'observation', action:'search') }"
+		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'observation', action:'search', userGroup:userGroupInstance) }"
 		class="searchbox">
 		<label class="control-label" for="name">Species</label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
