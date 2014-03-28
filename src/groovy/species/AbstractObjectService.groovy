@@ -175,7 +175,6 @@ class AbstractObjectService {
 
         log.debug "FeaturedQuery:"+ query + " params: "+queryParams
         featured = Featured.executeQuery(query, queryParams);
-println featured
         def observations = [:]
         featured.each {
             def observation = activityFeedService.getDomainObject(it.objectType,it.objectId)

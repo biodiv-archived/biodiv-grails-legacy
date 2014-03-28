@@ -81,7 +81,6 @@ abstract class AbstractSearchService {
         def result;
         try {
             result = solrServer.query( params );
-			println "===============res " + result
         } catch(SolrException e) {
             log.error "Error: ${e.getMessage()}"
         }
