@@ -82,9 +82,6 @@
             }
         });
 
-        $(".taxonRank").autofillNames();
-
-
 
         $('#validateSpeciesSubmit').click(function() {
             //Did u mean species 
@@ -93,7 +90,6 @@
                 data:{'name':$('#species').val()},
                 dataType:'json',
                 success:function(data) {
-                console.log(data);
                     if(data.success == true) {
                         if(data.id) {
                         data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"

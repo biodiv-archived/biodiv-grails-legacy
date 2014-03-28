@@ -53,7 +53,7 @@ class SpeciesPermissionService {
     int addContributors(Species speciesInstance, List<SUser> contributors) {
         if(!speciesInstance || !contributors) return 0;
         int n = 0;
-        contributors.each { c ->
+		contributors.each { c ->
             addContributorToSpecies(c, speciesInstance) ? n++ : '';
         }
         return n;

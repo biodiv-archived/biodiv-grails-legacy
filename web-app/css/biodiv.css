@@ -1993,7 +1993,7 @@ line-height: 11px;
         }
     }
 
-.contributor_entry, .speciesField .editableform {
+.contributor_entry {/*, .speciesField .editableform {*/
         border: 1px solid #D3D3D3;
 	border-color: #CECECE;
 	border-radius: 5px;
@@ -2623,9 +2623,9 @@ small {
     cursor: pointer;
     font-size:12px;
     font-weight:normal;
-    margin-right:5px;
+    margin:5px;
 }
-
+/*
 .editable-container.editable-inline {
     width:100%;
 }
@@ -2641,10 +2641,18 @@ small {
 .editable-pre-wrapped {
     white-space: normal;
 }
-
+*/
 .hidePoint {
     display:none;
 }
+
+.speciesField {
+	padding: 0px 10px;
+	background-color:white;
+	overflow: visible;
+    clear:both;
+}
+
 
 .speciesField .description {
     padding:5px;

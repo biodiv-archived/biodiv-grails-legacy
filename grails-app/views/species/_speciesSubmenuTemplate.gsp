@@ -12,7 +12,7 @@
     <div class="pull-right">
         <g:if test="${isSpeciesContributor}">
         <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"
-            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" onclick="initEditableFields(event);return false;">
+            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
             <i class="icon-edit"></i>Edit</a>
 
         </g:if>

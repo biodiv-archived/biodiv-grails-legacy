@@ -11,6 +11,8 @@ import species.TaxonomyDefinition.TaxonomyRank;
 import species.TaxonomyRegistry
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.XMLConverter
+import species.auth.SUser;
+import grails.converters.JSON;
 
 class TaxonService {
 
@@ -22,7 +24,8 @@ class TaxonService {
 	def namesLoaderService;
 	def speciesService;
 	def externalLinksService;
-	
+    def springSecurityService;
+
 	static int BATCH_SIZE = 100;
 
 	/**
@@ -767,7 +770,146 @@ class TaxonService {
 
 	}
 
-	/**
+    /**
+    *
+    */
+
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor) {
+        List errors = [];
+        if(!classification) {
+            return [success:false, msg:"Not a valid classification ${classification?.name}."]
+        }
+
+        def taxonRegistry = addTaxonEntries(speciesName, (new XMLConverter()), taxonRegistryNames, classification.name, contributor);
+        if(taxonRegistry) {
+            int maxRank = 0;
+            TaxonomyRegistry reg;
+            taxonRegistry.each { 
+                if(it.errors.getErrorCount() > 0)
+                    errors.addAll(it.errors.collect {it.toString()})
+                if(it.taxonDefinition.rank > maxRank) {
+                    reg = it;
+                    maxRank = it.taxonDefinition.rank;
+                }
+            }
+            return ['success':true, msg:'Successfully added hierarchy', 'reg' : reg, errors:errors]
+        }
+        return ['success':false, msg:'Error while adding hierarchy', errors:errors]
+    }
+
+    private List<TaxonomyRegistry> addTaxonEntries(String speciesName, converter, List taxonRegistryNames, String classificationName, SUser contributor) {
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor)
+        return converter.getClassifications(taxonRegistryNodes, speciesName, true); 
+    }
+
+    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
+        return deleteTaxonEntries(reg, force);
+    }
+
+    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+        String msg = '';
+        def content;
+        List errors = [];
+        Map r = [errors:errors];
+
+        List toDelete = [];
+
+        if(!reg) {
+            return [success:false, msg:"Taxonomy registry is null", errors:errors]
+        } 
+
+        if(!reg.isContributor()) {
+            return [success:false, msg:"You don't have permission to delete as you are not a contributor.", errors:errors]
+        }
+
+        def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
+            projections {
+                count('id')
+            }
+            taxonDefinition {
+                eq('id', reg.taxonDefinition.id)
+            }
+            like('path', '%_'+reg.taxonDefinition.id)
+        }
+
+        if(force == false && otherHierarchiesCount[0] == 1) {
+            //if this is the only hierarchy for the species ... then dont delete it.
+            return [success:false, msg:"Cannot remove hierarchy as its the only one available for the species", errors:errors]
+        }
+
+        try {
+            if(reg) {
+                def contributor = springSecurityService.currentUser;
+                while(reg != null) {
+                    println reg;
+                    def c = TaxonomyRegistry.withCriteria () {
+                        projections {
+                            count('id')
+                        }
+                        eq('parentTaxon', reg)
+                        contributors {
+                            eq('id', contributor.id)
+                        }
+                    }
+                    if(c[0] > 1) {
+                        //there is another hierarchy sharing same nodes and with same contributor.
+                        // so leaving this portion untouched
+                        r.success = true;
+                        r.msg = 'Successfully removed registry';
+                        r.errors << errors
+                        break;
+                    }
+                    //reg.removeFromContributors(contributor);
+
+                    toDelete << reg;
+                        //reg.delete(failOnError:true)
+                    reg = reg.parentTaxon;
+                } 
+                
+                int maxRank = 0, regId;
+                TaxonomyRegistry.withTransaction { status ->
+                    toDelete.each { r2 ->
+
+                        if(r2.taxonDefinition.rank > maxRank) {
+                            regId = r2.id;
+                            maxRank = r2.taxonDefinition.rank;
+                        }
+
+                        r2.removeFromContributors(contributor);
+
+                        if(r2.contributors.size() == 0) {
+                            r2.delete(failOnError:true)
+                        } else if(!r2.save()) {
+                            r2.errors.each { errors << it; log.error it }
+                            r.success = false;
+                            r.msg = "Error while deleting registry ${r2.path}"
+                            r.errors << errors
+                            throw new RuntimeException(r.msg + r.errors)
+                            return r;
+                        } 
+                    }
+                }
+                r.success = true;
+                r.msg = 'Successfully removed registry';
+                r.errors << errors
+                r.regId = regId
+                return r;
+            } else {
+                return r;
+            }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            r.success = false;
+            r.msg = "Error while deleting registry ${e.getMessage()}"
+            r.errors = errors
+            return r;
+        }
+
+    }
+
+    /**
 	 * 
 	 */
 	private List<TaxonomyRegistry> saveTaxonEntries(converter, List taxonEntries, Classification c, String name) {
@@ -832,4 +974,15 @@ class TaxonService {
 			hibSession.clear()
 		}
 	}
+
+    boolean validateHierarchy(List<String> taxonEntries) {
+        if(!taxonEntries[TaxonomyRank.KINGDOM.ordinal()]) return false;
+        if(!taxonEntries[TaxonomyRank.PHYLUM.ordinal()]) return false;
+        if(!taxonEntries[TaxonomyRank.CLASS.ordinal()]) return false;
+        if(!taxonEntries[TaxonomyRank.ORDER.ordinal()]) return false;
+        if(!taxonEntries[TaxonomyRank.FAMILY.ordinal()]) return false;
+        if(!taxonEntries[TaxonomyRank.GENUS.ordinal()]) return false;
+        if(!taxonEntries[TaxonomyRank.SPECIES.ordinal()]) return false;
+        return true;
+    }
 }

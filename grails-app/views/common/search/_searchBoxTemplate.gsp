@@ -92,6 +92,14 @@ $(document).ready(function() {
                 },
                 'ck':{
                     
+                },
+                'taxon': {
+                    'classification': {
+                        'listUrl':"${uGroup.createLink(controller:'taxon', action:'listHierarchy', userGroupWebaddress:params.webaddress)}",
+                        'createUrl':"${uGroup.createLink(controller:'taxon', action:'create', userGroupWebaddress:params.webaddress)}",
+                        'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
+                        'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
+                    }
                 }
                 
 	}
