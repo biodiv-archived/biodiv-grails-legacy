@@ -73,6 +73,7 @@
                                 def defaultAccuracy = (obvInfoFeeder?.locationAccuracy) ? obvInfoFeeder.locationAccuracy : "Approximate"
                                 def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
                                 def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
+								def isGeoPrivacyChecked = (observationInstance?.geoPrivacy) ? "checked" : ""
                                 %>
                                 <!--label for="location_accuracy" class="control-label" style="padding:0px"><g:message
                                 code="observation.accuracy.label"
@@ -80,7 +81,7 @@
 
                                 <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} />Accurate 
                                 <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} />Approximate
-                                <input type="checkbox" class="input-block-level" name="geo_privacy" value="geo_privacy" />
+                                <input type="checkbox" class="input-block-level" name="geoPrivacy" value="${observationInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} />
                                 Hide precise location
 
 

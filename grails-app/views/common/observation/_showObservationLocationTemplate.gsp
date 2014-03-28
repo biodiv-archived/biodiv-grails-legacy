@@ -7,15 +7,20 @@
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
+            <g:if test="${observationInstance.geoPrivacy}">
+            	Geoprivacy enabled
+            </g:if>
+            <g:else>
                 <g:if test="${observationInstance.placeName != ''}">
-                <g:set var="location" value="${observationInstance.placeName}"/>
+                	<g:set var="location" value="${observationInstance.placeName}"/>
                 </g:if>
                 <g:else>
-                <g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
+                	<g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
                 </g:else>
                 <div class="value ellipsis multiline" title="${location}">
-                ${location}
-            </div>
+                	${location}
+            	</div>
+            </g:else>
             </td>
         </tr>
         <tr>
@@ -38,7 +43,7 @@
                 %>
                 ${(geoPrivacyAdjustment != 0) ? 'Geoprivacy enabled' : latitude.toFloat() + ',' + longitude.toFloat()}
 
-                <input id='areas' type='hidden' name='areas' value='${areas}'/>
+				<input id='areas' type='hidden' name='areas' value='${areas}'/>
 
                 <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"/>
                 <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"/>

@@ -333,7 +333,7 @@ class DocumentService {
 	 */
 	Map getFilteredDocuments(params, max, offset) {
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
-		if(!params.aq){
+		if(Utils.isSearchAction(params)){
 			res.putAll(getDocsFromDB(params, max, offset))
 		}else{
 			//returning docs from solr search
@@ -385,17 +385,17 @@ class DocumentService {
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
-        params.userGroup = observationService.getUserGroup(params);
+        def userGroup = observationService.getUserGroup(params);
  
         if(params.featureBy == "true"){
 			query = "select document from Document document "
-		 	if(params.userGroup == null) {
+		 	if(!userGroup) {
                 filterQuery += " and document.featureCount > 0 "                
             }
              else {
                 query += ", Featured feat "
                 filterQuery += " and document.id = feat.objectId and feat.objectType =:featType and feat.userGroup.id = :userGroupId "
-                queryParams["userGroupId"] = params.userGroup?.id
+                queryParams["userGroupId"] = userGroup?.id
 
             }
             //params.userGroup = observationService.getUserGroup(params);
@@ -419,15 +419,15 @@ class DocumentService {
 			activeFilters["tag"] = params.tag
 		}
 		
-		if(params.webaddress) {
-			def userGroupInstance = userGroupService.get(params.webaddress)
-			if(userGroupInstance){
-				queryParams['userGroup'] = userGroupInstance
+		if(userGroup) {
+			//def userGroupInstance = userGroupService.get(params.webaddress)
+			//if(userGroupInstance){
+				queryParams['userGroup'] = userGroup
 				//queryParams['isDeleted'] = false;
 		
 				query += " join document.userGroups userGroup "
 				filterQuery += " and userGroup=:userGroup "
-			}
+			//}
 		}
 		
 		def sortBy = params.sort ? params.sort : "lastRevised "

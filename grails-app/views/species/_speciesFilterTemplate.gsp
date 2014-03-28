@@ -23,7 +23,7 @@
 				Relevancy
             </g:elseif>
 			<g:else>
-            	Richness
+            	Last Updated
             </g:else>
 			<span class="caret"></span>
 		</button>

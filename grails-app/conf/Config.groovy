@@ -171,9 +171,10 @@ speciesPortal {
     app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
     app.siteCode = 'ibp'
 
-    app.twitterUrl = "https://twitter.com/thewesternghats"
-    app.facebookUrl = "https://www.facebook.com/pages/India-Biodiversity-Portal/130062180358038?fref=ts"
+    app.twitterUrl = "https://twitter.com/inbiodiversity"
+    app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
     app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
+	app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
 
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
@@ -463,7 +464,6 @@ environments {
 
         ckeditor {
             upload {
-                baseurl = "/"
                 basedir = "${speciesPortal.app.rootDir}/"
                 image.browser = true
                 image.upload = true    
@@ -577,7 +577,6 @@ environments {
 
                 ckeditor {
                     upload {
-                         baseurl = "/"
                         basedir = "${speciesPortal.app.rootDir}/"
                     image.browser = true
                     image.upload = true    
@@ -653,7 +652,6 @@ environments {
 
                 ckeditor {
                     upload {
-                        baseurl = "/"
                         basedir = "${speciesPortal.app.rootDir}/"
 
                     image.browser = true
@@ -728,7 +726,6 @@ environments {
 
         ckeditor {
             upload {
-                baseurl = "/"
                 basedir = "${speciesPortal.app.rootDir}/"
 
 

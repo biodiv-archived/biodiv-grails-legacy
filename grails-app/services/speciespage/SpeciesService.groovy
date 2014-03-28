@@ -1211,7 +1211,7 @@ println speciesField.references.size();
     }
 
     def getSpeciesList(params, String action){
-        if("search".equalsIgnoreCase(action)){
+        if(Utils.isSearchAction(params, action)){
             return search(params)
         }else{
             return _getSpeciesList(params)
@@ -1259,7 +1259,7 @@ println speciesField.references.size();
             queryParams.offset = 0
         }
 
-        queryParams.sort = params.sort?:"percentOfInfo"
+        queryParams.sort = params.sort?:"lastrevised"
         if(queryParams.sort.equals('lastrevised')) {
             queryParams.sort = 'lastUpdated'
 

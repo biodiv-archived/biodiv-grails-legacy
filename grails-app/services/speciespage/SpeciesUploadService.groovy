@@ -235,6 +235,9 @@ class SpeciesUploadService {
 			
 			//sending mail to species contributor
 			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
+			otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
+			otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
+			otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
 			observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
 		}
 		
@@ -272,6 +275,8 @@ class SpeciesUploadService {
 			List<Map> imagesMetaData;
 			if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 				converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+				converter.imagesDir = imagesDir
+				
 			}
 			uploadCount = saveSpecies(converter, content, imagesDir, sBulkUploadEntry)
 			result['success'] = true
