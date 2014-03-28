@@ -255,7 +255,7 @@ class TaxonController {
             def reg = TaxonomyRegistry.read(classSystem);
                 def list = [] 
                 while(reg != null) {
-                    def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'contributors':reg.contributors]
+                    def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()]
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);
                     reg = reg.parentTaxon;
@@ -269,7 +269,7 @@ class TaxonController {
             TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
                 def list = [];
                 while(reg != null) {					
-                    def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'contributors':reg.contributors]
+                    def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);					
                     reg = reg.parentTaxon;
@@ -322,8 +322,6 @@ class TaxonController {
             total (1)
             int size = 0;
            rs.each { r->
-                String contributors = r['contributors']?:'';
- 
                 size ++;
                 String parentPath = "";
                 if(r.path && r.path.lastIndexOf("_")!=-1) {
@@ -341,6 +339,7 @@ class TaxonController {
                     cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)
                     cell (r.expanded?:false) //for expanded
                     cell (r.loaded?:false) //for loaded
+                    cell (r.isContributor?:false) //for edit/delete
                 }
             }
             records (size)

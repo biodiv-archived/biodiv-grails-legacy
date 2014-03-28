@@ -185,7 +185,7 @@
                     fillEmptyBlocks:false
                     //uiColor:'#AADC6F'
                 };
-
+                var speciesId = ${speciesInstance?.id}
             </r:script>
 
 

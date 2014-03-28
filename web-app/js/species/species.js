@@ -785,45 +785,6 @@ function initLangSelector($ele, $selectorOptions, defaultValue) {
 }
 
 
-
-
-function initEditableFields(e) {
-    if($(document).find('.editFieldButton').length == 0) {
-        refreshEditables($('body'));
-        initNameEditables($('#synonyms,#commonNames'));
-    } else {
-        /*    $('.editable').editable('disable');
-              $('.addField').hide();
-              $('.editFieldButton').hide();
-              */  
-        window.location.reload(true);
-    }
-    if(e) e.stopPropagation();
-}
-
-function initNameEditables($e) {
-    initEditables($e);
-    initAddables($e);
-    initSynRelSelector($e, synRelSelectorOptions, "Synonym");
-    initLangSelector($e, langSelectorOptions, "English");
-    $('#commonNames .entry').removeClass('pull-left');
-}
-
-function refreshEditables($e) {
-    //initEdit($e);
-    $e.speciesfield();
-    //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
-    //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
-    //initStatusSelector($e, statusSelectorOptions, "Under Validation");
-
-    $('.emptyField').show();
-    //$('.hidePoint').show();
-    $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
-    if($e) rate($e.find('.star_rating'));
-}
-
-//initEditableFields();
-
 function selectLicense($this, i) {
     $('#license_'+i).val($.trim($this.text()));
     $('#selected_license_'+i).find('img:first').replaceWith($this.html());
@@ -858,19 +819,65 @@ $(document).ready(function() {
     } catch(e) {
         console.log(e)
     } 
-    //loadIFrame();
-    //initializeCKEditor();	
-    // bind click event on delete buttons using jquery live
-    $('.del-reference').live('click', deleteReferenceHandler);
-    //  	if($("#resourceTabs-1 img").length === 0) {
-    //  		$("#flickrImages").click();
-    //  	}
-
+    
     $('.thumbwrap .figure').hover(function() {
         $(this).children('.attributionBlock').css('visibility', 'visible');
     }, function(){
         $(this).children('.attributionBlock').css('visibility', 'hidden');
     });
+    
+    var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+        speciesId:speciesId,
+        //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
+        expandAll:true,
+        expandSpecies:true
+    });	
 
+    var speciesfields = $('body').speciesfield();
+
+    var initEditableFields = function(e) {
+        if($(document).find('.editFieldButton').length == 0) {
+            refreshEditables($('body'));
+            initNameEditables($('#synonyms,#commonNames'));
+        } else {
+            /*    $('.editable').editable('disable');
+                  $('.addField').hide();
+                  $('.editFieldButton').hide();
+                  */  
+            window.location.reload(true);
+        }
+        if(e) e.stopPropagation();
+    }
+
+    var initNameEditables = function ($e) {
+        initEditables($e);
+        initAddables($e);
+        initSynRelSelector($e, synRelSelectorOptions, "Synonym");
+        initLangSelector($e, langSelectorOptions, "English");
+        $('#commonNames .entry').removeClass('pull-left');
+    }
+
+    var refreshEditables = function($e) {
+        //initEdit($e);
+        for (var i=0; i < taxonBrowser.taxonHierarchies.length; i++) {
+            taxonBrowser.taxonHierarchies[i].initEditables('#taxaHierarchy #taxonHierarchy.editField', '#taxaHierarchy #taxonHierarchy.emptyField');
+        }
+        for (var i=0; i < speciesfields.length; i++) {
+            speciesfields[i].initEditables('.ck_desc', '.dummy.speciesField');
+        }
+        //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
+        //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
+        //initStatusSelector($e, statusSelectorOptions, "Under Validation");
+
+        $('.emptyField').show();
+        //$('.hidePoint').show();
+        $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+        if($e) rate($e.find('.star_rating'));
+    }
+
+    $('#editSpecies').click(function() {
+        initEditableFields();
+        return false;
+    });
 });
 

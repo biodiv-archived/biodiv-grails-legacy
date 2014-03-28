@@ -325,8 +325,8 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     /**
-    * Update Species Field
-    */
+     * Update Species Field
+     */
     def updateSpeciesField(SpeciesField speciesField, params) {
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
@@ -364,22 +364,28 @@ class SpeciesService extends AbstractObjectService  {
         //contributors
         speciesField.contributors.clear();
         params.contributor.split("\\r?\\n|,").each { l ->
-            SUser c = SUser.findByEmail(l);
-            if(!c) {
-                errors <<  "No registered user with email ${l} found"
-            } else {
-                speciesField.addToContributors(c);
+            l = l.trim()
+            if(l) {
+                SUser c = SUser.findByEmail(l.trim());
+                if(!c) {
+                    errors <<  "No registered user with email ${l} found"
+                } else {
+                    speciesField.addToContributors(c);
+                }
             }
         } 
 
         //attributions
         speciesField.attributors?.clear();
         params.attribution?.split("\\r?\\n").each { l ->
-            Contributor c = (new XMLConverter()).getContributorByName(l, true);
-            if(!c) {
-                errors <<  "Error while adding attribution ${l}"
-            } else {
-                speciesField.addToAttributors(c);
+            l = l.trim()
+            if(l) {
+                Contributor c = (new XMLConverter()).getContributorByName(l.trim(), true);
+                if(!c) {
+                    errors <<  "Error while adding attribution ${l}"
+                } else {
+                    speciesField.addToAttributors(c);
+                }
             }
         }   
 
@@ -390,38 +396,42 @@ class SpeciesService extends AbstractObjectService  {
              * This is fixed in grails 2 http://jira.grails.org/browse/GRAILS-6734
              * For now doing hack by executing basic sql
              */
-println "deleting old references"
             SpeciesField.executeUpdate('delete Reference r where r.speciesField = :speciesField', ['speciesField':speciesField]);
-println speciesField.references.size();
-//            speciesField.references?.clear();
+            //            speciesField.references?.clear();
         }
         params.reference?.split("\\r?\\n").each { l ->
+            l = l.trim(); 
+
             if(l && l.trim()) {
-                speciesField.addToReferences(new Reference(title:l));
-            } else {
-                errors << "Reference cant be empty"
+                speciesField.addToReferences(new Reference(title:l.trim()));
             }
         }   
 
         //license
         speciesField.licenses.clear();
         params.license.split("\\r?\\n|,").each { l ->
-            License c = (new XMLConverter()).getLicenseByType(l, false);
-            if(!c) { 
-                errors << "Error while updating license"
-            } else {
-                speciesField.addToLicenses(c);
+            l = l.trim();
+            if(l) {
+                License c = (new XMLConverter()).getLicenseByType(l, false);
+                if(!c) { 
+                    errors << "Error while updating license"
+                } else {
+                    speciesField.addToLicenses(c);
+                }
             }
         }
 
         //audienceType
         speciesField.audienceTypes.clear();
         params.audienceType.split("\\r?\\n|,").each { l ->
-            AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
-            if(!c) {
-                errors << "Error while updating audience type"
-            } else {
-                speciesField.addToAudienceTypes(c);
+            l = l.trim();
+            if(l) {
+                AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
+                if(!c) {
+                    errors << "Error while updating audience type"
+                } else {
+                    speciesField.addToAudienceTypes(c);
+                }
             }
         }
 

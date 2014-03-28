@@ -7,12 +7,6 @@
 
 <r:script>
 $(document).ready(function() {
-$('.taxonomyBrowser').taxonhierarchy({
-speciesId:"${speciesId}",
-speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
-expandAll:true,
-expandSpecies:true
-});	
 });
 </r:script>
 
@@ -46,7 +40,7 @@ expandSpecies:true
             </div>
         </div>
 
-        <table id="taxonHierarchy" class="editField emptyField"></table>
+        <table id="taxonHierarchy" class="emptyField"></table>
 
         </g:if>
         <g:else>

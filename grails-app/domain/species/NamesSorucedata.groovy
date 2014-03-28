@@ -35,17 +35,6 @@ abstract class NamesSorucedata extends Sourcedata {
 
     boolean isContributor(SUser user) {
         if(!user) user = springSecurityService.currentUser;
-        println this.contributors
-        println user;
         return this.contributors.contains(user);
-        /*
-        boolean success = false;
-        this.contributors.each { c->
-           if(c.email == springSecurityService.currentUser.email) {
-               success = true;
-               return
-           }
-       }
-        return success;*/
     }
 }
