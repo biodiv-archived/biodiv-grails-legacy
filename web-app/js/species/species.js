@@ -791,6 +791,15 @@ function selectLicense($this, i) {
     return false;
 }
 
+var initNameEditables = function ($e) {
+    initEditables($e);
+    initAddables($e);
+    initSynRelSelector($e, synRelSelectorOptions, "Synonym");
+    initLangSelector($e, langSelectorOptions, "English");
+    $('#commonNames .entry').removeClass('pull-left');
+}
+
+
 $(document).ready(function() {
 
     $(".readmore").readmore({
@@ -838,7 +847,6 @@ $(document).ready(function() {
     var initEditableFields = function(e) {
         if($(document).find('.editFieldButton').length == 0) {
             refreshEditables($('body'));
-            initNameEditables($('#synonyms,#commonNames'));
         } else {
             /*    $('.editable').editable('disable');
                   $('.addField').hide();
@@ -849,15 +857,7 @@ $(document).ready(function() {
         if(e) e.stopPropagation();
     }
 
-    var initNameEditables = function ($e) {
-        initEditables($e);
-        initAddables($e);
-        initSynRelSelector($e, synRelSelectorOptions, "Synonym");
-        initLangSelector($e, langSelectorOptions, "English");
-        $('#commonNames .entry').removeClass('pull-left');
-    }
-
-    var refreshEditables = function($e) {
+   var refreshEditables = function($e) {
         //initEdit($e);
         for (var i=0; i < taxonBrowser.taxonHierarchies.length; i++) {
             taxonBrowser.taxonHierarchies[i].initEditables('#taxaHierarchy #taxonHierarchy.editField', '#taxaHierarchy #taxonHierarchy.emptyField');
@@ -868,6 +868,8 @@ $(document).ready(function() {
         //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
         //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
         //initStatusSelector($e, statusSelectorOptions, "Under Validation");
+
+        initNameEditables($('#synonyms,#commonNames'));
 
         $('.emptyField').show();
         //$('.hidePoint').show();

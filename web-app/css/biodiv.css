@@ -2651,6 +2651,7 @@ small {
 	background-color:white;
 	overflow: visible;
     clear:both;
+    border-left:1px solid #cecece;
 }
 
 
@@ -2662,6 +2663,10 @@ small {
 #synonyms li:nth-child(even),#commonNames li:nth-child(even)  {background-color: #e6e6e6; overflow:hidden;}
 
 #synonyms li:nth-child(odd),#commonNames li:nth-child(odd) {background-color: #FFF; overflow:hidden;}
+
+#synonyms .span8, #commonNames .span8 {
+    width : 655px;
+}
 
 .bodymarker {
     position:relative;
