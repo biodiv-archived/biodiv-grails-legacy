@@ -464,7 +464,8 @@ environments {
 
         ckeditor {
             upload {
-                basedir = "${speciesPortal.app.rootDir}/"
+				baseurl = "/newsletters"
+				basedir = "${app.rootDir}/newsletters/"
                 image.browser = true
                 image.upload = true    
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -577,7 +578,8 @@ environments {
 
                 ckeditor {
                     upload {
-                        basedir = "${speciesPortal.app.rootDir}/"
+                    baseurl = "/newsletters"
+                    basedir = "${app.rootDir}/newsletters/"
                     image.browser = true
                     image.upload = true    
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -652,7 +654,8 @@ environments {
 
                 ckeditor {
                     upload {
-                        basedir = "${speciesPortal.app.rootDir}/"
+                    baseurl = "/newsletters"
+                    basedir = "${app.rootDir}/newsletters/"
 
                     image.browser = true
                     image.upload = true    
@@ -726,8 +729,8 @@ environments {
 
         ckeditor {
             upload {
-                basedir = "${speciesPortal.app.rootDir}/"
-
+				baseurl = "/newsletters"
+				basedir = "${app.rootDir}/newsletters/"
 
                 image.browser = true
                 image.upload = true    

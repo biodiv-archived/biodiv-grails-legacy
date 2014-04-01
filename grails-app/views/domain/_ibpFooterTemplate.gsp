@@ -74,7 +74,7 @@
 
             </div>
 <div class="powered" style="text-align:center;">
-	<p> <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}"><img src="${resource(dir:'images',file:'facebook.png', absolute:true)}"></a> | <a href="${grailsApplication.config.speciesPortal.app.twitterUrl}"><img src="${resource(dir:'images',file:'twitter.png', absolute:true)}"></a>| <a href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}" rel="publisher"><img src="${resource(dir:'images',file:'google_plus.png', absolute:true)}"></a><br />
+	<p> <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}"><img src="${resource(dir:'images',file:'facebook.png', absolute:true)}"></a> | <a href="${grailsApplication.config.speciesPortal.app.twitterUrl}"><img src="${resource(dir:'images',file:'twitter.png', absolute:true)}"></a>| <a href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}"><img src="${resource(dir:'images',file:'google_plus.png', absolute:true)}"></a><br />
 Best supported on Google Chrome, Firefox 3.0+, Internet Explorer 8.0+, Safari 4.0+, Opera 10+.<br />
 Powered by the open source <a href="https://github.com/strandls/biodiv" target="_blank">Biodiversity Informatics Platform.</a></p>
 	</div>
