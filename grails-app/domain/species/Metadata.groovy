@@ -1,5 +1,6 @@
 package species;
 
+import species.auth.SUser;
 import species.groups.SpeciesGroup
 import species.Habitat
 
@@ -10,10 +11,11 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry;
 import speciespage.ObservationService;
 import species.participation.Featured;
+import species.utils.Utils;
 
 abstract class Metadata {
-
-    //Geographic Coverage
+	
+	//Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
 	
@@ -124,6 +126,17 @@ abstract class Metadata {
 
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
+	
+	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
+		if(!geoPrivacy || SUserService.ifOwns(author)){
+			return 0
+		}
+		//for backend thred e.g download request reqUser will be passed as argument
+		if(reqUser && (reqUser.id == author.id || SUserService.isAdmin(reqUser.id))){
+			return 0
+		}
+		return Utils.getRandomFloat()
 	}
 
 }
