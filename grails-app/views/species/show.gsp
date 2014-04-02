@@ -184,7 +184,8 @@
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                     height: '300px',
-                    ignoreEmptyParagraph: false,
+                    ignoreEmptyParagraph: true,
+                    enterMode:CKEDITOR.ENTER_BR,
                     autoParagraph:false,
                     fillEmptyBlocks:false
                     //uiColor:'#AADC6F'
@@ -223,7 +224,7 @@
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
                 <div class="span12" style="margin-left:0px">
 
-                    <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+                    <!--g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/-->
                     <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
 
 

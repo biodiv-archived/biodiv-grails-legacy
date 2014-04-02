@@ -142,22 +142,25 @@
         onDelete : function(e){    
             e.stopPropagation();
             e.preventDefault();
-            var $sf = this; 
-            var $form = $(e.currentTarget);
-            var params = e.data?e.data:{};
+            var c = confirm('You are about to delete some content. Are you sure?');
+            if(c == true) {
+                var $sf = this; 
+                var $form = $(e.currentTarget);
+                var params = e.data?e.data:{};
 
-            params['reg'] = $('#taxaHierarchy option:selected').val();
-            delete params['context'];
-            delete params['action'];
+                params['reg'] = $('#taxaHierarchy option:selected').val();
+                delete params['context'];
+                delete params['action'];
 
-            $form.ajaxSubmit({
-                url : window.params.taxon.classification.deleteUrl,
-                type : 'POST',
-                data : params,
-                context : $sf,
-                success : $sf.onUpdateSuccess,
-                error: $sf.onUpdateError
-            });
+                $form.ajaxSubmit({
+                    url : window.params.taxon.classification.deleteUrl,
+                    type : 'POST',
+                    data : params,
+                    context : $sf,
+                    success : $sf.onUpdateSuccess,
+                    error: $sf.onUpdateError
+                });
+            }
             return false;
         },
 
@@ -183,7 +186,6 @@
             var hierarchy = this.$element.find('#taxonHierarchy').getRowData();
             $.each(hierarchy, function(i, v) {
                 var temp = $(v.name.split(':')[1]);
-                console.log(temp);
                 $('.taxonRank[name="taxonRegistry.'+v.level+'"]').val(temp.text());
             });
 

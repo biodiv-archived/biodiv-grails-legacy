@@ -72,7 +72,7 @@
 
             $conEntry.find('.attributionContent').show();
 
-            $('.editableform').hide();
+            $container.find('.editableform').hide();
 
             var $form = $container.find('.editableform');
 
@@ -113,8 +113,13 @@
             $form.find('.editable-cancel').click(function(){
                 //TODO:can even remove form
                 $form.hide();
-                //TODO:dont show empty form on add cancel
-                $conEntry.show();
+                if(!$conEntry.parent().hasClass('dummy')) {
+                    $conEntry.show();
+                }
+
+                $('body').animate({
+                    scrollTop: $conEntry.offset().top
+                }, 2000);
             });
 
         },
@@ -253,6 +258,11 @@
                     speciesfields[i].initEditables('.ck_desc', '.dummy.speciesField');
                 }
                 $newEle.effect("highlight", {color: '#4BADF5'}, 5000);
+                $('body').animate({
+                    scrollTop: $newEle.offset().top
+                }, 2000);
+
+
             } else {
                 $errorBlock.removeClass('alert-info').addClass('alert-error').html(data.msg);
                 $container.addClass('errors');
