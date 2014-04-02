@@ -376,7 +376,6 @@ function onEditableSuccess(response, newValue) {
     if(!response) {
         return "Unknown error!";
     }          
-
     if(!response.success) {
         var $a = $(this).next(".alert-error")
             if( $a.length == 0) {
@@ -500,7 +499,6 @@ function initEditables($ele) {
                             var textareaId = $f.attr('id');
                             var editor = CKEDITOR.instances[textareaId];
                             if(editor) {
-                                console.log('destroying ckeditor');
                                 editor.destroy(false);
                             }
 
@@ -570,9 +568,12 @@ function onAddableDisplay(value, sourceData, response, context) {
             html.push ('<li><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></li>'); 
         }
 
-
+        /*$('html, body').animate({
+            scrollTop: $ul.offset().top
+        }, 2000);*/
         $ul.empty().html(html.join(' ')).effect("highlight", {color: '#4BADF5'}, 5000);
         $ul.find('.attributionContent').show();
+        //$('body').scrollTo($ul);
         initNameEditables($ul);
     } else {
         //me.html('Add'); 
