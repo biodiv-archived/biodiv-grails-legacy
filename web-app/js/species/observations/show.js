@@ -14,6 +14,24 @@ function showRecos(data, textStatus) {
     showUpdateStatus(data.msg, data.status);
 }
 
+function lockObv(url, lockType) {
+    $.ajax({
+        url:url,
+        dataType: "json",
+        data:{"lockType" : lockType},
+        success: function(data){
+            $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            if(lockType == "Lock"){
+                $("#addRecommendation").hide();
+                $("#lockObvId").hide();
+            }
+            else{
+                $("#addRecommendation").show();
+                $("#lockObvId").hide();
+            }
+        }
+    });
+}
 
 function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     $.ajax({

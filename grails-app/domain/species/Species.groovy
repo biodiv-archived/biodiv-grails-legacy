@@ -103,6 +103,7 @@ class Species implements Rateable {
     * Ordering resources basing on rating
     **/
 	List<Resource> getImages() { 
+        println "called=GET IMAGES ++++++++++=================="
         def params = [:]
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
@@ -128,10 +129,13 @@ class Species implements Rateable {
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r -> 
+            def finalRes = results.collect {  r -> 
                 instances.find { i -> (r[0] == i.id) } 
             }
+            println "===========GET IMAGES RESULT ======= " + finalRes
+            return finalRes
         } else {
+            println "===============IN ELSE NO RESULT==============="
             []
         }
     }

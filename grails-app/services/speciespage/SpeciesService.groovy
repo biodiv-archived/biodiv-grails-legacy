@@ -15,6 +15,7 @@ import species.License.LicenseType;
 import species.Contributor;
 import species.Field
 import species.Resource;
+import species.participation.Observation;
 import species.Species;
 import species.License;
 import species.Reference;
@@ -1479,21 +1480,64 @@ class SpeciesService extends AbstractObjectService  {
 	}
     
     def updateSpecies(params, species){
-        def resourcesXML = createResourcesXML(params);
-        println "=====RES XML =========== " + resourcesXML
-        def resources = saveResources(species, resourcesXML);
-        println "=========RESOURCES ========== " + resources
-        species.resources?.clear();
+        def resources = []
+        if(params.resourceListType == "ofSpecies"){
+            println "=====PARAMS ========== " + params
+            def resourcesXML = createResourcesXML(params);
+            println "=====RES XML =========== " + resourcesXML
+            resources = saveResources(species, resourcesXML);
+            println "=========RESOURCES ========== " + resources
+            species.resources?.clear();
+        }
+        else if(params.resourceListType == "fromRelatedObv"){
+            def resId = []
+            params.each { key, val ->
+                int index = -1;
+                if(key.startsWith('pullImage_')) {
+                    index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+                }
+                if(index != -1) {
+                    resId.add(params.get('resId_'+index));    
+                }
+            }
+            println "======RES ID ========= " + resId
+            resId.each{
+                resources.add(Resource.get(it.toLong()))
+            }
+            
+            resId.each{
+                def rid = it
+                def obv = Observation.withCriteria(){
+                    resource{
+                        eq("id", rid.toLong())
+                    }
+                }
+                if(obv.size() == 1 ){
+                    println "GOT OBV FOR RES==========="
+                    def obvIns = obv.get(0)
+                    if(obvIns.isLocked == false){
+                        println "locking obv ============" + obvIns.id
+                        obvIns.isLocked = true
+                    }
+                    if(!obvIns.save(flush:true)){
+                        obvIns.errors.allErrors.each { log.error it } 
+                    }
+                }
+            }
+        }
+
         resources.each { resource ->
             println "======ADDING RESOURCE = ======= " + resource
             species.addToResources(resource);
         }
         if(!species.save(flush:true)){
-            species.errors.allErrors.each { log.error it } 
+            species.errors.allErrors.each { log.error it }
+            return false
         }
         species.resources.each{
             println "==================== " + it
-        } 
+        }
+        return true
         
     }
 

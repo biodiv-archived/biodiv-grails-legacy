@@ -73,7 +73,8 @@ if(r) {
                             <obv:showSubmenuTemplate/>
                             
                         <g:if test="${observationInstance}">
-                            <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                        <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                        <g:set var="obvLock" value="${observationInstance.isLocked}"/>
                             </g:if>
                             
                         <div class="page-header clearfix ">
@@ -84,6 +85,7 @@ if(r) {
 
                                             <div class="pull-right">
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
+                                                
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                                                     <i class="icon-edit"></i>Edit</a>
@@ -91,7 +93,17 @@ if(r) {
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                                                     href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
                                                     onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
-
+                                                <sUser:hasObvLockPerm model="['observationInstance':observationInstance]">
+                                                <%
+                                                    def lockButton = "Lock"
+                                                    if(observationInstance.isLocked == true){
+                                                        lockButton = "Unlock"
+                                                    }
+                                                %>
+                                                <a id="lockObvId"  class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                                    onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}')">
+                                                   <i class="icon-lock"></i>${lockButton}</a>
+                                                </sUser:hasObvLockPerm>
                                                 </sUser:ifOwns>
 
                                             </div>
@@ -177,10 +189,9 @@ if(r) {
 									<g:renderErrors bean="${recommendationVoteInstance}" as="list" />
 								</div>
 							</g:hasErrors>
-
 							<form id="addRecommendation" name="addRecommendation"
 								action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
-								method="GET" class="form-horizontal">
+								method="GET" class="form-horizontal" style="${(obvLock) ? 'display:none;':'display:block;'}">
 								<div class="reco-input">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />

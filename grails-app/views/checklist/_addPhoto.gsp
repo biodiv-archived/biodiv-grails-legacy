@@ -5,7 +5,7 @@
          <h4>Add/Edit Media</h4>
      </div>
      <div class="modal-body">
-        <g:render template="/observation/addPhoto"/>
+        <g:render template="/observation/addPhotoWrapper"/>
     </div>
      <div class="modal-footer">
          <a id="addResourcesModalSubmit" class="btn btn-primary">Add Resources</a>

@@ -14,7 +14,7 @@
 <div class="span8 right-shadow-box" style="margin:0px;">
 
     <div style="padding-bottom:10px;height:430px;">
-        <center>
+                <center>
             <div id="gallerySpinner" class="spinner">
                 <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
                 alt="${message(code:'spinner.alt',default:'Loading...')}" />
@@ -23,6 +23,11 @@
 
 
         <div id="resourceTabs" style="visibility:hidden;">
+            <g:if test="${isSpeciesContributor}">
+            <a id="addSpeciesImagesBtn" class="btn btn-success"
+                        style="float: right; margin-right: 5px; margin-top: 5px;"> Add Images </a>
+
+            </g:if>
             <ul>
                 <li><a href="#resourceTabs-1">Images</a></li>
                 <li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>

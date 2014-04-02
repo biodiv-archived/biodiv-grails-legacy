@@ -213,7 +213,7 @@ class AbstractObjectService {
         Node videos = new Node(resources, "videos");
         
         String uploadDir = ""
-        if( params.speciesId == null ){
+        if( params.resourceListType != "ofSpecies" ){
             uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
             println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + uploadDir
         }
@@ -229,6 +229,7 @@ class AbstractObjectService {
         List source = [];
         List ratings = [];
         List contributor = [];
+        List resContext = [];
         params.each { key, val ->
             int index = -1;
             if(key.startsWith('file_')) {
@@ -243,6 +244,7 @@ class AbstractObjectService {
                 url.add(params.get('url_'+index));
                 source.add(params.get('source_'+index));
                 ratings.add(params.get('rating_'+index));
+                resContext.add(params.get('resContext_'+index));
                 if( params.speciesId != null ){
                     contributor.add(params.get('contributor_'+index));
                 }
@@ -264,14 +266,13 @@ class AbstractObjectService {
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
-
-                if( params.speciesId == null ){
+                new Node(image, "resContext", resContext.getAt(key));
+                if( params.resourceListType == "ofObv" ){
                     new Node(image, "contributor", params.author.username); 
                 }
                 else{
                     new Node(image, "contributor", contributor.getAt(key));
                     if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
-                        println "=====ITS A IMAGE ======= " + source.getAt(key)
                         new Node(image, "source", source.getAt(key));
                     }
                 }

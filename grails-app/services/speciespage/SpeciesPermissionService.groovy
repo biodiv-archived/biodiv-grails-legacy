@@ -102,6 +102,7 @@ class SpeciesPermissionService {
 
     boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes) {
         if(!user) return false;
+        if(!taxonConcept) return false;
         if(SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')) 
             return true;
         else {
