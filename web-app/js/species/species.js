@@ -360,13 +360,17 @@ function initGalleryTabs() {
 
 
 $.fn.editable.defaults.mode = 'inline';
+
+$.fn.editableform.buttons = '<button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button>'
+
 $.fn.neweditableform_template = '\
                                 <form class="form-horizontal editableform">\
                                 <div class="control-group">\
-                                <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right"><button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button></div></div>\
+                                <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right">'+$.fn.editableform.buttons+'</div></div>\
                                 <div class="editable-error-block"></div>\
                                 </div> \
                                 </form>';
+
 
 function onEditableSuccess(response, newValue) {
     if(!response) {
@@ -442,7 +446,14 @@ function initEditables($ele) {
         display: onAddableDisplay,
         success: onEditableSuccess,
         error:onEditableError,
+        savenochange:true,
         onblur: 'ignore'
+    }).on('shown', function(e, editable) {
+        $(this).parent().parent().find('.synRel.selector, .lang.selector').editable('show'); 
+    }).on('hidden', function(e, reason) {
+        var editable = $(this).data('editable');
+        $(this).prev().show().prev().show();
+        $(this).parent().parent().find('.synRel.selector, .lang.selector').editable('hide'); 
     });
 
     $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
@@ -453,47 +464,55 @@ function initEditables($ele) {
         var $editable = $(this).nextAll('.editField.editable')
         if($textarea.length != 0)
         initEditor($textarea);
-        else
-        initEditor($editable);
-    })
-    $ele.find('.deleteFieldButton').click(function(e) {
-        var $f =  $(this).nextAll('.editField.editable');
-        var $textarea = $(this).nextAll('textarea');
-
-        if($textarea.length != 0)
-        $f = $textarea
-
-        var d = $f.data();
-    var params = {};
-    if(d.params)
-        $.extend(params, $.fn.editableutils.tryParseJson(d.params, true));
-    if(d.cid) params.cid = d.cid;
-    if(d.sid) params.sid = d.sid;
-
-    $.extend(params, {'name':d.name, 'pk':d.pk, 'act':'delete'});
-
-    $.ajax({
-        url:d.url?d.url:window.params.species.updateUrl,
-        type:'POST',
-        data:params,
-        context:$f,
-        success : function( data, textStatus, jqXHR) {
-            onEditableSuccess.call($f, data, jqXHR);
-            if(data.success == true) {
-                if(data.type == 'description' || data.type == 'newdescription') {
-                    var textareaId = $f.attr('id');
-                    var editor = CKEDITOR.instances[textareaId];
-                    if(editor) {
-                        console.log('destroying ckeditor');
-                        editor.destroy(false);
-                    }
-
-                    onAddableDisplay(undefined, data, jqXHR, $f.parent());
-                } else
-        onAddableDisplay(undefined, data, jqXHR, $f);
-            }
+        else {
+            initEditor($editable);
+            $(this).parent().parent().find('.synRel.selector').editable('show');
+            $(this).parent().parent().parent().find('.lang.selector').editable('show'); 
+            $(this).hide().prev().hide();
         }
     });
+
+    $ele.find('.deleteFieldButton').click(function(e) {
+        var c = confirm('You are about to delete some content. Are you sure?')
+        if(c == true) {
+            var $f =  $(this).nextAll('.editField.editable');
+            var $textarea = $(this).nextAll('textarea');
+
+            if($textarea.length != 0) $f = $textarea;
+
+            var d = $f.data();
+            var params = {};
+            if(d.params) $.extend(params, $.fn.editableutils.tryParseJson(d.params, true));
+            if(d.cid) params.cid = d.cid;
+            if(d.sid) params.sid = d.sid;
+
+            $.extend(params, {'name':d.name, 'pk':d.pk, 'act':'delete'});
+
+            $.ajax({
+                url:d.url?d.url:window.params.species.updateUrl,
+                type:'POST',
+                data:params,
+                context:$f,
+                success : function( data, textStatus, jqXHR) {
+                    onEditableSuccess.call($f, data, jqXHR);
+                    if(data.success == true) {
+                        if(data.type == 'description' || data.type == 'newdescription') {
+                            var textareaId = $f.attr('id');
+                            var editor = CKEDITOR.instances[textareaId];
+                            if(editor) {
+                                console.log('destroying ckeditor');
+                                editor.destroy(false);
+                            }
+
+                            onAddableDisplay(undefined, data, jqXHR, $f.parent());
+                        } else {
+                            onAddableDisplay(undefined, data, jqXHR, $f);
+                        }
+                    }
+                }
+            });
+
+        }
     });
 }
 
@@ -753,7 +772,10 @@ function initStatusSelector($ele, $selectorOptions, defaultValue) {
 function initSynRelSelector($ele, $selectorOptions, defaultValue) {
     if($ele == undefined)
         $ele = $(document);
-    $ele.find('.synRel.selector').editable({
+    var $selector = $ele.find('.synRel.selector');
+    if($selector.text()) 
+        defaultValue = $selector.text();
+    $selector.editable({
         value: defaultValue,    
         showbuttons:false,
         source: $selectorOptions,
@@ -761,6 +783,12 @@ function initSynRelSelector($ele, $selectorOptions, defaultValue) {
         inputClass:'input-block-level',
         onblur: 'ignore',
         send:'never'
+    }).on('shown', function(e, editable) {
+        editable.input.$input.val($.trim(editable.$element.text()));
+    }).on('hidden', function(e, reason) {
+         if(reason === 'save') {
+            $(this).data('editable').show();
+         }
     });
 
     $ele.find('.synRel.add_selector').editable('toggle');
@@ -778,6 +806,12 @@ function initLangSelector($ele, $selectorOptions, defaultValue) {
         inputClass:'input-block-level',
         onblur: 'ignore',
         send:'never'
+    }).on('shown', function(e, editable) {
+        editable.input.$input.val($.trim(editable.$element.text()));
+    }).on('hidden', function(e, reason) {
+         if(reason === 'save') {
+            $(this).data('editable').show();
+         }
     });
 
     $ele.find('.lang.add_selector').editable('toggle');

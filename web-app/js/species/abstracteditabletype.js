@@ -28,7 +28,6 @@
         onEdit : function(e){    
             e.stopPropagation();
             e.preventDefault();
-            console.log(this);
             var $conEntry = $(e.currentTarget).parent();
             var $container = $conEntry.parent();
             this.initEditableForm($container, $conEntry, $container.data());
@@ -47,19 +46,23 @@
         onDelete : function(e) {
             e.stopPropagation();
             e.preventDefault();
-            var $conEntry = $(e.currentTarget).parent();
-            var $container = $conEntry.parent();
+            var c = confirm('You are about to delete some content. Are you sure?');
+            if(c == true) {
 
-            var params = $container.data();
-            params['act'] = 'delete';
-            $.ajax({
-                url : params.url ? params.url : window.params.species.updateUrl,
-                type : 'POST',
-                data : params,
-                context : $container,
-                success : this.onUpdateSuccess,
-                error : this.onUpdateError
-            });
+                var $conEntry = $(e.currentTarget).parent();
+                var $container = $conEntry.parent();
+
+                var params = $container.data();
+                params['act'] = 'delete';
+                $.ajax({
+                    url : params.url ? params.url : window.params.species.updateUrl,
+                    type : 'POST',
+                    data : params,
+                    context : $container,
+                    success : this.onUpdateSuccess,
+                    error : this.onUpdateError
+                });
+            }
         },
 
 
