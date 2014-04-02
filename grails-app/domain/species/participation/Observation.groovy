@@ -22,6 +22,7 @@ import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
 import speciespage.ObservationService;
+import species.Species;
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
@@ -60,10 +61,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	String notes;
 	int rating;
 	long visitCount = 0;
-	boolean isDeleted = false;
+    boolean isDeleted = false;
 	int flagCount = 0;
 	int featureCount = 0;
     String searchText;
+    //if observation locked due to pulling of images in species
+    boolean isLocked = false;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 	
@@ -548,4 +551,18 @@ class Observation extends Metadata implements Taggable, Rateable {
         return observationCount;
     }
 
+    private void removeResourcesOnUnlock(){
+        def obvRes = this.resource
+        def taxCon = this.maxVotedReco?.taxonConcept
+        if(!taxCon){return}
+        def speWithThisTaxon = Speceies.findAllByTaxonConcept(taxCon)
+        speWithThisTaxon.each{ sp ->   
+            obvRes.each{ obres ->
+                sp.removeFromResources(obres)
+            }
+            if(!sp.save(flush:true)){
+                sp.errors.allErrors.each { log.error it } 
+            }
+        }
+    }
 }

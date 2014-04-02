@@ -466,6 +466,7 @@ class ObservationController extends AbstractObjectController {
 					def videoUrl = params.videoUrl;
 					if(videoUrl && Utils.isURL(videoUrl)) {
 						String videoId = Utils.getYouTubeVideoId(videoUrl);
+                        println "======VIDEO ID ========= " + videoId
 						if(videoId) {
 						def res = new Resource(fileName:'v', type:ResourceType.VIDEO);		
 						res.setUrl(videoUrl);				
@@ -1240,6 +1241,27 @@ class ObservationController extends AbstractObjectController {
             log.error e.getMessage();
             result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
         }
+        render result as JSON
+    }
+
+    def lock = {
+        println "OBV CONT LOC PARAMS===========  " + params
+        def msg = ""
+        def obv = Observation.get(params.id.toLong());
+        if(params.lockType == "Lock"){
+            println "==========LOCK TYPE==========="
+            obv.isLocked = true;
+            msg = "Observation successfully locked, Please refresh to see changes"
+            
+        }else{
+            println "===UNLOCK TYPE================"
+            obv.isLocked = false;
+            msg = "Observation successfully unlocked, Please refresh to see changes"
+        }
+        if(!obv.save(flush:true)){
+            obv.errors.allErrors.each { log.error it } 
+        }
+        def result = ['msg': msg]
         render result as JSON
     }
 }

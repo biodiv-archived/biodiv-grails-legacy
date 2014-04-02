@@ -760,9 +760,49 @@ class SpeciesController extends AbstractObjectController {
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
         println "===UPLOADING FOR THIS SPECIES ============== " + species  
-        speciesService.updateSpecies(params, species)
+        def out = speciesService.updateSpecies(params, species)
         println "============DONE DONE ==================="
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }
+        render result as JSON
     }
+
+    def getRelatedObvForSpecies = {
+        println "=====FOR LOAD MORE ========= " + params
+        def spInstance = Species.get(params.speciesId.toLong())
+        def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 1, params.offset.toInteger())
+        def relatedObv = relatedObvMap.resList
+        def relatedObvCount = relatedObvMap.count
+        def obvLinkList = relatedObvMap.obvLinkList
+        println "OFFSET VALUE++++++++++++++" + params.offset.toInteger()
+        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:params.offset.toInteger() ]);
+        println "=======RELATED OBV COUNT ============= " + relatedObvCount
+        def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
+        render result as JSON
+    }
+
+    def pullObvImage = {
+        println "========PULLING OBV IMAGE================= " + params  
+        //pass that same species
+        def species = Species.get(params.speciesId.toLong())
+        println "===UPLOADING FOR THIS SPECIES ============== " + species  
+        def out = speciesService.updateSpecies(params, species)
+        println "============DONE DONE ==================="
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }   
+        render result as JSON
+    }
+
    @Secured(['ROLE_USER'])
    def validate = {
        def result = [:];

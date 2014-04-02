@@ -433,6 +433,44 @@ class ObservationService extends AbstractObjectService {
         }
         return ["observations":result, "count":count]
     }
+    
+    Map getRelatedObvForSpecies(resInstance, int limit, int offset){
+        def taxonConcept = resInstance.taxonConcept
+        println "=======taxonConcept ===== " + taxonConcept
+        List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+        println "==========scientificNameRecos======= " + scientificNameRecos
+        def resList = []
+        def obvLinkList = []
+        println "========MAX OFFSET ============== " + limit + "%%%%%"+  offset 
+        if(scientificNameRecos){
+            def resIdList = Observation.executeQuery ('''
+                select r.id, obv.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by r.id asc
+                ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit, offset: offset]);
+
+             /*
+            def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
+            def hqlQuery = sessionFactory.currentSession.createQuery(query) 
+            hqlQuery.setMaxResults(limit);
+            hqlQuery.setFirstResult(offset);
+            def queryParams = [:]
+            queryParams["scientificNameRecos"] = scientificNameRecos
+            queryParams["isDeleted"] = false
+            hqlQuery.setProperties(queryParams);
+            def resIdList = hqlQuery.list();
+            */
+            println "=======NEW RES AND OBV ID =============== " + resIdList
+            resIdList.each{
+                resList.add(Resource.get(it.getAt(0)));
+                obvLinkList.add(it.getAt(1));
+            }
+            println "OBV ID List OF THeSe RES ======== " + obvLinkList
+            def resListSize = resList.size()
+            println "===============RES LIST COMPLETE =========== " + resList + "====" + resListSize
+            return ['resList': resList, 'obvLinkList': obvLinkList, 'count' : resListSize ]
+        } else{
+            return ['resList': resList, 'obvLinkList': obvLinkList, 'count': 0]
+        }
+    }
 
     Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
         def taxonConcept = TaxonomyDefinition.read(taxonConceptId);

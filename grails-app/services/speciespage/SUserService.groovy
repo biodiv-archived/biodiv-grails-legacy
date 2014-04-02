@@ -17,6 +17,8 @@ import org.apache.solr.common.util.NamedList
 import species.auth.SUser;
 import species.utils.Utils;
 import speciespage.search.SUserSearchService;
+import species.SpeciesPermission;
+import species.SpeciesPermission.PermissionType;
 
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
@@ -25,7 +27,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def springSecurityService
 	def mailService
 	def SUserSearchService
-	private ApplicationTagLib g
+	def speciesPermissionService
+    private ApplicationTagLib g
 	ApplicationContext applicationContext
 
 	public static final String NEW_USER = "newUser";
@@ -124,6 +127,11 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	boolean ifOwns(SUser user) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
+    
+    boolean hasObvLockPerm(observationInstance) {
+        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, user, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+    }
 
 	boolean ifOwns(id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))

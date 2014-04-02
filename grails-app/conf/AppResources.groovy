@@ -76,6 +76,7 @@ modules = {
 		resource url:'/js/species/posting.js'
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'
+		resource url:'/js/species/abstracttype.js'
 	}
 
 	auth {
@@ -135,6 +136,7 @@ modules = {
 
 		resource url:'/css/create.css'
 		resource url:'/js/jquery/jquery.exif.js'
+		resource url:'/js/species/observations/addResource.js'
 		resource url:'/js/species/observations/create.js'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
         resource url:'http://api.filepicker.io/v1/filepicker.js'
