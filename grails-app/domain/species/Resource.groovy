@@ -83,6 +83,7 @@ class Resource extends Sourcedata implements Rateable {
 		mimeType(nullable:true);
 		licenses  validator : { val, obj -> val && val.size() > 0 }
         rating(nullable:false, min:0, max:5);
+        context(nullable:true);
     }
 	
 	static transients = ['baseUrl']

@@ -1,7 +1,6 @@
 package species
 
 import grails.converters.JSON;
-import species.Species;
 
 import grails.plugins.springsecurity.Secured
 class ResourceController {
@@ -150,11 +149,5 @@ class ResourceController {
                 }
             }
         }
-    }
-
-    def related = {
-        def speciesInstance = Species.get(params.id)
-        def criteria = Resource.createCriteria();
-        def resourceList = criteria.list(max:params.limit,offset:params.offset)
     }
 }

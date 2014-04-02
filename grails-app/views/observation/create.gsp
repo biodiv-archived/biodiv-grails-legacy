@@ -39,7 +39,6 @@
                     <div class="section">
                         <h3>What did you observe?</h3>
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'ofObv']"></obv:addPhotoWrapper>
-                        <!--g:render template="addPhoto" model="['observationInstance':observationInstance]"/-->
                          <div class="section" style="margin:0px;">
                             <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
@@ -114,7 +113,7 @@
                 class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
                 <span class="msg" style="float: right"></span>
-                <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                <input class="videoUrl" type="hidden" name='videoUrl' value="" />
                 <input type="hidden" name='obvDir' value="${obvDir}" />
                 <input type="hidden" name='resType' value='${observationInstance.class.name}'>
             </form>
@@ -123,11 +122,12 @@
     </div>
 
 <r:script>	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;z-index:10;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li class="add_file addedResource" style="display:none;z-index:10;"><div class="add_file_container"><div class="add_image"></div><div class="add_video editable"></div></div><div class="progress"><div class="translucent_box"></div><div class="progress_bar"></div ><div class="progress_msg"></div ></div></li>';
 
 
 
 $(document).ready(function(){
+    var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
      <%
            if(observationInstance?.group) {
            out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";

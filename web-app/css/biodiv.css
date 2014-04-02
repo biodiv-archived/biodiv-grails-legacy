@@ -444,7 +444,7 @@ div.errors {
 	padding-right: 5px;
 }
 
-#add_image {
+.add_image {
 	background-image: url('../images/add-photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
@@ -454,7 +454,7 @@ div.errors {
 	cursor: pointer;
 	border-bottom: 3px red;
 }
-#add_video {
+.add_video {
 	background-image: url('../images/add-video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
@@ -482,7 +482,7 @@ div.errors {
 	z-index:100;
 }
 
-#translucent_box {
+.translucent_box {
 	background-color: black;
 	opacity: 0.5;
         filter: alpha(opacity = 50);        
@@ -492,7 +492,7 @@ div.errors {
 	position: absolute;
 }
 
-#progress_bar {
+.progress_bar {
 	background-color: lime;
 	width: 0%;
 	height: 10px;
@@ -500,7 +500,7 @@ div.errors {
 	position: absolute;
 }
 
-#progress_msg {
+.progress_msg {
 	position: absolute;
 	display: inline-block;
 	bottom: 15px;
@@ -587,7 +587,15 @@ textarea#featureNotes {
     left:0px;
     top:0px;
  }
-
+/*
+.obvLocked {
+    background: url(../images/lock-icon.png) no-repeat right top;
+    width: 35px; 
+    height: 50px;
+    left:0px;
+    top:0px;
+}
+*/
 .badge {
     padding:0px;
     z-index: 1000;
@@ -665,7 +673,7 @@ ul#recoSummary {
 	background-color: #ffffff;
 }
 
-#addObservation #imagesList, #addResourcesModal #imagesList {
+#addObservation .imagesList, #addResourcesModal .imagesList {
 	background-color: #fefad5;
 	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
@@ -1030,7 +1038,7 @@ i {
 	list-style: none;
 }
 
-.control-group.error button,.control-group.error .selected_value,.control-group.error #imagesList,.control-group.error input
+.control-group.error button,.control-group.error .selected_value,.control-group.error .imagesList,.control-group.error input
 	{
 	border: 1px solid #B94A48 !important;
 }

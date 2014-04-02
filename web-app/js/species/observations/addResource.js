@@ -8,160 +8,125 @@ function removeResource(event, imageId) {
     $(".image_"+imageId).remove();
 }
 
-
-$(document).ready(function(){
-    $('.dropdown-toggle').dropdown();
-
-    var uploadResource = new UploadResource($('.upload_resource').parent());
-    /**
-     * upload_resource & FilePicker
-     */
-    /*
-    function filePick() {
-        var onSuccess = function(FPFiles){
-            $.each(FPFiles, function(){
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: 'resources',
-                    value:JSON.stringify(this)
-                }).appendTo('.upload_resource');
-            });
-            uploadResource.submit();
-        };
-        filepicker.pickMultiple({
-            maxSize: 104857600,
-            services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
-            mimetypes: ['image/*'] }, onSuccess, function(FPError){ console.log(FPError.toString()); });
-
-    }
-*/
-
-    function newPicker() {
-        google.load('picker', '1', {"callback" : createPicker});
-    }
-
-        // Create and render a Picker object for searching images.
-        var createPicker = function () {
-        var picker = new google.picker.PickerBuilder().
-        addView(google.picker.ViewId.YOUTUBE).
-        setCallback(pickerCallback).
-        build();
-        picker.setVisible(true);
-        //$(".picker-dialog-content").prepend("<div id='anyVideoUrl' class='editable'></div>");
-        //$('#anyVideoUrl').editable(addVideoOptions);
-        }
-
-        // A simple callback implementation.
-        function pickerCallback(data) {
-            var url = 'nothing';
-            if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-            var doc = data[google.picker.Response.DOCUMENTS][0];
-            url = doc[google.picker.Document.URL];
-            if(url) {
-                $('#videoUrl').val(url);
-                uploadResource.submit();
-            }
-        }
-        }
-
-
-        $('#add_image').bind('click', filePick);
-
-        var onVideoAddSuccess = function(params) {
-        var d = new $.Deferred;
-        if(!params.value) {
-        return d.reject('This field is required'); //returning error via deferred object
-        } else {
-        $('#videoUrl').val(params.value);
-        uploadResource.submit();
-        d.resolve();
-        }
-        return d.promise()  
-        }
-
-        var onVideoAddValidate = function(value) {
-        if($.trim(value) == '') {
-        return 'This field is required';
-        }
-        }
-
-        var addVideoOptions = {
-        type: 'text',
-        mode:'popup',
-        emptytext:'',
-        placement:'bottom',
-        url: onVideoAddSuccess,
-        validate : onVideoAddValidate,
-        title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
-        }
-
-        $('#add_video').editable(addVideoOptions);
-        $.each($('.star_obvcreate'), function(index, value){
-        rate($(value));
-    });
-
-
-    /**
-    */
-    $('#attachFiles').change(function(e){
-        uploadResource.submit();
-    });
-
-
-});
-
 /**
   @class uploadResource
  **/
 (function ($) {
     "use strict";
 
-    var UploadResource = function (ele) {
+    var UploadResource = function (ele, options) {
         this.$ele = $(ele);
-        this.initForm();
+        this.$form = $(ele).find('form#upload_resource');
+        this.initForm(options);
     }
 
     UploadResource.prototype = {
-        initForm : function() {
+
+        initForm : function(options) {
             var me = this;
-            me.$ele.find(".upload_resource").ajaxForm({ 
+            console.log("init of prototype");
+            me.$ele.find('.add_image').bind('click', $.proxy(me.filePick, me));
+
+            var videoOptions = {
+                type : 'text',
+                mode : 'popup',
+                emptytext : '',
+                placement : 'bottom', 
+                url : function(params) {
+                    var d = new $.Deferred;
+                    if(!params.value) {
+                        return d.reject('This field is required'); //returning error via deferred object
+                    } else {
+                        console.log("HAVE PARAMS FOR VIDEO UPLOAD");
+                        console.log(params.value);
+                        console.log( me.$form.find(".videoUrl"));
+                        me.$form.find('.videoUrl').val(params.value);
+                        console.log("after saving " + me.$form.find('.videoUrl').val());
+                        me.submitRes();
+                        d.resolve();
+                    }
+                    return d.promise() 
+                }, 
+                    validate :  function(value) {
+                        if($.trim(value) == '') {
+                            return 'This field is required';
+                        }
+                    }, 
+                title : 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
+            };
+
+            $.extend( videoOptions, options);
+            me.$ele.find('.add_video').editable(videoOptions);
+
+
+
+
+
+            me.$form.ajaxForm({ 
                 url:window.params.observation.uploadUrl,
                 dataType: 'xml',//could not parse json wih this form plugin 
                 clearForm: true,
                 resetForm: true,
                 type: 'POST',
-                beforeSubmit: function(formData, jqForm, options) {
+                beforeSubmit: function(formData, jqForm, opts) {
                     me.$ele.find("#addObservationSubmit").addClass('disabled');
                     return true;
                 }, 
-                success : me.onSuccess,
-                error : me.onError
+                context:me,
+                success : me.onUploadResourceSuccess,
+                error : me.onUploadResourceError
             });
         },
-        filePick : function() {
-            var me = this;
-            var onSuccess = function(FPFiles){
-            $.each(FPFiles, function(){
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: 'resources',
-                    value:JSON.stringify(this)
-                }).appendTo(me.$ele.find(".upload_resource"));
-            });
-                uploadResource.submit();
-            };
-            filepicker.pickMultiple({
-            maxSize: 104857600,
-            services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
-            mimetypes: ['image/*'] }, onSuccess, function(FPError){ console.log(FPError.toString()); });
-        },
-        submit : function() {
-            this.$ele.find(".upload_resource").submit().find("span.msg").html("Uploading... Please wait...");
+
+        submitRes : function() {
+            console.log("CALLING SUBMIT");
+            console.log(this.$form);
+            this.$form.submit().find("span.msg").html("Uploading... Please wait...");
+            console.log("FORM SUBMITTED");
             this.$ele.find(".iemsg").html("Uploading... Please wait...");
             this.$ele.find(".progress").css('z-index',110);
             this.$ele.find('.progress_msg').html('Uploading ...');
         },
-        onSuccess : function(responseXML, statusText, xhr, form) {
+
+        filePick : function(e) {
+            var me = this;
+            console.log(me);
+            console.log(e);
+
+            var onSuccess = function(FPFiles){
+                console.log("file pick success");
+                $.each(FPFiles, function(){
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'resources',
+                        value:JSON.stringify(this)
+                    }).appendTo(me.$form);
+                });
+                console.log("GOING TO CALL SUBMIT");
+                me.submitRes();
+                //$.proxy(me.submitRes(), me);
+            };
+
+            var filepickerOptions = {
+                maxSize: 104857600,
+                services:['COMPUTER', 
+                'FACEBOOK', 
+                'FLICKR', 
+                'PICASA', 
+                'GOOGLE_DRIVE', 
+                'DROPBOX'],
+                mimetypes: ['image/*'] 
+                                    }
+                                    filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
+                                    console.log(FPError.toString());
+                                    });
+                                    
+        },
+        onUploadResourceSuccess : function(responseXML, statusText, xhr, form) {
+            var me = this;
+            console.log("ON SUCCESS CALLED");
+            console.log(me.$ele.find("#addObservationSubmit"));
+
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
             me.$ele.find(".progress").css('z-index',90);
@@ -169,9 +134,12 @@ $(document).ready(function(){
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
+            console.log($(responseXML));
             var obvDir = $(responseXML).find('dir').text();
-            var obvDirInput = $('#upload_resource input[name="obvDir"]');
+            var obvDirInput = me.$form.find('input[name="obvDir"]');
             if(!obvDirInput.val()){
+                console.log("OBV DIR YE HAI ");
+                console.log(obvDir);
                 $(obvDirInput).val(obvDir);
             }
             var images = [];
@@ -186,7 +154,8 @@ $(document).ready(function(){
                 var type = $(this).attr('type');					
                 images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
             });
-
+            
+            console.log(images);
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
             metadataEle.each(function() {
@@ -196,26 +165,27 @@ $(document).ready(function(){
                 var $ratingContainer = $(this).find('.star_obvcreate');
                 rate($ratingContainer)
             })
-
+            console.log(me.$ele.find(".imagesList li:first" ));
             me.$ele.find(".imagesList li:first" ).after (metadataEle);
+            console.log(metadataEle);
             me.$ele.find(".add_file" ).fadeIn(3000);
             me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
             me.$ele.find(".image-resources-msg").html("");
-            me.$ele.find(".upload_resource input[name='resources']").remove();
+            me.$form.find("input[name='resources']").remove();
             me.$ele.find('.videoUrl').val('');
             me.$ele.find('.add_video').editable('setValue','', false);		
         },
 
-        onError : function (xhr, ajaxOptions, thrownError){
+        onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
             var successHandler = this.success, errorHandler;
             var me = this;
             handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
                 if(data && data.status == 401) {
-                    me.$ele.find('.upload_resource').submit();
+                    me.submitRes();
                     return; 
                 }
                 me.$ele.find("#addObservationSubmit").removeClass('disabled');
-                 me.$ele.find(".upload_resource input[name='resources']").remove();
+                me.$form("input[name='resources']").remove();
                 me.$ele.find('.videoUrl').val('');
                 me.$ele.find(".progress").css('z-index',90);
                 me.$ele.find('.add_video').editable('setValue','', false);
@@ -229,7 +199,7 @@ $(document).ready(function(){
 
                 var messageNode = me.$ele.find(".message .resources");
                 if(messageNode.length == 0 ) {
-                    me.$ele.find(".upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+                    me.$form.prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
                 } else {
                     messageNode.append(response?response.error:"Error");
                 }
@@ -238,7 +208,101 @@ $(document).ready(function(){
         } 
     }
 
+    //making object visible outside
+    $.fn.components.UploadResource = UploadResource;
+
 }(window.jQuery)); 
 
+
+
+$(document).ready(function(){
+    $('.dropdown-toggle').dropdown();
+
+    /**
+     * upload_resource & FilePicker
+     */
+    /*
+       function filePick() {
+       var onSuccess = function(FPFiles){
+       $.each(FPFiles, function(){
+       $('<input>').attr({
+       type: 'hidden',
+       name: 'resources',
+       value:JSON.stringify(this)
+       }).appendTo('.upload_resource');
+       });
+       uploadResource.submit();
+       };
+       filepicker.pickMultiple({
+       maxSize: 104857600,
+       services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
+       mimetypes: ['image/*'] }, onSuccess, function(FPError){ console.log(FPError.toString()); });
+
+       }
+       */
+
+    function newPicker() {
+        google.load('picker', '1', {"callback" : createPicker});
+    }
+
+    // Create and render a Picker object for searching images.
+    var createPicker = function () {
+        var picker = new google.picker.PickerBuilder().
+            addView(google.picker.ViewId.YOUTUBE).
+            setCallback(pickerCallback).
+            build();
+        picker.setVisible(true);
+        //$(".picker-dialog-content").prepend("<div id='anyVideoUrl' class='editable'></div>");
+        //$('#anyVideoUrl').editable(addVideoOptions);
+    }
+
+    // A simple callback implementation.
+    function pickerCallback(data) {
+        var url = 'nothing';
+        if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+            var doc = data[google.picker.Response.DOCUMENTS][0];
+            url = doc[google.picker.Document.URL];
+            if(url) {
+                $('#videoUrl').val(url);
+                uploadResource.submitRes();
+            }
+        }
+    }
+
+
+
+    /*
+       var onVideoAddSuccess = function(params) {
+       var d = new $.Deferred;
+       if(!params.value) {
+       return d.reject('This field is required'); //returning error via deferred object
+       } else {
+       $('#videoUrl').val(params.value);
+       uploadResource.submit();
+       d.resolve();
+       }
+       return d.promise()  
+       }
+
+       var onVideoAddValidate = function(value) {
+       if($.trim(value) == '') {
+       return 'This field is required';
+       }
+       }
+       */
+    //$('#add_video').editable(addVideoOptions);
+    $.each($('.star_obvcreate'), function(index, value){
+        rate($(value));
+    });
+
+
+    /**
+    */
+    $('#attachFiles').change(function(e){
+        uploadResource.submitRes();
+    });
+
+
+});
 
 

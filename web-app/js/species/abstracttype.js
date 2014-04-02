@@ -2,7 +2,7 @@
     "use strict";
 
     //types
-    $.fn.speciesComponents = {};
+    $.fn.components = {};
 
     var AbstractType = function () { 
     };
@@ -277,7 +277,7 @@
 
     }
 
-    $.extend($.fn.speciesComponents, {abstracttype: AbstractType});
+    $.extend($.fn.components, {abstracttype: AbstractType});
 
 }(window.jQuery));
 

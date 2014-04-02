@@ -82,11 +82,7 @@ function onSpeciesImageUploadSuccess(type){
     }, 1000);
     return true;
 }
-/*
-var uploadSpeciesImageOptions = { 
-    success: onSpeciesImageUploadSuccess(type)  // post-submit callback 
-};
-*/
+
 $("#uploadSpeciesImagesBtn").click(function(){
     $("#uploadSpeciesImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("imageUpload")});
     return false;
@@ -108,7 +104,7 @@ function getNextRelatedObvImages(speciesId, url, resourceListType){
             if(data.relatedObvCount == 0){
                 $("#relatedObvLoadMore").replaceWith("<span>No More to Load</span>");
             } 
-            $("#speciesImage-tab0 #imagesList" ).append(addPhotoHtmlData);
+            $("#speciesImage-tab0 .imagesList" ).append(addPhotoHtmlData);
             $("#relatedImagesOffset").val(parseInt(offset) + 1);
             
             /*

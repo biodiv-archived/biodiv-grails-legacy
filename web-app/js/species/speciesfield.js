@@ -11,7 +11,7 @@
         this.initEditables(selector);
     };
 
-    $.fn.editableutils.inherit(SpeciesField, $.fn.speciesComponents.abstracttype);
+    $.fn.editableutils.inherit(SpeciesField, $.fn.components.abstracttype);
 
     $.extend(SpeciesField.prototype, {
         constructor: SpeciesField

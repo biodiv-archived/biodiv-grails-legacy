@@ -10,7 +10,7 @@
         this.initEditables(selector);
     };
 
-    $.fn.editableutils.inherit(TaxonHierarchy, $.fn.speciesComponents.abstracttype);
+    $.fn.editableutils.inherit(TaxonHierarchy, $.fn.components.abstracttype);
 
     $.extend(TaxonHierarchy.prototype, {
         constructor: TaxonHierarchy,

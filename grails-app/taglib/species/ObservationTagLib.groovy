@@ -338,6 +338,7 @@ class ObservationTagLib {
     def addPhotoWrapper = { attrs, body ->
         println "called called==================="
         def resList = []
+        def obvLinkList = []
         def resCount = 0
         def offset = 0 
         def resInstance = attrs.model.observationInstance
@@ -359,12 +360,14 @@ class ObservationTagLib {
                 def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 1, 0)
                 resList = relObvMap.resList
                 resCount = relObvMap.count
+                obvLinkList = relObvMap.obvLinkList
             break
 
         }
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount
+        attrs.model['obvLinkList'] = obvLinkList
         println "========================" + attrs.model
         out << render(template:"/observation/addPhotoWrapper", model:attrs.model);
     }

@@ -193,3 +193,8 @@ onoremap <F6> <C-C>za
 vnoremap <F6> zf
 nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
 vnoremap <Space> zf
+
+set smartindent
+set tabstop=4
+set shiftwidth=4
+set expandtab

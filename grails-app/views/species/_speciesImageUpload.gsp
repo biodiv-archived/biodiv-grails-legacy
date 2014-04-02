@@ -18,7 +18,7 @@
                     <a id="pullObvImagesBtn" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> Pull Images </a>
                 </form>
-                
+                   
             </div>
             </g:if>
             <g:if test="${isSpeciesContributor}">
@@ -31,6 +31,22 @@
                         style="float: right; margin-right: 5px;"> Upload Images </a>
 
                 </form>
+                <%
+
+                def obvTmpFileName = (speciesInstance) ? (speciesInstance.fetchSpeciesImageDir().getAbsolutePath()) : false 
+                def obvDir = obvTmpFileName ?  obvTmpFileName.substring(obvTmpFileName.lastIndexOf("/"), obvTmpFileName.size()) : ""
+                %>
+                <form id="upload_resource" 
+                    title="Add a photo for this observation"
+                    method="post"
+                    class="${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}">
+
+                    <span class="msg" style="float: right"></span>
+                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                    <input type="hidden" name='obvDir' value="${obvDir}" />
+                    <input type="hidden" name='resType' value='${speciesInstance.class.name}'>
+                </form>
+
             </div>
             </g:if>
         </div>

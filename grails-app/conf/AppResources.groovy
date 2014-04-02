@@ -72,10 +72,11 @@ modules = {
 		resource url:'/js/daterangepicker.js'
 		resource url:'/js/stats.js'
 		resource url:'/js/jquery.tablesorter.js'
-		resource url:'/js/bootstrap-editable.min.js'
+		resource url:'/js/bootstrap-editable.js'
 		resource url:'/js/species/posting.js'
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'
+		resource url:'/js/species/abstracttype.js'
 	}
 
 	auth {
@@ -163,7 +164,6 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
-		resource url:'/js/species/abstracttype.js'
 		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/taxonhierarchy.js'
 		resource url:'/js/species/species.js'

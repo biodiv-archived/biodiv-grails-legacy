@@ -486,7 +486,6 @@ function selectNameColumn(selectedColumn, formatter) {
  */
 $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
-    $('#add_image').bind('click', filePick);
     intializesSpeciesHabitatInterest(false);
 
     //$(".tagit-input").watermark("Add some tags");

@@ -15,6 +15,7 @@ import species.License.LicenseType;
 import species.Contributor;
 import species.Field
 import species.Resource;
+import species.participation.Observation;
 import species.Species;
 import species.License;
 import species.Reference;
@@ -1480,17 +1481,40 @@ println speciesField.references.size();
             resId.each{
                 resources.add(Resource.get(it.toLong()))
             }
+            
+            resId.each{
+                def rid = it
+                def obv = Observation.withCriteria(){
+                    resource{
+                        eq("id", rid.toLong())
+                    }
+                }
+                if(obv.size() == 1 ){
+                    println "GOT OBV FOR RES==========="
+                    def obvIns = obv.get(0)
+                    if(obvIns.isLocked == false){
+                        println "locking obv ============" + obvIns.id
+                        obvIns.isLocked = true
+                    }
+                    if(!obvIns.save(flush:true)){
+                        obvIns.errors.allErrors.each { log.error it } 
+                    }
+                }
+            }
         }
+
         resources.each { resource ->
             println "======ADDING RESOURCE = ======= " + resource
             species.addToResources(resource);
         }
         if(!species.save(flush:true)){
-            species.errors.allErrors.each { log.error it } 
+            species.errors.allErrors.each { log.error it }
+            return false
         }
         species.resources.each{
             println "==================== " + it
-        } 
+        }
+        return true
         
     }
 
