@@ -102,6 +102,8 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def save = {
+        List errors = [];
+        Map result = [errors:errors];
         if(params.species) {
             Map list = params.taxonRegistry?:[];
             List t = [];
@@ -114,16 +116,15 @@ class SpeciesController extends AbstractObjectController {
             t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
-                def result = speciesService.createSpecies(params.species, t);
+                result = speciesService.createSpecies(params.species, t);
+                if(!result.success) {
+                    flash.message = result.msg?:"Error while creating page"
+                    redirect(action: "create")
+                    return;
+                }
+
                 Species speciesInstance = result.speciesInstance;
-                def taxonRegistry = result.taxonRegistry;
                 if(speciesInstance.taxonConcept) {
-                    //dont accept a species page without any hierarchy
-                    if(!taxonRegistry) {
-                        flash.message = "Cannot create a page without any hierarchy"
-                        redirect(action: "create")
-                        return;
-                    } 
 
                     if (speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
@@ -136,15 +137,16 @@ class SpeciesController extends AbstractObjectController {
                         redirect(action: "show", id: speciesInstance.id)
                         return;
                     } else {
-                        flash.message = "Error while saving species"
+                        flash.message = result.msg ? result.msg+result.errors : "Error while saving species"
                     }
                 }
                 else {
-                    flash.message = "Error while saving species"
+                    flash.message = result.msg ? result.msg+result.errors : "Error while saving species"
                 }
             } catch(e) {
                 e.printStackTrace();
-                flash.message = "Error while saving species ${e.getMessage()}"
+                result.errors << e.getMessage();
+                flash.message = result.msg ? result.msg+result.errors : "Error while saving species"
             }
         }
         render(view: "create")
@@ -356,7 +358,7 @@ class SpeciesController extends AbstractObjectController {
 
     private boolean isContentContributor(SpeciesField sField) {
         for(c1 in sField.contributors) {
-            if(c1.id == springSecurityService.currentUser.id) {
+            if(c1?.id == springSecurityService.currentUser.id) {
                 return true;
             }
         }

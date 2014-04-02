@@ -164,7 +164,7 @@
 
         </r:script>
 
-        <%String space = speciesInstance.taxonConcept.canonicalForm%>319px
+        <%String space = speciesInstance.taxonConcept.canonicalForm%>
             <r:script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
                 CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );               
@@ -189,8 +189,8 @@
                     fillEmptyBlocks:false
                     //uiColor:'#AADC6F'
                 };
-
-            </r:script>319px
+                var speciesId = ${speciesInstance?.id}
+            </r:script>
 
 
 
@@ -329,6 +329,10 @@
             langSelectorOptions.push({value:"${lang.name}", text:"${lang.name}"});
             </g:each>
 
+            var taxonRanks = [];
+            <g:each in="${TaxonomyRank.list()}" var="t">
+            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            </g:each>
 
             </g:javascript>	
 

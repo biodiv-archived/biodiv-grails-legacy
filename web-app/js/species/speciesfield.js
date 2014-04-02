@@ -5,13 +5,11 @@
 (function ($) {
     "use strict";
 
-    var SpeciesField = function (div, selector, options) {
+    var SpeciesField = function (div, options) {
         this.init($(div), options);
-        //nothing shown after init
-        this.initEditables(selector);
     };
 
-    $.fn.editableutils.inherit(SpeciesField, $.fn.components.abstracttype);
+    $.fn.editableutils.inherit(SpeciesField, $.fn.components.abstracteditabletype);
 
     $.extend(SpeciesField.prototype, {
         constructor: SpeciesField
@@ -24,11 +22,11 @@
        @params {Object} options
        */
     $.fn.speciesfield = function (options) {
-        var args = arguments;
-        return this.each(function () {
-            var $this = $(this);
-            new SpeciesField(this, '.ck_desc', options);
+        var speciesfields = new Array();
+        this.each(function () {
+            speciesfields.push(new SpeciesField(this, options));
         });
+        return speciesfields
     };
 
 }(window.jQuery)); 

@@ -19,6 +19,10 @@ import com.vividsolutions.jts.geom.Geometry
 import com.vividsolutions.jts.io.WKTWriter;
 import grails.converters.JSON;
 import species.participation.Featured;
+import species.TaxonomyDefinition;
+import species.TaxonomyDefinition.TaxonomyRank;
+import species.TaxonomyRegistry;
+import species.Classification;
 
 class BootStrap {
 
@@ -195,8 +199,17 @@ class BootStrap {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[rank].value()]
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value()]
         }
+
+        JSON.registerObjectMarshaller(Classification) {
+            return ['id':it.classification.id, name : it.classification.name]
+        }
+
+        JSON.registerObjectMarshaller(TaxonomyRegistry) {
+            return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
+        }
+ 
     }
 
 	/**

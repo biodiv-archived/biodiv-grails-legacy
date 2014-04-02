@@ -65,6 +65,7 @@ class SpeciesService extends AbstractObjectService  {
     def namesIndexerService;
     def observationService;
     def speciesPermissionService;
+    def taxonService;
 
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
@@ -325,8 +326,8 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     /**
-    * Update Species Field
-    */
+     * Update Species Field
+     */
     def updateSpeciesField(SpeciesField speciesField, params) {
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
@@ -364,22 +365,28 @@ class SpeciesService extends AbstractObjectService  {
         //contributors
         speciesField.contributors.clear();
         params.contributor.split("\\r?\\n|,").each { l ->
-            SUser c = SUser.findByEmail(l);
-            if(!c) {
-                errors <<  "No registered user with email ${l} found"
-            } else {
-                speciesField.addToContributors(c);
+            l = l.trim()
+            if(l) {
+                SUser c = SUser.findByEmail(l.trim());
+                if(!c) {
+                    errors <<  "No registered user with email ${l} found"
+                } else {
+                    speciesField.addToContributors(c);
+                }
             }
         } 
 
         //attributions
         speciesField.attributors?.clear();
         params.attribution?.split("\\r?\\n").each { l ->
-            Contributor c = (new XMLConverter()).getContributorByName(l, true);
-            if(!c) {
-                errors <<  "Error while adding attribution ${l}"
-            } else {
-                speciesField.addToAttributors(c);
+            l = l.trim()
+            if(l) {
+                Contributor c = (new XMLConverter()).getContributorByName(l.trim(), true);
+                if(!c) {
+                    errors <<  "Error while adding attribution ${l}"
+                } else {
+                    speciesField.addToAttributors(c);
+                }
             }
         }   
 
@@ -390,38 +397,42 @@ class SpeciesService extends AbstractObjectService  {
              * This is fixed in grails 2 http://jira.grails.org/browse/GRAILS-6734
              * For now doing hack by executing basic sql
              */
-println "deleting old references"
             SpeciesField.executeUpdate('delete Reference r where r.speciesField = :speciesField', ['speciesField':speciesField]);
-println speciesField.references.size();
-//            speciesField.references?.clear();
+            //            speciesField.references?.clear();
         }
         params.reference?.split("\\r?\\n").each { l ->
+            l = l.trim(); 
+
             if(l && l.trim()) {
-                speciesField.addToReferences(new Reference(title:l));
-            } else {
-                errors << "Reference cant be empty"
+                speciesField.addToReferences(new Reference(title:l.trim()));
             }
         }   
 
         //license
         speciesField.licenses.clear();
         params.license.split("\\r?\\n|,").each { l ->
-            License c = (new XMLConverter()).getLicenseByType(l, false);
-            if(!c) { 
-                errors << "Error while updating license"
-            } else {
-                speciesField.addToLicenses(c);
+            l = l.trim();
+            if(l) {
+                License c = (new XMLConverter()).getLicenseByType(l, false);
+                if(!c) { 
+                    errors << "Error while updating license"
+                } else {
+                    speciesField.addToLicenses(c);
+                }
             }
         }
 
         //audienceType
         speciesField.audienceTypes.clear();
         params.audienceType.split("\\r?\\n|,").each { l ->
-            AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
-            if(!c) {
-                errors << "Error while updating audience type"
-            } else {
-                speciesField.addToAudienceTypes(c);
+            l = l.trim();
+            if(l) {
+                AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
+                if(!c) {
+                    errors << "Error while updating audience type"
+                } else {
+                    speciesField.addToAudienceTypes(c);
+                }
             }
         }
 
@@ -1107,9 +1118,12 @@ println speciesField.references.size();
     def createSpecies(String speciesName, List taxonRegistryNames) {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
+        List errors = [];
+        Map result = [errors:errors];
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+        
         if(speciesInstance.taxonConcept) {
 
             speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
@@ -1122,13 +1136,22 @@ println speciesField.references.size();
 				existingSpecies.clearBasicContent()
                 speciesInstance = existingSpecies;
             }
-            
+
+            if(!taxonService.validateHierarchy(taxonRegistryNames)) {
+                if(!speciesInstance.fetchTaxonomyRegistry()) {
+                    return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                }
+            }
+ 
             //save taxonomy hierarchy
-            def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, springSecurityService.currentUser)
-            taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true); 
+            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+            result = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+
+            result.speciesInstance = speciesInstance;
+            result.taxonRegistry = taxonRegistry;
+            result.errors = errors;
         }
-        println speciesInstance
-        return ['speciesInstance':speciesInstance, 'taxonRegistry':taxonRegistry];
+       return result;
     }
 
     /**
@@ -1212,7 +1235,7 @@ println speciesField.references.size();
     }
 
     def getSpeciesList(params, String action){
-        if("search".equalsIgnoreCase(action)){
+        if(Utils.isSearchAction(params, action)){
             return search(params)
         }else{
             return _getSpeciesList(params)
@@ -1260,7 +1283,7 @@ println speciesField.references.size();
             queryParams.offset = 0
         }
 
-        queryParams.sort = params.sort?:"percentOfInfo"
+        queryParams.sort = params.sort?:"lastrevised"
         if(queryParams.sort.equals('lastrevised')) {
             queryParams.sort = 'lastUpdated'
 

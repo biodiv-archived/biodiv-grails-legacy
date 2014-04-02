@@ -148,7 +148,6 @@ class Species implements Rateable {
 		return this.title;
 	}
 
-
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
 		resources.each {
@@ -169,7 +168,6 @@ class Species implements Rateable {
 		return res;
 	}
 	
-
 	String notes() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
@@ -191,7 +189,6 @@ class Species implements Rateable {
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
 	}	
-
     
     //TODO:remove this function after getting icons for all groups
 	Resource fetchSpeciesGroupIcon(ImageType type) {
@@ -204,18 +201,18 @@ class Species implements Rateable {
 	}
 	
 	def classifications() {
-		def classifications = new HashSet();
-		def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
-		classifications.add(combinedHierarchy);
+		def classifications = []
+		//def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
+		//classifications.add([0, combinedHierarchy);
 		def reg = TaxonomyRegistry.findAllByTaxonDefinition(this.taxonConcept);
 		reg.each {
 			if(it.path.split('_').length >= 6) {
-				classifications.add(it.classification);
+				classifications.add([it.id, it.classification, it.contributors]);
 			}
 		}
 		//Ordering has to figured out. Sort is a vague criteria. 
 		//Added just to get Author contributed as first result if present 
-		classifications = classifications.sort {it.name};
+		classifications = classifications.sort {return it[1].name};
 		
 		return classifications;
 	}
@@ -242,16 +239,19 @@ class Species implements Rateable {
     }
 
     def afterInsert() {
-   
-        HashSet contributors = new HashSet();
-
-        //TODO:looks like this is gonna be heavy on every save ... gotta change
-        contributors.addAll(this.fields?.collect { it.contributors })
-        contributors.addAll(Synonyms.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
-        contributors.addAll(CommonNames.findAllByTaxonConcept(this.taxonConcept)?.collect { it.contributors })
-        
-        //Saving current user as contributor for the species
-        speciesPermissionService.addContributors(this, new ArrayList(contributors));
+		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
+		//http://jira.grails.org/browse/GRAILS-4453
+		Species.withNewSession{
+	        HashSet contributors = new HashSet();
+	
+	        //TODO:looks like this is gonna be heavy on every save ... gotta change
+			this.fields?.each { contributors.addAll(it.contributors)}
+	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+	        
+	        //Saving current user as contributor for the species
+	        speciesPermissionService.addContributors(this, new ArrayList(contributors));
+		}
     }
 
     def beforeDelete(){
@@ -346,5 +346,35 @@ class Species implements Rateable {
 			errors.allErrors.each { log.error it }
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param start
+	 * @param end
+	 * @return species list summary on given time period
+	 */
+	static Map fetchSpeciesSummary(start, end){
+		def allSpeciesUpdateCount = Species.createCriteria().count {
+			and{
+				between("lastUpdated", start, end)
+			}
+		}
+		
+		def speciesUpdateCount = Species.createCriteria().count {
+			and{
+				gt('percentOfInfo', new Float(0.0))
+				between("lastUpdated", start, end)
+				lt("dateCreated", start)
+			}
+		}
+		
+		def speciesCreateCount = Species.createCriteria().count {
+			and{
+				gt('percentOfInfo', new Float(0.0))
+				between("dateCreated", start, end)
+			}
+		}
+		
+		return ['allSpeciesUpdated':allSpeciesUpdateCount, 'speciesUpdated':speciesUpdateCount, 'speciesCreated':speciesCreateCount, 'stubsCreated':(allSpeciesUpdateCount - speciesUpdateCount - speciesCreateCount)]
+	}
 }

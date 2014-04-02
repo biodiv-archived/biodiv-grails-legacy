@@ -3,9 +3,11 @@ package species.participation
 import java.util.Date;
 import grails.converters.JSON;
 
+import species.Species;
 import species.auth.SUser;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
+
 
 class SpeciesBulkUpload {
 	private static log = LogFactory.getLog(this);
@@ -35,8 +37,14 @@ class SpeciesBulkUpload {
 	String notes;
 	Status status;
 	String filePath;
-	String errorFilePath
-	String imagesDir
+	String errorFilePath;
+	String imagesDir;
+	
+	int speciesCreated = 0;
+	int speciesUpdated = 0
+	int stubsCreated = 0;
+	
+	
 	static belongsTo = [author:SUser];
 	
     static constraints = {
@@ -69,6 +77,7 @@ class SpeciesBulkUpload {
 		
 		if((status == Status.ABORTED) ||(status == Status.FAILED) || (status == Status.UPLOADED)){
 			this.endDate = new Date()
+			updateSpeciesCount()
 		}
 		
 		if(!this.save(flush:true)){
@@ -76,5 +85,10 @@ class SpeciesBulkUpload {
 		}
 	}
 	
-	
+	private void updateSpeciesCount(){
+		def res = Species.fetchSpeciesSummary(startDate, endDate)
+		speciesCreated = res.speciesCreated
+		speciesUpdated = res.speciesUpdated
+		stubsCreated = res.stubsCreated
+	}
 }

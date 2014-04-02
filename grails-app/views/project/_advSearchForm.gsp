@@ -2,7 +2,7 @@
 <div  class="block-tagadelic ">
 
 	<form id="advSearchForm" method="get"  title="Search"
-		action="${uGroup.createLink(controller:params.controller, action:params.action) }"
+		action="${uGroup.createLink(controller:params.controller, action:params.action, userGroup:userGroupInstance) }"
 		class="searchbox">
 		<label class="control-label" for="name">Title</label>
 			<input id="aq.title"

@@ -2001,7 +2001,7 @@ line-height: 11px;
         }
     }
 
-.contributor_entry, .speciesField .editableform {
+.contributor_entry {/*, .speciesField .editableform {*/
         border: 1px solid #D3D3D3;
 	border-color: #CECECE;
 	border-radius: 5px;
@@ -2631,9 +2631,9 @@ small {
     cursor: pointer;
     font-size:12px;
     font-weight:normal;
-    margin-right:5px;
+    margin:5px;
 }
-
+/*
 .editable-container.editable-inline {
     width:100%;
 }
@@ -2649,10 +2649,19 @@ small {
 .editable-pre-wrapped {
     white-space: normal;
 }
-
+*/
 .hidePoint {
     display:none;
 }
+
+.speciesField {
+	padding: 0px 10px;
+	background-color:white;
+	overflow: visible;
+    clear:both;
+    border-left:1px solid #cecece;
+}
+
 
 .speciesField .description {
     padding:5px;
@@ -2662,6 +2671,10 @@ small {
 #synonyms li:nth-child(even),#commonNames li:nth-child(even)  {background-color: #e6e6e6; overflow:hidden;}
 
 #synonyms li:nth-child(odd),#commonNames li:nth-child(odd) {background-color: #FFF; overflow:hidden;}
+
+#synonyms .span8, #commonNames .span8 {
+    width : 655px;
+}
 
 .bodymarker {
     position:relative;

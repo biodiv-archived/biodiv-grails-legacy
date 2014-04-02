@@ -710,8 +710,7 @@ $(document).ready(function(){
                 var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(element);
                 $('#addObservation').append($(input));	
             })
-
-
+            
             $("#userGroupsList").val(getSelectedUserGroups());
             if(drawnItems) {
                 var areas = drawnItems.getLayers();
