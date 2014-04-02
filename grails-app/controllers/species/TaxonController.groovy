@@ -377,16 +377,9 @@ class TaxonController {
         if(params.classification) {
             String speciesName;
             Map list = params.taxonRegistry?:[];
-            List t = [];
-            list.each { key, value ->
-                if(value) {
-                    int rank = Integer.parseInt(key).intValue();
-                    t.putAt(rank, value.trim());
-                    if(rank == TaxonomyRank.SPECIES.ordinal())
-                        speciesName = value.trim();
-                }
-            }
-            
+            List t = taxonService.getTaxonHierarchyList(list);
+            speciesName = t[TaxonomyRank.SPECIES.ordinal()];
+
 //TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
 //            return [success:false, msg:"You don't have permission to delete synonym"]
 //        }
@@ -424,17 +417,10 @@ class TaxonController {
         if(params.classification) {
             String speciesName;
             Map list = params.taxonRegistry?:[];
-            List t = [];
-            list.each { key, value ->
-                if(value) {
-                    int rank = Integer.parseInt(key).intValue();
-                    t.putAt(rank, value.trim());
-                    if(rank == TaxonomyRank.SPECIES.ordinal())
-                        speciesName = value.trim();
-                }
-            }
-            
-//TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            List t = taxonService.getTaxonHierarchyList(list);
+            speciesName = t[TaxonomyRank.SPECIES.ordinal()];
+
+            //TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
 //            return [success:false, msg:"You don't have permission to delete synonym"]
 //        }
 

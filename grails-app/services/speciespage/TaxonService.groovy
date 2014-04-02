@@ -909,6 +909,18 @@ class TaxonService {
 
     }
 
+    List getTaxonHierarchyList(Map list) {
+        List t = [];
+
+        list.each { key, value ->
+            if(value) {
+                int rank = Integer.parseInt(key).intValue();
+                t.putAt(rank, value.trim().capitalize());
+            }
+        }
+        return t;
+    }
+
     /**
 	 * 
 	 */

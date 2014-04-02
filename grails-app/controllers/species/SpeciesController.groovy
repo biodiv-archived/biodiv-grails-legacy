@@ -358,7 +358,7 @@ class SpeciesController extends AbstractObjectController {
 
     private boolean isContentContributor(SpeciesField sField) {
         for(c1 in sField.contributors) {
-            if(c1.id == springSecurityService.currentUser.id) {
+            if(c1?.id == springSecurityService.currentUser.id) {
                 return true;
             }
         }

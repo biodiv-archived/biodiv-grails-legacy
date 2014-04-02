@@ -834,7 +834,8 @@ $(document).ready(function() {
     }, function(){
         $(this).children('.attributionBlock').css('visibility', 'hidden');
     });
-    
+   
+    if(speciesId != undefined) {
     var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
         speciesId:speciesId,
         //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
@@ -859,11 +860,13 @@ $(document).ready(function() {
 
    var refreshEditables = function($e) {
         //initEdit($e);
-        for (var i=0; i < taxonBrowser.taxonHierarchies.length; i++) {
-            taxonBrowser.taxonHierarchies[i].initEditables('#taxaHierarchy #taxonHierarchy.editField', '#taxaHierarchy #taxonHierarchy.emptyField');
-        }
+        //
         for (var i=0; i < speciesfields.length; i++) {
             speciesfields[i].initEditables('.ck_desc', '.dummy.speciesField');
+        }
+
+        for (var i=0; i < taxonBrowser.taxonHierarchies.length; i++) {
+            taxonBrowser.taxonHierarchies[i].initEditables('#taxaHierarchy #taxonHierarchy.editField', '#taxaHierarchy #taxonHierarchy.emptyField');
         }
         //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
         //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
@@ -881,5 +884,6 @@ $(document).ready(function() {
         initEditableFields();
         return false;
     });
+    }
 });
 

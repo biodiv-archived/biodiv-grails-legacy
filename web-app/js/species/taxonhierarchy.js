@@ -176,12 +176,15 @@
 
             //Cancel
             $form.find('.editable-cancel').on('click', {$form:$form}, $.proxy(this.cancel, this));
+            return false;
         },
 
         updateEditableForm: function(postData) {
             var hierarchy = this.$element.find('#taxonHierarchy').getRowData();
             $.each(hierarchy, function(i, v) {
-                $('.taxonRank[name="taxonRegistry.'+v.level+'"]').val(v.name);
+                var temp = $(v.name.split(':')[1]);
+                console.log(temp);
+                $('.taxonRank[name="taxonRegistry.'+v.level+'"]').val(temp.text());
             });
 
             /*if(postData) {
