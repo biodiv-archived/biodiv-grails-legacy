@@ -2621,27 +2621,27 @@ small {
 .addField, .editFieldButton, .deleteFieldButton, .addFieldButton {
     color:#12C;
     cursor: pointer;
-    font-size:12px;
     font-weight:normal;
     margin:5px;
 }
-/*
+
 .editable-container.editable-inline {
     width:100%;
+    margin:5px;
 }
 
 .editable-container.editable-inline .editable-input {
-    width:100%;
+    width:72%;
 }
 
-.editable-container.editable-inline .editable-input input.input-medium,.editable-container.editable-inline .editable-input textarea.input-large  {
-    width:98%;
+.editable-container.editable-inline .editable-input input.input-medium {
+    width:94%;
 }
 
 .editable-pre-wrapped {
     white-space: normal;
 }
-*/
+
 .hidePoint {
     display:none;
 }
