@@ -115,7 +115,7 @@ class XMLConverter extends SourceConverter {
 
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
-                s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName);
+                s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, TaxonomyRank.SPECIES.ordinal());
                 if(s.taxonConcept) {
 
                     s.title = s.taxonConcept.italicisedForm;
@@ -1558,7 +1558,7 @@ class XMLConverter extends SourceConverter {
      * @param s
      * @return
      */
-    TaxonomyDefinition getTaxonConceptFromName(String sciName) {
+    TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank) {
         def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
@@ -1566,13 +1566,13 @@ class XMLConverter extends SourceConverter {
             if(name[0].normalizedForm) {
                 def taxonCriteria = TaxonomyDefinition.createCriteria();
                 TaxonomyDefinition taxon = taxonCriteria.get {
-                    eq("rank", TaxonomyRank.SPECIES.ordinal());
+                    eq("rank", rank);
                     ilike("canonicalForm", name[0].canonicalForm);
                 }
 
                 if(!taxon) {
                     taxon = name[0];
-                    taxon.rank = TaxonomyRank.SPECIES.ordinal();
+                    taxon.rank = rank;
                     if(!taxon.save(flush:true)) {
                         taxon.errors.each { log.error it }
                     }

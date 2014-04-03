@@ -22,7 +22,7 @@
 
                 <div class="span12 super-section" style="clear:both;">
 
-                    <div class="control-group">
+                    <!--div class="control-group">
                         <label class="control-label span3" for="name">Species</label> 
                         <div class="span8">
                             <input id="species" 
@@ -33,9 +33,10 @@
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
                         </div>
-                    </div>   
+                    </div-->   
                     <g:render template="/common/createTaxonRegistryTemplate"/>
 
+                    <div id="errorMsg" class="alert hide"></div>
 
                 </div>   
                 <div class="span12 submitButtons">
@@ -49,11 +50,11 @@
                         style="float: right; margin-right: 30px;"> Cancel </a>
                     </g:else>
                     <a id="validateSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Validate Species </a>
+                        style="float: right; margin-right: 5px;"> Validate Hierarchy</a>
 
 
                     <a id="addSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;display:none;"> Add Species </a>
+                        style="float: right; margin-right: 5px;display:none;"> Add Page</a>
 
                 </div>
 
@@ -63,7 +64,7 @@
     </body>
     <r:script>
     $(document).ready(function() {
-        $("#species").autofillNames({
+        /*$("#species").autofillNames({
             'appendTo' : '#nameSuggestions',
             'nameFilter':'scientificNames',
             focus: function( event, ui ) {
@@ -80,21 +81,27 @@
             },open: function(event, ui) {
                 $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
             }
-        });
+        });*/
+        $(".taxonRank").autofillNames();
 
 
         $('#validateSpeciesSubmit').click(function() {
+            var params = {};
+            $("#addSpecies input").each(function(index, ele) {
+                if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
+            });
             //Did u mean species 
             $.ajax({
                 url:'/species/validate',
-                data:{'name':$('#species').val()},
+                data:params,
+                method:'POST',
                 dataType:'json',
                 success:function(data) {
                     if(data.success == true) {
                         if(data.id) {
                         data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
                         }
-                        $('#species').next('.alert').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+                        $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
                         //$('#validateSpeciesSubmit').hide()
                         var $ul = $('<ul></ul>');
                         $('#existingHierarchies').empty().append($ul);
@@ -105,7 +112,7 @@
                                 var $u = $('<ul><b>'+index+'</b></ul>');
                                 $c.append($u);
                                 $.each(value[0], function(i, v) {
-                                    $u.append('<li>'+v.rank+':'+v.name+'</li>');
+                                    $u.append('<li>'+v.rank+' : '+v.name+'</li>');
                                 });
                             });
                         }
@@ -113,7 +120,7 @@
                         $('#taxonHierachyInput').show();
                         $('#addSpeciesSubmit').show();
                     } else {
-                        $('#species').next('.alert').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                         $('#errorMsg').next('.alert').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
                     }
                 }
                 
