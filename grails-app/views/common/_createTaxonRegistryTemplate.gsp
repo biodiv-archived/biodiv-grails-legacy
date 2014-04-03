@@ -9,9 +9,12 @@
         <div id="existingHierarchies"><div>Following hierarchies already exist for the given species name.</div></div>
         <g:each in="${TaxonomyRank.list()}" var="taxonRank">
         <g:if test="${taxonRank.ordinal() != TaxonomyRank.SPECIES.ordinal()}">
-        <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
-        type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
-        placeholder="Add ${taxonRank.value()}" />
+        <div class="input-prepend input-block-level">
+            <span class="add-on"> ${taxonRank.value()}</span>
+            <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
+            type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
+            placeholder="Add ${taxonRank.value()}" />
+        </div>
         </g:if>
         </g:each>
     </div>

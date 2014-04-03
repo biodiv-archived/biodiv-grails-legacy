@@ -2650,6 +2650,15 @@ small {
     white-space: normal;
 }
 
+.editable-input .add-on, #taxonHierachyInput .add-on {
+    width:75px;
+}
+
+.editable-input .taxonRank {
+    width:80%;
+}
+
+
 .hidePoint {
     display:none;
 }
@@ -2679,3 +2688,4 @@ small {
 .bodymarker {
     position:relative;
 }
+
