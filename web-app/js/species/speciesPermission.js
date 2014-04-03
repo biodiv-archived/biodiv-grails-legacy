@@ -6,7 +6,6 @@ $('#inviteCuratorsDialog').modal({
 });
 
 $('#inviteCurators').click(function(){
-    //console.log("checking logged in");
     $.ajax({ 
         url:window.params.isLoggedInUrl,
         success: function(data, statusText, xhr, form) {
@@ -42,7 +41,6 @@ $("#inviteCuratorButton").click(function(){
         success: function(data, statusText, xhr, form) {
             if(data.statusComplete) {
                 $('#inviteCuratorsDialog').modal('hide');
-                console.log("====RETURNED MSG ======" + data.msg);
                 $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             } else {
                 $("#invite_CuratorMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);

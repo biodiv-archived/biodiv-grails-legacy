@@ -758,12 +758,10 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def uploadImage = {
-        println "====SPECIES IMAGE UPLOAD ============= " + params
+        log.debug params
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
-        println "===UPLOADING FOR THIS SPECIES ============== " + species  
         def out = speciesService.updateSpecies(params, species)
-        println "============DONE DONE ==================="
         def result
         if(out){
             result = ['success' : true]
@@ -775,7 +773,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def getRelatedObvForSpecies = {
-        println "=====FOR LOAD MORE ========= " + params
+        log.debug params
         def spInstance = Species.get(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 1, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
@@ -783,18 +781,15 @@ class SpeciesController extends AbstractObjectController {
         def obvLinkList = relatedObvMap.obvLinkList
         println "OFFSET VALUE++++++++++++++" + params.offset.toInteger()
         def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:params.offset.toInteger() ]);
-        println "=======RELATED OBV COUNT ============= " + relatedObvCount
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON
     }
 
     def pullObvImage = {
-        println "========PULLING OBV IMAGE================= " + params  
+        log.debug params  
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
-        println "===UPLOADING FOR THIS SPECIES ============== " + species  
         def out = speciesService.updateSpecies(params, species)
-        println "============DONE DONE ==================="
         def result
         if(out){
             result = ['success' : true]

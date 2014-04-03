@@ -551,11 +551,14 @@ class Observation extends Metadata implements Taggable, Rateable {
         return observationCount;
     }
 
-    private void removeResourcesOnUnlock(){
+    private void removeResourcesFromSpecies(){
         def obvRes = this.resource
+        if(!this.maxVotedReco) {
+            return
+        }
         def taxCon = this.maxVotedReco?.taxonConcept
         if(!taxCon){return}
-        def speWithThisTaxon = Speceies.findAllByTaxonConcept(taxCon)
+        def speWithThisTaxon = Species.findAllByTaxonConcept(taxCon)
         speWithThisTaxon.each{ sp ->   
             obvRes.each{ obres ->
                 sp.removeFromResources(obres)

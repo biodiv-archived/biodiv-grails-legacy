@@ -871,7 +871,7 @@ $(document).ready(function() {
     }, function(){
         $(this).children('.attributionBlock').css('visibility', 'hidden');
     });
-
+    
     if(typeof speciesId != 'undefined') {
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
             speciesId:speciesId,
