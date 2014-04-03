@@ -54,15 +54,20 @@ $(document).ready(function() {
                 <div class="editable-input">
                     <g:each in="${TaxonomyRank.list()}" var="taxonRank">
                     <g:if test="${taxonRank.ordinal() == TaxonomyRank.SPECIES.ordinal()}">
-                        <input type="hidden"  data-rank ="${taxonRank.ordinal()}"
-                            type="text" name="taxonRegistry.${taxonRank.ordinal()}" 
-                            value="${speciesInstance.taxonConcept.name}"
-                            placeholder="Add ${taxonRank.value()}" readonly/>
+                    <input type="hidden"  data-rank ="${taxonRank.ordinal()}"
+                    type="text" name="taxonRegistry.${taxonRank.ordinal()}" 
+                    value="${speciesInstance.taxonConcept.name}"
+                    placeholder="Add ${taxonRank.value()}" readonly/>
                     </g:if>
                     <g:else>
+                    <div class="input-prepend">
+                        <span class="add-on"> ${taxonRank.value()}</span>
                         <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
-                            type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
-                            placeholder="Add ${taxonRank.value()}" />
+                        type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
+                        placeholder="Add ${taxonRank.value()}" />
+
+                    </div>
+
                     </g:else>
                     </g:each>
                     <input class='classification' type="hidden" name="classification" value="${Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY).id}" readonly/>
