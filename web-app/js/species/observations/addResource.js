@@ -24,7 +24,6 @@ function removeResource(event, imageId) {
 
         initForm : function(options) {
             var me = this;
-            console.log("init of prototype");
             me.$ele.find('.add_image').bind('click', $.proxy(me.filePick, me));
 
             var videoOptions = {
@@ -37,11 +36,7 @@ function removeResource(event, imageId) {
                     if(!params.value) {
                         return d.reject('This field is required'); //returning error via deferred object
                     } else {
-                        console.log("HAVE PARAMS FOR VIDEO UPLOAD");
-                        console.log(params.value);
-                        console.log( me.$form.find(".videoUrl"));
                         me.$form.find('.videoUrl').val(params.value);
-                        console.log("after saving " + me.$form.find('.videoUrl').val());
                         me.submitRes();
                         d.resolve();
                     }
@@ -79,10 +74,7 @@ function removeResource(event, imageId) {
         },
 
         submitRes : function() {
-            console.log("CALLING SUBMIT");
-            console.log(this.$form);
             this.$form.submit().find("span.msg").html("Uploading... Please wait...");
-            console.log("FORM SUBMITTED");
             this.$ele.find(".iemsg").html("Uploading... Please wait...");
             this.$ele.find(".progress").css('z-index',110);
             this.$ele.find('.progress_msg').html('Uploading ...');
@@ -90,11 +82,7 @@ function removeResource(event, imageId) {
 
         filePick : function(e) {
             var me = this;
-            console.log(me);
-            console.log(e);
-
             var onSuccess = function(FPFiles){
-                console.log("file pick success");
                 $.each(FPFiles, function(){
                     $('<input>').attr({
                         type: 'hidden',
@@ -102,9 +90,7 @@ function removeResource(event, imageId) {
                         value:JSON.stringify(this)
                     }).appendTo(me.$form);
                 });
-                console.log("GOING TO CALL SUBMIT");
                 me.submitRes();
-                //$.proxy(me.submitRes(), me);
             };
 
             var filepickerOptions = {
@@ -124,9 +110,6 @@ function removeResource(event, imageId) {
         },
         onUploadResourceSuccess : function(responseXML, statusText, xhr, form) {
             var me = this;
-            console.log("ON SUCCESS CALLED");
-            console.log(me.$ele.find("#addObservationSubmit"));
-
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
             me.$ele.find(".progress").css('z-index',90);
@@ -134,12 +117,9 @@ function removeResource(event, imageId) {
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
-            console.log($(responseXML));
             var obvDir = $(responseXML).find('dir').text();
             var obvDirInput = me.$form.find('input[name="obvDir"]');
             if(!obvDirInput.val()){
-                console.log("OBV DIR YE HAI ");
-                console.log(obvDir);
                 $(obvDirInput).val(obvDir);
             }
             var images = [];
@@ -155,7 +135,6 @@ function removeResource(event, imageId) {
                 images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
             });
             
-            console.log(images);
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
             metadataEle.each(function() {
@@ -165,9 +144,7 @@ function removeResource(event, imageId) {
                 var $ratingContainer = $(this).find('.star_obvcreate');
                 rate($ratingContainer)
             })
-            console.log(me.$ele.find(".imagesList li:first" ));
             me.$ele.find(".imagesList li:first" ).after (metadataEle);
-            console.log(metadataEle);
             me.$ele.find(".add_file" ).fadeIn(3000);
             me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
             me.$ele.find(".image-resources-msg").html("");

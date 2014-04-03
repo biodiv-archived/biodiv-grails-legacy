@@ -224,7 +224,7 @@
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
                 <div class="span12" style="margin-left:0px">
 
-                    <!--g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/-->
+                    <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
                     <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
 
 
@@ -301,7 +301,6 @@
             <g:javascript>
             $(document).ready(function() {
                 var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
-                console.log("rutgfewrigtergterge");
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 

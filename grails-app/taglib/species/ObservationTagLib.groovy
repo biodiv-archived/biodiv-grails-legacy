@@ -336,7 +336,6 @@ class ObservationTagLib {
     }
 
     def addPhotoWrapper = { attrs, body ->
-        println "called called==================="
         def resList = []
         def obvLinkList = []
         def resCount = 0
@@ -344,17 +343,14 @@ class ObservationTagLib {
         def resInstance = attrs.model.observationInstance
         switch (attrs.model.resourceListType) {
             case "ofObv" :
-                println "RES FOR OBSER==============="
                 resList = resInstance.resource
             break
             
             case "ofSpecies" :
-                println " RES FOR SPECIES==================="
                 resList = resInstance.resources
             break
             
             case "fromRelatedObv" :
-                println "RES FROM RELATED OBV=============="
                 def taxId = resInstance.taxonConcept.id.toLong()
                 // new func service limit offset sp inst and returns a res list based on params
                 def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 1, 0)
@@ -368,7 +364,6 @@ class ObservationTagLib {
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount
         attrs.model['obvLinkList'] = obvLinkList
-        println "========================" + attrs.model
         out << render(template:"/observation/addPhotoWrapper", model:attrs.model);
     }
 }

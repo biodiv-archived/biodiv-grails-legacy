@@ -870,7 +870,7 @@ $(document).ready(function() {
         $(this).children('.attributionBlock').css('visibility', 'hidden');
     });
    
-    if(speciesId != undefined) {
+    if (typeof speciesId != 'undefined') {
     var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
         speciesId:speciesId,
         //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},

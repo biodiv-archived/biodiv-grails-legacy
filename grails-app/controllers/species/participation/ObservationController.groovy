@@ -374,17 +374,14 @@ class ObservationController extends AbstractObjectController {
 				def rs = [:]
 				//Utils.populateHttpServletRequestParams(request, rs);
 				def resourcesInfo = [];
-                println "============PARAMS ============= " + params
                 def rootDir
                 switch(params.resType) {
                     case Observation.class.name:
                         rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-                        println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
                     break;
 
                     case Species.class.name:
                         rootDir = grailsApplication.config.speciesPortal.resources.rootDir
-                        println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + rootDir
                     break;
                 }
                 File obvDir 
@@ -432,7 +429,6 @@ class ObservationController extends AbstractObjectController {
 					else {
 						if(!obvDir) {
 							if(!params.obvDir) {
-                                println "===================if "
 								obvDir = new File(rootDir);
 								if(!obvDir.exists()) {
 									obvDir.mkdir();
@@ -440,11 +436,9 @@ class ObservationController extends AbstractObjectController {
 								obvDir = new File(obvDir, UUID.randomUUID().toString());
 								obvDir.mkdir();
 							} else {
-                                println "else========"
 								obvDir = new File(rootDir, params.obvDir);
 								obvDir.mkdir();
 							}
-                            println "=========OIBV DIR =========== " + obvDir
 						}
 
 						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
@@ -466,7 +460,6 @@ class ObservationController extends AbstractObjectController {
 					def videoUrl = params.videoUrl;
 					if(videoUrl && Utils.isURL(videoUrl)) {
 						String videoId = Utils.getYouTubeVideoId(videoUrl);
-                        println "======VIDEO ID ========= " + videoId
 						if(videoId) {
 						def res = new Resource(fileName:'v', type:ResourceType.VIDEO);		
 						res.setUrl(videoUrl);				
@@ -1243,18 +1236,17 @@ class ObservationController extends AbstractObjectController {
         }
         render result as JSON
     }
-
+    
+    @Secured(['ROLE_ADMIN','ROLE_SPECIES_ADMIN'])
     def lock = {
-        println "OBV CONT LOC PARAMS===========  " + params
         def msg = ""
         def obv = Observation.get(params.id.toLong());
         if(params.lockType == "Lock"){
-            println "==========LOCK TYPE==========="
             obv.isLocked = true;
             msg = "Observation successfully locked, Please refresh to see changes"
             
         }else{
-            println "===UNLOCK TYPE================"
+            obv.removeResourcesFromSpecies()
             obv.isLocked = false;
             msg = "Observation successfully unlocked, Please refresh to see changes"
         }
