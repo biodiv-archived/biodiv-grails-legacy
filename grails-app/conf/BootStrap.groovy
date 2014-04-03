@@ -191,11 +191,19 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Synonyms) {
-            return ['id':it.id, 'name':it.name,  'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, relationship: ['name':it.relationship.value()], 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor()]
+            def syn =  ['id':it.id, 'name':it.name,  'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor()]
+            if(it.relationship) {
+                syn['relationship'] = ['name':it.relationship.value()] 
+            }
+            return syn;
         }
 
         JSON.registerObjectMarshaller(CommonNames) {
-            return ['id':it.id, 'name':it.name, 'language': ['id':it.language.id, 'name':it.language.name], 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ]
+            def commonname = ['id':it.id, 'name':it.name, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ];
+            if(it.language) {
+                commonname ['language'] =  ['id':it.language.id, 'name':it.language.name]
+            }
+            return commonname;
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
