@@ -13,6 +13,16 @@
 <g:set var="title" value="Pages"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show" />
+
+<style>
+#contentMenu > .nav-tabs > .active > a {
+    background-color: rgba(98, 100, 39, 0.14);
+}
+#contentMenu > .nav-tabs > li > a {
+    background-color: #CEEBD3;
+}
+
+</style>
 </head>
 <body>
 
@@ -47,10 +57,12 @@
             					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
                                                 <li><h5>Pages</h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
+							<g:if test="${newsletterInstance.sticky}">	
 							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
+							</g:if>		
 						</g:each>
-                                                <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
+                        <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/project/list">Western Ghats CEPF
 									Projects</a></li>
 						</g:if>
