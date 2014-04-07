@@ -221,7 +221,7 @@ class ChecklistService {
 				}
 			}
 			//updating obv count
-			checklistInstance.speciesCount = checklistInstance.observations?.size()
+			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
 		}
 		log.debug "saved checklist observation  "
 	}
