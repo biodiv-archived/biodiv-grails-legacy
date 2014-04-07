@@ -557,10 +557,12 @@ function onAddableDisplay(value, sourceData, response, context) {
         var $ul = me.parent().parent();
 
         if(sourceData.type == 'synonym') {
+            data_type = 'text';
             html.push('<li><div class="span3"><a href="#" class="synRel add_selector selector" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></a></div><div class="span8"><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></div></li>');
             $ul = me.parent().parent().parent();
 
         } else if(sourceData.type == 'commonname') {
+            data_type = 'text';
             html.push('<li><div class="span3"><a href="#" class="lang add_selector selector" data-type="select" data-name="language" data-original-title="Edit Commonname Language"></a></div><div class="span8"><div><a href="#" class="addField" data-type="'+data_type+'" data-pk="'+sourceData.id+'" data-rows="2" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Add '+sourceData.type+' name"></a></div></div></li>');
             $ul = me.parent().parent().parent().parent();
 
@@ -869,56 +871,56 @@ $(document).ready(function() {
     }, function(){
         $(this).children('.attributionBlock').css('visibility', 'hidden');
     });
-   
-    if (typeof speciesId != 'undefined') {
-    var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-        speciesId:speciesId,
-        //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
-        expandAll:true,
-        expandSpecies:true
-    });	
+    
+    if(typeof speciesId != 'undefined') {
+        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+            speciesId:speciesId,
+            //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
+            expandAll:true,
+            expandSpecies:true
+        });	
 
-    var speciesfields = $('body').speciesfield();
+        var speciesfields = $('body').speciesfield();
 
-    var initEditableFields = function(e) {
-        if($(document).find('.editFieldButton').length == 0) {
-            refreshEditables($('body'));
-        } else {
-            /*    $('.editable').editable('disable');
-                  $('.addField').hide();
-                  $('.editFieldButton').hide();
-                  */  
-            window.location.reload(true);
-        }
-        if(e) e.stopPropagation();
-    }
-
-   var refreshEditables = function($e) {
-        //initEdit($e);
-        //
-        for (var i=0; i < speciesfields.length; i++) {
-            speciesfields[i].initEditables('.ck_desc', '.dummy.speciesField');
+        var initEditableFields = function(e) {
+            if($(document).find('.editFieldButton').length == 0) {
+                refreshEditables($('body'));
+            } else {
+                /*    $('.editable').editable('disable');
+                      $('.addField').hide();
+                      $('.editFieldButton').hide();
+                      */  
+                window.location.reload(true);
+            }
+            if(e) e.stopPropagation();
         }
 
-        for (var i=0; i < taxonBrowser.taxonHierarchies.length; i++) {
-            taxonBrowser.taxonHierarchies[i].initEditables('#taxaHierarchy #taxonHierarchy.editField', '#taxaHierarchy #taxonHierarchy.emptyField');
+        var refreshEditables = function($e) {
+            //initEdit($e);
+            //
+            for (var i=0; i < speciesfields.length; i++) {
+                speciesfields[i].initEditables('.ck_desc', '.dummy.speciesField');
+            }
+
+            for (var i=0; i < taxonBrowser.taxonHierarchies.length; i++) {
+                taxonBrowser.taxonHierarchies[i].initEditables('#taxaHierarchy #taxonHierarchy.editField', '#taxaHierarchy #taxonHierarchy.emptyField');
+            }
+            //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
+            //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
+            //initStatusSelector($e, statusSelectorOptions, "Under Validation");
+
+            initNameEditables($('#synonyms,#commonNames'));
+
+            $('.emptyField').show();
+            //$('.hidePoint').show();
+            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+            if($e) rate($e.find('.star_rating'));
         }
-        //initLicenseSelector($e, licenseSelectorOptions, "CC BY");
-        //initAudienceTypeSelector($e, audienceTypeSelectorOptions, "General Audience");
-        //initStatusSelector($e, statusSelectorOptions, "Under Validation");
 
-        initNameEditables($('#synonyms,#commonNames'));
-
-        $('.emptyField').show();
-        //$('.hidePoint').show();
-        $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
-        if($e) rate($e.find('.star_rating'));
-    }
-
-    $('#editSpecies').click(function() {
-        initEditableFields();
-        return false;
-    });
+        $('#editSpecies').click(function() {
+            initEditableFields();
+            return false;
+        });
     }
 });
 

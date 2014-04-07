@@ -988,13 +988,9 @@ class TaxonService {
 	}
 
     boolean validateHierarchy(List<String> taxonEntries) {
-        if(!taxonEntries[TaxonomyRank.KINGDOM.ordinal()]) return false;
-        if(!taxonEntries[TaxonomyRank.PHYLUM.ordinal()]) return false;
-        if(!taxonEntries[TaxonomyRank.CLASS.ordinal()]) return false;
-        if(!taxonEntries[TaxonomyRank.ORDER.ordinal()]) return false;
-        if(!taxonEntries[TaxonomyRank.FAMILY.ordinal()]) return false;
-        if(!taxonEntries[TaxonomyRank.GENUS.ordinal()]) return false;
-        if(!taxonEntries[TaxonomyRank.SPECIES.ordinal()]) return false;
+        for (int i=0; i< taxonEntries.size(); i++) {
+            if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) return false;
+        }
         return true;
     }
 }

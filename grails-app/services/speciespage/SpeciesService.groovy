@@ -1115,14 +1115,14 @@ class SpeciesService extends AbstractObjectService  {
     /**
     * Create Species given species name and atleast one taxon hierarchy
     */
-    def createSpecies(String speciesName, List taxonRegistryNames) {
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames) {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
         Map result = [errors:errors];
 
         XMLConverter converter = new XMLConverter();
-        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName);
+        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
         
         if(speciesInstance.taxonConcept) {
 

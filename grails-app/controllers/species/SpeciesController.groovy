@@ -44,6 +44,8 @@ class SpeciesController extends AbstractObjectController {
 	def observationService;
 	def userGroupService;
 	def springSecurityService;
+    def taxonService;
+
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -104,19 +106,23 @@ class SpeciesController extends AbstractObjectController {
     def save = {
         List errors = [];
         Map result = [errors:errors];
-        if(params.species) {
+        if(params.taxonRegistry) {
             Map list = params.taxonRegistry?:[];
             List t = [];
+            String speciesName;
+            int rank;
             list.each { key, value ->
                 if(value) {
                     t.putAt(Integer.parseInt(key).intValue(), value);
+                    speciesName = value;
+                    rank = Integer.parseInt(key).intValue();
                 }
             }
             
-            t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
+            //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
-                result = speciesService.createSpecies(params.species, t);
+                result = speciesService.createSpecies(speciesName, rank, t);
                 if(!result.success) {
                     flash.message = result.msg?:"Error while creating page"
                     redirect(action: "create")
@@ -479,10 +485,6 @@ class SpeciesController extends AbstractObjectController {
                     result = speciesService.addSpeciesField(speciesId, fieldId, params);
                 } else {
                     SpeciesField speciesField = SpeciesField.get(speciesFieldId);
-                    /*createCriteria().get{
-                        eq("id", speciesFieldId)
-                        fetchMode 'references', FetchMode.JOIN
-                    }*/
                     if(!speciesField) {
                         return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
                     }
@@ -797,54 +799,71 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
-   @Secured(['ROLE_USER'])
-   def validate = {
-       def result = [:];
-       if(params.name) {
-           def cleanSciName = Utils.cleanSciName(params.name);
+    @Secured(['ROLE_USER'])
+    def validate = {
+        List hierarchy = [];
+        if(params.taxonRegistry) {
+            hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
+        }
+        NamesParser namesParser = new NamesParser();
 
-           if(cleanSciName) {
-               try {
-                   NamesParser namesParser = new NamesParser();
-                   List<TaxonomyDefinition> name = namesParser.parse([cleanSciName])
-                   if(name[0].binomialForm) { //TODO:check its not uninomial
-                       def taxonCriteria = TaxonomyDefinition.createCriteria();
-                       TaxonomyDefinition taxon = taxonCriteria.get {
-                           eq("rank", TaxonomyRank.SPECIES.ordinal());
-                           ilike("canonicalForm", name[0].canonicalForm);
-                       }
+        def result = [:];
+        if(hierarchy) {
+            try {
+                List<TaxonomyDefinition> names = namesParser.parse(hierarchy);
+                TaxonomyDefinition page;
+                println names;
+                int i=0, rank;
+                for(i = 0; i< names.size(); i++) {
+                    if(names[i] != null) {
+                        page = names[i];
+                        rank = i;
+                    }
+                }
+println page
+                if(page && page.canonicalForm) {
+                def taxonCriteria = TaxonomyDefinition.createCriteria();
+                TaxonomyDefinition taxon = taxonCriteria.get {
+                    eq("rank", rank);
+                    ilike("canonicalForm", page.canonicalForm);
+                }
 
-                       if(!taxon) {
-                           result = ['success':true, 'msg':'New taxon concept. Thanks for adding a new concept.']
-                       } else {
-                           //CHK if a species page exists for this concept
-                           Species species = Species.findByTaxonConcept(taxon);
-                           def taxonRegistry = taxon.parentTaxonRegistry();
-                           if(species) {
-                               result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title];
-                           } else {
-                               result = ['success':true, 'msg':'New species page for an existing concept'];
-                           }
-                           result['taxonRegistry'] = [:];
-                           taxonRegistry.each {classification, hierarchy ->
-                               if(!result['taxonRegistry'][classification.name])
-                                   result['taxonRegistry'][classification.name] = [];
-                               result['taxonRegistry'][classification.name] << hierarchy
-                           }
-                       }
-                   } else {
-                       result = ['success':false, 'msg':'Not a valid name.']
-                   }
-               } catch(e) {
-                   result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}"]
-               }
-           } else {
-                result = ['success':false, 'msg':"Error while cleaning name"]
-           }
+                if(!taxon) {
+                    result = ['success':true, 'msg':"Adding a new taxon concept ${page.name}"]
+                } else {
+                    //CHK if a species page exists for this concept
+                    Species species = Species.findByTaxonConcept(taxon);
+                    def taxonRegistry = taxon.parentTaxonRegistry();
+                    if(species) {
+                        result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title];
+                    } else {
+                        result = ['success':true, 'msg':"Adding a new species page for an existing concept ${page.name}"];
+                    }
+                    result['taxonRegistry'] = [:];
+                    taxonRegistry.each {classification, h ->
+                        if(!result['taxonRegistry'][classification.name])
+                            result['taxonRegistry'][classification.name] = [];
+                        result['taxonRegistry'][classification.name] << h
+                    }
+                }
+                if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
+                    result = ['success':false, 'msg':"Not a valid name ${page.name}."]
+                }
+                } else {
+                    result = ['success':false, 'msg':"Not a valid name ${page.name}."]
+                }
 
-       } else {
-           result = ['success':false, 'msg':'Not a valid name.']
-       }
-       render result as JSON
-   }
+
+            } catch(e) {
+                e.printStackTrace();
+                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}"]
+            }
+
+        } else {
+            result = ['success':false, 'msg':'Not a valid name.']
+        }
+        println "+++++++++++++"
+        println result
+        render result as JSON
+    }
 }
