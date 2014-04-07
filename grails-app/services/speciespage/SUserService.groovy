@@ -15,6 +15,7 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 import species.auth.SUser;
+import species.participation.Observation;
 import species.utils.Utils;
 import speciespage.search.SUserSearchService;
 import species.SpeciesPermission;
@@ -128,9 +129,10 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
     
-    boolean hasObvLockPerm(observationInstance) {
+    boolean hasObvLockPerm(obvId) {
+        def observationInstance = Observation.get(obvId.toLong());
         def taxCon = observationInstance.maxVotedReco?.taxonConcept 
-        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, user, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
     }
 
 	boolean ifOwns(id) {

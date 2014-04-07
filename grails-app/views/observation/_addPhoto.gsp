@@ -11,7 +11,9 @@
                 <g:set var="i" value="${1}"/>
             </g:else>
             <g:set var= "res" value="${resList}" />
-            <g:set var = "counter" value = "${0}" />
+            <%
+                def counter = 0 
+            %>
             <g:if test="${resourceListType != 'fromRelatedObv'}">
             <li class="add_file addedResource" style="z-index:40">
             
@@ -47,6 +49,7 @@
             if(obvLinkList.size()!= 0){
                 if(!r.url){
                     resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList.get(counter.toInteger()), 'absolute': true);
+                    counter++
                 }
             }
             %>
@@ -92,7 +95,6 @@
                 onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
 
             </li>
-            <g:set var="counter" value=${counter+1} />
             <g:set var="i" value="${i+1}" />
             </g:each>
             

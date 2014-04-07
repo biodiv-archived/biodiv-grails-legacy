@@ -775,11 +775,10 @@ class SpeciesController extends AbstractObjectController {
     def getRelatedObvForSpecies = {
         log.debug params
         def spInstance = Species.get(params.speciesId.toLong())
-        def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 1, params.offset.toInteger())
+        def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
         def relatedObvCount = relatedObvMap.count
         def obvLinkList = relatedObvMap.obvLinkList
-        println "OFFSET VALUE++++++++++++++" + params.offset.toInteger()
         def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:params.offset.toInteger() ]);
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON

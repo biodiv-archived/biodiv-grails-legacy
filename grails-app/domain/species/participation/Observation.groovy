@@ -256,9 +256,22 @@ class Observation extends Metadata implements Taggable, Rateable {
 			def map = reco.getRecommendationDetails(this);
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
+            map.put("isLocked", this.isLocked);
 			String cNames = fetchSuggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			map.put("disAgree", (currentUser in map.authors));
+            if(this.isLocked == false){
+                map.put("showLock", true);
+            }
+            else{
+                def recVo = RecommendationVote.findWhere(recommendation: reco, observation:this, author: currentUser);
+                if(recVo && recVo.recommendation == this.maxVotedReco){
+                    map.put("showLock", false);                   
+                }
+                else{
+                    map.put("showLock", true);
+                }
+            }
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];

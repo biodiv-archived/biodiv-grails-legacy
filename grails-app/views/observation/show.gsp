@@ -93,17 +93,7 @@ if(r) {
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                                                     href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
                                                     onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
-                                                <sUser:hasObvLockPerm model="['observationInstance':observationInstance]">
-                                                <%
-                                                    def lockButton = "Lock"
-                                                    if(observationInstance.isLocked == true){
-                                                        lockButton = "Unlock"
-                                                    }
-                                                %>
-                                                <a id="lockObvId"  class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                                    onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}')">
-                                                   <i class="icon-lock"></i>${lockButton}</a>
-                                                </sUser:hasObvLockPerm>
+                                                
                                                 </sUser:ifOwns>
 
                                             </div>
@@ -191,7 +181,7 @@ if(r) {
 							</g:hasErrors>
 							<form id="addRecommendation" name="addRecommendation"
 								action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
-								method="GET" class="form-horizontal" style="${(obvLock) ? 'display:none;':'display:block;'}">
+								method="GET" class="form-horizontal">
 								<div class="reco-input">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
@@ -269,8 +259,7 @@ if(r) {
 <%--		dcorateCommentBody($('.yj-message-body')); --%>
 
 		$("#seeMoreMessage").hide();
-		
-		$(".readmore").readmore({
+                		$(".readmore").readmore({
 			substr_len : 400,
 			more_link : '<a class="more readmore">&nbsp;More</a>'
 		});
@@ -397,7 +386,16 @@ if(r) {
 
                 preLoadRecos(3, 0, false);
                 //loadObjectInGroups();
-                
+                var obvLock = ${obvLock};
+                if(obvLock){
+                    showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+                    $('.nameContainer input').attr("disabled", "disabled");
+                    $('.iAgree button').addClass("disabled");
+                }
+                else{
+                    $('.nameContainer input').removeAttr("disabled");
+                    $('.iAgree button').removeClass("disabled");
+                } 
                 
         });
 
