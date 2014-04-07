@@ -57,10 +57,8 @@
             					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
                                                 <li><h5>Pages</h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
-							<g:if test="${newsletterInstance.sticky}">	
 							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
-							</g:if>		
 						</g:each>
                         <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/project/list">Western Ghats CEPF
