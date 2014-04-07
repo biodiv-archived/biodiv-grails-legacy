@@ -14,20 +14,25 @@ function showRecos(data, textStatus) {
     showUpdateStatus(data.msg, data.status);
 }
 
-function lockObv(url, lockType) {
+function lockObv(url, lockType, recoId, obvId) {
     $.ajax({
         url:url,
         dataType: "json",
-        data:{"lockType" : lockType},
+        data:{"lockType" : lockType, "recoId" : recoId},
         success: function(data){
-            $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             if(lockType == "Lock"){
-                $("#addRecommendation").hide();
-                $("#lockObvId").hide();
+                //$("#addRecommendation").hide();
+                $('.nameContainer input').attr('disabled', 'disabled');
+                $('.iAgree button').addClass('disabled');
+                $(".lockObvId").hide();
+                showUpdateStatus(data.msg, 'success');
             }
             else{
-                $("#addRecommendation").show();
-                $("#lockObvId").hide();
+                //$("#addRecommendation").show();
+                $('.nameContainer input').removeAttr('disabled');
+                $('.iAgree button').removeClass('disabled');
+                $(".lockObvId").hide();
+                showUpdateStatus(data.msg, 'success');
             }
         }
     });
@@ -61,7 +66,11 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     });
 }
 
-function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
+function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url, obj){
+    if($(obj).hasClass('disabled')) {
+        event.preventDefault();
+        return false; 		 		
+    }
     $.ajax({
         url: url,
     data:{'obvId':obvId, 'recoId':recoId, 'currentVotes':currentVotes},
@@ -90,7 +99,11 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
     });
 }
 
-function removeRecoVote(obvId, recoId, url){
+function removeRecoVote(obvId, recoId, url, obj){
+    if($(obj).hasClass('disabled')) {
+        event.preventDefault();
+        return false; 		 		
+    }
     $.ajax({
         url: url,
     data:{'obvId':obvId, 'recoId':recoId},

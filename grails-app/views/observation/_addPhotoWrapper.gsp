@@ -32,6 +32,8 @@
 <r:script>
     $(document).ready(function(){
         filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
-        $("#relatedImagesOffset").val(1); 
+        if("${resourceListType}" == "fromRelatedObv"){
+            $("#relatedImagesOffset").val(${resCount});
+        }
     });
 </r:script>

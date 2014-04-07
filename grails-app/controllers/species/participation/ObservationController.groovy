@@ -1241,13 +1241,32 @@ class ObservationController extends AbstractObjectController {
     def lock = {
         def msg = ""
         def obv = Observation.get(params.id.toLong());
+        def reco = Recommendation.get(params.recoId.toLong());
+        def currentUser = springSecurityService.currentUser;
         if(params.lockType == "Lock"){
+            //current user & reco
+            def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
+            if(recVo && reco != recVo.recommendation){
+                recVo.delete(flush: true, failOnError:true)
+                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                if(!newRecVo.save(flush:true)){
+                    newRecVo.errors.allErrors.each { log.error it } 
+                }
+            }
+            if(!recVo){
+                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                if(!newRecVo.save(flush:true)){
+                    newRecVo.errors.allErrors.each { log.error it } 
+                }
+            }
+            obv.maxVotedReco = reco; 
             obv.isLocked = true;
             msg = "Observation successfully locked, Please refresh to see changes"
             
         }else{
             obv.removeResourcesFromSpecies()
             obv.isLocked = false;
+            obv.calculateMaxVotedSpeciesName()
             msg = "Observation successfully unlocked, Please refresh to see changes"
         }
         if(!obv.save(flush:true)){

@@ -441,7 +441,7 @@ class ObservationService extends AbstractObjectService {
         if(scientificNameRecos){
             def resIdList = Observation.executeQuery ('''
                 select r.id, obv.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by r.id asc
-                ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit, offset: offset]);
+                ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
 
              /*
             def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"

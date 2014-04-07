@@ -353,7 +353,7 @@ class ObservationTagLib {
             case "fromRelatedObv" :
                 def taxId = resInstance.taxonConcept.id.toLong()
                 // new func service limit offset sp inst and returns a res list based on params
-                def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 1, 0)
+                def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 4, 0)
                 resList = relObvMap.resList
                 resCount = relObvMap.count
                 obvLinkList = relObvMap.obvLinkList
