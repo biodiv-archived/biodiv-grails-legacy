@@ -161,7 +161,7 @@ class ChecklistService {
 	
 	@Transactional
 	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
-        if(!params.checklistData && !isGlobalUpdate)
+	    if(!params.checklistData && !isGlobalUpdate)
 			return
 		
 		Checklists.withTransaction() {
@@ -216,12 +216,12 @@ class ChecklistService {
 				checklistInstance.observations.each { obv ->
 					if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
 						commonObsParams.id = obv.id
-						observationService.saveObservation(commonObsParams, false)
+						observationService.saveObservation(commonObsParams, false, false)
 					}
 				}
 			}
 			//updating obv count
-			checklistInstance.speciesCount = checklistInstance.observations.size()
+			checklistInstance.speciesCount = checklistInstance.observations?.size()
 		}
 		log.debug "saved checklist observation  "
 	}
@@ -234,7 +234,7 @@ class ChecklistService {
 		def snCol = m[cl.sciNameColumn]
 		def cnCol = m[cl.commonNameColumn]
 		
-		return snCol || snCol || media
+		return snCol || cnCol || media
 	}
 	
 	private getSafeAnnotation(Map m, List validColumns){

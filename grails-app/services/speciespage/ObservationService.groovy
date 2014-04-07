@@ -103,7 +103,7 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @param observation
      */
-    void updateObservation(params, observation){
+    void updateObservation(params, observation, boolean updateResources = true){
         //log.debug "Updating obv with params ${params}"
         if(params.author)  {
             observation.author = params.author;
@@ -143,16 +143,19 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        def resourcesXML = createResourcesXML(params);
-        def resources = saveResources(observation, resourcesXML);
-
-        observation.resource?.clear();
-        resources.each { resource ->
-            observation.addToResource(resource);
-        }
+		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
+		// has some global update like habitat, group in that case updating its observation info but not the resource info
+		if(updateResources){
+	        def resourcesXML = createResourcesXML(params);
+	        def resources = saveResources(observation, resourcesXML);
+	        observation.resource?.clear();
+	        resources.each { resource ->
+	            observation.addToResource(resource);
+	        }
+		}
     }
 
-    Map saveObservation(params, sendMail=true){
+    Map saveObservation(params, sendMail=true, boolean updateResources = true){
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
@@ -166,7 +169,7 @@ class ObservationService extends AbstractObjectService {
             }else{
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
-                updateObservation(params, observationInstance)
+                updateObservation(params, observationInstance, updateResources)
                 feedType = activityFeedService.OBSERVATION_UPDATED
                 feedAuthor = springSecurityService.currentUser
             }
