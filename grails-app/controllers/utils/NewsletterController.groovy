@@ -19,6 +19,7 @@ class NewsletterController {
 	def aclUtilService
 	def springSecurityService
 	def SUserService
+    def observationService
 	
 	public static final boolean COMMIT = true;
 
@@ -291,5 +292,75 @@ class NewsletterController {
 		render result.value as JSON;
 	}
 
+    private void swapDisplayOrder(nl1, nl2){
+        def temp = nl1.displayOrder
+        nl1.displayOrder = nl2.displayOrder
+        nl2.displayOrder = temp
+        return
+    }
+
+    def fetchNewsLetter(params){
+        def nlIns = Newsletter.get(params.pageId.toLong())
+        def disOrder = nlIns.displayOrder;
+        def newDisOrder = (params.typeOfChange == "up")?(disOrder+1):(disOrder-1)
+        def ug = observationService.getUserGroup(params)
+        def resNL = Newsletter.withCriteria{
+            if(!params.webaddress){
+                isNull('userGroup')
+            }
+            else{
+                //params ke webadress se cretae usergroup
+                and{
+                    eq('userGroup', ug) 
+                }
+            }
+            and{
+                if(params.typeOfChange == "up"){
+                    gt('displayOrder', disOrder)
+                }
+                else{
+                    lt('displayOrder', disOrder)
+                }
+            }
+            maxResults(1)
+            if(params.typeOfChange == "up"){
+                order("displayOrder", "asc")
+            }
+            else{
+                order("displayOrder", "desc")
+            }
+        }
+        if(resNL.size() != 0){
+            return resNL.get(0)
+        }
+        else{
+            return null
+        }
+    }
+
+    def changeDisplayOrder = {
+        def nlIns = Newsletter.get(params.pageId.toLong())
+        def disOrder = nlIns.displayOrder;
+        def otherNewsLetter = fetchNewsLetter(params); //how to fetch its group specific
+        def msg
+        def success
+        if(otherNewsLetter){
+            swapDisplayOrder(nlIns, otherNewsLetter);
+            if(!nlIns.save(flush:true)){
+                nlIns.errors.each { log.error it }        
+            }
+            if(!otherNewsLetter.save(flush:true)){
+                otherNewsLetter.errors.each { log.error it } 
+            }
+            success = true
+            msg = "order changed"
+        }
+        else{
+            msg = "Its already at the extreme"
+            success = false
+        }
+                def result = [success:success, msg:msg]
+        render result as JSON
+    }
 
 }

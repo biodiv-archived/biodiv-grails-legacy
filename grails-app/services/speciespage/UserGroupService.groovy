@@ -841,8 +841,14 @@ class UserGroupService {
 		if(offset && offset != -1) {
 			queryParams['offset'] = offset;
 		}
+        if(!sort){
+            sort = " displayOrder"
+        }
+        if(!order){
+            order = " desc"
+        }
 		if(sort) {
-			sort = sort?:"date"
+			sort = sort?:"displayOrder"
 			query += " order by newsletter."+sort
 		}
 		if(order) {

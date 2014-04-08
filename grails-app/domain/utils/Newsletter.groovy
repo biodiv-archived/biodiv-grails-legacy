@@ -7,6 +7,7 @@ class Newsletter {
     Date date    
     String newsitem
 	boolean sticky = false;
+    int displayOrder;
 
 	static belongsTo = [userGroup: UserGroup]
     static constraints = {
@@ -14,9 +15,10 @@ class Newsletter {
 		title nullable: false
         newsitem type:'text'
 		userGroup nullable:true;
+        displayOrder nullable:false;
     }
 	
 	static mappings = {
-		sort date:"desc"
+		sort displayOrder:"desc"
 	}
 }

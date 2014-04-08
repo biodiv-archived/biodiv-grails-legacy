@@ -103,7 +103,7 @@ function getNextRelatedObvImages(speciesId, url, resourceListType){
             var addPhotoHtmlData = $(data.addPhotoHtml);
             console.log(data.relatedObvCount);
             if(data.relatedObvCount == 0){
-                $("#relatedObvLoadMore").replaceWith("<span>No More to Load</span>");
+                $("#relatedObvLoadMore").replaceWith('<a class="btn disabled" style="margin-right: 5px;">No More</a>');
             } 
             $("#speciesImage-tab0 .imagesList" ).append(addPhotoHtmlData);
             $("#relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));

@@ -11,7 +11,7 @@
     </g:if>
     <div
         class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
-        <ul class="imagesList" class="thumbwrap thumbnails"
+        <ul class="imagesList thumbwrap thumbnails"
             style='list-style: none; margin-left: 0px;'>
             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
@@ -19,7 +19,7 @@
             </g:if>
             <input type="hidden" name='resourceListType' value="${resourceListType}" /> 
             <g:if test="${resourceListType == 'fromRelatedObv'}" >
-            <a class="btn" style="float: right; margin-right: 5px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" )'>Load More</a>
+            <a class="btn" style="margin-right: 5px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" )'>Load More</a>
             </g:if>
         </ul>
         <div id="image-resources-msg" class="help-inline">
