@@ -299,13 +299,7 @@
             </div>		
 
             <g:javascript>
-            $(document).ready(function() {
-                var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
-                window.params.carousel = {maxHeight:150, maxWidth:210}
-                window.params.species.name = "${speciesName}"
-                
-            });
-            var licenseSelectorOptions = [];
+           var licenseSelectorOptions = [];
             <g:each in="${License.LicenseType.toList()}" var="l">
             licenseSelectorOptions.push({value:"${l.value()}", text:"${l.value()}"});
             </g:each>
@@ -335,7 +329,15 @@
             </g:each>
 
             </g:javascript>	
-
+            <r:script>
+            $(document).ready(function() {
+                var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
+                window.params.carousel = {maxHeight:150, maxWidth:210}
+                window.params.species.name = "${speciesName}"
+                
+            });
+ 
+            </r:script>
         </body>
 
     </html>
