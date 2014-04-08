@@ -781,6 +781,7 @@ class TaxonService {
         }
 
         def taxonRegistry = addTaxonEntries(speciesName, (new XMLConverter()), taxonRegistryNames, classification.name, contributor);
+        println taxonRegistry
         if(taxonRegistry) {
             int maxRank = 0;
             TaxonomyRegistry reg;
@@ -798,7 +799,10 @@ class TaxonService {
     }
 
     private List<TaxonomyRegistry> addTaxonEntries(String speciesName, converter, List taxonRegistryNames, String classificationName, SUser contributor) {
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor)
+        println taxonRegistryNames
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor);
+        println "++++++++++++++++++++++++++"
+            println taxonRegistryNodes
         return converter.getClassifications(taxonRegistryNodes, speciesName, true); 
     }
 

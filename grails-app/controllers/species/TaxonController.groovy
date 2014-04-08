@@ -58,6 +58,8 @@ class TaxonController {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
             getSpeciesHierarchy(speciesid, rs, classSystem);
+            println "+++++++++++++++"
+            println rs;
         } else {
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
         }
@@ -171,9 +173,9 @@ class TaxonController {
      * @param classSystem
      * @return
      */
-    private getSpecies(long taxonId) {
+    private getSpecies(long taxonId, int level) {
         def sql = new Sql(dataSource)
-        int level = TaxonomyRank.SPECIES.ordinal();
+        //int level = TaxonomyRank.SPECIES.ordinal();
         return Species.find("from Species as s where s.taxonConcept.id = :taxonId", [taxonId:taxonId]);
     }
 
@@ -246,13 +248,13 @@ class TaxonController {
      * 
      */
 
-    private List getSpeciesHierarchy(Long speciesTaxonId, List rs, Long classSystem) {
+    private List getSpeciesHierarchy(Long speciesTaxonId, List rs, Long regId) {
         List speciesHier = [];
-        int minHierarchySize = 6;
-        if(classSystem) {
+        //int minHierarchySize = 6;
+        if(regId) {
             //Classification classification = Classification.get(classSystem);
             //TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(taxonConcept, classification).each {reg ->
-            def reg = TaxonomyRegistry.read(classSystem);
+            def reg = TaxonomyRegistry.read(regId);
                 def list = [] 
                 while(reg != null) {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()]
@@ -260,24 +262,27 @@ class TaxonController {
                     list.add(result);
                     reg = reg.parentTaxon;
                 }
-                if(list.size() >= minHierarchySize) {
+                //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};
                     speciesHier.addAll(list);
-                }
+                //}
         } else {
-            TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(speciesTaxonId);
+            TaxonomyDefinition taxonConcept = Species.read(speciesTaxonId)?.taxonConcept;
             TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
                 def list = [];
+                println reg;
+                println "++++"
                 while(reg != null) {					
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);					
                     reg = reg.parentTaxon;
+                    println reg
                 }
-                if(list.size() >= minHierarchySize) {
+                //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};
                     speciesHier.addAll(list);
-                }				
+                //}				
             }
         }
 
@@ -297,14 +302,14 @@ class TaxonController {
      * 
      */
     private void populateSpeciesDetails(Long speciesTaxonId, Map result) {
-        if(result.rank == TaxonomyRank.SPECIES.ordinal()) {
-            def species = getSpecies(speciesTaxonId);
+        //if(result.rank == TaxonomyRank.SPECIES.ordinal()) {
+            def species = getSpecies(speciesTaxonId, result.rank);
             if(species){
                 result.put("speciesid", species.id)
                 result.put('name', species.title)
                 result.put('count', 1);
             }
-        }
+        //}
     }
 
     /**

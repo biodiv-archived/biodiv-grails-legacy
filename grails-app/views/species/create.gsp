@@ -23,8 +23,7 @@
                 <div class="span12 super-section" style="clear:both;">
 
                     <div class="control-group">
-                        <label class="control-label span3" for="name">Add page for
-                                                </label> 
+                        <label class="control-label span3" for="name">Add page</label> 
                         <div class="span8">
 
                             <div class="input-prepend input-block-level">
@@ -35,8 +34,8 @@
                             </select>
 
                             <input id="page" 
-                            data-provide="typeahead" type="text" class="input-block-level"
-                            name="page" value="${page}"
+                            data-provide="typeahead" type="text" class="input-block-level taxonRank"
+                            name="page" value="${page}" data-rank="${TaxonomyRank.KINGDOM.ordinal()}"
                             placeholder="Add Page" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
@@ -98,6 +97,11 @@
         taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
         </g:each>
 
+        $('#rank').change(function() {
+            $('#page').attr('data-rank', $('#rank').find(':selected').val());
+        });
+        
+        $(".taxonRank").autofillNames();
 
         $('#validateSpeciesSubmit').click(function() {
             var params = {};
@@ -114,7 +118,7 @@
                 success:function(data) {
                     if(data.success == true) {
                         if(data.id) {
-                        data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
+                            data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
                         }
                         $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
                         //$('#validateSpeciesSubmit').hide()
@@ -138,8 +142,7 @@
                         for (var i=0; i<data.rank; i++) {
                             $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }
-                        if(data.rank > 0)
-                        $('#taxonHierarchyInputForm').show();
+                        if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 
                         $(".taxonRank").autofillNames();
 
@@ -150,14 +153,10 @@
                     }
                 }, error: function(xhr, status, error) {
                     handleError(xhr, status, error, this.success, function() {
-                    var msg = $.parseJSON(xhr.responseText);
-                    $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
-                    }
+                        var msg = $.parseJSON(xhr.responseText);
+                        $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                    });
                 }
-            });
-        }
-
-                
             });
             //get COL hierarchy 
             // get and autofill author contrib hierarchy

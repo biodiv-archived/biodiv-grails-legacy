@@ -53,13 +53,13 @@ $(document).ready(function() {
             <div>
                 <div class="editable-input">
                     <g:each in="${TaxonomyRank.list()}" var="taxonRank">
-                    <g:if test="${taxonRank.ordinal() == TaxonomyRank.SPECIES.ordinal()}">
+                    <g:if test="${taxonRank.ordinal() == speciesInstance.taxonConcept.rank}">
                     <input type="hidden"  data-rank ="${taxonRank.ordinal()}"
                     type="text" name="taxonRegistry.${taxonRank.ordinal()}" 
                     value="${speciesInstance.taxonConcept.name}"
                     placeholder="Add ${taxonRank.value()}" readonly/>
                     </g:if>
-                    <g:else>
+                    <g:elseif test="${taxonRank.ordinal() < speciesInstance.taxonConcept.rank}">
                     <div class="input-prepend">
                         <span class="add-on"> ${taxonRank.value()}</span>
                         <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
@@ -68,7 +68,7 @@ $(document).ready(function() {
 
                     </div>
 
-                    </g:else>
+                    </g:elseif>
                     </g:each>
                     <input class='classification' type="hidden" name="classification" value="${Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY).id}" readonly/>
                 </div>

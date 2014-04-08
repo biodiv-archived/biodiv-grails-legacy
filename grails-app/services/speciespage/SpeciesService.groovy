@@ -1141,6 +1141,7 @@ class SpeciesService extends AbstractObjectService  {
                 if(!speciesInstance.fetchTaxonomyRegistry()) {
                     return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
                 }
+                return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
             }
  
             //save taxonomy hierarchy

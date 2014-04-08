@@ -119,12 +119,15 @@ class SpeciesController extends AbstractObjectController {
 
             speciesName = params.page
             rank = params.int('rank');
+            t.putAt(rank, speciesName);
+
             //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
                 result = speciesService.createSpecies(speciesName, rank, t);
+                result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
-                    flash.message = result.msg?result.msg+" : "+result.errors:"Error while creating page : "+result.errors
+                    flash.message = result.msg ? result.msg+result.errors:"Error while creating page"+result.errors
                     redirect(action: "create")
                     return;
                 }
@@ -143,16 +146,16 @@ class SpeciesController extends AbstractObjectController {
                         redirect(action: "show", id: speciesInstance.id)
                         return;
                     } else {
-                        flash.message = result.msg ? result.msg + " : " + result.errors : "Error while saving species : " + result.errors
+                        flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
                     }
                 }
                 else {
-                    flash.message = result.msg ? result.msg + " : " + result.errors : "Error while saving species : " + result.errors
+                    flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
                 }
             } catch(e) {
                 e.printStackTrace();
                 result.errors << e.getMessage();
-                flash.message = result.msg ? result.msg+" : "+result.errors : "Error while saving species : "+result.errors
+                flash.message = result.msg ? result.msg+result.errors : "Error while saving species "+result.errors
             }
         }
         render(view: "create")
