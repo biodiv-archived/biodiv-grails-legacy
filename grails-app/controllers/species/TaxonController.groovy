@@ -58,8 +58,6 @@ class TaxonController {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
             getSpeciesHierarchy(speciesid, rs, classSystem);
-            println "+++++++++++++++"
-            println rs;
         } else {
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
         }
@@ -270,14 +268,11 @@ class TaxonController {
             TaxonomyDefinition taxonConcept = Species.read(speciesTaxonId)?.taxonConcept;
             TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
                 def list = [];
-                println reg;
-                println "++++"
                 while(reg != null) {					
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);					
                     reg = reg.parentTaxon;
-                    println reg
                 }
                 //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};

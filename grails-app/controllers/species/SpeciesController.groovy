@@ -816,15 +816,13 @@ class SpeciesController extends AbstractObjectController {
                 //List<TaxonomyDefinition> names = namesParser.parse(hierarchy);
                 List<TaxonomyDefinition> names = namesParser.parse([params.page]);
                 TaxonomyDefinition page = names[0];
-                println names;
                 int i=0, rank = params.rank?params.int('rank'):null;
                 /*for(i = 0; i< names.size(); i++) {
                     if(names[i] != null) {
                         page = names[i];
                         rank = i;
                     }
-                }
-println page*/
+                }*/
                 if(page && page.canonicalForm) {
                 def taxonCriteria = TaxonomyDefinition.createCriteria();
                 TaxonomyDefinition taxon = taxonCriteria.get {
@@ -866,8 +864,6 @@ println page*/
         } else {
             result = ['success':false, 'msg':'Not a valid name.']
         }
-        println "+++++++++++++"
-        println result
         render result as JSON
     }
 }

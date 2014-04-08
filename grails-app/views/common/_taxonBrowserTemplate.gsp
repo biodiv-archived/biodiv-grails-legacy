@@ -5,11 +5,6 @@
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-<r:script>
-$(document).ready(function() {
-});
-</r:script>
-
 <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
     <h5>Classifications</h5>	
 

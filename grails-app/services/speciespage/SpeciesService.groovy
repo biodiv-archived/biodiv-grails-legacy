@@ -841,7 +841,6 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                println content;
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
             }
         }
