@@ -35,7 +35,7 @@ class SUserTagLib {
 	/**
 	 * Renders the body if the authenticated user owns this page.
 	 */
-	def ifOwns = { attrs, body ->
+ 	def ifOwns = { attrs, body ->
 		if (SUserService.ifOwns(attrs.model.user)) {
 			out << body()
 		}
@@ -49,7 +49,17 @@ class SUserTagLib {
             out << body()
         } 
     }
-	/**
+	
+    /**
+    *
+    */
+    def permToReorderPages = { attrs, body ->
+        if(SUserService.permToReorderPages(attrs.model.userGroupInstance)){
+            out<<body()
+        }
+    
+    }
+    /**
 	 * 
 	 */
 	def ifOwnsOrIsPublic = { attrs, body ->

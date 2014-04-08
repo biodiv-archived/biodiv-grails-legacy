@@ -214,6 +214,7 @@ modules = {
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/species/userGroups/main.js'
+        resource url:'/js/species/pages.js'
 	}
 
 	userGroups_create {
@@ -285,6 +286,7 @@ modules = {
 		resource url:'/js/species/parseUtil.js'
 		resource url:'/js/species/jquery.csv-0.71.min.js'
         resource url:'/js/species/observations/upload.js'
+        resource url:'/js/species/observations/addResource.js'
 	}
     
     species_upload {

@@ -232,6 +232,7 @@
         <script type="text/javascript" src="http://api.filepicker.io/v1/filepicker.js"></script>
         <r:script>
         $(document).ready(function(){
+            var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
             <%
             if(observationInstance?.group) {
             out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";

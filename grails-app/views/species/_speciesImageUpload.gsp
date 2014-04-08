@@ -26,7 +26,6 @@
                 <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
-                    <!--g:render template="/observation/addPhoto" model="['observationInstance':speciesInstance]"/-->
                     <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> Upload Images </a>
 
