@@ -798,7 +798,7 @@ class TaxonService {
     }
 
     private List<TaxonomyRegistry> addTaxonEntries(String speciesName, converter, List taxonRegistryNames, String classificationName, SUser contributor) {
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor)
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor);
         return converter.getClassifications(taxonRegistryNodes, speciesName, true); 
     }
 
@@ -841,7 +841,6 @@ class TaxonService {
             if(reg) {
                 def contributor = springSecurityService.currentUser;
                 while(reg != null) {
-                    println reg;
                     def c = TaxonomyRegistry.withCriteria () {
                         projections {
                             count('id')

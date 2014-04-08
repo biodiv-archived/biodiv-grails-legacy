@@ -656,6 +656,9 @@ function createSynonym(content, sourceData) {
 }
 
 function createCommonname(content, sourceData) {
+    if(content.language == undefined) {
+        content.language = {name:'Others'};
+    }
     return '<li><div class="span3"><a href="#" class="lang span3 '+(content.isContributor?'selector':'')+'" data-type="select" data-name="language" data-original-title="Edit Common name Language">'+content.language.name+'</a></div><div class="span8" style="display:table"><div style="display:table-row;"><a href="#" class="common_name '+(content.isContributor?'editField':'')+' " data-type="text" data-pk="'+sourceData.id+'" data-cid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.name+'</a>,</div></div></li>' ;
 }
 
