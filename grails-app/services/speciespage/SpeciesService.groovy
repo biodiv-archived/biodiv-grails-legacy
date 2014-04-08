@@ -841,7 +841,6 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                println content;
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
             }
         }
@@ -1141,6 +1140,7 @@ class SpeciesService extends AbstractObjectService  {
                 if(!speciesInstance.fetchTaxonomyRegistry()) {
                     return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
                 }
+                return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
             }
  
             //save taxonomy hierarchy

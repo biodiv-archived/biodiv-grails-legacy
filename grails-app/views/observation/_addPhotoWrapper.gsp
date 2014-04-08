@@ -11,7 +11,7 @@
     </g:if>
     <div
         class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
-        <ul class="imagesList" class="thumbwrap thumbnails"
+        <ul class="imagesList thumbwrap thumbnails"
             style='list-style: none; margin-left: 0px;'>
             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">

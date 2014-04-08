@@ -203,9 +203,9 @@ class Species implements Rateable {
 		//classifications.add([0, combinedHierarchy);
 		def reg = TaxonomyRegistry.findAllByTaxonDefinition(this.taxonConcept);
 		reg.each {
-			if(it.path.split('_').length >= 6) {
+			//if(it.path.split('_').length >= 6) {
 				classifications.add([it.id, it.classification, it.contributors]);
-			}
+			//}
 		}
 		//Ordering has to figured out. Sort is a vague criteria. 
 		//Added just to get Author contributed as first result if present 

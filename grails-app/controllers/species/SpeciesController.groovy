@@ -106,7 +106,7 @@ class SpeciesController extends AbstractObjectController {
     def save = {
         List errors = [];
         Map result = [errors:errors];
-        if(params.taxonRegistry) {
+        if(params.taxonRegistry && params.page && params.rank) {
             Map list = params.taxonRegistry?:[];
             List t = [];
             String speciesName;
@@ -114,17 +114,20 @@ class SpeciesController extends AbstractObjectController {
             list.each { key, value ->
                 if(value) {
                     t.putAt(Integer.parseInt(key).intValue(), value);
-                    speciesName = value;
-                    rank = Integer.parseInt(key).intValue();
                 }
             }
-            
+
+            speciesName = params.page
+            rank = params.int('rank');
+            t.putAt(rank, speciesName);
+
             //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
                 result = speciesService.createSpecies(speciesName, rank, t);
+                result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
-                    flash.message = result.msg?:"Error while creating page"
+                    flash.message = result.msg ? result.msg+result.errors:"Error while creating page"+result.errors
                     redirect(action: "create")
                     return;
                 }
@@ -143,16 +146,16 @@ class SpeciesController extends AbstractObjectController {
                         redirect(action: "show", id: speciesInstance.id)
                         return;
                     } else {
-                        flash.message = result.msg ? result.msg+result.errors : "Error while saving species"
+                        flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
                     }
                 }
                 else {
-                    flash.message = result.msg ? result.msg+result.errors : "Error while saving species"
+                    flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
                 }
             } catch(e) {
                 e.printStackTrace();
                 result.errors << e.getMessage();
-                flash.message = result.msg ? result.msg+result.errors : "Error while saving species"
+                flash.message = result.msg ? result.msg+result.errors : "Error while saving species "+result.errors
             }
         }
         render(view: "create")
@@ -801,26 +804,25 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def validate = {
-        List hierarchy = [];
+/*        List hierarchy = [];
         if(params.taxonRegistry) {
             hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
         }
-        NamesParser namesParser = new NamesParser();
+*/        NamesParser namesParser = new NamesParser();
 
         def result = [:];
-        if(hierarchy) {
+        if(params.page && params.rank) {
             try {
-                List<TaxonomyDefinition> names = namesParser.parse(hierarchy);
-                TaxonomyDefinition page;
-                println names;
-                int i=0, rank;
-                for(i = 0; i< names.size(); i++) {
+                //List<TaxonomyDefinition> names = namesParser.parse(hierarchy);
+                List<TaxonomyDefinition> names = namesParser.parse([params.page]);
+                TaxonomyDefinition page = names[0];
+                int i=0, rank = params.rank?params.int('rank'):null;
+                /*for(i = 0; i< names.size(); i++) {
                     if(names[i] != null) {
                         page = names[i];
                         rank = i;
                     }
-                }
-println page
+                }*/
                 if(page && page.canonicalForm) {
                 def taxonCriteria = TaxonomyDefinition.createCriteria();
                 TaxonomyDefinition taxon = taxonCriteria.get {
@@ -829,15 +831,15 @@ println page
                 }
 
                 if(!taxon) {
-                    result = ['success':true, 'msg':"Adding a new taxon concept ${page.name}"]
+                    result = ['success':true, 'msg':"Adding a new taxon concept ${page.name}", rank:rank]
                 } else {
                     //CHK if a species page exists for this concept
                     Species species = Species.findByTaxonConcept(taxon);
                     def taxonRegistry = taxon.parentTaxonRegistry();
                     if(species) {
-                        result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title];
+                        result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title, rank:taxon.rank];
                     } else {
-                        result = ['success':true, 'msg':"Adding a new species page for an existing concept ${page.name}"];
+                        result = ['success':true, 'msg':"Adding a new species page for an existing concept ${page.name}", rank:taxon.rank];
                     }
                     result['taxonRegistry'] = [:];
                     taxonRegistry.each {classification, h ->
@@ -862,8 +864,6 @@ println page
         } else {
             result = ['success':false, 'msg':'Not a valid name.']
         }
-        println "+++++++++++++"
-        println result
         render result as JSON
     }
 }

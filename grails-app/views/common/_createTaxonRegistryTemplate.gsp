@@ -2,18 +2,10 @@
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-<div id="taxonHierachyInput" class="control-group">
+<div id="taxonHierarchyInputForm" class="control-group hide">
     <label
         class="control-label span3">Taxon Hierarchy</label> 
-    <div class = "span8">
-        <g:each in="${TaxonomyRank.list()}" var="taxonRank">
-        <div class="input-prepend input-block-level">
-            <span class="add-on"> ${taxonRank.value()}</span>
-            <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
-            type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
-            placeholder="Add ${taxonRank.value()}" />
-        </div>
-        </g:each>
+    <div id="taxonHierachyInput" class = "span8">
         <div id="existingHierarchies" class="hide" ><div>Following hierarchies already exist for the given name.</div></div>
     </div>
 </div>
