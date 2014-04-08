@@ -465,7 +465,7 @@ div.errors {
 }
 
 
-#add_file .progress {
+.add_file .progress {
 	border-radius: 3px 3px 3px 3px;
 	position: absolute;
 	height: 200px;
@@ -477,7 +477,7 @@ div.errors {
 	left:0;
 }
 
-#add_file_container {
+.add_file_container {
 	position:relative;
 	z-index:100;
 }

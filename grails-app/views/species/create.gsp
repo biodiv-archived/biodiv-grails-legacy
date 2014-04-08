@@ -22,21 +22,31 @@
 
                 <div class="span12 super-section" style="clear:both;">
 
-                    <!--div class="control-group">
-                        <label class="control-label span3" for="name">Species</label> 
+                    <div class="control-group">
+                        <label class="control-label span3" for="name">Add page for
+                                                </label> 
                         <div class="span8">
-                            <input id="species" 
+
+                            <div class="input-prepend input-block-level">
+                            <select id="rank" name="rank" class="add-on" style="height:auto;">
+                                <g:each in="${TaxonomyRank.list()}" var="rank">
+                                    <option value="${rank.ordinal()}">${rank.value()}</option>
+                                </g:each>
+                            </select>
+
+                            <input id="page" 
                             data-provide="typeahead" type="text" class="input-block-level"
-                            name="species" value="${species}"
-                            placeholder="Add species name" />
-                            <div class="alert hide"></div>
+                            name="page" value="${page}"
+                            placeholder="Add Page" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
+
                         </div>
-                    </div-->   
+                            <div id="errorMsg" class="alert hide"></div>
+                        </div>
+                    </div>  
                     <g:render template="/common/createTaxonRegistryTemplate"/>
 
-                    <div id="errorMsg" class="alert hide"></div>
 
                 </div>   
                 <div class="span12 submitButtons">
@@ -50,7 +60,7 @@
                         style="float: right; margin-right: 30px;"> Cancel </a>
                     </g:else>
                     <a id="validateSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Validate Hierarchy</a>
+                        style="float: right; margin-right: 5px;"> Validate</a>
 
 
                     <a id="addSpeciesSubmit" class="btn btn-primary"
@@ -82,7 +92,11 @@
                 $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
             }
         });*/
-        $(".taxonRank").autofillNames();
+
+        var taxonRanks = [];
+        <g:each in="${TaxonomyRank.list()}" var="t">
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+        </g:each>
 
 
         $('#validateSpeciesSubmit').click(function() {
@@ -90,6 +104,7 @@
             $("#addSpecies input").each(function(index, ele) {
                 if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
             });
+            params['rank'] = $('#rank').find(":selected").val(); 
             //Did u mean species 
             $.ajax({
                 url:'/species/validate',
@@ -116,13 +131,32 @@
                                 });
                             });
                         }
+                        
                         $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
-                        $('#taxonHierachyInput').show();
+                        var $hier = $('#taxonHierachyInput');
+                        $hier.empty()
+                        for (var i=0; i<data.rank; i++) {
+                            $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                        }
+                        if(data.rank > 0)
+                        $('#taxonHierarchyInputForm').show();
+
+                        $(".taxonRank").autofillNames();
+
+
                         $('#addSpeciesSubmit').show();
                     } else {
-                         $('#errorMsg').next('.alert').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                         $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                    }
+                }, error: function(xhr, status, error) {
+                    handleError(xhr, status, error, this.success, function() {
+                    var msg = $.parseJSON(xhr.responseText);
+                    $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
                     }
                 }
+            });
+        }
+
                 
             });
             //get COL hierarchy 
