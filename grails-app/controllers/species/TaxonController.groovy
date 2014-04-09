@@ -22,6 +22,7 @@ class TaxonController {
     def dataSource
     def taxonService;
     def springSecurityService;
+    def activityFeedService;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
@@ -171,9 +172,8 @@ class TaxonController {
      * @param classSystem
      * @return
      */
-    private getSpecies(long taxonId, int level) {
+    private getSpecies(long taxonId, int level=TaxonomyRank.SPECIES.ordinal()) {
         def sql = new Sql(dataSource)
-        //int level = TaxonomyRank.SPECIES.ordinal();
         return Species.find("from Species as s where s.taxonConcept.id = :taxonId", [taxonId:taxonId]);
     }
 
@@ -394,6 +394,14 @@ class TaxonController {
                 def classification = params.classification ? Classification.read(params.long('classification')) : null;
                 result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
                 result.action = 'create';
+
+                if(result.success) {
+                    def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
+                    activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_CREATED);
+                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                }
+
+
                 render result as JSON
                 return;
            } catch(e) {
@@ -449,6 +457,13 @@ class TaxonController {
 
                 result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
                 result.action = 'update';
+
+                if(result.success) {
+                    def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
+                    activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_UPDATED);
+                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                }
+
                 render result as JSON
                 return;
            } catch(e) {
@@ -479,6 +494,13 @@ class TaxonController {
                 TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
                 def result = taxonService.deleteTaxonHierarchy(reg);
                 result.action = 'delete';
+
+                if(result.success) {
+                    def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
+                    activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_DELETED);
+                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                }
+
                 render result as JSON;
                 return;
             } catch(e) {

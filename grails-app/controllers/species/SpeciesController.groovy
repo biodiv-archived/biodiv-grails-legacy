@@ -45,6 +45,7 @@ class SpeciesController extends AbstractObjectController {
 	def userGroupService;
 	def springSecurityService;
     def taxonService;
+    def activityFeedService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -135,7 +136,7 @@ class SpeciesController extends AbstractObjectController {
                 Species speciesInstance = result.speciesInstance;
                 if(speciesInstance.taxonConcept) {
 
-                    if (speciesInstance.save(flush:true)) {
+                    if (!speciesInstance.hasErrors() && speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
                         if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
 
@@ -143,6 +144,11 @@ class SpeciesController extends AbstractObjectController {
                         } else {
                             flash.message = "Successfully created species."
                         }
+                        
+                        activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
+                        observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, null, params.webaddress);
+
+
                         redirect(action: "show", id: speciesInstance.id)
                         return;
                     } else {
@@ -478,8 +484,11 @@ class SpeciesController extends AbstractObjectController {
                 } else {
                     result = speciesService.updateCommonname(cid, speciesFieldId, language, value);
                 }
+
                 break;
                 case 'speciesField':
+                Species speciesInstance;
+                SpeciesField speciesFieldInstance;
                 if(params.act == 'delete') {
                     result = speciesService.deleteSpeciesField(speciesFieldId);
                 } else if(params.act == 'add') {
@@ -487,11 +496,11 @@ class SpeciesController extends AbstractObjectController {
                     long fieldId = speciesFieldId;
                     result = speciesService.addSpeciesField(speciesId, fieldId, params);
                 } else {
-                    SpeciesField speciesField = SpeciesField.get(speciesFieldId);
-                    if(!speciesField) {
+                    speciesFieldInstance = SpeciesField.get(speciesFieldId);
+                    if(!speciesFieldInstance) {
                         return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
                     }
-                    result = speciesService.updateSpeciesField(speciesField, params);
+                    result = speciesService.updateSpeciesField(speciesFieldInstance, params);
                 }
                 result['act'] = params.act;
                 List html = [];
@@ -500,10 +509,19 @@ class SpeciesController extends AbstractObjectController {
                     html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
                 }
                 result.content = html.join();
-
+                
                 break;
                 default :
                 result=['success':false, msg:'Incorrect datatype'];
+            }
+ 
+            if(result.success) {
+                if(result.activityType)
+                    activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                result.remove('speciesInstance');
+                result.remove('speciesFieldInstance');
+                result.remove('activityType');
             }
 
             render result as JSON

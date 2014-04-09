@@ -61,7 +61,19 @@ class ActivityFeedService {
 	//species related
 	//static final String SPECIES_POSTED_ON_GROUP = "Posted species to group"
 	//static final String SPECIES_REMOVED_FROM_GROUP = "Removed species from group"
-	
+	static final String SPECIES_CREATED = "Species created"
+	static final String SPECIES_FIELD_UPDATED = "Species field updated"
+	static final String SPECIES_FIELD_CREATED = "Added species field"
+	static final String SPECIES_FIELD_DELETED = "Deleted species field"
+	static final String SPECIES_SYNONYM_CREATED = "Added synonym"
+	static final String SPECIES_SYNONYM_UPDATED = "Updated synonym"
+	static final String SPECIES_SYNONYM_DELETED = "Deleted synonym"
+	static final String SPECIES_COMMONNAME_CREATED = "Added common name"
+	static final String SPECIES_COMMONNAME_UPDATED = "Updated common name"
+	static final String SPECIES_COMMONNAME_DELETED = "Deleted common name"
+	static final String SPECIES_HIERARCHY_CREATED = "Added hierarchy"
+	static final String SPECIES_HIERARCHY_UPDATED = "Updated hierarchy"
+	static final String SPECIES_HIERARCHY_DELETED = "Deleted hierarchy"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"

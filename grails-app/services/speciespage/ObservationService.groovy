@@ -1651,7 +1651,17 @@ class ObservationService extends AbstractObjectService {
                 }
                 toUsers.addAll(getParticipants(obv))
                 break
-                default:
+            
+            case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
+                mailSubject = activityFeedService.SPECIES_CREATED
+                bodyView = "/emailtemplates/addObservation"
+                templateMap["message"] = " added the following species:"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(getOwner(obv))
+                break
+
+
+            default:
                 log.debug "invalid notification type"
             }
 
@@ -1762,7 +1772,7 @@ class ObservationService extends AbstractObjectService {
 	private SUser getOwner(observation) {
 		def author = null;
         if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-            if(observation.metaClass.hasProperty(observation, 'author')) {
+            if(observation.metaClass.hasProperty(observation, 'author') || observation.metaClass.hasProperty(observation, 'contributors')) {
                 author = observation.author;
                 if(!author.sendNotification) {
                     author = null;
