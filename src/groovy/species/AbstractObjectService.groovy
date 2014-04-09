@@ -213,12 +213,12 @@ class AbstractObjectService {
         Node videos = new Node(resources, "videos");
         
         String uploadDir = ""
-        if( params.resourceListType != "ofSpecies" ){
-            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
+        if( params.resourceListType == "ofSpecies" ){
+            uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
             println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + uploadDir
         }
         else{
-            uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
+            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
             println '============== 11111111111111111111111111' + uploadDir 
         }
         List files = [];
@@ -289,6 +289,11 @@ class AbstractObjectService {
         def rootDir
         switch(instance.class.name) {
             case Observation.class.name:
+            rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+            println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
+            break;
+            
+            case Checklists.class.name:
             rootDir = grailsApplication.config.speciesPortal.observations.rootDir
             println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
             break;
