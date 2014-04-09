@@ -816,7 +816,7 @@ class SpeciesService extends AbstractObjectService  {
             oldSynonym = Synonyms.read(synonymId);
 
             if(!oldSynonym) {
-                return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+                //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:"Nothing to change"]
             } else if(!oldSynonym.isContributor()) {
@@ -879,7 +879,7 @@ class SpeciesService extends AbstractObjectService  {
             oldCommonname = CommonNames.read(cnId);
 
             if(!oldCommonname) {
-                return [success:false, msg:"Commonname with id ${cnId} is not found"]
+                //return [success:false, msg:"Commonname with id ${cnId} is not found"]
             } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
                 return [success:true, msg:"Nothing to change"]
             } else if(!oldCommonname.isContributor()) {
