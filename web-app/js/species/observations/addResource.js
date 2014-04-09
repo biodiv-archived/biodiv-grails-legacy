@@ -81,6 +81,7 @@ function removeResource(event, imageId) {
         },
 
         filePick : function(e) {
+            console.log("filePick function called");
             var me = this;
             var onSuccess = function(FPFiles){
                 $.each(FPFiles, function(){

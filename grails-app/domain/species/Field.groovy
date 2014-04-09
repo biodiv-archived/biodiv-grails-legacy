@@ -22,4 +22,9 @@ class Field {
 		description (blank : true);
 		urlIdentifier(blank : true, nullable:true);
     }
+
+	@Override
+    String toString() {
+        return concept+" > "+category+(subCategory?" > "+subCategory:'');
+    }
 }

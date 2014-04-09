@@ -66,6 +66,7 @@ class SpeciesService extends AbstractObjectService  {
     def observationService;
     def speciesPermissionService;
     def taxonService;
+    def activityFeedService;
 
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
@@ -309,7 +310,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors]
+                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -344,7 +345,7 @@ class SpeciesService extends AbstractObjectService  {
                 } 
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField]
+            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field]
         } catch(Exception e) {
             e.printStackTrace();
             return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
@@ -359,7 +360,7 @@ class SpeciesService extends AbstractObjectService  {
         List errors = [];
         String msg;
         if(!params.contributor) {
-            params.contributor = springSecurityService.currentUser.id;
+            params.contributor = springSecurityService.currentUser.id+'';
         }
 
         //contributors
@@ -468,7 +469,7 @@ class SpeciesService extends AbstractObjectService  {
                     //sortAsPerRating(sameFieldSpeciesFieldInstances);
                     //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                     def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance]
+                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field]
                 } catch(e) {
                     e.printStackTrace();
                     log.error e.getMessage();
@@ -847,7 +848,13 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content]
+                String activityType;
+                if(oldSynonym)
+                    activityType = activityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                else
+                    activityType = activityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType]
             }
         }
     }
@@ -902,7 +909,14 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content]
+                String activityType;
+                if(oldCommonname)
+                    activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
+                else
+                    activityType = activityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+
+
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType]
             }
         }
     }
@@ -1057,7 +1071,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 msg = 'Successfully removed synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1107,7 +1121,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 msg = 'Successfully removed common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name]
             } 
             catch(e) {
                 e.printStackTrace();
