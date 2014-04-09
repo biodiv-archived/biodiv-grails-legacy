@@ -1563,7 +1563,7 @@ h4,.main_heading .species_title .common_name {
 	overflow: auto;
 	padding: 3px;
 	list-style: none;
-	clear: both;
+	/*clear: both;*/
 }
 
 li.userOrEmail-choice {
