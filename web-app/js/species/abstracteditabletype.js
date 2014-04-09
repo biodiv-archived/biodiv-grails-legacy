@@ -75,6 +75,7 @@
             $container.find('.editableform').hide();
 
             var $form = $container.find('.editableform');
+            var contriEditor;
 
             if($form.length == 0) {
                 var $form = $($.fn.neweditableform_template);
@@ -87,13 +88,24 @@
                     var data = $editField.data();
                     var v = data.value?data.value:$editField.text().trim();
 
-                    var $html = $sf.renderEditField($editField);
-                    var $existingEle = $editableInput.find(data.type+'[name='+data.name+']');
+                    var $existingEle = $editableInput.find('[name='+data.name+']');
+
                     if($existingEle.length == 0) {
+                        var $html = $sf.renderEditField($editField, contriEditor);
                         $editableInput.append($html);
                     } else {
                         v = $existingEle.val() + '\n' + v;
                         $existingEle.val(v);
+                    }
+
+                    if(data.type == 'autofillUsers') {
+                        if(!contriEditor) {
+                            //autofill users
+                            contriEditor = $form.find(".autofillUsers").autofillUsers({
+                                usersUrl : window.params.userTermsUrl
+                            });
+                        }
+                        contriEditor[0].addUserId({'item':{'userId':data.pk, 'value':data.value}});
                     }
                 });
 
@@ -104,9 +116,10 @@
 
             var editor = $sf.renderCKEditor($conEntry.find('.ck_desc'), $editableInput);
 
+
             //Submit
             var params = {};
-            $.extend(params, options, {'editor':editor, '$container':$container});
+            $.extend(params, options, {'editor':editor, 'contriEditor':contriEditor[0], '$container':$container});
             $form.on('submit', params, $.proxy($sf.onFormSubmit, $sf));
 
             //Cancel
@@ -121,10 +134,10 @@
                     scrollTop: $conEntry.offset().top
                 }, 2000);
             });
-
+            
         },
 
-        renderEditField : function($editField) {
+        renderEditField : function($editField, contriEditor) {
             var data = $editField.data();
             var value = data.value?data.value:$editField.text().trim();
             var $html = new Array();
@@ -160,6 +173,11 @@
                     $html.push('</select>');
                     break;
                 case 'ckeditor' :
+                    break;
+                case 'autofillUsers' : 
+                    if(contriEditor == undefined) {
+                        $html.push('<ul class="userOrEmail-list"><input id="userAndEmailList_'+data.fieldid+'" class="autofillUsers" placeholder="Type user name or email id" style="float: left" type="text" /><input name="contributor" type="hidden" /></ul>');
+                    }
                     break;
             }
             $html.push('</div></div>');
@@ -197,8 +215,10 @@
             var $container = params.$container;
             $form.find('textarea[name="description"]').val(e.data.editor.getData());
             
+		    $form.find('input[name="contributor"]').val(params.contriEditor.getEmailAndIdsList().join(","));
             delete params['$container'];
             delete params['editor'];
+            delete params['contriEditor'];
 
             $form.ajaxSubmit({
                 url : window.params.species.updateUrl,

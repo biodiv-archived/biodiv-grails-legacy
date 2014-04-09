@@ -137,6 +137,7 @@ $(function() {
 </g:javascript>
 
 <style>
+    /*
 input#userAndEmailList {
 	-moz-box-sizing: border-box;
 	border: medium none !important;
@@ -207,5 +208,5 @@ li#userOrEmail-new {
 	width: 100%;
 	min-width: 100%;
 	max-width: 100%;
-}
+}*/
 </style>

@@ -41,16 +41,17 @@
                 in="${ speciesFieldInstance?.contributors}" var="contributor">
                 <g:if test="${contributor}">
                 <li>
-                <a href="${uGroup.createLink(controller:'SUser', action:'show', id:contributor.id)}" class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2" data-name="contributor" data-value="${contributor.email}" data-original-title="Edit contributor name">${contributor.name}</a>
+                <a href="${uGroup.createLink(controller:'SUser', action:'show', id:contributor.id)}" class="${isSpeciesFieldContributor?'editField':''}" data-type="autofillUsers" data-name="contributor"  data-pk="${contributor.id}" data-fieldId="${speciesFieldInstance.id}" data-value="${contributor.name}" data-original-title="Edit contributor name">${contributor.name}</a>
                 </li> 
                 </g:if>
                 </g:each>
                 <g:if test="${isSpeciesFieldContributor}">
                 <!--li class="hidePoint"> 
-                <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Add contributor name" data-placeholder="Add contributor"></a>
+                <a href="#" class="addField"  data-fieldId="${speciesFieldInstance.id}" data-type="autofillUsers"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Add contributor name" data-placeholder="Add contributor"></a>
                 </li-->
                 </g:if>
             </ul>
+
     </div>
     </g:if>
 

@@ -359,11 +359,17 @@ class SpeciesService extends AbstractObjectService  {
         List errors = [];
         String msg;
         if(!params.contributor) {
-            params.contributor = springSecurityService.currentUser.email;
+            params.contributor = springSecurityService.currentUser.id;
         }
 
         //contributors
         speciesField.contributors.clear();
+
+        List contributors = Utils.getUsersList(params.contributor);
+        contributors.each { c ->
+            speciesField.addToContributors(c);
+        }
+        /*
         params.contributor.split("\\r?\\n|,").each { l ->
             l = l.trim()
             if(l) {
@@ -374,7 +380,7 @@ class SpeciesService extends AbstractObjectService  {
                     speciesField.addToContributors(c);
                 }
             }
-        } 
+        } */
 
         //attributions
         speciesField.attributors?.clear();
