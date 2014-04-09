@@ -214,7 +214,7 @@
 
                 </form>
                 
-                <g:render template="/checklist/addPhoto"/>
+                <g:render template="/checklist/addPhoto" model="['observationInstance':observationInstance, 'resourceListType':'ofChecklist']"/>
                 <form id="upload_resource" 
                     title="Add a photo for this observation"
                     method="post"
@@ -232,8 +232,7 @@
         <script type="text/javascript" src="http://api.filepicker.io/v1/filepicker.js"></script>
         <r:script>
         $(document).ready(function(){
-            var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
-            <%
+                        <%
             if(observationInstance?.group) {
             out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
             }
@@ -282,6 +281,8 @@
                 $("#checklistData").val('');
                 $("#addNames").show();
             });
+            var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
+
         });
         </r:script>
 
