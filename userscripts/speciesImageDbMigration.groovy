@@ -23,7 +23,7 @@ UPDATE newsletter SET display_order = 0;
 def res1 = Newsletter.executeQuery ('''
     from Newsletter nl where nl.userGroup is null order by nl.date asc''', []);
 
-    println "====================res ============== " + res
+    println "====================res1 ============== " + res1
     def counter1 = 0
     res1.each{
         it.displayOrder = counter

@@ -33,7 +33,14 @@
     $(document).ready(function(){
         filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
         if("${resourceListType}" == "fromRelatedObv"){
+            if(${resCount} == 0){
+                $('#speciesImage-li0').removeClass('active');
+                $('#speciesImage-li0').hide();
+                $('#speciesImage-tab0').hide();
+                $('#speciesImage-li1 a').tab('show');
+            }
             $("#relatedImagesOffset").val(${resCount});
         }
+
     });
 </r:script>

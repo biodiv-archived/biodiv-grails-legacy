@@ -1,10 +1,10 @@
 <div class="tabbable speciesImage-wrapper " style="display:none;">
     <ul class="nav nav-tabs" id="speciesImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
-        <li class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab">Add Observation Images</a></li>
+        <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab">Add Observation Images</a></li>
         </g:if>
         <g:if test="${isSpeciesContributor}">
-            <li id=""><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload Images</a></li>
+            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload Images</a></li>
         </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
