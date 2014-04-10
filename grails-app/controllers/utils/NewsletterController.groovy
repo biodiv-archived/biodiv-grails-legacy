@@ -56,9 +56,9 @@ class NewsletterController {
 		}
 		
 		if(permitted) {
-			def newsletterInstance = new Newsletter()
+            def newsletterInstance = new Newsletter()
 			newsletterInstance.properties = params
-			return [newsletterInstance: newsletterInstance]
+            return [newsletterInstance: newsletterInstance]
 		}
 		
 	}
@@ -106,6 +106,27 @@ class NewsletterController {
 				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 			}
 		}
+        def ug = observationService.getUserGroup(params)
+        def resNL = Newsletter.withCriteria{
+            if(!ug){
+                isNull('userGroup')
+            }
+            else{
+                and{
+                    eq('userGroup', ug) 
+                }
+            }
+            maxResults(1)
+            order("displayOrder", "desc")
+        }
+        def disOrder = 0
+        if(resNL.size() != 0){
+            disOrder = resNL.get(0).displayOrder + 1
+        }
+        newsletterInstance.displayOrder = disOrder
+        if(!newsletterInstance.save(flush:true)){
+            newsletterInstance.errors.allErrors.each { log.error it }      
+        }
 	}
 
 	def show = {
@@ -309,7 +330,6 @@ class NewsletterController {
                 isNull('userGroup')
             }
             else{
-                //params ke webadress se cretae usergroup
                 and{
                     eq('userGroup', ug) 
                 }
