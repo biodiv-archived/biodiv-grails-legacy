@@ -116,10 +116,9 @@
 
             var editor = $sf.renderCKEditor($conEntry.find('.ck_desc'), $editableInput);
 
-
             //Submit
             var params = {};
-            $.extend(params, options, {'editor':editor, 'contriEditor':contriEditor[0], '$container':$container});
+            $.extend(params, options, {'editor':editor, 'contriEditor':contriEditor[0], '$container':$container, $form:$form});
             $form.on('submit', params, $.proxy($sf.onFormSubmit, $sf));
 
             //Cancel
@@ -209,16 +208,20 @@
         },
 
         onFormSubmit :  function(e) {
+            e.stopPropagation();
+            e.preventDefault();
             var $sf = this;
-            var $form = $(e.currentTarget);
             var params = e.data?e.data:{};
             var $container = params.$container;
-            $form.find('textarea[name="description"]').val(e.data.editor.getData());
+            var $form = params.$form;
+            console.log($container);
+            $form.find('textarea[name="description"]').val(params.editor.getData());
             
 		    $form.find('input[name="contributor"]').val(params.contriEditor.getEmailAndIdsList().join(","));
             delete params['$container'];
             delete params['editor'];
             delete params['contriEditor'];
+            delete params['$form'];
 
             $form.ajaxSubmit({
                 url : window.params.species.updateUrl,
