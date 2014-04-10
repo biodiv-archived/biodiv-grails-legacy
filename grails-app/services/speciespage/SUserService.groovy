@@ -136,7 +136,12 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
     }
 
     boolean permToReorderPages(uGroup){
-        return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || uGroup.isFounder(springSecurityService.currentUser))
+        if(uGroup){
+            return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || uGroup.isFounder(springSecurityService.currentUser))
+        }
+        else{
+            return  springSecurityService.isLoggedIn() && SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        }
     }
 
 	boolean ifOwns(id) {
