@@ -68,7 +68,6 @@ $("#addSpeciesImagesBtn").click(function(){
 function onSpeciesImageUploadSuccess(type){
     var msgText
     if(type == "imageUpload"){
-        //$("#uploadSpeciesImagesForm").replaceWith( "<span>Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!</span>" );
         msgText = "Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!"
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab1") );
     }
@@ -101,21 +100,12 @@ function getNextRelatedObvImages(speciesId, url, resourceListType){
         data: {speciesId:speciesId, offset: offset ,resourceListType: resourceListType},	
         success: function(data) {
             var addPhotoHtmlData = $(data.addPhotoHtml);
-            console.log(data.relatedObvCount);
             if(data.relatedObvCount == 0){
                 $("#relatedObvLoadMore").replaceWith('<a class="btn disabled" style="margin-right: 5px;">No More</a>');
             } 
             $("#speciesImage-tab0 .imagesList" ).append(addPhotoHtmlData);
             $("#relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));
-            
-            /*
-            if(data.remainingCommentCount == 0){
-                $(targetComp).children('a').hide();	
-            }else{
-                $(targetComp).children('a').text("Show " + data.remainingCommentCount + " older comments >>");
-            }
-            feedPostProcess();
-            */
+            $("#relatedObvLoadMore").insertBefore($("#pullObvImagesBtn"));
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         }
