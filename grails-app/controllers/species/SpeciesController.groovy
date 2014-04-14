@@ -820,6 +820,20 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    def pullSpeciesFieldImage = {
+        log.debug params
+        def species = Species.get(params.speciesId.toLong())
+        def out = speciesService.updateSpecies(params, species)
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }   
+        render result as JSON
+    }
+
     @Secured(['ROLE_USER'])
     def validate = {
 /*        List hierarchy = [];

@@ -103,10 +103,10 @@ function removeResource(event, imageId) {
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
                 mimetypes: ['image/*'] 
-                                    }
-                                    filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
-                                    console.log(FPError.toString());
-                                    });
+            };
+            filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
+                console.log(FPError.toString());
+            });
                                     
         },
         onUploadResourceSuccess : function(responseXML, statusText, xhr, form) {

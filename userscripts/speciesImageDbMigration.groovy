@@ -6,6 +6,8 @@ import species.groups.UserGroup;
 //set context of resources accordingly
 UPDATE resource SET context ='SPECIES' where id in (select resource_id from species_resource);
 UPDATE resource SET context ='OBSERVATION' where id in (select resource_id from observation_resource);
+UPDATE resource SET context ='SPECIES_FIELD' where id in (select resource_id from species_field_resources);
+
 
 //add value false to all observation for isLocked
 UPDATE observation SET is_locked = false;
@@ -23,7 +25,7 @@ UPDATE newsletter SET display_order = 0;
 def res1 = Newsletter.executeQuery ('''
     from Newsletter nl where nl.userGroup is null order by nl.date asc''', []);
 
-    println "====================res ============== " + res
+    println "====================res1 ============== " + res1
     def counter1 = 0
     res1.each{
         it.displayOrder = counter

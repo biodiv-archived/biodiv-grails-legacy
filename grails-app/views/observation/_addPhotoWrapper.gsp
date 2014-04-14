@@ -4,7 +4,7 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.Species"%>
 <div>
-    <g:if test="${resourceListType != 'fromRelatedObv'}">
+    <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}"
     <i class="icon-picture"></i><span>Upload photos of a
         single observation and species and rate images inorder to order them.</span>
 
@@ -33,7 +33,14 @@
     $(document).ready(function(){
         filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
         if("${resourceListType}" == "fromRelatedObv"){
+            if(${resCount} == 0){
+                $('#speciesImage-li0').removeClass('active');
+                $('#speciesImage-li0').hide();
+                $('#speciesImage-tab0').hide();
+                $('#speciesImage-li1 a').tab('show');
+            }
             $("#relatedImagesOffset").val(${resCount});
         }
+
     });
 </r:script>

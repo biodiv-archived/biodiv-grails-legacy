@@ -1506,7 +1506,7 @@ class SpeciesService extends AbstractObjectService  {
             resources = saveResources(species, resourcesXML);
             species.resources?.clear();
         }
-        else if(params.resourceListType == "fromRelatedObv"){
+        else if(params.resourceListType == "fromRelatedObv" || params.resourceListType == "fromSpeciesField"){
             def resId = []
             params.each { key, val ->
                 int index = -1;
@@ -1520,21 +1520,23 @@ class SpeciesService extends AbstractObjectService  {
             resId.each{
                 resources.add(Resource.get(it.toLong()))
             }
-            
-            resId.each{
-                def rid = it
-                def obv = Observation.withCriteria(){
-                    resource{
-                        eq("id", rid.toLong())
+
+            if(params.resourceListType == "fromRelatedObv"){
+                resId.each{
+                    def rid = it
+                    def obv = Observation.withCriteria(){
+                        resource{
+                            eq("id", rid.toLong())
+                        }
                     }
-                }
-                if(obv.size() == 1 ){
-                    def obvIns = obv.get(0)
-                    if(obvIns.isLocked == false){
-                        obvIns.isLocked = true
-                    }
-                    if(!obvIns.save(flush:true)){
-                        obvIns.errors.allErrors.each { log.error it } 
+                    if(obv.size() == 1 ){
+                        def obvIns = obv.get(0)
+                        if(obvIns.isLocked == false){
+                            obvIns.isLocked = true
+                        }
+                        if(!obvIns.save(flush:true)){
+                            obvIns.errors.allErrors.each { log.error it } 
+                        }
                     }
                 }
             }
@@ -1548,7 +1550,5 @@ class SpeciesService extends AbstractObjectService  {
             return false
         }
         return true
-        
     }
-
 }

@@ -359,6 +359,18 @@ class ObservationTagLib {
                 obvLinkList = relObvMap.obvLinkList
             break
 
+            case "fromSpeciesField" :
+                def allSpField = resInstance.fields
+                allSpField.each{
+                    def r = it.resources
+                    r.each{
+                        resList.add(it)
+                    }
+                }
+                resCount = resList.size()
+                println "=======RES LIST ====== " + resList
+            break
+    
         }
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
