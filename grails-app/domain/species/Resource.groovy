@@ -37,8 +37,9 @@ class Resource extends Sourcedata implements Rateable {
     public enum ResourceContext {
         OBSERVATION("OBSERVATION"),
         SPECIES("SPECIES"),
-        DOCUMENT("DOCUMENT");
-        
+        DOCUMENT("DOCUMENT"),
+        SPECIES_FIELD("SPECIES_FIELD");
+
         private String value;
 
         ResourceContext(String value) {

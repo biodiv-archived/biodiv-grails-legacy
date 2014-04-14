@@ -71,6 +71,10 @@ function onSpeciesImageUploadSuccess(type){
         msgText = "Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!"
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab1") );
     }
+    else if(type == "pulledSpeciesFieldImage"){
+        msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
+        showUpdateStatus(msgText, 'success',$("#speciesImage-tab2") );
+    }
     else{
         msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(msgText);
@@ -79,7 +83,7 @@ function onSpeciesImageUploadSuccess(type){
         }, 1000);
 
     }
-        return true;
+    return true;
 }
 
 $("#uploadSpeciesImagesBtn").click(function(){
@@ -91,6 +95,12 @@ $("#pullObvImagesBtn").click(function(){
     $("#pullObvImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("pulledImage")});
     return false;
 });
+
+$("#pullSpeciesFieldImagesBtn").click(function(){
+    $("#pullSpeciesFieldImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("pulledSpeciesFieldImage")});
+    return false;
+});
+
 
 function getNextRelatedObvImages(speciesId, url, resourceListType){
     var offset = $("#relatedImagesOffset").val();

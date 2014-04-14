@@ -14,7 +14,7 @@
             <%
                 def counter = 0 
             %>
-            <g:if test="${resourceListType != 'fromRelatedObv'}">
+            <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
             <li class="add_file addedResource" style="z-index:40">
             
             <div class="add_file_container">
@@ -76,7 +76,7 @@
                     <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="Contributor">
                     <input name="source_${i}" type="text" value="${resSource}" placeholder="Source">
                     <input name="title_${i}" type="text" value="${r.description}" placeholder="Caption">
-                    <g:if test="${resourceListType == 'fromRelatedObv'}">
+                    <g:if test="${resourceListType == 'fromRelatedObv' || resourceListType == 'fromSpeciesField'}">
                         <%
                             def isChecked = ""
                             def resAlreadyPres = observationInstance.resources.id.asList()

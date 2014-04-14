@@ -4,7 +4,7 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.Species"%>
 <div>
-    <g:if test="${resourceListType != 'fromRelatedObv'}">
+    <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}"
     <i class="icon-picture"></i><span>Upload photos of a
         single observation and species and rate images inorder to order them.</span>
 
