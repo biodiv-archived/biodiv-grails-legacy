@@ -88,6 +88,10 @@
 					</div>
 				</sUser:isAdmin>
 			</g:else>
+			<div class="union-comment">
+				<feed:showAllActivityFeeds model="['rootHolder':newsletterInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+					<comment:showAllComments model="['commentHolder':newsletterInstance, commentType:'super','showCommentList':false]" />
+			</div>
 		</div>
 		
 	</div>
