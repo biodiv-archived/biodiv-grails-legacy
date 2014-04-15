@@ -102,11 +102,15 @@ function removeResource(event, imageId) {
                 'PICASA', 
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
-                mimetypes: ['image/*'] 
+                mimetypes: ['image/*']
             };
+            try {
             filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
                 console.log(FPError.toString());
             });
+            } catch(e) {
+                console.log('filepicker error : '+e);
+            }
                                     
         },
         onUploadResourceSuccess : function(responseXML, statusText, xhr, form) {

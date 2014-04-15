@@ -90,10 +90,8 @@ class Species implements Rateable {
                 }
 			}			
 		}
-		if(reprImage) {
-            if(new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists()) {
+		if(reprImage && new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists()) {
 			    return reprImage;
-            }
 		} else {
 			return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
 		}
