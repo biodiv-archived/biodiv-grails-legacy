@@ -5,6 +5,7 @@ import species.utils.ImageUtils;
 import species.utils.ImageType;
 import species.utils.Utils;
 import org.grails.rateable.*
+import content.eml.Document;
 
 class Resource extends Sourcedata implements Rateable {
 	
@@ -38,8 +39,9 @@ class Resource extends Sourcedata implements Rateable {
         OBSERVATION("OBSERVATION"),
         SPECIES("SPECIES"),
         DOCUMENT("DOCUMENT"),
-        SPECIES_FIELD("SPECIES_FIELD");
-
+        SPECIES_FIELD("SPECIES_FIELD"),
+		CHECKLIST("CHECKLIST")
+		
         private String value;
 
         ResourceContext(String value) {
@@ -51,7 +53,7 @@ class Resource extends Sourcedata implements Rateable {
         }
 
         static def toList() {
-            return [ OBSERVATION,SPECIES,DOCUMENT ]
+            return [ OBSERVATION,SPECIES,DOCUMENT, SPECIES_FIELD, CHECKLIST]
         }
 
         public String toString() {
@@ -145,4 +147,35 @@ class Resource extends Sourcedata implements Rateable {
 			this.url = url;
 		}
 	}
+	
+	void saveResourceContext(objInstance){
+		//saving only if context is null earlier
+		if(this.context) return;
+		
+		switch(objInstance.class.name){
+			case Species.class.name:
+				this.context = ResourceContext.SPECIES
+				break
+			case Observation.class.name:
+				this.context = ResourceContext.OBSERVATION
+				break
+			case Document.class.name:
+				this.context = ResourceContext.DOCUMENT
+				break
+			case SpeciesField.class.name:
+				this.context = ResourceContext.SPECIES_FIELD
+				break
+			case Checklists.class.name:
+				this.context = ResourceContext.CHECKLIST
+				break
+			default:
+				break
+		}
+		
+		if(!this.save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+		
+	}
+	
 }
