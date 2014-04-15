@@ -444,7 +444,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            //names.parser.serverURL = "saturn.strandls.com"
+            names.parser.serverURL = "saturn.strandls.com"
         }
         google.analytics.enabled = false
         grails.resources.debug = false
@@ -536,7 +536,7 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}/images"
+				serverURL = "http://saturn.strandls.com/${appName}/img"
 			}
 
 			nameSearch.indexStore = "${app.rootDir}/data/names"
