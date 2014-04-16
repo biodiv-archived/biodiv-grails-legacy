@@ -66,7 +66,7 @@
                                                             </sUser:permToReorderPages>
                                                         </a></li>
 						</g:each>
-                                                <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
+                        <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/project/list">Western Ghats CEPF
 									Projects</a></li>
 						</g:if>

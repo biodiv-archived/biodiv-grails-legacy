@@ -31,6 +31,9 @@
     <meta name="description" content="${grailsApplication.config.speciesPortal.app.description}">
 </g:if>
 
+<g:if test="${grailsApplication.config.speciesPortal.app.googlePlusUrl}">
+	<a href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}" rel="publisher"></a>
+</g:if>	
 
 </head>
 <body>

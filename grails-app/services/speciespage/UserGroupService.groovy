@@ -187,10 +187,24 @@ class UserGroupService {
 	
 	private void updateHomePage(userGroup, params){
 		//on create correcting webaddress of home page in other cases(i.e update) no need to do any thing
-		if(params.action == 'save' && params.homePage){
+		if(params.homePage){
 			def page = params.homePage.tokenize('/').last().trim()
 			def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-			userGroup.homePage = uGroup.createLink(mapping:'userGroup', action:page, params:['webaddress':userGroup.webaddress])
+			if(!page.isInteger()){
+				userGroup.homePage = uGroup.createLink(mapping:'userGroup', action:page, params:['webaddress':userGroup.webaddress])
+			}else{
+				//if home page is newsletter then setting appropriate url and sticky bit true
+				userGroup.homePage = uGroup.createLink(controller:'newsletter', action:'show', id:page.toInteger())
+				if(page.isInteger()){
+					def pageObj = Newsletter.read(page.toInteger())
+					if(pageObj){
+						pageObj.sticky = true
+						if(!pageObj.save(flush:true)){
+							pageObj.errors.allErrors.each { log.error it }
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -832,9 +846,16 @@ class UserGroupService {
 		if(userGroupInstance) {
 			queryParams['userGroupInstance'] = userGroupInstance;
 			query += " where newsletter.userGroup=:userGroupInstance"
+			def author = springSecurityService.currentUser
+			//if not logged in user or not a group founder then show only sticky pages
+			if(!author || !userGroupInstance.isFounder(author)){
+				queryParams['sticky'] = true;
+				query += " and newsletter.sticky=:sticky"
+			}
 		} else {
 			query += " where newsletter.userGroup is null"
 		}
+		
 		if(max && max != -1) {
 			queryParams['max'] = max;
 		}
