@@ -893,7 +893,7 @@ $(document).ready(function() {
            return false;
        }
         var data = grid.getData()[row]
-        var addedResources = $('#addResourcesModal ul#imagesList>li');
+        var addedResources = $('#addResourcesModal ul.imagesList>li');
         data.Media = new Array($(addedResources).length-1);
         for(var i=0; i<$(addedResources).length-1; i++) {
             data.Media[i] = {};

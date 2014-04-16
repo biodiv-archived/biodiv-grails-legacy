@@ -536,7 +536,7 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}/img"
+				serverURL = "http://saturn.strandls.com/${appName}/images"
 			}
 
 			nameSearch.indexStore = "${app.rootDir}/data/names"
@@ -605,7 +605,7 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}/images"
+				serverURL = "http://saturn.strandls.com/${appName}/img"
 			}
 
 			nameSearch.indexStore = "${app.rootDir}/data/names"

@@ -1543,6 +1543,7 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         resources.each { resource ->
+            resource.saveResourceContext(species)
             species.addToResources(resource);
         }
         if(!species.save(flush:true)){

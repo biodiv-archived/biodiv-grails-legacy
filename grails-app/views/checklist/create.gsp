@@ -223,6 +223,7 @@
                     <span class="msg" style="float: right"></span>
                     <input id="videoUrl" type="hidden" name='videoUrl'value="" />
                     <input type="hidden" name='obvDir' value="${obvDir}" />
+                    <input type="hidden" name='resType' value='${observationInstance.class.name}'>
                 </form>
 
 
@@ -239,8 +240,6 @@
             out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
             }
             %>
-            filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
-            
             function initBlankSpreadsheet() {
             
             var rowDataForBlankSheet = new Array();

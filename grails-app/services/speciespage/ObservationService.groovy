@@ -87,6 +87,7 @@ class ObservationService extends AbstractObjectService {
     static final int MAX_EXPORT_SIZE = -1;
     static final String FEATURED = "Featured";
     static final String UNFEATURED = "UnFeatured";
+    static final String DIGEST_MAIL = "digestMail";
     /**
      * 
      * @param params
@@ -149,6 +150,7 @@ class ObservationService extends AbstractObjectService {
         
         observation.resource?.clear();
         resources.each { resource ->
+            resource.saveResourceContext(observation)
             observation.addToResource(resource);
         }
     }
@@ -1652,6 +1654,14 @@ class ObservationService extends AbstractObjectService {
                 toUsers.addAll(getParticipants(obv))
                 break
             
+            case DIGEST_MAIL:
+                mailSubject = "Daily digest - IBP"
+                bodyView = "/emailtemplates/digest"
+                templateMap["digestContent"] = otherParams["digestContent"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(SUser.get(3L))
+                break
+
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
                 mailSubject = activityFeedService.SPECIES_CREATED
                 bodyView = "/emailtemplates/addObservation"
@@ -1659,8 +1669,7 @@ class ObservationService extends AbstractObjectService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
-
-
+                
             default:
                 log.debug "invalid notification type"
             }
