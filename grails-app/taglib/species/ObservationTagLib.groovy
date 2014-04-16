@@ -368,7 +368,6 @@ class ObservationTagLib {
                     }
                 }
                 resCount = resList.size()
-                println "=======RES LIST ====== " + resList
             break
     
         }
