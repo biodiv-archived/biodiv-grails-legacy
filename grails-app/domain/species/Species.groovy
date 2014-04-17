@@ -78,7 +78,8 @@ class Species implements Rateable {
 	static transients = [ "sLog" ]
 	
 	Resource mainImage() {  
-		if(!reprImage) {
+		def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+		if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
 			def images = this.getImages();
 			this.reprImage = images ? images[0]:null;
             
