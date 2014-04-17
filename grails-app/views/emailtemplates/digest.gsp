@@ -29,7 +29,7 @@
                     <h3>Recent</h3>
                     <table>
                         <tr align="left" style="background-color: #d4ece3">
-                            <g:each in="${obvIns}" var="observationInstance">
+                            <g:each in="${obvIns.size() < 5 ? obvIns : obvIns.subList(0, 5)}" var="observationInstance">
                             <g:set var="mainImage" value="${observationInstance.mainImage()}" />
                             <%
                             def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
@@ -47,7 +47,7 @@
                     <h3>Unidentified</h3>
                     <table>
                         <tr align="left" style="background-color: #d4ece3">
-                            <g:each in="${uniObvIns}" var="uniObvInstance">
+                            <g:each in="${uniObvIns.size() < 5 ? uniObvIns : uniObvIns.subList(0, 5)}" var="uniObvInstance">
                             <g:set var="mainImage" value="${uniObvInstance.mainImage()}" />
                             <%
                             def imagePath = mainImage?mainImage.thumbnailUrl(null, !uniObvInstance.resource ? '.png' :null): null;
@@ -73,7 +73,7 @@
                     <h3>Latest Updated</h3>
                     <table>
                         <tr align="left">
-                            <g:each in="${spIns}" var="speciesInstance">
+                            <g:each in="${spIns.size() < 5 ? spIns : spIns.subList(0, 5)}" var="speciesInstance">
                             <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
                             <%
                             def imagePath = '';
@@ -101,7 +101,7 @@
                     <h3>New</h3>
                     <table>
                         <tr align="left">
-                            <g:each in="${userIns}" var="userInstance">
+                            <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
                             <td class="w640" height="30" width="120"><a href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
                                     <img src="${userInstance.profilePicture()}" title="${userInstance.name}" />
                             </a></td>
@@ -124,7 +124,7 @@
                     <h3>Latest Updated</h3>
                     <table>
                         <tr align="left">
-                            <g:each in="${docIns}" var="documentInstance">
+                            <g:each in="${docIns.size() < 5 ? docIns : docIns.subList(0, 5)}" var="documentInstance">
                             <%
                             def docId = documentInstance.id
                             %>
