@@ -215,11 +215,9 @@ class AbstractObjectService {
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
-            println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + uploadDir
         }
         else{
             uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
-            println '============== 11111111111111111111111111' + uploadDir 
         }
         List files = [];
         List titles = [];
@@ -229,7 +227,7 @@ class AbstractObjectService {
         List source = [];
         List ratings = [];
         List contributor = [];
-        List resContext = [];
+        //List resContext = [];
         params.each { key, val ->
             int index = -1;
             if(key.startsWith('file_')) {
@@ -244,7 +242,7 @@ class AbstractObjectService {
                 url.add(params.get('url_'+index));
                 source.add(params.get('source_'+index));
                 ratings.add(params.get('rating_'+index));
-                resContext.add(params.get('resContext_'+index));
+                //resContext.add(params.get('resContext_'+index));
                 if( params.speciesId != null ){
                     contributor.add(params.get('contributor_'+index));
                 }
@@ -266,7 +264,7 @@ class AbstractObjectService {
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
-                new Node(image, "resContext", resContext.getAt(key));
+                //new Node(image, "resContext", resContext.getAt(key));
                 if( params.resourceListType == "ofObv" ){
                     new Node(image, "contributor", params.author.username); 
                 }
@@ -288,19 +286,12 @@ class AbstractObjectService {
         XMLConverter converter = new XMLConverter();
         def rootDir
         switch(instance.class.name) {
-            case Observation.class.name:
+            case [Observation.class.name, Checklists.class.name]:
             rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-            println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
             break;
             
-            case Checklists.class.name:
-            rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-            println "==============%%%%%%%%%%%%%%%%%%%%%%%" + rootDir
-            break;
-
             case Species.class.name:
             rootDir = grailsApplication.config.speciesPortal.resources.rootDir
-            println "==========@@@@@@@@@@@@@@@@@@@@@@@@" + rootDir
             break;
         }
         converter.setResourcesRootDir(rootDir);

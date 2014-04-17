@@ -37,7 +37,7 @@
             <%
             def imagePath = '';
             if(r) {
-            if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString()){
+            if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString() || r.context.value() == Resource.ResourceContext.CHECKLIST.toString()){
                 imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
             }else{
                 def spFolder = grailsApplication.config.speciesPortal.resources.rootDir
@@ -65,7 +65,7 @@
                 <input name="file_${i}" type="hidden" value='${r.fileName}' />
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
-                <input name="resContext__${i}" type="hidden" value='${r.context.value()}'/>
+                <!--input name="resContext_${i}" type="hidden" value='${r.context.value()}'/-->
                 <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
                 <g:if test="${r.type == ResourceType.IMAGE}">
                 <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList().first()]"/>
@@ -127,12 +127,12 @@
                     <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
                     <input name="source_{{>i}}" type="text" value="" placeholder="Source">
                     <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
-                    <input name="resContext_{{>i}}" type="hidden" value = "SPECIES">
+                    <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->
                 </div>
             </div>
             </g:if>
             <g:else>
-                <input name="resContext_{{>i}}" type="hidden" value = "OBSERVATION">
+                <!--input name="resContext_{{>i}}" type="hidden" value = "OBSERVATION"-->
             </g:else>
                 <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span>Choose a license</span>

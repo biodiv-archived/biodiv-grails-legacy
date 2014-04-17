@@ -155,7 +155,10 @@ class XMLConverter extends SourceConverter {
 
                     List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
                     log.debug "Resources ${resources}"
-                    resources.each { s.addToResources(it); }
+                    resources.each { 
+						it.saveResourceContext(s)
+						s.addToResources(it); 
+					}
 
                     List<Synonyms> synonyms;
 
@@ -403,7 +406,7 @@ class XMLConverter extends SourceConverter {
                 licenses.each { speciesField.addToLicenses(it); }
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
-                resources.each {  speciesField.addToResources(it); }
+                resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
                 references.each { println it; speciesField.addToReferences(it); }
 				speciesFields.add(speciesField);
             } else {
@@ -791,7 +794,7 @@ class XMLConverter extends SourceConverter {
 
             if(!res) {
                 log.debug "Creating new resource"
-                res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text(), context:imageNode.resContext?.text());
+                res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
                 res.url = sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {

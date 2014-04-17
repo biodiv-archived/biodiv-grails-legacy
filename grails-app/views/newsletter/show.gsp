@@ -33,7 +33,7 @@
 	font-style: italic;
 }
 </style>
-<r:require modules="core" />
+<r:require modules="core, distinct_reco" />
 </head>
 <body>
 	<div id="pageContent" class="observation  span8"  style="margin-left:0px;">
@@ -88,6 +88,10 @@
 					</div>
 				</sUser:isAdmin>
 			</g:else>
+			<div class="union-comment">
+				<feed:showAllActivityFeeds model="['rootHolder':newsletterInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+					<comment:showAllComments model="['commentHolder':newsletterInstance, commentType:'super','showCommentList':false]" />
+			</div>
 		</div>
 		
 	</div>

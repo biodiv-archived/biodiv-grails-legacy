@@ -87,6 +87,7 @@ class ObservationService extends AbstractObjectService {
     static final int MAX_EXPORT_SIZE = -1;
     static final String FEATURED = "Featured";
     static final String UNFEATURED = "UnFeatured";
+    static final String DIGEST_MAIL = "digestMail";
     /**
      * 
      * @param params
@@ -103,7 +104,7 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @param observation
      */
-    void updateObservation(params, observation){
+    void updateObservation(params, observation, boolean updateResources = true){
         //log.debug "Updating obv with params ${params}"
         
         if(params.author)  {
@@ -144,16 +145,20 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        def resourcesXML = createResourcesXML(params);
-        def resources = saveResources(observation, resourcesXML);
-        
-        observation.resource?.clear();
-        resources.each { resource ->
-            observation.addToResource(resource);
-        }
+		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
+		// has some global update like habitat, group in that case updating its observation info but not the resource info
+		if(updateResources){
+	        def resourcesXML = createResourcesXML(params);
+	        def resources = saveResources(observation, resourcesXML);
+	        observation.resource?.clear();
+	        resources.each { resource ->
+                resource.saveResourceContext(observation)
+	            observation.addToResource(resource);
+	        }
+		}
     }
 
-    Map saveObservation(params, sendMail=true){
+    Map saveObservation(params, sendMail=true, boolean updateResources = true){
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
@@ -167,7 +172,7 @@ class ObservationService extends AbstractObjectService {
             }else{
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
-                updateObservation(params, observationInstance)
+                updateObservation(params, observationInstance, updateResources)
                 feedType = activityFeedService.OBSERVATION_UPDATED
                 feedAuthor = springSecurityService.currentUser
             }
@@ -1652,6 +1657,14 @@ class ObservationService extends AbstractObjectService {
                 toUsers.addAll(getParticipants(obv))
                 break
             
+            case DIGEST_MAIL:
+                mailSubject = "Daily digest - IBP"
+                bodyView = "/emailtemplates/digest"
+                templateMap["digestContent"] = otherParams["digestContent"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(SUser.get(3L))
+                break
+
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
                 mailSubject = activityFeedService.SPECIES_CREATED
                 bodyView = "/emailtemplates/addObservation"
@@ -1659,8 +1672,7 @@ class ObservationService extends AbstractObjectService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
-
-
+                
             default:
                 log.debug "invalid notification type"
             }
@@ -1944,7 +1956,7 @@ class ObservationService extends AbstractObjectService {
         def distinctRecoListResult = distinctRecoQuery.list()
         distinctRecoListResult.each {it->
             def reco = Recommendation.read(it[0]);
-            distinctRecoList << [reco.name, reco.isScientificName, it[1]]
+            distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, it[1]]
         }
 
         def count = distinctRecoCountQuery.list()[0]
@@ -1991,12 +2003,22 @@ class ObservationService extends AbstractObjectService {
             List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
             distinctRecoListFacets.each {
                 //TODO second parameter, isScientificName
-                distinctRecoList.add([it.getName(), true, it.getCount()]);
+                distinctRecoList.add([getSpeciesHyperLinkedName(Recommendation.findByName(it.getName())), true, it.getCount()]);
             }
 
         }
         return [distinctRecoList:distinctRecoList] 
     }
+	
+	private String getSpeciesHyperLinkedName(Recommendation reco){
+		def speciesId = reco?.taxonConcept?.findSpeciesId()
+		if(!speciesId){
+			return reco?.name
+		}
+		
+		def link = generateLink("species", "show", ["id": speciesId])
+		return "" + '<a  href="' +  link +'"><i>' + reco.name + "</i></a>"
+	}
 
     /**
      */

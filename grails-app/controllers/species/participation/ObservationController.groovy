@@ -376,7 +376,7 @@ class ObservationController extends AbstractObjectController {
 				def resourcesInfo = [];
                 def rootDir
                 switch(params.resType) {
-                    case Observation.class.name:
+                    case [Observation.class.name,Checklists.class.name ]:
                         rootDir = grailsApplication.config.speciesPortal.observations.rootDir
                     break;
 
@@ -429,7 +429,7 @@ class ObservationController extends AbstractObjectController {
 					else {
 						if(!obvDir) {
 							if(!params.obvDir) {
-								obvDir = new File(rootDir);
+                                obvDir = new File(rootDir);
 								if(!obvDir.exists()) {
 									obvDir.mkdir();
 								}

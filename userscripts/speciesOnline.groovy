@@ -183,9 +183,9 @@ def updateNameContributor(){
 }
 
 
-//makeFieldGeneric()
-//addMetadataField()
-//addNewField()
+makeFieldGeneric()
+addMetadataField()
+addNewField()
 
 //populateUserInContributor()
 //populateUserInContributor1()

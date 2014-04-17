@@ -140,10 +140,15 @@ modules = {
 		resource url:'/js/species/observations/create.js'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
         resource url:'http://api.filepicker.io/v1/filepicker.js'
+        resource url:'https://api.filepicker.io/v1/filepicker_debug.js'
 	}
 
+    distinct_reco {
+        resource url:'/js/species/observations/distinctReco.js'
+    }
+
 	observations_list { 
-		dependsOn 'observations, list_utils, comment, activityfeed'
+		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
         resource url:'/js/species/observations/list.js'
 	}
@@ -286,13 +291,10 @@ modules = {
 		resource url:'/js/species/parseUtil.js'
 		resource url:'/js/species/jquery.csv-0.71.min.js'
         resource url:'/js/species/observations/upload.js'
-        resource url:'/js/species/observations/addResource.js'
 	}
     
     species_upload {
         dependsOn 'checklist_create'
-
-        resource url:'/js/species/observations/upload.js'
     }
 
 	chart {
@@ -357,6 +359,7 @@ modules = {
 		
 		resource url:'/css/am.css'
 		resource url:'/css/styles.css'
+        resource url:'/js/OpenLayers-2.10/theme/default/style.css'
 
 		resource url:'/js/OpenLayers-2.10/OpenLayers.js'
 		resource url:'/js/species/maps/am.js'

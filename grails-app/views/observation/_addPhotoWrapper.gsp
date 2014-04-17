@@ -41,6 +41,12 @@
             }
             $("#relatedImagesOffset").val(${resCount});
         }
+        if("${resourceListType}" == "fromSpeciesField"){
+            if(${resCount} == 0){
+                $('#speciesImage-li2').hide();
+                $('#speciesImage-tab2').hide();
+            }
+        }
 
     });
 </r:script>

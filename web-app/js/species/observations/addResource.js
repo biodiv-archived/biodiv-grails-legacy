@@ -81,7 +81,6 @@ function removeResource(event, imageId) {
         },
 
         filePick : function(e) {
-            console.log("filePick function called");
             var me = this;
             var onSuccess = function(FPFiles){
                 $.each(FPFiles, function(){
@@ -102,11 +101,15 @@ function removeResource(event, imageId) {
                 'PICASA', 
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
-                mimetypes: ['image/*'] 
+                mimetypes: ['image/*']
             };
+            try {
             filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
                 console.log(FPError.toString());
             });
+            } catch(e) {
+                console.log('filepicker error : '+e);
+            }
                                     
         },
         onUploadResourceSuccess : function(responseXML, statusText, xhr, form) {

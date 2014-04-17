@@ -464,7 +464,8 @@ environments {
 
         ckeditor {
             upload {
-                basedir = "${speciesPortal.app.rootDir}/"
+				baseurl = "/newsletters"
+				basedir = "${speciesPortal.app.rootDir}/newsletters/"
                 image.browser = true
                 image.upload = true    
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -536,7 +537,7 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}/img"
+				serverURL = "http://saturn.strandls.com/${appName}/images"
 			}
 
 			nameSearch.indexStore = "${app.rootDir}/data/names"
@@ -577,7 +578,8 @@ environments {
 
                 ckeditor {
                     upload {
-                        basedir = "${speciesPortal.app.rootDir}/"
+                    baseurl = "/newsletters"
+                    basedir = "${speciesPortal.app.rootDir}/newsletters/"
                     image.browser = true
                     image.upload = true    
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -605,7 +607,7 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}/images"
+				serverURL = "http://saturn.strandls.com/${appName}/img"
 			}
 
 			nameSearch.indexStore = "${app.rootDir}/data/names"
@@ -652,7 +654,8 @@ environments {
 
                 ckeditor {
                     upload {
-                        basedir = "${speciesPortal.app.rootDir}/"
+                    baseurl = "/newsletters"
+                    basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
                     image.browser = true
                     image.upload = true    
@@ -726,8 +729,8 @@ environments {
 
         ckeditor {
             upload {
-                basedir = "${speciesPortal.app.rootDir}/"
-
+				baseurl = "/newsletters"
+				basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
                 image.browser = true
                 image.upload = true    
