@@ -47,9 +47,9 @@
 						<tr class="prop">
 							<td valign="top"
 								class="value ${hasErrors(bean: newsletterInstance, field: 'newsitem', 'errors')}">
-								<textarea name="newsitem" id="newsitem">
+								<ckeditor:editor name="newsitem" height="400px" userSpace="${params.webaddress }">
 									${newsletterInstance?.newsitem}
-								</textarea>
+								</ckeditor:editor>
 							</td>
 						</tr>
 

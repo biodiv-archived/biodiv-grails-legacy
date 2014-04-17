@@ -521,16 +521,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return res
 	}
 
-	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
-		if(!geoPrivacy || SUserService.ifOwns(author)){
-			return 0
-		}
-		//for backend thred e.g download request reqUser will be passed as argument
-		if(reqUser && (reqUser.id == author.id || SUserService.isAdmin(reqUser.id))){
-			return 0
-		}
-		return Utils.getRandomFloat()
-	}
+
 //	
 //	def fetchSourceChecklistTitle(){
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
