@@ -14,6 +14,8 @@ class Comment{
 	String body;
 	Date dateCreated;
 	Date lastUpdated;
+	//main comment thread may have subject (i.e will be shown in group discussion foram)
+	String subject; 
 
 	//comment holder (i.e recoVote, image)
 	Long commentHolderId;
@@ -28,6 +30,7 @@ class Comment{
 	//to store main comment thread
 	Long mainParentId;
 	
+	
 	static hasMany = [likes:SUser, attachments:Resource];
 	static belongsTo = [author:SUser];
 
@@ -35,6 +38,7 @@ class Comment{
 		body blank:false;
 		parentId nullable:true;
 		mainParentId nullable:true;
+		subject nullable:true;
 	}
 
 	static mapping = {

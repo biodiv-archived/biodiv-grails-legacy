@@ -5,6 +5,7 @@ import grails.plugins.springsecurity.Secured
 import species.participation.Follow
 import species.auth.SUser
 
+
 class ActivityFeedController {
 
 	def activityFeedService;

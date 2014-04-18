@@ -83,7 +83,7 @@
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
 						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
-						title="Activity">Activity</a>
+						title="Discussions">Discussions</a>
 					</li>
 					
 					<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
@@ -158,7 +158,7 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity</a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Discussions">Discussions</a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
