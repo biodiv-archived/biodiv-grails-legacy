@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    console.log('distinctReco widget');
     $("#distinctRecoTableAction").click(loadDistinctRecoList);
 });
 
