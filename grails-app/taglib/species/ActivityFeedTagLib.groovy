@@ -1,6 +1,7 @@
 package species
 
 import species.participation.Comment
+import species.groups.UserGroup
 
 class ActivityFeedTagLib {
 	static namespace = "feed"
@@ -34,7 +35,7 @@ class ActivityFeedTagLib {
 	def showFeedWithFilter = {attrs, body->
 		def model = attrs.model
 		model.feedType = model.feedType ?: activityFeedService.ALL
-		model.feedCategory = model.feedCategory ?: activityFeedService.ALL
+		model.feedCategory = model.feedCategory ?: UserGroup.class.canonicalName
 		out << render(template:"/common/activityfeed/showFeedWithFilterTemplate", model:attrs.model);
 	}
 	

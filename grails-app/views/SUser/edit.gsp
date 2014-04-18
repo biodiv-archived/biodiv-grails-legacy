@@ -257,6 +257,21 @@
 										</g:hasErrors>
 									</div>
 								</div>
+                                                        </div>
+                                                        <div
+								class="control-group ${hasErrors(bean: user, field: 'sendDigest', 'error')}">
+								<div class="controls" style="margin-left: 0px;">
+									<label class="checkbox" style="clear: both;"> <g:checkBox
+											name="sendDigest" value="${user.sendDigest}" />
+										<g:message code='user.sendDigest.label'
+											default='Send me digest email' /> </label>
+									<div class="help-inline">
+										<g:hasErrors bean="${user}" field="sendDigest">
+											<g:renderErrors bean="${user}" as="list"
+												field="sendDigest" />
+										</g:hasErrors>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div class="super-section" style="clear: both;">

@@ -1,6 +1,8 @@
 package species.participation
 import species.*;
 import content.eml.Document;
+import species.groups.UserGroup;
+import species.auth.SUser;
 
 class DigestService {
     
@@ -12,13 +14,18 @@ class DigestService {
     def sendDigest(Digest digest){
         def digestContent = fetchDigestContent(digest)
         if(digestContent){
+            log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
             def otherParams = [:]
             otherParams['digestContent'] = digestContent
             otherParams['userGroup'] = digest.userGroup
-            println "========OTHER PARAMS ========= " + otherParams['digestContent']
+            log.debug "======== DIGEST CONTENT ========= " + otherParams['digestContent']
             def sp = new Species()
             observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
-            println "========== DONE ============="
+            digest.lastSent = new Date()
+            if(digest.save(flush:true)){
+                digest.errors.allErrors.each { log.error it }
+            }
+            log.debug " MAIL SENT and Digest Last sent time updated "
         }
     }
 
@@ -26,9 +33,10 @@ class DigestService {
         def params = [:]
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
-        params.refTime = digest.lastSent.getTime()
+        params.refTime = ""+digest.lastSent.getTime()
         params.timeLine = "older"
         params.feedOrder = "latestFirst"
+        params.feedType = "GroupSpecific"
 
         def res = [:]
         def obvList = []
@@ -36,7 +44,7 @@ class DigestService {
         def spList = []
         def docList = []
         def userList = []
-        if(digest.threshold > activityFeedService.getCount(params)){
+        if(digest.threshold > activityFeedService.getActivityFeeds(params).size()){
             res = null
         }
         else{

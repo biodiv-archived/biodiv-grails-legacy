@@ -19,7 +19,7 @@ class CommentService {
 		
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
-						parentId:params.parentId, mainParentId:params.mainParentId);
+						parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim());
 
 		if(params.dateCreated) {
 			c.dateCreated = params.dateCreated

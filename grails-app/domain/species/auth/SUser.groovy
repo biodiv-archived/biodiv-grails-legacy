@@ -45,6 +45,7 @@ class SUser {
 	String aboutMe;
 	String location;
 	boolean sendNotification = true;
+    boolean sendDigest = true;
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
 
