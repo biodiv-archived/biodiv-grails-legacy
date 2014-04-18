@@ -32,7 +32,7 @@
 	
 	<r:script>
 		$(document).ready(function(){
-            if($(".homePage-content").length == 0) {
+            if($(".homepage-content").length == 0) {
                 var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
                 $.get(url, function(data) {
     			    $('.homepage-content').html($(data).find('.bodymarker'));

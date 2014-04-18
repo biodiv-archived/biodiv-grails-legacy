@@ -9,6 +9,7 @@ export CATALINA_OPTS="-Xms2048M -Xmx16384M"
 #export CATALINA_BASE="/apps/apache-tomcat-7.0.52"
 #export LOGGING_CONFIG="${CATALINA_BASE}/lib/log4j.properties"
 #export LOGGING_MANAGER=
+export GEOSERVER_DATA_DIR=/apps/biodiv/geoserver_data_dir
 
 export BIODIV_CONFIG_LOCATION=/apps/biodiv/additional-config.groovy
 
