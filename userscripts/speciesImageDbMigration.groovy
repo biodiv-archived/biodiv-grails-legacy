@@ -16,6 +16,9 @@ UPDATE observation SET is_locked = false;
 //initialize all display order in newsletter to zero
 UPDATE newsletter SET display_order = 0;
 
+//for sendDigest true initially
+UPDATE suser SET send_digest = true;
+
 //set displayOrder for all news letter user group specific 
 // it should start from 0 and increase with date ascending
 //then latest created with have max displayOrder
