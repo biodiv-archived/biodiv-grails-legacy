@@ -1658,9 +1658,10 @@ class ObservationService extends AbstractObjectService {
                 break
             
             case DIGEST_MAIL:
-                mailSubject = "Daily digest - IBP"
+                mailSubject = "Activity digest on " + otherParams["userGroup"].name
                 bodyView = "/emailtemplates/digest"
                 templateMap["digestContent"] = otherParams["digestContent"]
+                templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(SUser.get(3L))
                 break

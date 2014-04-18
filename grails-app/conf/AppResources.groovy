@@ -143,8 +143,12 @@ modules = {
         resource url:'https://api.filepicker.io/v1/filepicker_debug.js'
 	}
 
+    distinct_reco {
+        resource url:'/js/species/observations/distinctReco.js'
+    }
+
 	observations_list { 
-		dependsOn 'observations, list_utils, comment, activityfeed'
+		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
         resource url:'/js/species/observations/list.js'
 	}
