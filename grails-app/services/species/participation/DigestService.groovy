@@ -1,16 +1,28 @@
 package species.participation
+import species.*;
+import content.eml.Document;
 
 class DigestService {
     
-    def activityFeedService
+    def activityFeedService;
+    def observationService;
 
     static transactional = true
-
-    def serviceMethod() {
-
+    
+    def sendDigest(Digest digest){
+        def digestContent = fetchDigestContent(digest)
+        if(digestContent){
+            def otherParams = [:]
+            otherParams['digestContent'] = digestContent
+            otherParams['userGroup'] = digest.userGroup
+            println "========OTHER PARAMS ========= " + otherParams['digestContent']
+            def sp = new Species()
+            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+            println "========== DONE ============="
+        }
     }
 
-    def fetchDigestContent(Digest digest){
+    private def fetchDigestContent(Digest digest){
         def params = [:]
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
@@ -30,7 +42,6 @@ class DigestService {
         else{
             def feedsList = activityFeedService.getActivityFeeds(params)
             feedsList.each{
-                //for checklist discuss
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():
                         def obv = Observation.get(it.rootHolderId)
