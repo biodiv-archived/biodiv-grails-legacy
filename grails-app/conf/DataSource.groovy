@@ -67,6 +67,12 @@ environments {
             url = "jdbc:postgresql://localhost:5432/${appName}"
         }
     }
+    kk {
+        dataSource {
+            dbCreate = "update" // one of 'create', 'create-drop','update'
+            url = "jdbc:postgresql://localhost:5432/${appName}"
+        }
+    }
 }
 
 /* Added by the Hibernate Spatial Plugin. */

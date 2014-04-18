@@ -88,12 +88,13 @@
 					</div>
 				</sUser:isAdmin>
 			</g:else>
-			<div class="union-comment">
-				<feed:showAllActivityFeeds model="['rootHolder':newsletterInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+			<g:if test="${!newsletterInstance.fetchIsHomePage()}">
+				<div class="union-comment">
+					<feed:showAllActivityFeeds model="['rootHolder':newsletterInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 					<comment:showAllComments model="['commentHolder':newsletterInstance, commentType:'super','showCommentList':false]" />
-			</div>
+				</div>
+			</g:if>
 		</div>
-		
 	</div>
 </body>
 </html>
