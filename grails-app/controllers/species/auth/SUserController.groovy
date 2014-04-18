@@ -389,7 +389,7 @@ class SUserController extends UserController {
 			if (params.sort == 'lastLoginDate') {
 				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
 			} else {
-				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
+				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'}"
 			}
 
 
