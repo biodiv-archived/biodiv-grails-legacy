@@ -19,7 +19,7 @@
                 <td class="w580" style="height: 10px; background-color: white;"></td>
             </tr>
             <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
-            <p>Here is the activity digest for the ${userGroup} on the India Biodiversity Portal</p>
+            <p>Here is the activity digest for the ${userGroup.name} on the India Biodiversity Portal</p>
             <g:if test = "${digestContent.observations || digestContent.unidObvs}">
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
                 <h2>Observations</h2>
