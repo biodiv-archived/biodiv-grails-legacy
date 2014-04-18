@@ -130,7 +130,7 @@ cache.headers.presets = [
  *  5. If additional conf file present then adding it to main config.
  */
 
-def ENV_NAME = "${appName}.config.location"
+def ENV_NAME = "${appName}_config_location".toUpperCase()
 if (!grails.config.locations || !(grails.config.locations instanceof List)) {
 	grails.config.locations = []
 }
@@ -155,7 +155,7 @@ else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) 
 		"file:${userHome}/.grails/${appName}-config.properties"
 	]
 }
-else if (new File("${userHome}/.grails/additional-config.groovy").exists()) {
+else if (new File(System.getenv(ENV_NAME)).exists()) {
 	println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
 	grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
@@ -723,6 +723,82 @@ environments {
 
         ibp.domain='indiabiodiversity.org'
         wgp.domain='thewesternghats.indiabiodiversity.org'   
+		
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
+
+        ckeditor {
+            upload {
+				baseurl = "/newsletters"
+				basedir = "${speciesPortal.app.rootDir}/newsletters/"
+
+                image.browser = true
+                image.upload = true    
+                image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                image.denied = []
+            }
+        }
+		log4jConsoleLogLevel = Priority.DEBUG
+		log4j = {
+			appenders {
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.INFO
+			}
+			info	'species',
+					'speciespage',
+					'com.mchange.v2.resourcepool.BasicResourcePool' 
+			warn 	'grails.app',
+					'org.springframework.security.web'
+
+
+		}
+	}
+	kk {
+		servername = 'ibp.kk.strandls.com'
+		grails.serverURL = "http://${servername}/${appName}"
+		
+        speciesPortal {
+            app.rootDir = "/apps/biodiv"
+            data.rootDir = "${app.rootDir}/data"
+            names.parser.serverURL = "127.0.0.1"
+
+            resources {
+                rootDir = "${app.rootDir}/img"
+                serverURL = "http://${servername}/${appName}/img"
+            }
+            nameSearch.indexStore = "${app.rootDir}/data/names"
+            observations {
+                rootDir = "${app.rootDir}/observations"
+                serverURL = "http://${servername}/${appName}/observations"
+				//filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
+            }
+            userGroups {
+                rootDir = "${app.rootDir}/userGroups"
+                serverURL = "http://${servername}/${appName}/userGroups"
+            }
+            users {
+                rootDir = "${app.rootDir}/users"
+                serverURL = "http://${servername}/${appName}/users"
+            }
+
+            content{
+                rootDir = "${app.rootDir}/content"
+                serverURL = "http://${servername}/${appName}/content"
+            }	
+            maps {
+		        serverURL = "http://${servername}/${appName}/maps"
+            }
+
+            search.serverURL="http://${servername}:8080/solr"
+            grails {
+                mail {
+                    host = "127.0.0.1"
+                    port = 25
+                }
+            }
+        }
+
+        ibp.domain=servername
+        wgp.domain="thewesternghats.${servername}" 
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
