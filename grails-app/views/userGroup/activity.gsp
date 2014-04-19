@@ -19,7 +19,7 @@ width:715px;
 </head>
 <body>
 	<div class="observation span12 bodymarker">
-		<uGroup:showSubmenuTemplate model="['entityName':'Disucssions']"/>
+		<uGroup:showSubmenuTemplate model="['entityName':'Discussions']"/>
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<div class="userGroup-section">
 			<div>

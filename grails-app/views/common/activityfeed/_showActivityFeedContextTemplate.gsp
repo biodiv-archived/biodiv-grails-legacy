@@ -7,13 +7,9 @@
 <%@page import="content.eml.Document"%>
 
 <div class="activityFeedContext thumbnails" >
-	<%
-		def isCommentThread = (feedInstance.subRootHolderType == Comment.class.getCanonicalName() && feedInstance.rootHolderType == UserGroup.class.getCanonicalName()) 
-	%>
-	
-	<div class="feedParentContext thumbnail clearfix">
+		<div class="feedParentContext thumbnail clearfix">
 		<g:if test="${isCommentThread}">
-			<comment:showCommentWithSub model="['feedInstance':feedInstance.fetchMainCommentFeed()]"/>
+			<comment:showCommentWithSub model="['feedInstance':feedInstance]"/>
 		</g:if> 
 		<g:elseif test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName() || feedInstance.rootHolderType ==  Checklists.class.getCanonicalName() }" >
 			<%
@@ -57,7 +53,7 @@
 		</g:else>
 	</div>
 	<g:if test="${isCommentThread}">
-		<div class="feedSubParentContext ${feedInstance.fetchMainCommentFeed().subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">
+		<div class="feedSubParentContext ${feedInstance.subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">
 <%--		Comment thread--%>
 		</div>
 	</g:if>
