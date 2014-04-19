@@ -18,6 +18,10 @@
         font-weight:normal;
         color: black;
         background-color:rgba(98, 100, 39, 0.14);
+        background: transparent;
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#23626427,endColorstr=#23626427)"; /* IE8 */
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#23626427,endColorstr=#23626427);   /* IE6 & 7 */
+              zoom: 1;
     }
     #contentMenu > .nav-tabs > li > a {
        color: #16509E;
