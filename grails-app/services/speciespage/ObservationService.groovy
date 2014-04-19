@@ -22,6 +22,7 @@ import species.auth.SUser;
 import species.participation.Featured;
 import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
+import species.participation.Comment;
 import species.participation.Follow;
 import species.participation.Observation;
 import species.participation.Checklists;

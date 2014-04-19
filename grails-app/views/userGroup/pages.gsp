@@ -92,11 +92,11 @@
 			<%} else {%>
 				var pageURL = "/page";
 			<%}%>
-			
+console.log('page');			
 	        $('#pageTabs a').click(function (e) {
   				
   				var me = $(this);
-  				var contentID = e.target.hash; //get anchor
+  				var contentID = me.attr('href');//e.target.hash; //get anchor
   				if(contentID) {
 	  				e.preventDefault();
 	  				var History = window.History; 
