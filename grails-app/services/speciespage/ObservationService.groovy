@@ -1750,7 +1750,7 @@ class ObservationService extends AbstractObjectService {
 
             def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
             if(isCommentThread) {
-                templateMap['feedInstance'] = feedInstance.fetchMainCommentFeed(); 
+                templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
                 templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
             }
         }
