@@ -100,6 +100,15 @@
 								 	The species can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
 								</g:if>
 
+                                <g:if test="${domainObjectType == 'usergroup' && action=='Added a comment'}">
+                                    <b>Group</b> : ${domainObjectTitle}<br/>      
+                                    <b> By </b> : 
+                                    				<a href="${feedActorProfileUrl}"><img src="${feedInstance.author?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
+                                                    <a href="${feedActorProfileUrl}">${feed.author.name}<a/><br/>
+                                    <b>Subject</b> : ${feedInstance.subject?:'No Subject'}<br/>
+                                    <b>Message</b> : ${feedInstance.body} <br/>
+
+                                </g:if>
 								</p><!-- /Callout Panel -->
 						</div>
 				</g:if>

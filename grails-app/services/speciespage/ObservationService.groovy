@@ -1602,6 +1602,8 @@ class ObservationService extends AbstractObjectService {
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
                 mailSubject = "New comment in ${templateMap['domainObjectType']}"
                 templateMap['message'] = " added a comment to the page listed below."
+                println "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                println templateMap;
                 toUsers.addAll(getParticipants(obv))
                 break;
 
@@ -1744,6 +1746,12 @@ class ObservationService extends AbstractObjectService {
             templateMap["activity"] = activityFeedService.getContextInfo(feed, [webaddress:userGroupWebaddress])
             templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId))
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
+
+            def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
+            if(isCommentThread) {
+                templateMap['feedInstance'] = feedInstance.fetchMainCommentFeed(); 
+                templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+            }
         }
     }
 
