@@ -1,7 +1,8 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.groups.UserGroup"%>
 <html>
     <head>
-        <g:set var="title" value="Activity"/>
+        <g:set var="title" value="Discussions"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="activityfeed,comment"/>
         <style>
@@ -26,7 +27,8 @@
             </g:if>
             <uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
             <div class="userGroup-section">
-                <feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
+           
+                <feed:showFeedWithFilter model="[feedType:feedType, feedCategory:UserGroup.class.canonicalName,'feedOrder':'latestFirst']" />
             </div>
         </div>
 

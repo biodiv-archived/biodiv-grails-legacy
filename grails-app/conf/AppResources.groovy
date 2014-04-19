@@ -143,8 +143,12 @@ modules = {
         resource url:'https://api.filepicker.io/v1/filepicker_debug.js'
 	}
 
+    distinct_reco {
+        resource url:'/js/species/observations/distinctReco.js'
+    }
+
 	observations_list { 
-		dependsOn 'observations, list_utils, comment, activityfeed'
+		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
         resource url:'/js/species/observations/list.js'
 	}
@@ -191,7 +195,6 @@ modules = {
 		resource url:'/js/bootstrap-wysihtml5-0.0.2.min.js'		
 		resource url:'/js/wysihtml5.js'
         resource url:'/js/species/speciesPermission.js'
-        resource url:'/js/species/membership.js'
         //resource url:'http://malsup.github.com/jquery.form.js'
 	}
 	

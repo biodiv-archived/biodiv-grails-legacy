@@ -4,7 +4,7 @@
     if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString()){
         basePath = grailsApplication.config.speciesPortal.observations.serverURL
     }
-    else if(r.context.value() == Resource.ResourceContext.SPECIES.toString()){
+    else if(r.context.value() == Resource.ResourceContext.SPECIES.toString() || r.context.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
         basePath = grailsApplication.config.speciesPortal.resources.serverURL
     }
 %>

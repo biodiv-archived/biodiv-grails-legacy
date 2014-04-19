@@ -39,7 +39,7 @@ class NewsletterController {
 		if(params.webaddress||params.userGroup) { 
 			def userGroupInstance = (params.userGroup)?params.userGroup:UserGroup.findByWebaddress(params.webaddress);
 			params.userGroup = userGroupInstance;
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 				permitted = true
 			} else {
 				flash.message = "${message(code: 'default.not.permitted.message', args: ['add new', message(code: 'page.label', default: 'page'), ''])}"
@@ -71,7 +71,7 @@ class NewsletterController {
 		if(params.userGroup) {
 			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			params.userGroup = userGroupInstance;
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 				newsletterInstance = new Newsletter(params)
 				userGroupInstance.addToNewsletters(newsletterInstance);
 	
@@ -138,7 +138,7 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+				['userGroupInstance':newsletterInstance.userGroup, 'newsletterInstance': newsletterInstance]
 			}
 			else {
 				[newsletterInstance: newsletterInstance]
@@ -155,11 +155,11 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
 				} else {
 					flash.message = "${message(code: 'edit.denied.message')}"
-					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':newsletterInstance.userGroup, params:['newsletterId':newsletterInstance.id])
 				}
 			}
 			else if(SUserService.isAdmin(springSecurityService.currentUser)) {
@@ -193,7 +193,7 @@ class NewsletterController {
 			newsletterInstance.properties = validMap
 			if(params.userGroup) {
 				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 					userGroupInstance.addToNewsletters(newsletterInstance);
 					if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 						postProcessNewsletter(newsletterInstance);
@@ -234,7 +234,7 @@ class NewsletterController {
 		if (newsletterInstance) {
 			boolean permitted = false;
 			if(newsletterInstance.userGroup) {
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 					permitted = true;
 				} else {
 					flash.message = "${message(code: 'default.not.permitted.message', args: ['delete', message(code: 'page.label', default: 'page'), ''])}"

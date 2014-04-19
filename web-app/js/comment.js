@@ -84,6 +84,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     			}
     			if(data.clearForm){
     				$(postComp).children('textarea[name=commentBody]').val("");
+    				$(postComp).children('textarea[name=commentSubject]').val("");
     			}
         	}
     		return false;

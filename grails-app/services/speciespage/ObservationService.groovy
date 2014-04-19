@@ -33,6 +33,8 @@ import species.participation.Annotation
 import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
+import species.groups.UserGroupMemberRole;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 
 
 //import org.apache.lucene.document.DateField;
@@ -1658,11 +1660,12 @@ class ObservationService extends AbstractObjectService {
                 break
             
             case DIGEST_MAIL:
-                mailSubject = "Daily digest - IBP"
+                mailSubject = "Activity digest on " + otherParams["userGroup"].name
                 bodyView = "/emailtemplates/digest"
                 templateMap["digestContent"] = otherParams["digestContent"]
+                templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(SUser.get(3L))
+                toUsers.addAll(getParticipantsForDigest(otherParams["userGroup"]));
                 break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
@@ -1765,6 +1768,22 @@ class ObservationService extends AbstractObjectService {
         }
 		return participants;
 	}
+
+    private List getParticipantsForDigest(userGroup) {
+        List participants = [];
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup).collect {it.sUser};
+            result.each { user ->
+                if(user.sendDigest && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
+            participants << springSecurityService.currentUser;
+        }
+		return participants;
+	}
+
 	
 	private List getUserForEmail(observation){
 		if(!observation.instanceOf(UserGroup)){

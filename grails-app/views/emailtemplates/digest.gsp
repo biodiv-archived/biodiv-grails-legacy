@@ -19,7 +19,7 @@
                 <td class="w580" style="height: 10px; background-color: white;"></td>
             </tr>
             <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
-            <p>Here is the activity digest for the ${userGroup} on the India Biodiversity Portal</p>
+            <p>Here is the activity digest for the ${userGroup.name} group on the India Biodiversity Portal</p>
             <g:if test = "${digestContent.observations || digestContent.unidObvs}">
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
                 <h2>Observations</h2>
@@ -29,37 +29,37 @@
                     <h3>Recent</h3>
                     <table>
                         <tr align="left" style="background-color: #d4ece3">
-                            <g:each in="${obvIns}" var="observationInstance">
+                            <g:each in="${obvIns.size() < 5 ? obvIns : obvIns.subList(0, 5)}" var="observationInstance">
                             <g:set var="mainImage" value="${observationInstance.mainImage()}" />
                             <%
                             def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
                             def controller = observationInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = observationInstance.id
                             %>
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
                         </tr>
                     </table>
-                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="www.google.com" style="color:#2ba6cb;">View More</a></p>
+                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
                     </g:if>
                     <g:if test = "${digestContent.unidObvs}">
                     <g:set var="uniObvIns" value="${digestContent.unidObvs}"></g:set>
                     <h3>Unidentified</h3>
                     <table>
                         <tr align="left" style="background-color: #d4ece3">
-                            <g:each in="${uniObvIns}" var="uniObvInstance">
+                            <g:each in="${uniObvIns.size() < 5 ? uniObvIns : uniObvIns.subList(0, 5)}" var="uniObvInstance">
                             <g:set var="mainImage" value="${uniObvInstance.mainImage()}" />
                             <%
                             def imagePath = mainImage?mainImage.thumbnailUrl(null, !uniObvInstance.resource ? '.png' :null): null;
                             def controller = uniObvInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = uniObvInstance.id
                             %>
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
                         </tr>
                     </table>
                 
-                <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="www.google.com" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true, params:['speciesName':'Unknown'])}" style="color:#2ba6cb;">View More</a></p>
                 </g:if>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                     <h3>Latest Updated</h3>
                     <table>
                         <tr align="left">
-                            <g:each in="${spIns}" var="speciesInstance">
+                            <g:each in="${spIns.size() < 5 ? spIns : spIns.subList(0, 5)}" var="speciesInstance">
                             <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
                             <%
                             def imagePath = '';
@@ -84,12 +84,12 @@
                             imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;
                             def spId = speciesInstance.id
                             %>
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
                         </tr>
                     </table>
                 </div>
-                <p style="text-align:right; padding-right:5px; font-weight:bold;background-color:white;margin:0;"><a href="www.google.com" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right; padding-right:5px; font-weight:bold;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'species', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
             </div>
             </g:if>
             
@@ -101,15 +101,15 @@
                     <h3>New</h3>
                     <table>
                         <tr align="left">
-                            <g:each in="${userIns}" var="userInstance">
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
+                            <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
+                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
                                     <img src="${userInstance.profilePicture()}" title="${userInstance.name}" />
                             </a></td>
                             </g:each>
                         </tr>
                     </table>
                 </div>
-                <p style="text-align:right; padding-right:5px; font-weight:bold; color:#2ba6cb;background-color:white;margin:0;"><a href="www.google.com" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right; padding-right:5px; font-weight:bold; color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'SUser', action:'list','userGroup':userGroup, absolute:true, params:['sort':'dateCreated'])}" style="color:#2ba6cb;">View More</a></p>
             </div>
             </g:if>
 
@@ -124,12 +124,12 @@
                     <h3>Latest Updated</h3>
                     <table>
                         <tr align="left">
-                            <g:each in="${docIns}" var="documentInstance">
+                            <g:each in="${docIns.size() < 5 ? docIns : docIns.subList(0, 5)}" var="documentInstance">
                             <%
                             def docId = documentInstance.id
                             %>
                             <tr>
-                                <td class="w640" height="30" width="627" style="font-weight:bold;padding-left:5px;">${counter}. <a href="${uGroup.createLink(controller:'document', action:'show','id': docId, absolute:true)}" style="color:#2ba6cb;">${documentInstance.title}</a></td>
+                                <td class="w640" height="30" width="627" style="font-weight:bold;padding-left:5px;">${counter}. <a href="${uGroup.createLink(controller:'document', action:'show','id': docId, absolute:true,'userGroup':userGroup)}" style="color:#2ba6cb;">${documentInstance.title}</a></td>
                             </tr>
                             <g:if test="${documentInstance.notes != null}">
                             <tr> 
@@ -150,7 +150,7 @@
                         </tr>
                     </table>
                 </div>
-                <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="www.google.com" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'document', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
             </div>
             </g:if>
             <p>If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${userProfileUrl}"> your profile</a></p>

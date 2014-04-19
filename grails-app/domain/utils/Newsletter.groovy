@@ -21,4 +21,12 @@ class Newsletter {
 	static mappings = {
 		sort displayOrder:"desc"
 	}
+	
+	def boolean fetchIsHomePage(){
+		if(userGroup?.homePage){
+			return ("newsletter".equalsIgnoreCase(userGroup.homePage.tokenize('/').first().trim())) && (id == userGroup.homePage.tokenize('/').last().trim().toLong())
+		}
+		
+		return false
+	}
 }
