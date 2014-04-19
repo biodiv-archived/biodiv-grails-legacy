@@ -13,6 +13,7 @@
     padding-right: 0px;
     padding-left: 0px;
     resize: vertical;
+    border-radius:0px 0px 5px 5px;
  }
  
  .comment-subjectbox {
@@ -21,6 +22,7 @@
     padding-right: 0px;
     padding-left: 0px;
     resize: vertical;
+    border-radius:5px 5px 0px 0px;
  }
  
 .yj-thread-replies-container{
