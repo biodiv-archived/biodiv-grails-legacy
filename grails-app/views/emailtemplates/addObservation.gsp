@@ -104,8 +104,8 @@
                                    <b>Subject</b> : ${commentInstance.subject?:'No Subject'}<br/>
                                     <b>Message</b> : ${commentInstance.body} <br/>
                                 <b>Group</b> :
-                                <span style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
-							    <a href="${baseUrl}/group/${group.webaddress}" style="text-decoration: none; color: #222222;"> 
+                                <span style="height: 30px; width: 186px; position: relative; background-color: #D4ECE3;  margin:2px 6px; " >
+							    <a href="${baseUrl}/group/${group.webaddress}"> 
 								<img src="${group.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
 
 
