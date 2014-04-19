@@ -1752,6 +1752,7 @@ class ObservationService extends AbstractObjectService {
             if(isCommentThread) {
                 templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
                 templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
+                templateMap['commentInstance'] = activityFeedService.getDomainObject(feed.activityHolderType, feed.activityHolderId)
             }
         }
     }

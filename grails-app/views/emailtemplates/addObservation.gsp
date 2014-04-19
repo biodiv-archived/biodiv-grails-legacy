@@ -105,8 +105,8 @@
                                     <b> By </b> : 
                                     				<a href="${feedActorProfileUrl}"><img src="${feedInstance.author?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
                                                     <a href="${feedActorProfileUrl}">${feedInstance.author.name}<a/><br/>
-                                    <b>Subject</b> : ${feedInstance.subject?:'No Subject'}<br/>
-                                    <b>Message</b> : ${feedInstance.body} <br/>
+                                    <b>Subject</b> : ${commentInstance.subject?:'No Subject'}<br/>
+                                    <b>Message</b> : ${commentInstance.body} <br/>
 
                                 </g:if>
 								</p><!-- /Callout Panel -->
