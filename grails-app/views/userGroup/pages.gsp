@@ -92,7 +92,6 @@
 			<%} else {%>
 				var pageURL = "/page";
 			<%}%>
-console.log('page');			
 	        $('#pageTabs a').click(function (e) {
   				
   				var me = $(this);
