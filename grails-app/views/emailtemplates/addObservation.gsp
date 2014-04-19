@@ -101,7 +101,24 @@
 								</g:if>
 
                                 <g:if test="${domainObjectType == 'usergroup' && action=='Added a comment'}">
-                                    <b>Group</b> : ${domainObjectTitle}<br/>      
+                                <b>Group</b> :
+                                <span style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
+							    <a href="${baseUrl}/group/${group.webaddress}" style="text-decoration: none; color: #222222;"> 
+								<img src="${group.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
+
+
+									<g:if test="${group.name}"> 
+										<g:if test="${group.name != null && group.name.length() > 19}">
+											${group.name[0..17] + '...'} <br />
+										</g:if>
+										<g:else>
+											${group.name?:''} <br />
+										</g:else>
+	
+									</g:if>
+							    </a>   
+                            </span><br/>
+ <br/>      
                                     <b> By </b> : 
                                     				<a href="${feedActorProfileUrl}"><img src="${feedInstance.author?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
                                                     <a href="${feedActorProfileUrl}">${feedInstance.author.name}<a/><br/>

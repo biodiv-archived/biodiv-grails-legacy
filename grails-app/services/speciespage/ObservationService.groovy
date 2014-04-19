@@ -1745,14 +1745,16 @@ class ObservationService extends AbstractObjectService {
             templateMap["actorIconUrl"] = feed.author.profilePicture(ImageType.SMALL)
             templateMap["actorName"] = feed.author.name
             templateMap["activity"] = activityFeedService.getContextInfo(feed, [webaddress:userGroupWebaddress])
-            templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId))
+            def domainObject = activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId);
+            templateMap['domainObjectTitle'] = getTitle(domainObject);
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
 
             def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
             if(isCommentThread) {
                 templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
                 templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
-                templateMap['commentInstance'] = activityFeedService.getDomainObject(feed.activityHolderType, feed.activityHolderId)
+                templateMap['commentInstance'] = activityFeedService.getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
+                templateMap['group'] = domainObject;
             }
         }
     }
