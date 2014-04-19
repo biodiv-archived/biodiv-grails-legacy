@@ -13,10 +13,10 @@ class DigestJob {
     }
 
     def execute() {
-		def digestList = Digest.list()
+		/*def digestList = Digest.list()
         digestList.each{ dig ->
             digestService.sendDigest(dig)
-        }
+        }*/
     } 
 	
 }
