@@ -1,19 +1,15 @@
 export JAVA_HOME=/apps/jdk1.7.0_51
 export JRE_HOME=/apps/jdk1.7.0_51/jre
-
 export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/apps/biodiv/solr"
-
+export PGDATA=/apps/biodiv/db
+export GRAILS_HOME=/apps/installers/grails-1.3.7
+export PATH=${JAVA_HOME}/bin:/apps/postgresql-9.3.2/bin:${GRAILS_HOME}/bin:/apps/apache-tomcat-7.0.52/bin:/apps/nginx-1.4.7/sbin:/apps/ruby/bin:${PATH}
+export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M"
 export CATALINA_OPTS="-Xms2048M -Xmx16384M"
 #export CATALINA_BASE="/apps/apache-tomcat-7.0.52"
 #export LOGGING_CONFIG="${CATALINA_BASE}/lib/log4j.properties"
 #export LOGGING_MANAGER=
-
-export PGDATA=/apps/biodiv/db
-
-export GRAILS_HOME=/apps/installers/grails-1.3.7
-export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M"
-
-export PATH=${JAVA_HOME}/bin:/apps/postgresql-9.3.2/bin:${GRAILS_HOME}/bin:/apps/apache-tomcat-7.0.52/bin:/apps/nginx-1.4.7/sbin:/apps/ruby/bin:${PATH}
+export GEOSERVER_DATA_DIR=/apps/biodiv/geoserver_data_dir
 
 export BIODIV_CONFIG_LOCATION=/apps/biodiv/additional-config.groovy
 
