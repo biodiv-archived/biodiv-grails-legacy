@@ -2244,6 +2244,7 @@ line-height: 11px;
 .feedParentContext {
 	background-color: white;
 	display: table;
+    width:100%;
 }
 
 div.rating-cancel {
