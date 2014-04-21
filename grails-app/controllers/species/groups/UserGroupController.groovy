@@ -1159,13 +1159,13 @@ class UserGroupController {
 		   } 
 	   }
 	   
-	   SUser.withTransaction(){
+	   /*SUser.withTransaction(){
 		   oldUsers.each{ user ->
 			   if(postObs){
 				   postObvToGroup(ug, user)
 			   }
 		   }
-	   }
+	   }*/
 	   
 	   render "== done"
    }

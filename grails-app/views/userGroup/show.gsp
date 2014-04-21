@@ -5,7 +5,7 @@
 <html>
 <head>
 <g:set var="title" value="${userGroupInstance.name}"/>
-<g:render template="/common/titleTemplate" model="['title':title, description:userGroupInstance.description.trim()]"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="userGroups_show,userGroups_list,comment" />
 <style>
