@@ -2,6 +2,7 @@
 <%@page import="species.utils.ImageType"%>
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <g:set var="fbAppId"/>
+
 <%
 if(domain.equals(grailsApplication.config.wgp.domain)) {
     fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
@@ -9,9 +10,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
     fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 }
 
-canonicalUrl = canonicalUrl ?: uGroup.createLink('controller':params.controller, 'action':params.action, userGroup:userGroupInstance,absolute:true)
-
-if(params.webaddress && userGroupInstance && userGroupInstance.id) {
+canonicalUrl = canonicalUrl ?: uGroup.createLink('controller':params.controller, 'action':params.action, userGroup:userGroupInstance, absolute:true)
+if(userGroupInstance && userGroupInstance.id) {
     imagePath = imagePath?:userGroupInstance.mainImage()?.fileName
     favIconPath = favIconPath?:userGroupInstance.icon(ImageType.SMALL)?.fileName;
     description = description?: userGroupInstance.description.replaceAll(/<.*?>/, '').trim()
