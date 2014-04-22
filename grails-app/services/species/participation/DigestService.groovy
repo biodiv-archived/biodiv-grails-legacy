@@ -44,11 +44,20 @@ class DigestService {
         def spList = []
         def docList = []
         def userList = []
-        if(digest.threshold >= activityFeedService.getActivityFeeds(params).size()){
+        def feedsList = activityFeedService.getActivityFeeds(params)
+        def feedCount = 0
+        feedsList.each{
+            switch(it.rootHolderType){
+                case [Observation.class.getCanonicalName(),Checklists.class.getCanonicalName(), Species.class.getCanonicalName(), Document.class.getCanonicalName(),SUser.class.getCanonicalName() ]:   
+                    feedCount++
+                break
+            } 
+        }
+
+        if(digest.threshold >= feedCount){
             res = null
         }
         else{
-            def feedsList = activityFeedService.getActivityFeeds(params)
             feedsList.each{
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():
