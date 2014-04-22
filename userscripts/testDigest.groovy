@@ -55,7 +55,7 @@ def sendDigestMail(){
     println "========== DONE ============="
 }
 
-//sendDigestMail()
+sendDigestMail()
 
 
 //creating a new digest instance

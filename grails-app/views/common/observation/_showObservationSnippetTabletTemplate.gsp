@@ -1,9 +1,9 @@
 <%@page import="species.Resource.ResourceType"%>
-<g:set var="mainImage" value="${observationInstance.mainImage()}" />
+<g:set var="mainImage" value="${observationInstance?.mainImage()}" />
 <%
 def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
-def obvId = observationInstance.id
+def obvId = observationInstance?.id
 %>
 
 <g:if test="${observationInstance}">
@@ -27,8 +27,8 @@ def obvId = observationInstance.id
 					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 					title="You can contribute!!!" />
 			</g:else>
-                        <g:if test="${observationInstance.isChecklist}">
-                        <div class="checklistCount">${observationInstance.speciesCount}</div>
+                        <g:if test="${observationInstance?.isChecklist}">
+                        <div class="checklistCount">${observationInstance?.speciesCount}</div>
                         </g:if>
 		</g:link>
                 <!--div class="mouseover" style="padding-left:0px;">

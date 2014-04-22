@@ -815,9 +815,13 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def snippet = {
-		def observationInstance = Observation.get(params.id)
-
-		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
+        def observationInstance
+        if(params.id){
+		    observationInstance = Observation.get(params.id)
+        }
+        if(observationInstance){
+		    render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
+        }
 	}
 
 	
