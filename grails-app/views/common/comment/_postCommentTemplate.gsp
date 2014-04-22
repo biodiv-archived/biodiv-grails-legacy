@@ -5,14 +5,19 @@
 
 	<form class="form-horizontal" onSubmit='return postComment(this, "${uGroup.createLink(controller:'comment', action:'addComment')}")'>
 		<%
+			boolean isGroupDisccusionThread = params.webaddress && (params.controller == 'activityFeed' || params.action == 'activity')
 			def commentPlaceHolder = "Write comment"
 			def commentHolderClass = ActivityFeedService.getType(commentHolder)
 			if(commentHolderClass == Observation.class.getName())
 				commentPlaceHolder += " on observation"
 			if(commentHolderClass == Recommendation.class.getName())
 				commentPlaceHolder += " on species call"
-						
+			if(isGroupDisccusionThread)
+				commentPlaceHolder = "Message"
 		%>
+		<g:if test="${isGroupDisccusionThread}">
+			<textarea name="commentSubject" class="comment-subjectbox" placeholder="Subject"></textarea>
+		</g:if>
 		<textarea name="commentBody" class="comment-textbox" placeholder="${commentPlaceHolder}" ></textarea>
 		<span  style="color:#B84A48; display:none;">Please write comment</span>
 		<input type="hidden" name='commentHolderId' value="${commentHolder.id}" />
