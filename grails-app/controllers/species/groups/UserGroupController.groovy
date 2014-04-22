@@ -1131,7 +1131,11 @@ class UserGroupController {
    /////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////To create and add user to a specific group (i.e BirdRace)////////////////
    /////////////////////////////////////////////////////////////////////////////////////////////
-   
+  
+   /**
+   * add member can only be done when a user who has 
+   * BasePermission.ADMINISTRATOR i.e., founder runs this code
+   */
    @Secured(['ROLE_USER'])
    def addUserToGroup = {
 	   log.debug params
@@ -1159,13 +1163,13 @@ class UserGroupController {
 		   } 
 	   }
 	   
-	   /*SUser.withTransaction(){
+	   SUser.withTransaction(){
 		   oldUsers.each{ user ->
 			   if(postObs){
 				   postObvToGroup(ug, user)
 			   }
 		   }
-	   }*/
+	   }
 	   
 	   render "== done"
    }

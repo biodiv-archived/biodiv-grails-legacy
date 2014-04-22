@@ -1031,6 +1031,7 @@ class ObservationService extends AbstractObjectService {
             log.debug "invalid source type ${source}"
         }
         def currentUser = springSecurityService.currentUser?:""
+        def currentUserProfileLink = generateLink("SUser", "show", ["id": currentUser.id], null);
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
         def conf = SpringSecurityUtils.securityConfig
         def staticMessage = conf.ui.askIdentification.staticMessage
@@ -1038,6 +1039,7 @@ class ObservationService extends AbstractObjectService {
             staticMessage = evaluate(staticMessage, templateMap)
         } 
 
+        templateMap["currentUserProfileLink"] = currentUserProfileLink;
         templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
         templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
         templateMap["userMessage"] = m.userMessage?: ""

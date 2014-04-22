@@ -135,6 +135,8 @@ class SUserController extends UserController {
             result.put('obvData', chartService.getUserStats(SUserInstance));
 //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
 //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
+            result['currentUser'] = springSecurityService.currentUser;
+            result['currentUserProfile'] = observationService. generateLink("SUser", "show", ["id": result['currentUser'].id], request);
 			return result
 		}
 	}

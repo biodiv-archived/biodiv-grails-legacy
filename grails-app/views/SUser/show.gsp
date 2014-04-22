@@ -116,6 +116,13 @@
                                     <li><a href="#groups"><i class="icon-group"></i>Groups</a></li>
                                     <li class="divider-vertical"></li>
                                     <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
+                                    <g:if test="${user.allowIdentifactionMail}">
+                                        <li style="padding:5px 0px">
+                                        <% String staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>' %>
+                            			    <obv:identificationByEmail
+                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:'Contact Me', titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+                                        </li>
+                                    </g:if>
                                 </ul>
                             </div>
                         </div>
