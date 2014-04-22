@@ -1665,8 +1665,8 @@ class ObservationService extends AbstractObjectService {
                 templateMap["digestContent"] = otherParams["digestContent"]
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipantsForDigest(otherParams["userGroup"]));
-                //toUsers.addAll(SUser.get(4136L));
+                //toUsers.addAll(getParticipantsForDigest(otherParams["userGroup"]));
+                toUsers.addAll(SUser.get(4136L));
                 break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
@@ -1689,7 +1689,7 @@ class ObservationService extends AbstractObjectService {
                         templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
                     }
                     if(notificationType == DIGEST_MAIL){
-                        templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id])
+                        templateMap['userID'] = toUser.id
                     }
                     log.debug "Sending email to ${toUser}"
                     try{
@@ -1752,8 +1752,8 @@ class ObservationService extends AbstractObjectService {
     }
 
     public String generateLink( String controller, String action, linkParams, request=null) {
-        request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-        userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+	request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+	userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
         controller:controller, action: action,
         params: linkParams)
     }

@@ -153,7 +153,7 @@
                 <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'document', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
             </div>
             </g:if>
-            <p>If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${userProfileUrl}"> your profile</a></p>
+            <p>If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${uGroup.createLink(controller:'SUser', action:'show','id':userID,'userGroup':userGroup, absolute:true)}"> your profile</a></p>
         </table>
     </body>
-</html>
+	</html>
