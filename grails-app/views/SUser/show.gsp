@@ -118,7 +118,11 @@
                                     <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
                                     <g:if test="${user.allowIdentifactionMail}">
                                         <li style="padding:5px 0px">
-                                        <% String staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>' %>
+                                        <% String staticMessage = '';
+                                        if(currentUser) {
+                                            staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
+                                        }
+                                        %>
                             			    <obv:identificationByEmail
                                             model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:'Contact Me', titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
                                         </li>
