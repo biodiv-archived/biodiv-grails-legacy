@@ -221,8 +221,9 @@ class SUser {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-		+ ((email == null) ? 0 : email.hashCode());
+		result = prime * result	+ ((email == null) ? 0 : email.hashCode());
+		result = prime * result	+ ((username == null) ? 0 : username.hashCode());
+		result = prime * result	+ ((name == null) ? 0 : name.hashCode());
 
 		return result;
 	}
@@ -245,6 +246,8 @@ class SUser {
 				return false;
 		} else if (!email.equals(other.email))
 			return false;
+        if(username != other.username) return false;
+        if(name != other.name) return false;
 
 		return true;
 	}

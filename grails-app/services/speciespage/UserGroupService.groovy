@@ -787,15 +787,16 @@ class UserGroupService {
 		}
 	}
 
-
 	@PreAuthorize("hasPermission(#userGroupInstance, write)")
 	void sendMemberInvitation(userGroupInstance, members, domain, message=null) {
 		//find if the invited members are already part of the group and ignore sending invitation to them
 		//def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
+        println groupMembers
 		def commons = members.intersect(groupMembers);
+        println commons
 		members.removeAll(commons);
-
+println members
 		log.debug "Sending invitation to ${members}"
 
 		String usernameFieldName = 'name'
