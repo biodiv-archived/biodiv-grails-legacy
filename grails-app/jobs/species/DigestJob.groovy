@@ -9,7 +9,7 @@ class DigestJob {
 	def digestService
 	
     static triggers = {
-      cron name:'cronTrigger', startDelay:600l, cronExpression: '0 0 7 ? * *'
+      cron name:'cronTrigger', startDelay:600l, cronExpression: '0 0 5 ? * *'
     }
 
     def execute() {

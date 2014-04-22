@@ -3,6 +3,7 @@ import species.*;
 import content.eml.Document;
 import species.groups.UserGroup;
 import species.auth.SUser;
+import java.lang.*;
 
 class DigestService {
     
@@ -20,8 +21,25 @@ class DigestService {
             otherParams['userGroup'] = digest.userGroup
             log.debug "======== DIGEST CONTENT ========= " + otherParams['digestContent']
             def sp = new Species()
-            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+            def max = 50
+            def offset = 0
+            def emailFlag = true
             digest.lastSent = new Date()
+            //def emailList = [SUser.get(4136L)]
+            while(emailFlag){
+                otherParams['usersEmailList'] = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+            //emailList.each{ 
+                //println "======CALLING SEND MAIL========="
+                //otherParams['usersEmailList'] = [it]      
+                if(otherParams['usersEmailList'].size() != 0 ){
+                    observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+                    offset = offset + max
+                    Thread.sleep(1800000L);
+                }
+                else{
+                    emailFlag = false
+                }
+            }
             if(digest.save(flush:true)){
                 digest.errors.allErrors.each { log.error it }
             }

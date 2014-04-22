@@ -1665,8 +1665,8 @@ class ObservationService extends AbstractObjectService {
                 templateMap["digestContent"] = otherParams["digestContent"]
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                //toUsers.addAll(getParticipantsForDigest(otherParams["userGroup"]));
-                toUsers.addAll(SUser.get(4136L));
+                toUsers.addAll(otherParams["usersEmailList"]);
+                //toUsers.addAll(SUser.get(4136L));
                 break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
@@ -1773,10 +1773,10 @@ class ObservationService extends AbstractObjectService {
 		return participants;
 	}
 
-    private List getParticipantsForDigest(userGroup) {
+    def List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-            def result = UserGroupMemberRole.findAllByUserGroup(userGroup).collect {it.sUser};
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
             result.each { user ->
                 if(user.sendDigest && !participants.contains(user)){
                     participants << user

@@ -19,10 +19,10 @@
                 <td class="w580" style="height: 10px; background-color: white;"></td>
             </tr>
             <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
-            <p>Here is the activity digest for the ${userGroup.name} group on the India Biodiversity Portal</p>
+            <p>Here is the activity digest for the <a href="${uGroup.createLink(controller:'userGroup', action:'show','userGroup':userGroup, absolute:true)}">${userGroup.name}</a> group on the India Biodiversity Portal</p>
             <g:if test = "${digestContent.observations || digestContent.unidObvs}">
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Observations</h2>
+                <h2>Observations (${digestContent.observations.size() + digestContent.unidObvs.size()})</h2>
                 <div style="background-color: #d4ece3;">
                     <g:if test = "${digestContent.observations }">
                     <g:set var="obvIns" value="${digestContent.observations}"></g:set>
@@ -68,7 +68,7 @@
             <g:if test = "${digestContent.species}">
             <g:set var="spIns" value="${digestContent.species}"></g:set>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Species</h2>
+                <h2>Species (${digestContent.species.size()})</h2>
                 <div style="background-color: #d4ece3;">
                     <h3>Latest Updated</h3>
                     <table>
@@ -96,7 +96,7 @@
             <g:if test = "${digestContent.users}">
             <g:set var="userIns" value="${digestContent.users}"></g:set>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Users</h2>
+                <h2>Users (${digestContent.users.size()})</h2>
                 <div style="background-color: #d4ece3;">
                     <h3>New</h3>
                     <table>
@@ -119,7 +119,7 @@
             def counter = 1
             %>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Documents</h2>
+                <h2>Documents (${digestContent.documents.size()})</h2>
                 <div style="background-color: #d4ece3;">
                     <h3>Latest Updated</h3>
                     <table>
