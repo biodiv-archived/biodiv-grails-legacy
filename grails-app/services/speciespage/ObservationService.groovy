@@ -1031,7 +1031,7 @@ class ObservationService extends AbstractObjectService {
             log.debug "invalid source type ${source}"
         }
         def currentUser = springSecurityService.currentUser?:""
-        def currentUserProfileLink = generateLink("SUser", "show", ["id": currentUser.id], null);
+        def currentUserProfileLink = generateLink("SUser", "show", ["id": currentUser?.id], null);
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
         def conf = SpringSecurityUtils.securityConfig
         def staticMessage = conf.ui.askIdentification.staticMessage
