@@ -1666,6 +1666,7 @@ class ObservationService extends AbstractObjectService {
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipantsForDigest(otherParams["userGroup"]));
+                //toUsers.addAll(SUser.get(4136L));
                 break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
@@ -1686,6 +1687,9 @@ class ObservationService extends AbstractObjectService {
                     templateMap['tousername'] = toUser.username;
                     if(request){
                         templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+                    }
+                    if(notificationType == DIGEST_MAIL){
+                        templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id])
                     }
                     log.debug "Sending email to ${toUser}"
                     try{
@@ -1771,7 +1775,7 @@ class ObservationService extends AbstractObjectService {
 
     private List getParticipantsForDigest(userGroup) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup).collect {it.sUser};
             result.each { user ->
                 if(user.sendDigest && !participants.contains(user)){
