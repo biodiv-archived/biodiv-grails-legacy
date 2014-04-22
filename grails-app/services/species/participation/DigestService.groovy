@@ -44,7 +44,7 @@ class DigestService {
         def spList = []
         def docList = []
         def userList = []
-        if(digest.threshold > activityFeedService.getActivityFeeds(params).size()){
+        if(digest.threshold >= activityFeedService.getActivityFeeds(params).size()){
             res = null
         }
         else{
