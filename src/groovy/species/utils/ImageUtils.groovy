@@ -188,7 +188,8 @@ class ImageUtils {
 		try {
 			mimeType = Magic.getMagicMatch(inImg, false).getMimeType();
 		} catch (Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
+            log.error "MIME TYPE NOT FOUND so making it as image/jpg"
             mimeType = "image/jpg";
 		
         } 
