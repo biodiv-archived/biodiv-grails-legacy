@@ -1079,7 +1079,7 @@ grails.plugins.springsecurity.ui.askIdentification.emailSubject = 'Please identi
 grails.plugins.springsecurity.ui.askIdentification.staticMessage = '''
 The user $currentUser has shared this $activitySource from $domain with you.'''
 grails.plugins.springsecurity.ui.askIdentification.emailBody = '''
-Message from <a href="$currentUserProfileLink">$currentUser</a> on $domain <% activitySource ? 'about <a href="$activitySourceUrl">$activitySource</a>':''%>.
+Message from <a href="$currentUserProfileLink">$currentUser</a> on $domain <% print activitySource != null ? 'about <a href="'+activitySourceUrl+'">'+activitySource+'</a>':''%>.
 <br/>
 $userMessage
 <br/>

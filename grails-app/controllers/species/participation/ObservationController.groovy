@@ -933,7 +933,7 @@ class ObservationController extends AbstractObjectController {
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			def conf = SpringSecurityUtils.securityConfig
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
@@ -941,7 +941,7 @@ class ObservationController extends AbstractObjectController {
 				try {
 					mailService.sendMail {
 						to entry.getKey()
-	                    			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+	                    bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
 						from grailsApplication.config.grails.mail.default.from
 						replyTo currentUserMailId
