@@ -6,20 +6,20 @@ import species.auth.SUser;
 import java.lang.*;
 
 class DigestService {
-    
+
     def activityFeedService;
     def observationService;
 
     static transactional = true
-    
-    def sendDigestWrapper(Digest digest){
+
+    def sendDigestWrapper(Digest digest, setTime=true){
         def max = 50
         def offset = 0
         def emailFlag = true
         while(emailFlag){
             def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
             if(usersEmailList.size() != 0){
-                sendDigest(digest, usersEmailList)
+                sendDigest(digest, usersEmailList, setTime)
                 offset = offset + max
                 Thread.sleep(900000L);
             }
@@ -29,7 +29,7 @@ class DigestService {
         }
     }
 
-    def sendDigest(Digest digest, usersEmailList){
+    def sendDigest(Digest digest, usersEmailList, setTime){
         def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
@@ -38,14 +38,18 @@ class DigestService {
             otherParams['userGroup'] = digest.userGroup
             log.debug "DIGEST CONTENT " + otherParams['digestContent']
             def sp = new Species()
-            digest.lastSent = new Date()
+            if(setTime){
+                digest.lastSent = new Date()
+            }
             otherParams['usersEmailList'] = usersEmailList  
             observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+            if(digest.save(flush:true)){
+                digest.errors.allErrors.each { log.error it }
+            }
+            log.debug " MAIL SENT and Digest Last sent time updated "
+        }else{
+            println "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
         }
-        if(digest.save(flush:true)){
-            digest.errors.allErrors.each { log.error it }
-        }
-        log.debug " MAIL SENT and Digest Last sent time updated "
     }
 
     private def fetchDigestContent(Digest digest){
@@ -68,7 +72,7 @@ class DigestService {
         feedsList.each{
             switch(it.rootHolderType){
                 case [Observation.class.getCanonicalName(),Checklists.class.getCanonicalName(), Species.class.getCanonicalName(), Document.class.getCanonicalName(),SUser.class.getCanonicalName() ]:   
-                    feedCount++
+                feedCount++
                 break
             } 
         }
@@ -80,34 +84,34 @@ class DigestService {
             feedsList.each{
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():
-                        def obv = Observation.get(it.rootHolderId)
-                        if(obv.maxVotedReco){
-                            obvList.add(obv)
-                        }
-                        else{
-                            unidObvList.add(obv)
-                        }
+                    def obv = Observation.get(it.rootHolderId)
+                    if(obv.maxVotedReco){
+                        obvList.add(obv)
+                    }
+                    else{
+                        unidObvList.add(obv)
+                    }
                     break
-                    
+
                     case Checklists.class.getCanonicalName():
-                        def chk = Checklists.get(it.rootHolderId)
-                        obvList.add(chk)
+                    def chk = Checklists.get(it.rootHolderId)
+                    obvList.add(chk)
                     break
 
 
                     case Species.class.getCanonicalName():
-                        def sp = Species.get(it.rootHolderId)
-                        spList.add(sp)
+                    def sp = Species.get(it.rootHolderId)
+                    spList.add(sp)
                     break
-                    
+
                     case Document.class.getCanonicalName():
-                        def doc = Document.get(it.rootHolderId)
-                        docList.add(doc)
+                    def doc = Document.get(it.rootHolderId)
+                    docList.add(doc)
                     break
 
                     case SUser.class.getCanonicalName():
-                        def user = SUser.get(it.rootHolderId)
-                        userList.add(user)
+                    def user = SUser.get(it.rootHolderId)
+                    userList.add(user)
                     break
                 } 
             }

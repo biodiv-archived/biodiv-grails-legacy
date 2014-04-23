@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.grails.taggable.*
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 
+import species.DigestJob;
 import species.auth.Role;
+import species.participation.Digest;
 import species.auth.SUser;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
@@ -1297,12 +1299,28 @@ class UserGroupController {
    }
   
     @Secured(['ROLE_ADMIN'])
-    def sendDigest = {
+    def sendSampleDigest = {
         println "=====STARTING SENDING SAMPLE EMAIL======"
         def digest = Digest.get(1L)
-        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4537L)]
-        digestService.sendDigest(digest, usersEmailList);
+        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4136L)]
+        println "==USERSMAIL LIST========= "  + usersEmailList
+        def setTime = params.setTime?params.setTime.toBoolean():false
+        println "=====SET TIME ===== " + setTime
+        digestService.sendDigest(digest, usersEmailList, setTime);
         println "==========SAMPLE EMAILS SENT============"
+    }
+    
+    @Secured(['ROLE_ADMIN'])
+    def sendDigest = {
+        println "=====STARTING SENDING DIGEST MAIL TO ALL TREES INDIA MEMBERS======"
+        /*
+        def digest = Digest.get(1L)
+        def setTime = params.setTime?params.setTime.toBoolean():true
+        digestService.sendDigestWrapper(digest, setTime);
+        */
+        def digJob = new DigestJob()
+        digJob.execute()
+        println "==========ALL DIGEST EMAILS SENT============"
     }
 
 }
