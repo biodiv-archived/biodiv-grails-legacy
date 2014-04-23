@@ -792,11 +792,8 @@ class UserGroupService {
 		//find if the invited members are already part of the group and ignore sending invitation to them
 		//def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
-        println groupMembers
 		def commons = members.intersect(groupMembers);
-        println commons
 		members.removeAll(commons);
-println members
 		log.debug "Sending invitation to ${members}"
 
 		String usernameFieldName = 'name'
@@ -1195,7 +1192,6 @@ println members
 			}
 		}
 		else {
-			println "================== sving   " + bean
 			if(!bean.save()){
 				bean.errors.allErrors.each { println  it }
 			}else{
@@ -1509,7 +1505,6 @@ println members
 					log.debug "User is author or obv is not featured in any group " + currUser
 				}
 			}
-			println "new obv  " + newObvs
 			return newObvs
 		}
 	}
