@@ -1322,8 +1322,7 @@ class UserGroupController {
         def setTime = params.setTime?params.setTime.toBoolean():true
         digestService.sendDigestWrapper(digest, setTime);
         */
-        def digJob = new DigestJob()
-        digJob.action()
+        digestService.sendDigestAction()
         println "==========ALL DIGEST EMAILS SENT============"
     }
 

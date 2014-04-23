@@ -14,14 +14,27 @@ class DigestService {
     public static final MAX_DIGEST_OBJECTS = 5
     static transactional = true
 
+    def sendDigestAction() {
+        def digestList = Digest.list()
+        def setTime = true
+        digestList.each{ dig ->
+            sendDigestWrapper(dig, setTime)
+        }
+
+    }
+
     def sendDigestWrapper(Digest digest, setTime=true){
         def max = 50
         def offset = 0
+        Date lastSent;
+        if(setTime){
+            lastSent = new Date()
+        }
         def emailFlag = true
         while(emailFlag){
             def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
             if(usersEmailList.size() != 0){
-                sendDigest(digest, usersEmailList, setTime)
+                sendDigest(digest, usersEmailList, false)
                 offset = offset + max
                 Thread.sleep(900000L);
             }
@@ -29,6 +42,12 @@ class DigestService {
                 emailFlag = false
             }
         }
+        if(setTime) {
+            digest.lastSent = lastSent;
+            if(!digest.save(flush:true))
+                digest.errors.allErrors.each { log.error it }
+        }
+
     }
 
     def sendDigest(Digest digest, usersEmailList, setTime){
@@ -39,18 +58,23 @@ class DigestService {
             otherParams['digestContent'] = digestContent
             otherParams['userGroup'] = digest.userGroup
             log.debug "DIGEST CONTENT " + otherParams['digestContent']
-            def sp = new Species()
+            def sp = new Species() 
             if(setTime){
                 digest.lastSent = new Date()
             }
+
             otherParams['usersEmailList'] = usersEmailList  
+            println "============================== Sending email" 
+            println usersEmailList
             observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
-            if(digest.save(flush:true)){
-                digest.errors.allErrors.each { log.error it }
+            
+            if(setTime) {
+                if(!digest.save(flush:true))
+                    digest.errors.allErrors.each { log.error it }
             }
             log.debug " MAIL SENT and Digest Last sent time updated "
         }else{
-            println "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
+            log.error "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
         }
     }
 
@@ -59,15 +83,14 @@ class DigestService {
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
         params.refTime = ""+digest.lastSent.getTime()
-        params.timeLine = "newer"
-        params.feedOrder = "latestFirst"
-        params.feedType = "GroupSpecific"
+        params.timeLine = ActivityFeedService.NEWER
+        params.feedOrder = ActivityFeedService.LATEST_FIRST
+        params.feedType = ActivityFeedService.GROUP_SPECIFIC
 
         def res = [:]
         def obvList = [], unidObvList = [], spList = [], docList = [], userList = [];
         boolean obvFlag = false, unidObvFlag = false, spFlag = false, docFlag = false, userFlag = false;
         //HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
-
         def feedsList = activityFeedService.getActivityFeeds(params)
         def feedCount = 0
         feedsList.each{
@@ -162,8 +185,10 @@ class DigestService {
                     break
                 } 
                 
-                if(obvFlag && unidObvFlag && spFlag && docFlag && userFlag)
+                if(obvFlag && unidObvFlag && spFlag && docFlag && userFlag){
                     return;
+                }
+
             }
 
             /*def obvListCount = obvIds.size(), unidObvListCount = 0;
