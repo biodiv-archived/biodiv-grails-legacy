@@ -95,10 +95,9 @@ class DigestService {
                     //UNIDENTIFIED OBV LIST
                     if (unidObvList.size() < MAX_DIGEST_OBJECTS) {
                         def obv = Observation.get(it.rootHolderId)
-                        if(obv.maxVotedReco){
+                        if(!obv.maxVotedReco){
                             unidObvList.add(obv)
                         }
-
                     }
                     break
 
