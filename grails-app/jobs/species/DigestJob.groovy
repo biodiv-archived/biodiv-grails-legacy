@@ -13,10 +13,12 @@ class DigestJob {
     }
 
     def execute() {
-		def digestList = Digest.list()
+		/*
+        def digestList = Digest.list()
         def setTime = true
         digestList.each{ dig ->
             digestService.sendDigestWrapper(dig, setTime)
         }
+        */
     } 
 }
