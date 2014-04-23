@@ -3,6 +3,7 @@ import species.*;
 import content.eml.Document;
 import species.groups.UserGroup;
 import species.auth.SUser;
+import java.lang.*;
 
 class DigestService {
     
@@ -11,22 +12,40 @@ class DigestService {
 
     static transactional = true
     
-    def sendDigest(Digest digest){
+    def sendDigestWrapper(Digest digest){
+        def max = 50
+        def offset = 0
+        def emailFlag = true
+        while(emailFlag){
+            def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+            if(usersEmailList.size() != 0){
+                sendDigest(digest, usersEmailList)
+                offset = offset + max
+                Thread.sleep(900000L);
+            }
+            else{
+                emailFlag = false
+            }
+        }
+    }
+
+    def sendDigest(Digest digest, usersEmailList){
         def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
             def otherParams = [:]
             otherParams['digestContent'] = digestContent
             otherParams['userGroup'] = digest.userGroup
-            log.debug "======== DIGEST CONTENT ========= " + otherParams['digestContent']
+            log.debug "DIGEST CONTENT " + otherParams['digestContent']
             def sp = new Species()
-            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
             digest.lastSent = new Date()
-            if(digest.save(flush:true)){
-                digest.errors.allErrors.each { log.error it }
-            }
-            log.debug " MAIL SENT and Digest Last sent time updated "
+            otherParams['usersEmailList'] = usersEmailList  
+            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
         }
+        if(digest.save(flush:true)){
+            digest.errors.allErrors.each { log.error it }
+        }
+        log.debug " MAIL SENT and Digest Last sent time updated "
     }
 
     private def fetchDigestContent(Digest digest){
@@ -44,11 +63,20 @@ class DigestService {
         def spList = []
         def docList = []
         def userList = []
-        if(digest.threshold > activityFeedService.getActivityFeeds(params).size()){
+        def feedsList = activityFeedService.getActivityFeeds(params)
+        def feedCount = 0
+        feedsList.each{
+            switch(it.rootHolderType){
+                case [Observation.class.getCanonicalName(),Checklists.class.getCanonicalName(), Species.class.getCanonicalName(), Document.class.getCanonicalName(),SUser.class.getCanonicalName() ]:   
+                    feedCount++
+                break
+            } 
+        }
+
+        if(digest.threshold >= feedCount){
             res = null
         }
         else{
-            def feedsList = activityFeedService.getActivityFeeds(params)
             feedsList.each{
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():

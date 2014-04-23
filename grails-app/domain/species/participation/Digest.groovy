@@ -5,7 +5,7 @@ class Digest {
 
     UserGroup userGroup
     Date lastSent
-    int threshold = -1
+    int threshold = 0
     boolean forObv
     boolean forSp
     boolean forDoc

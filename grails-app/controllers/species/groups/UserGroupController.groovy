@@ -33,6 +33,7 @@ class UserGroupController {
 	def emailConfirmationService;
 	def namesIndexerService;
 	def activityFeedService;
+    def digestService;
 	
 	static allowedMethods = [save: "POST", update: "POST"]
 
@@ -786,6 +787,7 @@ class UserGroupController {
 		flash.error = 'Your presence is important to us. Cannot let you leave at present.'
 		render (['msg':'Your presence is important to us. Cannot let you leave at present.', 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
 	}
+   
 
 	def about = {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
@@ -1297,7 +1299,16 @@ class UserGroupController {
 	   }
 	   return [oldUsers, newUsers]
    }
-      
+  
+    @Secured(['ROLE_ADMIN'])
+    def sendDigest = {
+        println "=====STARTING SENDING SAMPLE EMAIL======"
+        def digest = Digest.get(1L)
+        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4537L)]
+        digestService.sendDigest(digest, usersEmailList);
+        println "==========SAMPLE EMAILS SENT============"
+    }
+
 }
 
 class UserGroupCommand {

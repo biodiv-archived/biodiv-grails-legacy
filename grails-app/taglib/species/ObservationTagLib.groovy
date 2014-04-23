@@ -343,15 +343,15 @@ class ObservationTagLib {
         def resInstance = attrs.model.observationInstance
         switch (attrs.model.resourceListType) {
             case "ofObv" :
-                resList = resInstance.resource
+                resList = resInstance?.resource
             break
             
             case "ofSpecies" :
-                resList = resInstance.resources
+                resList = resInstance?.resources
             break
             
             case "fromRelatedObv" :
-                def taxId = resInstance.taxonConcept.id.toLong()
+                def taxId = resInstance?.taxonConcept.id.toLong()
                 // new func service limit offset sp inst and returns a res list based on params
                 def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 4, 0)
                 resList = relObvMap.resList
@@ -360,7 +360,7 @@ class ObservationTagLib {
             break
 
             case "fromSpeciesField" :
-                def allSpField = resInstance.fields
+                def allSpField = resInstance?.fields
                 allSpField.each{
                     def r = it.resources
                     r.each{

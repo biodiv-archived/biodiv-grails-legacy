@@ -1671,7 +1671,8 @@ class ObservationService extends AbstractObjectService {
                 templateMap["digestContent"] = otherParams["digestContent"]
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipantsForDigest(otherParams["userGroup"]));
+                toUsers.addAll(otherParams["usersEmailList"]);
+                //toUsers.addAll(SUser.get(4136L));
                 break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
@@ -1692,6 +1693,9 @@ class ObservationService extends AbstractObjectService {
                     templateMap['tousername'] = toUser.username;
                     if(request){
                         templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+                    }
+                    if(notificationType == DIGEST_MAIL){
+                        templateMap['userID'] = toUser.id
                     }
                     log.debug "Sending email to ${toUser}"
                     try{
@@ -1763,8 +1767,8 @@ class ObservationService extends AbstractObjectService {
     }
 
     public String generateLink( String controller, String action, linkParams, request=null) {
-        request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-        userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+	request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+	userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
         controller:controller, action: action,
         params: linkParams)
     }
@@ -1784,10 +1788,10 @@ class ObservationService extends AbstractObjectService {
 		return participants;
 	}
 
-    private List getParticipantsForDigest(userGroup) {
+    def List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("development")) {
-            def result = UserGroupMemberRole.findAllByUserGroup(userGroup).collect {it.sUser};
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
             result.each { user ->
                 if(user.sendDigest && !participants.contains(user)){
                     participants << user

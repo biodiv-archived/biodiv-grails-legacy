@@ -60,8 +60,8 @@ def sendDigestMail(){
 
 //creating a new digest instance
 def createDigestIns(){
-    def ug = UserGroup.get(3L)
-    def dig = new Digest(userGroup:ug,lastSent:new Date(),forObv:true,forSp:true,forDoc:true,forUsers:true);
+    def ug = UserGroup.get(18L)
+    def dig = new Digest(userGroup:ug, lastSent:new Date() - 20, forObv:true, forSp:true, forDoc:true, forUsers:true);
     dig.save(flush:true)
     println "========== CREATED Digest instance ============="
 }
