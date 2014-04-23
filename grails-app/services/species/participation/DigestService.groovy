@@ -10,6 +10,7 @@ class DigestService {
     def activityFeedService;
     def observationService;
 
+    public static final MAX_DIGEST_OBJECTS = 5
     static transactional = true
 
     def sendDigestWrapper(Digest digest, setTime=true){
@@ -84,34 +85,50 @@ class DigestService {
             feedsList.each{
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():
-                    def obv = Observation.get(it.rootHolderId)
-                    if(obv.maxVotedReco){
-                        obvList.add(obv)
-                    }
-                    else{
-                        unidObvList.add(obv)
+                    if(obvList.size() < MAX_DIGEST_OBJECTS) { 
+                        def obv = Observation.get(it.rootHolderId)
+                        if(obv.maxVotedReco){
+                            obvList.add(obv)
+                        }
+                    } 
+
+                    //UNIDENTIFIED OBV LIST
+                    if (unidObvList.size() < MAX_DIGEST_OBJECTS) {
+                        def obv = Observation.get(it.rootHolderId)
+                        if(obv.maxVotedReco){
+                            unidObvList.add(obv)
+                        }
+
                     }
                     break
 
                     case Checklists.class.getCanonicalName():
-                    def chk = Checklists.get(it.rootHolderId)
-                    obvList.add(chk)
+                    if(obvList.size() < MAX_DIGEST_OBJECTS){
+                        def chk = Checklists.get(it.rootHolderId)
+                        obvList.add(chk)
+                    }
                     break
 
 
                     case Species.class.getCanonicalName():
-                    def sp = Species.get(it.rootHolderId)
-                    spList.add(sp)
+                    if(spList.size() < MAX_DIGEST_OBJECTS){
+                        def sp = Species.get(it.rootHolderId)
+                        spList.add(sp)
+                    }
                     break
 
                     case Document.class.getCanonicalName():
-                    def doc = Document.get(it.rootHolderId)
-                    docList.add(doc)
+                    if(docList.size() < MAX_DIGEST_OBJECTS){
+                        def doc = Document.get(it.rootHolderId)
+                        docList.add(doc)
+                    }
                     break
 
                     case SUser.class.getCanonicalName():
-                    def user = SUser.get(it.rootHolderId)
-                    userList.add(user)
+                    if(userList.size() < MAX_DIGEST_OBJECTS){
+                        def user = SUser.get(it.rootHolderId)
+                        userList.add(user)
+                    }
                     break
                 } 
             }
