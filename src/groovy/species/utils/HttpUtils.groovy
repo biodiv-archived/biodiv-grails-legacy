@@ -6,8 +6,7 @@ class HttpUtils {
 
 	private static final log = LogFactory.getLog(this);
 	
-	static File download(String address, File directory, boolean forceDownload, String filename=null)
-	{
+	static File download(String address, File directory, boolean forceDownload, String filename=null) {
         if(!filename) {
             filename = Utils.generateSafeFileName(address.tokenize("/")[-1])
         }
@@ -19,9 +18,27 @@ class HttpUtils {
 		
 		log.debug "Downloading from : "+address
 		def fileOpStream = new FileOutputStream(file)
-		def out = new BufferedOutputStream(fileOpStream)
-		out << new URL(address).openStream()
-		out.close()
+		//def out = new BufferedOutputStream(fileOpStream)
+        new URL( address ).openConnection().with { conn ->
+            conn.instanceFollowRedirects = false
+
+            def redirectUrl = conn.getHeaderField( "Location" )      
+            if( redirectUrl ) {
+                file.withOutputStream { out ->
+                    new URL(redirectUrl).openConnection().inputStream.with { inp ->
+                        out << inp
+                        inp.close()
+                    }
+                }
+            } else {
+                file.withOutputStream { out ->
+                    conn.inputStream.with { inp ->
+                        out << inp
+                        inp.close()
+                    }
+                }
+            }
+        }
 		log.debug "Saving to : "+file.getAbsolutePath();
 		return file;
 	}
