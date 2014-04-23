@@ -57,7 +57,7 @@ class DigestService {
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
         params.refTime = ""+digest.lastSent.getTime()
-        params.timeLine = "older"
+        params.timeLine = "newer"
         params.feedOrder = "latestFirst"
         params.feedType = "GroupSpecific"
 
