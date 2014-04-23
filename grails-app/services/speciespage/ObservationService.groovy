@@ -1605,6 +1605,7 @@ class ObservationService extends AbstractObjectService {
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
                 mailSubject = "New comment in ${templateMap['domainObjectType']}"
                 templateMap['message'] = " added a comment to the page listed below."
+                templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
                 println "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
                 println templateMap;
                 toUsers.addAll(getParticipants(obv))
