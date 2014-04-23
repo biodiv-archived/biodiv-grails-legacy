@@ -88,7 +88,9 @@ class DigestService {
                     if(obvList.size() < MAX_DIGEST_OBJECTS) { 
                         def obv = Observation.get(it.rootHolderId)
                         if(obv.maxVotedReco){
-                            obvList.add(obv)
+                            if(!obvList.contains(obv)){
+                                obvList.add(obv)
+                            }
                         }
                     } 
 
@@ -96,7 +98,9 @@ class DigestService {
                     if (unidObvList.size() < MAX_DIGEST_OBJECTS) {
                         def obv = Observation.get(it.rootHolderId)
                         if(!obv.maxVotedReco){
-                            unidObvList.add(obv)
+                            if(!unidObvList.contains(obv)){
+                                unidObvList.add(obv)
+                            }
                         }
                     }
                     break
@@ -104,7 +108,9 @@ class DigestService {
                     case Checklists.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS){
                         def chk = Checklists.get(it.rootHolderId)
-                        obvList.add(chk)
+                        if(!obvList.contains(chk)){
+                            obvList.add(chk)
+                        }
                     }
                     break
 
@@ -112,21 +118,27 @@ class DigestService {
                     case Species.class.getCanonicalName():
                     if(spList.size() < MAX_DIGEST_OBJECTS){
                         def sp = Species.get(it.rootHolderId)
-                        spList.add(sp)
+                        if(!spList.contains(sp)){
+                            spList.add(sp)
+                        }
                     }
                     break
 
                     case Document.class.getCanonicalName():
                     if(docList.size() < MAX_DIGEST_OBJECTS){
                         def doc = Document.get(it.rootHolderId)
-                        docList.add(doc)
+                        if(!docList.contains(doc)){
+                            docList.add(doc)
+                        }
                     }
                     break
 
                     case SUser.class.getCanonicalName():
                     if(userList.size() < MAX_DIGEST_OBJECTS){
                         def user = SUser.get(it.rootHolderId)
-                        userList.add(user)
+                        if(!userList.contains(user)){
+                            userList.add(user)
+                        }
                     }
                     break
                 } 
