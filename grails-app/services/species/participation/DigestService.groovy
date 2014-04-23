@@ -63,11 +63,9 @@ class DigestService {
         params.feedType = "GroupSpecific"
 
         def res = [:]
-        def obvList = []
-        def unidObvList = []
-        def spList = []
-        def docList = []
-        def userList = []
+        def obvList = [], unidObvList = [], spList = [], docList = [], userList = [];
+        HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
+
         def feedsList = activityFeedService.getActivityFeeds(params)
         def feedCount = 0
         feedsList.each{
@@ -86,68 +84,100 @@ class DigestService {
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS) { 
-                        def obv = Observation.get(it.rootHolderId)
-                        if(obv.maxVotedReco){
-                            if(!obvList.contains(obv)){
-                                obvList.add(obv)
-                            }
+                        def obv = Observation.read(it.rootHolderId)
+                        if(!obvList.contains(obv)){
+                            obvList.add(obv)
                         }
-                    } 
+                    }
 
                     //UNIDENTIFIED OBV LIST
                     if (unidObvList.size() < MAX_DIGEST_OBJECTS) {
-                        def obv = Observation.get(it.rootHolderId)
+                        def obv = Observation.read(it.rootHolderId)
                         if(!obv.maxVotedReco){
                             if(!unidObvList.contains(obv)){
                                 unidObvList.add(obv)
                             }
                         }
                     }
+
+                    obvIds.add(it.rootHolderId);
                     break
 
                     case Checklists.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS){
-                        def chk = Checklists.get(it.rootHolderId)
+                        def chk = Checklists.read(it.rootHolderId)
                         if(!obvList.contains(chk)){
                             obvList.add(chk)
                         }
                     }
+                    obvIds.add(it.rootHolderId);
                     break
 
 
                     case Species.class.getCanonicalName():
                     if(spList.size() < MAX_DIGEST_OBJECTS){
-                        def sp = Species.get(it.rootHolderId)
+                        def sp = Species.read(it.rootHolderId)
                         if(!spList.contains(sp)){
                             spList.add(sp)
                         }
                     }
+                    spIds.add(it.rootHolderId);
                     break
 
                     case Document.class.getCanonicalName():
                     if(docList.size() < MAX_DIGEST_OBJECTS){
-                        def doc = Document.get(it.rootHolderId)
+                        def doc = Document.read(it.rootHolderId)
                         if(!docList.contains(doc)){
                             docList.add(doc)
                         }
                     }
+                    docIds.add(it.rootHolderId);
                     break
 
-                    case SUser.class.getCanonicalName():
-                    if(userList.size() < MAX_DIGEST_OBJECTS){
-                        def user = SUser.get(it.rootHolderId)
-                        if(!userList.contains(user)){
-                            userList.add(user)
+                    case UserGroup.class.getCanonicalName():
+                    if(it.activityHolderType == SUser.class.getCanonicalName()){
+                        if(userList.size() < MAX_DIGEST_OBJECTS){
+                            def user = SUser.read(it.activityHolderId)
+                            if(!userList.contains(user)){
+                                userList.add(user)
+                            }
                         }
+                        userIds.add(it.activityHolderId);
                     }
+                    
                     break
                 } 
+            }
+
+            def obvListCount = obvIds.size(), unidObvListCount = 0;
+            if(obvIds.size() > 0) {
+                unidObvListCount = Observation.withCriteria() {
+                    projections {
+                        count('id')
+                    }
+                    'in'('id', obvIds.toList())
+                    isNull('maxVotedReco')
+                } 
+                /*idObvListCount = Observation.withCriteria() {
+                    projections {
+                        count('id')
+                    }
+                    'in'('id', obvIds.toList())
+                    isNotNull('maxVotedReco')
+                }*/
             }
             res['observations'] = obvList
             res['unidObvs'] = unidObvList
             res['species'] = spList
             res['documents'] = docList
             res['users'] = userList
+
+            res['obvListCount'] = obvListCount;
+            //res['idObvListCount'] = idObvListCount;
+            res['unidObvListCount'] = unidObvListCount;
+            res['spListCount'] = spIds.size();
+            res['docListCount'] = docIds.size();
+            res['userListCount'] = userIds.size();
         }
         return res
     }

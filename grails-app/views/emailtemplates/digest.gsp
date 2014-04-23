@@ -22,7 +22,7 @@
             <p>Here is the activity digest for the <a href="${uGroup.createLink(controller:'userGroup', action:'show','userGroup':userGroup, absolute:true)}">${userGroup.name}</a> group on the India Biodiversity Portal</p>
             <g:if test = "${digestContent.observations || digestContent.unidObvs}">
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Observations (${digestContent.observations.size() + digestContent.unidObvs.size()})</h2>
+                <h2>Observations (${digestContent.obvListCount})</h2>
                 <div style="background-color: #d4ece3;">
                     <g:if test = "${digestContent.observations }">
                     <g:set var="obvIns" value="${digestContent.observations}"></g:set>
@@ -68,7 +68,7 @@
             <g:if test = "${digestContent.species}">
             <g:set var="spIns" value="${digestContent.species}"></g:set>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Species (${digestContent.species.size()})</h2>
+                <h2>Species (${digestContent.spListCount})</h2>
                 <div style="background-color: #d4ece3;">
                     <h3>Latest Updated</h3>
                     <table>
@@ -96,14 +96,14 @@
             <g:if test = "${digestContent.users}">
             <g:set var="userIns" value="${digestContent.users}"></g:set>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Users (${digestContent.users.size()})</h2>
+                <h2>Users (${digestContent.userListCount})</h2>
                 <div style="background-color: #d4ece3;">
                     <h3>New</h3>
                     <table>
                         <tr align="left">
                             <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
                             <td class="w640" height="30" width="120"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
-                                    <img src="${userInstance.profilePicture()}" title="${userInstance.name}" />
+                                    <img src="${userInstance.profilePicture()}" title="${userInstance.name}" style="border: 0px solid ; width: 120px; height: 101px;" />
                             </a></td>
                             </g:each>
                         </tr>
@@ -119,7 +119,7 @@
             def counter = 1
             %>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Documents (${digestContent.documents.size()})</h2>
+                <h2>Documents (${digestContent.docListCount})</h2>
                 <div style="background-color: #d4ece3;">
                     <h3>Latest Updated</h3>
                     <table>
@@ -131,20 +131,20 @@
                             <tr>
                                 <td class="w640" height="30" width="627" style="font-weight:bold;padding-left:5px;">${counter}. <a href="${uGroup.createLink(controller:'document', action:'show','id': docId, absolute:true,'userGroup':userGroup)}" style="color:#2ba6cb;">${documentInstance.title}</a></td>
                             </tr>
-                            <g:if test="${documentInstance.notes != null}">
                             <tr> 
-                                <td class="w640" height="30" width="627">
-                                    <g:if test="${documentInstance.notes != null && documentInstance.notes.length() > 140}">
-                                    ${documentInstance.notes[0..138] + '...'} <br />
+                                <td class="w640" height="30" width="627" style="border-bottom:1px solid white">
+                                    <g:if test="${documentInstance.notes != null}">
+                                    <g:if test="${documentInstance.notes.length() > 160}">
+                                    ${documentInstance.notes[0..158] + '...'} <br />
                                     </g:if>
                                     <g:else>
                                     ${documentInstance.notes?:''} <br />
                                     </g:else>
+                                    </g:if>
                                 </td>
                             </tr>
-                            </g:if>
                             <%
-                                counter++
+                            counter++
                             %>
                             </g:each>
                         </tr>
