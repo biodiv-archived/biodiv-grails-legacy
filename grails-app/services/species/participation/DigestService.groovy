@@ -9,6 +9,7 @@ class DigestService {
 
     def activityFeedService;
     def observationService;
+    def chartService;
 
     public static final MAX_DIGEST_OBJECTS = 5
     static transactional = true
@@ -64,7 +65,8 @@ class DigestService {
 
         def res = [:]
         def obvList = [], unidObvList = [], spList = [], docList = [], userList = [];
-        HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
+        boolean obvFlag = false, unidObvFlag = false, spFlag = false, docFlag = false, userFlag = false;
+        //HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
 
         def feedsList = activityFeedService.getActivityFeeds(params)
         def feedCount = 0
@@ -88,6 +90,8 @@ class DigestService {
                         if(!obvList.contains(obv)){
                             obvList.add(obv)
                         }
+                    } else {
+                        obvFlag = true
                     }
 
                     //UNIDENTIFIED OBV LIST
@@ -98,9 +102,11 @@ class DigestService {
                                 unidObvList.add(obv)
                             }
                         }
+                    } else {
+                        unidObvFlag= true;
                     }
 
-                    obvIds.add(it.rootHolderId);
+                    //obvIds.add(it.rootHolderId);
                     break
 
                     case Checklists.class.getCanonicalName():
@@ -109,8 +115,10 @@ class DigestService {
                         if(!obvList.contains(chk)){
                             obvList.add(chk)
                         }
+                    } else {
+                        obvFlag = true;
                     }
-                    obvIds.add(it.rootHolderId);
+                    //obvIds.add(it.rootHolderId);
                     break
 
 
@@ -120,8 +128,10 @@ class DigestService {
                         if(!spList.contains(sp)){
                             spList.add(sp)
                         }
+                    } else {
+                        spFlag = true;
                     }
-                    spIds.add(it.rootHolderId);
+                    //spIds.add(it.rootHolderId);
                     break
 
                     case Document.class.getCanonicalName():
@@ -130,8 +140,10 @@ class DigestService {
                         if(!docList.contains(doc)){
                             docList.add(doc)
                         }
+                    } else {
+                        docFlag = true;
                     }
-                    docIds.add(it.rootHolderId);
+                    //docIds.add(it.rootHolderId);
                     break
 
                     case UserGroup.class.getCanonicalName():
@@ -141,15 +153,20 @@ class DigestService {
                             if(!userList.contains(user)){
                                 userList.add(user)
                             }
+                        } else {
+                            userFlag = true;
                         }
-                        userIds.add(it.activityHolderId);
+                        //userIds.add(it.activityHolderId);
                     }
                     
                     break
                 } 
+                
+                if(obvFlag && unidObvFlag && spFlag && docFlag && userFlag)
+                    return;
             }
 
-            def obvListCount = obvIds.size(), unidObvListCount = 0;
+            /*def obvListCount = obvIds.size(), unidObvListCount = 0;
             if(obvIds.size() > 0) {
                 unidObvListCount = Observation.withCriteria() {
                     projections {
@@ -158,26 +175,29 @@ class DigestService {
                     'in'('id', obvIds.toList())
                     isNull('maxVotedReco')
                 } 
-                /*idObvListCount = Observation.withCriteria() {
+                idObvListCount = Observation.withCriteria() {
                     projections {
                         count('id')
                     }
                     'in'('id', obvIds.toList())
                     isNotNull('maxVotedReco')
-                }*/
-            }
+                }
+            }*/
             res['observations'] = obvList
             res['unidObvs'] = unidObvList
             res['species'] = spList
             res['documents'] = docList
             res['users'] = userList
+       
+            def p = [webaddress:digest.userGroup.webaddress];
+            def stats = [observationCount:chartService.getObservationCount(p), speciesCount:chartService.getSpeciesCount(p), checklistsCount:chartService.getChecklistCount(p), documentCount:chartService.getDocumentCount(p), userCount:chartService.getUserCount(p)];
 
-            res['obvListCount'] = obvListCount;
+            res['obvListCount'] = stats.observationCount;
             //res['idObvListCount'] = idObvListCount;
-            res['unidObvListCount'] = unidObvListCount;
-            res['spListCount'] = spIds.size();
-            res['docListCount'] = docIds.size();
-            res['userListCount'] = userIds.size();
+            //res['unidObvListCount'] = unidObvListCount;
+            res['spListCount'] = stats.speciesCount;
+            res['docListCount'] = stats.documentCount;
+            res['userListCount'] = stats.userCount;
         }
         return res
     }
