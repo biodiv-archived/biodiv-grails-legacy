@@ -70,7 +70,7 @@
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
                 <h2>Species (${digestContent.spListCount})</h2>
                 <div style="background-color: #d4ece3;">
-                    <h3>Latest Updated</h3>
+                    <h3>Recent</h3>
                     <table>
                         <tr align="left">
                             <g:each in="${spIns.size() < 5 ? spIns : spIns.subList(0, 5)}" var="speciesInstance">
@@ -121,7 +121,7 @@
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
                 <h2>Documents (${digestContent.docListCount})</h2>
                 <div style="background-color: #d4ece3;">
-                    <h3>Latest Updated</h3>
+                    <h3>Recent</h3>
                     <table>
                         <tr align="left">
                             <g:each in="${docIns.size() < 5 ? docIns : docIns.subList(0, 5)}" var="documentInstance">
