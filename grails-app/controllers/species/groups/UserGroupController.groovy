@@ -1300,7 +1300,7 @@ class UserGroupController {
     def sendDigest = {
         println "=====STARTING SENDING SAMPLE EMAIL======"
         def digest = Digest.get(1L)
-        def usersEmailList = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rahulk@strandls.com"]
+        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4537L)]
         digestService.sendDigest(digest, usersEmailList);
         println "==========SAMPLE EMAILS SENT============"
     }
