@@ -15,7 +15,7 @@ class DigestJob {
     def execute() {
 		def digestList = Digest.list()
         digestList.each{ dig ->
-            digestService.sendDigest(dig)
+            digestService.sendDigestWrapper(dig)
         }
     } 
 	

@@ -12,39 +12,40 @@ class DigestService {
 
     static transactional = true
     
-    def sendDigest(Digest digest){
+    def sendDigestWrapper(Digest digest){
+        def max = 50
+        def offset = 0
+        def emailFlag = true
+        while(emailFlag){
+            def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+            if(usersEmailList.size() != 0){
+                sendDigest(digest, usersEmailList)
+                offset = offset + max
+                Thread.sleep(900000L);
+            }
+            else{
+                emailFlag = false
+            }
+        }
+    }
+
+    def sendDigest(Digest digest, usersEmailList){
         def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
             def otherParams = [:]
             otherParams['digestContent'] = digestContent
             otherParams['userGroup'] = digest.userGroup
-            log.debug "======== DIGEST CONTENT ========= " + otherParams['digestContent']
+            log.debug "DIGEST CONTENT " + otherParams['digestContent']
             def sp = new Species()
-            def max = 50
-            def offset = 0
-            def emailFlag = true
             digest.lastSent = new Date()
-            //def emailList = [SUser.get(4136L)]
-            while(emailFlag){
-                otherParams['usersEmailList'] = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
-            //emailList.each{ 
-                //println "======CALLING SEND MAIL========="
-                //otherParams['usersEmailList'] = [it]      
-                if(otherParams['usersEmailList'].size() != 0 ){
-                    observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
-                    offset = offset + max
-                    Thread.sleep(1800000L);
-                }
-                else{
-                    emailFlag = false
-                }
-            }
-            if(digest.save(flush:true)){
-                digest.errors.allErrors.each { log.error it }
-            }
-            log.debug " MAIL SENT and Digest Last sent time updated "
+            otherParams['usersEmailList'] = usersEmailList  
+            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
         }
+        if(digest.save(flush:true)){
+            digest.errors.allErrors.each { log.error it }
+        }
+        log.debug " MAIL SENT and Digest Last sent time updated "
     }
 
     private def fetchDigestContent(Digest digest){
