@@ -1323,7 +1323,7 @@ class UserGroupController {
         digestService.sendDigestWrapper(digest, setTime);
         */
         def digJob = new DigestJob()
-        digJob.execute()
+        digJob.action()
         println "==========ALL DIGEST EMAILS SENT============"
     }
 
