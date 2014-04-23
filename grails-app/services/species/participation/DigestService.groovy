@@ -85,7 +85,7 @@ class DigestService {
             feedsList.each{
                 switch(it.rootHolderType){
                     case Observation.class.getCanonicalName():
-                    if(obvList.size() <= MAX_DIGEST_OBJECTS) { 
+                    if(obvList.size() < MAX_DIGEST_OBJECTS) { 
                         def obv = Observation.get(it.rootHolderId)
                         if(obv.maxVotedReco){
                             obvList.add(obv)
@@ -93,7 +93,7 @@ class DigestService {
                     } 
 
                     //UNIDENTIFIED OBV LIST
-                    if (unidObvList.size() <= MAX_DIGEST_OBJECTS) {
+                    if (unidObvList.size() < MAX_DIGEST_OBJECTS) {
                         def obv = Observation.get(it.rootHolderId)
                         if(obv.maxVotedReco){
                             unidObvList.add(obv)
@@ -103,7 +103,7 @@ class DigestService {
                     break
 
                     case Checklists.class.getCanonicalName():
-                    if(obvList.size() <= MAX_DIGEST_OBJECTS){
+                    if(obvList.size() < MAX_DIGEST_OBJECTS){
                         def chk = Checklists.get(it.rootHolderId)
                         obvList.add(chk)
                     }
@@ -111,21 +111,21 @@ class DigestService {
 
 
                     case Species.class.getCanonicalName():
-                    if(spList.size() <= MAX_DIGEST_OBJECTS){
+                    if(spList.size() < MAX_DIGEST_OBJECTS){
                         def sp = Species.get(it.rootHolderId)
                         spList.add(sp)
                     }
                     break
 
                     case Document.class.getCanonicalName():
-                    if(docList.size() <= MAX_DIGEST_OBJECTS){
+                    if(docList.size() < MAX_DIGEST_OBJECTS){
                         def doc = Document.get(it.rootHolderId)
                         docList.add(doc)
                     }
                     break
 
                     case SUser.class.getCanonicalName():
-                    if(userList.size() <= MAX_DIGEST_OBJECTS){
+                    if(userList.size() < MAX_DIGEST_OBJECTS){
                         def user = SUser.get(it.rootHolderId)
                         userList.add(user)
                     }
