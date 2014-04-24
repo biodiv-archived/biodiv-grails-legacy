@@ -145,7 +145,6 @@ function removeResource(event, imageId) {
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
             metadataEle.each(function() {
-            console.log(this);
                 $('.geotagged_image', this).load(function(){
                     update_geotagged_images_list($(this));		
                 });

@@ -264,7 +264,7 @@ class ChecklistController {
             List columns = [obv_id]
             cl.fetchColumnNames().each { columns.add(it) }
             
-            return [columns: columns, data :obvData, sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
+            return [columns: columns, data :obvData, res:'checklist', sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
         }
         return ['error':"Couldn't find checklist with this id"];
     }

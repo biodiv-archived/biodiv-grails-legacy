@@ -44,15 +44,15 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         headerFunction = getHeaderMenuOptions;
     }
 
-function setUnEditableColumn(columns){
-        var unEditableColumn = "Id"
-            $.each(columns, function(index, column) {
-                if(column.name === unEditableColumn){
-                    column.editor = null;
-    		}	
-    	});
+    function setUnEditableColumn(columns){
+        var unEditableColumn = "Id";
+        $.each(columns, function(index, column) {
+            if(column.name === unEditableColumn){
+                column.editor = null;
+            }	
+        });
     }
-    
+
     $(function () {
     	setUnEditableColumn(columns);
         grid = new Slick.Grid("#myGrid", data, columns, options);
@@ -393,7 +393,7 @@ function loadGrid(url, id){
                             columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100, 'header':getHeaderMenuOptions()});
 			});
                         columns.push(getMediaColumnOptions());
-                        loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
+                        loadTextToGrid(data.data, columns, data.res, data.sciNameColumn, data.commonNameColumn);
                         //grid.setColumns(finalCols);
                         //grid.render();
                         //grid.autosizeColumns();
