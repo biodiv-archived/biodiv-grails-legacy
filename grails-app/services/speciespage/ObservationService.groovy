@@ -1689,6 +1689,10 @@ class ObservationService extends AbstractObjectService {
 
             toUsers.eachWithIndex { toUser, index ->
                 if(toUser) {
+                    if(!toUser.enabled || toUser.accountLocked){
+                        log.error "Account not enabled or locked - so skipping sending email to ${toUser}"
+                        return
+                    }
                     templateMap['username'] = toUser.name.capitalize();
                     templateMap['tousername'] = toUser.username;
                     if(request){
@@ -1697,10 +1701,7 @@ class ObservationService extends AbstractObjectService {
                     if(notificationType == DIGEST_MAIL){
                         templateMap['userID'] = toUser.id
                     }
-                    if(!toUser.enabled || toUser.accountLocked){
-                        log.error "Account not enabled or locked - so skipping sending email to ${toUser}"
-                        return
-                    }
+                    
                     log.debug "Sending email to ${toUser}"
                     try{
                         mailService.sendMail {
