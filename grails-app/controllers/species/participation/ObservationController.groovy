@@ -775,17 +775,27 @@ class ObservationController extends AbstractObjectController {
 
 	def listRelated = {
 		log.debug params;
-		def result = observationService.getRelatedObservations(params);
-		
-		def inGroupMap = [:]
-		result.relatedObv.observations.each { m-> 
-			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
-		}
-	    def activeFilters = new HashMap(params);
+
+        long parentId = params.id?params.long('id'):null;
+        def result = observationService.getRelatedObservations(params);
+
+        def activeFilters = new HashMap(params);
         activeFilters.remove('userGroupInstance');
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:activeFilters, parentId:params.long('id'), filterProperty:params.filterProperty]
-		render (view:'listRelated', model:model)
-	}
+
+        def model = [ queryParams: [max:result.max  ], activeFilters:activeFilters, filterProperty:params.filterProperty];
+        model['parentId'] = parentId;
+
+        def inGroupMap = [:]
+        result.relatedObv.observations.each { m-> 
+            inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
+        }
+
+        model['observationInstanceList'] = result.relatedObv.observations.observation
+        model['inGroupMap'] = inGroupMap
+        model['instanceTotal'] = result.relatedObv.count
+
+        render (view:'listRelated', model:model)
+    }
 
 	/**
 	 * 

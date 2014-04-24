@@ -133,16 +133,20 @@ function removeResource(event, imageId) {
                 var file_id = $(metadata.get(0)).children("input").first().attr("name");
                 i = parseInt(file_id.substring(file_id.indexOf("_")+1));
             }
-            $(responseXML).find('resources').find('res').each(function() {
+            var $s = $(responseXML).find('resources').find('res');
+            var x = $s.length;
+            $s.each(function() {
                 var fileName = $(this).attr('fileName');
                 var type = $(this).attr('type');					
-                images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
+                images.push({i:x+i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
+                x--;
             });
             
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
             metadataEle.each(function() {
-                me.$ele.find('.geotagged_image', this).load(function(){
+            console.log(this);
+                $('.geotagged_image', this).load(function(){
                     update_geotagged_images_list($(this));		
                 });
                 var $ratingContainer = $(this).find('.star_obvcreate');

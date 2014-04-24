@@ -15,7 +15,7 @@
                 def counter = 0 
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
-            <li class="add_file addedResource" style="z-index:40">
+            <li class="add_file addedResource">
             
             <div class="add_file_container">
                 <div class="add_image"></div> 

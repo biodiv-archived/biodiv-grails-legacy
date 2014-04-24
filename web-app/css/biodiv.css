@@ -415,6 +415,13 @@ div.errors {
 	padding: 5px;
 }
 
+.addedResource.thumbnail  {
+    z-index:40;
+}
+.add_file.addedResource {
+    z-index:41;
+}
+
 .resources .addedResource {
 	width: 200px;
 	display: inline-block;
@@ -889,7 +896,7 @@ ul#recoSummary {
 
 #ui-datepicker-div {
 	width: auto;
-	z-index: 4 !important;
+	z-index: 60 !important;
 }
 
 .normal_profile_pic {

@@ -239,8 +239,7 @@ class ObservationService extends AbstractObjectService {
         log.debug params;
         int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
         int offset = params.offset ? params.offset.toInteger() : 0
-
-        def relatedObv
+        def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
             relatedObv = getRelatedObservationBySpeciesName(params.id.toLong(), max, offset)
         } else if(params.filterProperty == "speciesGroup"){
@@ -256,7 +255,11 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         }
         else{
-            relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
+            if(params.id) {
+                relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
+            } else {
+                log.debug "no id"
+            }
         }
 
         if(params.contextGroupWebaddress || params.webaddress){
