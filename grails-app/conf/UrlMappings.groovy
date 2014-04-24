@@ -5,6 +5,7 @@ class UrlMappings {
 	static mappings = {
 
 		
+		//"500"(controller:'BiodivException', action:'error')
 		"500"(view:'/error')
 		"403"(view:'/error')
 		"404"(view:'/notfound')

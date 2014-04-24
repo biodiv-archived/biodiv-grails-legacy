@@ -476,29 +476,31 @@ environments {
 
         log4jConsoleLogLevel = Priority.DEBUG
 	    log4j = {
-		appenders {
-		    console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+            }
+            error   'org.codehaus.groovy.grails.web.pages', //  GSP
+            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.hibernate',
+            'net.sf.ehcache.hibernate',
+            'org.springframework.security',
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.plugin',
+            'org.springframework.security.web',
+            'grails.app.tagLib.org.grails.plugin.resource'
+            debug   'speciespage',
+            'grails.app',
+            'species'
+            debug   'grails.app.filters.species.SecurityFilters'
+            info    'species.auth',
+            'com.mchange.v2.resourcepool.BasicResourcePool'
+
         }
-        error   'org.codehaus.groovy.grails.web.pages', //  GSP
-                'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-                'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                'org.codehaus.groovy.grails.commons', // core / classloading
-                'org.codehaus.groovy.grails.plugins', // plugins
-                'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                'org.hibernate',
-                'net.sf.ehcache.hibernate',
-                'org.springframework.security',
-                'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                'grails.plugin',
-                'org.springframework.security.web',
-                'grails.app.tagLib.org.grails.plugin.resource'
-		debug   'speciespage',
-                'grails.app',
-                'species'
-        info    'species.auth',
-        		'com.mchange.v2.resourcepool.BasicResourcePool' 
-	}
     }	
     test {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
@@ -595,6 +597,7 @@ environments {
 			debug	'species',
 					'speciespage'
 			info 'com.mchange.v2.resourcepool.BasicResourcePool' 
+            debug   'grails.app.filters.species.SecurityFilters'
 		}
 	}
 	pambaTest {
@@ -671,6 +674,7 @@ environments {
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
+            debug   'grails.app.filters.species.SecurityFilters'
 		}
 
 	}
@@ -740,14 +744,15 @@ environments {
         }
 		log4jConsoleLogLevel = Priority.DEBUG
 		log4j = {
-			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.INFO
-			}
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+            }
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
 			warn 	'grails.app',
 					'org.springframework.security.web'
+            debug   'grails.app.filters.species.SecurityFilters'
 
 
 		}
@@ -817,13 +822,14 @@ environments {
 		log4jConsoleLogLevel = Priority.DEBUG
 		log4j = {
 			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.INFO
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
 			}
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
 			warn 	'grails.app',
 					'org.springframework.security.web'
+            debug   'grails.app.filters.species.SecurityFilters'
 
 
 		}

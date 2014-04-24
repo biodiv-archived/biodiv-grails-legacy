@@ -13,7 +13,7 @@ class DigestJob {
     }
 
     def execute() {
-        //digestService.sendDigestAction();
+        digestService.sendDigestAction();
     } 
 
 }

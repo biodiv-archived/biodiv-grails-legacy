@@ -130,7 +130,7 @@ function removeResource(event, imageId) {
             var metadata = me.$ele.find(".metadata");
             var i = 0;
             if(metadata.length > 0) {
-                var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+                var file_id = $(metadata.get(0)).children("input").first().attr("name");
                 i = parseInt(file_id.substring(file_id.indexOf("_")+1));
             }
             $(responseXML).find('resources').find('res').each(function() {
