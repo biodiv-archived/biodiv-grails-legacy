@@ -4,13 +4,13 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.Species"%>
 
+            <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <g:set var="i" value="${1+offset}"/>
             </g:if>
             <g:else>
-                <g:set var="i" value="${1}"/>
+                <g:set var="i" value="${res?.size()?:1}"/>
             </g:else>
-            <g:set var= "res" value="${resList}" />
             <%
                 def counter = 0 
             %>
@@ -95,7 +95,7 @@
                 onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
 
             </li>
-            <g:set var="i" value="${i+1}" />
+            <g:set var="i" value="${i-1}" />
             </g:each>
             
 <!--====== Template ======-->

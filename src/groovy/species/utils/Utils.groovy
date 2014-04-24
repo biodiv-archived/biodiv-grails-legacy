@@ -264,6 +264,7 @@ class Utils {
     }
 
 	static List getUsersList(String userIdsAndEmailIds) {
+        if(!userIdsAndEmailIds) return [];
 		List result = [];
 		def emailValidator = EmailValidator.getInstance()
 		userIdsAndEmailIds.trim().split(",").each{

@@ -297,6 +297,8 @@ class AbstractObjectService {
         converter.setResourcesRootDir(rootDir);
         def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
         relImagesContext = new File(relImagesContext).getParent();
+        println "+++++++++++++++++++++"
+        println resourcesXML
         return converter.createMedia(resourcesXML, relImagesContext);
     }
 
