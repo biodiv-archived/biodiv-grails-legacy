@@ -41,9 +41,16 @@
             <div class="featured_body">
                 <div class="featured_title ellipsis"> 
                     <div class="heading">
+                        <g:if test="${observationInstance.isChecklist}">
+                        <g:link url="${uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                            <span class="ellipsis">${observationInstance.title}</span>
+                        </g:link>
+                        </g:if>
+                        <g:else>
                         <g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
                             <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
                         </g:link>
+                        </g:else>
                     </div>
                 </div>
                 <g:render template="/common/featureNotesTemplate" model="['instance':observationInstance, 'featuredNotes':featuredNotes]"/>

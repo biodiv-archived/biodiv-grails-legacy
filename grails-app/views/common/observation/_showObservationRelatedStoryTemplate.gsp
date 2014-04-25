@@ -43,7 +43,7 @@ $(document).ready(function() {
             <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
                 <li style="float: left; list-style: none;">
 
-                <g:render template="/${relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller]"/>
+                <g:render template="/${relatedInstanceDetails.controller.equalsIgnoreCase('checklist')?'observation':relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller]"/>
                 </li>
             </g:each>
         </ul>

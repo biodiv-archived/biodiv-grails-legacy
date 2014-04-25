@@ -824,13 +824,15 @@ function mapViewSlideToggleHandler() {
 }
 
 function load_content(params){
-    var marker = this
-    $.ajax({
-        url: window.params.snippetUrl+"/"+params.id,
-        success: function(data){
-            marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
-        }
-    });
+    var marker = this;
+    if(params.id) {
+        $.ajax({
+            url: window.params.snippetUrl+"/"+params.id,
+            success: function(data){
+                marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
+            }
+        });
+    }
 }
 
 function speciesHabitatInterestHandler(event){

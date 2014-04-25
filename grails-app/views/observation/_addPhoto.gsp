@@ -68,7 +68,7 @@
                 <!--input name="resContext_${i}" type="hidden" value='${r.context.value()}'/-->
                 <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
                 <g:if test="${r.type == ResourceType.IMAGE}">
-                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList().first()]"/>
+                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList()?.first()]"/>
                 </g:if>
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
