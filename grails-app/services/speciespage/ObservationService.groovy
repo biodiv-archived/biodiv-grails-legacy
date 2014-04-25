@@ -2044,7 +2044,9 @@ class ObservationService extends AbstractObjectService {
             List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
             distinctRecoListFacets.each {
                 //TODO second parameter, isScientificName
-                distinctRecoList.add([getSpeciesHyperLinkedName(Recommendation.findByName(it.getName())), true, it.getCount()]);
+                def recoWithLink = getSpeciesHyperLinkedName(Recommendation.findByName(it.getName()));
+                if(recoWithLink)
+                    distinctRecoList.add([recoWithLink, true, it.getCount()]);
             }
 
         }
@@ -2052,9 +2054,11 @@ class ObservationService extends AbstractObjectService {
     }
 	
 	private String getSpeciesHyperLinkedName(Recommendation reco){
-		def speciesId = reco?.taxonConcept?.findSpeciesId()
+        if(!reco) return;
+		def speciesId = reco.taxonConcept?.findSpeciesId()
 		if(!speciesId){
-			return reco?.name
+            println "RECONAME : "+reco
+			return reco.name
 		}
 		
 		def link = generateLink("species", "show", ["id": speciesId])
