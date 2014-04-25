@@ -1,12 +1,13 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.ChartTagLib"%>
 <%@ page import="org.grails.plugins.google.visualization.data.Cell; org.grails.plugins.google.visualization.util.DateUtil" %>
 
 <div style="clear:both;border-style:groove;border-width:6px;color:green;border-radius:10px;">
-	<div style="text-align:center">
+	<!--div style="text-align:center">
 		<a  href="${uGroup.createLink(controller:'chart')}"> <h4>Activity Monitor: See top contributor | View observations stats | Explore species pages by group</h4> </a>
-	</div>
-	<div id="annotatedtimeline_activity" style='width: 870px; height: 180px;'></div>
-	<gvisualization:annotatedTimeLine  dynamicLoading="${true}"  elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}" max="${max?:1000}" fill="${30}" displayRangeSelector="${false}"  zoomStartTime="${(new Date())-30}"/>
+	</div-->
+	<div id="annotatedtimeline_activity" style='width: 870px; height: 210px;'></div>
+	<gvisualization:annotatedTimeLine  dynamicLoading="${true}"  elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}" max="${max?:1500}" fill="${30}" displayRangeSelector="${false}"  zoomStartTime="${(new Date())-30}"/>
 <%----%>
 <%--	<br/>--%>
 <%--	<div style="clear:both;">--%>
