@@ -47,5 +47,18 @@ def updateGeoPrivacy(){
 }
 
 
+def fixSpeciesCount() {
+    Checklists.withTransaction() {
+        Checklists.findAllBySpeciesCountAndIsDeleted(0,false).each { checklistInstance ->
+            println checklistInstance.title
+            println checklistInstance.observations.size()
 
+//		    checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
+  //          if(!checklistInstance.save(flush:true)) {
+    //            checklistInstance.errors.each { println it }
+     //       }
+       }
+    }
+}
 
+fixSpeciesCount();
