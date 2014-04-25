@@ -507,14 +507,14 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
-    def getLatestUpdatedObservation(webaddress, sortBy, max, offset ){
+    Map getLatestUpdatedObservation(String webaddress,String sortBy, int max, int offset ){
         def p = [:]
         p.webaddress = webaddress
         p.sort = sortBy
         def result = getFilteredObservations(p, max, offset).observationInstanceList
         def res = []
         result.each{
-            res.add(["observation":it, 'title':(it.isChecklist)? it.title : it.maxVotedReco?it.maxVotedReco.name:"Unknown"])
+            res.add(["observation":it, 'title':(it.isChecklist)? it.title : (it.maxVotedReco?it.maxVotedReco.name:"Unknown")])
         }
         return ['observations':res]
     }
