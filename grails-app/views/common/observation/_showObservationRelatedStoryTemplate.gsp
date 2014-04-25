@@ -1,34 +1,10 @@
 <r:script> 
 $(document).ready(function() {
-    <g:if test="${relatedInstanceList || filterProperty != 'featureBy'}">
-    $('#carousel_${id}').jcarousel({
-        itemLoadCallback : itemLoadCallback,
-        initCallback : initCallback,
-        setupCallback : setupCallback,
-        url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
-        filterProperty:"${filterProperty}",
-        filterPropertyValue:"${filterPropertyValue}",
-        carouselDivId:"#carousel_" + "${id}",
-        carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
-        carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
-        itemFallbackDimension : window.params.carousel.maxWidth,
-        contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
-        contextGroupWebaddress:"${userGroupWebaddress}",
-        <g:if test="${filterProperty == 'featureBy'}">
-            vertical:true,
-            scroll:1,
-            getItemHTML:getSnippetHTML
-        </g:if>
-        <g:else>
-            getItemHTML:getSnippetTabletHTML,
-            horizontal:true
-        </g:else>
-    });
-    </g:if>
+    relatedStory("${relatedInstanceList}", "${filterProperty}", "${id}", "${userGroupWebaddress}", "${filterPropertyValue}")
 });
 </r:script>
 
-<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;">
+<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;" data-url="${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}" data-contextFreeUrl=${uGroup.createLink(controller:resultController?:controller, action:'show')}"">
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
     <g:if test="${controller.toLowerCase().equals('featured')}">

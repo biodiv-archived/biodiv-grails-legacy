@@ -75,6 +75,7 @@ class ObservationService extends AbstractObjectService {
     def mailService;
     def SUserService;
     def speciesPermissionService;
+    def speciesService;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
@@ -254,7 +255,12 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getNearbyObservations(params.id, max, offset)
         } else if(params.filterProperty == "taxonConcept") {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
+        } else if(params.filterProperty == "latestUpdatedObservations") {
+            relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
+        } else if(params.filterProperty == "latestUpdatedSpecies") {
+            relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
         }
+        
         else{
             relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
         }
@@ -501,7 +507,17 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
-
+    def getLatestUpdatedObservation(webaddress, sortBy, max, offset ){
+        def p = [:]
+        p.webaddress = webaddress
+        p.sort = sortBy
+        def result = getFilteredObservations(p, max, offset).observationInstanceList
+        def res = []
+        result.each{
+            res.add(["observation":it, 'title':(it.isChecklist)? it.title : it.maxVotedReco?it.maxVotedReco.name:"Unknown"])
+        }
+        return ['observations':res]
+    }
 
     Map getRecommendation(params){
         def recoName = params.recoName;
