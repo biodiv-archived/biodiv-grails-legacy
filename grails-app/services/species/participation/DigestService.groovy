@@ -227,4 +227,55 @@ class DigestService {
         }
         return res
     }
+
+    def sendDigestPrizeEmail(){
+        def max = 50
+        def offset = 0
+        def emailFlag = true
+        def userGroup = UserGroup.read(18L)
+        while(emailFlag){
+            def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+            if(usersEmailList.size() != 0){
+                def otherParams = [:]
+                otherParams['userGroup'] = userGroup
+                otherParams['usersEmailList'] = usersEmailList
+                def sp = new Species() 
+                println "============================== Sending DIGEST PRIZE Email" 
+                println usersEmailList
+                observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+                offset = offset + max
+                Thread.sleep(300000L);
+            }
+            else{
+                emailFlag = false
+            }
+        }
+        log.debug " DIGEST PRIZE EMAIL SENT "
+    }
+
+    def sendSampleDigestPrizeEmail(usersEmailList){
+        def max = 50
+        def offset = 0
+        def emailFlag = true
+        def userGroup = UserGroup.read(18L)
+        //while(emailFlag){
+        //def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+        //if(usersEmailList.size() != 0){
+        def otherParams = [:]
+        otherParams['userGroup'] = userGroup
+        otherParams['usersEmailList'] = usersEmailList
+        def sp = new Species() 
+        println "============================== Sending DIGEST PRIZE Email" 
+        println usersEmailList
+        observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+        offset = offset + max
+        //Thread.sleep(300000L);
+        //}
+        //else{
+        //  emailFlag = false
+        //}
+        //}
+        log.debug " DIGEST PRIZE EMAIL SENT "
+    }
+
 }

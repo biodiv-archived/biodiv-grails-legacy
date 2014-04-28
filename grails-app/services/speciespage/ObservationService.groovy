@@ -92,6 +92,7 @@ class ObservationService extends AbstractObjectService {
     static final String FEATURED = "Featured";
     static final String UNFEATURED = "UnFeatured";
     static final String DIGEST_MAIL = "digestMail";
+    static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
     /**
      * 
      * @param params
@@ -1690,6 +1691,14 @@ class ObservationService extends AbstractObjectService {
                 toUsers.addAll(otherParams["usersEmailList"]);
                 //toUsers.addAll(SUser.get(4136L));
                 break
+            
+            case DIGEST_PRIZE_MAIL:
+                mailSubject = "Neighborhood Trees Campaign extended till tonight"
+                bodyView = "/emailtemplates/digestPrizeEmail"
+                templateMap["userGroup"] = otherParams["userGroup"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(otherParams["usersEmailList"]);
+                break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
                 mailSubject = activityFeedService.SPECIES_CREATED
@@ -1811,7 +1820,7 @@ class ObservationService extends AbstractObjectService {
 
     def List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("development")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
             result.each { user ->
                 if(user.sendDigest && !participants.contains(user)){
