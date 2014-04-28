@@ -1326,6 +1326,26 @@ class UserGroupController {
         println "==========ALL DIGEST EMAILS SENT============"
     }
 
+    @Secured(['ROLE_ADMIN'])
+    def sendSampleDigestPrizeEmail = {
+        println "=====STARTING SAMPLE DIGEST PRIZE EMAIL======"
+        /*
+        def digest = Digest.get(1L)
+        def setTime = params.setTime?params.setTime.toBoolean():true
+        digestService.sendDigestWrapper(digest, setTime);
+        */
+        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4136L)]
+        digestService.sendSampleDigestPrizeEmail(usersEmailList)
+        println "==========ALL DIGEST EMAILS SENT============"
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def sendDigestPrizeEmail = {
+        println "=====STARTING SENDING DIGEST PRIZE MAIL TO ALL TREES INDIA MEMBERS======"
+        digestService.sendDigestPrizeEmail()
+        println "==========ALL DIGEST EMAILS SENT============"
+    }
+
 }
 
 class UserGroupCommand {
