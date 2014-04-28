@@ -20,7 +20,7 @@
             <tr>
                 <td>
                     <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
-                    <p>Due to an issue we experienced with a third party plugin some users were unable to upload observations. To compensate, we have decided to extend the Neighborhood Trees Campaign for one more day.The campaign will close at midnight today (28/4/2014) and prize winners and campaign results will be announced <a href="http://treesindia.indiabiodiversity.org/page/56">here</a> shortly. TreesIndia will continue to accept tree observation uploads even after the campaign.<br><br>
+                    <p>Due to an issue we experienced with a third party plugin some users were unable to upload observations. To compensate, we have decided to extend the <a href="http://treesindia.indiabiodiversity.org/">Neighborhood Trees Campaign</a> for one more day.The campaign will close at midnight today (28/4/2014) and prize winners and campaign results will be announced <a href="http://treesindia.indiabiodiversity.org/page/56">here</a> shortly. <br><br><a href="http://treesindia.indiabiodiversity.org/">TreesIndia</a> will continue to accept tree observation uploads even after the campaign.<br><br>
                     Thanks,<br>
                     The TreesIndia Team</p>
                 </td>
