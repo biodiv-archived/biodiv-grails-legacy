@@ -35,25 +35,31 @@ class ImageUtils {
 		String fileName = imageFile.getName();
 		int lastIndex = fileName.lastIndexOf('.');
 		String name = fileName;
+        String originalFileExt = ".jpg";
  		if(lastIndex != -1) {
 			name = fileName.substring(0, lastIndex);
+            originalFileExt = fileName.substring(lastIndex, fileName.length())
 		}
+        //Auto orienting to fix orientation for galleria and saving with "_o" 
+        //and using this oriented image for futher creation 
+        File imageFile1= ImageUtils.autoOrientOriginalImage(imageFile, new File(dir, name+"_o"+originalFileExt))
+
         ///////////////////////////////////////////////////
 
         log.debug "Creating gallery image";
         def extension = config.gallery.suffix
-        ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
+        ImageUtils.convert(imageFile1, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
         ///////////////////////////////////////////////////
         log.debug "Creating gallery thumbnail image";
         extension = config.galleryThumbnail.suffix
-        ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
+        ImageUtils.convert(imageFile1, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
 
         ////////////////////////////////////////////////
         log.debug "Creating thumbnail image";
         extension = config.thumbnail.suffix 
         try{
-            doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+            doResize(imageFile1, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
         } catch (Exception e) {
             log.debug "Error while resizing image probably due to unsupported type so using _gall_th.jpg image for _th1.jpg image $imageFile"
             def jpgGall_extension = config.gallery.suffix
@@ -93,6 +99,7 @@ class ImageUtils {
 		// it might be something like "/usr/local/magick/bin/convert" or something else, depending on where you installed it.
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		command.add(config.imageConverterProg);
+        command.add("-auto-orient")
 		command.add("-resize");
 		command.add(width + "x" + height);
 		command.add("-quality");
@@ -115,6 +122,29 @@ class ImageUtils {
 		}
 		return (proc.exitValue() == 0)
 	}
+    
+    private static File autoOrientOriginalImage(File inImg, File outImg) {
+        
+		ArrayList command = new ArrayList(6);
+
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		command.add(config.imageConverterProg);
+        command.add("-auto-orient")
+		command.add(inImg.getAbsolutePath());
+		command.add(outImg.getAbsolutePath());
+
+		log.debug command;
+
+		def proc = command.execute()                 // Call *execute* on the string
+		proc.waitFor()                               // Wait for the command to finish
+
+		// Obtain status and output
+		log.debug "return code: ${ proc.exitValue()}"
+		log.debug "stderr: ${proc.err.text}"
+		log.debug "stdout: ${proc.in.text}" // *out* from the external program is *in* for groovy
+
+		return outImg 
+    }
 
 	/**
 	 *Resizing Image to 200*200
