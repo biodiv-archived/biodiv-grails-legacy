@@ -75,6 +75,7 @@ class ObservationService extends AbstractObjectService {
     def mailService;
     def SUserService;
     def speciesPermissionService;
+    def speciesService;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
@@ -91,6 +92,7 @@ class ObservationService extends AbstractObjectService {
     static final String FEATURED = "Featured";
     static final String UNFEATURED = "UnFeatured";
     static final String DIGEST_MAIL = "digestMail";
+    static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
     /**
      * 
      * @param params
@@ -253,7 +255,12 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getNearbyObservations(params.id, max, offset)
         } else if(params.filterProperty == "taxonConcept") {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
+        } else if(params.filterProperty == "latestUpdatedObservations") {
+            relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
+        } else if(params.filterProperty == "latestUpdatedSpecies") {
+            relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
         }
+        
         else{
             if(params.id) {
                 relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
@@ -504,7 +511,17 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
-
+    Map getLatestUpdatedObservation(String webaddress,String sortBy, int max, int offset ){
+        def p = [:]
+        p.webaddress = webaddress
+        p.sort = sortBy
+        def result = getFilteredObservations(p, max, offset).observationInstanceList
+        def res = []
+        result.each{
+            res.add(["observation":it, 'title':(it.isChecklist)? it.title : (it.maxVotedReco?it.maxVotedReco.name:"Unknown")])
+        }
+        return ['observations':res]
+    }
 
     Map getRecommendation(params){
         def recoName = params.recoName;
@@ -1677,6 +1694,14 @@ class ObservationService extends AbstractObjectService {
                 toUsers.addAll(otherParams["usersEmailList"]);
                 //toUsers.addAll(SUser.get(4136L));
                 break
+            
+            case DIGEST_PRIZE_MAIL:
+                mailSubject = "Neighborhood Trees Campaign extended till tonight"
+                bodyView = "/emailtemplates/digestPrizeEmail"
+                templateMap["userGroup"] = otherParams["userGroup"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(otherParams["usersEmailList"]);
+                break
 
             case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
                 mailSubject = activityFeedService.SPECIES_CREATED
@@ -1692,6 +1717,10 @@ class ObservationService extends AbstractObjectService {
 
             toUsers.eachWithIndex { toUser, index ->
                 if(toUser) {
+                    if(!toUser.enabled || toUser.accountLocked){
+                        log.error "Account not enabled or locked - so skipping sending email to ${toUser}"
+                        return
+                    }
                     templateMap['username'] = toUser.name.capitalize();
                     templateMap['tousername'] = toUser.username;
                     if(request){
@@ -1700,6 +1729,7 @@ class ObservationService extends AbstractObjectService {
                     if(notificationType == DIGEST_MAIL){
                         templateMap['userID'] = toUser.id
                     }
+                    
                     log.debug "Sending email to ${toUser}"
                     try{
                         mailService.sendMail {

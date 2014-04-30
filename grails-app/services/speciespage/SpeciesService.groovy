@@ -1292,8 +1292,8 @@ class SpeciesService extends AbstractObjectService  {
 
         def queryParams = [:]
         def activeFilters = [:]
-        queryParams.max = Math.min(params.max ? params.int('max') : 42, 100);
-        queryParams.offset = params.offset ? params.int('offset') : 0
+        queryParams.max = Math.min(params.max ? params.max.toInteger() : 42, 100);
+        queryParams.offset = params.offset ? params.offset.toInteger() : 0
 
         if(queryParams.max < 0 ) {
             queryParams.max = 42 
@@ -1551,5 +1551,21 @@ class SpeciesService extends AbstractObjectService  {
             return false
         }
         return true
+    }
+    
+     def getLatestUpdatedSpecies(webaddress, sortBy, max, offset ){
+        println "===SERVICE SPECIES++++++++++GET LATEST==="
+        def p = [:]
+        p.webaddress = webaddress
+        p.sort = sortBy
+        p.max = max.toInteger()
+        p.offset = offset.toInteger()
+        def result = _getSpeciesList(p).speciesInstanceList
+        def res = []
+        result.each{
+            res.add(["observation":it, 'title':it.title])
+        }
+        println "=====RESULT SPECIES ++++++ RETURNED====== " + res
+        return ['observations':res]
     }
 }

@@ -36,7 +36,7 @@ class DigestService {
             if(usersEmailList.size() != 0){
                 sendDigest(digest, usersEmailList, false)
                 offset = offset + max
-                Thread.sleep(900000L);
+                Thread.sleep(600000L);
             }
             else{
                 emailFlag = false
@@ -47,6 +47,7 @@ class DigestService {
             if(!digest.save(flush:true))
                 digest.errors.allErrors.each { log.error it }
         }
+        log.debug " MAIL SENT and Digest Last sent time updated "
 
     }
 
@@ -72,7 +73,7 @@ class DigestService {
                 if(!digest.save(flush:true))
                     digest.errors.allErrors.each { log.error it }
             }
-            log.debug " MAIL SENT and Digest Last sent time updated "
+            
         }else{
             log.error "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
         }
@@ -105,11 +106,11 @@ class DigestService {
             res = null
         }
         else{
-            feedsList.each{
-                switch(it.rootHolderType){
+            for (def feed : feedsList){
+                switch(feed.rootHolderType){
                     case Observation.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS) { 
-                        def obv = Observation.read(it.rootHolderId)
+                        def obv = Observation.read(feed.rootHolderId)
                         if(!obvList.contains(obv)){
                             obvList.add(obv)
                         }
@@ -119,7 +120,7 @@ class DigestService {
 
                     //UNIDENTIFIED OBV LIST
                     if (unidObvList.size() < MAX_DIGEST_OBJECTS) {
-                        def obv = Observation.read(it.rootHolderId)
+                        def obv = Observation.read(feed.rootHolderId)
                         if(!obv.maxVotedReco){
                             if(!unidObvList.contains(obv)){
                                 unidObvList.add(obv)
@@ -134,7 +135,7 @@ class DigestService {
 
                     case Checklists.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS){
-                        def chk = Checklists.read(it.rootHolderId)
+                        def chk = Checklists.read(feed.rootHolderId)
                         if(!obvList.contains(chk)){
                             obvList.add(chk)
                         }
@@ -147,7 +148,7 @@ class DigestService {
 
                     case Species.class.getCanonicalName():
                     if(spList.size() < MAX_DIGEST_OBJECTS){
-                        def sp = Species.read(it.rootHolderId)
+                        def sp = Species.read(feed.rootHolderId)
                         if(!spList.contains(sp)){
                             spList.add(sp)
                         }
@@ -159,7 +160,7 @@ class DigestService {
 
                     case Document.class.getCanonicalName():
                     if(docList.size() < MAX_DIGEST_OBJECTS){
-                        def doc = Document.read(it.rootHolderId)
+                        def doc = Document.read(feed.rootHolderId)
                         if(!docList.contains(doc)){
                             docList.add(doc)
                         }
@@ -170,9 +171,9 @@ class DigestService {
                     break
 
                     case UserGroup.class.getCanonicalName():
-                    if(it.activityHolderType == SUser.class.getCanonicalName()){
+                    if(feed.activityHolderType == SUser.class.getCanonicalName()){
                         if(userList.size() < MAX_DIGEST_OBJECTS){
-                            def user = SUser.read(it.activityHolderId)
+                            def user = SUser.read(feed.activityHolderId)
                             if(!userList.contains(user)){
                                 userList.add(user)
                             }
@@ -186,7 +187,7 @@ class DigestService {
                 } 
                 
                 if(obvFlag && unidObvFlag && spFlag && docFlag && userFlag){
-                    return;
+                    break;
                 }
 
             }
@@ -226,4 +227,55 @@ class DigestService {
         }
         return res
     }
+
+    def sendDigestPrizeEmail(){
+        def max = 50
+        def offset = 0
+        def emailFlag = true
+        def userGroup = UserGroup.read(18L)
+        while(emailFlag){
+            def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+            if(usersEmailList.size() != 0){
+                def otherParams = [:]
+                otherParams['userGroup'] = userGroup
+                otherParams['usersEmailList'] = usersEmailList
+                def sp = new Species() 
+                println "============================== Sending DIGEST PRIZE Email" 
+                println usersEmailList
+                observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+                offset = offset + max
+                Thread.sleep(300000L);
+            }
+            else{
+                emailFlag = false
+            }
+        }
+        log.debug " DIGEST PRIZE EMAIL SENT "
+    }
+
+    def sendSampleDigestPrizeEmail(usersEmailList){
+        def max = 50
+        def offset = 0
+        def emailFlag = true
+        def userGroup = UserGroup.read(18L)
+        //while(emailFlag){
+        //def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+        //if(usersEmailList.size() != 0){
+        def otherParams = [:]
+        otherParams['userGroup'] = userGroup
+        otherParams['usersEmailList'] = usersEmailList
+        def sp = new Species() 
+        println "============================== Sending DIGEST PRIZE Email" 
+        println usersEmailList
+        observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+        offset = offset + max
+        //Thread.sleep(300000L);
+        //}
+        //else{
+        //  emailFlag = false
+        //}
+        //}
+        log.debug " DIGEST PRIZE EMAIL SENT "
+    }
+
 }

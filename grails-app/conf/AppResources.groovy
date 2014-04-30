@@ -77,6 +77,7 @@ modules = {
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'
 		resource url:'/js/species/abstracttype.js'
+		resource url:'/js/species/relatedStory.js'
 	}
 
 	auth {
