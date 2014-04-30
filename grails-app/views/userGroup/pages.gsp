@@ -100,7 +100,7 @@
   				
   				var me = $(this);
   				var contentID = me.attr('href');//e.target.hash; //get anchor
-  				if(contentID) {
+  				if(contentID && contentID != '/project/list') {
 	  				e.preventDefault();
 	  				var History = window.History; 
 		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
