@@ -116,8 +116,8 @@ class ChecklistController {
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
-                //flash.message = "${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
+                flash.error = result.msg;//"${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
             }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
@@ -212,8 +212,8 @@ class ChecklistController {
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
-                //flash.message = "${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData, checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
+                flash.error = result.msg;//"${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance, 'msg':result.msg, checklistData:params.checklistData, checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
             }
 
 		}else {

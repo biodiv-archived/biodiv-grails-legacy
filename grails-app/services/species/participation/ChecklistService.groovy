@@ -125,8 +125,20 @@ class ChecklistService {
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
 			}
 			
-			
-			if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
+            // ignoring saving when there is no valid observation
+            boolean validObvPresent = false
+            for(Map m in params.checklistData) {
+                def oldObvId = m.OBSERVATION_COLUMN
+                if(isValidObservation(m, oldObvId, checklistInstance)){
+                    validObvPresent = true;
+                    break;
+                }
+            }
+            if(!validObvPresent) {
+				return ['success' : false, 'msg':'No valid observation present. Ignoring saving checklist', checklistInstance:checklistInstance]
+            }
+
+			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
 				
@@ -139,14 +151,14 @@ class ChecklistService {
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
-				return ['success' : true, checklistInstance:checklistInstance]
+				return ['success' : true, 'msg':'Successfully saved checklist.', checklistInstance:checklistInstance]
 			} else {
 				checklistInstance.errors.allErrors.each { log.error it }
-				return ['success' : false, checklistInstance:checklistInstance]
+				return ['success' : false, 'msg':checklistInstance.errors, checklistInstance:checklistInstance]
 			}
 		} catch(e) {
 			e.printStackTrace();
-			return ['success' : false, checklistInstance:checklistInstance]
+			return ['success' : false, 'msg':"Error in saving checklist : ${e.getMessage()}", checklistInstance:checklistInstance]
 		}
 	}
 	
@@ -163,7 +175,7 @@ class ChecklistService {
 	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
 	    if(!params.checklistData && !isGlobalUpdate)
 			return
-		
+            
 		Checklists.withTransaction() {
 			Set updatedObv = new HashSet()
 			Set newObv = new HashSet()
@@ -179,7 +191,7 @@ class ChecklistService {
 					def media = m.remove(MEDIA_COLUMN);
 					m.remove(SPECIES_TITLE_COLUMN);
 					m.remove(SPECIES_ID_COLUMN);
-	                println "------------media----------- ${media}"
+
 	                Map obsParams = new HashMap(commonObsParams);
 	                if(media) {
 	                    media.eachWithIndex{ item, index ->
@@ -223,7 +235,7 @@ class ChecklistService {
 			//updating obv count
 			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
 		}
-		log.debug "saved checklist observation  "
+		log.debug "saved checklist observations"
 	}
 	
 	private boolean isValidObservation(m, oldObvId, cl){
@@ -630,7 +642,6 @@ class ChecklistService {
 		clIdList.each {  id ->
 			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
 			if(!cl.observations.iterator().next().checklistAnnotations){
-				println cl
 				Checklists.withTransaction(){
 					cl.observations.each { obv ->
 						def m = [:]

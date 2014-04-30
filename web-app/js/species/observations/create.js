@@ -2,6 +2,30 @@ var grid;
 var dirtyRows;
 var prevNameColumn = {};
 
+function isEmptyRow(rowEntry){
+    var emptyRow = true;
+    $.each( rowEntry, function( key, value ) {
+        if(value != "" && value != undefined && value != null) {
+            emptyRow = false;
+        }
+    });
+    return emptyRow;
+}
+
+/*function getData(gridData) {
+    var data = [];
+    var gridData = grid.getData();
+
+    for(var rowId=0; rowId<gridData.length; rowId++) {
+        var rowEntry = gridData.getDataItem(rowId);
+         if(isEmptyRow(rowEntry)){
+            continue;
+        }
+        data.push(rowEntry);
+    }
+    return data; 
+}*/
+
 //only returning modified data
 function getDataFromGrid(){
     if(!dirtyRows){
@@ -14,7 +38,8 @@ function getDataFromGrid(){
     dirtyRows = dirtyRows.unique();
     var data = new Array();
     $.each(dirtyRows, function(index, rowId) {
-        data.push(grid.getDataItem(rowId));
+        var rowEntry = grid.getDataItem(rowId);
+        data.push(rowEntry);
     });
     return data;
 }
@@ -127,6 +152,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
             var name = args.column.name;
+
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
                     name = ''
@@ -268,7 +294,6 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             });
 
         }
-
 
         if(sciNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
@@ -612,16 +637,7 @@ $(document).ready(function(){
         $('#legend').hide();
         var me = this
         
-        function isEmptyRow(rowEntry){
-        	var emptyRow = true;
-        	$.each( rowEntry, function( key, value ) {
-        		if(value != "" && value != undefined && value != null) {
-        			emptyRow = false;
-        		}
-        	});
-        	return emptyRow;
-        }
-        
+       
         
         $.ajax({
             url : window.params.recommendation.getRecos,
@@ -685,6 +701,25 @@ $(document).ready(function(){
         });
     });
 
+    //removning empty rows and properties
+    function getGridDataJSON(gridData) {
+        var ck = new Array();
+        for(var rowId=0; rowId<gridData.length; rowId++) {
+            var rowEntry = grid.getDataItem(rowId);
+            if(isEmptyRow(rowEntry)){
+                continue;
+            }
+            var row = new Object();
+            $.each( rowEntry, function( key, value ) {
+                if(value != "" && value != undefined && value != null) {
+                    row[key] = value;
+                }
+            });
+            ck.push(row);
+        }
+        return JSON.stringify(ck);
+    }
+
     /**
      *
      */
@@ -724,7 +759,7 @@ $(document).ready(function(){
             //checklist related data
             if(grid){
 	            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
-	            $("#checklistData").val(JSON.stringify(getDataFromGrid()));
+	            $("#checklistData").val(getGridDataJSON(getDataFromGrid()));
 	            $("#rawChecklist").val($("#checklistStartFile_path").val());
             }
             $("#addObservation").submit();        	
