@@ -1,5 +1,4 @@
 function changeDisplayOrder(url, pageId, typeOfChange){
-    console.log("clicked");
     $.ajax({
         url : url,
         datatype : 'json',
