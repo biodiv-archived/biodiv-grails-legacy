@@ -1734,7 +1734,7 @@ class ObservationService extends AbstractObjectService {
                     try{
                         mailService.sendMail {
                             to toUser.email
-                            if(index == 0 && Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("pamba")||Environment.getCurrent().getName().equalsIgnoreCase("kk")) ) {
                                 bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                             }
                             from grailsApplication.config.grails.mail.default.from
@@ -1808,7 +1808,7 @@ class ObservationService extends AbstractObjectService {
 
     private List getParticipants(observation) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = getUserForEmail(observation) //Follow.getFollowers(observation)
             result.each { user ->
                 if(user.sendNotification && !participants.contains(user)){
@@ -1823,7 +1823,7 @@ class ObservationService extends AbstractObjectService {
 
     def List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
             result.each { user ->
                 if(user.sendDigest && !participants.contains(user)){
@@ -1854,7 +1854,7 @@ class ObservationService extends AbstractObjectService {
 	
 	private SUser getOwner(observation) {
 		def author = null;
-        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") ||Environment.getCurrent().getName().equalsIgnoreCase("kk") ) {
             if(observation.metaClass.hasProperty(observation, 'author') || observation.metaClass.hasProperty(observation, 'contributors')) {
                 author = observation.author;
                 if(!author.sendNotification) {
