@@ -48,6 +48,7 @@ class AbstractObjectController {
 			if(relatedObv.observations)
 				relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));
 		} else {
+            log.debug "no related observations"
 		}
 		render relatedObv as JSON
 	}
