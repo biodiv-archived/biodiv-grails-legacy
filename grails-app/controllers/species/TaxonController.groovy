@@ -272,8 +272,10 @@ class TaxonController {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);					
+                    println list
                     reg = reg.parentTaxon;
                 }
+                println list
                 //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};
                     speciesHier.addAll(list);
@@ -301,7 +303,7 @@ class TaxonController {
             def species = getSpecies(speciesTaxonId, result.rank);
             if(species){
                 result.put("speciesid", species.id)
-                result.put('name', species.title)
+                result.put('speciesname', species.title)
                 result.put('count', 1);
             }
         //}
