@@ -72,9 +72,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
 <%--	</div>--%>
 										
-	<div class="alertMsg alert alert-info" style="background-color: #2d2d2d; color: yellow; text-shadow: none; clear: both; margin: 0px; text-align: center;padding:4px;border:none;">
+	<!--div class="alertMsg alert alert-info" style="background-color: #2d2d2d; color: yellow; text-shadow: none; clear: both; margin: 0px; text-align: center;padding:4px;border:none;">
 		The <a style="color:orange;" href="http://treesindia.indiabiodiversity.org">TreesIndia@IBP</a> is organizing a "Neighbourhood Trees Campaign" from Earth day 22nd-27th April. Participate in the campaign and upload <a style="color:orange;" href="http://treesindia.indiabiodiversity.org/observation/create">tree observations</a>.
-	</div>
+	</div-->
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">

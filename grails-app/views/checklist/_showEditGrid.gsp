@@ -5,6 +5,12 @@ $(document).ready(function(){
     if(data && columns) {
         data = eval(data);
         columns = eval(columns);
+        for(var i=0; i<columns.length; i++) {
+            if(columns[i].name == "Media") {
+                $.extend(columns[i], getMediaColumnOptions())
+            }
+        }
+        console.log(columns);
         loadDataToGrid(data, columns, 'checklist', '${sciNameColumn?:""}', '${commonNameColumn?:""}');
     } else {
     	loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance.id}");

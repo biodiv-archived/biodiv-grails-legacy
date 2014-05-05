@@ -58,9 +58,9 @@ class SecurityFilters {
 						model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
 					}
 				}
-				if (!Environment.getCurrent().getName().startsWith("pamba")) {
+//				if (!Environment.getCurrent().getName().startsWith("pamba")) {
 					//log.debug "before view rendering "
-				}  
+//				}  
             }
 			
             afterView = {
