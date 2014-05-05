@@ -138,10 +138,9 @@ function removeResource(event, imageId) {
             $s.each(function() {
                 var fileName = $(this).attr('fileName');
                 var type = $(this).attr('type');					
-                images.push({i:x+i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
+                images.push({i:x+i, file:fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
                 x--;
             });
-            
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
             metadataEle.each(function() {
