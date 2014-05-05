@@ -123,6 +123,7 @@ class ChecklistService {
 				//so that original author of checklist should not change
 				//to say if all obv needs to be updated because some change in MetaData properties
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
+                mailType = feedType
 			}
 			
             // ignoring saving when there is no valid observation

@@ -705,7 +705,7 @@ $(document).ready(function(){
     function getGridDataJSON(gridData) {
         var ck = new Array();
         for(var rowId=0; rowId<gridData.length; rowId++) {
-            var rowEntry = grid.getDataItem(rowId);
+            var rowEntry = gridData[rowId];
             if(isEmptyRow(rowEntry)){
                 continue;
             }
@@ -872,10 +872,9 @@ function openDetails(row, cell) {
         return false;
     }
 
-    $('#addResourcesModal ul#imagesList>li.addedResource.thumbnail').remove();
+    $('#addResourcesModal ul.imagesList>li.addedResource.thumbnail').remove();
 
     var data = grid.getData()[row];
-
     var media = data.Media;
     if(media) {
         var obvDir = data.obvDir;
@@ -883,20 +882,20 @@ function openDetails(row, cell) {
         if(!obvDirInput.val()){
             $(obvDirInput).val(obvDir);
         }
-
         var images = [];
         var metadata = $(".metadata");
         var i = 0;
-        /*if(metadata.length > 0) {
+        /*
+        if(metadata.length > 0) {
           var file_id = $(metadata.get(-1)).children("input").first().attr("name");
           i = parseInt(file_id.substring(file_id.indexOf("_")+1));
-          }*/
-        for(i=0; i< media.length; i++) {
+        }*/
+        //order reversed
+        for(i = (media.length - 1); i >= 0; i--) {
             var m = media[i];
             //TODO:push rating also
-            images.push({i:i+1, file:obvDir + "/" + m['file'], url:m['url'], thumbnail:m['thumbnail'], type:m['type'], title:m['fileName']});
+            images.push({i:i+1, file: m['file'], url:m['url'], thumbnail:m['thumbnail'], type:m['type'], title:m['fileName']});
         };
-
         var html = $( "#metadataTmpl" ).render( images );
         var metadataEle = $(html);
         metadataEle.each(function() {
@@ -907,7 +906,7 @@ function openDetails(row, cell) {
             rate($ratingContainer)
         })
 
-        $("#imagesList li:last" ).before (metadataEle);
+        $(".imagesList li:first" ).after (metadataEle);
     }
 
     $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
@@ -920,7 +919,7 @@ $(document).ready(function() {
      *
      */
     $('#addResourcesModalSubmit').click(function(){
-       var row = $('#addResourcesModal').data().row;    
+        var row = $('#addResourcesModal').data().row;    
        var cell = $('#addResourcesModal').data().cell;
        if(row === undefined || cell === undefined) {
            alert('Either row or cell is missing');

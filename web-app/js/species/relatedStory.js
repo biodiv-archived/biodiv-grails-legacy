@@ -1,6 +1,4 @@
 function relatedStory(relatedInstanceList, filterProperty, id, userGroupWebaddress, filterPropertyValue){
-    console.log("gfdgdfgdfgdrgdrgh");
-    console.log(relatedInstanceList);
     var carouselOptions = {
         itemLoadCallback : itemLoadCallback,
         initCallback : initCallback,

@@ -451,7 +451,7 @@ class ObservationController extends AbstractObjectController {
 						def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
 						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
-						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
+						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
 				}
 				

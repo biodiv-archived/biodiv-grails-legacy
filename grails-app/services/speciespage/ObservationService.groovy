@@ -1702,8 +1702,8 @@ class ObservationService extends AbstractObjectService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(otherParams["usersEmailList"]);
                 break
-
-            case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
+            //below case also had activityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
+            case [activityFeedService.SPECIES_CREATED]:
                 mailSubject = activityFeedService.SPECIES_CREATED
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = " added the following species:"
