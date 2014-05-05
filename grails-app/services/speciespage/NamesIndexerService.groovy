@@ -138,7 +138,7 @@ class NamesIndexerService {
 	
 	private String getIconPath(mainImage){
         if(!mainImage) return null;
-        return mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, !speciesInstance.resources ? '.png' :null): null;
+        return mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, null): null;
 	}
 
 	/**

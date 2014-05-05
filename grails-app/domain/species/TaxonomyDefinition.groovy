@@ -105,7 +105,8 @@ class TaxonomyDefinition extends NamesSorucedata {
 	 */
 	Map<Classification, List<TaxonomyDefinition>> parentTaxonRegistry() {
 		Map<List<TaxonomyDefinition>> result = [:];
-		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->
+        def regList = TaxonomyRegistry.findAllByTaxonDefinition(this);
+        for(TaxonomyRegistry reg in regList) {
 			//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
 			def l = []
 			reg.path.tokenize('_').each { taxonDefinitionId ->
