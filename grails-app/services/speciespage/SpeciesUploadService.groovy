@@ -569,6 +569,7 @@ class SpeciesUploadService {
 		try{
 			//TaxonomyDefinition.withNewSession{
 				for(Species s : species) {
+                    s.afterInsert();
 					def taxonConcept = s.taxonConcept;
 					if(!taxonConcept.isAttached()) {
 						taxonConcept.attach();

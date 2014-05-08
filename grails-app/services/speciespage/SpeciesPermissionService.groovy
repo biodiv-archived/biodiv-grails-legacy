@@ -81,45 +81,46 @@ class SpeciesPermissionService {
 
     private boolean addTaxonUser(SUser user, TaxonomyDefinition taxonConcept, SpeciesPermission.PermissionType permissionType){
         if(!isTaxonContributor(taxonConcept, user, [permissionType])) {
+            log.debug "adding taxon user ${user} to ${taxonConcept} with permission ${permissionType}"
             try{
                 def newCon = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
                 if(!newCon.save(flush:true)){
                     newCon.errors.allErrors.each { log.error it }
                     return false
                 }
+                log.error "done"
                 return true;
             } catch (Exception e) {
                 log.error "error adding new contributor ${e.getMessage()}"
                 return false;
             }
-        } else 
+        } else { 
+            log.debug "is already a contributor"
             return true;
+        }
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        return isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes);
+        return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) ||SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
     boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes) {
         if(!user) return false;
         if(!taxonConcept) return false;
-        if(SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')) 
-            return true;
-        else {
-            List parentTaxons = taxonConcept.parentTaxon()
-            parentTaxons.add(taxonConcept);
-            def permissions = permissionTypes.collect {it.value()};
-            def res = SpeciesPermission.withCriteria {
-                eq('author', user)
-                inList('permissionType', permissions)
-                inList('taxonConcept',  parentTaxons)
-            }
-            if(res && res.size() > 0)
-                return true
-            else
-                return false
+        List parentTaxons = taxonConcept.parentTaxon()
+        parentTaxons.add(taxonConcept);
+        def permissions = permissionTypes.collect {it.value()};
+        def res = SpeciesPermission.withCriteria {
+            eq('author', user)
+            inList('permissionType', permissions)
+            inList('taxonConcept',  parentTaxons)
         }
-        return false;
+
+        if(res && res.size() > 0) {
+            return true
+        } else {
+            return false
+        }
     }
 
     boolean isSpeciesFieldContributor(SpeciesField speciesFieldInstance, SUser user) {

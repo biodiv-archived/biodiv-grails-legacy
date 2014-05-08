@@ -236,7 +236,6 @@ class Species implements Rateable {
     def afterInsert() {
 		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
 		//http://jira.grails.org/browse/GRAILS-4453
-        println "After insert into species"
 		Species.withNewSession{
 	        HashSet contributors = new HashSet();
 	
@@ -246,8 +245,11 @@ class Species implements Rateable {
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        
 	        //Saving current user as contributor for the species
-	        speciesPermissionService.addContributors(this, new ArrayList(contributors));
-            log.debug "Added permissions on ${this} to ${contributors}"
+	        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
+                log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
+            } else {
+                log.error "Error while adding permissions on ${this} species and taxon ${species.taxonConcept.id} to ${contributors}"
+            }
 		}
     }
 
