@@ -562,7 +562,6 @@ class ObservationController extends AbstractObjectController {
 
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
@@ -575,8 +574,9 @@ class ObservationController extends AbstractObjectController {
 						mailType = observationService.SPECIES_RECOMMENDED;
 					}
 					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
-
-					if(!params["createNew"]){
+					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+					
+                    if(!params["createNew"]){
 						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
