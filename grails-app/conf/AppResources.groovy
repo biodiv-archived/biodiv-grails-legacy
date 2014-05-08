@@ -141,7 +141,6 @@ modules = {
 		resource url:'/js/species/observations/create.js'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
         resource url:'http://api.filepicker.io/v1/filepicker.js'
-        resource url:'https://api.filepicker.io/v1/filepicker_debug.js'
 	}
 
     distinct_reco {
@@ -170,7 +169,6 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
-		resource url:'/js/species/abstracttype.js'
 		resource url:'/js/species/abstracteditabletype.js'
 		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/taxonhierarchy.js'

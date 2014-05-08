@@ -245,7 +245,11 @@ class Species implements Rateable {
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        
 	        //Saving current user as contributor for the species
-	        speciesPermissionService.addContributors(this, new ArrayList(contributors));
+	        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
+                log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
+            } else {
+                log.error "Error while adding permissions on ${this} species and taxon ${species.taxonConcept.id} to ${contributors}"
+            }
 		}
     }
 
