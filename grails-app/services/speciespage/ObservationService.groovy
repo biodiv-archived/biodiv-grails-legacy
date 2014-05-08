@@ -180,6 +180,9 @@ class ObservationService extends AbstractObjectService {
                 updateObservation(params, observationInstance, updateResources)
                 feedType = activityFeedService.OBSERVATION_UPDATED
                 feedAuthor = springSecurityService.currentUser
+                if(params.action == "update") {
+                    mailType = activityFeedService.OBSERVATION_UPDATED
+                }
             }
 
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
@@ -194,6 +197,7 @@ class ObservationService extends AbstractObjectService {
                     sendNotificationMail(mailType, observationInstance, null, params.webaddress);
 
                 params["createNew"] = true
+                params["oldAction"] = params.action
                 return ['success' : true, observationInstance:observationInstance]
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -1516,19 +1520,30 @@ class ObservationService extends AbstractObjectService {
             //def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
 
             switch ( notificationType ) {
-                case OBSERVATION_ADDED:
+                case [OBSERVATION_ADDED, activityFeedService.OBSERVATION_UPDATED]:
+                if( notificationType == OBSERVATION_ADDED ) {
+                    mailSubject = conf.ui.addObservation.emailSubject
+                    templateMap["message"] = " added the following observation:"
+                } else {
                 mailSubject = conf.ui.addObservation.emailSubject
+                    mailSubject = "Observation updated"
+                    templateMap["message"] = " updated the following observation:"
+                }
                 bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = " added the following observation:"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
 
-                case activityFeedService.CHECKLIST_CREATED:
-                mailSubject = conf.ui.addChecklist.emailSubject
+                case [activityFeedService.CHECKLIST_CREATED, activityFeedService.CHECKLIST_UPDATED]:
+                if( notificationType == activityFeedService.CHECKLIST_CREATED ) {
+                    mailSubject = conf.ui.addChecklist.emailSubject
+                    templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
+                } else {
+                    mailSubject = "Checklist updated"
+                    templateMap["message"] = " updated a checklist on ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
+                }
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["actionObject"] = "checklist"
-                templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
                 toUsers.add(getOwner(obv))
                 break
                 

@@ -202,7 +202,7 @@ class ObservationController extends AbstractObjectController {
 		log.debug params;
 		def observationInstance = Observation.get(params.id?.toLong())
 		if(observationInstance)	{
-			saveAndRender(params, false)
+			saveAndRender(params, true)
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -545,8 +545,7 @@ class ObservationController extends AbstractObjectController {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					
-					if(params["createNew"]) {
+					if(params["createNew"] && params.oldAction == "save") {
 						mailType = observationService.OBSERVATION_ADDED;
 						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
@@ -570,7 +569,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending email
-					if(params["createNew"]) {
+					if(params["createNew"] && params.oldAction == "save" ) {
 						mailType = observationService.OBSERVATION_ADDED;
 					} else {
 						mailType = observationService.SPECIES_RECOMMENDED;
