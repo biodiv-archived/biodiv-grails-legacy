@@ -1342,6 +1342,10 @@ span.cke_skin_kama {
     padding:2px;
 }
 
+.galleria-counter {
+    bottom : 318px;
+}
+
 .galleria-thumbnails-container {
     height: 82%;
     bottom: 0;

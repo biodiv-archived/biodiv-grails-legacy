@@ -250,7 +250,16 @@ function initGalleryTabs() {
                 });
 
                 this.bind('loadfinish', function(e){
+                    var galleriaInfo = $(".galleria-info");
+                    galleriaInfo.css({'top': '350px'});
                     galleryImageLoadFinish();
+                    var galleriaSlideUp = $(".galleria-info .slideUp");
+                    galleriaSlideUp.addClass('icon-chevron-down').removeClass('icon-chevron-up');
+                    galleriaSlideUp.click();
+                    var top = galleriaInfo.position().top
+                    // minus 8 out of top bcoz trunk8 of 2 lines takes 
+                    // height of 8 in galleryImageLoadFinish()
+                    galleriaInfo.css({'top': (top - 8)+'px'});
                 })
 
             }
