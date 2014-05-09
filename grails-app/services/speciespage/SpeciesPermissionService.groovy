@@ -95,7 +95,7 @@ class SpeciesPermissionService {
                 return false;
             }
         } else { 
-            log.debug "is already a contributor"
+            log.debug "${user} is already a contributor"
             return true;
         }
     }
@@ -109,6 +109,7 @@ class SpeciesPermissionService {
         if(!taxonConcept) return false;
         List parentTaxons = taxonConcept.parentTaxon()
         parentTaxons.add(taxonConcept);
+        println parentTaxons
         def permissions = permissionTypes.collect {it.value()};
         def res = SpeciesPermission.withCriteria {
             eq('author', user)

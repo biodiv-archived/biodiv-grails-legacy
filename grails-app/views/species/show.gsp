@@ -167,9 +167,8 @@
         <%String space = speciesInstance.taxonConcept.canonicalForm%>
             <r:script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
-                CKEDITOR.plugins.addExternal( 'inlinesave', '${request.contextPath}/js/ckeditor/plugins/inlinesave/' );               
 
-                var config = { extraPlugins: 'confighelper,inlinesave', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
+                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
                     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
                     { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
                     { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
@@ -177,8 +176,7 @@
                     { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
                     { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
                     { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-                    { name: 'insert', items: [ 'Image', 'Table'] },
-                    {name: 'save', items:['Inlinesave']}
+                    { name: 'insert', items: [ 'Image', 'Table'] }
                     ],
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/biodivofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
