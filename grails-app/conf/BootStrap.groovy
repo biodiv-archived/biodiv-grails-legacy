@@ -11,6 +11,8 @@ import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
+import species.Habitat;
+import species.License;
 import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
@@ -181,6 +183,18 @@ class BootStrap {
                 log.error "Error writing polygon wkt : ${it}"
             }
             return geomStr;
+        }
+
+        JSON.registerObjectMarshaller(SpeciesGroup) {
+            return ['id':it.id, 'name': it.name, 'groupOrder':it.groupOrder]
+        }
+
+        JSON.registerObjectMarshaller(Habitat) {
+            return ['id':it.id, 'name': it.name, 'habitatOrder':it.habitatOrder]
+        }
+
+        JSON.registerObjectMarshaller(License) {
+            return ['name': it.name.value(), 'url':it.name]
         }
 
         JSON.registerObjectMarshaller(Featured) {

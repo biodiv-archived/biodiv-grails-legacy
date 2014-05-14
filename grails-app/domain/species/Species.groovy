@@ -248,7 +248,7 @@ class Species implements Rateable {
 	        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
                 log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
             } else {
-                log.error "Error while adding permissions on ${this} species and taxon ${species.taxonConcept.id} to ${contributors}"
+                log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
             }
 		}
     }

@@ -266,6 +266,7 @@ class SpeciesUploadService {
 		def uploadCount = 0
 		try {
 			log.info "Uploading mapped spreadsheet : "+file;
+			println "Uploading mapped spreadsheet : "+file;
 	
 			List<Species> species = new ArrayList<Species>();
 			converter = new MappedSpreadsheetConverter();
@@ -280,7 +281,6 @@ class SpeciesUploadService {
 			}
 			uploadCount = saveSpecies(converter, content, imagesDir, sBulkUploadEntry)
 			result['success'] = true
-			
 		} catch (Exception e) {
 			log.error e.message
 			e.printStackTrace()
@@ -700,6 +700,7 @@ class SpeciesUploadService {
     }
 
     File saveModifiedSpeciesFile(params){
+        try{
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
@@ -719,6 +720,10 @@ class SpeciesUploadService {
         InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
         return file
+        } catch(Exception e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+        }
     }
 	
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
