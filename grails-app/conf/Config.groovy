@@ -758,7 +758,7 @@ environments {
 		}
 	}
 	kk {
-		servername = 'ibp.kk.strandls.com'
+		servername = 'indiabiodiversity.org'
 		grails.serverURL = "http://${servername}/${appName}"
 		
         speciesPortal {
