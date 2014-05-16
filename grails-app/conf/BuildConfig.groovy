@@ -129,15 +129,14 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-        //build   ":tomcat:$grailsVersion"
-        build ':jetty:2.0.3'
+        build   ":tomcat:7.0.50"
 
         compile ":scaffolding:2.0.1"
         //TODO enable this plugin
         //compile ':cache:1.1.1'
         //runtime ":database-migration:1.3.8"
 
-        compile ':hibernate:3.6.10.3'
+        compile ':hibernate:3.6.10.7'
         //        compile ":hibernate:$grailsVersion"
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'

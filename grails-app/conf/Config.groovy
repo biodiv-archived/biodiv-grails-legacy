@@ -473,31 +473,22 @@ environments {
         }
 
 
-        log4jConsoleLogLevel = Priority.INFO
+        log4jConsoleLogLevel = Priority.DEBUG
         log4j = {
-            appenders {
-                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
-                file name:'file', file:'/tmp/biodiv.log'
-            }
-
-            root {
-                level = org.apache.log4j.Level.DEBUG
-                debug 'file'
-                warn 'stdout'
-            }
             error   'net.sf.ehcache.hibernate'
-            warn    'org.codehaus.groovy.grails.web.pages', //  GSP
+            debug    'org.codehaus.groovy.grails.web.pages', //  GSP
                     'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
                     'org.codehaus.groovy.grails.web.mapping', // URL mapping
                     'org.codehaus.groovy.grails.commons', // core / classloading
                     'org.codehaus.groovy.grails.plugins', // plugins
                     'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'org.hibernate',
-                    'org.springframework.security',
+                    'grails.app.tagLib.org.grails.plugin.resource'
+                    'org.hibernate'
+
+            debug   'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.plugin',
-                    'org.springframework.security.web',
-                    'grails.app.tagLib.org.grails.plugin.resource'
+                    'org.springframework.security.web'
 
             debug   'speciespage',
                     'grails.app',
