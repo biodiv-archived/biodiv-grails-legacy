@@ -389,6 +389,7 @@ class ObvUtilService {
 		
 		//tags, grouplist, notes
 		obvParams['notes'] = m[NOTES]
+
 		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",").collect { it.trim() } : null)
 		obvParams['userGroupsList'] = getUserGroupIds(m[USER_GROUPS])
 		
@@ -396,6 +397,8 @@ class ObvUtilService {
 		
 		//author
 		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
+		
+		obvParams['geoPrivacy'] = m["geoprivacy"]
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(obvParams.latitude && obvParams.longitude) {
@@ -442,11 +445,11 @@ class ObvUtilService {
 				observationInstance.setTags(tags);
 
 				if(params.groupsWithSharingNotAllowed) {
-					observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+					observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
 				}else {
 					if(params.userGroupsList) {
 						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-						observationService.setUserGroups(observationInstance, userGroups);
+						observationService.setUserGroups(observationInstance, userGroups, false);
 					}
 				}
 				if(!observationInstance.save(flush:true)){

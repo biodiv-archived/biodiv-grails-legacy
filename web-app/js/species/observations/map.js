@@ -25,13 +25,10 @@ function refreshMarkers(p, url, callback) {
             	var longitude = obv.lng?obv.lng:obv[2];
             	var icon;
                 
-                /*if(obv.geoPrivacy || obv[4]){
-                	icon = (obv.isChecklist || obv[3])?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
-                	latitude += data.geoPrivacyAdjust;
-                	longitude += data.geoPrivacyAdjust;
-                } else{*/
-                	icon = (obv.isChecklist || obv[3])?checklistIcon:pointIcon;
-                //}
+                if(obv.geoPrivacy){
+                	latitude += obv.geoPrivacyAdjust;
+                	longitude += obv.geoPrivacyAdjust;
+                }
                 var marker = createMarker(latitude, longitude, {
                     draggable: false,
                     clusterable: true,

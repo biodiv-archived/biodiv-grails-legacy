@@ -19,6 +19,12 @@
 </head>
 <body>
 	<div class="homepage-content" style="margin-left:20px;">
+        <g:if test="${userGroupInstance.homePage =~ /\/newsletter\/show\/[0-9]+/}">
+            <% def c = userGroupInstance.homePage?userGroupInstance.homePage.split('/'):['userGroup', 'about']%>
+            <g:applyLayout name="empty">
+                <g:include controller="${c[1]}" action="${c[2]}" id="${c[3]}"/>
+            </g:applyLayout>
+        </g:if>
 	</div>
 	<g:javascript>
 		$(document).ready(function() {
@@ -28,12 +34,16 @@
 	
 	<r:script>
 		$(document).ready(function(){
-                	var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
-			$.get(url, function(data) {
-			    $('.homepage-content').html($(data).find('.bodymarker'));
-
-                            loadUserGroupLocation("${userGroupInstance.ne_latitude}","${userGroupInstance.ne_longitude}","${userGroupInstance.sw_latitude}","${userGroupInstance.sw_longitude}");
-			});
+            if($(".homepage-content").length == 0) {
+                var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
+                $.get(url, function(data) {
+    			    $('.homepage-content').html($(data).find('.bodymarker'));
+                    loadUserGroupLocation("${userGroupInstance.ne_latitude}","${userGroupInstance.ne_longitude}","${userGroupInstance.sw_latitude}","${userGroupInstance.sw_longitude}");
+                    loadUserGroupStats('${uGroup.createLink(controller:'chart', action:'basicStat', userGroupWebaddress:params.webaddress, userGroup:params.userGroup)}')
+                });
+            } else {
+                $('.page-header').hide();
+            }
 		});
 	</r:script>
 </body>

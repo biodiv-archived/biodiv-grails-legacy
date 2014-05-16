@@ -2,6 +2,7 @@
 <%@page import="species.utils.ImageType"%>
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <g:set var="fbAppId"/>
+
 <%
 if(domain.equals(grailsApplication.config.wgp.domain)) {
     fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
@@ -9,9 +10,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
     fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 }
 
-canonicalUrl = canonicalUrl ?: uGroup.createLink('controller':params.controller, 'action':params.action, userGroup:userGroupInstance,absolute:true)
-
-if(params.webaddress && userGroupInstance && userGroupInstance.id) {
+canonicalUrl = canonicalUrl ?: uGroup.createLink('controller':params.controller, 'action':params.action, userGroup:userGroupInstance, absolute:true)
+if(userGroupInstance && userGroupInstance.id) {
     imagePath = imagePath?:userGroupInstance.mainImage()?.fileName
     favIconPath = favIconPath?:userGroupInstance.icon(ImageType.SMALL)?.fileName;
     description = description?: userGroupInstance.description.replaceAll(/<.*?>/, '').trim()
@@ -29,7 +29,7 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title>${title}<g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
+<title><g:if test="${title}">${title} | </g:if><g:if test="${params.action.equals('show')}"> ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
 
 <g:if test="${favIconPath}">
 <link rel="shortcut icon" href="${favIconPath}" type="image/x-icon" />
@@ -47,7 +47,7 @@ if(description != null && description.length() > 300) {
 <meta property="og:description" content="${description}"/>
 </g:if>
 <meta property="og:type" content="article" />
-<meta property="og:title" content="${title}"/>
+<meta property="og:title" content="${title?:params.controller.capitalize()}"/>
 <g:if test="${videoPath}">
 <meta property="og:video" content="${videoPath}" />
 <meta property="og:video:width" content="640">

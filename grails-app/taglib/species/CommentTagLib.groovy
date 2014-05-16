@@ -34,7 +34,14 @@ class CommentTagLib {
 		out << render(template:"/common/comment/showCommentWithReplyTemplate", model:attrs.model);
 //		}
 	}
-	
+
+	def showCommentWithSub = {attrs, body->
+		def feedInstance = attrs.model.feedInstance
+		attrs.model.commentInstance = activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+		attrs.model.userGroupInstance =  activityFeedService.getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
+		out << render(template:"/common/comment/showCommentWithSubTemplate", model:attrs.model);
+	}
+
 	
 	def showCommentPopup = {attrs, body->
 		def model = attrs.model

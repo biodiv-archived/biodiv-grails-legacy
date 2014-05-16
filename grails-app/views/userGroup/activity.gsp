@@ -19,14 +19,14 @@ width:715px;
 </head>
 <body>
 	<div class="observation span12 bodymarker">
-		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>
+		<uGroup:showSubmenuTemplate model="['entityName':'Discussions']"/>
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<div class="userGroup-section">
 			<div>
 				<comment:showAllComments
 					model="['commentHolder':userGroupInstance, commentType:'super', 'showCommentList':false]" />
 			</div>
-			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />
+			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', feedPermission:'editable', feedCategory:UserGroup.class.canonicalName,'feedOrder':'latestFirst']" />
 		</div>	
 	</div>
 </body>

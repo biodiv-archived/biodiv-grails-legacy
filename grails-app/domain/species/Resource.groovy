@@ -5,8 +5,9 @@ import species.utils.ImageUtils;
 import species.utils.ImageType;
 import species.utils.Utils;
 import org.grails.rateable.*
+import content.eml.Document;
 
-class Resource implements Rateable {
+class Resource extends Sourcedata implements Rateable {
 	
 	public enum ResourceType {
 		ICON("Icon"),
@@ -33,6 +34,32 @@ class Resource implements Rateable {
             }
         }
 	}
+
+    public enum ResourceContext {
+        OBSERVATION("OBSERVATION"),
+        SPECIES("SPECIES"),
+        DOCUMENT("DOCUMENT"),
+        SPECIES_FIELD("SPECIES_FIELD"),
+		CHECKLIST("CHECKLIST")
+		
+        private String value;
+
+        ResourceContext(String value) {
+            this.value = value;
+        }
+
+        String value() {
+            return this.value;
+        }
+
+        static def toList() {
+            return [ OBSERVATION,SPECIES,DOCUMENT, SPECIES_FIELD, CHECKLIST]
+        }
+
+        public String toString() {
+            return this.value();
+        }
+    }
 	
 	ResourceType type;
 	String url; //TODO validate as url
@@ -41,7 +68,8 @@ class Resource implements Rateable {
 	String mimeType; //TODO:validate
     int rating = 0;
 	String baseUrl; 
-	def grailsApplication
+	ResourceContext context;
+    def grailsApplication
 
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
 	static belongsTo = [SpeciesField, Observation];
@@ -58,6 +86,7 @@ class Resource implements Rateable {
 		mimeType(nullable:true);
 		licenses  validator : { val, obj -> val && val.size() > 0 }
         rating(nullable:false, min:0, max:5);
+        context(nullable:true);
     }
 	
 	static transients = ['baseUrl']
@@ -118,4 +147,35 @@ class Resource implements Rateable {
 			this.url = url;
 		}
 	}
+	
+	void saveResourceContext(objInstance){
+		//saving only if context is null earlier
+		if(this.context) return;
+		
+		switch(objInstance.class.name){
+			case Species.class.name:
+				this.context = ResourceContext.SPECIES
+				break
+			case Observation.class.name:
+				this.context = ResourceContext.OBSERVATION
+				break
+			case Document.class.name:
+				this.context = ResourceContext.DOCUMENT
+				break
+			case SpeciesField.class.name:
+				this.context = ResourceContext.SPECIES_FIELD
+				break
+			case Checklists.class.name:
+				this.context = ResourceContext.CHECKLIST
+				break
+			default:
+				break
+		}
+		
+		if(!this.save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+		
+	}
+	
 }

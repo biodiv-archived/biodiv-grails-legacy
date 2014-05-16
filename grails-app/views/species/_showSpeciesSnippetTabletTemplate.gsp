@@ -1,7 +1,13 @@
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.utils.ImageType"%>
 <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 <%
-def imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, !speciesInstance.resources ? '.png' :null): null;
+def imagePath = '';
+def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+if(mainImage?.fileName == speciesGroupIcon.fileName) 
+    imagePath = mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, '.png');
+else
+    imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;
 def obvId = speciesInstance.id
 %>
 

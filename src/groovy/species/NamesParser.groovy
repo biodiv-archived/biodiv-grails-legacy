@@ -72,11 +72,15 @@ class NamesParser {
 		def s = new Socket(config.speciesPortal.names.parser.serverURL, config.speciesPortal.names.parser.port);
 		s.withStreams { input, output ->
 			names.each { name ->
-				log.debug "sending ${name}"
-				output << name + "\n"
-				def result = input.newReader().readLine()
-				log.debug result;
-				parsedJSON.add(JSON.parse(result));
+				if(name) {
+                    log.debug "sending ${name}"
+                    output << name + "\n"
+                    def result = input.newReader().readLine()
+                    log.debug result;
+                    parsedJSON.add(JSON.parse(result));
+                } else {
+				    parsedJSON.add(null);
+                }
 			}
 		}
 		s.close();

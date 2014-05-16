@@ -7,13 +7,16 @@
 <%@page import="content.eml.Document"%>
 
 <div class="activityFeedContext thumbnails" >
-	<div class="feedParentContext thumbnail clearfix">
-		<g:if test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName() || feedInstance.rootHolderType ==  Checklists.class.getCanonicalName() }" >
+		<div class="feedParentContext thumbnail clearfix">
+		<g:if test="${isCommentThread}">
+			<comment:showCommentWithSub model="['feedInstance':feedInstance]"/>
+		</g:if> 
+		<g:elseif test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName() || feedInstance.rootHolderType ==  Checklists.class.getCanonicalName() }" >
 			<%
 				def tmpUserGroup = (feedHomeObject && feedHomeObject.class.getCanonicalName() == UserGroup.class.getCanonicalName()) ? feedHomeObject : null
 			%>
 			<obv:showSnippet model="['observationInstance':feedParentInstance, userGroup:tmpUserGroup, userGroupWebaddress:tmpUserGroup?.webaddress]"></obv:showSnippet>
-		</g:if>
+		</g:elseif>
 		<g:elseif test="${feedInstance.rootHolderType ==  UserGroup.class.getCanonicalName()}" >
 		<div class="span10">
 			<table class="table" style="margin-left: 0px;">
@@ -49,13 +52,9 @@
 			${feedInstance.rootHolderType}
 		</g:else>
 	</div>
-	<%
-		def isCommentThread = (feedInstance.subRootHolderType == Comment.class.getCanonicalName() && feedInstance.rootHolderType == UserGroup.class.getCanonicalName()) 
-	%>
 	<g:if test="${isCommentThread}">
-		<div class="feedSubParentContext ${feedInstance.fetchMainCommentFeed().subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">
-		Comment thread
-<%--			<comment:showCommentWithReply model="['feedInstance' : feedInstance.fetchMainCommentFeed(), 'feedPermission':feedPermission, 'showAlways':true]" />	--%>
+		<div class="feedSubParentContext ${feedInstance.subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">
+<%--		Comment thread--%>
 		</div>
 	</g:if>
 	<feed:showAllActivityFeeds model="['rootHolder':feedParentInstance, 'isCommentThread':isCommentThread, 'subRootHolderType':feedInstance.subRootHolderType, 'subRootHolderId':feedInstance.subRootHolderId, 'feedType':ActivityFeedService.SPECIFIC, 'refreshType':ActivityFeedService.MANUAL, 'feedPermission':feedPermission]" />

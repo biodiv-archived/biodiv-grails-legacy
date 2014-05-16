@@ -15,6 +15,8 @@ import species.utils.ImageType;
 import species.participation.ActivityFeed;
 import species.participation.ActivityFeedService;
 import species.participation.Observation;
+import species.participation.Checklists;
+import content.eml.Document;
 import species.participation.RecommendationVote;
 
 class ChartService {
@@ -401,7 +403,9 @@ class ChartService {
 		return ActivityFeed.createCriteria().count{
 			and{
 				eq('isShowable', true)
-				between('lastUpdated', startDate, endDate)
+				if(startDate && endDate){
+					between('lastUpdated', startDate, endDate)
+				}
 				if(feedType){
 					eq('activityType', feedType)
 				}
@@ -576,4 +580,91 @@ class ChartService {
 		return ActivityFeed.countByAuthorAndIsShowable(user,true);
 	}
 
+	def long getObservationCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Observation.simpleName, userGroup);
+		}else{
+			count = Observation.createCriteria().count {
+				and {
+					eq("isDeleted", false)
+					eq("isShowable", true)
+					eq("isChecklist", false)
+				}
+			}
+		}
+		return count
+	}
+
+	def long getChecklistCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Checklists.simpleName, userGroup);
+		}else{
+			count = Checklists.countByIsDeleted(false);
+		}
+		return count
+	}
+
+	def long getSpeciesCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Species.simpleName, userGroup);
+		}else{
+			count = Species.count();
+		}
+		return count
+	}
+
+	def long getDocumentCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Document.simpleName, userGroup);
+		}else{
+			count = Document.count();
+		}
+		return count
+	}
+
+	def long getUserCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroup.getAllMembersCount();
+		}else{
+			count = SUser.count();
+		}
+		return count
+	}
+
+	
+	def long getActivityFeedCount(params){
+		def userGroup, typeToIdFilterMap
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroup])
+			
+		}
+		
+		return getActivityCount(null, null, typeToIdFilterMap, userGroup)
+	}
 }

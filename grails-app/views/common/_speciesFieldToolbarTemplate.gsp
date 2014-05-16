@@ -14,7 +14,9 @@
 					class="icon-user"></i> by </span></li>
 					<g:each in="${ca}"
 						var="attributor">
+                                                <g:if test="${attributor}">
 						<li class="contributor_ellipsis" title="${attributor.name.trim()}" style="float:none;">${attributor.name.trim()}</li>
+                                                </g:if>
 					</g:each>
 				</ul>
 			</g:if>
@@ -44,7 +46,7 @@
 		</div>
 		<div class="clearfix"></div>
 		<g:showSpeciesFieldAttribution
-			model="['speciesFieldInstance':speciesFieldInstance]" />
+			model="['speciesFieldInstance':speciesFieldInstance, 'isSpeciesFieldContributor':isSpeciesFieldContributor]" />
                 <g:if test="${speciesFieldInstance instanceof SpeciesField}">
         		<g:showSpeciesFieldHelp
                             model="['field':speciesFieldInstance.field]" />

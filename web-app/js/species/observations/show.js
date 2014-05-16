@@ -14,6 +14,29 @@ function showRecos(data, textStatus) {
     showUpdateStatus(data.msg, data.status);
 }
 
+function lockObv(url, lockType, recoId, obvId) {
+    $.ajax({
+        url:url,
+        dataType: "json",
+        data:{"lockType" : lockType, "recoId" : recoId},
+        success: function(data){
+            if(lockType == "Lock"){
+                //$("#addRecommendation").hide();
+                $('.nameContainer input').attr('disabled', 'disabled');
+                $('.iAgree button').addClass('disabled');
+                $(".lockObvId").hide();
+                showUpdateStatus(data.msg, 'success');
+            }
+            else{
+                //$("#addRecommendation").show();
+                $('.nameContainer input').removeAttr('disabled');
+                $('.iAgree button').removeClass('disabled');
+                $(".lockObvId").hide();
+                showUpdateStatus(data.msg, 'success');
+            }
+        }
+    });
+}
 
 function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     $.ajax({
@@ -43,7 +66,11 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     });
 }
 
-function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
+function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url, obj){
+    if($(obj).hasClass('disabled')) {
+        event.preventDefault();
+        return false; 		 		
+    }
     $.ajax({
         url: url,
     data:{'obvId':obvId, 'recoId':recoId, 'currentVotes':currentVotes},
@@ -72,7 +99,11 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
     });
 }
 
-function removeRecoVote(obvId, recoId, url){
+function removeRecoVote(obvId, recoId, url, obj){
+    if($(obj).hasClass('disabled')) {
+        event.preventDefault();
+        return false; 		 		
+    }
     $.ajax({
         url: url,
     data:{'obvId':obvId, 'recoId':recoId},

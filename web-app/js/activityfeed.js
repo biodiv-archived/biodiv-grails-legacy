@@ -361,3 +361,22 @@ function setFollowButton(){
 		$(comp).html('Unfollow')
 	}
 }
+
+/*
+ * To roll back species bulk upload session
+ */
+function updateBulkUploadStatus(comp, url, action){
+	if(!confirm(action + ' requested. Do you want to proceed ?')){
+		return false;
+	}
+	$.ajax({
+        url : url,
+        success : function(data) {
+        	alert(data.msg);
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert(xhr.msg);
+        }
+    });
+}
+

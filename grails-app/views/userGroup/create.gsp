@@ -105,8 +105,8 @@ max-width: 100%;
 				</g:hasErrors>
 			
 			
-			<g:set var="founders_autofillUsersId" value="id1" />
-			<g:set var="experts_autofillUsersId" value="id2" />
+			<g:set var="founders_autofillUsersId" value="founder_id" />
+			<g:set var="experts_autofillUsersId" value="expert_id" />
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
 				<input type="hidden" name="id" value="${userGroupInstance?.id}"/>
@@ -505,8 +505,8 @@ $(document).ready(function() {
 	}
 	
 	$("#createGroupSubmit").click(function(){
-		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
-		$('#expertUserIds').val(experts_autofillUsersComp[0].getEmailAndIdsList().join(","));
+		$('input[name="founderUserIds"]').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
+		$('input[name="expertUserIds"]').val(experts_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		/*var tags = $("#tags").tagit("tags");
        	$.each(tags, function(index){
        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this.label);

@@ -1,8 +1,14 @@
 package species
 
+import species.auth.SUser;
+
 class SpeciesTagLib {
 	
 	static namespace = "s"
+
+    def springSecurityService;
+    def speciesService;
+	def speciesPermissionService;
 
 	def showSpeciesImages = { attrs, body->
 		out << render(template:"/common/speciesImagesTemplate", model:attrs.model);
@@ -102,17 +108,21 @@ class SpeciesTagLib {
 	def speciesFilter = {attrs, body->
 		out << render(template:"/species/speciesFilterTemplate", model:attrs.model);
 	}
+
 	def showSpeciesList = {attrs, body->
 		out << render(template:"/species/showSpeciesListTemplate", model:attrs.model);
 	}
+
 	def showHeadingAndSubHeading = {attrs, body->
 		out << render(template:"/common/headingAndSubHeading", model:attrs.model);
 	}
+
 	def showSnippet = {attrs, body->
 		if(attrs.model.speciesInstance) {
 			out << render(template:"/species/showSpeciesSnippetTemplate", model:attrs.model);
 		}
 	}
+
 	def showSpeciesExternalLink = {attrs, body->
 		out << render(template:"/species/showSpeciesExternalLinkTemplate", model:attrs.model);
 	}
@@ -120,4 +130,52 @@ class SpeciesTagLib {
 	def showDownloadAction = {attrs, body->
 		out << render(template:"/species/showDownloadAction", model:attrs.model);
 	}
+	
+	def rollBackTable = {attrs, body->
+		out << render(template:"/species/speciesBulkUploadTableTemplate", model:attrs.model);
+	}
+
+    def hasPermission = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        Field fieldInstance = attrs.model.fieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if((speciesFieldInstance && speciesFieldInstance.description) || speciesPermissionService.isContributor(speciesFieldInstance, fieldInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def isSpeciesContributor = {attrs, body -> 
+        Species speciesInstance = attrs.model.speciesInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if(speciesPermissionService.isSpeciesContributor(speciesInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def isSpeciesFieldContributor = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if(speciesPermissionService.isSpeciesFieldContributor(speciesFieldInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def isCurator = {attrs, body ->
+        SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
+        SUser currentUser = springSecurityService.currentUser;
+
+        if(speciesPermissionService.isCurator(speciesFieldInstance, currentUser)) {
+            out << body();
+        }
+    }
+
+    def hasContent = {attrs, body ->
+        def map = attrs.model.map;
+        if(map instanceof Map && (map.hasContent || map.isContributor)) {
+            out << body();
+        }
+    }
 }

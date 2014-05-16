@@ -24,12 +24,12 @@ function joinAction(me, joinUsUrl) {
         	}
         	
         }, error: function(xhr, status, error) {
-			handleError(xhr, status, error, this.success, function() {
-            	var msg = $.parseJSON(xhr.responseText);
+            handleError(xhr, status, error, this.success, function() {
+                var msg = $.parseJSON(xhr.responseText);
                 $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
-			});
+            });
         }
-	});
+        });
 	return false;
 }
 
@@ -48,14 +48,14 @@ function requestMembershipAction(me, requestMembershipUrl) {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
         		//reloadActionsHeader();
-        	}
+                }
         }, error: function(xhr, status, error) {
-			handleError(xhr, status, error, this.success, function() {
-            	var msg = $.parseJSON(xhr.responseText);
+            handleError(xhr, status, error, this.success, function() {
+                var msg = $.parseJSON(xhr.responseText);
                 $(".alertMsg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
-			});
+            });
         }
-	});
+        });
 	return false;
 }
 
@@ -221,8 +221,8 @@ function membership_actions() {
 					if(data === "true"){
 						$('#memberUserIds').val('');
 						$('#userAndEmailList_1').val('');
-						$('ul.userOrEmail-list > li').each(function(){
-							members_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
+						$(members_autofillUsersComp[0]).parent().children('li').each(function(){
+							$(members_autofillUsersComp[0]).removeChoice($(this).find('span')[0]);
 						});
 						$('#inviteMembersForm')[0].reset()
 						$('#inviteMembersDialog').modal('show');
@@ -244,8 +244,8 @@ function membership_actions() {
 				if(data === "true"){
 					$('#expertUserIds').val('');
 					$('#userAndEmailList_2').val('');
-					$('ul.userOrEmail-list > li').each(function(){
-						experts_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
+					$(experts_autofillUsersComp[0]).parent().children('li').each(function(){
+						$(experts_autofillUsersComp[0]).removeChoice($(this).find('span')[0]);
 					});
 					$('#inviteExpertsForm')[0].reset()
 					$('#inviteExpertsDialog').modal('show');
@@ -286,9 +286,12 @@ function init_group_header() {
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
-	
+
 	experts_autofillUsersComp = $("#userAndEmailList_"+window.experts_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
+	});
+        curators_autofillUsersComp = $("#userAndEmailList_"+window.params.curators_autofillUsersId).autofillUsers({
+		usersUrl : window.params.userTermsUrl
 	});
 }
 

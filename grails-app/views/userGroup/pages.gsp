@@ -13,6 +13,23 @@
 <g:set var="title" value="Pages"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show" />
+<style>
+    #contentMenu > .nav-tabs > .active > a {
+        font-weight:normal;
+        color: black;
+        background-color:rgba(98, 100, 39, 0.14);
+        background: transparent;
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#23626427,endColorstr=#23626427)"; /* IE8 */
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#23626427,endColorstr=#23626427);   /* IE6 & 7 */
+              zoom: 1;
+    }
+    #contentMenu > .nav-tabs > li > a {
+       color: #16509E;
+        font-weight:bold;
+        background-color: #CEEBD3;
+        border: none
+    }
+</style>
 </head>
 <body>
 
@@ -47,10 +64,13 @@
             					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
                                                 <li><h5>Pages</h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
-							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
-									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
+                                                <li id="newsletter_${newsletterInstance.id}"><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}"><p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                    ${fieldValue(bean: newsletterInstance, field: "title")}</p>
+                                                            <sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up")'></i>
+                                                            </sUser:permToReorderPages>
+                                                        </a></li>
 						</g:each>
-                                                <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
+                        <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/project/list">Western Ghats CEPF
 									Projects</a></li>
 						</g:if>
@@ -76,12 +96,11 @@
 			<%} else {%>
 				var pageURL = "/page";
 			<%}%>
-			
 	        $('#pageTabs a').click(function (e) {
   				
   				var me = $(this);
-  				var contentID = e.target.hash; //get anchor
-  				if(contentID) {
+  				var contentID = me.attr('href');//e.target.hash; //get anchor
+  				if(contentID && contentID != '/project/list') {
 	  				e.preventDefault();
 	  				var History = window.History; 
 		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){

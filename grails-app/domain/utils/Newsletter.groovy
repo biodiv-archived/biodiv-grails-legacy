@@ -7,6 +7,7 @@ class Newsletter {
     Date date    
     String newsitem
 	boolean sticky = false;
+    int displayOrder;
 
 	static belongsTo = [userGroup: UserGroup]
     static constraints = {
@@ -14,9 +15,18 @@ class Newsletter {
 		title nullable: false
         newsitem type:'text'
 		userGroup nullable:true;
+        displayOrder nullable:false;
     }
 	
 	static mappings = {
-		sort date:"desc"
+		sort displayOrder:"desc"
+	}
+	
+	def boolean fetchIsHomePage(){
+		if(userGroup?.homePage){
+			return ("newsletter".equalsIgnoreCase(userGroup.homePage.tokenize('/').first().trim())) && (id == userGroup.homePage.tokenize('/').last().trim().toLong())
+		}
+		
+		return false
 	}
 }

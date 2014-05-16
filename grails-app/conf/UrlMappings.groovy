@@ -1,8 +1,11 @@
+import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
+
 class UrlMappings {
 
 	static mappings = {
 
 		
+		//"500"(controller:'BiodivException', action:'error')
 		"500"(view:'/error')
 		"403"(view:'/error')
 		"404"(view:'/notfound')
@@ -146,10 +149,23 @@ class UrlMappings {
         controller = 'document'
         action = 'browser'
     }
-		"/group/$webaddress/document/list" {
-			controller='document'
-			action='browser'
-		}
 
+    "/group/$webaddress/document/list" {
+        controller='document'
+        action='browser'
+    }
+
+    def prefix = "/${CkeditorConfig.getConnectorsPrefix()}";
+    def uploadPrefix = CkeditorConfig.getUploadPrefix();
+
+    // Open File Manager
+    //using ofm index page
+    delegate.(prefix + "/biodivofm") (controller: "biodivOpenFileManagerConnector", action: "index")
+    delegate.(prefix + "/biodivofm/filemanager") (controller: "biodivOpenFileManagerConnector", action: "fileManager")
+
+    // Images outside the web-app dir
+    if (uploadPrefix) { 
+        delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
+    }
     }
 }

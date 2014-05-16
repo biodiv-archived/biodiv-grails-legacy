@@ -26,7 +26,7 @@ String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
 	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
-} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+} else{ // if(domain.equals(grailsApplication.config.ibp.domain)) {
 	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
 }
 %>
@@ -66,6 +66,15 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			${flash.error}
 		</div>
 	</g:if>
+
+<%--	<div class="alertMsg alert alert-info"--%>
+<%--		style="clear: both; margin: 0px; text-align: center;">--%>
+<%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
+<%--	</div>--%>
+										
+	<!--div class="alertMsg alert alert-info" style="background-color: #2d2d2d; color: yellow; text-shadow: none; clear: both; margin: 0px; text-align: center;padding:4px;border:none;">
+		The <a style="color:orange;" href="http://treesindia.indiabiodiversity.org">TreesIndia@IBP</a> is organizing a "Neighbourhood Trees Campaign" from Earth day 22nd-27th April. Participate in the campaign and upload <a style="color:orange;" href="http://treesindia.indiabiodiversity.org/observation/create">tree observations</a>.
+	</div-->
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">

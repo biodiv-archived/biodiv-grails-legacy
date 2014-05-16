@@ -52,8 +52,20 @@ $(document).ready(function() {
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
                 'species':{
-                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
+                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
+                    'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}"
                 },
+                'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
+                'isLoggedInUrl' : "${createLink(controller:'SUser', action:'isLoggedIn','userGroup':userGroupInstance)}",
+                'curators_autofillUsersId' : "3",
+                'userTermsUrl' : "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}",
+                'inviteCuratorsFormUrl' : "${uGroup.createLink(controller:'species', action: 'inviteCurator','userGroup':userGroupInstance)}",
+                'saveModifiedSpecies' : "${uGroup.createLink(controller:'UFile', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
+                'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
+                'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
+                'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
+                'getLicenseFromDB' :  "${uGroup.createLink(action:'getLicenseList', controller:'species', 'userGroup':userGroupInstance)}",
+                'getAudienceFromDB' :  "${uGroup.createLink(action:'getAudienceList', controller:'species', 'userGroup':userGroupInstance)}",
                 'content':{
                     'url':"${uGroup.createLink('controller':'content')}"
                 },
@@ -72,8 +84,28 @@ $(document).ready(function() {
                 },
                 'action': {
                     'inGroupsUrl':"${uGroup.createLink(controller:'action', action: 'inGroups', userGroup:userGroupInstance)}"
+                },
+                'map': {
+                    'domain':document.domain,
+                    'geoserverHost':document.domain,
+                    'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
+                },
+                'ck':{
+                    
+                },
+                'taxon': {
+                    'classification': {
+                        'listUrl':"${uGroup.createLink(controller:'taxon', action:'listHierarchy', userGroupWebaddress:params.webaddress)}",
+                        'createUrl':"${uGroup.createLink(controller:'taxon', action:'create', userGroupWebaddress:params.webaddress)}",
+                        'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
+                        'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
+                    }
                 }
+                
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });
+        
+
+
 </g:javascript>

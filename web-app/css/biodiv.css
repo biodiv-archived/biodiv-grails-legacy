@@ -112,7 +112,16 @@ h6 {
 
 .snippet.tablet {
 	width: 150px;
-	height: 200px;
+	height: 195px;
+}
+
+.observations_list .story-footer{
+    bottom:inherit;
+}
+
+.tab-pane .qq-upload-button{
+    margin-top: 20px;
+    margin-left: 107px;
 }
 
 .snippet.tablet .figure {
@@ -124,7 +133,6 @@ h6 {
         padding:0px 0px;
         position:relative;
 }
-
 .snippet.tablet .caption .story-footer {
         left:0px;
 }
@@ -186,6 +194,10 @@ h6 {
 	background-color: #fefad5;
 }
 
+.initPropagation:hover{
+    cursor: pointer;    
+}
+
 .thumbnail .observation_story {
     /*display: table-cell;
     vertical-align: middle;*/
@@ -204,6 +216,11 @@ h6 {
     width:784px;
 }
 
+.ui-autocomplete { 
+    height: 200px; 
+    overflow-y: scroll; 
+    overflow-x: hidden;
+}
 #carousel_featureBy li {
     border: solid 3px cadetblue;
     width:934px;
@@ -312,7 +329,6 @@ h6 {
 
 div.errors {
 	border: 1px solid red;
-	color: #cc0000;
 	word-wrap: break-word;
 }
 
@@ -399,6 +415,13 @@ div.errors {
 	padding: 5px;
 }
 
+.addedResource.thumbnail  {
+    z-index:40;
+}
+.add_file.addedResource {
+    z-index:41;
+}
+
 .resources .addedResource {
 	width: 200px;
 	display: inline-block;
@@ -428,7 +451,7 @@ div.errors {
 	padding-right: 5px;
 }
 
-#add_image {
+.add_image {
 	background-image: url('../images/add-photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
@@ -438,7 +461,7 @@ div.errors {
 	cursor: pointer;
 	border-bottom: 3px red;
 }
-#add_video {
+.add_video {
 	background-image: url('../images/add-video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
@@ -449,7 +472,7 @@ div.errors {
 }
 
 
-#add_file .progress {
+.add_file .progress {
 	border-radius: 3px 3px 3px 3px;
 	position: absolute;
 	height: 200px;
@@ -461,12 +484,12 @@ div.errors {
 	left:0;
 }
 
-#add_file_container {
+.add_file_container {
 	position:relative;
 	z-index:100;
 }
 
-#translucent_box {
+.translucent_box {
 	background-color: black;
 	opacity: 0.5;
         filter: alpha(opacity = 50);        
@@ -476,7 +499,7 @@ div.errors {
 	position: absolute;
 }
 
-#progress_bar {
+.progress_bar {
 	background-color: lime;
 	width: 0%;
 	height: 10px;
@@ -484,7 +507,7 @@ div.errors {
 	position: absolute;
 }
 
-#progress_msg {
+.progress_msg {
 	position: absolute;
 	display: inline-block;
 	bottom: 15px;
@@ -522,9 +545,15 @@ textarea#featureNotes {
         -moz-box-sizing: border-box;
         box-sizing: border-box;
 }
+
+#speciesImage-tabs>.active>a, #speciesImage-tabs>.active>a:hover, #speciesImage-tabs>.active>a:focus {
+   border:1px solid #6ac9a2;
+   border-bottom: 0px;
+}
+
 #action-tabs>.active>a, #action-tabs>.active>a:hover, #action-tabs>.active>a:focus {
-    border:1px solid #6ac9a2;
-    border-bottom: 0px solid #6ac9a2;
+   border:1px solid #6ac9a2;
+   border-bottom: 0px;
 }
 .userGroups{
     list-style:none;
@@ -565,7 +594,15 @@ textarea#featureNotes {
     left:0px;
     top:0px;
  }
-
+/*
+.obvLocked {
+    background: url(../images/lock-icon.png) no-repeat right top;
+    width: 35px; 
+    height: 50px;
+    left:0px;
+    top:0px;
+}
+*/
 .badge {
     padding:0px;
     z-index: 1000;
@@ -643,7 +680,7 @@ ul#recoSummary {
 	background-color: #ffffff;
 }
 
-#addObservation #imagesList, #addResourcesModal #imagesList {
+#addObservation .imagesList, #addResourcesModal .imagesList {
 	background-color: #fefad5;
 	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
@@ -720,7 +757,9 @@ ul#recoSummary {
 	background-color: #FFFFFF;
 /* 	color: #333333; */
 	display: block;
-	margin: 10px 0px;
+	/*padding: 10px 0px;*/
+        margin-top:10px;
+        margin-left:0px;
 	overflow: hidden;
 }
 
@@ -857,7 +896,7 @@ ul#recoSummary {
 
 #ui-datepicker-div {
 	width: auto;
-	z-index: 4 !important;
+	z-index: 60 !important;
 }
 
 .normal_profile_pic {
@@ -1006,7 +1045,7 @@ i {
 	list-style: none;
 }
 
-.control-group.error button,.control-group.error .selected_value,.control-group.error #imagesList,.control-group.error input
+.control-group.error button,.control-group.error .selected_value,.control-group.error .imagesList,.control-group.error input
 	{
 	border: 1px solid #B94A48 !important;
 }
@@ -1303,6 +1342,10 @@ span.cke_skin_kama {
     padding:2px;
 }
 
+.galleria-counter {
+    bottom : 318px;
+}
+
 .galleria-thumbnails-container {
     height: 82%;
     bottom: 0;
@@ -1400,6 +1443,20 @@ span.cke_skin_kama {
 /* 	display: inline; */
 /* 	cursor: pointer; */
 /* } */
+
+.nav-tabs>li>a{
+    color: black;
+    background-color:rgba(98, 100, 39, 0.14);
+    border: none
+}
+.nav-tabs>.active>.btn{
+    background-position: 0 0px;
+}
+.nav-tabs>.active>a{
+    font-weight:bold;
+    color: #16509E;
+    background-color: #CEEBD3;
+}
 .nav-tabs {
 	border-bottom: 0px solid #FFF;
 	background-color: whiteSmoke;
@@ -1517,7 +1574,7 @@ h4,.main_heading .species_title .common_name {
 	overflow: auto;
 	padding: 3px;
 	list-style: none;
-	clear: both;
+	/*clear: both;*/
 }
 
 li.userOrEmail-choice {
@@ -1925,42 +1982,51 @@ li#userOrEmail-new {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-	select {
-		display: inline-block;
-		width: 210px;
-		height: 18px;
-		padding: 4px;
-		margin-bottom: 9px;
-		font-size: 13px;
-		line-height: 18px;
-		color: #555555;
-		border: 1px solid #ccc;
-		-webkit-border-radius: 3px;
-		-moz-border-radius: 3px;
-		border-radius: 3px;
-	}
-	select {
-		height: 28px;
-		/* In IE7, the height of the select element cannot be changed by height, only font-size /
-*margin-top: 4px;
-/ For IE7, add top margin to align select with labels */
-		line-height: 11px;
-	}
-	select {
-		width: 220px;
-		background-color: #ffffff;
-	}
-	select[multiple],select[size] {
-		height: auto;
-	}
-}
+    select {
+        display: inline-block;
+        width: 210px;
+        height: 18px;
+        padding: 4px;
+        margin-bottom: 9px;
+        font-size: 13px;
+        line-height: 18px;
+        color: #555555;
+        border: 1px solid #ccc;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+    select {
+        height: 28px;
+        /* In IE7, the height of the select element cannot be changed by height, only font-size /
+         *margin-top: 4px;
+         / For IE7, add top margin to align select with labels */
+line-height: 11px;
+        }
+        select {
+            width: 220px;
+            background-color: #ffffff;
+        }
+        select[multiple],select[size] {
+            height: auto;
+        }
+    }
 
-.contributor_entry {
+.contributor_entry {/*, .speciesField .editableform {*/
+        border: 1px solid #D3D3D3;
 	border-color: #CECECE;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
 	margin-bottom: 10px;
+}
+
+.speciesField span.cke_skin_kama {
+	background-color: rgb(106, 201, 162, 0.15);
+	background-color: rgba(106, 201, 162, 0.15);
+	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr='#266AC9A2',endColorstr='#266AC9A2')";	/* IE8 */
+	filter: progid : DXImageTransform.Microsoft.gradient(startColorstr = '#266AC9A2', endColorstr = '#266AC9A2' );/* IE6 & 7 */
+	zoom: 1;
 }
 
 .contributor_entry .toolbar {
@@ -1978,7 +2044,7 @@ li#userOrEmail-new {
 		rgba(0, 0, 0, 0.05);
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px
 		rgba(0, 0, 0, 0.05);
-	overflow:auto;
+	overflow:visible;
 }
 
 .s2ui_hidden_button {
@@ -2189,6 +2255,7 @@ li#userOrEmail-new {
 .feedParentContext {
 	background-color: white;
 	display: table;
+    width:100%;
 }
 
 div.rating-cancel {
@@ -2386,10 +2453,10 @@ div.noOfRatings {
 .thumbnail .selectable  .checkbox {
 	margin-bottom: 0px;
 	min-height: 5px;
-	padding-left: 20px;
+        padding-left: 5px;
 } 
 
-.post-to-groups .checkbox {
+.thumbnails .checkbox {
     padding-left:5px;
 }
 
@@ -2470,5 +2537,167 @@ small {
 .table-column .title {
     max-width:300px;
     word-wrap:break-word;
+}
+
+.speciesImage-wrapper .tab-pane {
+    border:1px solid #6ac9a2;
+    overflow:hidden;
+}
+
+.speciesImage-wrapper li {
+    margin-bottom:0px;
+}
+
+.speciesImage-wrapper li.active {
+    margin-bottom:-1px;
+}
+
+.groups-wrapper .tab-pane {
+    border:1px solid #6ac9a2;
+    overflow:hidden;
+}
+
+.groups-wrapper li {
+    margin-bottom:0px;
+}
+
+.groups-wrapper li.active {
+    margin-bottom:-1px;
+}
+
+#home #species_entry {
+    background-image: url(../images/species.png);
+}
+#home #explore {
+    background-image: url(../images/explore.png);
+}
+#home #documents {
+    background-image: url(../images/documents.png);
+}
+#home #observations {
+    background-image: url(../images/observations.png);
+}
+#home #groups_entry {
+    background-image: url(../images/groups.png);
+}
+#home #dashboard {
+    background-image: url(../images/dashboard.png);
+}   
+
+#home .entry:hover {
+    background-position: -135px 0;
+    box-shadow: -1px -1px 21px #efefef;
+}
+#home .entry {
+    float: left;
+    width: 135px;
+    height: 135px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 7px;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    box-shadow: -3px -1px 21px #777777;
+    background-size:200% 100%;
+}
+.navblock {
+    display: inline-block;
+    float: left;
+    list-style: none;
+    margin: 0;
+    text-align: left;
+    vertical-align: top;
+}
+#stats .entry {
+    height:65px;
+    padding:3px 0px;
+    text-align:center;
+}
+.stats_normal {
+    color: #9e9e9e;
+}
+.stats_big {
+    font-size: 1em;
+    font-weight: normal;
+    color: #9e9e9e;
+}
+.stats_number {
+    font-size: 2.2em;
+    font-weight: bold;
+    text-shadow: 2px 2px 3px #999999;
+}
+.stats_big_bold {
+    font-size: 1em;
+    font-weight: bold;
+    color: #9e9e9e;
+}
+.editable-click, a.editable-click, a.editable-click:hover {
+    border-bottom: none;
+}
+
+.addField {
+}
+
+.addField, .editFieldButton, .deleteFieldButton, .addFieldButton {
+    color:#12C;
+    cursor: pointer;
+    font-weight:normal;
+    margin:5px;
+}
+
+.editable-container.editable-inline {
+    width:100%;
+    margin:5px;
+}
+
+.editable-container.editable-inline .editable-input {
+    width:72%;
+}
+
+.editable-container.editable-inline .editable-input input.input-medium {
+    width:94%;
+}
+
+.editable-pre-wrapped {
+    white-space: normal;
+}
+
+.editable-input .add-on, #taxonHierachyInput .add-on {
+    width:75px;
+}
+
+.editable-input .taxonRank {
+    width:80%;
+}
+
+
+.hidePoint {
+    display:none;
+}
+
+.speciesField {
+	padding: 0px 10px;
+	background-color:white;
+	overflow: visible;
+    clear:both;
+    border-left:1px solid #cecece;
+}
+
+
+.speciesField .description {
+    padding:5px;
+    margin:0px;
+}
+
+#synonyms li:nth-child(even),#commonNames li:nth-child(even)  {background-color: #e6e6e6; overflow:hidden;}
+
+#synonyms li:nth-child(odd),#commonNames li:nth-child(odd) {background-color: #FFF; overflow:hidden;}
+
+#synonyms .span8, #commonNames .span8 {
+    width : 655px;
+}
+
+.bodymarker {
+    position:relative;
 }
 

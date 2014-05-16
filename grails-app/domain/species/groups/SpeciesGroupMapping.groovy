@@ -18,5 +18,6 @@ class SpeciesGroupMapping {
 	
 	static mapping = {
 		version  false;
+		speciesGroup lazy: false
 	}
 }

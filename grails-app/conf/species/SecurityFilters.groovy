@@ -13,7 +13,7 @@ class SecurityFilters {
     def filters = {
         all(controller:'*', action:'*') {
             before = {
-                log.debug params
+                log.debug "request params: $params"
 
 				grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
 				//println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
@@ -58,9 +58,9 @@ class SecurityFilters {
 						model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
 					}
 				}
-				if (!Environment.getCurrent().getName().startsWith("pamba")) {
+//				if (!Environment.getCurrent().getName().startsWith("pamba")) {
 					//log.debug "before view rendering "
-				}  
+//				}  
             }
 			
             afterView = {

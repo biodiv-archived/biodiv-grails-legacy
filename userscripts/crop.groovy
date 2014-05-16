@@ -113,7 +113,7 @@ def doCrop(){
 
 //doCrop();
 
-ImageUtils.createScaledImages(new File('/tmp/142.jpg'), new File('/tmp') )
+ImageUtils.createScaledImages(new File('/home/rahulk/Desktop/5_Kaggli-like_leaf.tif'), new File('/home/rahulk/Desktop') )
 println "=========== DONE!!";
 
 /*

@@ -1,94 +1,137 @@
 <!-- field toolbar -->
 <g:if test="${speciesFieldInstance}">
-	<g:if test="${speciesFieldInstance?.description}">
-			<!--  content attribution -->
-			<div class="attributionContent" style="display:none;">
-							
-						<!-- attributions -->
-						<g:if test="${speciesFieldInstance.attributors.size() > 0}">
-							<div class="prop span11">
-								<div class="name span2">Attributions</div>
-								<div class="span7">
-									<ul style="list-style:none;margin-left:0px;">
-										<g:each in="${speciesFieldInstance.attributors}" var="r">
-											<li>
-												<a href="#" class="editField" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name">${r.name}
-												</a>
-											</li>
-										</g:each>
-									</ul>
-								</div>
-							</div>
-						</g:if>
-					
-						<g:if test="${speciesFieldInstance?.contributors}">
-							<div class="prop span11">
-								<div class="span2 name">Contributors</div>
-								<div class="span7 value">
-								<ul style="list-style:none;margin-left:0px;"><g:each
-										in="${ speciesFieldInstance?.contributors}" var="contributor">
-										<li>
-										<a href="#" class="editField" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${contributor.id}}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Edit contributor name">${contributor.name}</a>
-										</li> 
-									</g:each>
-								</ul>
-								</div>
-							</div>
-						</g:if>
-						<g:if test="${speciesFieldInstance?.status}">
-							<div class="prop span11">
-								<div class="span2 name">Status</div>
-								<div class="span7 value">${speciesFieldInstance?.status?.value()}
-								
-								</div>
-							</div>
-						</g:if>
-						<g:if test="${speciesFieldInstance?.audienceTypes}">
-							<div class="prop span11">
-								<div class="span2 name">Audiences</div>
-								<div class="span7 value"><g:each
-										in="${ speciesFieldInstance?.audienceTypes}"
-										var="audienceType">
-										${audienceType.value}
-									</g:each>
-								</div>
-							</div>
-						</g:if>
-						<g:if test="${speciesFieldInstance?.licenses.size() > 0}">
-							<div class="prop span11">
-								<div class="span2 name">Licenses</div>
-								<div class="span7 value"><g:each
-										in="${speciesFieldInstance?.licenses}" var="license">
-										<a class="license" href="${license?.url}" target="_blank"><img
-											class="icon" style="float: left;"
-											src="${createLinkTo(dir:'images/license', file: license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-											alt="${license?.name.value()}" /> </a>
-									</g:each>
-								</div>
-							</div>
-						</g:if>
+<!--  content attribution -->
+<div class="attributionContent" style="display:none;overflow:hidden;">
+    <!-- attributions -->
+    <g:if test="${speciesFieldInstance.attributors?.size() > 0}">
+    <div class="prop span11">
+        <div class="name" style="float:none;">Attributions</div>
+            <ul>
+                <g:each in="${speciesFieldInstance.attributors}" var="r">
+                <g:if test="${r}">
+                <li>
+                <span class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2" data-name="attribution" data-original-title="Edit attribution" >${r.name}
+                </span>
+                </li>
+                </g:if>
+                </g:each>
+                <g:if test="${isSpeciesFieldContributor}">
+                <!--li class="hidePoint">
+                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attribution" data-original-title="Add attribution" data-placeholder="Add attribution"></a>
+                </li-->
+                </g:if>
+            </ul>
+    </div>
+    </g:if>
+    <g:elseif test="${isSpeciesFieldContributor}">
+    <div class="prop span11">
+        <div class="name" style="float:none;">Attributions</div>
+            <ul>
+                <li class="hidePoint">
+                <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-name="attribution" data-original-title="Add attribution" data-placeholder="Add attribution"></span>
+                </li>
+            </ul>
+    </div>
+    </g:elseif>
 
-					
-						<!-- references -->
-						<g:if test="${speciesFieldInstance.references.size() > 0}">
-				<div class="prop span11">
-					<div class="name span2">References</div>
-					<div class="span7">
-						<ol>
-							<g:each in="${speciesFieldInstance.references}" var="r">
-								<li style="margin-left: 20px;" title="${r.title?:r.url}"><g:if
-										test="${r.url}">
-										<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
-										</a>
-									</g:if> <g:else>
-										${r.title }
-									</g:else></li>
-							</g:each>
-						</ol>
-					</div>
-				</div>
-			</g:if>
+    <g:if test="${speciesFieldInstance?.contributors}">
+    <div class="prop span11">
+        <div class="name" style="float:none;">Contributors</div>
+            <ul><g:each
+                in="${ speciesFieldInstance?.contributors}" var="contributor">
+                <g:if test="${contributor}">
+                <li>
+                <a href="${uGroup.createLink(controller:'SUser', action:'show', id:contributor.id)}" class="${isSpeciesFieldContributor?'editField':''}" data-type="autofillUsers" data-name="contributor"  data-pk="${contributor.id}" data-fieldId="${speciesFieldInstance.id}" data-value="${contributor.name}" data-original-title="Edit contributor name">${contributor.name}</a>
+                </li> 
+                </g:if>
+                </g:each>
+                <g:if test="${isSpeciesFieldContributor}">
+                <!--li class="hidePoint"> 
+                <a href="#" class="addField"  data-fieldId="${speciesFieldInstance.id}" data-type="autofillUsers"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Add contributor name" data-placeholder="Add contributor"></a>
+                </li-->
+                </g:if>
+            </ul>
 
-				</div>
-		</g:if>
+    </div>
+    </g:if>
+
+    <g:if test="${speciesFieldInstance?.status}">
+    <div class="prop span11">
+        <div class="name span2" style="margin-left:0px;">Status</div>
+        <div class="value pull-left">
+            
+            <!--a href="#" class="status ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status"  data-value="${speciesFieldInstance?.status?.value()}" data-original-title="Edit status">
+                ${speciesFieldInstance?.status?.value()}</a-->
+                ${speciesFieldInstance?.status?.value()}
+
+        </div>
+    </div>
+    </g:if>
+    <g:if test="${speciesFieldInstance?.audienceTypes}">
+    <div class="prop span11">
+        <div class="span2 name" style="margin-left:0px;">Audiences</div>
+        <div class="value pull-left"><g:each
+            in="${ speciesFieldInstance?.audienceTypes}"
+            var="audienceType">
+
+            <span class="audienceType ${isSpeciesFieldContributor?'selector':''}" data-type="select"  data-name="audienceType" data-value="${audienceType.value}" data-original-title="Edit Audience Type"> ${audienceType.value}</span>
+            </g:each>
+        </div>
+    </div>
+    </g:if>
+    <g:if test="${speciesFieldInstance?.licenses?.size() > 0}">
+    <div class="prop span11">
+        <div class="span2 name" style="margin-left:0px;">Licenses</div>
+        <div class="value pull-left"><g:each status="i"
+            in="${speciesFieldInstance?.licenses}" var="license">
+            <span class="license ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-name="license" data-value="${license.name}" data-original-title="Edit license">${license.name}</span>
+            </g:each>
+        </div>
+    </div>
+    </g:if>
+
+
+    <!-- references -->
+    <g:if test="${speciesFieldInstance.references?.size() > 0}">
+    <div class="prop span11">
+        <div class="name" style="float:none;">References</div>
+        <div>
+            <ul>
+                <g:each in="${speciesFieldInstance.references}" var="r">
+                <li title="${r.title?:r.url}">
+                
+                <span class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2" data-name="reference" data-original-title="Edit reference">
+                <g:if
+                test="${r.url}">
+                 ${r.title?r.title:r.url}
+                </g:if> <g:else>
+                ${r.title }
+                </g:else>
+                </span>
+                
+                </li>
+                </g:each>
+                <g:if test="${isSpeciesFieldContributor}">
+                <!--li>
+                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></a>
+                </li-->
+                </g:if>
+
+            </ul>
+        </div>
+    </div>
+    </g:if>
+    <g:elseif test="${isSpeciesFieldContributor}">
+    <div class="prop span11">
+        <div class="name" style="float:none;">References</div>
+            <ul>
+                <li class="hidePoint">
+                <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></span>
+                </li>
+            </ul>
+    </div>
+    </g:elseif>
+
+
+</div>
 </g:if>

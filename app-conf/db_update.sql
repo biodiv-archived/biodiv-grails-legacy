@@ -112,3 +112,14 @@ ALTER TABLE flag ADD CONSTRAINT flag_author_type_id UNIQUE (author_id, object_id
 ALTER TABLE flag ALTER COLUMN object_id SET NOT NULL;
 ALTER TABLE flag ALTER COLUMN object_type SET NOT NULL;
 
+/**
+* 3rd April 2014
+* Delete all hierarchy related entries from species field
+* Add contributor to taxonomy registry where classification is Author contributoed hierarchy
+*/
+
+delete from species_field_license where species_field_licenses_id in (select id from species_field where field_id in (select id from field where category='Author Contributed Taxonomy Hierarchy'));;
+
+delete from species_field_contributor where species_field_attributors_id in (select id from species_field where field_id in (select id from field where category='Author Contributed Taxonomy Hierarchy'));
+
+delete from species_field where field_id in (select id from field where category='Author Contributed Taxonomy Hierarchy');

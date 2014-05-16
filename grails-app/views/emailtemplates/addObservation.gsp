@@ -82,27 +82,57 @@
 				</table>
 			</div>
 			
-				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'species' || domainObjectType == 'usergroup')}">
+				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'species' || domainObjectType == 'usergroup' || domainObjectType == 'newsletter')}">
 				 		<div class="clear" class="content" style="margin: 0 auto;padding: 10px 0px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; background-color:#D4ECE3; align:left; clear: both;">
 							<!-- Callout Panel -->
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
 
 								<g:if test="${domainObjectType == 'document' || currentAction == 'Document created'}">
 								 	The document can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
-								</g:if>
-								<g:if  test="${currentAction == 'downloadRequest'}">
+                                </g:if>
+								<g:elseif  test="${currentAction == 'downloadRequest'}">
 									You can log into your profile <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a>
-								</g:if>
-								<g:if test="${domainObjectType == 'checklists'}">
+                                </g:elseif>
+								<g:elseif test="${domainObjectType == 'checklists'}">
 								 	The checklist can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
-								</g:if>
-								<g:if test="${domainObjectType == 'species'}">
+                                </g:elseif>
+								<g:elseif test="${domainObjectType == 'species'}">
 								 	The species can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
-								</g:if>
-								<g:if test="${domainObjectType == 'usergroup'}">
-								 	You can be viewed the page <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
-								</g:if>
 
+                                </g:elseif>
+                                <g:elseif test="${domainObjectType == 'usergroup' && action=='Added a comment'}">
+                                    <b>Subject</b> : ${commentInstance.subject?:'No Subject'}<br/>
+                                    <b>Message</b> : ${commentInstance.body} <br/>
+                                    <b>Group</b> :
+                                    <span style="height: 30px; width: 186px; position: relative; background-color: #D4ECE3;  margin:2px 6px; " >
+                                        <a href="${baseUrl}/group/${group.webaddress}"> 
+                                            <img src="${group.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
+
+
+                                            <g:if test="${group.name}"> 
+                                            <g:if test="${group.name != null && group.name.length() > 19}">
+                                            ${group.name[0..17] + '...'} <br />
+                                            </g:if>
+                                            <g:else>
+                                            ${group.name?:''} <br />
+                                            </g:else>
+
+                                            </g:if>
+                                        </a>   
+                                    </span><br/>
+                                    <br/>      
+                                    <b> By </b> : 
+                                    <a href="${feedActorProfileUrl}"><img src="${feedInstance.author?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
+                                    <a href="${feedActorProfileUrl}">${feedInstance.author.name}<a/><br/>
+
+                                    The discussion can be viewed <a href="${discussionUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+                                </g:elseif>
+								<g:elseif test="${domainObjectType == 'newsletter'}">
+                                The page can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+                                </g:elseif>
+								<g:else>
+                                The ${domainObjectType} can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+                                </g:else>
 								</p><!-- /Callout Panel -->
 						</div>
 				</g:if>

@@ -155,7 +155,8 @@ function loadGoogleVisualizationAPI(callback) {
 if (typeof String.prototype.startsWith != 'function') {
     // see below for better implementation!
     String.prototype.startsWith = function (str){
-        return this.indexOf(str) == 0;
+        if($.type(this) === 'string')
+            return this.indexOf(str) == 0;
     };
 }
 

@@ -1,0 +1,139 @@
+##
+# You should look at the following URL's in order to grasp a solid understanding
+# of Nginx configuration files in order to fully unleash the power of Nginx.
+# http://wiki.nginx.org/Pitfalls
+# http://wiki.nginx.org/QuickStart
+# http://wiki.nginx.org/Configuration
+#
+# Generally, you will want to move this file somewhere, and start with a clean
+# file but keep this around for reference. Or just disable in sites-enabled.
+#
+# Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
+##
+
+server {
+	#listen   8080; ## listen for ipv4; this line is default and implied
+	#listen   [::]:80 default ipv6only=on; ## listen for ipv6
+
+	#root /data/biodiv;
+	#index index.html index.htm;
+
+	# Make site accessible from http://localhost/
+	server_name portal.wikwio.org www.portal.wikwio.org;
+
+	location /biodiv/static/templates {
+		root /data;
+	}
+
+	location /biodiv/logo/ {
+		root /data;
+	}
+	location /biodiv/t {
+		root /data;
+	}
+
+
+	location /biodiv/observations {
+		root /data;
+	}
+	#access_log off;
+
+	location /biodiv/newsletters {
+		root /data;
+	}
+	location /biodiv/group-themes {
+		root /data;
+	}
+	location /biodiv/users {
+		root /data;
+	}
+
+	location /biodiv/userGroups {
+		root /data;
+	}
+
+#	location /biodiv/images {
+#		root /data;
+#	}
+
+	location /biodiv/group_icons {
+		root /data;
+	}
+
+	location /biodiv/content {
+		root /data;
+	}
+	location /biodiv/simg {
+		root /data;
+	}
+	location /biodiv/maps {
+		root /data;
+	}
+
+	location /geoserver {
+		proxy_pass http://localhost:8080/geoserver;
+	}
+
+	#access_log off;
+	access_log      /var/log/nginx/biodiv-access.log;
+	error_log       /var/log/nginx/biodiv-error.log notice;
+	rewrite_log on;
+	
+	location = / {
+		#rewrite_log on;
+		proxy_pass http://localhost:8080/biodiv/;
+		proxy_redirect   default;
+		proxy_redirect http://localhost:8080/biodiv/ /;
+	}
+	location = /biodiv {
+		#rewrite_log on;
+		proxy_pass http://localhost:8080/biodiv/;
+		proxy_redirect   default;
+		proxy_redirect http://localhost:8080/biodiv/ /;
+	}
+
+	location / {
+		#rewrite_log on;
+
+
+		rewrite ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|ck)(.*)$ /biodiv/$1$2 break;
+
+		rewrite ^/map/(img|theme)/(.*)$   /biodiv/js/OpenLayers-2.10/$1/$2 last;
+		rewrite ^/group/([A-Za-z0-9-_]+)/(map)$   /biodiv/map?userGroup=$1 last;
+
+		rewrite ^/content/(.*)$ /biodiv/content/$1 last;
+
+		rewrite ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|edit|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|curation|resource|rateable|rating|document|project|UFile|direction|biodivAdmin|action|map|theportal)(.*)$ /biodiv/$1$2 last;
+
+		#RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|group_icons|content)|(wgp_maps|geoserver)))
+		#RewriteCond %{REQUEST_URI} !(^/(biodiversity_news|biodiversity_in_india))
+		proxy_pass http://localhost:8080/;
+		proxy_redirect   default;
+		proxy_redirect http://portal.wikwio.org/biodiv/ /;
+		proxy_set_header   Host $host;
+
+		
+		#rewrite ^/biodiv/(.*)$ /$1 permanent;
+
+		# First attempt to serve request as file, then
+		# as directory, then fall back to index.html
+		#try_files $uri $uri/ /index.html;
+		# Uncomment to enable naxsi on this location
+		# include /etc/nginx/naxsi.rules
+	}
+
+	error_page 404 /404.html;
+
+	# redirect server error pages to the static page /50x.html
+	#
+	#error_page 500 502 503 504 /50x.html;
+	location = /503.html {
+		root /data/update_in_progress.html;
+	}
+
+
+
+#    ProxyPassReverseCookiePath /biodiv /
+
+}
+

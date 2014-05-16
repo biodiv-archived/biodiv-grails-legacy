@@ -1,208 +1,112 @@
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
-<div class="sidebar_section  <%=sparse?'':'menubutton'%>">
-	<g:set var="fieldCounter" value="${1}" />
-	<a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
-	<!-- speciesConcept section -->
-	<div
-		class="speciesConcept <%=concept.key.equals(grailsApplication.config.speciesPortal.fields.OVERVIEW)?'defaultSpeciesConcept':''%>"
-		id="speciesConcept${conceptCounter}" <%=sparse?'':'style=\"display:none\"'%>>
-		<a class="speciesFieldHeader" data-toggle="collapse" data-parent="#speciesConcept${conceptCounter++}"  href="#speciesField${conceptCounter}_${fieldCounter}"> <h5>${concept.key}</h5></a> 
+<div class="sidebar_section  <%=sparse?'':'menubutton'%>  ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
+    <g:set var="fieldCounter" value="${1}" />
+    <a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
-		<!-- speciesField section -->
-		<div id="speciesField${conceptCounter}_${fieldCounter++}"
-			class="speciesField collapse in">
+    <!-- speciesConcept section -->
 
-			<g:if test="${concept.value.containsKey('speciesFieldInstance')}">
-				<g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
-				<g:showSpeciesField
-					model="['speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
-				</g:each>
-			</g:if>
-			<g:else>
-				<g:each in="${concept.value}" var="category">
-					<g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
+    <div
+        class="speciesConcept <%=concept.key.equals(grailsApplication.config.speciesPortal.fields.OVERVIEW)?'defaultSpeciesConcept':''%>   ${concept.value.hasContent?'':'emptyField'}"
+        id="speciesConcept${conceptCounter}" <%=sparse|| concept.value.hasContent?'':'style=\"display:none\"'%>>
+        <a class="speciesFieldHeader" data-toggle="collapse" data-parent="#speciesConcept${conceptCounter++}"  href="#speciesField${conceptCounter}_${fieldCounter}"> <h5>${concept.key}</h5></a> 
 
-						<div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory">
+        <!-- speciesField section -->
+        <div id="speciesField${conceptCounter}_${fieldCounter++}"
+            class="speciesField collapse in">
+            <g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 
-							<a class="category-header-heading speciesFieldHeader" 
-								href="#speciesField${conceptCounter}_${fieldCounter}"><h6> ${category.key} </h6>
-							</a>
+            <g:if test="${isSpeciesContributor && concept.value.isContributor!=2}">
+            <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:concept.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance, isSpeciesContributor:isSpeciesContributor]"/>
+            </g:if>
+            <g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
+            <g:showSpeciesField
+            model="['speciesInstance':speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':concept.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
+            </g:each>
+            </g:if>
+            <g:else>
+            <g:each in="${concept.value}" var="category">
+            <s:hasContent model="['map':category.value]">
+            <g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
 
-							<div 
-								class="<%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField  ">
+            <div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory ${category.value.hasContent?'':'emptyField'}" <%=category.value.hasContent?'':'style=\"display:none\"'%> >
+                <h6>
+                    <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
+                </h6>
+                <div>
+                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES) && isSpeciesContributor && category.value.isContributor!=2}">
+                <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:category.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
+                </g:if>
 
-								<g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-									<g:if test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.COMMON_NAME)}">
-										<div>
-											<g:showSpeciesFieldHelp
-												model="['speciesFieldInstance':(speciesInstance.commonNames as List)[0]]" /><br/>
-											<%
-										Map names = new LinkedHashMap();
-										speciesInstance.commonNames.each(){
-											String languageName = it?.language?.name ?: "Others";
-											if(!names.containsKey(languageName)) {
-												names.put(languageName, new ArrayList());
-											}
-											names.get(languageName).add(it)
-										};
-										%>
-											<g:if test="${names}">
-												<table style="width:100%;">
-													<g:each in="${names}">
-														<tr class="">
-															<td class="grid_3"><b> ${it.key} </b></td>
-															<td style="width:100%;"><g:each in="${it.value}">
-															<g:showSpeciesFieldAttribution
-												model="['speciesFieldInstance':it]" />
-																	<a href="#" class="speciesName"> ${it.name}</a>
-																	
-																	</g:each></td>
-														</tr>
-													</g:each>
-												</table>
-											</g:if>
-										</div>
-									</g:if>
 
-									<g:elseif
-										test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS)}">
-										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
-                                                                                <br />
-                                                                                <div id="map">
-                                                                                    <div id="map1311326056727" class="occurenceMap"
-                                                                                        style="height: 600px; width: 100%"></div>
-                                                                                    <div class="alert alert-info">
-                                                                                        The current map showing distribution of species is only indicative.
-                                                                                    </div>
 
-                                                                                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />       
-                                                                                </div>
-                                                                                <%--                                                                            --%>
-                                                                                <%--                                                                            <obv:showObservationsList  model="['observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress]"  />--%>
+                <div 
+                    class="<%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField">
+                    <div>   
+                    <g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
+                    <g:if
+                    test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS)}">
+                    <g:render template="/species/showSpeciesOccurences" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance, 'category':category]"/> 
+                    </g:if>
 
-                                                                                <div class="sidebar_section">
-                                                                                    <h5>Related Observations</h5>
-                                                                                    <div class="tile" style="clear: both">
-                                                                                        <obv:showRelatedStory
-                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupInstance':userGroupInstance]" />
-                                                                                    </div>
-                                                                                </div>
-                                       
-									</g:elseif>
+                    <g:elseif test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
+                    <g:render template="/species/showSpeciesReferences" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance, 'category':category, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor]"/> 
+                    </g:elseif>
 
-									<g:elseif test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-										<g:if test="${category.value.get('speciesFieldInstance')}">
-										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
-                                                                                <%
-                                                                                def references = speciesInstance.fields.collect{it.references};
-										Map refs = new LinkedHashMap();
-										references.each(){
-											if(it) {
-												it.each() {
-													refs.put(it?.url?.trim()?:it?.title, it)
-												}
-											}
-                                                                                };
+                    <g:else>
+                    <g:each in="${category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
+                    <g:showSpeciesField
+                    model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':category.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
+                    </g:each>
+                    </g:else>
+                    </g:if>
 
-                                                                                //printing only if references are not available.. using description
-										if(category.value.get('speciesFieldInstance')[0]?.description && !category.value.get('speciesFieldInstance')[0]?.references) {
-											category.value.get('speciesFieldInstance')[0]?.description?.replaceAll(/<.*?>/, '\n').split('\n').each() {
-												if(it) {
-                                                                                                    if(it.startsWith("http://")) {
-                                                                                                            refs.put(it, new Reference(url:it));
-                                                                                                    } else {
-                                                                                                            refs.put(it, new Reference(title:it));
-                                                                                                    }
-												}
-											}
-										}
-										references = refs.values();
-										%>
-										<g:if test="${references}">
-											<ol class="references" style="list-style:disc;list-style-type:decimal">
-												<g:each in="${references}" var="r">
-													<li class="linktext"><g:if test="${r.url}">
-															<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
-															</a>
-														</g:if> <g:else>
-															${r?.title}
-														</g:else>
-													</li>
-												</g:each>
+                    <g:each in="${category.value}">
+                    <g:if test="${((it.key.equals(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY))||
+                    (it.key.equals(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY))||
+                    (it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) ||
+                    (it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY))
+                    ) && category.value }">
+                    <g:showSpeciesField
+                    model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance')?.getAt(0), 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
+                    </g:if>
+                    <g:elseif
+                    test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance') && !it.key.equals('hasContent') && !it.key.equals('isContributor') }">
 
-											</ol>
-										</g:if>
-										</g:if>
-									</g:elseif>
-								
-									<g:else>
-										<g:each in="${ category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
-										<g:showSpeciesField
-											model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
-										</g:each>
-									</g:else>
-								</g:if>
+                    <div class="clearfix speciesSubCategory ${it.value.hasContent?'':'emptyField'}" <%=it.value.hasContent?'':'style=\"display:none\"'%> >
+                        <g:if test="${it.value.field?.subCategory}">
+                        <h6 style="margin-bottom: 0px">
+                            ${it.value.field?.subCategory}
+                        </h6>
+                        <div>
+                            <g:if test="${isSpeciesContributor && it.value.isContributor != 2}">
 
-								<g:if test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SYNONYMS)}">
+                                <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:it.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
+                           </g:if>
+                        </div>
+                        </g:if>
+                        <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
+                        <g:showSpeciesField
+                        model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
+                        </g:each>
+                    </div>
+                    </g:elseif>
+                    </g:each>
+                </div>
+                </div>
+                <br/>
+            </div>
+            </div>
+            </g:if>
+            </s:hasContent>
+            </g:each>
 
-									<div>
-									 
-										<g:showSpeciesFieldHelp
-											model="['speciesFieldInstance':(speciesInstance.synonyms as List)[0]]" />
-									<br/>
-										<g:each in="${speciesInstance.synonyms}">
-										<g:showSpeciesFieldAttribution
-											model="['speciesFieldInstance':it]" />
-											<div class="">
-												<span class="grid_3"><b> ${it?.relationship?.value()} </b> </span> <span>
-													<a class="speciesName" href="#"> ${it?.name} </a> </span>
-											</div>
-										</g:each>
+            </g:else>
 
-									</div>
+        </div>
 
-								</g:if>
-
-								<g:elseif
-									test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME)}">
-									<!-- ignore -->
-								</g:elseif>
-								<g:elseif
-									test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY)}">
-									
-								</g:elseif>
-								<g:else>
-									<g:each in="${category.value}">
-										<g:if test="${(it.key.equals(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY))||
-											(it.key.equals(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY))||
-											(it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) ||
-											(it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY))
-											 }">
-											 <g:showSpeciesField
-													model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance')?.getAt(0), 'speciesId':speciesInstance.id]" />
-										</g:if>
-										<g:elseif
-											test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance')}">
-												<g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
-												<g:showSpeciesField
-													model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
-												</g:each>
-										</g:elseif>
-									</g:each>
-								</g:else>
-							</div>
-							<br/>
-						</div>
-					</g:if>
-				</g:each>
-
-			</g:else>
-
-		</div>
-
-	</div>
+    </div>
 </div>
 

@@ -3,18 +3,19 @@
 		style="z-index: 10; float: left; margin-left: 5px;">
 		<button id="identification-email"
 			class="${(params.action == 'show')?'btn btn-link' : 'btn'} dropdown-toggle"
-                        title="Share this page link through email."
-			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</button>
+            title="${titleTooltip?:'Share this page link through email.'}"
+            data-toggle="dropdown" href="#"><i class="icon-envelope"></i>${title?:'Share'}</button>
 		<form id="email-form" name="email-form" class="popup-form"
 			style="display: none; background-color: #F2F2F2;">
-			<div class="form-row">
+            <div class="form-row" style="${hideTo?'display:none;':''}">
 				<span class="keyname">To</span>
 				<ul class="userOrEmail-list">
 					<li id="userOrEmail-new"><input id="userAndEmailList_${autofillUsersId}"
 						placeholder='Type user name or email id' style="float: left"
 						type="text" /></li>
 				</ul>
-			</div>
+            </div>
+            
 			<div class="form-row">
 				<span class="keyname" style="clear: both">Subject</span><input
 					type="text" style="width: 97%" name="mailSubject"
@@ -75,6 +76,10 @@ $(function() {
 							autofillUsersComp[0].removeChoice($(this).find('span')[0]);
 						});
 						$('#email-form')[0].reset()
+
+	                    for (var i in CKEDITOR.instances) {
+                	        CKEDITOR.instances[i].setData('');
+                        }
 						$('#email-form').show();
 						return false;
 					}else{
@@ -99,12 +104,16 @@ $(function() {
 	$('#email-form').bind('submit', function(event) {
 		//adding last entry if not ended with comma
 		var emailAndIdsList = autofillUsersComp[0].getEmailAndIdsList();
+        <g:each in="${users}" var="user">
+        emailAndIdsList.push("${user.id}");
+        </g:each>
+
 		if(emailAndIdsList.length == 0){
 			$("#userAndEmailList_${autofillUsersId}" ).addClass('alert alert-error');
 			event.preventDefault();
 			return false; 
 		} else {
-			$('#userIdsAndEmailIds').val(emailAndIdsList.join(","));
+            $('#userIdsAndEmailIds').val(emailAndIdsList.join(","));
 		}
 		
 		UpdateCKEditors();
@@ -137,6 +146,7 @@ $(function() {
 </g:javascript>
 
 <style>
+    /*
 input#userAndEmailList {
 	-moz-box-sizing: border-box;
 	border: medium none !important;
@@ -207,5 +217,5 @@ li#userOrEmail-new {
 	width: 100%;
 	min-width: 100%;
 	max-width: 100%;
-}
+}*/
 </style>

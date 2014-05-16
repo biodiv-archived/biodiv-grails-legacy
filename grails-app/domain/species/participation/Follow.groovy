@@ -31,9 +31,6 @@ class Follow extends AbstractAction {
 		if(!fetchIsFollowing(object, author)){
             String objectType = object.class.getCanonicalName()
             Long objectId = object.id
-            println objectType
-            println objectId
-            println author
             Follow follow = new Follow(objectType:objectType, objectId:objectId, author:author)
             if(!follow.save(flush:flushImmidiatly)){
                 follow.errors.allErrors.each { log.error it }

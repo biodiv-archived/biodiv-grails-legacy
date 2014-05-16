@@ -50,4 +50,14 @@ environments {
 		useSecureAPI = true
 	  }
 	}
+  kk {
+	  recaptcha {
+		// Set to false to disable the display of captcha
+		enabled = true
+  
+		// Communicate using HTTPS
+		useSecureAPI = true
+	  }
+	}
+
 }

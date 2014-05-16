@@ -3,7 +3,7 @@ package species
 class ChartTagLib {
 	static namespace = "chart"
 	
-	private final static int Y_MAX = 500
+	private final static int Y_MAX = 1500
 	
 	def chartService
 	

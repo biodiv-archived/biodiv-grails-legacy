@@ -218,7 +218,7 @@ class DocumentService {
 
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof GrailsParameterMap) {
+		if(params.aq instanceof GrailsParameterMap  || params.aq instanceof Map){
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -333,11 +333,11 @@ class DocumentService {
 	 */
 	Map getFilteredDocuments(params, max, offset) {
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
-		if(!params.aq){
-			res.putAll(getDocsFromDB(params, max, offset))
-		}else{
+		if(Utils.isSearchAction(params)){
 			//returning docs from solr search
 			res.putAll(search(params))
+		}else{
+			res.putAll(getDocsFromDB(params, max, offset))
 		}
 		return res
 	}
@@ -385,19 +385,27 @@ class DocumentService {
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
-        
+        def userGroup = observationService.getUserGroup(params);
+ 
         if(params.featureBy == "true"){
 			query = "select document from Document document "
-			filterQuery += " and document.featureCount > 0 "
-            params.userGroup = observationService.getUserGroup(params);
-            if(params.userGroup == null) {
+		 	if(!userGroup) {
+                filterQuery += " and document.featureCount > 0 "                
+            }
+             else {
+                query += ", Featured feat "
+                filterQuery += " and document.id = feat.objectId and feat.objectType =:featType and feat.userGroup.id = :userGroupId "
+                queryParams["userGroupId"] = userGroup?.id
+
+            }
+            //params.userGroup = observationService.getUserGroup(params);
+            // if(params.userGroup == null) {
                 //filterQuery += "and feat.userGroup is null"
-            }
-            else {
-                filterQuery += "and feat.userGroup.id =:userGroupId"
-                queryParams["userGroupId"] = params.userGroup?.id
-            }
-            
+            //}
+            //else {
+                //filterQuery += "and feat.userGroup.id =:userGroupId"
+              //  queryParams["userGroupId"] = params.userGroup?.id
+            //}
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Document.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy
@@ -411,15 +419,15 @@ class DocumentService {
 			activeFilters["tag"] = params.tag
 		}
 		
-		if(params.webaddress) {
-			def userGroupInstance = userGroupService.get(params.webaddress)
-			if(userGroupInstance){
-				queryParams['userGroup'] = userGroupInstance
+		if(userGroup) {
+			//def userGroupInstance = userGroupService.get(params.webaddress)
+			//if(userGroupInstance){
+				queryParams['userGroup'] = userGroup
 				//queryParams['isDeleted'] = false;
 		
 				query += " join document.userGroups userGroup "
 				filterQuery += " and userGroup=:userGroup "
-			}
+			//}
 		}
 		
 		def sortBy = params.sort ? params.sort : "lastRevised "

@@ -5,6 +5,7 @@
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.participation.SpeciesBulkUpload"%>
 <html>
 <head>
 
@@ -60,7 +61,7 @@
 		<div>
 			<div class="row section" style="">
 				<div class="figure span3"
-					style="float: left; max-height: 220px; max-width: 220px">
+					style="float: left; max-height: 220px; max-width: 220px; font-size: 75%;">
 					<a
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
@@ -90,6 +91,7 @@
 			</div>
 			<%
 				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
+				def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
 			%>
 
                         <div id="userprofilenavbar" class="navbar">
@@ -114,6 +116,17 @@
                                     <li><a href="#groups"><i class="icon-group"></i>Groups</a></li>
                                     <li class="divider-vertical"></li>
                                     <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
+                                    <g:if test="${user.allowIdentifactionMail}">
+                                        <li style="padding:5px 0px">
+                                        <% String staticMessage = '';
+                                        if(currentUser) {
+                                            staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
+                                        }
+                                        %>
+                            			    <obv:identificationByEmail
+                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:'Contact Me', titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+                                        </li>
+                                    </g:if>
                                 </ul>
                             </div>
                         </div>
@@ -202,6 +215,16 @@
                                     <obv:downloadTable model="[downloadLogList:downloadLogList]" />
                                 </div>
                                 </g:if>
+                                
+                                <g:if test="${!speciesBulkUploadList.isEmpty()}">
+                                <div id="uploads" class="section" style="clear: both;overflow:auto;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"></span> Species Bulk Uploads
+                                    </h6>
+                                    <s:rollBackTable model="[uploadList:speciesBulkUploadList]" />
+                                </div>
+                                </g:if>
+                                
                             </div>
 			<div id="groups" class="super-section" style="clear: both;">
 				<h5>

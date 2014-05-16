@@ -52,62 +52,81 @@ function parseCSVData(data, options) {
  
     var rowData = new Array();
     var columns = new Array();
-
-    //console.log(rowData.length)
-    var lines = data.replace('\r','').split('\n');
+    if(options.res === "species") {
+        var lines = data.split('\r\r\n\n');
+    }
+    else {
+        var lines = data.replace('\r','').split('\n');
+    }
     var printedLines = 0;
     var headerCount = 0;
     var error = '';
     var foundHeader = false;
+    var rowLimit = 500;
+    var rowCount = 0;
     $.each(lines, function(lineCount, line) {
-    	line = $.trim(line);
+        line = $.trim(line);
         try{
             if ((!foundHeader) || (lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
                 var headers = $.csv.toArray(line);
                 foundHeader = isValidRow(headers);
                 headers = getSafeHeaders(headers);
-                if(foundHeader){
-	                headerCount = headers.length;
-	                $.each(headers, function(headerCount, header) {
-	                	var columnName = header;
-	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
-	                    console.log(columns);
-	                });
+                var headerFunction;
+                if(options.res === "species") {
+                    headerFunction = getSpeciesHeaderMenuOptions;
                 }
+                else{
+                    headerFunction = getHeaderMenuOptions;
+                }
+    if(foundHeader){
+        headerCount = headers.length;
+        $.each(headers, function(headerCount, header) {
+            var columnName = header;
+            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, resizable : true, minWidth: 60, header: headerFunction()});
+        });
+    }
             } else if (lineCount >= options.startLine) {
-                var items = $.csv.toArray(line);
-                if(isValidRow(items)) {
-                    printedLines++;
-                    if (items.length != headerCount) {
-                        error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
+                if(rowCount < rowLimit){
+                    var items = $.csv.toArray(line);
+                    if(isValidRow(items)) {
+                        printedLines++;
+                        if (items.length != headerCount) {
+                            error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
+                        }
+
+                        var d = (rowData[printedLines-1] = {});
+                        $.each(items, function(itemCount, item) {
+                            var dataKey = columns[itemCount]['field']
+                            d[dataKey] = item;
+                        });
+                        rowCount = rowCount + 1;
                     }
-                    var d = (rowData[printedLines-1] = {});
-                    $.each(items, function(itemCount, item) {
-                        var dataKey = columns[itemCount]['field']
-                        d[dataKey] = item;
-                    });
                 }
             }
         }catch(e){
             error += e + '\n';
         }
+
     });
+    if(rowCount >= rowLimit){
+        alert("Maximum of " + rowLimit + " data rows can be uploaded excluding header row!!");
+    }
     if (error) {
         alert(error);
     }else{
-        columns.push(getMediaColumnOptions());
-
-
-	    if(options.callBack){
-	        options.callBack(rowData, columns);
-	    }
+        if(options.res !== "species"){
+            columns.push(getMediaColumnOptions());
+        }
+        if(options.callBack){
+            options.callBack(rowData, columns, options.res);
+        }
     }
 }
 
 function getSafeHeaders(array){
-	var newArray = new Array();
-	$.each(array, function(index, value) {
-		value = getDefaultColumnName(newArray, array.length, value)
+    var newArray = new Array();
+    $.each(array, function(index, value) {
+        value = getDefaultColumnName(newArray, array.length, value)
 		newArray.push($.trim(value))
 	});
 	return newArray

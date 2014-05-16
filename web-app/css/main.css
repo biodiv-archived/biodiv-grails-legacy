@@ -9,12 +9,12 @@
 	font-weight: bold;
 }
 
-
+/*
 textarea {
 	width: 250px;
 	height: 150px;
 	vertical-align: top;
-}
+}*/
 
 /* PAGINATION */
 .paginateButtons {
@@ -152,12 +152,6 @@ th.name {
 	margin: 2px 0;
 	padding: 10px 4px;
 	/*margin-left: 250px;*/
-}
-
-.speciesField {
-	padding: 0px 10px;
-	background-color:white;
-	overflow: visible;
 }
 
 /* .speciesField.collapse.in { */
@@ -1190,7 +1184,7 @@ ul.thumbwrap .license_options li:hover {
 	//background-color: rgba(106, 201, 162, 0.15);
 }*/
 
-
+/*
 .userOrEmail-list {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: 1px solid #CCCCCC;
@@ -1239,7 +1233,7 @@ li#userOrEmail-new {
 	margin: 2px 5px 2px 0;
 	position: relative;
 }
-
+*/
 #email-form {
 	background-clip: padding-box;
 	background-color: #FFFFFF;

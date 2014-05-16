@@ -41,6 +41,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		int fieldsCount = content.get(0).size()-1;
 		
+		//reading first concept, category and subcategory but ignoring descriptionfrom simple spreadsheet
 		String[] concepts = new String[fieldsCount];
 		String[] categories = new String[fieldsCount];
 		String[] subcategories = new String[fieldsCount];
@@ -51,6 +52,8 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			if(index < content.get(2).size())
 				subcategories[index-1] = content.get(2).get(index)?.toLowerCase().trim();
 		}
+		//done reading
+		
 		List<String> contributors, attributions,  licenses,  audiences,  status, imageIds;
 		
 		int i=0;
@@ -70,12 +73,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 				if(fieldContent) {
 					fieldContent = fieldContent.trim();
 					Node field = new Node(speciesElement, "field");
-					if(concepts[j])
-						new Node(field, "concept", concepts[j]);
-					if(categories[j])
-						new Node(field, "category", categories[j]);
-					if(subcategories[j])
-						new Node(field, "subcategory", subcategories[j]);
+                    updateFieldNode(field, concepts[j], categories[j], subcategories[j]);
 					
 					log.debug "Reading $field"
 					if(field.category.text().equalsIgnoreCase((String)fieldsConfig.COMMON_NAME)) {

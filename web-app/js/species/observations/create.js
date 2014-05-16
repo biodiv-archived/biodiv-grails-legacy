@@ -2,31 +2,55 @@ var grid;
 var dirtyRows;
 var prevNameColumn = {};
 
+function isEmptyRow(rowEntry){
+    var emptyRow = true;
+    $.each( rowEntry, function( key, value ) {
+        if(value != "" && value != undefined && value != null) {
+            emptyRow = false;
+        }
+    });
+    return emptyRow;
+}
+
+/*function getData(gridData) {
+    var data = [];
+    var gridData = grid.getData();
+
+    for(var rowId=0; rowId<gridData.length; rowId++) {
+        var rowEntry = gridData.getDataItem(rowId);
+         if(isEmptyRow(rowEntry)){
+            continue;
+        }
+        data.push(rowEntry);
+    }
+    return data; 
+}*/
+
 //only returning modified data
 function getDataFromGrid(){
     if(!dirtyRows){
         return grid.getData();
     }
-
-    var selectedRows = grid.getSelectedRows()
-        if(selectedRows.length > 0){
-            dirtyRows.push(selectedRows.last());
-        }
-
+    var selectedRows = grid.getSelectedRows();
+    if(selectedRows.length > 0){
+    	dirtyRows.push(selectedRows.last());
+    }
     dirtyRows = dirtyRows.unique();
     var data = new Array();
     $.each(dirtyRows, function(index, rowId) {
-        data.push(grid.getDataItem(rowId));
+        var rowEntry = grid.getDataItem(rowId);
+        data.push(rowEntry);
     });
     return data;
 }
 
 function addDirtyRows(e, args) {
-    if(dirtyRows)
+	if(dirtyRows)
         dirtyRows.push(args.row);
 };
 
-function initGrid(data, columns, sciNameColumn, commonNameColumn) {
+function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
+    $("#speciesGridSection").show();
     var options = {
         editable: true,
         enableAddRow: true,
@@ -36,16 +60,24 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         fullWidthRows:true,
         rowHeight:32
     };
+    
+    var headerFunction;
+    if(res === "species") {
+        headerFunction = getSpeciesHeaderMenuOptions;
+    }
+    else{
+        headerFunction = getHeaderMenuOptions;
+    }
 
     function setUnEditableColumn(columns){
-    	var unEditableColumn = "Id"
-    	$.each(columns, function(index, column) {
-    		if(column.name === unEditableColumn){
-    			column.editor = null;
-    		}	
-    	});
+        var unEditableColumn = "Id";
+        $.each(columns, function(index, column) {
+            if(column.name === unEditableColumn){
+                column.editor = null;
+            }	
+        });
     }
-    
+
     $(function () {
     	setUnEditableColumn(columns);
         grid = new Slick.Grid("#myGrid", data, columns, options);
@@ -76,14 +108,23 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
             if(newColumn) return;
             else {
-                options = $.extend({}, {
-                    id:newColumnName,
-                    name:newColumnName,
-                    field:newColumnName,
-                    editor: Slick.Editors.Text,
-                    header:getHeaderMenuOptions()
-                }, options);
-
+                if(res === "species"){
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.Text,
+                    }, options);
+                }
+                else{
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.Text,
+                        header:headerFunction()
+                    }, options);
+                }
                 newColumn = options;
 
                 if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
@@ -108,10 +149,10 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             menu.items[0].iconCssClass = (args.column.name === $("#sciNameColumn").val())?'icon-check':undefined
             menu.items[1].iconCssClass = (args.column.name === $("#commonNameColumn").val())?'icon-check':undefined
         });
-
+        
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
-            var name = args.column.name
-            
+            var name = args.column.name;
+
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
                     name = ''
@@ -128,7 +169,6 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         });
-
         grid.registerPlugin(headerMenuPlugin);
 
         
@@ -136,16 +176,141 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
 
+        if(res === "species") {
+            var col = new Array();
+            var k = 0;
+            for(var i= 0; i < columns.length; i++) {
+                if(columns[i].name != "Media"){
+                    col[k] = columns[i];
+                    k=k+1;
+                }
+            }
+            var infoCol = new Array();
+            for(var z= 0; z < col.length; z++) {
+                infoCol[z] = col[z].name;
+            }
+            $('#columnOrder').val(infoCol);
+
+            populateTagHeaders(col);
+            $.ajax({
+                url:window.params.getDataColumnsDB,
+                dataType:'JSON',
+                success:function(data){
+                    updateMetadataValues();  
+                    $(".propagateDown").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags',
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
+                    });
+                    $(".headerInfoTags").tagit({
+                        availableTags:data,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(data.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
+                    });
+                    $(".extraInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
+                    });
+                    $(".licenseInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags',
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
+                    });
+                    /*
+                    $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: false});
+                    $(".licenseInfoTags").tagit("createTag", "brand-new-tag");
+                    $(".licenseInfoTags").tagit( {showAutocompleteOnFocus: true});
+                    */
+                    $(".audienceInfoTags").tagit({
+                        availableTags:infoCol,
+                        fieldName: 'tags', 
+                        showAutocompleteOnFocus: true,
+                        allowSpaces: true,
+                        beforeTagAdded: function(event, ui) {
+                            if(infoCol.indexOf(ui.tagLabel) == -1)
+                            {
+                                return false;
+                            }
+                            if(ui.tagLabel == "not found")
+                            {
+                                return false;
+                            }
+                        }
+                    });
+                    var headerMetadata = getHeaderMetadata();
+                    if(Object.keys(headerMetadata).length == 0){
+                        var res = tagMetadatas(data);
+                        if(res == true){
+                            automaticPropagate();
+                            alert("Your columns have been automatically marked.Please Verify");
+                        }
+                    }
+                }
+            });
+
+        }
+
         if(sciNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
-
+        else {
+            $('#sciNameColumn').val(sciNameColumn);
+            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+        }
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
-
+        else{
+            $('#commonNameColumn').val(commonNameColumn);
+            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+        }
     });
 } 
 
@@ -189,14 +354,17 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
 /**
  */
 function showGrid(){
-    var input = $("#checklistStartFile_path").val(); 
-    if($('#textAreaSection').is(':visible'))
-        parseData(  window.params.content.url + input , {callBack:loadDataToGrid});
-    else
-        parseData(  window.params.content.url + input , {callBack:initGrid});
+    var input = $("#checklistStartFile_path").val();
+    var res = "checklist";
+    if($('#textAreaSection').is(':visible')){
+        parseData(  window.params.content.url + input , {callBack:loadDataToGrid, res: res});
+    }
+    else{
+        parseData(  window.params.content.url + input , {callBack:initGrid, res: res });
+    }
 }
 
-function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
+function loadDataToGrid(data, columns, res, sciNameColumn, commonNameColumn) {
     var cols = '', d = '';
     
     $.each(columns, function(i, n){
@@ -211,16 +379,15 @@ function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
         line = line.slice(1);
         d = d + '\n' + line
     });
+        $("#checklistData").val(d);
+        $("#checklistColumns").val(cols.slice(1));
 
-    $("#checklistData").val(d);
-    $("#checklistColumns").val(cols.slice(1));
-   
-    loadTextToGrid(data, columns, sciNameColumn, commonNameColumn);
+    loadTextToGrid(data, columns, res, sciNameColumn, commonNameColumn);
 }
 
-function loadTextToGrid(data, columns, sciNameColumn, commonNameColumn) {
+function loadTextToGrid(data, columns, res, sciNameColumn, commonNameColumn) {
     $("#gridSection").show();
-    initGrid(data, columns, sciNameColumn, commonNameColumn)
+    initGrid(data, columns, res, sciNameColumn, commonNameColumn)
     $("#textAreaSection").hide();
     $("#addNames").hide();
     $("#parseNames").show();
@@ -251,7 +418,7 @@ function loadGrid(url, id){
                             columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100, 'header':getHeaderMenuOptions()});
 			});
                         columns.push(getMediaColumnOptions());
-                        loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
+                        loadTextToGrid(data.data, columns, data.res, data.sciNameColumn, data.commonNameColumn);
                         //grid.setColumns(finalCols);
                         //grid.render();
                         //grid.autosizeColumns();
@@ -265,105 +432,15 @@ function loadGrid(url, id){
 	});
 }
 
-
-
 $('#addNewColumn').unbind('click').click(function(){
     grid.addNewColumn();
 }); 
 
-function removeResource(event, imageId) {
-    var targ;
-    if (!event) var event = window.event;
-    if (event.target) targ = event.target;
-    else if (event.srcElement) targ = event.srcElement; //for IE
-
-    $(targ).parent('.addedResource').remove();
-    $(".image_"+imageId).remove();
-}
-
 $( ".date" ).datepicker({ 
     changeMonth: true,
     changeYear: true,
-    format: 'dd/mm/yyyy' 
+    dateFormat: 'dd/mm/yy' 
 });
-
-
-function progressHandlingFunction(e){
-    if(e.lengthComputable){
-        var position = e.position || e.loaded;
-        var total = e.totalSize || e.total;
-
-        var percentVal = ((position/total)*100).toFixed(0) + '%';
-        $('#progress_bar').width(percentVal)
-            $('#translucent_box').width('100%')
-            $(".progress").css('z-index',110);
-        $('#progress_msg').html('Uploaded '+percentVal);
-    }
-}
-
-/**
- * upload_resource & FilePicker
- */
-function filePick() {
-    var onSuccess = function(FPFiles){
-        $.each(FPFiles, function(){
-            $('<input>').attr({
-                type: 'hidden',
-            name: 'resources',
-            value:JSON.stringify(this)
-            }).appendTo('#upload_resource');
-        })
-        $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-        $("#iemsg").html("Uploading... Please wait...");
-        $(".progress").css('z-index',110);
-        $('#progress_msg').html('Uploading ...');
-    }
-
-    filepicker.pickMultiple({
-            mimetypes: ['image/*'],
-            maxSize: 104857600,
-            services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
-        }, onSuccess, 
-        function(FPError){
-            console.log(FPError.toString());
-        }
-    );//end of pickMultiple	
-}
-
-    /**
-     * Google Picker API for the Google Docs import
-     */
-
-    function newPicker() {
-        google.load('picker', '1', {"callback" : createPicker});
-    }
-
-// Create and render a Picker object for searching images.
-function createPicker() {
-    var picker = new google.picker.PickerBuilder().
-        addView(google.picker.ViewId.YOUTUBE).
-        setCallback(pickerCallback).
-        build();
-    picker.setVisible(true);
-    //$(".picker-dialog-content").prepend("<div id='anyVideoUrl' class='editable'></div>");
-    //$('#anyVideoUrl').editable(addVideoOptions);
-}
-
-// A simple callback implementation.
-function pickerCallback(data) {
-    var url = 'nothing';
-    if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-        var doc = data[google.picker.Response.DOCUMENTS][0];
-        url = doc[google.picker.Document.URL];
-        if(url) {
-            $('#videoUrl').val(url);
-            $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-            $("#iemsg").html("Uploading... Please wait...");
-            $(".progress").css('z-index',110);
-            $('#progress_msg').html('Uploading ...');
-        }
-    }
-}
 
 /**
  *
@@ -434,44 +511,7 @@ function selectNameColumn(selectedColumn, formatter) {
  */
 $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
-    $('#add_image').bind('click', filePick);
     intializesSpeciesHabitatInterest(false);
-
-    var onVideoAddSuccess = function(params) {
-        var d = new $.Deferred;
-        if(!params.value) {
-            return d.reject('This field is required'); //returning error via deferred object
-        } else {
-            $('#videoUrl').val(params.value);
-            $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-            $("#iemsg").html("Uploading... Please wait...");
-            $(".progress").css('z-index',110);
-            $('#progress_msg').html('Uploading ...');
-            d.resolve();
-        }
-        return d.promise()  
-    }
-
-    var onVideoAddValidate = function(value) {
-        if($.trim(value) == '') {
-            return 'This field is required';
-        }
-    }
-
-    var addVideoOptions = {
-        type: 'text',
-        mode:'popup',
-        emptytext:'',
-        placement:'bottom',
-        url: onVideoAddSuccess,
-        validate : onVideoAddValidate,
-        title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
-    }
-
-    $('#add_video').editable(addVideoOptions);
-    $.each($('.star_obvcreate'), function(index, value){
-        rate($(value));
-    });
 
     //$(".tagit-input").watermark("Add some tags");
     $("#tags").tagit({
@@ -522,105 +562,6 @@ $(document).ready(function(){
             $('.nameContainer input').removeAttr('disabled');
         }
     });
-
-    /**
-     */
-    $('#attachFiles').change(function(e){
-        $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-        $("#iemsg").html("Uploading... Please wait...");
-    });
-
-    /**
-     */
-    var onUploadResourceSuccess = function(responseXML, statusText, xhr, form) {
-        $("#addObservationSubmit").removeClass('disabled');
-        $(form).find("span.msg").html("");
-        $(".progress").css('z-index',90);
-        $('#progress_msg').html('');
-        $("#iemsg").html("");
-        //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
-        //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
-        var obvDir = $(responseXML).find('dir').text();
-        var obvDirInput = $('#upload_resource input[name="obvDir"]');
-        if(!obvDirInput.val()){
-            $(obvDirInput).val(obvDir);
-        }
-        var images = [];
-        var metadata = $(".metadata");
-        var i = 0;
-        if(metadata.length > 0) {
-            var file_id = $(metadata.get(-1)).children("input").first().attr("name");
-            i = parseInt(file_id.substring(file_id.indexOf("_")+1));
-        }
-        $(responseXML).find('resources').find('res').each(function() {
-            var fileName = $(this).attr('fileName');
-            var type = $(this).attr('type');					
-            images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
-        });
-
-        var html = $( "#metadataTmpl" ).render( images );
-        var metadataEle = $(html);
-        metadataEle.each(function() {
-            $('.geotagged_image', this).load(function(){
-                update_geotagged_images_list($(this));		
-            });
-            var $ratingContainer = $(this).find('.star_obvcreate');
-            rate($ratingContainer)
-        })
-
-        $("#imagesList li:last" ).before (metadataEle);
-        $("#add_file" ).fadeIn(3000);
-        $("#image-resources-msg").parent(".resources").removeClass("error");
-        $("#image-resources-msg").html("");
-        $("#upload_resource input[name='resources']").remove();
-        $('#videoUrl').val('');
-        $('#add_video').editable('setValue','', false);		
-    }
-
-    var onUploadResourceError = function (xhr, ajaxOptions, thrownError){
-        var successHandler = this.success, errorHandler;
-        handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
-            if(data && data.status == 401) {
-                $('#upload_resource').submit();
-                return; 
-            }
-            $("#addObservationSubmit").removeClass('disabled');
-            $("#upload_resource input[name='resources']").remove();
-            $('#videoUrl').val('');
-            $(".progress").css('z-index',90);
-            $('#add_video').editable('setValue','', false);
-            //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
-
-            var response = $.parseJSON(xhr.responseText);
-            if(response.error){
-                $("#image-resources-msg").parent(".resources").addClass("error");
-                $("#image-resources-msg").html(response.error);
-            }
-
-            var messageNode = $(".message .resources");
-            if(messageNode.length == 0 ) {
-                $("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-            } else {
-                messageNode.append(response?response.error:"Error");
-            }
-
-        });
-    } 
-
-    $('#upload_resource').ajaxForm({ 
-        url:window.params.observation.uploadUrl,
-        dataType: 'xml',//could not parse json wih this form plugin 
-        clearForm: true,
-        resetForm: true,
-        type: 'POST',
-
-        beforeSubmit: function(formData, jqForm, options) {
-            $("#addObservationSubmit").addClass('disabled');
-            return true;
-        }, 
-        success:onUploadResourceSuccess,
-        error:onUploadResourceError
-    });  
 
     /**
      *
@@ -695,6 +636,9 @@ $(document).ready(function(){
 
         $('#legend').hide();
         var me = this
+        
+       
+        
         $.ajax({
             url : window.params.recommendation.getRecos,
             type : 'post', 
@@ -708,6 +652,10 @@ $(document).ready(function(){
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {}; var incorrectNames = false;
                 for(var rowId=0; rowId<gridData.length; rowId++) {
+                	var rowEntry = grid.getDataItem(rowId);
+                	if(isEmptyRow(rowEntry)){
+                        continue;
+                    }
                     if(data.hasOwnProperty(rowId+'')) {
                         if(!changes[rowId])
                             changes[rowId] = {}
@@ -753,6 +701,25 @@ $(document).ready(function(){
         });
     });
 
+    //removning empty rows and properties
+    function getGridDataJSON(gridData) {
+        var ck = new Array();
+        for(var rowId=0; rowId<gridData.length; rowId++) {
+            var rowEntry = gridData[rowId];
+            if(isEmptyRow(rowEntry)){
+                continue;
+            }
+            var row = new Object();
+            $.each( rowEntry, function( key, value ) {
+                if(value != "" && value != undefined && value != null) {
+                    row[key] = value;
+                }
+            });
+            ck.push(row);
+        }
+        return JSON.stringify(ck);
+    }
+
     /**
      *
      */
@@ -778,8 +745,7 @@ $(document).ready(function(){
                 var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(element);
                 $('#addObservation').append($(input));	
             })
-
-
+            
             $("#userGroupsList").val(getSelectedUserGroups());
             if(drawnItems) {
                 var areas = drawnItems.getLayers();
@@ -793,7 +759,7 @@ $(document).ready(function(){
             //checklist related data
             if(grid){
 	            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
-	            $("#checklistData").val(JSON.stringify(getDataFromGrid()));
+	            $("#checklistData").val(getGridDataJSON(getDataFromGrid()));
 	            $("#rawChecklist").val($("#checklistStartFile_path").val());
             }
             $("#addObservation").submit();        	
@@ -802,7 +768,8 @@ $(document).ready(function(){
             alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
         }
     });
-	
+
+    
 });	
 
  function AutoCompleteEditor(args) {
@@ -905,10 +872,9 @@ function openDetails(row, cell) {
         return false;
     }
 
-    $('#addResourcesModal ul#imagesList>li.addedResource.thumbnail').remove();
+    $('#addResourcesModal ul.imagesList>li.addedResource.thumbnail').remove();
 
     var data = grid.getData()[row];
-
     var media = data.Media;
     if(media) {
         var obvDir = data.obvDir;
@@ -916,20 +882,20 @@ function openDetails(row, cell) {
         if(!obvDirInput.val()){
             $(obvDirInput).val(obvDir);
         }
-
         var images = [];
         var metadata = $(".metadata");
         var i = 0;
-        /*if(metadata.length > 0) {
+        /*
+        if(metadata.length > 0) {
           var file_id = $(metadata.get(-1)).children("input").first().attr("name");
           i = parseInt(file_id.substring(file_id.indexOf("_")+1));
-          }*/
-        for(i=0; i< media.length; i++) {
+        }*/
+        //order reversed
+        for(i = (media.length - 1); i >= 0; i--) {
             var m = media[i];
             //TODO:push rating also
-            images.push({i:i+1, file:obvDir + "/" + m['file'], url:m['url'], thumbnail:m['thumbnail'], type:m['type'], title:m['fileName']});
+            images.push({i:i+1, file: m['file'], url:m['url'], thumbnail:m['thumbnail'], type:m['type'], title:m['fileName']});
         };
-
         var html = $( "#metadataTmpl" ).render( images );
         var metadataEle = $(html);
         metadataEle.each(function() {
@@ -940,7 +906,7 @@ function openDetails(row, cell) {
             rate($ratingContainer)
         })
 
-        $("#imagesList li:last" ).before (metadataEle);
+        $(".imagesList li:first" ).after (metadataEle);
     }
 
     $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
@@ -953,7 +919,7 @@ $(document).ready(function() {
      *
      */
     $('#addResourcesModalSubmit').click(function(){
-       var row = $('#addResourcesModal').data().row;    
+        var row = $('#addResourcesModal').data().row;    
        var cell = $('#addResourcesModal').data().cell;
        if(row === undefined || cell === undefined) {
            alert('Either row or cell is missing');
@@ -961,7 +927,7 @@ $(document).ready(function() {
            return false;
        }
         var data = grid.getData()[row]
-        var addedResources = $('#addResourcesModal ul#imagesList>li');
+        var addedResources = $('#addResourcesModal ul.imagesList>li');
         data.Media = new Array($(addedResources).length-1);
         for(var i=0; i<$(addedResources).length-1; i++) {
             data.Media[i] = {};

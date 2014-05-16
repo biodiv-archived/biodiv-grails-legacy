@@ -8,6 +8,17 @@
     <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px;"   title="${(featureCount>0) ? 'Featured':''}">
     </span>
     </g:if>
+
+    <div class="pull-right">
+        <g:if test="${isSpeciesContributor}">
+        <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"
+            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+            <i class="icon-edit"></i>Edit</a>
+
+        </g:if>
+
+    </div>
+
     <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]"/>		
     </div>
 </g:if>

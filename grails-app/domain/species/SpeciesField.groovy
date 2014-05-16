@@ -1,9 +1,12 @@
 package species
 
 import org.grails.rateable.*
+import species.auth.SUser
 
-class SpeciesField implements Rateable {
+class SpeciesField extends Sourcedata implements Rateable {
 
+	def activityFeedService
+	
 	public enum Status {
 		UNDER_CREATION("Under Creation"),
 		PUBLISHED("Published"),
@@ -18,6 +21,15 @@ class SpeciesField implements Rateable {
 		
 		String value() {
 			return this.value;
+		}
+
+		static def toList() {
+			return [
+				UNDER_CREATION,
+				PUBLISHED,
+				UNDER_VALIDATION,
+				VALIDATED 
+            ]
 		}
 	}
 	
@@ -35,6 +47,14 @@ class SpeciesField implements Rateable {
 		public String value() {
 			return this.value;
 		}
+
+        static def toList() {
+			return [
+	            CHILDREN,
+                GENERAL_PUBLIC,
+                EXPERT_USERS
+            ]
+        }
 	}
 	
 	Status status = Status.UNDER_CREATION;
@@ -42,24 +62,24 @@ class SpeciesField implements Rateable {
 	String description;
 	Date dateCreated
 	Date lastUpdated
+    List<SUser> contributors;
+    List<Contributor> attributors;
 	
-	
-	static hasMany = [contributors:Contributor, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
+	static hasMany = [contributors:SUser, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
 	static mapping = {
 		description type:"text";
-		tablePerHierarchy true		
+		tablePerHierarchy true;
+		references cascade: "all-delete-orphan"
 	}
 	
 	static constraints = {
-	
+        description blank:false, nullable:false
 		contributors validator : { val, obj ->
 			if(!val) {
-				println "++++++${obj}"
-				obj.addToContributors(Contributor.findByName('pearlsravanthi'));
-				//return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
-				return true;
+				//obj.addToContributors(SUser.findByUsername('pearlsravanthi'));
+				return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 			}
 		}
 		licenses validator : { val, obj ->
@@ -68,6 +88,8 @@ class SpeciesField implements Rateable {
 			}
 		}
 	}
-
 	
+	def beforeDelete(){
+		activityFeedService.deleteFeed(this)
+	}
 }
