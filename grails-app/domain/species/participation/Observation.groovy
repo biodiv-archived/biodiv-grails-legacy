@@ -22,6 +22,7 @@ import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
 import speciespage.ObservationService;
+import species.Species;
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
@@ -60,10 +61,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	String notes;
 	int rating;
 	long visitCount = 0;
-	boolean isDeleted = false;
+    boolean isDeleted = false;
 	int flagCount = 0;
 	int featureCount = 0;
     String searchText;
+    //if observation locked due to pulling of images in species
+    boolean isLocked = false;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 	
@@ -253,9 +256,22 @@ class Observation extends Metadata implements Taggable, Rateable {
 			def map = reco.getRecommendationDetails(this);
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
-			String cNames = suggestedCommonNames(reco.id, true)
+            map.put("isLocked", this.isLocked);
+			String cNames = fetchSuggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			map.put("disAgree", (currentUser in map.authors));
+            if(this.isLocked == false){
+                map.put("showLock", true);
+            }
+            else{
+                def recVo = RecommendationVote.findWhere(recommendation: reco, observation:this, author: currentUser);
+                if(recVo && recVo.recommendation == this.maxVotedReco){
+                    map.put("showLock", false);                   
+                }
+                else{
+                    map.put("showLock", true);
+                }
+            }
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
@@ -505,17 +521,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return res
 	}
 
-	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
-		if(!geoPrivacy || SUserService.ifOwns(author)){
-			return 0
-		}
-		//for backend thred e.g download request reqUser will be passed as argument
-		if(reqUser && (reqUser.id == author.id || reqUser.id == 1)){
-			return 0
-		}
-		
-		return Utils.getRandomFloat()
-	}
+
 //	
 //	def fetchSourceChecklistTitle(){
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
@@ -528,4 +534,42 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def fetchList(params, max, offset, action){
 		return observationService.getObservationList(params, max, offset, action)
 	}
+
+    static long countObservations() {
+        def c = Observation.createCriteria();
+        def observationCount = c.count {
+            eq ('isDeleted', false);
+            eq ('isShowable', true);
+            eq ('isChecklist', false);
+        }
+        return observationCount;
+    }
+
+    static long countChecklists() {
+        def c = Observation.createCriteria();
+        def observationCount = c.count {
+            eq ('isDeleted', false);
+            eq ('isShowable', true);
+            eq ('isChecklist', true);
+        }
+        return observationCount;
+    }
+
+    private void removeResourcesFromSpecies(){
+        def obvRes = this.resource
+        if(!this.maxVotedReco) {
+            return
+        }
+        def taxCon = this.maxVotedReco?.taxonConcept
+        if(!taxCon){return}
+        def speWithThisTaxon = Species.findAllByTaxonConcept(taxCon)
+        speWithThisTaxon.each{ sp ->   
+            obvRes.each{ obres ->
+                sp.removeFromResources(obres)
+            }
+            if(!sp.save(flush:true)){
+                sp.errors.allErrors.each { log.error it } 
+            }
+        }
+    }
 }

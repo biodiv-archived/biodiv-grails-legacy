@@ -122,10 +122,23 @@ class ChecklistService {
 				//so that original author of checklist should not change
 				//to say if all obv needs to be updated because some change in MetaData properties
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
+                mailType = feedType
 			}
 			
-			
-			if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
+            // ignoring saving when there is no valid observation
+            boolean validObvPresent = false
+            for(Map m in params.checklistData) {
+                def oldObvId = m.OBSERVATION_COLUMN
+                if(isValidObservation(m, oldObvId, checklistInstance)){
+                    validObvPresent = true;
+                    break;
+                }
+            }
+            if(!validObvPresent) {
+				return ['success' : false, 'msg':'No valid observation present. Ignoring saving checklist', checklistInstance:checklistInstance]
+            }
+
+			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
 				
@@ -138,14 +151,14 @@ class ChecklistService {
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
-				return ['success' : true, checklistInstance:checklistInstance]
+				return ['success' : true, 'msg':'Successfully saved checklist.', checklistInstance:checklistInstance]
 			} else {
 				checklistInstance.errors.allErrors.each { log.error it }
-				return ['success' : false, checklistInstance:checklistInstance]
+				return ['success' : false, 'msg':checklistInstance.errors, checklistInstance:checklistInstance]
 			}
 		} catch(e) {
 			e.printStackTrace();
-			return ['success' : false, checklistInstance:checklistInstance]
+			return ['success' : false, 'msg':"Error in saving checklist : ${e.getMessage()}", checklistInstance:checklistInstance]
 		}
 	}
 	
@@ -160,9 +173,9 @@ class ChecklistService {
 	
 	@Transactional
 	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
-		if(!params.checklistData && !isGlobalUpdate)
+	    if(!params.checklistData && !isGlobalUpdate)
 			return
-		
+            
 		Checklists.withTransaction() {
 			Set updatedObv = new HashSet()
 			Set newObv = new HashSet()
@@ -178,7 +191,7 @@ class ChecklistService {
 					def media = m.remove(MEDIA_COLUMN);
 					m.remove(SPECIES_TITLE_COLUMN);
 					m.remove(SPECIES_ID_COLUMN);
-	                println "------------media----------- ${media}"
+
 	                Map obsParams = new HashMap(commonObsParams);
 	                if(media) {
 	                    media.eachWithIndex{ item, index ->
@@ -215,14 +228,14 @@ class ChecklistService {
 				checklistInstance.observations.each { obv ->
 					if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
 						commonObsParams.id = obv.id
-						observationService.saveObservation(commonObsParams, false)
+						observationService.saveObservation(commonObsParams, false, false)
 					}
 				}
 			}
 			//updating obv count
-			checklistInstance.speciesCount = checklistInstance.observations.size()
+			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
 		}
-		log.debug "saved checklist observation  "
+		log.debug "saved checklist observations"
 	}
 	
 	private boolean isValidObservation(m, oldObvId, cl){
@@ -233,7 +246,7 @@ class ChecklistService {
 		def snCol = m[cl.sciNameColumn]
 		def cnCol = m[cl.commonNameColumn]
 		
-		return snCol || snCol || media
+		return snCol || cnCol || media
 	}
 	
 	private getSafeAnnotation(Map m, List validColumns){
@@ -261,6 +274,15 @@ class ChecklistService {
 	}
 	
 	private saveReco(Observation obv, Map m, Checklists cl){
+		def safeMap = new HashMap()
+		m.each { k, v ->
+			if(k.trim() && v && !m.isNull(k)){
+				safeMap.put(k.trim(), v.trim())
+			}
+		}
+		
+		m = safeMap
+		
 		def res = observationService.getRecommendation([recoName:m[cl.sciNameColumn], commonName: m[cl.commonNameColumn]])
 		
 		if(!isNewReco(obv,res))
@@ -620,7 +642,6 @@ class ChecklistService {
 		clIdList.each {  id ->
 			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
 			if(!cl.observations.iterator().next().checklistAnnotations){
-				println cl
 				Checklists.withTransaction(){
 					cl.observations.each { obv ->
 						def m = [:]

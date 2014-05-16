@@ -5,6 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import species.participation.Follow
 import species.auth.SUser
 
+
 class ActivityFeedController {
 
 	def activityFeedService;
@@ -72,5 +73,18 @@ class ActivityFeedController {
 		def r = [status:'success']
 		r['msg']= msg 
 		render r as JSON
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////// COMMENT THIS /////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Secured(['ROLE_ADMIN'])
+	def migrateFeedForPost() {
+		def wgpGroup = species.groups.UserGroup.read(1)
+		def author = SUser.read(1426)
+		def resList = wgpGroup.species.collect{it}
+		ActivityFeed.withTransaction(){
+			activityFeedService.addFeedOnGroupResoucePull(resList, wgpGroup, author, true, false, true, true)
+		}
 	}
 }

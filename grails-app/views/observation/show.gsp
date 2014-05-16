@@ -73,7 +73,8 @@ if(r) {
                             <obv:showSubmenuTemplate/>
                             
                         <g:if test="${observationInstance}">
-                            <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                        <g:set var="featureCount" value="${observationInstance.featureCount}"/>
+                        <g:set var="obvLock" value="${observationInstance.isLocked}"/>
                             </g:if>
                             
                         <div class="page-header clearfix ">
@@ -84,6 +85,7 @@ if(r) {
 
                                             <div class="pull-right">
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
+                                                
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                                                     <i class="icon-edit"></i>Edit</a>
@@ -91,7 +93,7 @@ if(r) {
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                                                     href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
                                                     onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
-
+                                                
                                                 </sUser:ifOwns>
 
                                             </div>
@@ -111,7 +113,7 @@ if(r) {
 
 				<div class="span8 right-shadow-box" style="margin: 0;">
 				<div style="height:400px;position:relative">
-                                    <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
+                                    <div class="story-footer" style="right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
                                     <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
                                     </div>
                                     <center>
@@ -176,7 +178,6 @@ if(r) {
 									<g:renderErrors bean="${recommendationVoteInstance}" as="list" />
 								</div>
 							</g:hasErrors>
-
 							<form id="addRecommendation" name="addRecommendation"
 								action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
 								method="GET" class="form-horizontal">
@@ -257,8 +258,7 @@ if(r) {
 <%--		dcorateCommentBody($('.yj-message-body')); --%>
 
 		$("#seeMoreMessage").hide();
-		
-		$(".readmore").readmore({
+                		$(".readmore").readmore({
 			substr_len : 400,
 			more_link : '<a class="more readmore">&nbsp;More</a>'
 		});
@@ -385,7 +385,16 @@ if(r) {
 
                 preLoadRecos(3, 0, false);
                 //loadObjectInGroups();
-                
+                var obvLock = ${obvLock};
+                if(obvLock){
+                    showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+                    $('.nameContainer input').attr("disabled", "disabled");
+                    $('.iAgree button').addClass("disabled");
+                }
+                else{
+                    $('.nameContainer input').removeAttr("disabled");
+                    $('.iAgree button').removeClass("disabled");
+                } 
                 
         });
 

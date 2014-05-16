@@ -16,6 +16,7 @@ class ChecklistController {
 	def checklistUtilService
 	def observationService
 	def SUserService
+	def chartService
 	
 	def index = {
 		redirect(action:list, params: params)
@@ -96,16 +97,7 @@ class ChecklistController {
 	
 	def count = {
 		log.debug params
-		def userGroup
-		if(params.webaddress) {
-			userGroup = userGroupService.get(params.webaddress)
-		}
-		
-		if(userGroup){
-			render getChecklistCount(null, userGroup)
-		}else{
-			render Checklists.countByIsDeleted(false);
-		}
+		render chartService.getChecklistCount(params)
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -124,8 +116,8 @@ class ChecklistController {
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
-                //flash.message = "${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
+                flash.error = result.msg;//"${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
             }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
@@ -220,8 +212,8 @@ class ChecklistController {
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
-                //flash.message = "${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData, checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
+                flash.error = result.msg;//"${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance, 'msg':result.msg, checklistData:params.checklistData, checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
             }
 
 		}else {
@@ -272,7 +264,7 @@ class ChecklistController {
             List columns = [obv_id]
             cl.fetchColumnNames().each { columns.add(it) }
             
-            return [columns: columns, data :obvData, sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
+            return [columns: columns, data :obvData, res:'checklist', sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
         }
         return ['error':"Couldn't find checklist with this id"];
     }

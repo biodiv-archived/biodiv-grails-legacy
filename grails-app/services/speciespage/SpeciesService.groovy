@@ -2,21 +2,33 @@ package speciespage
 
 
 import java.util.List
+import java.text.DateFormat
 import org.apache.solr.common.util.DateUtil;
 import org.apache.commons.logging.LogFactory
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
+import species.License.LicenseType;
 import species.Contributor;
 import species.Field
 import species.Resource;
-import species.Species
+import species.participation.Observation;
+import species.Species;
+import species.License;
+import species.Reference;
 import species.SpeciesField;
+import species.SpeciesField.AudienceType;
+import species.SpeciesField.Status;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
+import species.Synonyms;
+import species.CommonNames;
+import species.Language;
+import species.Classification;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -25,6 +37,7 @@ import species.sourcehandler.SourceConverter;
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
+import species.auth.SUser;
 import java.text.SimpleDateFormat;
 import species.sourcehandler.exporter.DwCAExporter
 import org.apache.log4j.PatternLayout;
@@ -35,23 +48,27 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
 import species.groups.UserGroup;
+import species.AbstractObjectService;
+import species.TaxonomyRegistry;
+import org.hibernate.FetchMode;
 
-class SpeciesService {
+class SpeciesService extends AbstractObjectService  {
 
     private static log = LogFactory.getLog(this);
 
     static transactional = false
 
-    def grailsApplication;
     def groupHandlerService;
     def namesLoaderService;
-    def sessionFactory;
     def externalLinksService;
     def speciesSearchService;
     def namesIndexerService;
     def observationService;
-    def springSecurityService;
+    def speciesPermissionService;
+    def taxonService;
+    def activityFeedService;
 
+	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
     //static int noOfFields = Field.count();
 
@@ -79,7 +96,7 @@ class SpeciesService {
 
         String aq = "";
         int i=0;
-        if(params.aq instanceof GrailsParameterMap) {
+        if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
             params.aq.each { key, value ->
                 queryParams["aq."+key] = value;
                 activeFilters["aq."+key] = value;
@@ -256,17 +273,231 @@ class SpeciesService {
         return false;
     }
 
+    /**
+    * Add Species Field
+    */
+    def addSpeciesField(long speciesId, long fieldId, params) {
+        if(!fieldId || !speciesId) {
+            return [success:false, msg:"Id or value cannot be empty"]
+        }
+        XMLConverter converter = new XMLConverter();
 
-    def updateContributor(long contributorId, long speciesFieldId, def value, String type) {
+        Species speciesInstance = Species.get(speciesId);
+        Field field = Field.read(fieldId);
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to add"]
+        }
+
+        if(!field) {
+            return [success:false, msg:"Invalid field"]
+        }
+        try {
+            SpeciesField speciesFieldInstance = createNewSpeciesField(speciesInstance, field, null);
+            if(speciesFieldInstance) {
+                //updating metadata for the species field
+                def result = updateSpeciesFieldInstance(speciesFieldInstance, params);
+                def errors = result.errors;
+                speciesInstance.addToFields(speciesFieldInstance);
+
+                //TODO:make sure this is run in only one user updates this species at a time
+                Species.withTransaction {
+                    if(!speciesInstance.save()) {
+                        speciesInstance.errors.each { errors << it; log.error it }
+                        return [success:false, msg:"Error while adding species field", errors:errors]
+                    }
+                }
+
+                List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                sortAsPerRating(sameFieldSpeciesFieldInstances);
+                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field]
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            return [success:false, msg:"Error while adding species field"]
+        }
+        return [success:false, msg:"Error while adding species field"]
+    }       
+
+    SpeciesField createNewSpeciesField(Species speciesInstance, Field fieldInstance, String value) {
+            def newSpeciesFieldInstance = (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
+            newSpeciesFieldInstance.species = speciesInstance;
+            newSpeciesFieldInstance.field = fieldInstance;
+            return newSpeciesFieldInstance;
+    }
+
+    /**
+     * Update Species Field
+     */
+    def updateSpeciesField(SpeciesField speciesField, params) {
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        try {
+            def result;
+            SpeciesField.withTransaction { status ->
+                result = updateSpeciesFieldInstance(speciesField, params); 
+                if(!speciesField.save()) {
+                    speciesField.errors.each { result.errors << it }
+                    return [success:false, msg:"Error while updating species field", errors:result.errors]
+                } 
+            }
+            log.debug "Successfully updated species field";
+            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field]
+        } catch(Exception e) {
+            e.printStackTrace();
+            return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
+        }
+    }
+
+    private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
+        if(!params.description) {
+            return [success:false, msg:"Description cant be empty. Please delete the field if you dont want to have any description"]
+        }
+
+        List errors = [];
+        String msg;
+        if(!params.contributor) {
+            params.contributor = springSecurityService.currentUser.id+'';
+        }
+
+        //contributors
+        speciesField.contributors.clear();
+
+        List contributors = Utils.getUsersList(params.contributor);
+        contributors.each { c ->
+            speciesField.addToContributors(c);
+        }
+        /*
+        params.contributor.split("\\r?\\n|,").each { l ->
+            l = l.trim()
+            if(l) {
+                SUser c = SUser.findByEmail(l.trim());
+                if(!c) {
+                    errors <<  "No registered user with email ${l} found"
+                } else {
+                    speciesField.addToContributors(c);
+                }
+            }
+        } */
+
+        //attributions
+        speciesField.attributors?.clear();
+        params.attribution?.split("\\r?\\n").each { l ->
+            l = l.trim()
+            if(l) {
+                Contributor c = (new XMLConverter()).getContributorByName(l.trim(), true);
+                if(!c) {
+                    errors <<  "Error while adding attribution ${l}"
+                } else {
+                    speciesField.addToAttributors(c);
+                }
+            }
+        }   
+
+        //reference
+        if(speciesField.references?.size() > 0) {
+            /* HACK:As reference has all-delete-orphan... a clear on this collection is failing 
+             * java.lang.UnsupportedOperationException: queued clear cannot be used with orphan delete
+             * This is fixed in grails 2 http://jira.grails.org/browse/GRAILS-6734
+             * For now doing hack by executing basic sql
+             */
+            SpeciesField.executeUpdate('delete Reference r where r.speciesField = :speciesField', ['speciesField':speciesField]);
+            //            speciesField.references?.clear();
+        }
+        params.reference?.split("\\r?\\n").each { l ->
+            l = l.trim(); 
+
+            if(l && l.trim()) {
+                speciesField.addToReferences(new Reference(title:l.trim()));
+            }
+        }   
+
+        //license
+        speciesField.licenses.clear();
+        params.license.split("\\r?\\n|,").each { l ->
+            l = l.trim();
+            if(l) {
+                License c = (new XMLConverter()).getLicenseByType(l, false);
+                if(!c) { 
+                    errors << "Error while updating license"
+                } else {
+                    speciesField.addToLicenses(c);
+                }
+            }
+        }
+
+        //audienceType
+        speciesField.audienceTypes.clear();
+        params.audienceType.split("\\r?\\n|,").each { l ->
+            l = l.trim();
+            if(l) {
+                AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
+                if(!c) {
+                    errors << "Error while updating audience type"
+                } else {
+                    speciesField.addToAudienceTypes(c);
+                }
+            }
+        }
+
+        //description
+        speciesField.description = params.description;
+
+        log.warn errors
+        return [errors:errors]
+    }
+
+
+    /**
+    * Delete species field
+    */
+    def deleteSpeciesField(long id) {
+        SpeciesField speciesField = SpeciesField.get(id);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesField not found"]
+        } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            def speciesInstance = speciesField.species;
+            def field = speciesField.field;
+            SpeciesField.withTransaction {
+                try {
+                    speciesInstance.removeFromFields(speciesField);
+                    speciesField.delete(failOnError:true);
+                    //List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                    //sortAsPerRating(sameFieldSpeciesFieldInstances);
+                    //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
+                    def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
+                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field]
+                } catch(e) {
+                    e.printStackTrace();
+                    log.error e.getMessage();
+                    return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
+                }
+            }
+       } else {
+            return [success:false, msg:"You don't have persmission to delete this field"]
+        }
+    }
+
+    /**
+    * Update methods for individual metadata fields
+    */
+    def updateContributor(contributorId, long speciesFieldId, def value, String type) {
         if(!value) {
             return [success:false, msg:"Field content cannot be empty"]
         }
 
-        Contributor oldContrib = Contributor.read(contributorId);
-        if(!oldContrib) {
-            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
-        } else if(oldContrib.name == value) {
-            return [success:true, msg:"Nothing to change"]
+        SUser oldContrib;
+        if(contributorId) {
+            oldContrib = SUser.read(contributorId);
+
+            if(!oldContrib) {
+                return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+            } else if(oldContrib.email == value) {
+                return [success:true, msg:"Nothing to change"]
+            }
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
@@ -274,35 +505,173 @@ class SpeciesService {
             return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
         }
 
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            SUser c = SUser.findByEmail(value);
+            if(!c) {
+                return [success:false, msg:"Error while updating ${type}. No registered user with email ${value} found"]
+            } else {
+                String msg = '';
+                def content;
+                if(oldContrib)
+                    speciesField.removeFromContributors(oldContrib);
+                speciesField.addToContributors(c);
+                msg = 'Successfully added contributor';
+                content = speciesField.contributors;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating ${type}"]
+                }
+                return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
+            }
+        }
+    }
+
+    def updateAttributor(contributorId, long speciesFieldId, def value, String type) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        Contributor oldContrib;
+        if(contributorId) {
+            oldContrib = Contributor.read(contributorId);
+
+            if(!oldContrib) {
+                return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+            } else if(oldContrib.name == value) {
+                return [success:true, msg:"Nothing to change"]
+            }
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
         SpeciesField.withTransaction { status ->
             Contributor c = (new XMLConverter()).getContributorByName(value, true);
             if(!c) {
                 return [success:false, msg:"Error while updating ${type}"]
             } else {
-                if(type == 'contributor') {
-                    speciesField.removeFromContributors(oldContrib);
-                    speciesField.addToContributors(c);
-                } else if (type == 'attributor') {
-                    speciesField.removeFromAttributors(oldContrib);
+                String msg = '';
+                def content;
+                   if(oldContrib)
+                        speciesField.removeFromAttributors(oldContrib);
                     speciesField.addToAttributors(c);
-                }
+                    msg = 'Successfully added attribution';
+                    content = speciesField.attributors;
+
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
                     return [success:false, msg:"Error while updating ${type}"]
                 }
-                return [success:true, msg:""]
+                return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
             }
         }
     }
 
-    def updateDescription(long id, def value) {
+    def updateReference(referenceId, long speciesFieldId, def value) {
         if(!value) {
             return [success:false, msg:"Field content cannot be empty"]
         }
 
-        SpeciesField c = SpeciesField.get(id)
+        Reference oldReference;
+        if(referenceId) {
+            oldReference = Reference.read(referenceId);
+
+            if(!oldReference) {
+                return [success:false, msg:"Reference with id ${referenceId} is not found"]
+            } else if(oldReference.title == value) {
+                return [success:true, msg:"Nothing to change"]
+            }
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            if(oldReference)
+                speciesField.removeFromReferences(oldReference);
+            speciesField.addToReferences(new Reference(title:value));
+            msg = 'Successfully added reference';
+            content = speciesField.references;
+
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating reference"]
+            }
+            return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
+        }
+    }
+
+    def addDescription(long speciesId, long fieldId, String value) { 
+        if(!value || !fieldId || !speciesId) {
+            return [success:false, msg:"Id or value cannot be empty"]
+        }
+        XMLConverter converter = new XMLConverter();
+
+        Species speciesInstance = Species.get(speciesId);
+        Field field = Field.read(fieldId);
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to add"]
+        }
+
+        if(!field) {
+            return [success:false, msg:"Invalid field"]
+        }
+        try {
+            SpeciesField speciesFieldInstance = converter.createSpeciesField(speciesInstance, field, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
+            if(speciesFieldInstance) {
+                speciesInstance.addToFields(speciesFieldInstance);
+                //TODO:make sure this is run in only one user updates this species at a time
+                Species.withTransaction {
+                    if(!speciesInstance.save()) {
+                        speciesInstance.errors.each { log.error it }
+                        return [success:false, msg:"Error while adding species field"]
+                    }
+                }
+                List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                sortAsPerRating(sameFieldSpeciesFieldInstances);
+                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            return [success:false, msg:"Error while adding species field"]
+        }
+        return [success:false, msg:"Error while adding species field"]
+    }
+
+    def updateDescription(long id, String value) {
+        if(!value || !id) {
+            return [success:false, msg:"Id or value cannot empty"]
+        }
+        SpeciesField c = SpeciesField.get(id);
+        return updateSpeciesFieldDescription(c, value);
+    }
+    
+    def updateSpeciesFieldDescription(SpeciesField c, String value) {
         if(!c) {
-            return [success:false, msg:"SpeciesField with id ${id} is not found"]
+            return [success:false, msg:"SpeciesField not found"]
+        } else if(!speciesPermissionService.isSpeciesFieldContributor(c, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
         } else {
             SpeciesField.withTransaction {
                 c.description = value.trim()
@@ -315,6 +684,499 @@ class SpeciesService {
         }
     }
 
+    def updateLicense(long speciesFieldId, def value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            License c = (new XMLConverter()).getLicenseByType(value, false);
+            if(!c) {
+                return [success:false, msg:"Error while updating license"]
+            } else {
+                String msg = '';
+                def content;
+                speciesField.licenses.clear();
+                speciesField.addToLicenses(c);
+                msg = 'Successfully added license';
+                content = speciesField.licenses;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating license"]
+                }
+                return [success:true, id:speciesFieldId, msg:msg, content:content]
+            }
+        }
+    }
+
+    def updateAudienceType(long speciesFieldId, String value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+
+        SpeciesField.withTransaction { status ->
+            AudienceType c = (new XMLConverter()).getAudienceTypeByType(value);
+            if(!c) {
+                return [success:false, msg:"Error while updating audience type"]
+            } else {
+                String msg = '';
+                def content;
+                speciesField.audienceTypes.clear();
+                speciesField.addToAudienceTypes(c);
+                msg = 'Successfully added audience type';
+                content = speciesField.audienceTypes;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating audience type"]
+                }
+                return [success:true, id:speciesFieldId, msg:msg, content:content]
+            }
+        }
+    }
+
+    def updateStatus(long speciesFieldId, String value) {
+        if(!value) {
+            return [success:false, msg:"Field content cannot be empty"]
+        }
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+
+        SpeciesField.withTransaction { status ->
+            SpeciesField.Status c = getStatus(value);
+            if(!c) {
+                return [success:false, msg:"Error while updating status"]
+            } else {
+                String msg = '';
+                def content;
+                speciesField.status = c;
+                msg = 'Successfully added status';
+                content = speciesField.status;
+
+                if(!speciesField.save()) {
+                    speciesField.errors.each { log.error it }
+                    return [success:false, msg:"Error while updating status"]
+                }
+                return [success:true, id:speciesFieldId, msg:msg, content:content]
+            }
+        }
+    }
+
+    private Status getStatus(String value) {
+        for(Status l : Status){
+			if(l.value().equalsIgnoreCase(value))
+				return l
+		}
+    }
+
+    def updateSynonym(def synonymId, def speciesId, String relationship, String value) {
+        if(!value || !relationship) {
+            return [success:false, msg:"Synonym value or relationship content cannot be empty"]
+        }
+        Species speciesInstance = Species.get(speciesId);
+   
+        if(!speciesInstance) {
+            return [success:false, msg:"Species with id ${speciesId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+
+            if(!oldSynonym) {
+                //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+            } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
+                return [success:true, msg:"Nothing to change"]
+            } else if(!oldSynonym.isContributor()) {
+                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+            }
+        }
+
+        Species.withTransaction { status ->
+            if(oldSynonym) {
+                def result = deleteSynonym(oldSynonym, speciesInstance);
+                if(!result.success) {
+                    return [success:false, msg:"Error while updating synonym. Error: ${result.msg})"]
+                }
+            } 
+            XMLConverter converter = new XMLConverter();
+
+            NodeBuilder builder = NodeBuilder.newInstance();
+            def synonym = builder.createNode("synonym");
+            Node data = new Node(synonym, 'data', value)
+            new Node(data, "relationship", relationship);
+            new Node(data, "contributor", springSecurityService.currentUser.email);
+ 
+            List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
+            
+            if(!synonyms) {
+                return [success:false, msg:"Error while updating synonym"]
+            } else {
+                String msg = '';
+                def content;
+                msg = 'Successfully updated synonym';
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                String activityType;
+                if(oldSynonym)
+                    activityType = activityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                else
+                    activityType = activityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType]
+            }
+        }
+    }
+
+    def updateCommonname(def cnId, def speciesId, String language, String value) {
+        if(!value || !language) {
+            return [success:false, msg:"Common name or language content cannot be empty"]
+        }
+        Species speciesInstance = Species.get(speciesId);
+   
+        if(!speciesInstance) {
+            return [success:false, msg:"Species with id ${speciesId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to update"]
+        }
+
+        CommonNames oldCommonname;
+        Language lang = Language.getLanguage(language);
+        if(cnId) {
+            oldCommonname = CommonNames.read(cnId);
+
+            if(!oldCommonname) {
+                //return [success:false, msg:"Commonname with id ${cnId} is not found"]
+            } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
+                return [success:true, msg:"Nothing to change"]
+            } else if(!oldCommonname.isContributor()) {
+                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+            }
+        }
+
+        Species.withTransaction { status ->
+            if(oldCommonname) {
+                oldCommonname.delete();
+            } 
+            XMLConverter converter = new XMLConverter();
+
+            NodeBuilder builder = NodeBuilder.newInstance();
+            def cn = builder.createNode("commonname");
+            Node data = new Node(cn, 'data', value)
+            Node l = new Node(data, "language");
+            new Node(l, 'name', language);
+            new Node(data, "contributor", springSecurityService.currentUser.email);
+ 
+            List<CommonNames> commonnames = converter.createCommonNames(cn, speciesInstance.taxonConcept);
+            
+            if(!commonnames) {
+                return [success:false, msg:"Error while updating common name"]
+            } else {
+                String msg = '';
+                def content;
+                msg = 'Successfully updated common name';
+                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                String activityType;
+                if(oldCommonname)
+                    activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
+                else
+                    activityType = activityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+
+
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType]
+            }
+        }
+    }
+
+    /**
+    * Delete methods for individual metadata fields
+    */
+    def deleteContributor(contributorId, long speciesFieldId, String type) {
+        SUser oldContrib;
+        if(contributorId) {
+            oldContrib = SUser.read(contributorId);
+        }
+        if(!oldContrib) {
+            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+        } 
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete this ${type}"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            speciesField.removeFromContributors(oldContrib);
+            if(speciesField.contributors.size() == 0) {
+                msg = 'There should be atleast one contributor';
+                return [success:false, msg:msg]
+            } else {
+                msg = 'Successfully removed contributor';
+                content = speciesField.contributors;
+            }
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating ${type}"]
+            }
+            return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
+        }
+    }
+
+    def deleteAttributor(contributorId, long speciesFieldId, String type) {
+        Contributor oldContrib;
+        if(contributorId) {
+            oldContrib = Contributor.read(contributorId);
+        }
+        if(!oldContrib) {
+            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+        } 
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete this ${type}"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            speciesField.removeFromAttributors(oldContrib);
+            msg = 'Successfully removed attribution';
+            content = speciesField.attributors;
+
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating ${type}"]
+            }
+            return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
+        }
+    }
+
+    def deleteReference(referenceId, long speciesFieldId) {
+
+        Reference oldReference;
+        if(referenceId) {
+            oldReference = Reference.read(referenceId);
+        }
+        if(!oldReference) {
+            return [success:false, msg:"Reference with id ${referenceId} is not found"]
+        } 
+
+        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+        if(!speciesField) {
+            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+        }
+
+        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete this reference"]
+        }
+
+        SpeciesField.withTransaction { status ->
+            String msg = '';
+            def content;
+            speciesField.removeFromReferences(oldReference);
+            msg = 'Successfully removed reference';
+            content = speciesField.references;
+
+            if(!speciesField.save()) {
+                speciesField.errors.each { log.error it }
+                return [success:false, msg:"Error while updating reference"]
+            }
+            return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
+        }
+    }
+
+    def deleteDescription(long id) {
+        return deleteSpeciesField(id);
+    }
+
+    def deleteSynonym(long synonymId, long speciesId) {
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+        }
+        Species speciesInstance = Species.get(speciesId);
+
+        return deleteSynonym(oldSynonym, speciesInstance);
+    }
+    
+    def deleteSynonym(Synonyms oldSynonym, Species speciesInstance) {
+        if(!oldSynonym) {
+            return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+        } 
+
+        if(!oldSynonym.isContributor()) {
+            return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete synonym"]
+        }
+
+        Synonyms.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                
+                if(oldSynonym.contributors.size() == 0) {
+                    oldSynonym.delete(failOnError:true)
+                } else {
+                    if(!oldSynonym.save()) {
+                        oldSynonym.errors.each { log.error it }
+                        return [success:false, msg:"Error while deleting synonym"]
+                    }
+                }
+                msg = 'Successfully removed synonym';
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name]
+            } 
+            catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                return [success:false, msg:"Error while deleting synonym: ${e.getMessage()}"]
+            }
+        }
+    }
+
+    def deleteCommonname(def cnId, def speciesId) {
+        CommonNames oldCommonname;
+        if(cnId) {
+            oldCommonname = CommonNames.read(cnId);
+        }
+
+        Species speciesInstance = Species.get(speciesId);
+        return deleteCommonname(oldCommonname, speciesInstance);
+    } 
+    
+    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance) {
+        if(!oldCommonname) {
+            return [success:false, msg:"Common name with id ${cnId} is not found"]
+        } 
+
+        if(!oldCommonname.isContributor()) {
+            return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:"You don't have permission to delete commonname"]
+        }
+
+        CommonNames.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldCommonname.removeFromContributors(springSecurityService.currentUser);
+                
+                if(oldCommonname.contributors.size() == 0) {
+                    oldCommonname.delete(failOnError:true)
+                } else {
+                    if(!oldCommonname.save()) {
+                        oldCommonname.errors.each { log.error it }
+                        return [success:false, msg:"Error while deleting common name"]
+                    }
+                }
+
+                msg = 'Successfully removed common name';
+                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name]
+            } 
+            catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                return [success:false, msg:"Error while deleting common name: ${e.getMessage()}"]
+            }
+        }
+    }
+    
+    /**
+    * Create Species given species name and atleast one taxon hierarchy
+    */
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames) {
+        def speciesInstance = new Species();
+        List<TaxonomyRegistry> taxonRegistry;
+        List errors = [];
+        Map result = [errors:errors];
+
+        XMLConverter converter = new XMLConverter();
+        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
+        
+        if(speciesInstance.taxonConcept) {
+
+            speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
+            //taxonconcept is being used as guid
+            speciesInstance.guid = converter.constructGUID(speciesInstance);
+
+            //a species page with guid as taxon concept is considered as duplicate
+            Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
+            if(existingSpecies) {
+				existingSpecies.clearBasicContent()
+                speciesInstance = existingSpecies;
+            }
+
+            if(!taxonService.validateHierarchy(taxonRegistryNames)) {
+                if(!speciesInstance.fetchTaxonomyRegistry()) {
+                    return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                }
+                return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+            }
+ 
+            //save taxonomy hierarchy
+            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+            result = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+
+            result.speciesInstance = speciesInstance;
+            result.taxonRegistry = taxonRegistry;
+            result.errors = errors;
+        }
+       return result;
+    }
+
+    /**
+    * Create resources XML
+    */
     private def createImagesXML(params) {
         NodeBuilder builder = NodeBuilder.newInstance();
         XMLConverter converter = new XMLConverter();
@@ -368,9 +1230,6 @@ class SpeciesService {
         return resources;
     }
 
-    /**
-     * 
-     */
     private List<Resource> saveResources(Node resourcesXML, String relImagesContext) {
         XMLConverter converter = new XMLConverter();
         converter.setResourcesRootDir(grailsApplication.config.speciesPortal.resources.rootDir);
@@ -381,14 +1240,11 @@ class SpeciesService {
     /////////////////////////////// Export ////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
-
     def requestExport(params){
         log.debug(params)
         log.debug "creating species download request"
         DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
     }
-
-
 
     def export(params, dl){
         log.debug(params)
@@ -398,10 +1254,8 @@ class SpeciesService {
         return exportSpeciesData(speciesInstanceList, null)
     }
 
-
-
     def getSpeciesList(params, String action){
-        if("search".equalsIgnoreCase(action)){
+        if(Utils.isSearchAction(params, action)){
             return search(params)
         }else{
             return _getSpeciesList(params)
@@ -423,132 +1277,173 @@ class SpeciesService {
     }
 
     /**
-     */
+    * get species list query
+    */
     def _getSpeciesListQuery(params) {
         params.startsWith = params.startsWith?:"A-Z"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
         def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
         params.sGroup = params.sGroup ?: allGroup.id+""
-        params.max = Math.min(params.max ? params.int('max') : 42, 100);
-        params.offset = params.offset ? params.int('offset') : 0
-        params.sort = params.sort?:"percentOfInfo"
-        if(params.sort.equals('lastrevised')) {
-            params.sort = 'lastUpdated'
-        } else if(params.sort.equals('percentofinfo')) {
-            params.sort = 'percentOfInfo'
-        }
-        params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
+        
+        int count = 0;
+        String query, countQuery;
+        String filterQuery = " where s.id is not null " //dummy statement
+        String countFilterQuery = " where s.id is not null " //dummy statement
 
-        log.debug params
+        def queryParams = [:]
+        def activeFilters = [:]
+        queryParams.max = Math.min(params.max ? params.max.toInteger() : 42, 100);
+        queryParams.offset = params.offset ? params.offset.toInteger() : 0
+
+        if(queryParams.max < 0 ) {
+            queryParams.max = 42 
+        }
+
+        if(queryParams.offset < 0) {
+            queryParams.offset = 0
+        }
+
+        queryParams.sort = params.sort?:"lastrevised"
+        if(queryParams.sort.equals('lastrevised')) {
+            queryParams.sort = 'lastUpdated'
+
+        } else if(queryParams.sort.equals('percentofinfo') || queryParams.sort.equals('score')) {
+            queryParams.sort = 'percentOfInfo'
+        }
+        queryParams.order = (queryParams.sort.equals("percentOfInfo")||queryParams.sort.equals("lastUpdated"))?"desc":queryParams.sort.equals("title")?"asc":"asc"
+
         def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
 
-        int count = 0;
-        if (params.startsWith && params.sGroup) {
-            String query, countQuery;
-            String filterQuery = " where s.id is not null " //dummy statement
-            String countFilterQuery = " where s.id is not null " //dummy statement
-            def queryParams = [:]
-
-            if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
-                if(params.startsWith == "A-Z") {
-                    query = "select s from Species s ";
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s "
-                } else {
-                    query = "select s from Species s "
-                    filterQuery += " and s.title like '<i>${params.startsWith}%' ";
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s "
-                    countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
-                }
-            } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
-                if(params.startsWith == "A-Z") {
-                    query = "select s from Species s, TaxonomyDefinition t " 
-                    filterQuery += " and s.taxonConcept = t and t.group.id  is null "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
-                } else {
-                    query = "select s from Species s, TaxonomyDefinition t "
-                    filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
-                }
+        if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+            if(params.startsWith == "A-Z") {
+                query = "select s from Species s ";
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s "
             } else {
-                if(params.startsWith == "A-Z") {
-                    query = "select s from Species s, TaxonomyDefinition t "
-                    filterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup) "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
-
-                } else {
-                    query = "select s from Species s, TaxonomyDefinition t "
-                    filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
-                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
-                    countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
-                }
-                queryParams['sGroup']  = groupIds
+                query = "select s from Species s "
+                filterQuery += " and s.title like '<i>${params.startsWith}%' ";
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+                countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
+				queryParams["startsWith"] = params.startsWith
             }
+        } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
+            if(params.startsWith == "A-Z") {
+                query = "select s from Species s, TaxonomyDefinition t " 
+                filterQuery += " and s.taxonConcept = t and t.group.id  is null "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
+            } else {
+                query = "select s from Species s, TaxonomyDefinition t "
+                filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
+				queryParams["startsWith"] = params.startsWith
+            }
+            queryParams['sGroup']  = groupIds
+        } else {
+            if(params.startsWith == "A-Z") {
+                query = "select s from Species s, TaxonomyDefinition t "
+                filterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup) "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
-            if(params.featureBy == "true" ) {
-                params.userGroup = observationService.getUserGroup(params)
-               // def featureQuery = ", Featured feat "
-                //query += featureQuery;
-                //countQuery += featureQuery
+            } else {
+                query = "select s from Species s, TaxonomyDefinition t "
+                filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
+                countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+                countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+				queryParams["startsWith"] = params.startsWith
+            }
+            queryParams['sGroup']  = groupIds
+        }
+
+        if(params.featureBy == "true" ) {
+            params.userGroup = observationService.getUserGroup(params)
+            // def featureQuery = ", Featured feat "
+            //query += featureQuery;
+            //countQuery += featureQuery
+            if(params.userGroup == null) {
                 def featureQuery = " and s.featureCount > 0"
                 countFilterQuery += featureQuery
                 filterQuery += featureQuery
-                if(params.userGroup == null) {
-                    //String str = "feat.userGroup is null "
-                    //filterQuery += str
-                    //countFilterQuery += str
-                }else {
-                    String str = " and feat.userGroup.id = :userGroupId "
-                    filterQuery += str
-                    countFilterQuery += str
-                    queryParams["userGroupId"] = params.userGroup?.id
-                }   
-                queryParams["featureBy"] = params.featureBy
-                queryParams["featType"] = Species.class.getCanonicalName();
-            }
-
-
-            if(params.webaddress) {
-                def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
-                if(userGroupInstance){
-                    queryParams['userGroup'] = userGroupInstance
-                    query += " join s.userGroups userGroup "
-                    filterQuery += " and userGroup=:userGroup "
-                    countQuery += " join s.userGroups userGroup "
-                    countFilterQuery += " and userGroup=:userGroup "
-                }
-            }
-
-            query += filterQuery + " order by s.${params.sort} ${params.order}"
-            countQuery += countFilterQuery + " group by s.percentOfInfo"
-            return [query:query, countQuery:countQuery, queryParams:queryParams]
-
+                //String str = "feat.userGroup is null "
+                //filterQuery += str
+                //countFilterQuery += str
+            }else {
+                String featureQuery = ", Featured feat "
+                query += featureQuery
+                countQuery += featureQuery
+                String str = " and s.id = feat.objectId and feat.objectType =:featType and feat.userGroup.id = :userGroupId "
+                filterQuery += str
+                countFilterQuery += str
+                queryParams["userGroupId"] = params.userGroup?.id
+            }   
+            queryParams["featureBy"] = params.featureBy
+            queryParams["featType"] = Species.class.getCanonicalName();
         }
+
+        if(params.daterangepicker_start && params.daterangepicker_end){
+			def startDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_start))
+            def endDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_end))
+            filterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
+            countFilterQuery += " and ( last_updated between :daterangepicker_start and :daterangepicker_end) "
+            queryParams["daterangepicker_start"] =  startDate   
+            queryParams["daterangepicker_end"] =  endDate
+        }
+
+
+        if(params.webaddress) {
+            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
+            if(userGroupInstance){
+                queryParams['userGroup'] = userGroupInstance
+                query += " join s.userGroups userGroup "
+                filterQuery += " and userGroup=:userGroup "
+                countQuery += " join s.userGroups userGroup "
+                countFilterQuery += " and userGroup=:userGroup "
+            }
+        }
+
+//		XXX: to be corrected		
+//		if(params.user){
+//			def userInstance = params.user.toLong()
+//			if(userInstance){
+//				queryParams['user'] = userInstance
+//				query += " join s.fields as f "
+//				filterQuery += " and f.uploader.id=:user "
+//				countQuery += " join s.fields as f "
+//				countFilterQuery += " and f.uploader.id=:user "
+//			}
+//		}
+
+        query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
+        countQuery += countFilterQuery + " group by s.percentOfInfo"
+		
+        return [query:query, countQuery:countQuery, queryParams:queryParams]
+
 
     }
 
     /**
-     */
+    * get species list 
+    */
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
         def hqlQuery = sessionFactory.currentSession.createQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createQuery(queryParts.countQuery)
         def queryParams = queryParts.queryParams
-        if(params.max > -1){
-            hqlQuery.setMaxResults(params.max);
-            queryParams["max"] = params.max
+        if(queryParams.max > -1){
+            hqlQuery.setMaxResults(queryParams.max);
         }
-        if(params.offset > -1) {
-            hqlQuery.setFirstResult(params.offset);
-            queryParams["offset"] = params.offset
+        if(queryParams.offset > -1) {
+            hqlQuery.setFirstResult(queryParams.offset);
         } 
         hqlQuery.setProperties(queryParams);
         hqlCountQuery.setProperties(queryParams);
-        //log.debug "Species query :${query}"
+        
+        log.debug "Species list query :${queryParts.query} with params ${queryParams}"
         def speciesInstanceList = hqlQuery.list();
+
+        log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
 
         def speciesCountWithContent = 0;
@@ -558,10 +1453,119 @@ class SpeciesService {
             if (c[0] >0)
                 speciesCountWithContent += c[1];
         }
+        if(params.daterangepicker_start){
+            queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
+        }
+        if(params.daterangepicker_end){
+            queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
+        }
         return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
         //else {
         //Not being used for now
         //return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
         //}
+    }
+
+    /**
+    *
+    */
+    private sortAsPerRating(List fields) {
+        if(!fields) return;
+        fields.sort( { a, b -> 
+            if (a.averageRating < b.averageRating) {
+                return -1;
+            } else if (a.averageRating > b.averageRating) {
+                return 1;
+            } else {
+                return a.lastUpdated <=> b.lastUpdated;
+            }
+        } as Comparator )
+    } 
+
+    /**
+    *
+    */
+    boolean hasContent(speciesFieldInstances) {
+        if(!speciesFieldInstances) return false;
+        if(speciesFieldInstances.instanceOf(SpeciesField)) {
+            if(speciesFieldInstances.description)
+                return true;
+        }
+		for(speciesFieldInstance in speciesFieldInstances) {
+			if(speciesFieldInstance.description) {
+				return true
+			}
+		}
+		return false;
+	}
+    
+    def updateSpecies(params, species){
+        def resources = []
+        if(params.resourceListType == "ofSpecies"){
+            def resourcesXML = createResourcesXML(params);
+            resources = saveResources(species, resourcesXML);
+            species.resources?.clear();
+        }
+        else if(params.resourceListType == "fromRelatedObv" || params.resourceListType == "fromSpeciesField"){
+            def resId = []
+            params.each { key, val ->
+                int index = -1;
+                if(key.startsWith('pullImage_')) {
+                    index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+                }
+                if(index != -1) {
+                    resId.add(params.get('resId_'+index));    
+                }
+            }
+            resId.each{
+                resources.add(Resource.get(it.toLong()))
+            }
+
+            if(params.resourceListType == "fromRelatedObv"){
+                resId.each{
+                    def rid = it
+                    def obv = Observation.withCriteria(){
+                        resource{
+                            eq("id", rid.toLong())
+                        }
+                    }
+                    if(obv.size() == 1 ){
+                        def obvIns = obv.get(0)
+                        if(obvIns.isLocked == false){
+                            obvIns.isLocked = true
+                        }
+                        if(!obvIns.save(flush:true)){
+                            obvIns.errors.allErrors.each { log.error it } 
+                        }
+                    }
+                }
+            }
+        }
+
+        resources.each { resource ->
+            resource.saveResourceContext(species)
+            species.addToResources(resource);
+        }
+        if(!species.save(flush:true)){
+            species.errors.allErrors.each { log.error it }
+            return false
+        }
+        return true
+    }
+    
+     def getLatestUpdatedSpecies(webaddress, sortBy, max, offset ){
+        println "===SERVICE SPECIES++++++++++GET LATEST==="
+        def p = [:]
+        p.webaddress = webaddress
+        p.sort = sortBy
+        p.max = max.toInteger()
+        p.offset = offset.toInteger()
+        def result = _getSpeciesList(p).speciesInstanceList
+        def res = []
+        result.each{
+            res.add(["observation":it, 'title':it.title])
+        }
+        println "=====RESULT SPECIES ++++++ RETURNED====== " + res
+        return ['observations':res]
     }
 }

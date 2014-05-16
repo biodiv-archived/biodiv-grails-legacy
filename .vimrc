@@ -65,6 +65,11 @@ map <leader>to :tabonly<cr>
 map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
 
+set smartindent
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
             \ if line("'\"") > 0 && line("'\"") <= line("$") |
@@ -194,3 +199,14 @@ au BufNewFile,BufRead *.groovy imap <silent> <S-F8> <Esc><S-F8>a
 "to kill running grails application and start app again
 nmap <F5> :wa<CR> :silent !pkill -f grails<CR> :call system("screen -X stuff 'ra\n'")<CR>
 
+inoremap <F6> <C-O>za
+nnoremap <F6> za
+onoremap <F6> <C-C>za
+vnoremap <F6> zf
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space> zf
+
+set smartindent
+set tabstop=4
+set shiftwidth=4
+set expandtab

@@ -61,7 +61,7 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
-        println attrs.model;
+        //println attrs.model;
 			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	
@@ -151,6 +151,7 @@ class ObservationTagLib {
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////  Tag List added by specific User ///////////////////////////
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
 	def showNoOfTagsOfUser = {attrs, body->
@@ -220,8 +221,8 @@ class ObservationTagLib {
 	def showMapInput = {attrs, body->
 		def model = attrs.model
 		model.sourceInstance = model.sourceInstance ?: model.observationInstance
-		model.placeNameField = (model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
-		model.topologyNameField = (model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
+		model.placeNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
+		model.topologyNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
 		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	
@@ -336,6 +337,49 @@ class ObservationTagLib {
             }
         }
            out << obv.showRelatedStory(attrs, body);
+    }
+
+    def addPhotoWrapper = { attrs, body ->
+        def resList = []
+        def obvLinkList = []
+        def resCount = 0
+        def offset = 0 
+        def resInstance = attrs.model.observationInstance
+        switch (attrs.model.resourceListType) {
+            case "ofObv" :
+                resList = resInstance?.resource
+            break
+            
+            case "ofSpecies" :
+                resList = resInstance?.resources
+            break
+            
+            case "fromRelatedObv" :
+                def taxId = resInstance?.taxonConcept.id.toLong()
+                // new func service limit offset sp inst and returns a res list based on params
+                def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 4, 0)
+                resList = relObvMap.resList
+                resCount = relObvMap.count
+                obvLinkList = relObvMap.obvLinkList
+            break
+
+            case "fromSpeciesField" :
+                def allSpField = resInstance?.fields
+                allSpField.each{
+                    def r = it.resources
+                    r.each{
+                        resList.add(it)
+                    }
+                }
+                resCount = resList.size()
+            break
+    
+        }
+        attrs.model['resList'] = resList
+        attrs.model['offset'] = offset
+        attrs.model['resCount'] = resCount
+        attrs.model['obvLinkList'] = obvLinkList
+        out << render(template:"/observation/addPhotoWrapper", model:attrs.model);
     }
 }
 

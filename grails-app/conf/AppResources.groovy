@@ -73,10 +73,12 @@ modules = {
 		resource url:'/js/daterangepicker.js'
 		resource url:'/js/stats.js'
 		resource url:'/js/jquery.tablesorter.js'
-		resource url:'/js/bootstrap-editable.min.js'
+		resource url:'/js/bootstrap-editable.js'
 		resource url:'/js/species/posting.js'
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'
+		resource url:'/js/species/abstracttype.js'
+		resource url:'/js/species/relatedStory.js'
 	}
 
 	auth {
@@ -136,12 +138,18 @@ modules = {
 
 		resource url:'/css/create.css'
 		resource url:'/js/jquery/jquery.exif.js'
+		resource url:'/js/species/observations/addResource.js'
 		resource url:'/js/species/observations/create.js'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
+        resource url:'http://api.filepicker.io/v1/filepicker.js'
 	}
 
+    distinct_reco {
+        resource url:'/js/species/observations/distinctReco.js'
+    }
+
 	observations_list { 
-		dependsOn 'observations, list_utils, comment, activityfeed'
+		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
         resource url:'/js/species/observations/list.js'
 	}
@@ -162,13 +170,14 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
-
+		resource url:'/js/species/abstracteditabletype.js'
+		resource url:'/js/species/speciesfield.js'
+		resource url:'/js/species/taxonhierarchy.js'
 		resource url:'/js/species/species.js'
-
 	}
 
 	species_show {
-		dependsOn 'species, gallery, comment, activityfeed'
+		dependsOn 'species, maps, gallery, comment, activityfeed, observations_create'
 
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
@@ -185,10 +194,13 @@ modules = {
 		resource url:'/js/wysihtml5-0.3.0_rc2.min.js'
 		resource url:'/js/bootstrap-wysihtml5-0.0.2.min.js'		
 		resource url:'/js/wysihtml5.js'
+        resource url:'/js/species/speciesPermission.js'
+        //resource url:'http://malsup.github.com/jquery.form.js'
 	}
 	
 	species_list {
 		dependsOn 'observations_list'
+
 	}
 
 	search {
@@ -206,6 +218,7 @@ modules = {
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/species/userGroups/main.js'
+        resource url:'/js/species/pages.js'
 	}
 
 	userGroups_create {
@@ -276,8 +289,13 @@ modules = {
 		
 		resource url:'/js/species/parseUtil.js'
 		resource url:'/js/species/jquery.csv-0.71.min.js'
+        resource url:'/js/species/observations/upload.js'
 	}
-	
+    
+    species_upload {
+        dependsOn 'checklist_create'
+    }
+
 	chart {
 		dependsOn 'core'
 		
@@ -292,7 +310,6 @@ modules = {
 		resource url:'/css/location_picker.css'
 		resource url:'/js/location/location-picker.js'
 	}
-	
 	
 	content_view {
 		dependsOn 'core,  tagit'
@@ -336,8 +353,17 @@ modules = {
  
     }
 
-    images{
-//        resource url:"${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/images/spinner.gif", attrs:[type:'gif', width='20', height='20', alt='Loading ...'], disposition:'inline'
+    maps {
+    	dependsOn 'core'
+		
+		resource url:'/css/am.css'
+		resource url:'/css/styles.css'
+        resource url:'/js/OpenLayers-2.10/theme/default/style.css'
 
+		resource url:'/js/OpenLayers-2.10/OpenLayers.js'
+		resource url:'/js/species/maps/am.js'
+		resource url:'/js/species/maps/map-search.js'
+		resource url:'/js/species/maps/mapapp.js'
+		resource url:'/js/species/maps/cookie-chef.js'
     }
 }

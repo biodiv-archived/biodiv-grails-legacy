@@ -124,10 +124,8 @@ grails.project.dependency.resolution = {
         compile 'org.imgscalr:imgscalr-lib:4.2'
         compile 'org.apache.sanselan:sanselan:0.97-incubator'
         compile 'jmimemagic:jmimemagic:0.1.2'
-
-
         //compile 'net.sf.jtidy:jtidy:r938'
-
+        compile 'com.mchange:c3p0:0.9.5-pre6'
     }
 
     plugins { 

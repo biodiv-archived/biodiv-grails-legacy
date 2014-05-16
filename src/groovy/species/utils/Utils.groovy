@@ -78,8 +78,21 @@ class Utils {
 	 * @return
 	 */
 	static String cleanName(String name) {
+        if(!name) return null;
 		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
 	}
+
+    static String cleanSciName(String scientificName) {
+        def cleanSciName = Utils.cleanName(scientificName);
+        if(cleanSciName =~ /s\.\s*str\./) {
+            cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
+        }
+
+        if(cleanSciName.indexOf(' ') == -1) {
+            cleanSciName = cleanSciName.toLowerCase().capitalize();
+        }
+        return cleanSciName;
+    }
 
 	static String generateSafeFileName(String name) {
 		//returning random integer (between 1-1000) as file name along with original extension
@@ -251,6 +264,7 @@ class Utils {
     }
 
 	static List getUsersList(String userIdsAndEmailIds) {
+        if(!userIdsAndEmailIds) return [];
 		List result = [];
 		def emailValidator = EmailValidator.getInstance()
 		userIdsAndEmailIds.trim().split(",").each{
@@ -395,7 +409,9 @@ class Utils {
 	
 	public static Map getQueryMap(URL url){
 		def map = [:]
-		if(!url.query) return map
+		if(!url.query){
+			return new GrailsParameterMap(map, null)
+		}
 		url.query.split('&').each{kv ->
 			def (key, value) = kv.split('=').toList()
 		    if(value != null) {
@@ -425,8 +441,17 @@ class Utils {
 		   
 		}
 		retMap = new GrailsParameterMap(retMap, null)
-		println "Returned url map == " + retMap
 		return retMap
+	}
+	
+	/**
+	 * On browser if you are on list page and doing some advance search result came from search while url still shows 'list' action
+	 * this leading to wrong result in ResourceFetcher (i.e download/export post/unpost) this function is take care of all such cases
+	 * @param params
+	 * @return
+	 */
+	public static boolean isSearchAction(params, String action = null){
+		return ("search".equalsIgnoreCase(action) || "search".equalsIgnoreCase(params.action) ||  params.aq || params.query ) 
 	}
 	
 }

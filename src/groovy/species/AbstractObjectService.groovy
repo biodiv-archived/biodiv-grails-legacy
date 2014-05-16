@@ -11,6 +11,9 @@ import species.Resource.ResourceType;
 import species.participation.Featured;
 import species.auth.SUser;
 import species.participation.Checklists;
+import species.sourcehandler.XMLConverter;
+import species.participation.Observation;
+import species.Species;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -77,9 +80,12 @@ class AbstractObjectService {
             def obj = param['observation'];
             if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
             if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
-            if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy) item.geoPrivacy = obj.geoPrivacy
             if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
             if(obj.hasProperty('fromDate') && obj.fromDate) item.observedOn = obj.fromDate.getTime();
+			if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy){
+				item.geoPrivacy = obj.geoPrivacy
+				item.geoPrivacyAdjust = obj.fetchGeoPrivacyAdjustment()
+			}
 			urlList << item;
 		}
 		return urlList
@@ -138,12 +144,22 @@ class AbstractObjectService {
         }
         else {    
         }
+
         def featured = []
         def count = 0;
-        def queryParams = ["type": type]
-        queryParams["type1"] = type1
-        def countQuery = "select count(*) from Featured feat where feat.objectType = :type or feat.objectType = :type1 "
-        def query = "from Featured feat where feat.objectType = :type or feat.objectType = :type1 "
+        def queryParams = [:];
+        def countQuery,query;
+        if(type) {
+            queryParams["type"] = type
+            queryParams["type1"] = type1
+
+            countQuery = "select count(*) from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
+        
+            query = "from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
+        } else {
+            countQuery = "select count(*) from Featured feat "
+            query = "from Featured feat "
+        }
 
         if(ugId) {
             queryParams["ugId"] = ugId
@@ -151,7 +167,7 @@ class AbstractObjectService {
             query +=  ' and feat.userGroup.id = :ugId'
         }
         
-        log.debug "CountQuery:"+ countQuery + "params: "+queryParams
+        log.debug "CountQuery:"+ countQuery + " params: "+queryParams
         count = Featured.executeQuery(countQuery, queryParams)
 
         queryParams["max"] = limit
@@ -160,9 +176,8 @@ class AbstractObjectService {
         def orderByClause = " order by feat.createdOn desc"
         query += orderByClause
 
-        log.debug "FeaturedQuery:"+ query + "params: "+queryParams
+        log.debug "FeaturedQuery:"+ query + " params: "+queryParams
         featured = Featured.executeQuery(query, queryParams);
-
         def observations = [:]
         featured.each {
             def observation = activityFeedService.getDomainObject(it.objectType,it.objectId)
@@ -175,16 +190,116 @@ class AbstractObjectService {
             //JSON marsheller is registered in Bootstrap
             featuredNotes << it
         }
-
+		
         def result = []
         def i = 0;
         observations.each {key,value ->
-            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value]);
+            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':getTargetController(key)]);
         }
-        return['observations':result,'count':count[0]]
+		
+        return['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
                 		
     }
 
 
+     /**
+     * 
+     */
+    private def createResourcesXML(params) {
+        NodeBuilder builder = NodeBuilder.newInstance();
+        XMLConverter converter = new XMLConverter();
+        def resources = builder.createNode("resources");
+        Node images = new Node(resources, "images");
+        Node videos = new Node(resources, "videos");
+        
+        String uploadDir = ""
+        if( params.resourceListType == "ofSpecies" ){
+            uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
+        }
+        else{
+            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
+        }
+        List files = [];
+        List titles = [];
+        List licenses = [];
+        List type = [];
+        List url = []
+        List source = [];
+        List ratings = [];
+        List contributor = [];
+        //List resContext = [];
+        params.each { key, val ->
+            int index = -1;
+            if(key.startsWith('file_')) {
+                index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+
+            }
+            if(index != -1) {
+                files.add(val);
+                titles.add(params.get('title_'+index));
+                licenses.add(params.get('license_'+index));
+                type.add(params.get('type_'+index));
+                url.add(params.get('url_'+index));
+                source.add(params.get('source_'+index));
+                ratings.add(params.get('rating_'+index));
+                //resContext.add(params.get('resContext_'+index));
+                if( params.speciesId != null ){
+                    contributor.add(params.get('contributor_'+index));
+                }
+            }
+        }
+        files.eachWithIndex { file, key ->
+            Node image;
+            if(file) {
+                if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
+                    image = new Node(images, "image");
+                    File f = new File(uploadDir, file);
+                    new Node(image, "fileName", f.absolutePath);
+                } else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
+                    image = new Node(videos, "video");
+                    new Node(image, "fileName", file);
+                    new Node(image, "source", url.getAt(key));
+                }				
+                new Node(image, "caption", titles.getAt(key));
+                new Node(image, "license", licenses.getAt(key));
+                new Node(image, "rating", ratings.getAt(key));
+                new Node(image, "user", springSecurityService.currentUser?.id);
+                //new Node(image, "resContext", resContext.getAt(key));
+                if( params.resourceListType == "ofObv" ){
+                    new Node(image, "contributor", params.author.username); 
+                }
+                else{
+                    new Node(image, "contributor", contributor.getAt(key));
+                    if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
+                        new Node(image, "source", source.getAt(key));
+                    }
+                }
+            } else {
+                log.warn("No reference key for image : "+key);
+            } 
+        }
+
+        return resources;
+    }
+
+    private List<Resource> saveResources(instance, resourcesXML) {
+        XMLConverter converter = new XMLConverter();
+        def rootDir
+        switch(instance.class.name) {
+            case [Observation.class.name, Checklists.class.name]:
+            rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+            break;
+            
+            case Species.class.name:
+            rootDir = grailsApplication.config.speciesPortal.resources.rootDir
+            break;
+        }
+        converter.setResourcesRootDir(rootDir);
+        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
+        relImagesContext = new File(relImagesContext).getParent();
+        println "+++++++++++++++++++++"
+        println resourcesXML
+        return converter.createMedia(resourcesXML, relImagesContext);
+    }
 
 }

@@ -7,6 +7,17 @@ import org.grails.taggable.Tag
 import java.io.File;
 import java.io.InputStream;
 import java.util.List
+import java.util.ArrayList;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.io.FileUtils;
+import java.net.URL;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.DataFormatter;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -22,26 +33,32 @@ import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
 import grails.plugin.springsecurity.annotation.Secured
-
-
+import species.formatReader.SpreadsheetReader;
+import species.formatReader.SpreadsheetWriter;
 import speciespage.ObservationService
 import species.utils.Utils
 import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
 
+
 class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def observationService
-	def springSecurityService;
-	def grailsApplication
-
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def springSecurityService;
+    def grailsApplication
+    def speciesUploadService;
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	String contentRootDir = config.speciesPortal.content.rootDir
-
+    
+    static String outputCSVFile = "output.csv" 
+    static String columnSep = SpreadsheetWriter.COLUMN_SEP
+    static String keyValueSep = SpreadsheetWriter.KEYVALUE_SEP
+    static String fieldSep = SpreadsheetWriter.FIELD_SEP
+    static String headerSheetName = "headerMetadata"
 
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
@@ -84,19 +101,42 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = createFile(originalFilename, params.uploadDir)
+			File uploaded = observationService.createFile(originalFilename, params.uploadDir,contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
 
-
 			String relPath = uploaded.absolutePath.replace(contentRootDir, "")
-
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
-			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
-
-			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/html')
+            String fileExt = fileExtension(originalFilename);
+            def res;
+            def xlsxFileUrl = null;
+            def isSimpleSheet;
+            //Conversion of excel to csv 
+            //FIND out a proper method to detect excel
+            def headerMetadata;
+            if(params.fileConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
+                xlsxFileUrl = url;
+                if(params.fromChecklist == "false") {
+                    headerMetadata = getHeaderMetaDataInFormat(uploaded);
+                    //println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
+                }
+                res = convertExcelToCSV(uploaded, params)
+                if(res != null) {
+                    isSimpleSheet = res.get("isSimpleSheet")
+                    relPath = res.get("relPath")
+                    url = res.get("url")
+                    File temp = uploaded
+                    uploaded = res.get("outCSVFile")
+                    if(params.fromChecklist == "true"){
+                        temp.delete();
+                    }
+                }
+            }
+            println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
+            //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
+			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
@@ -110,7 +150,7 @@ class UFileController {
 	 */
 	@Secured(['ROLE_USER'])
 	def upload() {
-		log.debug "&&&&&&&&&&&&&&&&&&& <><><<>>params in upload of file" +  params
+		log.debug params
 		try {
 
 			//IE handling: for IE qqfile sends the whole file
@@ -125,7 +165,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = createFile(originalFilename, params.uploadDir)
+			File uploaded = observationService.createFile(originalFilename, params.uploadDir, contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 
@@ -187,74 +227,451 @@ class UFileController {
 		return request.inputStream
 	}
 
-	//Create file with given filename
-	private File createFile(String fileName, String uploadDir) {
-		File uploaded
-		if (uploadDir) {
-			File fileDir = new File(contentRootDir + "/"+ uploadDir)
-			if(!fileDir.exists())
-				fileDir.mkdirs()
-			uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
 
-		} else {
 
-			File fileDir = new File(contentRootDir)
-			if(!fileDir.exists())
-				fileDir.mkdirs()
-			uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
-			//uploaded = File.createTempFile('grails', 'ajaxupload')
-		}
-		
-		log.debug "New file created : "+ uploaded.getPath()
-		return uploaded
+
+    def download = {
+
+        UFile ufile = UFile.get(params.id)
+        if (!ufile) {
+            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], request.locale)
+            log.debug msg
+            flash.message = msg
+            redirect controller: params.errorController, action: params.errorAction
+            return
+        }
+
+        def file = new File(ufile.path)
+        if (file.exists()) {
+            log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+            ufile.downloads++
+            ufile.save()
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${file.name}")
+            response.outputStream << file.readBytes()
+            return
+        } else {
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            log.error msg
+            flash.message = msg
+            redirect controller: params.errorController, action: params.errorAction
+            return
+        }
+    }
+
+    def saveModifiedSpeciesFile = {
+        //log.debug params
+        File file = speciesUploadService.saveModifiedSpeciesFile(params);
+        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+        /*
+        if (f.exists()) {
+            println "here here===================="
+            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+            response.outputStream << f.readBytes()
+            response.outputStream.flush()
+            println "==YAHAN HUN == " 
+            return render(text: [success:true] as JSON, contentType:'text/html')
+        } else {
+            println "in else================"
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            log.error msg
+            flash.message = msg
+            redirect controller: params.errorController, action: params.errorAction
+            return
+        }
+        */
+    }
+
+    def downloadSpeciesFile = {
+        //println "====FILE NAME =======" + params
+        File f = new File(params.downloadFile);
+        if (f.exists()) {
+            //println "here here===================="
+            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+            response.outputStream << f.readBytes()
+            response.outputStream.flush()
+            //println "==YAHAN HUN == " 
+        } 
+    } 
+
+    protected def getUFileList(params) {
+
+        def max = Math.min(params.max ? params.int('max') : 12, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        def filteredUFile = uFileService.getFilteredUFiles(params, max, offset)
+        def UFileInstanceList = filteredUFile.UFileInstanceList
+        def queryParams = filteredUFile.queryParams
+        def activeFilters = filteredUFile.activeFilters
+
+        def totalUFileInstanceList = uFileService.getFilteredUFiles(params, -1, -1).UFileInstanceList
+        def count = totalUFileInstanceList.size()
+
+        return [totalUFileInstanceList:totalUFileInstanceList, UFileInstanceList: UFileInstanceList, UFileInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
+
+    }
+
+    public Map getHeaderMetaDataInFormat(File uploaded) {
+		def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+        def sheetContent
+        def res = [:]
+        InputStream inp = new FileInputStream(uploaded);
+		Workbook wb = WorkbookFactory.create(inp);
+        if(wb.getSheet(headerSheetName)){
+            sheetContent = completeContent.get(2)
+        }
+        else{
+            println " ======NO HEADER METADATA=== "
+            return res
+        }
+		sheetContent.each{ sc ->
+			String s1,s2
+			if(sc["category"] == ""){
+				s1 = ""
+	 		}
+	 		else{
+				s1 = "|"
+			}
+			if(sc["subcategory"] == ""){
+				s2 = ""
+	 		}
+	 		else{
+				s2 = "|"
+			}
+			String dataColumn = sc["concept"] + s1 + sc["category"] + s2 + sc["subcategory"]
+			String fieldNames = sc["field name(s)"].toLowerCase()
+            String conDel = sc["content delimiter"]
+            String conFor = sc["content format"]
+            String imagesCol = sc["images"]
+            String contributorCol = sc["contributor"]
+            String attributionsCol = sc["attributions"]
+            String referencesCol = sc["references"]
+            String licenseCol = sc["license"]
+            String audienceCol = sc["audience"]
+
+
+            if(fieldNames != ""){
+                List fnList = fieldNames.split(fieldSep)
+                def cdMap = [:]
+                def gMap = [:]
+                def hMap = [:]
+                def aMap = [:]
+                def imgMap = [:]
+                def contMap = [:]
+                def attrMap = [:]
+                def refMap = [:]
+                def licMap = [:]
+                def audMap = [:]
+                if(conDel != ""){
+                    //println conDel
+                    List conDelList = conDel.split(columnSep)
+                    //println "===CDLIST = " + conDelList
+                    conDelList.each { cdl ->
+                        def z = cdl.split(keyValueSep)
+                        if(z.size()==2){
+                            cdMap[z[0]] = z[1]
+                        }
+                        else{
+                            cdMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(imagesCol != ""){
+                    List imgList = imagesCol.split(columnSep)
+                    imgList.each { il ->
+                        def z = il.split(keyValueSep)
+                        if(z.size()==2){
+                            imgMap[z[0]] = z[1]
+                        }
+                        else{
+                            imgMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(contributorCol != ""){
+                    List contList = contributorCol.split(columnSep)
+                    contList.each { cl ->
+                        def z = cl.split(keyValueSep)
+                        if(z.size()==2){
+                            contMap[z[0]] = z[1]
+                        }
+                        else{
+                            contMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(attributionsCol != ""){
+                    List attrList = attributionsCol.split(columnSep)
+                    attrList.each { al ->
+                        def z = al.split(keyValueSep)
+                        if(z.size()==2){
+                            attrMap[z[0]] = z[1]
+                        }
+                        else{
+                            attrMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(referencesCol != ""){
+                    List refList = referencesCol.split(columnSep)
+                    refList.each { rl ->
+                        def z = rl.split(keyValueSep)
+                        if(z.size()==2){
+                            refMap[z[0]] = z[1]
+                        }
+                        else{
+                            refMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(licenseCol != ""){
+                    List licList = licenseCol.split(columnSep)
+                    licList.each { ll ->
+                        def z = ll.split(keyValueSep)
+                        if(z.size()==2){
+                            licMap[z[0]] = z[1]
+                        }
+                        else{
+                            licMap[z[0]] = ""
+                        }
+                    }
+                }
+                if(audienceCol != ""){
+                    List audList = audienceCol.split(columnSep)
+                    audList.each { al ->
+                        def z = al.split(keyValueSep)
+                        if(z.size()==2){
+                            audMap[z[0]] = z[1]
+                        }
+                        else{
+                            audMap[z[0]] = ""
+                        }
+                    }
+                }
+
+
+                if(conFor != ""){
+                    List conForList = conFor.split(columnSep)
+                    conForList.each { cfl ->
+                        def z = cfl.split(keyValueSep)
+                        def q = z[1].split(";")
+                        if(q[0].split("=").size() == 2){
+                            gMap[z[0]] = q[0].split("=")[1]
+                        }else{
+                            gMap[z[0]] = "" 
+                        }
+                        if(q[1].split("=").size() == 2){
+
+                            hMap[z[0]] = q[1].split("=")[1]	
+                        }
+                        else{
+                            hMap[z[0]] = ""
+                        }
+                        if(q[2].split("=").size() == 2){
+
+                            aMap[z[0]] = q[2].split("=")[1]	
+                        }
+                        else{
+                            aMap[z[0]] = ""
+                        }
+                    }
+                }
+                fnList.each{ fn ->
+                    fn = fn.trim()
+                    def val = res[fn]
+                    if(val){
+                        val["dataColumns"] = val["dataColumns"] + "," + dataColumn
+                    }
+                    else{
+                        def m =[:]
+                        m["dataColumns"] = dataColumn
+                        m["delimiter"] = cdMap[fn]
+                        m["group"] = gMap[fn]
+                        m["header"] = hMap[fn]
+                        m["append"] = aMap[fn]
+                        m["images"] = imgMap[fn]
+                        m["contributor"] = contMap[fn]
+                        m["attributions"] = attrMap[fn]
+                        m["references"] = refMap[fn]
+                        m["license"] = licMap[fn]
+                        m["audience"] = audMap[fn]
+                        res[fn] = m
+                    }
+                }
+            }
+        }
+        return res
 	}
 
+    public Map getHeaderMetaData(File uploaded) {
+        def completeContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+        def sheetContent
+        int numAttributes = 5
+        def res = [:]
+        if(completeContent.size() == 3 ){
+            sheetContent = completeContent.get(2)
+            //println "==SHEET CONTENT ======== " + sheetContent
+        }
+        else{
+            //println " ======NO HEADER METADATA=== "
+            return res
+        }
+        int contentSize = sheetContent.size();
+        int index = 0;
+        while(index < contentSize){
+            String mapKey = sheetContent.get(index).get("column_name");
+            def mapValue = [:]
+            //println "=====MAP KEY === " + mapKey
+            for(int k = index; k < (index + numAttributes) ; k++){
+                mapValue[sheetContent.get(k).get("type")] = sheetContent.get(k).get("value")
+            }
+            //println "======MAP VALUE ==== " + mapValue
+            index = index + numAttributes
+            res.put(mapKey, mapValue)
+            //println "=======RES IN MIDDLE ==== " + res
+        }
+        //println "===RESULT ======= " + res
+        return res
+    }
 
-	def download = {
+    private Map convertExcelToCSV(File uploaded, params ) {
+        def compContent
+        def spread
+        File outCSVFile = observationService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
+        boolean isSimpleSheet = detectSheetType(uploaded)
+        FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        if(isSimpleSheet == false){
+            compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+            spread = compContent.get(0)
+            def headerNameList = spread.get(0).collect {
+                StringEscapeUtils.escapeCsv(it.getKey());
+            }
+            def  joinedHeader = headerNameList.join(",")
+            bw.write(joinedHeader + "\r\r\n\n")
 
-		UFile ufile = UFile.get(params.id)
-		if (!ufile) {
-			def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], request.locale)
-			log.debug msg
-			flash.message = msg
-			redirect controller: params.errorController, action: params.errorAction
-			return
+            spread.each { rowMap->  
+                List rowValues = []
+                rowMap.each{
+                    rowValues << StringEscapeUtils.escapeCsv(it.getValue());
+                }
+                def joinedContent = rowValues.join(",")
+                bw.write(joinedContent + "\r\r\n\n")
+            }
+        }else{
+            compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath, 0)
+            def conceptRow = compContent.get(0)
+            def categoryRow = compContent.get(1)
+            def subcategoryRow = compContent.get(2)
+            def headerRow = []
+            def index = 0
+            conceptRow.each{
+                def hName
+                if(index != 0){
+                    hName = conceptRow.get(index).toLowerCase()
+                    def val1 = categoryRow.get(index).toLowerCase()
+                    if(val1 != ""){
+                        hName = hName + "|" + val1
+                    }
+                    def val2 = subcategoryRow.get(index).toLowerCase()
+                    if(val2 != ""){
+                        hName = hName + "|" + val2
+                    }
+                    headerRow << StringEscapeUtils.escapeCsv(hName)
+
+                }
+                index = index + 1
+            }
+            def  joinedHeader = headerRow.join(",")
+            bw.write(joinedHeader + "\r\r\n\n")
+            def counter = 0
+            compContent.each{ stringRow ->
+                if(counter >= 4){
+                    List rowValues = []
+                    def k = 0;
+                    stringRow.each{
+                        if(k != 0){
+                            rowValues << StringEscapeUtils.escapeCsv(it);
+                        }
+                        k++;
+                    }
+                    def joinedContent = rowValues.join(",")
+                    bw.write(joinedContent + "\r\r\n\n")
+                }
+                counter = counter + 1
+            }
+            
+        }
+
+        bw.close();
+        String relPath = outCSVFile.absolutePath.replace(contentRootDir, "")
+        def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
+        Map res = new HashMap();
+        res.put("outCSVFile" , outCSVFile)
+        res.put("relPath" , relPath)
+        res.put("url" , url)
+        res.put("isSimpleSheet", isSimpleSheet)
+        return res
+    }
+
+    private boolean detectSheetType(File uploaded){
+        def compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath)
+        boolean isSimpleSheet = true
+        InputStream inp = new FileInputStream(uploaded);
+		Workbook wb = WorkbookFactory.create(inp);
+        if(wb.getSheet(headerSheetName)){
+            isSimpleSheet = false
+            return isSimpleSheet
 		}
+        else{
+            def spread = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath, 0)
+            if(spread.get(0).get(0).toLowerCase() == "concept" && spread.get(1).get(0).toLowerCase() == "category" && spread.get(2).get(0).toLowerCase() == "subcategory" && spread.get(3).get(0).toLowerCase() == "description"){
+                isSimpleSheet = true
+                return isSimpleSheet
+            }
+            else{
+                isSimpleSheet = false
+                return isSimpleSheet
+            }
+        }
 
-		def file = new File(ufile.path)
-		if (file.exists()) {
-			log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
-			ufile.downloads++
-			ufile.save()
-			response.setContentType("application/octet-stream")
-			response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${file.name}")
-			response.outputStream << file.readBytes()
-			return
-		} else {
-			def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
-			log.error msg
-			flash.message = msg
-			redirect controller: params.errorController, action: params.errorAction
-			return
-		}
-	}
+    }
 
-	protected def getUFileList(params) {
+    private String fileExtension(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension.toLowerCase();
+    }
 
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
-		def offset = params.offset ? params.int('offset') : 0
-		def filteredUFile = uFileService.getFilteredUFiles(params, max, offset)
-		def UFileInstanceList = filteredUFile.UFileInstanceList
-		def queryParams = filteredUFile.queryParams
-		def activeFilters = filteredUFile.activeFilters
+    private String sanitizeForCsv(String cellData) {
+        if (cellData == ""){
+            return "";
+        }
+        StringBuilder resultBuilder = new StringBuilder(cellData);
 
-		def totalUFileInstanceList = uFileService.getFilteredUFiles(params, -1, -1).UFileInstanceList
-		def count = totalUFileInstanceList.size()
+        // Look for doublequotes, escape as necessary.
+        int lastIndex = 0;
+        while (resultBuilder.indexOf("\"", lastIndex) >= 0) {
+            int quoteIndex = resultBuilder.indexOf("\"", lastIndex);
+            resultBuilder.replace(quoteIndex, quoteIndex + 1, "\"\"");
+            lastIndex = quoteIndex + 2;
+        }
+        ///println "=========== " + cellData;
+        char firstChar = cellData.charAt(0);
+        char lastChar = cellData.charAt(cellData.length() - 1);
 
-		return [totalUFileInstanceList:totalUFileInstanceList, UFileInstanceList: UFileInstanceList, UFileInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
-
-	}
-
-
-
+        if (cellData.contains(",") || // Check for commas
+                cellData.contains("\n") ||  // Check for line breaks
+                Character.isWhitespace(firstChar) || // Check for leading whitespace.
+                Character.isWhitespace(lastChar)) { // Check for trailing whitespace
+            resultBuilder.insert(0, "\"").append("\""); // Wrap in doublequotes.
+                }
+        return resultBuilder.toString();
+    }
 }

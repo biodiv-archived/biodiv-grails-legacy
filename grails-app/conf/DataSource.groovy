@@ -1,10 +1,9 @@
 dataSource {
     pooled = true
+    
     //Added bu hibernatespatial plugin
 // //     driverClassName = "org.postgis.DriverWrapper"
     dialect = org.hibernatespatial.postgis.PostgisDialect
-    username = "postgres"
-    password = "postgres123"
 //    logSql = true
     properties {
         //TODO: following params to be enabled after testing for connection leak
@@ -15,9 +14,11 @@ dataSource {
         validationQuery="SELECT 1"
         testOnBorrow=true
         testOnReturn=false
-        testWhileIdle=false
+        testWhileIdle=true
 
-        timeBetweenEvictionRunsMillis = 1000 * 60 * 30
+        timeBetweenEvictionRunsMillis = 1000 * 60 * 15
+		numTestsPerEvictionRun=3
+		minEvictableIdleTimeMillis=1000 * 60 * 5
         //        maxWait = 30000
     }
 }
@@ -61,6 +62,12 @@ environments {
         }
     }
     pambaTest {
+        dataSource {
+            dbCreate = "update" // one of 'create', 'create-drop','update'
+            url = "jdbc:postgresql://localhost:5432/${appName}"
+        }
+    }
+    kk {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
             url = "jdbc:postgresql://localhost:5432/${appName}"

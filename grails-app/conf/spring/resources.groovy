@@ -28,6 +28,8 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
 
+import com.mchange.v2.c3p0.ComboPooledDataSource
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
 
 // Place your Spring DSL code here
 beans = {
@@ -152,24 +154,30 @@ beans = {
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
         solrServer = ref('speciesSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     observationsSearchService(speciespage.search.ObservationsSearchService) {
         solrServer = ref('observationsSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     //checklistSearchService(speciespage.search.ChecklistSearchService) {
     //    solrServer = ref('checklistSolrServer');
     //}
     newsletterSearchService(speciespage.search.NewsletterSearchService) {
         solrServer = ref('newsletterSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
         solrServer = ref('projectSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
         solrServer = ref('documentSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
     SUserSearchService(speciespage.search.SUserSearchService) {
         solrServer = ref('usersSolrServer');
+		sessionFactory = ref("sessionFactory");
     }
 
     preAuthenticationChecks(DefaultPreAuthenticationChecks)
@@ -261,4 +269,28 @@ beans = {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }
 
+    dataSource(ComboPooledDataSource) { bean ->
+        bean.destroyMethod = 'close'
+        user = CH.config.dataSource.username
+        password = CH.config.dataSource.password
+        driverClass = CH.config.dataSource.driverClassName
+        jdbcUrl = CH.config.dataSource.url
+        //unreturnedConnectionTimeout = 5 // seconds
+		maxConnectionAge = 1800 // seconds (30 minutes)
+        debugUnreturnedConnectionStackTraces = true
+      } 
+
+    /*if (Environment.current == Environment.DEVELOPMENT) {
+    log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
+        targetClass = "org.springframework.util.Log4jConfigurer"
+        targetMethod = "initLogging"
+        arguments = ["file:/home/sravanthi/git/biodiv/lib/log4j.properties"]
+    }
+    } else {
+    log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
+        targetClass = "org.springframework.util.Log4jConfigurer"
+        targetMethod = "initLogging"
+        arguments = ["classpath:log4j.properties"]
+    }
+    }*/
 }

@@ -22,6 +22,7 @@ import species.auth.SUser;
 import species.participation.Featured;
 import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
+import species.participation.Comment;
 import species.participation.Follow;
 import species.participation.Observation;
 import species.participation.Checklists;
@@ -33,12 +34,16 @@ import species.participation.Annotation
 import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
+import species.groups.UserGroupMemberRole;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
+
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
+import java.net.URLDecoder;
 import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
@@ -69,8 +74,12 @@ class ObservationService extends AbstractObjectService {
     def activityFeedService;
     def mailService;
     def SUserService;
+    def speciesPermissionService;
+    def speciesService;
 
     static final String OBSERVATION_ADDED = "observationAdded";
+    static final String SPECIES_CONTRIBUTOR = "speciesContributor";
+    static final String SPECIES_CURATORS = "speciesCurators"
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
     static final String SPECIES_AGREED_ON = "speciesAgreedOn";
     static final String SPECIES_NEW_COMMENT = "speciesNewComment";
@@ -82,6 +91,8 @@ class ObservationService extends AbstractObjectService {
     static final int MAX_EXPORT_SIZE = -1;
     static final String FEATURED = "Featured";
     static final String UNFEATURED = "UnFeatured";
+    static final String DIGEST_MAIL = "digestMail";
+    static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
     /**
      * 
      * @param params
@@ -98,8 +109,9 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @param observation
      */
-    void updateObservation(params, observation){
+    void updateObservation(params, observation, boolean updateResources = true){
         //log.debug "Updating obv with params ${params}"
+        
         if(params.author)  {
             observation.author = params.author;
         }
@@ -109,14 +121,16 @@ class ObservationService extends AbstractObjectService {
         }
         observation.group = params.group?:SpeciesGroup.get(params.group_id);
         observation.notes = params.notes;
-        observation.fromDate = parseDate(params.fromDate);
-        observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
+        if( params.fromDate != ""){
+            observation.fromDate = parseDate(params.fromDate);
+            observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
+        }
         observation.placeName = params.placeName//?:observation.reverseGeocodedName;
         observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
 
         //observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
         observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
-        observation.geoPrivacy = false;
+        observation.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
 
         observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
@@ -138,16 +152,20 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        def resourcesXML = createResourcesXML(params);
-        def resources = saveResources(observation, resourcesXML);
-
-        observation.resource?.clear();
-        resources.each { resource ->
-            observation.addToResource(resource);
-        }
+		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
+		// has some global update like habitat, group in that case updating its observation info but not the resource info
+		if(updateResources){
+	        def resourcesXML = createResourcesXML(params);
+	        def resources = saveResources(observation, resourcesXML);
+	        observation.resource?.clear();
+	        resources.each { resource ->
+                resource.saveResourceContext(observation)
+	            observation.addToResource(resource);
+	        }
+		}
     }
 
-    Map saveObservation(params, sendMail=true){
+    Map saveObservation(params, sendMail=true, boolean updateResources = true){
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
@@ -161,9 +179,12 @@ class ObservationService extends AbstractObjectService {
             }else{
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
-                updateObservation(params, observationInstance)
+                updateObservation(params, observationInstance, updateResources)
                 feedType = activityFeedService.OBSERVATION_UPDATED
                 feedAuthor = springSecurityService.currentUser
+                if(params.action == "update") {
+                    mailType = activityFeedService.OBSERVATION_UPDATED
+                }
             }
 
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
@@ -178,6 +199,7 @@ class ObservationService extends AbstractObjectService {
                     sendNotificationMail(mailType, observationInstance, null, params.webaddress);
 
                 params["createNew"] = true
+                params["oldAction"] = params.action
                 return ['success' : true, observationInstance:observationInstance]
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -225,8 +247,7 @@ class ObservationService extends AbstractObjectService {
         log.debug params;
         int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
         int offset = params.offset ? params.offset.toInteger() : 0
-
-        def relatedObv
+        def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
             relatedObv = getRelatedObservationBySpeciesName(params.id.toLong(), max, offset)
         } else if(params.filterProperty == "speciesGroup"){
@@ -240,9 +261,18 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getNearbyObservations(params.id, max, offset)
         } else if(params.filterProperty == "taxonConcept") {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
+        } else if(params.filterProperty == "latestUpdatedObservations") {
+            relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
+        } else if(params.filterProperty == "latestUpdatedSpecies") {
+            relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
         }
+        
         else{
-            relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
+            if(params.id) {
+                relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
+            } else {
+                log.debug "no id"
+            }
         }
 
         if(params.contextGroupWebaddress || params.webaddress){
@@ -392,6 +422,7 @@ class ObservationService extends AbstractObjectService {
             projections {
                 groupProperty('sourceId')
                 groupProperty('isShowable')
+				groupProperty('lastRevised')
             }
             and {
                 eq("maxVotedReco", maxVotedReco)
@@ -399,6 +430,7 @@ class ObservationService extends AbstractObjectService {
                 if(obvId) ne("id", obvId)
             }
             order("isShowable", "desc")
+            order("lastRevised", "desc")
             if(limit >= 0) maxResults(limit)
                 firstResult (offset?:0)
         }
@@ -423,6 +455,38 @@ class ObservationService extends AbstractObjectService {
             }
         }
         return ["observations":result, "count":count]
+    }
+    
+    Map getRelatedObvForSpecies(resInstance, int limit, int offset){
+        def taxonConcept = resInstance.taxonConcept
+        List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+        def resList = []
+        def obvLinkList = []
+        if(scientificNameRecos){
+            def resIdList = Observation.executeQuery ('''
+                select r.id, obv.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by r.id asc
+                ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
+
+             /*
+            def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
+            def hqlQuery = sessionFactory.currentSession.createQuery(query) 
+            hqlQuery.setMaxResults(limit);
+            hqlQuery.setFirstResult(offset);
+            def queryParams = [:]
+            queryParams["scientificNameRecos"] = scientificNameRecos
+            queryParams["isDeleted"] = false
+            hqlQuery.setProperties(queryParams);
+            def resIdList = hqlQuery.list();
+            */
+            resIdList.each{
+                resList.add(Resource.get(it.getAt(0)));
+                obvLinkList.add(it.getAt(1));
+            }
+            def resListSize = resList.size()
+            return ['resList': resList, 'obvLinkList': obvLinkList, 'count' : resListSize ]
+        } else{
+            return ['resList': resList, 'obvLinkList': obvLinkList, 'count': 0]
+        }
     }
 
     Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
@@ -453,7 +517,17 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
-
+    Map getLatestUpdatedObservation(String webaddress,String sortBy, int max, int offset ){
+        def p = [:]
+        p.webaddress = webaddress
+        p.sort = sortBy
+        def result = getFilteredObservations(p, max, offset).observationInstanceList
+        def res = []
+        result.each{
+            res.add(["observation":it, 'title':(it.isChecklist)? it.title : (it.maxVotedReco?it.maxVotedReco.name:"Unknown")])
+        }
+        return ['observations':res]
+    }
 
     Map getRecommendation(params){
         def recoName = params.recoName;
@@ -477,13 +551,7 @@ class ObservationService extends AbstractObjectService {
     /**
      * 
      */
-    private List<Resource> saveResources(Observation observation, resourcesXML) {
-        XMLConverter converter = new XMLConverter();
-        converter.setResourcesRootDir(grailsApplication.config.speciesPortal.observations.rootDir);
-        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(grailsApplication.config.speciesPortal.observations.rootDir.toString(), "")?:""
-        relImagesContext = new File(relImagesContext).getParent();
-        return converter.createMedia(resourcesXML, relImagesContext);
-    }
+    
 
     /**
      * 
@@ -514,61 +582,7 @@ class ObservationService extends AbstractObjectService {
         return null;
     }
 
-    /**
-     * 
-     */
-    private def createResourcesXML(params) {
-        NodeBuilder builder = NodeBuilder.newInstance();
-        XMLConverter converter = new XMLConverter();
-        def resources = builder.createNode("resources");
-        Node images = new Node(resources, "images");
-        Node videos = new Node(resources, "videos");
-        String uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
-        List files = [];
-        List titles = [];
-        List licenses = [];
-        List type = [];
-        List url = []
-        List ratings = [];
-        params.each { key, val ->
-            int index = -1;
-            if(key.startsWith('file_')) {
-                index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
-
-            }
-            if(index != -1) {
-                files.add(val);
-                titles.add(params.get('title_'+index));
-                licenses.add(params.get('license_'+index));
-                type.add(params.get('type_'+index));
-                url.add(params.get('url_'+index));
-                ratings.add(params.get('rating_'+index));
-            }
-        }
-        files.eachWithIndex { file, key ->
-            Node image;
-            if(file) {
-                if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
-                    image = new Node(images, "image");
-                    File f = new File(uploadDir, file);
-                    new Node(image, "fileName", f.absolutePath);
-                } else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
-                    image = new Node(videos, "video");
-                    new Node(image, "fileName", file);
-                    new Node(image, "source", url.getAt(key));
-                }				
-                new Node(image, "caption", titles.getAt(key));
-                new Node(image, "contributor", params.author.username);
-                new Node(image, "license", licenses.getAt(key));
-                new Node(image, "rating", ratings.getAt(key));
-                new Node(image, "user", springSecurityService.currentUser?.id);
-            } else {
-                log.warn("No reference key for image : "+key);
-            } 
-        }
-
-        return resources;
-    }
+   
 
     Map findAllTagsSortedByObservationCount(int max){
         def sql =  Sql.newInstance(dataSource);
@@ -797,25 +811,27 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.featureBy == "true" ) {
-           // if(params.userGroup == null) {
-                //filterQuery += " and feat.userGroup is null "     
+            if(params.userGroup == null) {
+                filterQuery += " and obv.featureCount > 0 "     
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
               //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
-            //} else {
-              //  featureQuery = ", Featured feat "
-            //}
+            } else {
+                featureQuery = ", Featured feat "
+            }
             query += featureQuery;
-            filterQuery += " and obv.featureCount > 0 "
+            //filterQuery += " and obv.featureCount > 0 "
             if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
             }else {
-                filterQuery += " and feat.userGroup.id = :userGroupId "
+                filterQuery += " and obv.id = feat.objectId and (feat.objectType =:featType or feat.objectType=:featType1) and feat.userGroup.id = :userGroupId "
                 queryParams["userGroupId"] = params.userGroup?.id
             }
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Observation.class.getCanonicalName();
+            queryParams["featType1"] = Checklists.class.getCanonicalName();
             activeFilters["featureBy"] = params.featureBy
         }
+        //TODO: check logic
         if(params.featureBy == "false") {
             featureQuery = ", Featured feat "
             query += featureQuery;
@@ -882,8 +898,8 @@ class ObservationService extends AbstractObjectService {
 
         if(params.daterangepicker_start && params.daterangepicker_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
-            def startDate = df.parse(params.daterangepicker_start)
-            def endDate = df.parse(params.daterangepicker_end)
+            def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
+            def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
             Calendar cal = Calendar.getInstance(); // locale-specific
             cal.setTime(endDate)
             cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -1041,6 +1057,7 @@ class ObservationService extends AbstractObjectService {
             log.debug "invalid source type ${source}"
         }
         def currentUser = springSecurityService.currentUser?:""
+        def currentUserProfileLink = currentUser?generateLink("SUser", "show", ["id": currentUser.id], null):'';
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
         def conf = SpringSecurityUtils.securityConfig
         def staticMessage = conf.ui.askIdentification.staticMessage
@@ -1048,6 +1065,7 @@ class ObservationService extends AbstractObjectService {
             staticMessage = evaluate(staticMessage, templateMap)
         } 
 
+        templateMap["currentUserProfileLink"] = currentUserProfileLink;
         templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
         templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
         templateMap["userMessage"] = m.userMessage?: ""
@@ -1430,6 +1448,7 @@ class ObservationService extends AbstractObjectService {
         def messageCode, url, label = Utils.getTitleCase(params.controller)
         def messageArgs = [label, params.id]
         def observationInstance = Observation.get(params.id.toLong())
+        observationInstance.removeResourcesFromSpecies()
         if (observationInstance) {
             boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
             if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
@@ -1470,7 +1489,7 @@ class ObservationService extends AbstractObjectService {
 
     /**
      */
-    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null) {
+    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
         def conf = SpringSecurityUtils.securityConfig
         log.debug "Sending email"
         try {
@@ -1503,22 +1522,57 @@ class ObservationService extends AbstractObjectService {
             //def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
 
             switch ( notificationType ) {
-                case OBSERVATION_ADDED:
+                case [OBSERVATION_ADDED, activityFeedService.OBSERVATION_UPDATED]:
+                if( notificationType == OBSERVATION_ADDED ) {
+                    mailSubject = conf.ui.addObservation.emailSubject
+                    templateMap["message"] = " added the following observation:"
+                } else {
                 mailSubject = conf.ui.addObservation.emailSubject
+                    mailSubject = "Observation updated"
+                    templateMap["message"] = " updated the following observation:"
+                }
                 bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = " added the following observation:"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
 
-                case activityFeedService.CHECKLIST_CREATED:
-                mailSubject = conf.ui.addChecklist.emailSubject
+                case [activityFeedService.CHECKLIST_CREATED, activityFeedService.CHECKLIST_UPDATED]:
+                if( notificationType == activityFeedService.CHECKLIST_CREATED ) {
+                    mailSubject = conf.ui.addChecklist.emailSubject
+                    templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
+                } else {
+                    mailSubject = "Checklist updated"
+                    templateMap["message"] = " updated a checklist on ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
+                }
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["actionObject"] = "checklist"
-                templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
                 toUsers.add(getOwner(obv))
                 break
-
+                
+                case SPECIES_CURATORS:
+                mailSubject = "Request to curate species"
+                bodyView = "/emailtemplates/speciesCurators"
+                templateMap["link"] = otherParams["link"]
+                templateMap["curator"] = otherParams["curator"]
+                //templateMap["link"] = URLDecoder.decode(templateMap["link"])
+                //println "========THE URL  =============" + templateMap["link"]
+                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                toUsers = otherParams["usersMailList"]
+                break
+                
+                case SPECIES_CONTRIBUTOR:
+                mailSubject = "Species uploaded"
+                bodyView = "/emailtemplates/speciesContributor"
+                templateMap["link"] = otherParams["link"]
+                def user = springSecurityService.currentUser;                
+                templateMap["contributor"] = user.name
+                templateMap["speciesCreated"] = otherParams["speciesCreated"]
+				templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
+				templateMap["stubsCreated"] = otherParams["stubsCreated"]
+				templateMap["uploadCount"] = otherParams["uploadCount"]
+				populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                toUsers.add(user)
+                break
 
                 case OBSERVATION_FLAGGED :
                 mailSubject = activityFeedService.getResType(obv).capitalize() + " flagged"
@@ -1588,6 +1642,7 @@ class ObservationService extends AbstractObjectService {
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
                 mailSubject = "New comment in ${templateMap['domainObjectType']}"
                 templateMap['message'] = " added a comment to the page listed below."
+                templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
                 toUsers.addAll(getParticipants(obv))
                 break;
 
@@ -1644,22 +1699,57 @@ class ObservationService extends AbstractObjectService {
                 }
                 toUsers.addAll(getParticipants(obv))
                 break
-                default:
+            
+            case DIGEST_MAIL:
+                mailSubject = "Activity digest on " + otherParams["userGroup"].name
+                bodyView = "/emailtemplates/digest"
+                templateMap["digestContent"] = otherParams["digestContent"]
+                templateMap["userGroup"] = otherParams["userGroup"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(otherParams["usersEmailList"]);
+                //toUsers.addAll(SUser.get(4136L));
+                break
+            
+            case DIGEST_PRIZE_MAIL:
+                mailSubject = "Neighborhood Trees Campaign extended till tonight"
+                bodyView = "/emailtemplates/digestPrizeEmail"
+                templateMap["userGroup"] = otherParams["userGroup"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(otherParams["usersEmailList"]);
+                break
+            //below case also had activityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
+            case [activityFeedService.SPECIES_CREATED]:
+                mailSubject = activityFeedService.SPECIES_CREATED
+                bodyView = "/emailtemplates/addObservation"
+                templateMap["message"] = " added the following species:"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(getOwner(obv))
+                break
+                
+            default:
                 log.debug "invalid notification type"
             }
 
             toUsers.eachWithIndex { toUser, index ->
                 if(toUser) {
+                    if(!toUser.enabled || toUser.accountLocked){
+                        log.error "Account not enabled or locked - so skipping sending email to ${toUser}"
+                        return
+                    }
                     templateMap['username'] = toUser.name.capitalize();
                     templateMap['tousername'] = toUser.username;
                     if(request){
                         templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
                     }
+                    if(notificationType == DIGEST_MAIL){
+                        templateMap['userID'] = toUser.id
+                    }
+                    
                     log.debug "Sending email to ${toUser}"
                     try{
                         mailService.sendMail {
                             to toUser.email
-                            if(index == 0 && Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("pamba")||Environment.getCurrent().getName().equalsIgnoreCase("kk")) ) {
                                 bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                             }
                             from grailsApplication.config.grails.mail.default.from
@@ -1710,21 +1800,30 @@ class ObservationService extends AbstractObjectService {
             templateMap["actorIconUrl"] = feed.author.profilePicture(ImageType.SMALL)
             templateMap["actorName"] = feed.author.name
             templateMap["activity"] = activityFeedService.getContextInfo(feed, [webaddress:userGroupWebaddress])
-            templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId))
+            def domainObject = activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId);
+            templateMap['domainObjectTitle'] = getTitle(domainObject);
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
+
+            def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
+            if(isCommentThread) {
+                templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
+                templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
+                templateMap['commentInstance'] = activityFeedService.getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
+                templateMap['group'] = domainObject;
+            }
         }
     }
 
     public String generateLink( String controller, String action, linkParams, request=null) {
-        request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-        userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+	request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+	userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
         controller:controller, action: action,
         params: linkParams)
     }
 
     private List getParticipants(observation) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = getUserForEmail(observation) //Follow.getFollowers(observation)
             result.each { user ->
                 if(user.sendNotification && !participants.contains(user)){
@@ -1736,6 +1835,22 @@ class ObservationService extends AbstractObjectService {
         }
 		return participants;
 	}
+
+    def List getParticipantsForDigest(userGroup, max, offset) {
+        List participants = [];
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
+            result.each { user ->
+                if(user.sendDigest && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
+            participants << springSecurityService.currentUser;
+        }
+		return participants;
+	}
+
 	
 	private List getUserForEmail(observation){
 		if(!observation.instanceOf(UserGroup)){
@@ -1754,8 +1869,8 @@ class ObservationService extends AbstractObjectService {
 	
 	private SUser getOwner(observation) {
 		def author = null;
-        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-            if(observation.metaClass.hasProperty(observation, 'author')) {
+        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") ||Environment.getCurrent().getName().equalsIgnoreCase("kk") ) {
+            if(observation.metaClass.hasProperty(observation, 'author') || observation.metaClass.hasProperty(observation, 'contributors')) {
                 author = observation.author;
                 if(!author.sendNotification) {
                     author = null;
@@ -1927,7 +2042,7 @@ class ObservationService extends AbstractObjectService {
         def distinctRecoListResult = distinctRecoQuery.list()
         distinctRecoListResult.each {it->
             def reco = Recommendation.read(it[0]);
-            distinctRecoList << [reco.name, reco.isScientificName, it[1]]
+            distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, it[1]]
         }
 
         def count = distinctRecoCountQuery.list()[0]
@@ -1974,12 +2089,26 @@ class ObservationService extends AbstractObjectService {
             List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
             distinctRecoListFacets.each {
                 //TODO second parameter, isScientificName
-                distinctRecoList.add([it.getName(), true, it.getCount()]);
+                def recoWithLink = getSpeciesHyperLinkedName(Recommendation.findByName(it.getName()));
+                if(recoWithLink)
+                    distinctRecoList.add([recoWithLink, true, it.getCount()]);
             }
 
         }
         return [distinctRecoList:distinctRecoList] 
     }
+	
+	private String getSpeciesHyperLinkedName(Recommendation reco){
+        if(!reco) return;
+		def speciesId = reco.taxonConcept?.findSpeciesId()
+		if(!speciesId){
+            println "RECONAME : "+reco
+			return reco.name
+		}
+		
+		def link = generateLink("species", "show", ["id": speciesId])
+		return "" + '<a  href="' +  link +'"><i>' + reco.name + "</i></a>"
+	}
 
     /**
      */
@@ -2118,7 +2247,7 @@ class ObservationService extends AbstractObjectService {
      * used for download and post in bulk
      */
     def getObservationList(params, max, offset, action){
-		if("search".equalsIgnoreCase(action)){
+		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
             def res = []
@@ -2142,15 +2271,38 @@ class ObservationService extends AbstractObjectService {
 
     def getUserGroup(params) {
 
-        if(params.userGroup && params.userGroup.instanceOf(UserGroup)) {
+        if(params.userGroup && params.userGroup instanceof UserGroup) {
             return params.userGroup
         }
 
-        if(params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress) {
+        if(params.webaddress || (params.userGroup && (params.userGroup instanceof String || params.userGroup instanceof Long ))) {
             def userGroupController = new UserGroupController();
             return userGroupController.findInstance(params.userGroup, params.webaddress);
         }
 
         return null;
     }
+
+    //Create file with given filename
+    def File createFile(String fileName, String uploadDir, String contentRootDir) {
+        File uploaded
+        if (uploadDir) {
+            File fileDir = new File(contentRootDir + "/"+ uploadDir)
+            if(!fileDir.exists())
+                fileDir.mkdirs()
+                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+
+        } else {
+
+            File fileDir = new File(contentRootDir)
+            if(!fileDir.exists())
+                fileDir.mkdirs()
+                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+            //uploaded = File.createTempFile('grails', 'ajaxupload')
+        }
+
+        log.debug "New file created : "+ uploaded.getPath()
+        return uploaded
+    }
+
 }

@@ -135,6 +135,8 @@ class SUserController extends UserController {
             result.put('obvData', chartService.getUserStats(SUserInstance));
 //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
 //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
+            result['currentUser'] = springSecurityService.currentUser;
+            result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
 			return result
 		}
 	}
@@ -389,7 +391,7 @@ class SUserController extends UserController {
 			if (params.sort == 'lastLoginDate') {
 				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
 			} else {
-				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
+				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'}"
 			}
 
 

@@ -15,12 +15,15 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
+import grails.converters.JSON
+
 
 import species.Contributor;
 import species.Field
 import species.Resource;
 import species.Species
 import species.SpeciesField;
+import species.GeographicEntity;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.KeyStoneDataConverter
@@ -31,6 +34,7 @@ import species.sourcehandler.SourceConverter;
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
+import java.text.DateFormat
 import java.text.SimpleDateFormat;
 import species.sourcehandler.exporter.DwCAExporter
 import org.apache.log4j.PatternLayout;
@@ -39,6 +43,18 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
+import species.auth.SUser
+import species.formatReader.SpreadsheetReader;
+import species.formatReader.SpreadsheetWriter;
+
+import species.participation.Featured
+import species.participation.Recommendation
+import species.participation.SpeciesBulkUpload
+import species.CommonNames
+import species.Synonyms
+import species.TaxonomyRegistry
+import species.SpeciesPermission
+import species.groups.SpeciesGroupMapping
 
 class SpeciesUploadService {
 
@@ -59,8 +75,14 @@ class SpeciesUploadService {
 	def namesIndexerService;
 	def observationService;
 	def springSecurityService
+	def speciesPermissionService;
+	def SUserService;
+	
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static int BATCH_SIZE = 10;
+	int noOfFields = Field.count();
+    String contentRootDir = config.speciesPortal.content.rootDir
 
 	/**
 	 * 
@@ -151,7 +173,83 @@ class SpeciesUploadService {
 
 		return noOfInsertions;
 	}
-
+	
+	
+	Map basicUploadValidation(params){
+		if(!params.xlsxFileUrl){
+			return ['msg': 'File not found !!!' ]
+		}
+		
+		File speciesDataFile = saveModifiedSpeciesFile(params)
+		log.debug "THE FILE BEING UPLOADED " + speciesDataFile
+		
+		if(!speciesDataFile.exists()){
+			return ['msg': 'File not found !!!' ]
+		}
+		
+		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir)
+		
+		return ['msg': 'Bulk upload in progres. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
+		
+	}
+	
+	Map upload(SpeciesBulkUpload sBulkUploadEntry){
+		def speciesDataFile = sBulkUploadEntry.filePath
+		def imagesDir = sBulkUploadEntry.imagesDir
+		sBulkUploadEntry.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		
+		def res = uploadMappedSpreadsheet(speciesDataFile, speciesDataFile, 2,0,0,0, imagesDir?1:-1, imagesDir, sBulkUploadEntry)
+		
+		//writing log after upload
+		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
+		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " + res.log
+		File errorFile = observationService.createFile("ErrorLog.txt" , "species", contentRootDir);
+		errorFile.write(mylog)
+		
+		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
+		sBulkUploadEntry.save()
+		
+		//Every thing is fine then sending mail
+		String link
+		if(res.success){
+			def otherParams = [:]
+			def usersMailList = []
+			usersMailList = speciesPermissionService.getSpeciesAdmin()
+			log.debug "user mail list " + usersMailList
+			def sp = new Species()
+			
+			def linkParams = [:]
+			linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
+			linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
+			linkParams["sort"] = "lastUpdated"
+			linkParams["user"] = springSecurityService.currentUser?.id
+			link = observationService.generateLink("species", "list", linkParams)
+			otherParams["link"] = link
+			usersMailList.each{ user ->
+				def uml =[]
+				uml.add(user)
+				otherParams["curator"] = user.name
+				otherParams["usersMailList"] = uml
+				observationService.sendNotificationMail(observationService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+			}
+			
+			//sending mail to species contributor
+			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
+			otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
+			otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
+			otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
+			observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
+		}
+		
+		def msg = ""
+		if(sBulkUploadEntry.status == SpeciesBulkUpload.Status.UPLOADED){
+			msg = "Species uploaded Successfully. Please visit your profile page to view summary."
+		}else{
+			msg = "Species upload " + sBulkUploadEntry.status.value().toLowerCase() + ". Please visit your profile page to view summary."
+		}
+		return [success:res.success, downloadFile:speciesDataFile, filterLink: link, msg:msg]
+	}
+	
 	/**
 	 * 
 	 * @param file
@@ -162,21 +260,37 @@ class SpeciesUploadService {
 	 * @param contentHeaderRowNo
 	 * @return
 	 */
-	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="") {
-        log.info "Uploading mapped spreadsheet : "+file;
-
-		List<Species> species = new ArrayList<Species>();
-		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
-
-
-		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
-		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
-		List<Map> imagesMetaData;
-		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
-			converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+	Map uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="", SpeciesBulkUpload sBulkUploadEntry=null) {
+		Map result = ['success':false]
+		MappedSpreadsheetConverter converter
+		def uploadCount = 0
+		try {
+			log.info "Uploading mapped spreadsheet : "+file;
+			println "Uploading mapped spreadsheet : "+file;
+	
+			List<Species> species = new ArrayList<Species>();
+			converter = new MappedSpreadsheetConverter();
+	
+			converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
+			List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
+			List<Map> imagesMetaData;
+			if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
+				converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+				converter.imagesDir = imagesDir
+				
+			}
+			uploadCount = saveSpecies(converter, content, imagesDir, sBulkUploadEntry)
+			result['success'] = true
+		} catch (Exception e) {
+			log.error e.message
+			e.printStackTrace()
 		}
-
-		return saveSpecies(converter, content, imagesDir);
+		
+		result['uploadCount'] = uploadCount
+		result['summary'] = converter ? converter.getSummary():""
+		result['log'] = converter ? converter.getLogs() : ""
+		
+		return result
 	}
 
 	/**
@@ -235,15 +349,28 @@ class SpeciesUploadService {
 		return saveSpecies(species);
 	}
 
-	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
-        converter.setLogAppender(fa);
+	int saveSpecies(SourceConverter converter, List content, String imagesDir="", SpeciesBulkUpload sBulkUploadEntry=null) {
+		converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		def speciesElements = [];
 		int noOfSpecies = content.size();
+		
+		log.info " CONTENT SIZE " + noOfSpecies
+		boolean isAborted = false
 		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
-				noOfInsertions += saveSpeciesElements(speciesElements);
+				if(shouldAbortUpload(sBulkUploadEntry)){
+					isAborted = true
+					log.debug "Aborting bulk upload"
+					break;
+				}
+				
+				def res = saveSpeciesElementsWrapper(speciesElements)
+				noOfInsertions += res.noOfInsertions;
+				converter.addToSummary(res.summary);
+				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
+				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				speciesElements.clear();
 				cleanUpGorm();
 			}
@@ -253,27 +380,62 @@ class SpeciesUploadService {
 			if(speciesElement)
 				speciesElements.add(speciesElement);
 		}
-		if(speciesElements.size() > 0) {
-			noOfInsertions += saveSpeciesElements(speciesElements);
+		
+		//saving last batch
+		if(speciesElements.size() > 0 && !isAborted) {
+			def res = saveSpeciesElementsWrapper(speciesElements)
+			noOfInsertions += res.noOfInsertions;
+			converter.addToSummary(res.summary);
+			converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 			speciesElements.clear();
 			cleanUpGorm();
 		}
-
+		
+		sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
+			
+		
+		log.info "================================ LOG ============================="
+		println  converter.getLogs()
+		log.info "=================================================================="
+		
 		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		log.info "Total number of species that got added : ${noOfInsertions}"
 		return noOfInsertions;
 	}
 
-	private int saveSpeciesElements(List speciesElements) {
+	
+	private boolean shouldAbortUpload(SpeciesBulkUpload sbu){
+		sbu.refresh()
+		log.debug "Current status " + sbu.status 
+		return (sbu.status == SpeciesBulkUpload.Status.ABORTED)
+	}
+	
+	private Map saveSpeciesElementsWrapper(List speciesElements) {
+		def res = saveSpeciesElements(speciesElements)
+		if(res.noOfInsertions == speciesElements.size()){
+			return res
+		}
+		
+		//batch fail now running 1 by 1 for each species
+		List<Species> species = new ArrayList<Species>();
+		int noOfInsertions = 0;
+		speciesElements.each { sEle ->
+			def tmpRes = saveSpeciesElements([sEle])
+			noOfInsertions += tmpRes.noOfInsertions
+			species.addAll(tmpRes.species)
+		}
+		
+		return ['noOfInsertions':noOfInsertions, 'species':species];
+	}
+	
+	private Map saveSpeciesElements(List speciesElements) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
-
+		
 		List<Species> species = new ArrayList<Species>();
-
 
 		int noOfInsertions = 0;
 		try {
-			List<Species> addedSpecies = new ArrayList<Species>();
 			//Species.withTransaction { status ->
 				for(Node speciesElement : speciesElements) {
 					Species s = converter.convertSpecies(speciesElement)
@@ -284,25 +446,26 @@ class SpeciesUploadService {
 				//addedSpecies = saveSpeciesBatch(species);
 				//noOfInsertions += addedSpecies.size()
 			//}
+				//converter.addToSummary("Saved ${noOfInsertions} species till now")
 
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
+			converter.addToSummary(e)
 		}catch (org.springframework.dao.DataIntegrityViolationException e) {
 			log.error "DataIntegrityViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
+			converter.addToSummary(e)
 		} catch(ConstraintViolationException e) {
 			log.error "ConstraintViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
+			converter.addToSummary(e)
 		}
 
-
-
-
-		return noOfInsertions;
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs()];
 	}
 
 	/** 
@@ -356,25 +519,29 @@ class SpeciesUploadService {
                 }
 
 				//externalLinksService.updateExternalLinks(taxonConcept);
+				
+				s.percentOfInfo = calculatePercentOfInfo(s);
+				if(!s.save()) {
+					s.errors.allErrors.each {
+						log.error it
+						s.appendLogSummary(it)
+					}
+				} else {
+					noOfInsertions++;
+					//addedSpecies.add(s);
+				}
+				
 			} catch(e) {
+				s.appendLogSummary(e)
 				e.printStackTrace()
 			}
-
-			s.percentOfInfo = calculatePercentOfInfo(s);
-
-			if(!s.save()) {
-				s.errors.allErrors.each { log.error it }
-			} else {
-				noOfInsertions++;
-				//addedSpecies.add(s);
-			}
-
+            
 		}
 
 		//log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-		return noOfInsertions;
+        return noOfInsertions;
 	}
 
 	/**
@@ -400,14 +567,16 @@ class SpeciesUploadService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			//TaxonomyDefinition.withTransaction { status ->
-			for(Species s : species) {
-				def taxonConcept = s.taxonConcept;
-				if(!taxonConcept.isAttached()) {
-					taxonConcept.attach();
+			//TaxonomyDefinition.withNewSession{
+				for(Species s : species) {
+                    s.afterInsert();
+					def taxonConcept = s.taxonConcept;
+					if(!taxonConcept.isAttached()) {
+						taxonConcept.attach();
+					}
+					groupHandlerService.updateGroup(taxonConcept);
+					log.info "post processed spcecies ${s}"
 				}
-				groupHandlerService.updateGroup(taxonConcept);
-			}
 			//}
 		} catch(e) {
 			log.error "$e.message"
@@ -450,7 +619,7 @@ class SpeciesUploadService {
 	 how many different sources contribute information
 	 whether information has been reviewed or not
 	 */
-	protected float calculatePercentOfInfo(Species s) {
+	float calculatePercentOfInfo(Species s) {
 		//		int synonyms = Synonyms.countByTaxonConcept(s.taxonConcept);
 		//		int commonNames = CommonNames.countByTaxonConcept(s.taxonConcept);
 		//		def authClassification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
@@ -464,7 +633,7 @@ class SpeciesUploadService {
 		int noOfMultimedia = s.resources?.size()?:0;
 		//int diffSources =
 		//TODO: int reviewedFields =
-		int richness = s.fields?.size()?:0 + s.globalDistributionEntities?.size()?:0 + s.globalEndemicityEntities?.size()?:0 + s.indianDistributionEntities?.size()?:0 + s.indianEndemicityEntities?.size()?:0;
+		int richness = (s.fields?.size()?:0 )+ (s.globalDistributionEntities?.size()?:0 )+ (s.globalEndemicityEntities?.size()?:0) + (s.indianDistributionEntities?.size()?:0) + (s.indianEndemicityEntities?.size()?:0);
 		richness += noOfMultimedia;
 		//richness += textSize;
 		return richness;
@@ -511,4 +680,210 @@ class SpeciesUploadService {
         return new FileAppender(new PatternLayout("%d %m%n"), filename, true);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////Online upload related //////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    def List getDataColumns(){
+    	List columnList = []
+    	Field.findAllByCategoryNotEqual("Catalogue of Life Taxonomy Hierarchy", [sort:"displayOrder", order:"asc"]).each {
+			def tmpList = []
+    		tmpList << it.concept
+			if(it.category)
+    			tmpList << it.category
+    		if(it.subCategory)
+    			tmpList << it.subCategory
+
+    		columnList <<  tmpList.join("|")
+    	}
+    	return columnList
+    }
+
+    File saveModifiedSpeciesFile(params){
+        try{
+        def gData = JSON.parse(params.gridData)
+        def headerMarkers = JSON.parse(params.headerMarkers)
+        def orderedArray = JSON.parse(params.orderedArray);
+        String fileName = "speciesSpreadsheet"
+        String uploadDir = "species"
+        def ext = params.xlsxFileUrl.split("\\.")[-1];
+        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+        println "=========THE SPLITED LIST ================ " + ext
+        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
+        String writeContributor = params.writeContributor.replace("\"","").trim();
+        println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+        fileName = fileName + "."+ext;
+        println "===FILE NAME CREATED ================ " + fileName
+        File file = observationService.createFile(fileName , uploadDir, contentRootDir);
+        println "=== NEW MODIFIED SPECIES FILE === " + file
+        String contEmail = springSecurityService.currentUser.email;
+        InputStream input = new FileInputStream(xlsxFileUrl);
+        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
+        return file
+        } catch(Exception e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+        }
+    }
+	
+	//////////////////////////////////////// ROLL BACK //////////////////////////////
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes)
+		
+	}
+	
+	def String abortBulkUpload(params){
+		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
+		
+		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+			log.error "Authentication failed for user " + springSecurityService.currentUser
+			return "Authentication failed for user. Please login."
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+			log.debug "Aborting in progress..." + sbu
+			sbu.updateStatus(SpeciesBulkUpload.Status.ABORTED)
+			return "Sent request for abort."
+		}else{
+			log.error "Already uploaded or aborted or roll backed " + sbu
+			return "Nothing to abort."
+		}
+	}
+	
+	def String rollBackUpload(params){
+		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
+		
+		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+			log.error "Authentication failed for user " + springSecurityService.currentUser
+			return "Authentication failed for user. Please login."
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			log.error "Already roll backed " + sbu
+			return "Already rolled back." 
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+			log.error "Roll back in progress..." + sbu
+			return "Rollback in progress..."
+		}
+		
+		sbu.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		log.debug "Changed to running status"
+		
+		SUser user = sbu.author
+		Date start = sbu.startDate
+		Date end = sbu.endDate
+		
+		//based on time stamp and user contributor get all the species fields and delete one by one
+		List sFields = SpeciesField.withCriteria(){
+			and{
+				eq('uploader', user)
+				between("lastUpdated", start, end)
+			}
+		}
+		log.debug "sFields " + sFields
+		
+		if(!sFields){
+			log.debug "Nothing to rollback"
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+			return "Nothing to rollback."
+		}
+		
+		Collection<Species> sList = getAffectedSpecies(sFields)
+		log.debug "species list " + sList
+		
+		SpeciesField.withTransaction{   
+			sFields.each { sf ->
+					log.info "Deleting ${sf}"
+					sf.delete()
+			}
+			sList.each { s->
+				rollBackSpeciesUpdate(s, sFields, user)
+			}
+			
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+		}
+		
+		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			return "Successfully Rolled back."
+		}else{
+			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
+			return "Rollback failed..."
+		}
+	}
+	
+	private Collection<Species> getAffectedSpecies(List sFields){
+		def sList = sFields.collect{it.species}
+		return sList.unique() 
+	}
+ 
+	
+	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user) throws Exception {
+		List sFieldIds = SpeciesField.findAllBySpecies(s).collect{ it.id}
+		
+		//All species field deleted before this function call
+		boolean canDelete = sFieldIds.isEmpty();
+		
+		if(canDelete){
+			log.debug "Deleting species ${s} "
+			deleteSpecies(s, user)
+			return
+		}
+		
+		log.debug "Removing species field from species ${s}"
+		sFields.each { sf ->
+			s.removeFromFields(sf)
+			def ge = GeographicEntity.read(sf.id) 
+			if(ge){
+				s.removeFromGlobalDistributionEntities(ge)
+				s.removeFromGlobalEndemicityEntities(ge)
+				s.removeFromIndianDistributionEntities(ge)
+				s.removeFromIndianEndemicityEntities(ge)
+			}
+		}
+		
+		if(!s.save()){
+			s.errors.allErrors.each { log.error it }
+		}
+	}
+	
+	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
+		try{
+			Featured.deleteFeatureOnObv(s, user)
+			s.userGroups.each { ug ->
+				ug.removeFromSpecies(s)
+				ug.save()
+			}
+			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
+				reco.taxonConcept = null
+				reco.save()
+			}
+//			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
+//				cn.delete()
+//			}
+//			Synonyms.findAllByTaxonConcept(s.taxonConcept).each { sn ->
+//				sn.delete()
+//			}
+//			TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).each { tr ->
+//				tr.delete()
+//			}
+//			SpeciesGroupMapping.findAllByTaxonConcept(s.taxonConcept).each { sgm ->
+//				sgm.delete()
+//			}
+			SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
+				sp.delete()
+			}
+			
+			s.resources?.clear()
+			s.delete()
+			log.debug "Deleted ${s}"
+			return true
+		}catch (Exception e) {
+			log.error "Error in Deleting ${s}"
+			e.printStackTrace()
+			throw e
+		}
+		return false
+	}		
 }

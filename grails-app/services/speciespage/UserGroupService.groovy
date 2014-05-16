@@ -187,10 +187,24 @@ class UserGroupService {
 	
 	private void updateHomePage(userGroup, params){
 		//on create correcting webaddress of home page in other cases(i.e update) no need to do any thing
-		if(params.action == 'save' && params.homePage){
+		if(params.homePage){
 			def page = params.homePage.tokenize('/').last().trim()
 			def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-			userGroup.homePage = uGroup.createLink(mapping:'userGroup', action:page, params:['webaddress':userGroup.webaddress])
+			if(!page.isInteger()){
+				userGroup.homePage = uGroup.createLink(mapping:'userGroup', action:page, params:['webaddress':userGroup.webaddress])
+			}else{
+				//if home page is newsletter then setting appropriate url and sticky bit true
+				userGroup.homePage = uGroup.createLink(controller:'newsletter', action:'show', id:page.toInteger())
+				if(page.isInteger()){
+					def pageObj = Newsletter.read(page.toInteger())
+					if(pageObj){
+						pageObj.sticky = true
+						if(!pageObj.save(flush:true)){
+							pageObj.errors.allErrors.each { log.error it }
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -497,6 +511,16 @@ class UserGroupService {
             query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
             count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
             break;
+            case Checklists.simpleName:
+            queryParams['isDeleted'] = false;
+            queryParams['isChecklist'] = true;
+            queryParams['isShowable'] = true;
+            query = "select count(*) from Observation obv "
+            if(userGroupInstance)
+                query += "join obv.userGroups userGroup where userGroup=:userGroup and "
+            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
+            count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
+            break;
             case Species.simpleName :
             query = "select count(*) from Species obv "
             if(userGroupInstance)
@@ -627,6 +651,7 @@ class UserGroupService {
 	private deletePermissionsAsPerRole(UserGroup userGroup, SUser user, Role role) {
 		log.debug "Deleting permissions for member ${user} who had role ${role} in group ${userGroup}"
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		switch(role.id) {
 			case founderRole.id :
@@ -635,7 +660,7 @@ class UserGroupService {
 				log.debug "Deleting write permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;
-			case memberRole.id :
+			case [memberRole.id, expertRole.id] :
 				log.debug "Deleting write permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;
@@ -762,7 +787,6 @@ class UserGroupService {
 		}
 	}
 
-
 	@PreAuthorize("hasPermission(#userGroupInstance, write)")
 	void sendMemberInvitation(userGroupInstance, members, domain, message=null) {
 		//find if the invited members are already part of the group and ignore sending invitation to them
@@ -770,7 +794,6 @@ class UserGroupService {
 		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
 		def commons = members.intersect(groupMembers);
 		members.removeAll(commons);
-
 		log.debug "Sending invitation to ${members}"
 
 		String usernameFieldName = 'name'
@@ -821,17 +844,30 @@ class UserGroupService {
 		if(userGroupInstance) {
 			queryParams['userGroupInstance'] = userGroupInstance;
 			query += " where newsletter.userGroup=:userGroupInstance"
+			def author = springSecurityService.currentUser
+			//if not logged in user or not a group founder then show only sticky pages
+			if(!author || !userGroupInstance.isFounder(author)){
+				queryParams['sticky'] = true;
+				query += " and newsletter.sticky=:sticky"
+			}
 		} else {
 			query += " where newsletter.userGroup is null"
 		}
+		
 		if(max && max != -1) {
 			queryParams['max'] = max;
 		}
 		if(offset && offset != -1) {
 			queryParams['offset'] = offset;
 		}
+        if(!sort){
+            sort = " displayOrder"
+        }
+        if(!order){
+            order = " desc"
+        }
 		if(sort) {
-			sort = sort?:"date"
+			sort = sort?:"displayOrder"
 			query += " order by newsletter."+sort
 		}
 		if(order) {
@@ -870,7 +906,16 @@ class UserGroupService {
 	}
 
 	def getGroupThemes(){
-		return ["default"]
+        def themes = ['default'];
+        File themesFile = new File(grailsApplication.config.speciesPortal.app.rootDir+'/group-themes/themes.txt');
+        if(themesFile.exists()) {
+            themesFile.eachLine { theme ->
+                themes << theme;
+            }
+        } else {
+            log.error "${themesFile.getAbsolutePath()} does not exist"
+        }
+        return themes;
 	}
 
 	def fetchHomePageTitle(UserGroup userGroupInstance){
@@ -1147,7 +1192,6 @@ class UserGroupService {
 			}
 		}
 		else {
-			println "================== sving   " + bean
 			if(!bean.save()){
 				bean.errors.allErrors.each { println  it }
 			}else{
@@ -1386,7 +1430,7 @@ class UserGroupService {
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
 			ResourceFetcher rf
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-				rf = new ResourceFetcher(params.objectType, params.filterUrl)
+				rf = new ResourceFetcher(params.objectType, params.filterUrl, params.webaddress)
 				List newList = rf.getAllResult()
 				newList.removeAll(allObvs)
 				allObvs = newList
@@ -1396,12 +1440,13 @@ class UserGroupService {
 			log.debug " All Groups " + groups
 			
 			def afDescriptionList = []
+			def currUser = springSecurityService.currentUser?:SUser.read(params.author?.toLong()) 
 			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
 				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
 				if(success){
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
-					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
 				}
 			}
@@ -1460,7 +1505,6 @@ class UserGroupService {
 					log.debug "User is author or obv is not featured in any group " + currUser
 				}
 			}
-			println "new obv  " + newObvs
 			return newObvs
 		}
 	}

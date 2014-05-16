@@ -2,10 +2,15 @@ import org.apache.commons.logging.LogFactory;
 
 import species.Field;
 import species.UserGroupTagLib;
+import species.Synonyms;
+import species.CommonNames;
+import species.TaxonomyDefinition;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
+import species.Habitat;
+import species.License;
 import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
@@ -14,6 +19,10 @@ import com.vividsolutions.jts.geom.Geometry
 import com.vividsolutions.jts.io.WKTWriter;
 import grails.converters.JSON;
 import species.participation.Featured;
+import species.TaxonomyDefinition;
+import species.TaxonomyDefinition.TaxonomyRank;
+import species.TaxonomyRegistry;
+import species.Classification;
 
 class BootStrap {
 
@@ -129,13 +138,23 @@ class BootStrap {
 	def initEmailConfirmationService() {
 		emailConfirmationService.onConfirmation = { email, uid, confirmationToken ->
 			log.info("User with id $uid has confirmed their email address $email")
-			def userToken = UserToken.findByToken(uid);
+            def userToken = UserToken.findByToken(uid);
 			if(userToken) {
 				userToken.params.tokenId = userToken.id.toString();
 				userToken.params.confirmationToken = confirmationToken;
 				def userGroupController = new UserGroupController();
-				def userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
-				return [url: userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)]
+				def userGroup = null
+                if(userToken.params.userGroupInstanceId){
+                    userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
+                }
+                def url
+                if(userToken.controller == "userGroup" || userToken.controller == "userGroupGeneric"){
+                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+                }else{
+                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+
+                }
+                return [url: url]
 			} else {
 				//TODO
 			}
@@ -162,12 +181,53 @@ class BootStrap {
             return geomStr;
         }
 
+        JSON.registerObjectMarshaller(SpeciesGroup) {
+            return ['id':it.id, 'name': it.name, 'groupOrder':it.groupOrder]
+        }
+
+        JSON.registerObjectMarshaller(Habitat) {
+            return ['id':it.id, 'name': it.name, 'habitatOrder':it.habitatOrder]
+        }
+
+        JSON.registerObjectMarshaller(License) {
+            return ['name': it.name.value(), 'url':it.name]
+        }
+
         JSON.registerObjectMarshaller(Featured) {
             if(it.userGroup) 
                 return ['createdOn':it.createdOn, 'notes': it.notes, 'userGroupId':it.userGroup.id, 'userGroupName':it.userGroup.name, 'userGroupUrl':userGroupService.userGroupBasedLink(['mapping':'userGroup', 'controller':'userGroup', 'action':'show', 'userGroup':it.userGroup])]
             else
                 return ['createdOn':it.createdOn, 'notes': it.notes]
         }
+
+        JSON.registerObjectMarshaller(Synonyms) {
+            def syn =  ['id':it.id, 'name':it.name,  'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor()]
+            if(it.relationship) {
+                syn['relationship'] = ['name':it.relationship.value()] 
+            }
+            return syn;
+        }
+
+        JSON.registerObjectMarshaller(CommonNames) {
+            def commonname = ['id':it.id, 'name':it.name, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ];
+            if(it.language) {
+                commonname ['language'] =  ['id':it.language.id, 'name':it.language.name]
+            }
+            return commonname;
+        }
+        
+        JSON.registerObjectMarshaller(TaxonomyDefinition) {
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value()]
+        }
+
+        JSON.registerObjectMarshaller(Classification) {
+            return ['id':it.classification.id, name : it.classification.name]
+        }
+
+        JSON.registerObjectMarshaller(TaxonomyRegistry) {
+            return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
+        }
+ 
     }
 
 	/**

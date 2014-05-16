@@ -40,15 +40,15 @@ import species.participation.Featured
 class AbstractObjectController {
     
     def observsationService;
-    
+   
     def related = {
-		log.debug params;
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 
 		if(relatedObv) {
 			if(relatedObv.observations)
 				relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));
 		} else {
+            log.debug "no related observations"
 		}
 		render relatedObv as JSON
 	}

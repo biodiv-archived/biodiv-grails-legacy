@@ -27,10 +27,10 @@
 		href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}" />
 </g:if>
 
-<g:if test="${params?.action !='show'}">
-    <meta name="description" content="${grailsApplication.config.speciesPortal.app.description}">
-</g:if>
 
+<g:if test="${grailsApplication.config.speciesPortal.app.googlePlusUrl}">
+	<a href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}" rel="publisher"></a>
+</g:if>	
 
 </head>
 <body>
@@ -54,7 +54,7 @@
 		<domain:showSiteFooter />
 
 	</div>
-	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>
+<%--	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>--%>
 	<r:layoutResources />
 </body>
 </html>

@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.grails.taggable.*
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 
+import species.DigestJob;
 import species.auth.Role;
+import species.participation.Digest;
 import species.auth.SUser;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
@@ -33,6 +35,7 @@ class UserGroupController {
 	def emailConfirmationService;
 	def namesIndexerService;
 	def activityFeedService;
+    def digestService;
 	
 	static allowedMethods = [save: "POST", update: "POST"]
 
@@ -595,6 +598,7 @@ class UserGroupController {
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
+            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
@@ -656,10 +660,54 @@ class UserGroupController {
 //				params: linkParams)
 //	}
 
-	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    private boolean findDesignation (user, ug, role) {
+        switch(role) {
+            case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
+                if(ug.isFounder(user)) {
+                    flash.message="${user} is already founder of this group"
+                    return true
+                }
+                else if (ug.isExpert(user)) {
+                    flash.message="${user} is already moderator of this group"
+                    return true
+                }
+                else if( ug.isMember(user)) {
+                    flash.message="${user} is already member of this group"
+                    return true
+                }
+                else {
+                    return false
+                }
+                break;
+            case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
+                if(ug.isFounder(user)) {
+                    flash.message="${user} is already founder of this group"
+                    return true
+                }
+                else if (ug.isExpert(user)) {
+                    flash.message="${user} is already moderator of this group"
+                    return true
+                }
+                else {
+                    return false
+                }
+                break;
+            case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
+                if(ug.isFounder(user)) {
+                    flash.message="${user} is already founder of this group"
+                    return true
+                }
+                else {
+                    return false
+                }
+                break;
+            	default: log.error "No proper role type defined"
+        }
+    }
+
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest() {
 		log.debug params;
-		
 		if(params.userId && params.userGroupInstanceId) {
 			def user;
 			if(params.userId == 'register') {
@@ -668,20 +716,36 @@ class UserGroupController {
 				user = SUser.read(params.userId.toLong())
 			}
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
-			if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder())) {
+            //Founder can approve for all 3 roles here
+            //Expert can only approve for member and expert
+            //expert is not getting a mail to confirm for founder so it works fine
+			//Same func also used to accept invitation--important
+            if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder() || userGroupInstance.isExpert())) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
-						if(userGroupInstance.addMember(user)) {
-							flash.message="Successfully added ${user} to this group as member"
+					    boolean b = findDesignation(user, userGroupInstance, params.role)
+                        if(b) {
+                            break;
+                        }
+                        if(userGroupInstance.addMember(user)) {
+                            flash.message="Successfully added ${user} to this group as member"
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
-						if(userGroupInstance.addFounder(user)) {
+						boolean b = findDesignation(user, userGroupInstance, params.role)
+                        if(b) {
+                            break;
+                        }
+                        if(userGroupInstance.addFounder(user)) {
 							flash.message="Successfully added ${user} to this group as founder"
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
-						if(userGroupInstance.addExpert(user)) {
+						boolean b = findDesignation(user, userGroupInstance, params.role)
+                        if(b) {
+                            break;
+                        }
+                        if(userGroupInstance.addExpert(user)) {
 							flash.message="Successfully added ${user} to this group as a moderator"
 						}
 						break;
@@ -726,15 +790,16 @@ class UserGroupController {
 		flash.error = 'Your presence is important to us. Cannot let you leave at present.'
 		render (['msg':'Your presence is important to us. Cannot let you leave at present.', 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
 	}
+   
 
-	def about = {
+	def about() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
 		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount()]
 	}
 
-	def getRelatedUserGroups = {
+	def getRelatedUserGroups() {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
@@ -761,7 +826,7 @@ class UserGroupController {
 		render r as JSON
 	}
 
-	def getFeaturedUserGroups = {
+	def getFeaturedUserGroups() {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
@@ -879,7 +944,7 @@ class UserGroupController {
 		}
 	}
 
-	def getFeaturedObservations = {
+	def getFeaturedObservations() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
@@ -901,7 +966,7 @@ class UserGroupController {
 		render r as JSON
 	}
 
-	def getFeaturedMembers = {
+	def getFeaturedMembers() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
@@ -925,7 +990,7 @@ class UserGroupController {
 		render r as JSON
 	}
 
-	def getUserUserGroups = {
+	def getUserUserGroups() {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
@@ -953,28 +1018,28 @@ class UserGroupController {
 		render r as JSON
 	}
 	
-	def actionsHeader = {
+	def actionsHeader() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (template:"/common/userGroup/actionsHeaderTemplate", model:['userGroupInstance':userGroupInstance]);
 	}
 
-	def pages = {
+	def pages() {
 		log.debug params
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
 		render (view:"pages", model:['userGroupInstance':userGroupInstance, 'newsletters':newsletters])
-	}
+	} 
 	
-	def page = {
+	def page() {
 		log.debug params;
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.id])
-	}
+	} 
 	
-	def pageCreate = {
+	def pageCreate() {
 		log.debug params;
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
@@ -988,7 +1053,7 @@ class UserGroupController {
 	/**
 	 *
 	 */
-	def search = {
+	def search() {
 		log.debug params;
 		
 		def model = getUserGroupList(params);
@@ -1009,7 +1074,7 @@ class UserGroupController {
 	/**
 	* Ajax call used by autocomplete textfield.
 	*/
-   def nameTerms = {
+   def nameTerms() {
 	   log.debug params
 
 	   params.max = Math.min(params.max ? params.int('max') : 5, 10);
@@ -1023,40 +1088,40 @@ class UserGroupController {
 	   render jsonData as JSON
    }
       
-   def allGroups = {
+   def allGroups() {
 	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'allGroups', model:['userGroupInstance':userGroupInstance])
    }
    
-   def myGroups = {
+   def myGroups() {
 	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
    
-   def suggestedGroups = {
+   def suggestedGroups() {
 	   log.debug params;
 	   def gList = userGroupService.getSuggestedUserGroups(null)
 	   def res =[suggestedGroupsHtml: g.render(template:"/common/userGroup/showSuggestedUserGroupsListTemplate", model:['userGroups':gList])];
 	   render res as JSON
    }
 
-//   def species = {
+//   def species() {
 //	   log.debug params;
 //	   def userGroupInstance = findInstance(params.id, params.webaddress)
 //	   if (!userGroupInstance) return;
 //	   render (view:'species', model:['userGroupInstance':userGroupInstance, params:params])
 //   }
 
-   def tags = {
+   def tags() {
 	   log.debug params;
 	   render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
    }
    
-   def bulkPost = {
+   def bulkPost() {
 	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
        def resObj = r.remove('resourceObj')
@@ -1067,11 +1132,15 @@ class UserGroupController {
 	   
        r['msg'] = "${message(code:r.remove('msgCode'))}"
 	   render r as JSON
-   }
+   } 
    /////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////To create and add user to a specific group (i.e BirdRace)////////////////
    /////////////////////////////////////////////////////////////////////////////////////////////
-   
+  
+   /**
+   * add member can only be done when a user who has 
+   * BasePermission.ADMINISTRATOR i.e., founder runs this code
+   */
    @Secured(['ROLE_USER'])
    def addUserToGroup() {
 	   log.debug params
@@ -1233,7 +1302,51 @@ class UserGroupController {
 	   }
 	   return [oldUsers, newUsers]
    }
-      
+  
+    @Secured(['ROLE_ADMIN'])
+    def sendSampleDigest() {
+        println "=====STARTING SENDING SAMPLE EMAIL======"
+        def digest = Digest.get(1L)
+        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4136L)]
+        println "==USERSMAIL LIST========= "  + usersEmailList
+        def setTime = params.setTime?params.setTime.toBoolean():false
+        println "=====SET TIME ===== " + setTime
+        digestService.sendDigest(digest, usersEmailList, setTime);
+        println "==========SAMPLE EMAILS SENT============"
+    }
+    
+    @Secured(['ROLE_ADMIN'])
+    def sendDigest() {
+        println "=====STARTING SENDING DIGEST MAIL TO ALL TREES INDIA MEMBERS======"
+        /*
+        def digest = Digest.get(1L)
+        def setTime = params.setTime?params.setTime.toBoolean():true
+        digestService.sendDigestWrapper(digest, setTime);
+        */
+        digestService.sendDigestAction()
+        println "==========ALL DIGEST EMAILS SENT============"
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def sendSampleDigestPrizeEmail() {
+        println "=====STARTING SAMPLE DIGEST PRIZE EMAIL======"
+        /*
+        def digest = Digest.get(1L)
+        def setTime = params.setTime?params.setTime.toBoolean():true
+        digestService.sendDigestWrapper(digest, setTime);
+        */
+        def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4136L)]
+        digestService.sendSampleDigestPrizeEmail(usersEmailList)
+        println "==========ALL DIGEST EMAILS SENT============"
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def sendDigestPrizeEmail() {
+        println "=====STARTING SENDING DIGEST PRIZE MAIL TO ALL TREES INDIA MEMBERS======"
+        digestService.sendDigestPrizeEmail()
+        println "==========ALL DIGEST EMAILS SENT============"
+    }
+
 }
 
 class UserGroupCommand {

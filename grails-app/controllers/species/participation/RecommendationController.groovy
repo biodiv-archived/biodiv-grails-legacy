@@ -131,7 +131,8 @@ class RecommendationController {
     */
     def getRecos = {
         log.debug params;
-        def names = JSON.parse(params.names);
+        
+        def names = params.names?JSON.parse(params.names):null;
         def recoInfos = recommendationService.getRecosForNames(names)
         def result = new HashMap(recoInfos.size())
         recoInfos.each { key, recoInfo ->

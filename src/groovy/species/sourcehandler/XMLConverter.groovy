@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.FetchMode;
 
 import species.Classification
 import species.CommonNames
@@ -31,6 +32,8 @@ import species.groups.SpeciesGroup;
 import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
+import species.auth.SUser
+
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
 
@@ -94,12 +97,14 @@ class XMLConverter extends SourceConverter {
             log.info "Creating/Updating species"
             log.debug species;
             s = new Species();
-
             removeInvalidNode(species);
 
             //sciName is must for the species to be populated
             Node speciesNameNode = species.field.find {it.subcategory.text().equalsIgnoreCase(fieldsConfig.SCIENTIFIC_NAME);}
-            def speciesName = getData(speciesNameNode?.data);
+
+            //XXX: sending just the first element need to decide on this if list has multiple elements
+            def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
+			addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
             if(speciesName) {
                 //getting classification hierarchies and saving these taxon definitions
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
@@ -109,8 +114,7 @@ class XMLConverter extends SourceConverter {
 
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
-                s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName);
-
+                s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, TaxonomyRank.SPECIES.ordinal());
                 if(s.taxonConcept) {
 
                     s.title = s.taxonConcept.italicisedForm;
@@ -124,32 +128,36 @@ class XMLConverter extends SourceConverter {
                     //either overwrite or merge if an existing species exists
                     if(existingSpecies) {
                         if(defaultSaveAction == SaveAction.OVERWRITE || existingSpecies.percentOfInfo == 0){
-                            log.info "Deleting old version of species : "+existingSpecies.id;
+                            log.info "Cleraring old version of species : "+existingSpecies.id;
                             try {
-                                s.id = existingSpecies.id;
-                                if(!existingSpecies.delete(flush:true)) {
-                                    existingSpecies.errors.allErrors.each { log.error it }
-                                }
+								existingSpecies.clearBasicContent()
+								s = existingSpecies;
                             }
                             catch(org.springframework.dao.DataIntegrityViolationException e) {
                                 e.printStackTrace();
-                                log.error "Could not delete species ${existingSpecies.id} : "+e.getMessage();
-                                return;
+                                log.error "Could not clear species ${existingSpecies.id} : "+e.getMessage();
+								addToSummary("Could not clear species ${existingSpecies.id} : "+e.getMessage())
+								addToSummary(e);
+								return;
                             }
                         } else if(defaultSaveAction == SaveAction.MERGE){
                             log.info "Merging with already existing species information : "+existingSpecies.id;
                             //mergeSpecies(existingSpecies, s);
                             s = existingSpecies;
-                            s.resources.clear();
+                            s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
+							addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
                             return;
                         }
                     }
 
                     List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
                     log.debug "Resources ${resources}"
-                    resources.each { s.addToResources(it); }
+                    resources.each { 
+						it.saveResourceContext(s)
+						s.addToResources(it); 
+					}
 
                     List<Synonyms> synonyms;
 
@@ -157,6 +165,7 @@ class XMLConverter extends SourceConverter {
                         if(fieldNode.name().equals("field")) {
                             if(!isValidField(fieldNode)) {
                                 log.warn "NOT A VALID FIELD : "+fieldNode;
+								addToSummary("NOT A VALID FIELD : "+fieldNode)
                                 continue;
                             }
 
@@ -170,7 +179,8 @@ class XMLConverter extends SourceConverter {
                             } else if(category && category.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
                                 //synonyms.each { s.addToSynonyms(it); }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+                            }
+							 else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
@@ -191,7 +201,7 @@ class XMLConverter extends SourceConverter {
                                         s.addToIndianDistributionEntities(it);
                                     }
                                 }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+                            }	else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
@@ -199,7 +209,8 @@ class XMLConverter extends SourceConverter {
                                     }
                                 }
 
-                            } else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
+                            } 
+							else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
                                 //ignore
                                 println "ignoring hierarchy" 
                             } else {
@@ -215,7 +226,7 @@ class XMLConverter extends SourceConverter {
                     }
 
                     //adding taxonomy classifications
-                    taxonHierarchy.each { s.addToTaxonomyRegistry(it); }
+                    taxonHierarchy.each {it.save();}
 
                     //					if(defaultSaveAction == SaveAction.MERGE){
                     //						log.info "Merging with already existing species information : "+existingSpecies.id;
@@ -226,14 +237,17 @@ class XMLConverter extends SourceConverter {
                     s.reprImage = null;
                     return s;
                 } else {
-                    log.error "TaxonConcept is not found"
+					log.error "TaxonConcept is not found"
+					addToSummary("TaxonConcept is not found")
                 }
             } else {
                 log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
+				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
             }
         } catch(Exception e) {
             log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
             e.printStackTrace();
+			addToSummary(e);
         }
     }
 
@@ -246,6 +260,7 @@ class XMLConverter extends SourceConverter {
             if(fieldNode.name().equals("field")) {
                 if(!isValidField(fieldNode)) {
                     log.warn "NOT A VALID FIELD. IGNORING : "+fieldNode;
+					addToSummary("NOT A VALID FIELD. IGNORING : "+fieldNode)
                     fieldNode.parent().remove(fieldNode);
                     continue;
                 }
@@ -272,6 +287,15 @@ class XMLConverter extends SourceConverter {
     }
 
     /**
+    */
+    public SpeciesField createSpeciesField(Species s, Field field, String text, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
+        Node fieldNode = createFieldNode(field);
+        createDataNode(fieldNode, text, contributors, attributions, licenses, audiences, status); 
+
+        return createSpeciesFields(s, fieldNode, SpeciesField.class, null, null, null, null, []) [0]
+    }
+
+    /**
      * 
      * @param fieldNode
      * @param sFieldClass
@@ -284,25 +308,32 @@ class XMLConverter extends SourceConverter {
     private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode, List<Synonyms> synonyms) {
         log.debug "Creating species field from node : "+fieldNode;
         List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
-        def field = getField(fieldNode, false);
+        Field field = getField(fieldNode, false);
         if(field == null) {
             log.warn "NO SUCH FIELD : "+field?.name;
+			addToSummary("NO SUCH FIELD : "+field?.name)
             return;
         }
       
         List sFields = [];
         
-         if(s.isAttached()) {
+         if(s.isAttached() && field) {
              sFields = SpeciesField.withCriteria() {
                 eq("field", field)
                 eq('species', s)
+				fetchMode 'references', FetchMode.JOIN
+				fetchMode 'contributors', FetchMode.JOIN
+				fetchMode 'licenses', FetchMode.JOIN
+				fetchMode 'audienceTypes', FetchMode.JOIN
+				fetchMode 'resources', FetchMode.JOIN
+				fetchMode 'attributors', FetchMode.JOIN
             }
         }
 
         for(Node dataNode : fieldNode.data) {
             String data = getData(dataNode);
             data = cleanData(data, s.taxonConcept, synonyms);
-            List<Contributor> contributors = getContributors(dataNode, true);
+            List<SUser> contributors = getUserContributors(dataNode);
             List<License> licenses = getLicenses(dataNode, false);
             List<AudienceType> audienceTypes = getAudienceTypes(dataNode, true);
             List<Resource> resources = getResources(dataNode, imagesNode, iconsNode, audiosNode, videosNode);
@@ -314,49 +345,50 @@ class XMLConverter extends SourceConverter {
             //TODO:HACK just for keystone
             String dt = data.replaceAll("</?p>","");
             for (sField in sFields) {
-                if(isDuplicateSpeciesField(sField,contributors, dt)) {
+                if(isDuplicateSpeciesField(sField, contributors, attributors,  dt)) {
                     log.debug "Found already existing species fields for field ${field} ${sField}"
                     temp << sField;
                 }
             }
 
-            println "Found duplicate fields ${temp}"
+            log.debug "Found duplicate fields ${temp}"
 
-                if(dataNode.action?.text()?.trim() == "merge") {
-                    for(sField in temp) {
+            if(dataNode.action?.text()?.trim() == "merge") {
+                for(sField in temp) {
 
                     //HACK for deleting keystone fields with different content and contributor 
                     /*if(dt.equals(sField.description.replaceAll("</?p>",""))) {
-                        println "Deleting same description field"
-                        s.removeFromFields(sField);
-                        sField.delete();
+                      println "Deleting same description field"
+                      s.removeFromFields(sField);
+                      sField.delete();
 
-                    } else*/ if(sField.description.contains(dt)){
-                        log.debug "Field already contains given text"
-                    } else {
-                        log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
-                        data = sField.description + "<br/>" + data
-                        speciesField = sField
-                    }
-                    }
-                } else {
-                    for(sField in temp) {
-
-                        //HACK for deleting keystone fields with different content and contributor 
-                        /*if(!dt.equals(sField.description.replaceAll("</?p>",""))) {
-                            println "Deleting different description field & retaining new description field"
-                            s.removeFromFields(sField);
-                            sField.delete()
-                        } else {*/
-                            speciesField = sField
-                       // }
-                    }
+                      } else*/ if(sField.description.contains(dt)){
+                          log.debug "Field already contains given text"
+                      } else {
+                          log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
+                          data = sField.description + "<br/>" + data
+                          speciesField = sField
+                      }
                 }
+            } else {
+                for(sField in temp) {
+
+                    //HACK for deleting keystone fields with different content and contributor 
+                    /*if(!dt.equals(sField.description.replaceAll("</?p>",""))) {
+                      println "Deleting different description field & retaining new description field"
+                      s.removeFromFields(sField);
+                      sField.delete()
+                      } else {*/
+                    speciesField = sField
+                    // }
+                }
+            }
 
             if(!speciesField) {
-                log.debug "Adding new field to species ${s}"
+                log.debug "Adding new field to species ${s} ===  " + "  field " + field + "  data " + data
+				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
                 speciesField = sFieldClass.newInstance(field:field, description:data);
-            } else {
+		    } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
                 //TODO: Will have to clean up orphaned entries from following tables
@@ -365,25 +397,32 @@ class XMLConverter extends SourceConverter {
                 speciesField.audienceTypes?.clear()
                 speciesField.attributors?.clear()
                 speciesField.resources?.clear()
-                speciesField.references?.clear()
+				speciesField.references?.clear()
             }
-
-            if(speciesField && contributors) {
-                contributors.each { speciesField.addToContributors(it); }
+			
+		    if(speciesField && contributors) {
+                contributors.each {speciesField.addToContributors(it); }
                 licenses.each { speciesField.addToLicenses(it); }
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
-                resources.each {  speciesField.addToResources(it); }
+                resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
                 references.each { println it; speciesField.addToReferences(it); }
-                speciesFields.add(speciesField);
-                println "----${speciesField.field.category}......${speciesField.contributors}"
+				speciesFields.add(speciesField);
             } else {
-                log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS"
+                log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
+				addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }			
         }
+        println speciesFields
         return speciesFields;
-    }
+    } 
 
+	private String getData(NodeList dataNodes) {
+		//log.info "It should be one node only but got list of nodes " + dataNodes
+		if(!dataNodes) return "";
+		return getData(dataNodes[0]);
+	}
+	
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
@@ -391,17 +430,18 @@ class XMLConverter extends SourceConverter {
     }
 
     /**
-    * A field is duplicate if atleast one of the contributors is same.
+    * A field is duplicate if contributor and attributor are exactly same.
     * 
     **/
-    private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, data) {
-        for(c1 in sField.contributors) {
-            for(c2 in contributors) {
-                if(c1.id == c2.id) {
-                    return true;
-                }
-            }
-        }
+    private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, attributors, data) {
+		return (new HashSet(sField.contributors) == new HashSet(contributors)) && (new HashSet(sField.attributors) == new HashSet(attributors))
+//        for(c1 in sField.contributors) {
+//            for(c2 in contributors) {
+//                if(c1.id == c2.id) {
+//                    return true;
+//                }
+//            }
+//        }
 
         /**
         * Hack to find duplicate where conributor is not specified or specified to be dummy
@@ -461,6 +501,10 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private Field getField(Node fieldNode, boolean createNew) {
+        if(fieldNode.fieldInstance) {
+            return fieldNode.fieldInstance[0].value();
+        }
+
         String concept = fieldNode.concept?.text()?.trim();
         String category = fieldNode.category?.text()?.trim();
         String subCategory = fieldNode.subcategory?.text()?.trim();
@@ -501,10 +545,31 @@ class XMLConverter extends SourceConverter {
                 contributors.add(contributor);
             } else {
                 log.warn "NOT A VALID CONTIBUTOR : "+contributorName;
+				addToSummary("NOT A VALID CONTIBUTOR : "+contributorName)
             }
         }
         return contributors;
     }
+	
+	private List<SUser> getUserContributors(NodeList dataNodes ) {
+		//log.info "It should be one node only but got list of nodes " + dataNodes
+		return getUserContributors(dataNodes[0])
+	}
+	
+	private List<SUser> getUserContributors(Node dataNode) {
+		List<SUser> contributors = new ArrayList<SUser>();
+		dataNode.contributor.each {
+			String contributorEmail = it.text()?.trim();
+			SUser contributor = SUser.findByEmail(contributorEmail)
+			if(contributor) {
+				contributors.add(contributor);
+			} else {
+				log.warn "NOT A VALID CONTIBUTOR : "+contributorEmail;
+				addToSummary("NOT A VALID CONTIBUTOR : "+contributorEmail)
+			}
+		}
+		return contributors;
+	}
 
     /**
      * 
@@ -540,6 +605,7 @@ class XMLConverter extends SourceConverter {
                 licenses.add(license);
             } else {
                 log.warn "NOT A SUPPORTED LICENSE TYPE: "+licenseType;
+				addToSummary("NOT A SUPPORTED LICENSE TYPE: "+licenseType)
             }
         }
 
@@ -600,6 +666,7 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.add(audienceType);
             } else {
                 log.warn "NOT A SUPPORTED AUDIENCE TYPE: "+audienceType;
+				addToSummary("NOT A SUPPORTED AUDIENCE TYPE: "+audienceType)
             }
         }
         return audienceTypes;
@@ -705,16 +772,18 @@ class XMLConverter extends SourceConverter {
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
+				addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
             }
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-            if(!imageFile.exists()) {
+			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-                    ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+					ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                 } catch(FileNotFoundException e) {
                     log.error "File not found : "+tempFile.absolutePath;
+					addToSummary("File not found : "+tempFile.absolutePath)
                 }
             }
 
@@ -757,10 +826,11 @@ class XMLConverter extends SourceConverter {
 
             //s.addToResources(res);
             imageNode.appendNode("resource", res);
-            log.debug "Successfully created resource";
+            log.debug "Successfully created resource " + res;
             return res;
         } else {
             log.error "File not found : "+tempFile?.absolutePath;
+			addToSummary("File not found : "+tempFile?.absolutePath)
         }
     }
 
@@ -770,7 +840,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     File getImageFile(Node imageNode, String imagesDir="") {
-        String fileName = imageNode?.fileName?.text()?.trim();
+		String fileName = imageNode?.fileName?.text()?.trim();
         String sourceUrl = imageNode.source?.text();
         if(!fileName && !sourceUrl) return;
 
@@ -794,7 +864,7 @@ class XMLConverter extends SourceConverter {
                 }
                 try {
                     tempFile = HttpUtils.download(sourceUrl, tempdir, false);
-                } catch (FileNotFoundException e) {
+                } catch (Exception e) {
                     log.error e.getMessage();
                     tempFile = null;
                 }
@@ -894,11 +964,10 @@ class XMLConverter extends SourceConverter {
     private List<Resource> getResources(Node dataNode, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
         List<Resource> resources = new ArrayList<Resource>();
         List<Resource> res =  getImages(dataNode.images?.image, imagesNode);
-        if(res) resources.addAll(res);
-        res =  getImages(dataNode.icons?.icon, iconsNode);
-        if(res) resources.addAll(res);
-
-        log.debug "Getting resources for dataNode : "+resources;
+		if(res) resources.addAll(res);
+		res =  getImages(dataNode.icons?.icon, iconsNode);
+		if(res) resources.addAll(res);
+		log.debug "Getting resources for dataNode : "+resources;
         return resources;
     }
 
@@ -909,7 +978,7 @@ class XMLConverter extends SourceConverter {
         imagesRefNode.each {
             String fileName = it?.text()?.trim();
             def imageNode = imagesNode.image.find { it?.refKey?.text()?.trim() == fileName };
-println imageNode;
+			myPrint("========== image node  " + imageNode);
 
             if(imageNode) {
                 def res;
@@ -921,6 +990,7 @@ println imageNode;
                     resources.add(res);
                 } else {
                     log.error "IMAGE NOT FOUND : "+imageNode
+					addToSummary("IMAGE NOT FOUND : "+imageNode)
                 }
 
             } else {
@@ -928,15 +998,16 @@ println imageNode;
                 if(tempFile) {
                     //check if the fileName is a physical file on disk and create a resource from it
                     def resource = createImage(it, s.taxonConcept.canonicalForm, ResourceType.IMAGE);
-                    if(resource) {
-                        return [resource];
+				    if(resource) {
+                        resources.add(resource)
                     }
                 } else {
                     log.error "COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}"
+					addToSummary("COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}")
                 }
             }
         }
-        return resources;
+		return resources;
     }
 
     //	private List<Resource> getIcons(Node dataNode, Node iconsNode) {
@@ -1089,7 +1160,7 @@ println imageNode;
             }
 
             if(!sfield) {
-                log.debug "Saving common name : "+n.text();
+                log.debug "Saving common name :"+n.text();
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
@@ -1097,11 +1168,17 @@ println imageNode;
                     sfield.language = lang;
                 else {
                     log.warn "NOT A SUPPORTED LANGUAGE: " + n.language;
+					addToSummary("NOT A SUPPORTED LANGUAGE: " + n.language)
                 }
+				
                 if(!sfield.save(flush:true)) {
-                    sfield.errors.each { log.error it }
+					sfield.errors.each { log.error it }
                 }
             }
+			
+			//adding contributors to common name
+			sfield.updateContributors(getUserContributors(n))
+			
             commonNames.add(sfield);
         }
         return commonNames;
@@ -1149,7 +1226,7 @@ println imageNode;
      * @param fieldNode
      * @return
      */
-    private List<Synonyms> createSynonyms(Node fieldNode, TaxonomyDefinition taxonConcept) {
+    List<Synonyms> createSynonyms(Node fieldNode, TaxonomyDefinition taxonConcept) {
         log.debug "Creating synonyms";
         List<Synonyms> synonyms = new ArrayList<Synonyms>();
         //List<SpeciesField> sfields = createSpeciesFields(fieldNode, Synonyms.class, null, null, null, null,null);
@@ -1160,10 +1237,13 @@ println imageNode;
                 def parsedNames = namesParser.parse([cleanName]);
                 def sfield = saveSynonym(parsedNames[0], rel, taxonConcept);
                 if(sfield) {
-                    synonyms.add(sfield);
+					//adding contributors
+					sfield.updateContributors(getUserContributors(n))
+		            synonyms.add(sfield);
                 }
             } else {
                 log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
+				addToSummary("NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text())
             }
         }
         return synonyms;
@@ -1199,6 +1279,7 @@ println imageNode;
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
+			addToSummary("Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name)
         }
 
     }
@@ -1247,9 +1328,11 @@ println imageNode;
                     }
                 } else {
                     log.warn "NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text();
+					addToSummary("NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text())
                 }
             } else {
                 log.error " NO COUNTRY IS SPECIFIED in $c"
+				addToSummary(" NO COUNTRY IS SPECIFIED in $c")
             }
         }
         return geographicEntities;
@@ -1259,7 +1342,7 @@ println imageNode;
      * Creating the given classification entries hierarchy.
      * Saves any new taxondefinition found 
      */
-    private List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
+     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
         log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         def taxonHierarchies = new ArrayList();
@@ -1294,30 +1377,37 @@ println imageNode;
      * @param scientificName
      * @return
      */
-    private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
+    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
         log.debug "Getting classification hierarchy : "+classification.name;
 
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
 
         List<String> names = new ArrayList<String>();
         List<TaxonomyDefinition> parsedNames;
+        List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
+
         fieldNodes.each { fieldNode ->
+            println fieldNode
+            println fieldNode.data
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
-                def cleanSciName = cleanSciName(scientificName);
+                def cleanSciName = Utils.cleanSciName(scientificName);
                 name = cleanSciName
             } else {
-                name = cleanSciName(name);
+                name = Utils.cleanSciName(name);
             }
             if(name) {
-                names.add(name);
+                names.putAt(rank, name);
             }
+            sortedFieldNodes.putAt(rank, fieldNode)
         }
         parsedNames = namesParser.parse(names);
+        fieldNodes = sortedFieldNodes;
 
         int i=0;
         fieldNodes.each { fieldNode ->
+            if(fieldNode) {
             log.debug "Adding taxonomy registry from node: "+fieldNode;
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             String name = getData(fieldNode.data);
@@ -1348,8 +1438,11 @@ println imageNode;
                         if(!taxon.save()) {
                             taxon.errors.each { log.error it }
                         }
+						taxon.updateContributors(getUserContributors(fieldNode.data))
                     } else if(taxon.name != parsedName.name) {
-                        saveSynonym(parsedName, getRelationship(null), taxon);
+                        def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+						if(synonym)
+							synonym.updateContributors(getUserContributors(fieldNode.data))
                     }
 
 
@@ -1369,6 +1462,7 @@ println imageNode;
 
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
+						registry.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(registry);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;
@@ -1377,13 +1471,16 @@ println imageNode;
                         } else {
                             log.debug "Saved taxon registry entity : "+ent;
                         }
+						ent.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(ent);
                     }
 
 
                 } else {
                     log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
+					addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                 }
+            }
             }
         }
         //		if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {
@@ -1463,21 +1560,21 @@ println imageNode;
      * @param s
      * @return
      */
-    TaxonomyDefinition getTaxonConceptFromName(String sciName) {
-        def cleanSciName = cleanSciName(sciName);
+    TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank) {
+        def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
             List name = namesParser.parse([cleanSciName])
             if(name[0].normalizedForm) {
                 def taxonCriteria = TaxonomyDefinition.createCriteria();
                 TaxonomyDefinition taxon = taxonCriteria.get {
-                    eq("rank", TaxonomyRank.SPECIES.ordinal());
+                    eq("rank", rank);
                     ilike("canonicalForm", name[0].canonicalForm);
                 }
 
                 if(!taxon) {
                     taxon = name[0];
-                    taxon.rank = TaxonomyRank.SPECIES.ordinal();
+                    taxon.rank = rank;
                     if(!taxon.save(flush:true)) {
                         taxon.errors.each { log.error it }
                     }
@@ -1495,11 +1592,21 @@ println imageNode;
      * @return
      */
     static Species findDuplicateSpecies(s) {
-        def species = Species.findByGuid(s.guid);
+        def species = Species.withCriteria() {
+                eq("guid", s.guid);
+				fetchMode 'userGroups', FetchMode.JOIN
+				fetchMode 'resources', FetchMode.JOIN
+				fetchMode 'fields', FetchMode.JOIN
+				fetchMode 'globalDistributionEntities', FetchMode.JOIN
+				fetchMode 'globalEndemicityEntities', FetchMode.JOIN
+				fetchMode 'indianDistributionEntities', FetchMode.JOIN
+				fetchMode 'indianEndemicityEntities', FetchMode.JOIN
         //		if(!species.isAttached()) {
         //			species.attach();
         //		}
-        return species
+        }
+		if(species)
+			return species[0]
     }
 
     /**
@@ -1521,18 +1628,6 @@ println imageNode;
         //				synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
         //				taxonomyRegistry;
 
-    }
-
-    private String cleanSciName(String scientificName) {
-        def cleanSciName = Utils.cleanName(scientificName);
-        if(cleanSciName =~ /s\.\s*str\./) {
-            cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
-        }
-
-        if(cleanSciName.indexOf(' ') == -1) {
-            cleanSciName = cleanSciName.toLowerCase().capitalize();
-        }
-        return cleanSciName;
     }
 
     /**

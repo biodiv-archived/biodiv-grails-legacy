@@ -15,8 +15,11 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 import species.auth.SUser;
+import species.participation.Observation;
 import species.utils.Utils;
 import speciespage.search.SUserSearchService;
+import species.SpeciesPermission;
+import species.SpeciesPermission.PermissionType;
 
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
@@ -25,7 +28,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def springSecurityService
 	def mailService
 	def SUserSearchService
-	private ApplicationTagLib g
+	def speciesPermissionService
+    private ApplicationTagLib g
 	ApplicationContext applicationContext
 
 	public static final String NEW_USER = "newUser";
@@ -124,6 +128,21 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	boolean ifOwns(SUser user) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
+    
+    boolean hasObvLockPerm(obvId) {
+        def observationInstance = Observation.get(obvId.toLong());
+        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+    }
+
+    boolean permToReorderPages(uGroup){
+        if(uGroup){
+            return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || uGroup.isFounder(springSecurityService.currentUser))
+        }
+        else{
+            return  springSecurityService.isLoggedIn() && SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        }
+    }
 
 	boolean ifOwns(id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
@@ -163,7 +182,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					try {
 						mailService.sendMail {
 							to user.email
-				            if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+				            if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 	                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                             }
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
@@ -189,7 +208,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
 
-				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 					try {
 						mailService.sendMail {
 	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()

@@ -41,7 +41,6 @@ class ResourceController {
 		def activeFilters = filteredResource.activeFilters
 		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
 		def count = Resource.count()
-	println resourceInstanceList
 		return [resourceInstanceList: resourceInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 	

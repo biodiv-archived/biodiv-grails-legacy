@@ -118,8 +118,7 @@ class ActionController {
 
         if(ugParam != null && params.notes && obv) {
             List splitGroups = [];
-           println ugParam 
-             if(ugParam && ugParam.length() > 0){
+            if(ugParam && ugParam.length() > 0){
                 splitGroups = ugParam.split(",")
                  if(ugParam[-1] == ',') {//TODO:CHECK THIS
                     splitGroups.add("")
@@ -133,7 +132,6 @@ class ActionController {
             def featuredInstance;
             UserGroup.withTransaction() {
                 groups.each { ug ->
-                    println ug
                    if(ug == null) {
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }
@@ -304,42 +302,55 @@ class ActionController {
 	@Secured(['ROLE_USER'])
 	def flagIt() { 
         log.debug params;
-		params.author = springSecurityService.currentUser;
-		def obv = activityFeedService.getDomainObject(params.type,params.id);     
-		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());    
-		def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);
-		if (!flagInstance) {
-			try {
-				flagInstance = new Flag(objectId: params.id.toLong(),objectType: params.type, author: params.author, flag:flag, notes:params.notes)
-				flagInstance.save(flush: true)
-				if(!flagInstance.save(flush:true)){
-                    flagInstance.errors.allErrors.each { println it }
-			        return null
-		        }
-                def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
-                obv.flagCount++
-				obv.save(flush:true)
-				def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
-                searchIndex(params.type,obv)				
-				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
-				flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'flag.error', default: 'Error during addition of flag')}"   ///change message
-			}
-		}
-		else {
-			flash.message  = "${message(code: 'flag.duplicate', default:'Already flagged')}"    ///change message
-		}
-        def r = ["success":true]
-        def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
-        def flagListUsersHTML = g.render(template:"/common/observation/flagListUsersTemplate" ,model:['observationInstance':observationInstance])
-	    def msg = "Flagged..."
-        r['msg'] = msg
+        params.author = springSecurityService.currentUser;
+        def r = [:]
+        def msg =''
+        if(params.type && params.obvFlag) { 
+            def obv = activityFeedService.getDomainObject(params.type,params.id);     
+            FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.DETAILS_INAPPROPRIATE.name());    
+            def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);
+            if (!flagInstance) {
+                try {
+                    flagInstance = new Flag(objectId: params.id.toLong(),objectType: params.type, author: params.author, flag:flag, notes:params.notes)
+                    flagInstance.save(flush: true)
+                    if(!flagInstance.save(flush:true)){
+                        flagInstance.errors.allErrors.each { println it }
+                        return null
+                    }
+                    def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
+                    obv.flagCount++
+                    obv.save(flush:true)
+                    def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
+                    searchIndex(params.type,obv)				
+                    observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
+                    flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
+                    msg = "Flagged..."
+                }
+                catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    flash.message = "${message(code: 'flag.error', default: 'Error during addition of flag')}"   ///change message
+                }
+            }
+            else {
+                msg = "You have already flagged it!!"
+                flash.message  = "${message(code: 'flag.duplicate', default:'Already flagged')}"    ///change message
+            }
+            r["success"] = true;
+            def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
+            def flagListUsersHTML = g.render(template:"/common/observation/flagListUsersTemplate" ,model:['observationInstance':observationInstance])
+            
+            r['msg'] = msg
 
-        r['flagListUsersHTML'] = flagListUsersHTML
-	    render r as JSON
-	}
+            r['flagListUsersHTML'] = flagListUsersHTML
+        }else if(params.ajax_login_error == "1") {
+            r["success"] = true;
+            r["status"] = 401;
+        }
+        else {
+            r["suucess"] = true;
+        }
+
+        render r as JSON
+    }
 
 	@Secured(['ROLE_USER'])
 	def deleteFlag() {

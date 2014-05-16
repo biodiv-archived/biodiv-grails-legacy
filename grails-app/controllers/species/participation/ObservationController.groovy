@@ -102,6 +102,8 @@ class ObservationController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else {
+
+			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
@@ -195,7 +197,7 @@ class ObservationController extends AbstractObjectController {
 	def update() {
 		def observationInstance = Observation.get(params.id?.toLong())
 		if(observationInstance)	{
-			saveAndRender(params, false)
+			saveAndRender(params, true)
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -255,7 +257,8 @@ class ObservationController extends AbstractObjectController {
 	 * @param pos
 	 * @return
 	 */
-	private def getPrevNextObservations(int pos, String userGroupWebaddress) {
+	def getPrevNextObservations(int pos, String userGroupWebaddress) {
+		if(pos == null) pos = 0;
 		String listKey = "obv_ids_list";
 		String listParamsKey = "obv_ids_list_params"
 		if(userGroupWebaddress) {
@@ -363,9 +366,17 @@ class ObservationController extends AbstractObjectController {
 				def rs = [:]
 				//Utils.populateHttpServletRequestParams(request, rs);
 				def resourcesInfo = [];
-				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-				File obvDir 
-				
+                def rootDir
+                switch(params.resType) {
+                    case [Observation.class.name,Checklists.class.name ]:
+                        rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+                    break;
+
+                    case Species.class.name:
+                        rootDir = grailsApplication.config.speciesPortal.resources.rootDir
+                    break;
+                }
+                File obvDir 
 
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
@@ -410,7 +421,7 @@ class ObservationController extends AbstractObjectController {
 					else {
 						if(!obvDir) {
 							if(!params.obvDir) {
-								obvDir = new File(rootDir);
+                                obvDir = new File(rootDir);
 								if(!obvDir.exists()) {
 									obvDir.mkdir();
 								}
@@ -429,10 +440,10 @@ class ObservationController extends AbstractObjectController {
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                         //context specific baseUrl for location picker script to work
-						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
+						def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
 						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
-						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
+						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
 				}
 				
@@ -524,8 +535,7 @@ class ObservationController extends AbstractObjectController {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					
-					if(params["createNew"]) {
+					if(params["createNew"] && params.oldAction == "save") {
 						mailType = observationService.OBSERVATION_ADDED;
 						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
@@ -542,21 +552,21 @@ class ObservationController extends AbstractObjectController {
 
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending email
-					if(params["createNew"]) {
+					if(params["createNew"] && params.oldAction == "save" ) {
 						mailType = observationService.OBSERVATION_ADDED;
 					} else {
 						mailType = observationService.SPECIES_RECOMMENDED;
 					}
 					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
-
-					if(!params["createNew"]){
+					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+					
+                    if(!params["createNew"]){
 						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
@@ -748,17 +758,28 @@ class ObservationController extends AbstractObjectController {
 	 */
 
 	def listRelated = {
-		def result = observationService.getRelatedObservations(params);
-		
-		def inGroupMap = [:]
-		result.relatedObv.observations.each { m-> 
-			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
-		}
-	    def activeFilters = new HashMap(params);
+    	log.debug params;
+
+        long parentId = params.id?params.long('id'):null;
+        def result = observationService.getRelatedObservations(params);
+
+        def activeFilters = new HashMap(params);
         activeFilters.remove('userGroupInstance');
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:activeFilters, parentId:params.long('id'), filterProperty:params.filterProperty]
-		render (view:'listRelated', model:model)
-	}
+
+        def model = [ queryParams: [max:result.max  ], activeFilters:activeFilters, filterProperty:params.filterProperty];
+        model['parentId'] = parentId;
+
+        def inGroupMap = [:]
+        result.relatedObv.observations.each { m-> 
+            inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
+        }
+
+        model['observationInstanceList'] = result.relatedObv.observations.observation
+        model['inGroupMap'] = inGroupMap
+        model['instanceTotal'] = result.relatedObv.count
+
+        render (view:'listRelated', model:model)
+    }
 
 	/**
 	 * 
@@ -786,9 +807,13 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def snippet = {
-		def observationInstance = Observation.get(params.id)
-
-		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
+        def observationInstance
+        if(params.id){
+		    observationInstance = Observation.get(params.id)
+        }
+        if(observationInstance){
+		    render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
+        }
 	}
 
 	
@@ -893,22 +918,7 @@ class ObservationController extends AbstractObjectController {
 	 * Count   
 	 */
 	def count = {
-		def userGroup 
-		if(params.webaddress) {
-			userGroup = userGroupService.get(params.webaddress)
-		}
-		
-		if(userGroup){
-			render userGroupService.getCountByGroup(Observation.simpleName, userGroup);
-		}else{
-			render Observation.createCriteria().count {
-				and {
-					eq("isDeleted", false)
-					eq("isShowable", true)
-					eq("isChecklist", false)
-				}
-			}
-		}
+		render chartService.getObservationCount(params)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -917,7 +927,7 @@ class ObservationController extends AbstractObjectController {
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 			def conf = SpringSecurityUtils.securityConfig
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
@@ -925,7 +935,7 @@ class ObservationController extends AbstractObjectController {
 				try {
 					mailService.sendMail {
 						to entry.getKey()
-	                    			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+	                    bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
 						from grailsApplication.config.grails.mail.default.from
 						replyTo currentUserMailId
@@ -1204,6 +1214,45 @@ class ObservationController extends AbstractObjectController {
             log.error e.getMessage();
             result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
         }
+        render result as JSON
+    }
+    
+    @Secured(['ROLE_ADMIN','ROLE_SPECIES_ADMIN'])
+    def lock() {
+        def msg = ""
+        def obv = Observation.get(params.id.toLong());
+        def reco = Recommendation.get(params.recoId.toLong());
+        def currentUser = springSecurityService.currentUser;
+        if(params.lockType == "Lock"){
+            //current user & reco
+            def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
+            if(recVo && reco != recVo.recommendation){
+                recVo.delete(flush: true, failOnError:true)
+                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                if(!newRecVo.save(flush:true)){
+                    newRecVo.errors.allErrors.each { log.error it } 
+                }
+            }
+            if(!recVo){
+                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                if(!newRecVo.save(flush:true)){
+                    newRecVo.errors.allErrors.each { log.error it } 
+                }
+            }
+            obv.maxVotedReco = reco; 
+            obv.isLocked = true;
+            msg = "Observation successfully locked, Please refresh to see changes"
+            
+        }else{
+            obv.removeResourcesFromSpecies()
+            obv.isLocked = false;
+            obv.calculateMaxVotedSpeciesName()
+            msg = "Observation successfully unlocked, Please refresh to see changes"
+        }
+        if(!obv.save(flush:true)){
+            obv.errors.allErrors.each { log.error it } 
+        }
+        def result = ['msg': msg]
         render result as JSON
     }
 }

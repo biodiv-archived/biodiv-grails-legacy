@@ -2,11 +2,12 @@ package species.auth;
 
 import grails.util.Environment;
 
+import grails.plugin.springsecurity.annotation.Secured;
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.plugin.springsecurity.ui.RegistrationCode;
-import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import grails.plugin.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.web.context.request.RequestContextHolder as RCH
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
@@ -16,6 +17,7 @@ import species.utils.Utils;
 import org.springframework.security.web.WebAttributes;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import species.groups.UserGroup;
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 	
@@ -71,7 +73,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 					openidIdentifier: config.openid.claimedIdentityFieldName]
 		}
 	}
-	
+
 	def register = { CustomRegisterCommand command ->
 		def config = SpringSecurityUtils.securityConfig
 		
@@ -124,12 +126,30 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			return
 		}
 
-		//recaptchaService.cleanUp(session)
-		
+        //recaptchaService.cleanUp(session)
+        if(params.webaddress) {
+            //trigger joinUs 
+            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+            if(userGroupInstance) {
+                if(userGroupInstance.allowUsersToJoin) {
+                    def founder = userGroupInstance.getFounders(1,0)[0]; 
+                    log.debug "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities ";
+                    SpringSecurityUtils.doWithAuth(founder.email, {
+                        if(userGroupInstance.addMember(user)) {
+                            flash.message = "You have joined ${userGroupInstance.name} group. We look forward for your contribution.";
+                        }
+                    });
+                }
+            } else {
+                log.error "Cannot find usergroup with webaddress : "+params.webaddress;
+            }
+        }
+
+
 		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
 		activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
 		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
-		
+
 		if(command.openId) {
 			authenticateAndRedirect user.email
 			return	
@@ -142,8 +162,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 	}
 
-
-	def verifyRegistration = {
+    	def verifyRegistration = {
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;

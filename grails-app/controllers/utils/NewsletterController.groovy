@@ -19,6 +19,7 @@ class NewsletterController {
 	def aclUtilService
 	def springSecurityService
 	def SUserService
+    def observationService
 	
 	public static final boolean COMMIT = true;
 
@@ -38,7 +39,7 @@ class NewsletterController {
 		if(params.webaddress||params.userGroup) { 
 			def userGroupInstance = (params.userGroup)?params.userGroup:UserGroup.findByWebaddress(params.webaddress);
 			params.userGroup = userGroupInstance;
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 				permitted = true
 			} else {
 				flash.message = "${message(code: 'default.not.permitted.message', args: ['add new', message(code: 'page.label', default: 'page'), ''])}"
@@ -55,9 +56,9 @@ class NewsletterController {
 		}
 		
 		if(permitted) {
-			def newsletterInstance = new Newsletter()
+            def newsletterInstance = new Newsletter()
 			newsletterInstance.properties = params
-			return [newsletterInstance: newsletterInstance]
+            return [newsletterInstance: newsletterInstance]
 		}
 		
 	}
@@ -70,7 +71,7 @@ class NewsletterController {
 		if(params.userGroup) {
 			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			params.userGroup = userGroupInstance;
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 				newsletterInstance = new Newsletter(params)
 				userGroupInstance.addToNewsletters(newsletterInstance);
 	
@@ -105,6 +106,27 @@ class NewsletterController {
 				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 			}
 		}
+        def ug = observationService.getUserGroup(params)
+        def resNL = Newsletter.withCriteria{
+            if(!ug){
+                isNull('userGroup')
+            }
+            else{
+                and{
+                    eq('userGroup', ug) 
+                }
+            }
+            maxResults(1)
+            order("displayOrder", "desc")
+        }
+        def disOrder = 0
+        if(resNL.size() != 0){
+            disOrder = resNL.get(0).displayOrder + 1
+        }
+        newsletterInstance.displayOrder = disOrder
+        if(!newsletterInstance.save(flush:true)){
+            newsletterInstance.errors.allErrors.each { log.error it }      
+        }
 	}
 
 	def show() {
@@ -116,7 +138,7 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+				['userGroupInstance':newsletterInstance.userGroup, 'newsletterInstance': newsletterInstance]
 			}
 			else {
 				[newsletterInstance: newsletterInstance]
@@ -133,11 +155,11 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
 				} else {
 					flash.message = "${message(code: 'edit.denied.message')}"
-					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':newsletterInstance.userGroup, params:['newsletterId':newsletterInstance.id])
 				}
 			}
 			else if(SUserService.isAdmin(springSecurityService.currentUser)) {
@@ -171,7 +193,7 @@ class NewsletterController {
 			newsletterInstance.properties = validMap
 			if(params.userGroup) {
 				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 					userGroupInstance.addToNewsletters(newsletterInstance);
 					if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 						postProcessNewsletter(newsletterInstance);
@@ -212,7 +234,7 @@ class NewsletterController {
 		if (newsletterInstance) {
 			boolean permitted = false;
 			if(newsletterInstance.userGroup) {
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
 					permitted = true;
 				} else {
 					flash.message = "${message(code: 'default.not.permitted.message', args: ['delete', message(code: 'page.label', default: 'page'), ''])}"
@@ -291,5 +313,74 @@ class NewsletterController {
 		render result.value as JSON;
 	}
 
+    private void swapDisplayOrder(nl1, nl2){
+        def temp = nl1.displayOrder
+        nl1.displayOrder = nl2.displayOrder
+        nl2.displayOrder = temp
+        return
+    }
+
+    def fetchNewsLetter(params){
+        def nlIns = Newsletter.get(params.pageId.toLong())
+        def disOrder = nlIns.displayOrder;
+        def newDisOrder = (params.typeOfChange == "up")?(disOrder+1):(disOrder-1)
+        def ug = observationService.getUserGroup(params)
+        def resNL = Newsletter.withCriteria{
+            if(!params.webaddress){
+                isNull('userGroup')
+            }
+            else{
+                and{
+                    eq('userGroup', ug) 
+                }
+            }
+            and{
+                if(params.typeOfChange == "up"){
+                    gt('displayOrder', disOrder)
+                }
+                else{
+                    lt('displayOrder', disOrder)
+                }
+            }
+            maxResults(1)
+            if(params.typeOfChange == "up"){
+                order("displayOrder", "asc")
+            }
+            else{
+                order("displayOrder", "desc")
+            }
+        }
+        if(resNL.size() != 0){
+            return resNL.get(0)
+        }
+        else{
+            return null
+        }
+    }
+
+    def changeDisplayOrder = {
+        def nlIns = Newsletter.get(params.pageId.toLong())
+        def disOrder = nlIns.displayOrder;
+        def otherNewsLetter = fetchNewsLetter(params); //how to fetch its group specific
+        def msg
+        def success
+        if(otherNewsLetter){
+            swapDisplayOrder(nlIns, otherNewsLetter);
+            if(!nlIns.save(flush:true)){
+                nlIns.errors.each { log.error it }        
+            }
+            if(!otherNewsLetter.save(flush:true)){
+                otherNewsLetter.errors.each { log.error it } 
+            }
+            success = true
+            msg = "order changed"
+        }
+        else{
+            msg = "Its already at the extreme"
+            success = false
+        }
+                def result = [success:success, msg:msg]
+        render result as JSON
+    }
 
 }

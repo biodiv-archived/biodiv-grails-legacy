@@ -87,7 +87,7 @@ class BiodivAdminController {
 
     def reloadSpeciesSearchIndex = {
         try {
-            speciesSearchService.deleteIndex();
+            //speciesSearchService.deleteIndex();
             speciesSearchService.publishSearchIndex();
             speciesSearchService.optimize();
             flash.message = "Successfully created species search index"
@@ -100,7 +100,7 @@ class BiodivAdminController {
 
     def reloadObservationsSearchIndex = {
         try {
-            observationsSearchService.deleteIndex();
+            //observationsSearchService.deleteIndex();
             observationsSearchService.publishSearchIndex();
             observationsSearchService.optimize();
             flash.message = "Successfully created observations search index"
@@ -113,7 +113,7 @@ class BiodivAdminController {
 
     def reloadUsersSearchIndex = {
         try {
-            SUserSearchService.deleteIndex();
+            //SUserSearchService.deleteIndex();
             SUserSearchService.publishSearchIndex();
             SUserSearchService.optimize();
             flash.message = "Successfully created users search index"
@@ -126,7 +126,7 @@ class BiodivAdminController {
 
     def reloadDocumentSearchIndex = {
         try {
-            documentSearchService.deleteIndex();
+            //documentSearchService.deleteIndex();
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
             flash.message = "Successfully created documents search index"
