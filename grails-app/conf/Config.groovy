@@ -480,7 +480,7 @@ environments {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
             }
             warn   'net.sf.ehcache.hibernate'
-            debug    'org.codehaus.groovy.grails.web.pages', //  GSP
+            warn    'org.codehaus.groovy.grails.web.pages', //  GSP
                     'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
                     'org.codehaus.groovy.grails.web.mapping', // URL mapping
                     'org.codehaus.groovy.grails.commons', // core / classloading
@@ -489,7 +489,7 @@ environments {
                     'grails.app.tagLib.org.grails.plugin.resource'
                     'org.hibernate'
 
-            debug   'org.springframework.security',
+            info   'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.plugin',
                     'org.springframework.security.web'

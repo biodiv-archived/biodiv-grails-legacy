@@ -129,7 +129,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-        build   ":tomcat:7.0.50"
+        //build   ":tomcat:7.0.50"
+        build ':jetty:2.0.3'
 
         compile ":scaffolding:2.0.1"
         //TODO enable this plugin
