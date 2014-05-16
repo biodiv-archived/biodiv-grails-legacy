@@ -475,7 +475,8 @@ environments {
 
         log4jConsoleLogLevel = Priority.DEBUG
         log4j = {
-            error   'net.sf.ehcache.hibernate'
+
+            warn   'net.sf.ehcache.hibernate'
             debug    'org.codehaus.groovy.grails.web.pages', //  GSP
                     'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
                     'org.codehaus.groovy.grails.web.mapping', // URL mapping

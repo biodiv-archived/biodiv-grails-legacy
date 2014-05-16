@@ -137,7 +137,6 @@ grails.project.dependency.resolution = {
         //runtime ":database-migration:1.3.8"
 
         compile ':hibernate:3.6.10.7'
-        //        compile ":hibernate:$grailsVersion"
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
         runtime ":resources:1.2.1"

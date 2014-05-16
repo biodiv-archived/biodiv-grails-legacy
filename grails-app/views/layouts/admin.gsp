@@ -1,6 +1,6 @@
 <%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder"%>
 <%@ page
-	import="org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils"%>
+	import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 <%@ page import="grails.plugin.springsecurity.SecurityConfigType"%>
 
 
