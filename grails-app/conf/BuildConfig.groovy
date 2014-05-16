@@ -112,7 +112,7 @@ grails.project.dependency.resolution = {
         }
          */
         compile ("org.hibernatespatial:hibernate-spatial-postgis:1.1") {
-            excludes 'hibernate-core'
+            excludes 'hibernate-core', 'javassist'
         }
 
         runtime 'postgresql:postgresql:9.0-801.jdbc4'

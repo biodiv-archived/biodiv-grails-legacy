@@ -25,7 +25,6 @@ class TaxonController {
     def activityFeedService;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-    def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
     /**
      * 
@@ -48,6 +47,7 @@ class TaxonController {
         long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
+        def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
         combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
             classSystem = null;

@@ -489,13 +489,13 @@ environments {
                     'grails.app.tagLib.org.grails.plugin.resource'
                     'org.hibernate'
 
-            info   'org.springframework.security',
+            warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.plugin',
+                    'grails.app',
                     'org.springframework.security.web'
 
             debug   'speciespage',
-                    'grails.app',
                     'species'
             info    'species.auth'
         }
