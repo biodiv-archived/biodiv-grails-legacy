@@ -476,6 +476,9 @@ environments {
         log4jConsoleLogLevel = Priority.DEBUG
         log4j = {
 
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+            }
             warn   'net.sf.ehcache.hibernate'
             debug    'org.codehaus.groovy.grails.web.pages', //  GSP
                     'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
