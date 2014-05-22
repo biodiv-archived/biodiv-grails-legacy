@@ -223,7 +223,7 @@ if(r) {
                                         <div class="tile">
                                             <div class="title">Observations nearby</div>
                                             <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
+                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearByRelated', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
                                         </div>
                                         
                                     </div>

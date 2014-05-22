@@ -257,8 +257,10 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getFeaturedObject(ugId, max, offset, params.controller)
         } else if(params.filterProperty == "user"){
             relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
+        } else if(params.filterProperty == "nearByRelated"){
+            relatedObv = getNearbyObservationsRelated(params.id, max, offset)
         } else if(params.filterProperty == "nearBy"){
-            relatedObv = getNearbyObservations(params.id, max, offset)
+            relatedObv = getNearbyObservations(params.lat?.toFloat(), params.long?.toFloat(), max, offset)
         } else if(params.filterProperty == "taxonConcept") {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "latestUpdatedObservations") {
@@ -603,7 +605,7 @@ class ObservationService extends AbstractObjectService {
         return count.size()
     }
 
-    Map getNearbyObservations(String observationId, int limit, int offset){
+    Map getNearbyObservationsRelated(String observationId, int limit, int offset){
         int maxRadius = 200;
         int maxObvs = 50;
         def sql =  Sql.newInstance(dataSource);
@@ -617,6 +619,27 @@ class ObservationService extends AbstractObjectService {
             nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
         }
         return ["observations":nearbyObservations, "count":totalResultCount]
+    }
+
+    Map getNearbyObservations(float latitude, float longitude, int limit, int offset) {
+        if(!latitude || ! longitude) return [count:0];
+        int maxRadius = 200;
+        int maxObvs = 50;
+        def sql =  Sql.newInstance(dataSource);
+
+        String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+        println point
+        def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true", [maxRadius:maxRadius]);
+        def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
+        limit = Math.min(limit, maxObvs - offset);
+        def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true order by ST_Distance(${point}, g2.topology), g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
+
+        def nearbyObservations = []
+        for (row in resultSet){
+            nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
+        }
+        return ["observations":nearbyObservations, "count":totalResultCount]
+
     }
 
     Map getAllTagsOfUser(userId){
