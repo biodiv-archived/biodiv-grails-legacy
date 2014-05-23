@@ -129,10 +129,11 @@ class ObservationController extends AbstractObjectController {
         model.queryParams.remove('userGroup');
 
         model.observations = [];
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        String iconBasePath = config.speciesPortal.observations.serverURL;
 		for(obv in model.observationInstanceList){
 			def item = [:];
             item.id = obv.id
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = obv.mainImage()
             def sGroup = obv.fetchSpeciesGroup()
             if(sGroup)
