@@ -235,7 +235,7 @@ class BootStrap {
         }
         
         JSON.registerObjectMarshaller(SUser) {
-            return ['id':it.id, 'name':it.name, 'email': it.email, 'icon':it.icon]
+            return ['id':it.id, 'name':it.name, 'email': it.email, 'icon':it.profilePicture()]
         }
  
         JSON.registerObjectMarshaller(Recommendation) {
