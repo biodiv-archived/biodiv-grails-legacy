@@ -127,6 +127,64 @@ class ObservationController extends AbstractObjectController {
 		log.debug params
 		def model = getObservationList(params);
         model.queryParams.remove('userGroup');
+
+        model.observations = [];
+		for(obv in model.observationInstanceList){
+			def item = [:];
+            item.id = obv.id
+			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			Resource image = obv.mainImage()
+            def sGroup = obv.fetchSpeciesGroup()
+            if(sGroup)
+			    item.sGroup = sGroup.name
+            if(obv.habitat)
+			    item.habitat = obv.habitat?.name
+			if(image){
+				if(image.type == ResourceType.IMAGE) {
+                    boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
+					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
+				} else if(image.type == ResourceType.VIDEO) {
+					item.imageLink = image.thumbnailUrl()
+				}
+			}else{
+				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
+			} 			
+		
+            item.author = obv.author;
+            item.createdOn = obv.createdOn;
+            item.notes = obv.notes()
+  			item.summary = obv.summary();				
+            item.maxVotedReco = obv.maxVotedReco;
+            item.placeName = obv.placeName;
+            item.topology = obv.topology; 
+           
+            def obj = obv;
+            if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
+            if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
+            if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
+            if(obj.hasProperty('fromDate') && obj.fromDate) item.observedOn = obj.fromDate.getTime();
+            if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy){
+				item.geoPrivacy = obj.geoPrivacy
+				item.geoPrivacyAdjust = obj.fetchGeoPrivacyAdjustment()
+			}
+            item.featureCount = obv.featureCount;
+            item.flagCount = obv.flagCount;
+            item.rating = obv.rating;
+            item.visitCount = obv.visitCount;
+            item.isLocked = obv.isLocked;
+            if(obj.hasProperty('isChecklist') && obj.isChecklist) {
+                 item.toDate = obj.toDate.getTime();
+                item.isChecklist = obj.isChecklist;
+                item.isShowable = obv.isShowable;
+                item.sourceId = obv.sourceId;
+            }
+
+            item.userGroups = obv.userGroups;
+			model.observations << item;
+		}
+
+        model.remove('observationInstanceList');
+
 		render model as JSON
 	}
 

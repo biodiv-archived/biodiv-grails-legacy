@@ -628,7 +628,6 @@ class ObservationService extends AbstractObjectService {
         def sql =  Sql.newInstance(dataSource);
 
         String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-        println point
         def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true", [maxRadius:maxRadius]);
         def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
         limit = Math.min(limit, maxObvs - offset);
@@ -812,6 +811,8 @@ class ObservationService extends AbstractObjectService {
 
         def query = "select "
 
+        def orderByClause = "  obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
+
         if(params.fetchField) {
             query += " obv.id as id,"
             params.fetchField.split(",").each { fetchField ->
@@ -953,6 +954,19 @@ class ObservationService extends AbstractObjectService {
             activeFilters["bounds"] = params.bounds
         } 
 
+        if(params.type == 'nearBy' && params.lat && params.long) {
+            String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            filterQuery += " and ROUND(ST_Distance_Sphere(${point}, ST_Centroid(obv.topology))/1000) < :maxRadius";
+            int maxRadius = params.maxRadius?params.int('maxRadius'):200
+            queryParams['maxRadius'] = maxRadius;
+
+            activeFilters["lat"] = params.lat
+            activeFilters["long"] = params.long
+            activeFilters["maxRadius"] = maxRadius
+            
+            orderByClause = " ST_Distance(${point}, obv.topology)" 
+        }
+
         String checklistObvCond = ""
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             checklistObvCond = " and obv.isShowable=false "
@@ -970,11 +984,11 @@ class ObservationService extends AbstractObjectService {
             activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
         }
 
-        def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 
         def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery + " and obv.isChecklist = true "
         def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 
+        orderByClause = " order by " + orderByClause;
         return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
