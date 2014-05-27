@@ -67,7 +67,7 @@ class LoginController {
 
 	def authSuccess = {
 		if(params.uid) {
-			def targetUrl = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
+			def targetUrl = request.getParameter(SpringSecurityUtils.DEFAULT_TARGET_PARAMETER);
 			if (StringUtils.hasText(targetUrl)) {
 				try {
 					targetUrl = URLDecoder.decode(targetUrl, "UTF-8");

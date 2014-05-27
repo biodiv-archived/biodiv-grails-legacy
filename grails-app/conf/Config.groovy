@@ -472,15 +472,21 @@ environments {
             }
         }
 
-
         log4jConsoleLogLevel = Priority.DEBUG
         log4j = {
 
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+                 //console name:'stacktrace'
+                 //'null' name:'stacktrace'//to disable stacktraces on stdout
+             }
+            root {
+                    warn 'stdout'
             }
-            warn   'net.sf.ehcache.hibernate'
-            warn    'org.codehaus.groovy.grails.web.pages', //  GSP
+            warn stdout:"StackTrace"
+
+            error   'net.sf.ehcache.hibernate'
+            error    'org.codehaus.groovy.grails.web.pages', //  GSP
                     'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
                     'org.codehaus.groovy.grails.web.mapping', // URL mapping
                     'org.codehaus.groovy.grails.commons', // core / classloading
@@ -489,7 +495,7 @@ environments {
                     'grails.app.tagLib.org.grails.plugin.resource'
                     'org.hibernate'
 
-            warn    'org.springframework.security',
+            info    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.plugin',
                     'grails.app',
@@ -497,7 +503,9 @@ environments {
 
             debug   'speciespage',
                     'species'
-            info    'species.auth'
+            debug   'com.the6hours', 
+                    'grails.app.taglib.com.the6hours'
+            debug    'species.auth'
         }
     }
 	test {
@@ -1262,9 +1270,8 @@ grails.plugin.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
 grails.plugin.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
 grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation 
+//grails.plugin.springsecurity.rejectIfNoRule = false;
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-    '/*/list*/**':                  ['permitAll'],
-    '/*/show/**':                  ['permitAll'],
     '/*/create/**':                  ['ROLE_USER'],
     '/*/edit/**':                  ['ROLE_USER'],
 	'/role/**': ['ROLE_ADMIN'],
@@ -1279,14 +1286,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
     '/rateable/rate/**': ['ROLE_USER'],
-    '/index':             ['permitAll'],
-    '/index.gsp':         ['permitAll'],
-    '/**/js/**':          ['permitAll'],
-    '/**/css/**':         ['permitAll'],
-    '/**/images/**':      ['permitAll'],
-    '/**/favicon.ico':    ['permitAll'],
-    '/login/**':          ['permitAll'],
-    '/logout/**':         ['permitAll']
+    '/**':['permitAll']
  ]
 
 
@@ -1366,8 +1366,7 @@ grails {
 remove this line */
 //grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
 //TODO remove this client side fb authentication ... as this is legacy code in plugin
-grails.plugin.springsecurity.facebook.filter.type='transparent,cookieDirect'
-grails.plugin.springsecurity.facebook.filter.types='transparent,cookieDirect'
+grails.plugin.springsecurity.facebook.filter.type='cookie,transparent,json'
 //TODO:In Spring Security 3.0 and earlier, the username was stored in the HTTP session under the key "SPRING_SECURITY_LAST_USERNAME". This no longer done, but the plugin will use the old behavior if the grails.plugin.springsecurity.apf.storeLastUsername setting is set to true (the default is false ). Further, the name is no longer escaped before storing, it is stored exactly as entered by the user, so you must escape it when redisplaying to avoid XSS attacks.
 grails.plugin.springsecurity.apf.storeLastUsername=true
 grails.databinding.useSpringBinder=true
@@ -1383,6 +1382,7 @@ grails.controllers.defaultScope = 'singleton'
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password', 'password2']
+grails.exceptionresolver.logRequestParameters=true
 
 grails.plugin.springsecurity.logout.postOnly = false
 

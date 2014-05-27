@@ -141,15 +141,17 @@ grails.project.dependency.resolution = {
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
         runtime ":resources:1.2.1"
-        compile ":spring-security-core:2.0-RC2" 
+        compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
         compile ":spring-security-acl:2.0-RC1"
-        compile (":spring-security-facebook:0.15.1-CORE2") {
+        compile (":spring-security-facebook:0.15.2-CORE2") {
             excludes 'spring-web' 
-        }
+        } 
 
         compile ":spring-security-openid:2.0-RC2"
-        compile ":spring-security-ui:1.0-RC1"
+        compile ":spring-security-ui:1.0-RC2"
+        compile ":spring-security-appinfo:2.0-RC2"
+
 
         runtime ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
@@ -165,7 +167,7 @@ grails.project.dependency.resolution = {
         compile ":google-visualization:0.6.2"
         //        compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.2.1"
-        runtime ":jquery:1.10.2"
+        runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
         compile (":mail:1.0.1") {
             excludes 'spring-test'

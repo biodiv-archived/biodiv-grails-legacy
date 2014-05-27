@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.util.StringUtils;
 import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 class OpenIDAuthenticationFilter extends
 		org.springframework.security.openid.OpenIDAuthenticationFilter {
@@ -18,9 +19,9 @@ class OpenIDAuthenticationFilter extends
 		   protected String buildReturnToUrl(HttpServletRequest request) {
 			   String return_to = super.buildReturnToUrl(request)
 			   return_to = return_to.replace(":8080", '');
-			   def target = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
+			   def target = request.getParameter(SpringSecurityUtils.DEFAULT_TARGET_PARAMETER);
 			   if (StringUtils.hasText(target)) {
-				   return_to += "?"+AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER+"="+target
+				   return_to += "?"+SpringSecurityUtils.DEFAULT_TARGET_PARAMETER+"="+target
 			   }
 			   return return_to;
 		   }

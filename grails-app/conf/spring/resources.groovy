@@ -23,7 +23,6 @@ import species.auth.OpenIdAuthenticationFailureHandler;
 
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
-import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
@@ -210,7 +209,7 @@ beans = {
         exceptionMappings = conf.failureHandler.exceptionMappings // [:]
     }
 
-    facebookAuthCookieFilter(FacebookAuthCookieFilter) {
+    facebookAuthCookieTransparentFilter(FacebookAuthCookieFilter) {
         grailsApplication = ref('grailsApplication')
         authenticationManager = ref('authenticationManager')
         facebookAuthUtils = ref('facebookAuthUtils')

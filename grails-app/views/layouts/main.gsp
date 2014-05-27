@@ -19,6 +19,7 @@
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 
 
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>

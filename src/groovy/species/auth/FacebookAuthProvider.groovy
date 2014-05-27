@@ -84,9 +84,9 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 	}
 
 	protected UserDetails createUserDetails(Object fbUser, String secret) {
-		Collection<GrantedAuthority> roles = facebookAuthDao.getRoles(fbUser)
 		
 		def user = fbUser.user;
+		Collection<GrantedAuthority> roles = facebookAuthDao.getRoles(user)
 		
 		def conf = SpringSecurityUtils.securityConfig
 		String usernamePropertyName = conf.userLookup.usernamePropertyName
