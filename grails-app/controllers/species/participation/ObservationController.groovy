@@ -41,7 +41,6 @@ class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
-	def grailsApplication;
 	def observationService;
 	def springSecurityService;
 	def mailService;

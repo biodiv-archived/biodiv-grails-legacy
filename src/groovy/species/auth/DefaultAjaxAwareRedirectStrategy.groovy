@@ -19,8 +19,6 @@ class DefaultAjaxAwareRedirectStrategy extends DefaultRedirectStrategy {
 		String redirectUrl = calculateRedirectUrl(request.getContextPath(), url);
 		String ajaxHeaderName = (String)ReflectionUtils.getConfigProperty("ajaxHeader");
 		
-		println "::::::::::::::::::::::"
-		println request.getRequestURL();
         def ajaxHeader = request.getHeader(ajaxHeaderName)
 		if(ajaxHeader && ajaxHeader != '') { //  && request.getMethod() == 'POST' .. request is the currentRequest & not the savedRequest
 			logger.debug ("Request is an ajax request. Ading extra parameter ajax_login_error to handle")
@@ -40,16 +38,20 @@ class DefaultAjaxAwareRedirectStrategy extends DefaultRedirectStrategy {
     }
 	
 	private String calculateRedirectUrl(String contextPath, String url) {
+        
+        println "+++++++++++++++++++++++++++++++++++++++"
+        println url
+        url =  java.net.URLDecoder.decode(url, "UTF-8"); 
 		if (!UrlUtils.isAbsoluteUrl(url)) {
 			if (contextRelative) {
 				return url;
 			} else {
 				return contextPath + url;
-			}
+			} 
 		}
 
 		// Full URL, including http(s)://
-
+println contextRelative;
 		if (!contextRelative) {
 			return url;
 		}

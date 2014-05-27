@@ -34,7 +34,6 @@ import species.participation.UserToken;
 class SpeciesController extends AbstractObjectController {
 
 	def dataSource
-	def grailsApplication
 	def speciesSearchService;
 	def namesIndexerService;
     def speciesUploadService;

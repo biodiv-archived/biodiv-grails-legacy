@@ -481,9 +481,9 @@ environments {
                  //'null' name:'stacktrace'//to disable stacktraces on stdout
              }
             root {
-                    warn 'stdout'
+                error 'stdout'
             }
-            warn stdout:"StackTrace"
+            error stdout:"StackTrace"
 
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages', //  GSP
@@ -492,8 +492,9 @@ environments {
                     'org.codehaus.groovy.grails.commons', // core / classloading
                     'org.codehaus.groovy.grails.plugins', // plugins
                     'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource'
-                    'org.hibernate'
+                    'grails.app.tagLib.org.grails.plugin.resource',
+                    'org.hibernate',
+                    'grails.util'
 
             info    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -1381,7 +1382,7 @@ grails.views.default.codec = "html"
 grails.controllers.defaultScope = 'singleton'
 
 // request parameters to mask when logging exceptions
-grails.exceptionresolver.params.exclude = ['password', 'password2']
+grails.exceptionresolver.params.exclude = ['password', 'password2', 'j_password']
 grails.exceptionresolver.logRequestParameters=true
 
 grails.plugin.springsecurity.logout.postOnly = false
