@@ -43,6 +43,7 @@ class AbstractObjectService {
 		for(param in observations){
 			def item = [:];
             def controller = getTargetController(param['observation']);
+            item.id = param['observation'].id
 			item.url = "/" + controller + "/show/" + param['observation'].id
 			item.title = param['title']
             item.type = controller

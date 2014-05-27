@@ -46,7 +46,7 @@
 						</g:elseif>
 					</div>
 					<h5 style="position: relative; top: 40px; clear: both">
-						<g:if test="${filterProperty == 'nearBy'}">
+						<g:if test="${filterProperty == 'nearByRelated'}">
 										Observations nearby
 									</g:if>
 						<g:elseif test="${filterProperty == 'speciesName'}">

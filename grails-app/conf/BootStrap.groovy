@@ -12,8 +12,10 @@ import species.groups.SpeciesGroup;
 import species.Habitat;
 import species.License;
 import species.groups.UserGroupController;
+import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
+import species.participation.Recommendation;
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import com.vividsolutions.jts.geom.Geometry
 import com.vividsolutions.jts.io.WKTWriter;
@@ -227,7 +229,19 @@ class BootStrap {
         JSON.registerObjectMarshaller(TaxonomyRegistry) {
             return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
         }
+        
+        JSON.registerObjectMarshaller(SUser) {
+            return ['id':it.id, 'name':it.name, 'email': it.email, 'icon':it.profilePicture()]
+        }
  
+        JSON.registerObjectMarshaller(Recommendation) {
+            return ['name':it.name, 'taxonomyDefinition' : it.taxonConcept];
+        }
+
+        JSON.registerObjectMarshaller(UserGroup) {
+            return ['id':it.id, 'name':it.name, 'description' : it.description, 'domainName':it.domainName, 'webaddress':it.webaddress, 'foundedOn':it.foundedOn, 'icon':it.icon, ];
+        }
+
     }
 
 	/**
