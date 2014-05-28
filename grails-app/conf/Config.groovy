@@ -1401,7 +1401,8 @@ grails.doc.copyright=''
 grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
 
 //REST
-grails.plugin.springsecurity.rest.login.useJsonCredentials = true
+//grails.plugin.springsecurity.rest.login.useJsonCredentials = true
+grails.plugin.springsecurity.rest.login.useRequestParamsCredentials=true
 grails.plugin.springsecurity.rest.token.storage.useGorm=true
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName='species.auth.AuthenticationToken'
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenValuePropertyName='tokenValue'

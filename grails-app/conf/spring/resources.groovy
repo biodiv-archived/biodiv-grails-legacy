@@ -29,6 +29,7 @@ import grails.util.Environment
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoint
 
 // Place your Spring DSL code here
 beans = {
@@ -45,6 +46,7 @@ beans = {
     }
 
     // default 'authenticationEntryPoint'
+    //overriding entry point defined in rest plugin to redirect to login page on accessdenied exception. Workd only when anonymous auth is present in the session
     authenticationEntryPoint(AjaxAwareAuthenticationEntryPoint, conf.auth.loginFormUrl) { // '/login/auth'
         ajaxLoginFormUrl = conf.auth.ajaxLoginFormUrl // '/login/authAjax'
         forceHttps = conf.auth.forceHttps // false
