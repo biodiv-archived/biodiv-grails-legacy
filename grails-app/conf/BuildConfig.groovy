@@ -5,7 +5,7 @@ grails.project.source.level = 1.6
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
-//grails.project.war.file = "target/${appName}.war"
+grails.project.war.file = "target/${appName}.war"
 
 grails.project.fork = [
 // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -129,8 +129,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-        //build   ":tomcat:7.0.50"
-        build ':jetty:2.0.3'
+        build   ":tomcat:7.0.50"
+        //build ':jetty:2.0.3'
 
         compile ":scaffolding:2.0.1"
         //TODO enable this plugin
@@ -185,12 +185,12 @@ grails.project.dependency.resolution = {
     } 
 
     grails.war.resources = { stagingDir ->
-        /*for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j']) {
+        for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j', 'servlet-api-2.3']) {
           delete {
           fileset dir: "$stagingDir/WEB-INF/lib/",
           includes: "$name*.jar"
           }
-          }*/
+          }
         //        delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
     }
 

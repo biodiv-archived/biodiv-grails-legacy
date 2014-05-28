@@ -648,7 +648,7 @@ environments {
 			data.rootDir = "${app.rootDir}/data"
 
 			resources {
-				rootDir = "${app.rootDir}/images"
+				rootDir = "${app.rootDir}/img"
 				serverURL = "http://saturn.strandls.com/${appName}/img"
 			}
 
@@ -1292,8 +1292,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
     '/rateable/rate/**': ['ROLE_USER'],
-    //'/adminManage/**': ['ROLE_ADMIN'],
-    //'/admin/**':['ROLE_ADMIN'],
+    '/adminmanage/**': ['ROLE_ADMIN'],
     '/biodivAdmin/**':['ROLE_ADMIN'],
     '/**':['permitAll']
  ]
