@@ -1393,7 +1393,9 @@ grails.controllers.defaultScope = 'singleton'
 grails.exceptionresolver.params.exclude = ['password', 'password2', 'j_password']
 grails.exceptionresolver.logRequestParameters=true
 
+
 grails.plugin.springsecurity.logout.postOnly = false
+grails.plugin.springsecurity.logout.handlerNames = ['securityContextLogoutHandler', 'facebookAuthCookieLogout'];
 
 grails.doc.authors='Prabhakar R, Thomas Vattakaven, Sravanthi M, Sandeep Tandekar, Rahul kumar Sinha'
 grails.doc.license=''
