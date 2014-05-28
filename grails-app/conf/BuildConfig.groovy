@@ -90,7 +90,10 @@ grails.project.dependency.resolution = {
         compile (group:'org.apache.poi', name:'poi', version:'3.7'){
             excludes 'servlet-api'
         }
-        compile group:'org.apache.poi', name:'poi-contrib', version:'3.6'
+        compile (group:'org.apache.poi', name:'poi-contrib', version:'3.6'){
+            excludes 'servlet-api'
+        }
+
         compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.7'
         compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7') {
             excludes 'geronimo-stax-api_1.0_spec'
@@ -129,12 +132,15 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-        build   ":tomcat:7.0.50"
+        build   ":tomcat:7.0.52.1"
+        //build ":tomcat8:8.0.5"
         //build ':jetty:2.0.3'
 
         compile ":scaffolding:2.0.1"
         //TODO enable this plugin
-        //compile ':cache:1.1.1'
+        compile (':cache:1.1.6') {
+                excludes "servlet-api" 
+        }
         //runtime ":database-migration:1.3.8"
 
         compile ':hibernate:3.6.10.7'
@@ -150,14 +156,14 @@ grails.project.dependency.resolution = {
 
         compile ":spring-security-openid:2.0-RC2"
         compile ":spring-security-ui:1.0-RC2"
-        compile ":spring-security-appinfo:2.0-RC2"
-        compile ":spring-security-rest:1.3.4", {
+
+        compile (":spring-security-rest:1.3.4") {
                 excludes 'spring-security-core', 'cors'
         }
 
         runtime ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
-        compile ":error-pages-fix:0.2"
+        //compile ":error-pages-fix:0.2"
         compile ":ajax-uploader:1.1"
         compile ":cache-headers:1.1.5"
         runtime ":cached-resources:1.0"

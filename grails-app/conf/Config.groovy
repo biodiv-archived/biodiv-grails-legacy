@@ -1294,6 +1294,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/rateable/rate/**': ['ROLE_USER'],
     '/adminmanage/**': ['ROLE_ADMIN'],
     '/biodivAdmin/**':['ROLE_ADMIN'],
+    '/securityinfo':    ['ROLE_ADMIN'],
+    '/securityinfo.*':  ['ROLE_ADMIN'],
+    '/securityinfo/**': ['ROLE_ADMIN'],
     '/**':['permitAll']
  ]
 
