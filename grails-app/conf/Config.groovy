@@ -496,17 +496,22 @@ environments {
                     'org.hibernate',
                     'grails.util'
 
-            info    'org.springframework.security',
+            warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.plugin',
-                    'grails.app',
-                    'org.springframework.security.web'
+                    'grails.app'
+            info   'org.springframework.security'
+            debug   'org.springframework.security.web'
 
             debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
                     'grails.app.taglib.com.the6hours'
-            debug    'species.auth'
+            debug   'species.auth'
+            debug   'com.odobo',
+                    'grails.app.controllers.com.odobo',
+                    'grails.app.services.com.odobo',
+                    'org.pac4j'
         }
     }
 	test {
@@ -1287,6 +1292,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
     '/rateable/rate/**': ['ROLE_USER'],
+    //'/adminManage/**': ['ROLE_ADMIN'],
+    //'/admin/**':['ROLE_ADMIN'],
+    '/biodivAdmin/**':['ROLE_ADMIN'],
     '/**':['permitAll']
  ]
 
@@ -1391,3 +1399,42 @@ grails.doc.authors='Prabhakar R, Thomas Vattakaven, Sravanthi M, Sandeep Tandeka
 grails.doc.license=''
 grails.doc.copyright=''
 grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
+
+//REST
+grails.plugin.springsecurity.rest.login.useJsonCredentials = true
+grails.plugin.springsecurity.rest.token.storage.useGorm=true
+grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName='species.auth.AuthenticationToken'
+grails.plugin.springsecurity.rest.token.storage.gorm.tokenValuePropertyName='tokenValue'
+grails.plugin.springsecurity.rest.token.storage.gorm.usernamePropertyName='email'
+grails.plugin.springsecurity.rest.login.endpointUrl='/api/login'
+grails.plugin.springsecurity.rest.login.failureStatusCode=401
+grails.plugin.springsecurity.rest.logout.endpointUrl='/api/logout'
+grails.plugin.springsecurity.rest.token.validation.headerName='X-Auth-Token'
+
+//APPINFO
+
+grails.plugins.dynamicController.mixins = [
+'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController',
+
+'app.info.custom.example.MyConfigControllerMixin' :
+'com.burtbeckwith.appinfo_test.AdminManageController'
+]

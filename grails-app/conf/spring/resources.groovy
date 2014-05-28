@@ -44,6 +44,16 @@ beans = {
         redirectStrategy = ref('redirectStrategy')
     }
 
+    // default 'authenticationEntryPoint'
+    authenticationEntryPoint(AjaxAwareAuthenticationEntryPoint, conf.auth.loginFormUrl) { // '/login/auth'
+        ajaxLoginFormUrl = conf.auth.ajaxLoginFormUrl // '/login/authAjax'
+        forceHttps = conf.auth.forceHttps // false
+        useForward = conf.auth.useForward // false
+        portMapper = ref('portMapper')
+        portResolver = ref('portResolver')
+    }
+
+
     userDetailsService(OpenIdUserDetailsService) { grailsApplication = ref('grailsApplication') }
 
     def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config

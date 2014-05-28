@@ -151,9 +151,9 @@ grails.project.dependency.resolution = {
         compile ":spring-security-openid:2.0-RC2"
         compile ":spring-security-ui:1.0-RC2"
         compile ":spring-security-appinfo:2.0-RC2"
-        /*compile ":spring-security-rest:1.3.4", {
-                excludes: 'spring-security-core'
-        }*/
+        compile ":spring-security-rest:1.3.4", {
+                excludes 'spring-security-core', 'cors'
+        }
 
         runtime ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'

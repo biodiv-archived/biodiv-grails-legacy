@@ -167,5 +167,10 @@ class UrlMappings {
     if (uploadPrefix) { 
         delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
     }
+    
+
+    "/admin/manage/$action?"(controller: "adminManage")
+    "/adminManage/$action?"(controller: "errors", action: "urlMapping")
+     
     }
 }
