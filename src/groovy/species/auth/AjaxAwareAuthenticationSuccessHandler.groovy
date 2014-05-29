@@ -37,7 +37,9 @@ grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHa
 		cookie.domain = "."+Utils.getDomain(request);
 		response.addCookie(cookie)
 
-		
+println ")))))))))))))))))))))))))))))))))"
+println 		request.getSession().getAttribute("SAVED_REQUEST");
+println ")))))))))))))))))))))))))))))))))"
 		super.onAuthenticationSuccess(request, response, authentication);
 		//removing login referrer
 		request.getSession().removeAttribute("LOGIN_REFERRER");

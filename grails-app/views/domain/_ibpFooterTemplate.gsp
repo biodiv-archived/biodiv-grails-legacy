@@ -135,12 +135,12 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                                                         $.ajax({
                                                             url: "${uGroup.createLink(controller:'login', action:'authSuccess')}",
                                                             method:"GET",
-                                                            data:{'uid':response.authResponse.userID, 'spring-security-redirect':'${(targetUrl?targetUrl:'')}'},
+                                                            data:{'uid':response.authResponse.userID ${targetUrl?'",spring-security-redirect":"'+targetUrl+'"':''}},
                                                             success: function(data, statusText, xhr) {
                                                                 ajaxLoginSuccessHandler(data, statusText, xhr);
                                                             },  error: function(xhr, ajaxOptions, thrownError) {
-                                                $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
-                                            }
+                                                                $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
+                                                            }
                                                         });
                                                 } else{
                                                         var redirectTarget = "${targetUrl?'spring-security-redirect='+targetUrl:''}";

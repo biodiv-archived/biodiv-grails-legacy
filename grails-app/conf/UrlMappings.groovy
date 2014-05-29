@@ -43,6 +43,19 @@ class UrlMappings {
 			} 
         }
 
+        "/api/login" {
+            
+        }
+
+        "/api/validate" {
+        }
+
+        "/api/logout" {
+        }
+
+        "/api/$controller/$action?/$id?"{ 
+        }
+
 		"/static/$path"(controller:"species", action:"staticContent")
 		
 		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {

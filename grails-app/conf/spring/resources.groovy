@@ -30,6 +30,8 @@ import grails.util.Environment
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoint
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 
 // Place your Spring DSL code here
 beans = {
@@ -53,6 +55,20 @@ beans = {
         useForward = conf.auth.useForward // false
         portMapper = ref('portMapper')
         portResolver = ref('portResolver')
+    }
+
+    /** securityContextRepository */
+    securityContextRepository(HttpSessionSecurityContextRepository) {
+        allowSessionCreation = conf.scr.allowSessionCreation // true
+        disableUrlRewriting = conf.scr.disableUrlRewriting // true
+        springSecurityContextKey = conf.scr.springSecurityContextKey // SPRING_SECURITY_CONTEXT
+    }
+
+          
+    requestCache(HttpSessionRequestCache) {
+        portResolver = ref('portResolver')
+        createSessionAllowed = conf.requestCache.createSession // true
+        requestMatcher = ref('requestMatcher')
     }
 
 

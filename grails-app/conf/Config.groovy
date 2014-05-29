@@ -502,6 +502,7 @@ environments {
                     'grails.app'
             info   'org.springframework.security'
             debug   'org.springframework.security.web'
+            debug   'org.springframework.security.authentication'
 
             debug   'speciespage',
                     'species'
@@ -1377,9 +1378,11 @@ grails {
 remove this line */
 //grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
 //TODO remove this client side fb authentication ... as this is legacy code in plugin
-grails.plugin.springsecurity.facebook.filter.type='cookie,transparent,json'
+grails.plugin.springsecurity.facebook.filter.type='cookie,transparent'
 //TODO:In Spring Security 3.0 and earlier, the username was stored in the HTTP session under the key "SPRING_SECURITY_LAST_USERNAME". This no longer done, but the plugin will use the old behavior if the grails.plugin.springsecurity.apf.storeLastUsername setting is set to true (the default is false ). Further, the name is no longer escaped before storing, it is stored exactly as entered by the user, so you must escape it when redisplaying to avoid XSS attacks.
 grails.plugin.springsecurity.apf.storeLastUsername=true
+grails.plugin.springsecurity.useSessionFixationPrevention = false
+
 grails.databinding.useSpringBinder=true
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*', '/bootstrap/*']
