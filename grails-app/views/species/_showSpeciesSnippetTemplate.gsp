@@ -1,5 +1,6 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.Resource"%>
 <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 <%
     def basePath = '';
