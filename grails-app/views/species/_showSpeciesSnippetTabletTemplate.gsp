@@ -1,14 +1,23 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.Resource"%>
 <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 <%
-def imagePath = '';
-def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-if(mainImage?.fileName == speciesGroupIcon.fileName) 
-    imagePath = mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, '.png');
-else
-    imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;
-def obvId = speciesInstance.id
+    def basePath = '';
+    if(mainImage?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
+        basePath = grailsApplication.config.speciesPortal.observations.serverURL
+    }
+    else if(mainImage?.context?.value() == Resource.ResourceContext.SPECIES.toString() || mainImage?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+        basePath = grailsApplication.config.speciesPortal.resources.serverURL
+    }
+
+    def imagePath = '';
+    def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+    if(mainImage?.fileName == speciesGroupIcon.fileName) 
+        imagePath = mainImage.thumbnailUrl(basePath, '.png');
+    else
+        imagePath = mainImage?mainImage.thumbnailUrl(basePath):null;
+    def obvId = speciesInstance.id
 %>
 
 <g:if test="${speciesInstance}">

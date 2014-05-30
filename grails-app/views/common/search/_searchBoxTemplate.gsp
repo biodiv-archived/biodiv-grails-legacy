@@ -43,7 +43,7 @@ $(document).ready(function() {
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
 		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
-		'dropDownIconUrl' : "${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
+		'dropDownIconUrl' : "${resource(dir:'images', file:'dropdown_active.gif',absolute:'true')}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
 		'carousel':{maxHeight:150, maxWidth:150},
