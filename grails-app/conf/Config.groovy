@@ -641,7 +641,7 @@ environments {
 		}
 	}
 	pambaTest {
-		appName = "biodiv_test"
+		appName = "biodiv"
 		grails.serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}"
 		
 		speciesPortal {
@@ -711,11 +711,43 @@ environments {
 			appenders {
 				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
 			}
-			info	'species',
+/*			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
             debug   'grails.app.filters.species.SecurityFilters'
-		}
+*/
+            error stdout:"StackTrace"
+
+            error   'net.sf.ehcache.hibernate'
+            error    'org.codehaus.groovy.grails.web.pages', //  GSP
+                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
+                    'org.codehaus.groovy.grails.commons', // core / classloading
+                    'org.codehaus.groovy.grails.plugins', // plugins
+                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+                    'grails.app.tagLib.org.grails.plugin.resource',
+                    'org.hibernate',
+                    'grails.util'
+
+            warn    'org.springframework.security',
+                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
+                    'grails.plugin',
+                    'grails.app'
+            info   'org.springframework.security'
+            debug   'org.springframework.security.web'
+            debug   'org.springframework.security.authentication'
+
+            debug   'speciespage',
+                    'species'
+            debug   'com.the6hours', 
+                    'grails.app.taglib.com.the6hours'
+            debug   'species.auth'
+            debug   'com.odobo',
+                    'grails.app.controllers.com.odobo',
+                    'grails.app.services.com.odobo',
+                    'org.pac4j'
+ 
+        }
 
 	}
 
