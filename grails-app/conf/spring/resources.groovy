@@ -32,6 +32,8 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoint
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
+import species.auth.DefaultOauthUserDetailsService;
+import species.auth.MyOauthService;
 
 // Place your Spring DSL code here
 beans = {
@@ -320,4 +322,18 @@ beans = {
         arguments = ["classpath:log4j.properties"]
     }
     }*/
+
+    /* oauthUserDetailsService */
+    oauthUserDetailsService(DefaultOauthUserDetailsService) {
+        userDetailsService = ref('userDetailsService')
+    }
+    
+    oauthService(MyOauthService) {
+        tokenGenerator = ref('tokenGenerator')
+        tokenStorageService = ref('tokenStorageService')
+        userDetailsService = ref('userDetailsService')
+        grailsApplication = ref('grailsApplication')
+        grailsLinkGenerator = ref('grailsLinkGenerator')
+        oauthUserDetailsService = ref('oauthUserDetailsService')
+    }
 }

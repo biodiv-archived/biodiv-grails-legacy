@@ -91,7 +91,11 @@ class LoginController {
 				redirect uri:"/";
 				return;
 			}
-		}
+		} else {
+            params.remove('action');
+            params.remove('controller');
+            render params as JSON
+        }
 	}
 
 	/**
