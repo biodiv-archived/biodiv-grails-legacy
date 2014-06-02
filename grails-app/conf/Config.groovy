@@ -1446,3 +1446,9 @@ grails.plugins.dynamicController.mixins = [
 'app.info.custom.example.MyConfigControllerMixin' :
 'com.burtbeckwith.appinfo_test.AdminManageController'
 ]
+
+
+grails.plugin.springsecurity.filterChain.chainMap = [
+    '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',  // Stateless chain
+    '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
+]

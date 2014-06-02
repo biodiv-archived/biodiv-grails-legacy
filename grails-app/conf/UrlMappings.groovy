@@ -53,6 +53,8 @@ class UrlMappings {
         "/api/logout" {
         }
 
+        name oauth: "/api/oauth/${action}/${provider}"(controller: 'oauth')
+
         "/api/$controller/$action?/$id?"{ 
         }
 
