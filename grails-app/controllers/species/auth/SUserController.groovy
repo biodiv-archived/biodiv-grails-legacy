@@ -787,8 +787,6 @@ class SUserController extends UserController {
 				return [command: command2]
 			}
 			
-			println 'no errors'
-
 			String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
 			SUser.withTransaction { status ->
 				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
@@ -912,7 +910,6 @@ class ResetPasswordCommand {
 			def currentUser = command.springSecurityService.currentUser;
 			String salt = command.saltSource instanceof NullSaltSource ? null : params.username
 			if (!currentUser.password.equals(command.springSecurityService.encodePassword(value, salt))) { 
-				println "doesn't match"
 				return 'spring.security.ui.resetPassword.currentPassword.doesnt.match' 
 			}
 		} 

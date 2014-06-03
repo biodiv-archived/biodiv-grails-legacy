@@ -41,35 +41,17 @@ class AbstractObjectService {
 	protected static List createUrlList2(observations, String iconBasePath){
 		List urlList = []
 		for(param in observations){
-			def item = [:];
-            def controller = getTargetController(param['observation']);
-            item.id = param['observation'].id
-			item.url = "/" + controller + "/show/" + param['observation'].id
+            def obv = param['observation'];
+
+			def item = asJSON(obv, iconBasePath) 
+            
+            def controller = getTargetController(obv);
+			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
             item.type = controller
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-			Resource image = param['observation'].mainImage()
-            def sGroup = param['observation'].fetchSpeciesGroup()
-            if(sGroup)
-			    item.sGroup = sGroup.name
-            if(param['observation'].habitat)
-			    item.habitat = param['observation'].habitat?.name
-			if(image){
-				if(image.type == ResourceType.IMAGE) {
-                    boolean isChecklist = param['observation'].hasProperty("isChecklist")?param['observation'].isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
-				} else if(image.type == ResourceType.VIDEO) {
-					item.imageLink = image.thumbnailUrl()
-				}
-			}else{
-				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
-			} 			
-			if(param.inGroup) {
+    		if(param.inGroup) {
 				item.inGroup = param.inGroup;
 			} 
-			
-            item.notes = param['observation'].notes()
-  			item.summary = param['observation'].summary();				
             
             if(param['featuredNotes']) {
                 item.featuredNotes = param['featuredNotes']
@@ -78,7 +60,39 @@ class AbstractObjectService {
             if(param['featuredOn']) {
                 item.featuredOn = param['featuredOn'].getTime();
             }
-            def obj = param['observation'];
+
+	        
+			urlList << item;
+		}
+		return urlList
+	}
+
+    protected static asJSON(def obv, String iconBasePath) {
+            def item = [:] 
+            item.id = obv.id
+			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def sGroup = obv.fetchSpeciesGroup()
+            if(sGroup)
+			    item.sGroup = sGroup.name
+            if(obv.habitat)
+			    item.habitat = obv.habitat?.name
+			
+            Resource image = obv.mainImage()
+			if(image){
+				if(image.type == ResourceType.IMAGE) {
+                    boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
+					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
+				} else if(image.type == ResourceType.VIDEO) {
+					item.imageLink = image.thumbnailUrl()
+				}
+			}else{
+				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
+			} 			
+		
+            item.notes = obv.notes()
+  			item.summary = obv.summary();				
+            
+            def obj = obv;
             if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
             if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
             if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
@@ -87,10 +101,8 @@ class AbstractObjectService {
 				item.geoPrivacy = obj.geoPrivacy
 				item.geoPrivacyAdjust = obj.fetchGeoPrivacyAdjustment()
 			}
-			urlList << item;
-		}
-		return urlList
-	}
+            return item;
+    }
 
     //XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
 	// to resolve controller name

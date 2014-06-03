@@ -264,6 +264,10 @@ class ObservationController extends AbstractObjectController {
 	
 	private saveAndRender(params, sendMail=true){
 		def result = observationService.saveObservation(params, sendMail)
+        if(request.getHeader('X-Auth-Token')) {
+            render result as JSON;
+            return
+        }
 		if(result.success){
 			chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 		}else{
@@ -273,6 +277,32 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def show() {
+        if(request.getHeader('X-Auth-Token')) {
+            if(params.id) {
+    			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
+	    		if (!observationInstance) {
+                    render (['success':false, 'msg':"Coudn't find observation with id ${params.id}"] as JSON)
+                    return
+                } else {
+    				if(observationInstance.instanceOf(Checklists)){
+                        render (['success':false, 'msg':"Id ${params.id} is a checklist"] as JSON)
+					    return
+	    			}
+
+		            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		            String iconBasePath = config.speciesPortal.observations.serverURL
+                    //def obvJSON = observationService.asJSON(observationInstance, iconBasePath)
+                    //render ([success:true, msg:'', observation:obvJSON] as JSON)
+                    render observationInstance as JSON
+                    return
+                }
+
+            } else {
+                render (['success':false, 'msg':"Id is required"] as JSON)
+                return
+            }
+        }
+
 		if(params.id) {
 			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!observationInstance) {

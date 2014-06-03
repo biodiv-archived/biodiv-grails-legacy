@@ -1,32 +1,111 @@
 
-h3. Observations API
+h3. Observations
+
+h4. Save
+
+* /api/observation/save : POST request takes following parameters
+** group : species group id
+** habitat : habitat id
+** notes : observation notes
+** fromDate : observed on date in format (dd/mm/yyyy)
+** placeName : String 
+** locationAccuracy : Accurate|Approximate
+** geoPrivacy : true|false
+** agreeTerms : on|off
+** areas : WKT representation of topology of location. e.g., POINT(77.60492180000006 17.6740832)
+** resources : urls for the uploaded images and videos and their metadata as in following format
+{code}
+file_2:/8eaf2f40-5f65-4066-ac65-226482d481ff/748.png
+url_2:
+type_2:IMAGE
+rating_2:
+license_2:CC BY
+file_1:v
+url_1:http://www.youtube.com/watch?v=v8HVWDrGr6o
+type_1:VIDEO
+rating_1:
+{code}
+** commonName: common name
+** languageName: language name
+** recoName: species scientific name
+** recoComment: comment
+** tags:[tag1,tag2...]
+** userGroupsList: csv of all user group id's
+
+h4. upload_resource
+
+h4. show 
+
+* /api/observation/show/id 
+{code}
+{
+    "success": true,
+    "msg": "",
+    "observation": {
+        "id": 224,
+        "sGroup": "Arthropods",
+        "habitat": "All",
+        "imageLink": "http://img.youtube.com/vi/mvl0xh9-fcA/default.jpg",
+        "notes": "",
+        "summary": "Observed by Sravanthi Mutyala</a></b> at 'Internal Colony Road, Shivashahi, Airport Area, Shankar Nagar, Solapur, Maharashtra 413224, India'</b> on October 22, 2013</b>.",
+        "lat": 17.623081,
+        "lng": 75.95398,
+        "observedOn": 1382412251435
+    }
+}
+{code}
 
 h4. list 
 
-* Filtered Observations listing 
+* /api/observation/listJSON : Parameters available for listing are 
+** sGroup : speciesGroupId
+** habitat : habitat id
+** user : observation author id
+** type : nearBy|...
+** lat : latitude value in decimal
+** long: longitude value in float
+** daterangepicker_start , daterangepicker_end
+** bounds : swLat, swLong, neLat, neLon 
 
-** all observations 
+** isFlagged : true| false
+** featureBy : true|false
+** isChecklistOnly : true| false
+
+** tag : tag name
+** webaddress : to filter observations with group with this webaddress
+** speciesName:'Unknown' to get all unidentified observations
+
+** max: limit of number of results
+** offset : offset in to the result set.
+** sort: lastRevised|createsOn|visitCount
+
+* NearBy Observations : 
 {code}
-http://indiabiodiversity.org/observation/listJSON
+http://indiabiodiversity.saturn.strandls.com/observation/listJSON?type=nearBy&lat=10&long=76&maxRadius=1000
 {code}
 
-** within certain bounds 
+* My collection : 
+{code}
+http://indiabiodiversity.saturn.strandls.com/observation/listJSON?user=4440
+{code}
+
+* Within certain bounds 
 {code}
 http://indiabiodiversity.org/observation/list?bounds=4.8282597468669755%2C69.521484375%2C37.09023980307208%2C95.888671875&max=24&offset=0
 {code}
 
-** with species group and habitat filter 
+* With species group and habitat filter 
 {code}
 http://indiabiodiversity.org/observation/list?bounds=4.8282597468669755,69.521484375,37.09023980307208,95.888671875&max=24&offset=0&sGroup=837&habitat=267835
 {code}
 
-* Related Observations
-** Featured Observations 
+* Featured Observations 
 {code}
 http://indiabiodiversity.org/observation/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
 {code}
-** Related Observations by species name
-** Related Observations by location
+
+* Related Observations by species name
+* Related Observations by location
 
 * Observation Occurences 
 {code}
@@ -37,10 +116,6 @@ http://indiabiodiversity.org/observation/occurrences?sGroup=829&habitat=267835&o
 {code}
 http://indiabiodiversity.org/observation/distinctReco?sGroup=829&habitat=267835&offset=0&fl=id&bounds=4.8282597468669755%2C69.521484375%2C37.09023980307208%2C95.888671875
 {code}
-
-h4. show
-
-h4. Save 
 
 h4. delete
 

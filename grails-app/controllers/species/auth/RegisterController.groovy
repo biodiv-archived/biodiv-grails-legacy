@@ -18,6 +18,7 @@ import org.springframework.security.web.WebAttributes;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import species.groups.UserGroup;
+import grails.converters.JSON;
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 	
@@ -162,32 +163,88 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 	}
 
-    	def verifyRegistration = {
+    def user( CustomRegisterCommand2 command ) {
+		def config = SpringSecurityUtils.securityConfig
+		
+		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            render(['success':false, 'msg':'Already logged in'] as JSON) 
 			return;
 		}
 		
 		def conf = SpringSecurityUtils.securityConfig
-		String defaultTargetUrl = conf.successHandler.defaultTargetUrl
-		String usernamePropertyName = conf.userLookup.usernamePropertyName
-
-		String token = params.t
-
-		def registrationCode = token ? RegistrationCode.findByToken(token) : null
-		if (!registrationCode) {
-			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri: defaultTargetUrl
+        if (command.hasErrors()) {
+            def errors = [];
+            for (int i = 0; i < command.errors.allErrors.size(); i++) {
+                def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
+                errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
+            }
+            render(['success':false, 'msg':"Failed to register the user because of the following errors: ${errors}"] as JSON) 
 			return
 		}
 
-		def user
-		RegistrationCode.withTransaction { status ->
-			user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
+        if(!command.username) command.username = command.name;
 
-			if (!user) {
-				return
-			}
+		def user = SUserService.create(command.properties);
+		
+			log.debug("Is an local account registration");
+			user.accountLocked = true;
+			SUserService.save(user);
+		
+		if (user == null || user.hasErrors()) {
+            def errors = [];
+            if(user) {
+            for (int i = 0; i < user.errors.allErrors.size(); i++) {
+                def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
+                errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
+            }
+            } else {
+                errors << "User is null."
+            }
+            
+
+            render(['success':false, 'msg':"Failed to register the user because of the following errors: ${errors}"] as JSON) 
+			return
+		}
+
+		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
+		activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
+		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
+
+        def registrationCode = registerAndEmail user.username, user.email, request, false	
+        
+		if (registrationCode == null || registrationCode.hasErrors()) {
+            render(['success':false, 'msg':"Successfully registered new user '${user}' but there was an error while sending verification code. As a result your account will be locked. Please try to do a forgot password to unlock your account."] as JSON) 
+        }
+        render(['success':true, 'msg':"Welcome user ${user}. A verification link has been sent to ${user.email}. Please click on the verification link in the email to activate your account."] as JSON) 
+	}
+
+    def verifyRegistration = {
+        if (springSecurityService.isLoggedIn()) {
+            redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            return;
+        }
+
+        def conf = SpringSecurityUtils.securityConfig
+        String defaultTargetUrl = conf.successHandler.defaultTargetUrl
+        String usernamePropertyName = conf.userLookup.usernamePropertyName
+
+        String token = params.t
+
+        def registrationCode = token ? RegistrationCode.findByToken(token) : null
+        if (!registrationCode) {
+            flash.error = message(code: 'spring.security.ui.register.badCode')
+            redirect uri: defaultTargetUrl
+            return
+        }
+
+        def user
+        RegistrationCode.withTransaction { status ->
+            user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
+
+            if (!user) {
+                return
+            }
 			user.accountLocked = false
 			user.save(flush:true)
 			SUserService.assignRoles(user);
@@ -315,25 +372,42 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		}
 	}
 
-	protected void registerAndEmail(String username, String email, request) {
+	protected RegistrationCode registerAndEmail(String username, String email, request, boolean redirect=true) {
 		RegistrationCode registrationCode = SUserService.register(email)
 		if (registrationCode == null || registrationCode.hasErrors()) {
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params
+            if(redirect) {
 			redirect action: 'index'
-			return
+            }
+			return registrationCode
 		}
 
 		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
 		sendVerificationMail(username,email,url,request)
+        return registrationCode;
 	}
 	
-	def resend = {
-		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]?.decodeHTML()
-		def registrationCode = RegistrationCode.findByUsername(username)
-		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
-        SUser user = SUser.findByEmail(username);
-		sendVerificationMail(user.name, username, url, request)
+	def resend() {
+		def username = params.email
+        if(username) {
+    		def registrationCode = RegistrationCode.findByUsername(username)
+            if(registrationCode) {
+                String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
+                SUser user = SUser.findByEmail(username);
+                sendVerificationMail(user.name, username, url, request)
+
+                render ([success:true, 'msg':"Successfully sent verification email to ${username}. Please check your inbox."] as JSON)
+                return;
+            } else {
+                log.error "registration code for ${username} is not present"
+                render ([success:false, 'msg':"Registration code for the email address ${username} is not found"] as JSON)
+                return;
+            }
+        } else {
+            log.error "username is null"
+            render ([success:false, 'msg':'Please provide a valid email address'] as JSON)
+        }
 	}
 
 	protected void sendVerificationMail(String username, String email, String url, request)  {
@@ -426,7 +500,7 @@ class CustomRegisterCommand {
 					return 'registerCommand.email.unique'
 				}
 			}
-		}
+ 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
 		captcha_response blank:false, nullable:false, validator: { value, command ->
@@ -452,7 +526,45 @@ class CustomRegisterCommand {
 	public String toString() {
 		return this.properties.toString();
 	}
+} 
+
+class CustomRegisterCommand2 {
+	String username
+	String email
+	String password
+	String password2
+	String name
+	String website
+	float timezone=0
+	String aboutMe;
+	String location;
+	
+	def grailsApplication
+	
+	static constraints = {
+		name blank: false, nullable: false
+		email email: true, blank: false, nullable: false, validator: { value, command ->
+			if (value) {
+				def User = command.grailsApplication.getDomainClass(
+						SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
+				if (User.findByEmail(value)) {
+					return 'registerCommand.email.unique'
+				}
+			}
+		}
+		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
+		password2 validator: RegisterController.password2Validator
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return this.properties.toString();
+	}
 }
+
 
 
 class ResetPasswordCommand2 {

@@ -49,7 +49,7 @@
                focus: _options.focus,
                select: _options.select,
                open: _options.open
-        }).data( "catcomplete" )._renderItem = function( ul, item ) {
+        }).data( "customCatcomplete" )._renderItem = function( ul, item ) {
             ul.removeClass().addClass("dropdown-menu")
                 if(item.category == "General") {
                     return $( "<li class='span3'></li>" )

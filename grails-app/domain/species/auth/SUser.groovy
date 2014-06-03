@@ -18,6 +18,7 @@ import species.Habitat;
 import species.groups.SpeciesGroup;
 import content.eml.Document
 import species.utils.ImageUtils;
+import species.SpeciesPermission;
 
 class SUser {
 
@@ -111,6 +112,7 @@ class SUser {
 	def beforeDelete() {
 		activityFeedService.deleteFeed(this)
 		UserGroupMemberRole.removeAll(this);
+        //SpeciesPermission.removeAll(this);
 	}
 
 	protected void encodePassword() {

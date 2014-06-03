@@ -43,8 +43,12 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
 
-		propsMap.remove('metaClass')
-		propsMap.remove('class')
+        if(propsMap.containsKey('metaClass')) {
+		    propsMap.remove('metaClass')
+        }
+        if(propsMap.containsKey('class')) {
+            propsMap.remove('class')
+        }
 
 		String userDomainClassName = SpringSecurityUtils.securityConfig.userLookup.userDomainClassName
 
@@ -208,11 +212,13 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
 
-				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 					try {
 						mailService.sendMail {
+
+				            if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+				            }
 							from conf.ui.notification.emailFrom
 							subject mailSubject
 							html bodyContent.toString()
@@ -220,7 +226,6 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					}catch(all)  {
 					    log.error all.getMessage()
 					}
-				}
 				break
 			default:
 				log.debug "invalid notification type"

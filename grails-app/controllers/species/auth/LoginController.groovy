@@ -152,8 +152,8 @@ class LoginController {
 				//check if the email has been verified and give option to resend the email
 				def registerationCode = RegistrationCode.findAllByUsername(username.decodeHTML()) 
 				if(registerationCode) {
-					def url = Utils.getDomainServerUrl(request) + "/register/resend"	
-					msg = g.message(code: "You have not verified your email yet! <a href=\"${url}\">Resend Verification Email</a>")
+					def url = Utils.getDomainServerUrl(request) + "/register/resend?email="+username	
+					msg = g.message(code: "You have not verified your email yet! Please resend the email by clicking on this url ${url}")
 				}else 
 					msg = g.message(code: "springSecurity.errors.login.locked")
 			}

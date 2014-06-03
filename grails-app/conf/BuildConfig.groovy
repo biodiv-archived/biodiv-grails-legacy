@@ -129,6 +129,7 @@ grails.project.dependency.resolution = {
         compile 'jmimemagic:jmimemagic:0.1.2'
         //compile 'net.sf.jtidy:jtidy:r938'
         compile 'com.mchange:c3p0:0.9.5-pre6'
+
     }
 
     plugins { 
@@ -177,9 +178,7 @@ grails.project.dependency.resolution = {
         compile ":jcaptcha:1.2.1"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
-        compile (":mail:1.0.1") {
-            excludes 'spring-test'
-        }
+        compile (":mail:1.0.5")
         compile ":quartz:1.0.1"
         compile ":rateable:0.7.1"
         //      compile ":recaptcha:0.5.2"
