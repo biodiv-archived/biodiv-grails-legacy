@@ -1,0 +1,33 @@
+h3. Login
+
+h4. Basic Login
+
+1. http://indiabiodiversity.saturn.strandls.com/api/login?username=emailAddress&password=password
+
+If successful a return type of following format is returned
+{code}
+{
+    "username": "pearlsravanthi@gmail.com",
+        "token": "8huintdfo716d329qnpndlj0srdbufgl",
+        "roles": [
+            "ROLE_ADMIN",
+        "ROLE_CEPF_ADMIN",
+        "ROLE_SPECIES_ADMIN",
+        "ROLE_USER"
+            ]
+}
+{code}
+If unsuccessful a 401 unauthorized status code is sent
+
+2. http://indiabiodiversity.saturn.strandls.com/api/observation/create with header X-Auth-Token= token value 
+
+would return result for any secure action.
+
+h4. OAuth Login
+
+1. Login to oauth service providers by sending a request at the respective urls. 
+
+* Facebook : http://indiabiodiversity.saturn.strandls.com/api/oauth/authenticate/facebook  
+* Google : http://indiabiodiversity.saturn.strandls.com/api/oauth/authenticate/google
+
+2. Upon successful login a token value is returned else a error message will be sent back in JSON format.
