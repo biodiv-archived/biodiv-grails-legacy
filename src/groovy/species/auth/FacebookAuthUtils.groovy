@@ -132,11 +132,10 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 
 	String getFacebookAppIdForDomain(String domain) {
 		if(!domain) return;
-		//log.debug "Looking facebook appId for domain $domain"
 
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else {//if(domain.equals(grailsApplication.config.ibp.domain)) {
+		} else {
 			return grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
 		return null;
@@ -145,11 +144,9 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 	String getFacebookAppSecretForDomain(String domain) {
 		if(!domain) return;
 
-		//log.debug "Looking facebook secret for domain $domain"
-
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.secret
-		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
+		} else {
 			return grailsApplication.config.speciesPortal.ibp.facebook.secret
 		}
 		return null;

@@ -243,9 +243,8 @@ class AbstractObjectService {
         //List resContext = [];
         params.each { key, val ->
             int index = -1;
-            if(key.startsWith('file_')) {
+            if(key.startsWith('file_')|| key.startsWith('url_')) {
                 index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
-
             }
             if(index != -1) {
                 files.add(val);
@@ -310,8 +309,6 @@ class AbstractObjectService {
         converter.setResourcesRootDir(rootDir);
         def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
         relImagesContext = new File(relImagesContext).getParent();
-        println "+++++++++++++++++++++"
-        println resourcesXML
         return converter.createMedia(resourcesXML, relImagesContext);
     }
 

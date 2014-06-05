@@ -265,8 +265,10 @@ class ObservationController extends AbstractObjectController {
 	private saveAndRender(params, sendMail=true){
 		def result = observationService.saveObservation(params, sendMail)
         if(request.getHeader('X-Auth-Token')) {
+            if(!result.success) result.remove('observationInstance');
             render result as JSON;
             return
+
         }
 		if(result.success){
 			chain(action: 'addRecommendationVote', model:['chainedParams':params]);

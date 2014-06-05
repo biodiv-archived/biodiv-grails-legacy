@@ -43,8 +43,6 @@ class Utils {
 	private static final MIN_FLOAT = 0.2;
 	private static final MAX_FLOAT = 0.7;
 	
-	def grailsApplication;
-
 	static boolean copy(File src, File dst) throws IOException {
 		try {
 			InputStream inS = new FileInputStream(src);

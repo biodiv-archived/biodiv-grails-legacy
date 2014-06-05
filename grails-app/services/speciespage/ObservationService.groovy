@@ -76,6 +76,7 @@ class ObservationService extends AbstractObjectService {
     def SUserService;
     def speciesPermissionService;
     def speciesService;
+    def messageSource;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
@@ -203,11 +204,16 @@ class ObservationService extends AbstractObjectService {
                 return ['success' : true, observationInstance:observationInstance]
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
-                return ['success' : false, observationInstance:observationInstance]
+                def errors = [];
+                observationInstance.errors.allErrors .each {
+                    def formattedMessage = messageSource.getMessage(it, null);
+                    errors << [field: it.field, message: formattedMessage]
+                }
+                return ['success' : false, 'msg':'Failed to save observation', 'errors':errors, observationInstance:observationInstance]
             }
         } catch(e) {
             e.printStackTrace();
-            return ['success' : false, observationInstance:observationInstance]
+            return ['success' : false, 'msg':e.getMessage(), observationInstance:observationInstance]
         }
     }
 
@@ -2235,6 +2241,7 @@ class ObservationService extends AbstractObjectService {
         String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+obv.topology.toText()+"', t.topology)order by t.type" ;
         log.debug query;
         def features = [:]
+        if(!Environment.getCurrent().getName().equalsIgnoreCase("development")) {
         try {
             def sql =  Sql.newInstance(dataSource);
             //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
@@ -2252,6 +2259,7 @@ class ObservationService extends AbstractObjectService {
         } catch(e) {
             e.printStackTrace();
             log.error e.getMessage();
+        }
         }
         return features
     } 

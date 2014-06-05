@@ -15,15 +15,7 @@ h4. Save
 ** areas : WKT representation of topology of location. e.g., POINT(77.60492180000006 17.6740832)
 ** resources : urls for the uploaded images and videos and their metadata as in following format
 {code}
-file_2:/8eaf2f40-5f65-4066-ac65-226482d481ff/748.png
-url_2:
-type_2:IMAGE
-rating_2:
-license_2:CC BY
-file_1:v
-url_1:http://www.youtube.com/watch?v=v8HVWDrGr6o
-type_1:VIDEO
-rating_1:
+http://indiabiodiversity.localhost.org/api/observation/save?url_1=http://www.youtube.com/watch?v=v8HVWDrGr6o&type_1=VIDEO&rating_1=2&resourceListType=ofObv&fromDate=01/06/2014&placeName=Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India&areas=POINT(76.42376839999997 9.6297152)&location_accuracy=Approximate&notes=    Found this bird on my trip to&nbsp;Kumarakom Bird Sanctuary</p>&tags=parrot, bird&agreeTerms=on&group_id=829&habitat_id=267838"
 {code}
 ** commonName: common name
 ** languageName: language name
@@ -32,6 +24,34 @@ rating_1:
 ** tags:[tag1,tag2...]
 ** userGroupsList: csv of all user group id's
 
+For example
+{code}
+file_1:v
+url_1:http://www.youtube.com/watch?v=v8HVWDrGr6o
+type_1:VIDEO
+rating_1:3
+resourceListType:ofObv
+commonName:Parrot
+languageName: English
+recoName:Parakeet
+recoComment: Please suggest exact scientific name
+fromDate:01/06/2014
+placeName:Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India
+areas:POINT(76.42376839999997 9.6297152)
+location_accuracy:Approximate
+reverse_geocoded_name:
+notes:<p>
+
+    Found this bird on my trip to&nbsp;Kumarakom Bird Sanctuary</p>
+
+tags:bird
+tags:parrot
+userGroupsList:1
+agreeTerms:on
+group_id:829
+habitat_id:267838
+{code}
+
 h4. upload_resource
 
 h4. show 
@@ -39,19 +59,91 @@ h4. show
 * /api/observation/show/id 
 {code}
 {
-    "success": true,
-    "msg": "",
-    "observation": {
-        "id": 224,
-        "sGroup": "Arthropods",
-        "habitat": "All",
-        "imageLink": "http://img.youtube.com/vi/mvl0xh9-fcA/default.jpg",
-        "notes": "",
-        "summary": "Observed by Sravanthi Mutyala</a></b> at 'Internal Colony Road, Shivashahi, Airport Area, Shankar Nagar, Solapur, Maharashtra 413224, India'</b> on October 22, 2013</b>.",
-        "lat": 17.623081,
-        "lng": 75.95398,
-        "observedOn": 1382412251435
-    }
+    "id": 245,
+        "placeName": "Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India",
+        "reverseGeocodedName": "Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India",
+        "geoPrivacy": false,
+        "locationAccuracy": "Approximate",
+        "topology": "POINT (76.42376839999997 9.6297152)",
+        "group": {
+            "id": 6,
+            "name": "Birds",
+            "groupOrder": 0
+        },
+        "habitat": {
+            "id": 2,
+            "name": "Forest",
+            "habitatOrder": 2
+        },
+        "fromDate": "2014-05-31T18:30:00Z",
+        "toDate": "2014-05-31T18:30:00Z",
+        "createdOn": "2014-06-04T06:55:21Z",
+        "lastRevised": "2014-06-05T02:51:53Z",
+        "author": {
+            "id": 2,
+            "name": "Sravanthi Mutyala",
+            "email": "pearlsravanthi@gmail.com",
+            "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+        },
+        "notes": "    Found this bird on my trip tonbsp;Kumarakom Bird Sanctuary</p>",
+        "summary": "Observed by <b><a href='/user/show/2'>Sravanthi Mutyala</a></b> at <b>'Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India'</b> on <b>June 01, 2014</b>.",
+        "rating": 0,
+        "maxVotedReco": {
+            "name": "Parakeet",
+            "taxonomyDefinition": null
+        },
+        "resource": [
+        {
+            "id": 1,
+            "url": "http://www.youtube.com/watch?v=v8HVWDrGr6o",
+            "icon": "http://img.youtube.com/vi/v8HVWDrGr6o/default.jpg",
+            "uploader": {
+                "id": 2,
+                "name": "Sravanthi Mutyala",
+                "email": "pearlsravanthi@gmail.com",
+                "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+            },
+            "type": "Video",
+            "uploadTime": "2014-06-04T06:55:22Z",
+            "rating": 2
+        }
+    ],
+        "recommendationVote": [
+        {
+            "recommendation": {
+                "name": "Parakeet",
+                "taxonomyDefinition": null
+            },
+            "commonNameReco": null,
+            "author": {
+                "id": 2,
+                "name": "Sravanthi Mutyala",
+                "email": "pearlsravanthi@gmail.com",
+                "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+            },
+            "confidence": "I am certain",
+            "votedOn": "2014-06-05T02:27:28Z",
+            "comment": null
+        }
+    ],
+        "userGroups": [
+        {
+            "id": 3,
+            "name": "The Western Ghats",
+            "description": "<h2 style=\"margin: 10px 0px; font-family: Verdana, Helvetica, sans-serif; font-weight: normal; line-height: 40px; color: rgb(85, 85, 85); text-rendering: optimizelegibility; font-size: 31.5px; padding: 5px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(229, 229, 229);\">\r\n\t<span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghats, a mountainous ridge running parallel to the west coast of India&rsquo;s ancient peninsula, has a rich and intriguing history.&nbsp;</span><span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghat portal seeks to provide a platform for aggregating diverse information on the biodiversity of the Western Ghats. As interested, discerning readers, students and researchers we request you to participate and create an online open collaborative system for sharing biodiversity information.</span></h2>\r\n<p>\r\n\t&nbsp;</p>\r\n",
+            "domainName": "http://thewesternghats.indiabiodiversity.localhost.org",
+            "webaddress": "the_western_ghats",
+            "foundedOn": "2013-07-15T18:09:55Z",
+            "icon": "/7d3bb3f5-2626-4a13-b9aa-ecfaabe84263/resources/807.gif"
+        }
+    ],
+        "annotations": [],
+        "isDeleted": false,
+        "isLocked": false,
+        "isChecklist": false,
+        "visitCount": 13,
+        "flagCount": 0,
+        "featureCount": 0
 }
 {code}
 

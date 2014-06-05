@@ -34,6 +34,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import species.auth.DefaultOauthUserDetailsService;
 import species.auth.MyOauthService;
+import species.utils.marshallers.*;
 
 // Place your Spring DSL code here
 beans = {
@@ -335,5 +336,13 @@ beans = {
         grailsApplication = ref('grailsApplication')
         grailsLinkGenerator = ref('grailsLinkGenerator')
         oauthUserDetailsService = ref('oauthUserDetailsService')
+    }
+
+    customObjectMarshallers( CustomObjectMarshallers ) {
+        grailsApplication = ref('grailsApplication') 
+
+        marshallers = [
+            new ObservationMarshaller()
+        ]
     }
 }
