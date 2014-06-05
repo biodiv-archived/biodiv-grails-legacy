@@ -41,8 +41,9 @@ class SUserController extends UserController {
     def dataSource;
     def chartService;
     def SUserSearchService;
+    def messageSource;
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST", resetPassword: "POST"]
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
 
@@ -125,20 +126,47 @@ class SUserController extends UserController {
 		}
 
 		def SUserInstance = SUser.get(params.long("id"))
-		if (!SUserInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			def result = buildUserModel(SUserInstance)
-			result.put('userGroupWebaddress', params.webaddress)
-            result.put('obvData', chartService.getUserStats(SUserInstance));
-//            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
-//            result.put('totalObservationInstanceList', totalObservationInstanceList); 
-            result['currentUser'] = springSecurityService.currentUser;
-            result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
-			return result
-		}
+        
+        if(request.getHeader('X-Auth-Token')) {
+            if(!params.id) {
+                render (['success':false, 'msg':"Id is required"] as JSON)
+                return
+            } else {
+                if (!SUserInstance) {
+                    render (['success':false, 'msg':"Coudn't find user with id ${params.id}"] as JSON)
+                    return
+                } else {
+                    def result = [:];
+                    result['success'] = true;
+                    result['user'] = SUserInstance
+                    result['roles'] = [];
+                    def r = buildUserModel(SUserInstance)
+                    r.roleMap.each {role, granted ->
+                        if(granted) {
+                            result.roles << role.authority
+                        }                    
+                    }
+                    result['stat'] = chartService.getUserStats(SUserInstance);
+                    render result as JSON
+                    return;
+                }
+            } 
+        } else {
+            if (!SUserInstance) {
+                flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
+                redirect(action: "list")
+            }
+            else {
+                def result = buildUserModel(SUserInstance)
+                result.put('userGroupWebaddress', params.webaddress)
+                result.put('obvData', chartService.getUserStats(SUserInstance));
+    //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
+    //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
+                result['currentUser'] = springSecurityService.currentUser;
+                result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                return result
+            }
+        }
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
@@ -768,23 +796,26 @@ class SUserController extends UserController {
 
 	@Secured(['ROLE_USER'])
 	def resetPassword (ResetPasswordCommand command ) {
-		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+        String msg;
+        boolean success = false;
 		if(SUserService.ifOwns(params.long('id'))) {
-
-			if (!request.post) {
-				return [command: new ResetPasswordCommand()]
-			}
 			def user = springSecurityService.currentUser
-//			command.username = user.username?:email
-//			println command.username;
-//			String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def command2 = new ResetPasswordCommand(username:user.username?:email, currentPassword:command.currentPassword, password:command.password, password2:command.password2, springSecurityService:springSecurityService
 ,saltSource:saltSource);
 			command2.validate()
-//
 			if (command2.hasErrors()) {
-				return [command: command2]
+                if(request.getHeader('X-Auth-Token')) {
+                    def errors = [];
+                    command2.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                    }
+                    render (['success' : false, 'msg':'Failed to reset password', 'errors':errors] as JSON); 
+                    return
+                } else {
+    				return [command: command2]
+                }
 			}
 			
 			String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
@@ -792,18 +823,28 @@ class SUserController extends UserController {
 				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
 				user.password = command2.password
 				if(!user.save()) {
-					log.error "Error saving password"
-				}
+					msg = "Error saving password"
+				} else {
+                    success = true;
+					msg = "Successfully updated password"
+                }
 			}
 
-			//springSecurityService.reauthenticate command.username
-
-			flash.message = message(code: 'spring.security.ui.resetPassword.success')
-			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
-
+            if(request.getHeader('X-Auth-Token')) {
+                render (['success' : success, 'msg':msg] as JSON); 
+                return
+            } else {
+			    flash.message = message(code: 'spring.security.ui.resetPassword.success')
+			    redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+            }
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}";
-			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+            if(request.getHeader('X-Auth-Token')) {
+                render (['success' : false, 'msg':flash.message] as JSON); 
+                return
+            } else {
+			    redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+            }
 		}
 	}
 

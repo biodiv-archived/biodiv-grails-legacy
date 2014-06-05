@@ -32,6 +32,7 @@ class UrlMappings {
 
 
 		"/user/$action?/$id?" { controller = 'SUser' }
+		"/api/user/$action?/$id?" { controller = 'SUser' }
 
 		"/" {view="index"}
 		//"/login/$action?"(controller: "login")
