@@ -46,15 +46,19 @@ class CommentController {
 	}
 	
 	def getAllNewerComments = {
-		render getResultForResponse(params) as JSON;
+		render getResultForResponse(params, request) as JSON;
 	}
 
 	def getComments = {
 		def comments = commentService.getComments(params);
-		def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
 		def olderTimeRef = (comments) ? (comments.last().lastUpdated.time.toString()) : null
 		def remainingCommentCount = (comments) ? getRemainingCommentCount(comments.last().lastUpdated.time.toString(), params) : 0
-		def result = [showCommentListHtml:showCommentListHtml, olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
+		def result = [olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
+		if(request.getHeader('X-Auth-Token')) {
+			result['commentList'] = comments	
+		}else{
+			result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+		}
 		render result as JSON
 	}
 	
@@ -73,12 +77,16 @@ class CommentController {
 		render "To do edit"
 	}
 	
-	private getResultForResponse(params){
+	private getResultForResponse(params, request){
 		def result = ["success":true];
 		def comments = _getAllNewerComments(params);
 		if(!comments.isEmpty()){
-			def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
-			result.putAll([showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
+			result.putAll([newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
+			if(request.getHeader('X-Auth-Token')) {
+				result['commentList'] = comments
+			}else{
+				result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+			}
 		}	
 		return result
 	}

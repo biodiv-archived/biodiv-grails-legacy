@@ -27,6 +27,7 @@ import species.TaxonomyDefinition.TaxonomyRank;
 import species.TaxonomyRegistry;
 import species.Classification;
 import species.Resource;
+import species.participation.Comment;
 
 import grails.converters.JSON
 import species.participation.Observation
@@ -128,7 +129,10 @@ class CustomObjectMarshallers {
 
             return ['id':it.id, url:it.url, 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating];
         }
-
+	
+		JSON.registerObjectMarshaller(Comment) {
+			return ['id':it.id, 'text':it.body, 'authorId':it.author.id, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
+		}
 
     }
 }
