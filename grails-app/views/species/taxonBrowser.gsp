@@ -1,5 +1,6 @@
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
+<%@ page import="species.Classification"%>
 <html>
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -13,15 +14,27 @@
 
 </head>
 <body>
-    <div class="container_12 big_wrapper outer_wrapper">
+    <div class="span12">
         <s:showSubmenuTemplate model="['entityName':'Taxonomy Browser']"/>
 
-            <div class="grid_12">
-                <t:showTaxonBrowser model="['expandAll':false]"/>
-            </div>
+            <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+                <h5>Classifications</h5>	
 
+                <div id="taxaHierarchy">
+
+                    <%
+                    def classifications = [];
+                    Classification.list().each {
+                    classifications.add([null, it, null]);
+                    }
+                    classifications = classifications.sort {return it[1].name};
+                    %>
+
+                    <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                </div>
+            </div>
             <a id="inviteCurators" class="btn btn-primary" href="#inviteCuratorsDialog" role="button" data-toggle="modal"><i
-                    class="icon-envelope"></i> <g:message code="userGroup.members.label"
+                class="icon-envelope"></i> <g:message code="userGroup.members.label"
                 default="Invite Curators" /> </a>
             <div class="modal hide fade" id="inviteCuratorsDialog" tabindex='-1'
                 role="dialog" aria-labelledby="inviteCuratorsModalLabel"
@@ -48,6 +61,21 @@
                 </div>
             </div>
         </div>
+        <g:javascript>
+        var taxonRanks = [];
+            <g:each in="${TaxonomyRank.list()}" var="t">
+            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            </g:each>
 
+            </g:javascript>	
+
+        <r:script>
+        $(document).ready(function() {
+        console.log("sdf");
+            var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+                expandAll:false
+            });	
+        });
+        </r:script>
     </body>
 </html>

@@ -207,8 +207,11 @@
             var $sf = this; 
             var $form = $(e.currentTarget);
             var params = e.data?e.data:{};
-            var action = params.action; 
+            if(params.action) {
+                $(this).data('action', params.action);
+            }
 
+            var action = $(this).data('action'); 
             params['reg'] = $('#taxaHierarchy option:selected').val();
             delete params['context'];
             delete params['action'];
