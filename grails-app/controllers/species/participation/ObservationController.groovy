@@ -125,7 +125,7 @@ class ObservationController extends AbstractObjectController {
 		def model = getObservationList(params);
         model.queryParams.remove('userGroup');
 
-        model.observations = [];
+        /*model.observations = [];
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
         String iconBasePath = config.speciesPortal.observations.serverURL;
 		for(obv in model.observationInstanceList){
@@ -182,7 +182,7 @@ class ObservationController extends AbstractObjectController {
 		}
 
         model.remove('observationInstanceList');
-
+*/
 		render model as JSON
 	}
 
@@ -279,9 +279,12 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def show() {
+        params.id = params.long('id');
+
         if(request.getHeader('X-Auth-Token')) {
+            
             if(params.id) {
-    			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
+    			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
 	    		if (!observationInstance) {
                     render (['success':false, 'msg':"Coudn't find observation with id ${params.id}"] as JSON)
                     return
@@ -300,13 +303,13 @@ class ObservationController extends AbstractObjectController {
                 }
 
             } else {
-                render (['success':false, 'msg':"Id is required"] as JSON)
+                render (['success':false, 'msg':"Valid id is required"] as JSON)
                 return
             }
         }
 
 		if(params.id) {
-			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
+			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
 			if (!observationInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))

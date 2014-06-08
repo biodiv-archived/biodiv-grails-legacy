@@ -250,7 +250,6 @@ class ObservationService extends AbstractObjectService {
      * @return
      */
     Map getRelatedObservations(params) {
-        log.debug params;
         int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
         int offset = params.offset ? params.offset.toInteger() : 0
         def relatedObv = [observations:[],max:max];
