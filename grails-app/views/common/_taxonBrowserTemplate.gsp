@@ -9,7 +9,7 @@
 <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
     <g:each in="${classifications}" var="classification">
     <option value="${classification[0]}">
-    ${classification[1].name} ${classification[2].toString()}
+    ${classification[1].name} ${classification[2]?classification[2].toString():''}
     </option>
     </g:each>
 </select>

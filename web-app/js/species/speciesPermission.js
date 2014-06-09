@@ -23,7 +23,7 @@ $('#inviteCurators, #inviteContributors').click(function(e){
             $dialog.find('input[name="userIds"]').val('');
             $('#userAndEmailList_'+invitetype).val('');
             $($autofillUsers[0]).parent().children('li').each(function(){
-                $($autofillUsers[0]).removeChoice($(this).find('span')[0]);
+                $autofillUsers[0].removeChoice($(this).find('span')[0]);
             });
 
             $dialog.find('form')[0].reset()
