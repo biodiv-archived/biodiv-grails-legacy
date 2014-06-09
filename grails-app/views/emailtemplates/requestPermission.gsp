@@ -2,8 +2,8 @@
 
 Hi ${curator.name.capitalize()},
 <br/><br/> 
-You have been invited as a curator for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
-Please <a href="${uri}" title="Confirmation code">click here</a> to accept being a curator.<br/>
+You have been invited as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
+Please <a href="${uri}" title="Confirmation code">click here</a> to accept being a ${invitetype}.<br/>
 <br/><br/>
 Thank you,<br/>
 The Portal Team

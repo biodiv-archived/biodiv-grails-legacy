@@ -23,6 +23,7 @@ class TaxonController {
     def taxonService;
     def springSecurityService;
     def activityFeedService;
+    def observationService;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -410,9 +411,10 @@ class TaxonController {
                 result.action = 'create';
 
                 if(result.success) {
+                    println result;
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
-                    activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_CREATED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType );
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
 
@@ -478,9 +480,10 @@ class TaxonController {
                 result.action = 'update';
 
                 if(result.success) {
+                    println result;
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
-                    activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_UPDATED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON
@@ -515,9 +518,10 @@ class TaxonController {
                 result.action = 'delete';
 
                 if(result.success) {
+                    println result;
                     def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
-                    activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_DELETED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON;

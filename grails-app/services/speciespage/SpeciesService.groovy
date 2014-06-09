@@ -310,7 +310,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field]
+                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:activityFeedService.SPECIES_FIELD_CREATED]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -345,7 +345,7 @@ class SpeciesService extends AbstractObjectService  {
                 } 
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field]
+            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_UPDATED]
         } catch(Exception e) {
             e.printStackTrace();
             return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
@@ -469,7 +469,7 @@ class SpeciesService extends AbstractObjectService  {
                     //sortAsPerRating(sameFieldSpeciesFieldInstances);
                     //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                     def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field]
+                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_DELETED]
                 } catch(e) {
                     e.printStackTrace();
                     log.error e.getMessage();
@@ -848,13 +848,16 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType;
-                if(oldSynonym)
+                String activityType, mailType;
+                if(oldSynonym) {
                     activityType = activityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                else
+                    mailType = activityFeedService.SPECIES_SYNONYM_UPDATED
+                } else {
                     activityType = activityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    mailType = activityFeedService.SPECIES_SYNONYM_CREATED
+                }
 
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType]
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
             }
         }
     }
@@ -909,14 +912,17 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType;
-                if(oldCommonname)
+                String activityType, mailType;
+                if(oldCommonname) {
                     activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
-                else
+                    mailType = activityFeedService.SPECIES_COMMONNAME_UPDATED
+                } else {
                     activityType = activityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+                    mailType = activityFeedService.SPECIES_COMMONNAME_CREATED
+                }
 
 
-                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType]
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType]
             }
         }
     }
@@ -1071,7 +1077,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 msg = 'Successfully removed synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:activityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1121,7 +1127,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 msg = 'Successfully removed common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:activityFeedService.SPECIES_COMMONNAME_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();

@@ -516,9 +516,11 @@ class SpeciesController extends AbstractObjectController {
             }
  
             if(result.success) {
+                def feedInstance;
                 if(result.activityType)
-                    activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                if(result.mailType) 
+                    observationService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
