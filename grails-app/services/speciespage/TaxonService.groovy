@@ -25,6 +25,7 @@ class TaxonService {
 	def speciesService;
 	def externalLinksService;
     def springSecurityService;
+    def activityFeedService;
 
 	static int BATCH_SIZE = 100;
 
@@ -784,6 +785,7 @@ class TaxonService {
         if(taxonRegistry) {
             int maxRank = 0;
             TaxonomyRegistry reg;
+            String hier = ""
             taxonRegistry.each { 
                 if(it.errors.getErrorCount() > 0)
                     errors.addAll(it.errors.collect {it.toString()})
@@ -791,8 +793,9 @@ class TaxonService {
                     reg = it;
                     maxRank = it.taxonDefinition.rank;
                 }
+                hier += it.taxonDefinition.name +" > "
             }
-            return ['success':true, msg:'Successfully added hierarchy', 'reg' : reg, errors:errors]
+            return ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
         }
         return ['success':false, msg:'Error while adding hierarchy', errors:errors]
     }
@@ -804,7 +807,7 @@ class TaxonService {
 
     def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
         return deleteTaxonEntries(reg, force);
-    }
+    } 
 
     private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
         String msg = '';
@@ -816,9 +819,9 @@ class TaxonService {
 
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
-        } 
+         } 
 
-        if(!reg.isContributor()) {
+         if(!reg.isContributor()) {
             return [success:false, msg:"You don't have permission to delete as you are not a contributor.", errors:errors]
         }
 
@@ -839,6 +842,7 @@ class TaxonService {
 
         try {
             if(reg) {
+                String hier = "";
                 def contributor = springSecurityService.currentUser;
                 while(reg != null) {
                     def c = TaxonomyRegistry.withCriteria () {
@@ -861,8 +865,10 @@ class TaxonService {
                     //reg.removeFromContributors(contributor);
 
                     toDelete << reg;
+                    hier += reg.taxonDefinition.name +" > "
                         //reg.delete(failOnError:true)
                     reg = reg.parentTaxon;
+
                 } 
                 
                 int maxRank = 0, regId;
@@ -890,6 +896,7 @@ class TaxonService {
                 }
                 r.success = true;
                 r.msg = 'Successfully removed registry';
+                r.activityType = activityFeedService.SPECIES_HIERARCHY_DELETED+" : "+hier;
                 r.errors << errors
                 r.regId = regId
                 return r;

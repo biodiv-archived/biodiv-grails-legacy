@@ -912,7 +912,7 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType, mailtype;
+                String activityType, mailType;
                 if(oldCommonname) {
                     activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
                     mailType = activityFeedService.SPECIES_COMMONNAME_UPDATED

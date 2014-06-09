@@ -213,10 +213,10 @@
             var $sf = this;
             var params = e.data?e.data:{};
             if(params.$container) {
-                $(e.target).data($container, params.$container);
-                $(e.target).data(editor, params.editor);
-                $(e.target).data(contriEditor, params.contriEditor);
-                $(e.target).data($form, params.$form);
+                $(e.target).data('$container', params.$container);
+                $(e.target).data('editor', params.editor);
+                $(e.target).data('contriEditor', params.contriEditor);
+                $(e.target).data('$form', params.$form);
             }
             var $container = $(e.target).data('$container');;
             var $form = $(e.target).data('$form');;
