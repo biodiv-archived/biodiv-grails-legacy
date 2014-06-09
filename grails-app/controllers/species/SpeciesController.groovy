@@ -744,12 +744,12 @@ class SpeciesController extends AbstractObjectController {
 		render m as JSON
 	}
 	
-    def inviteCurator = {
+    def requestPermission = {
         log.debug " inviting curators " + params
-        List members = Utils.getUsersList(params.curatorUserIds);
+        List members = Utils.getUsersList(params.userIds);
         def selectedNodes = params.selectedNodes
         if(selectedNodes) {
-            def msg = speciesPermissionService.sendSpeciesCuratorInvitation(selectedNodes, members, Utils.getDomainName(request), params.message)
+            def msg = speciesPermissionService.sendPermissionInvitation(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
             render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
@@ -757,32 +757,45 @@ class SpeciesController extends AbstractObjectController {
 		return
     }
 
-    def confirmCuratorInviteRequest = {
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def confirmPermissionInviteRequest = {
         if(params.userId && params.taxonConcept){
-            def user = SUser.get(params.userId.toLong())
-            def taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
-            speciesPermissionService.addCurator(user, taxonConcept)
+            SUser user = SUser.get(params.userId.toLong())
+            TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
+            String invitetype = params.invitetype;
+            switch (invitetype) {
+                case 'curator':
+                speciesPermissionService.addCurator(user, taxonConcept)
+                break;
+ 
+                case 'contributor':
+                speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
+                break;
+                default: log.error "No invite type"
+            }
+
             def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
             if(conf) {
                 log.debug "Deleting confirmation code and usertoken params";
                 conf.delete();
                 UserToken.get(params.tokenId.toLong())?.delete();
             }
-            flash.message="Successfully added ${user} as a curator to ${taxonConcept.name}"
+            flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
         }else{
-            flash.error="Couldn't add ${user} as curator to ${taxonConcept.name} because of missing information."            
+            flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
 		return;
     }
 
-   def speciesPermission = {
+/*   def speciesPermission = {
         def s = (new SpeciesPermission(['author':springSecurityService.currentUser, 'permissionType':SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(), 'taxonConcept':TaxonomyDefinition.get(1912L)]))
         if(!s.save(flush:true))
 					s.errors.each { log.error it }
         render "done"
     }
+*/
 
     def uploadImage = {
         log.debug params
