@@ -67,6 +67,10 @@ class SpeciesPermissionService {
         return addUser(author, species, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR)
     }
 
+    boolean addContributorToTaxonConcept(SUser author, TaxonomyDefinition taxonConcept) {
+        return addTaxonUser(author, taxonConcept, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR);
+    }
+
     private int addUsers(SUser author, List<Species> species, SpeciesPermission.PermissionType permissionType) {
         int n = 0
         species.each { spec -> 
@@ -156,17 +160,22 @@ class SpeciesPermissionService {
     }
     
     List<TaxonomyDefinition> contributorFor(SUser user){
-        def result = SpeciesPermission.findAllByAuthorAndPermissionType(user, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR)
+        def result = SpeciesPermission.findAllByAuthorAndPermissionType(user, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
         def res = []
         result.each{
             res << it.taxonConcept
         }
         return res
     }
-
-    def sendSpeciesCuratorInvitation(selectedNodes, members, domain, message=null) {
+/*
+    String sendSpeciesCuratorInvitation(String selectedNodes, List<SUser> members, String domain, String message=null) {
+        if(!selectedNodes) return "Please select a node";
         def rankLevel
-        def rankArray = ["Kingdom", "Phylum", "Class", "Order", "Family", "Sub Family", "Genus", "Sub Genus", "Species"]
+        def rankArray = [];
+        TaxonomyDefinition.TaxonomyRank.each {
+            rankArray << it.value()
+        }
+
         String mailSubject = "Invitation for curatorship"
         String msg = ""
         String usernameFieldName = 'name'
@@ -205,7 +214,48 @@ class SpeciesPermissionService {
         }
         return msg
     }
-    
+*/
+    String sendPermissionInvitation(String selectedNodes, List<SUser> members, String domain, String invitetype, String message=null) {
+        if(!selectedNodes) return "Please select a node";
+        def rankLevel
+        def rankArray = [];
+        TaxonomyDefinition.TaxonomyRank.each {
+            rankArray << it.value()
+        }
+
+        String mailSubject = "Invitation for ${invitetype}"
+        String msg = ""
+        String usernameFieldName = 'name'
+        def selNodes = selectedNodes.split(",")
+        members.each { mem ->
+            def hadPermissionFor;
+            if(invitetype == 'curator')
+                hadPermissionFor = curatorFor(mem)
+            else
+                hadPermissionFor = contributorFor(mem)
+
+            selNodes.each { snid ->
+                def sn = TaxonomyDefinition.get(snid.toLong())
+                def allParents = sn.parentTaxon()
+                if(hadPermissionFor) {
+                    if(hadPermissionFor.intersect(allParents)) {
+                        //he is already has permission for a parent node, no need to add for child node
+                        rankLevel = rankArray[sn.rank]
+                        msg += " ${mem.name} is already a ${invitetype} of " + rankLevel + " : ${sn.name} ";
+                        return msg
+                    }
+                }
+                rankLevel = rankArray[sn.rank]
+                def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
+                userToken.save(flush: true)
+                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission'], userToken.token);
+
+                msg += " Successfully sent invitation to ${mem.name} for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
+            }
+        }
+        return msg
+    }
+
     void addCurator(SUser user, TaxonomyDefinition taxonConcept){
         def cu = SpeciesPermission.findWhere(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CURATOR.toString())
         if(!cu){

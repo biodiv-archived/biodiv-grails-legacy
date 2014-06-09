@@ -1,22 +1,33 @@
 var curators_autofillUsersComp;
+var contributors_autofillUsersComp;
 
-$('#inviteCuratorsDialog').modal({
+$('#inviteCuratorsDialog,#inviteContributorsDialog').modal({
     "show" : false,
     "backdrop" : "static"
 });
 
-$('#inviteCurators').click(function(){
+$('#inviteCurators, #inviteContributors').click(function(e){
+    var invitetype = $(this).data('invitetype');
+    var $dialog, $autofillUsers;
+    if(invitetype === 'curator') {
+        $dialog = $('#inviteCuratorsDialog');
+        $autofillUsers = curators_autofillUsersComp;
+    } else {
+        $dialog = $('#inviteContributorsDialog');
+        $autofillUsers = contributors_autofillUsersComp;
+    }
     $.ajax({ 
         url:window.params.isLoggedInUrl,
-        success: function(data, statusText, xhr, form) {
+        success: function(data, statusText, xhr) {
         if(data === "true"){
-            $('#curatorUserIds').val('');
-            $('#userAndEmailList_3').val('');
-            $(curators_autofillUsersComp[0]).parent().children('li').each(function(){
-                $(curators_autofillUsersComp[0]).removeChoice($(this).find('span')[0]);
+            $dialog.find('input[name="userIds"]').val('');
+            $('#userAndEmailList_'+invitetype).val('');
+            $($autofillUsers[0]).parent().children('li').each(function(){
+                $autofillUsers[0].removeChoice($(this).find('span')[0]);
             });
-            $('#inviteCuratorsForm')[0].reset()
-            $('#inviteCuratorsDialog').modal('show');
+
+            $dialog.find('form')[0].reset()
+            $dialog.modal('show');
             return false;
         }else{
             window.location.href = window.params.loginUrl+"?spring-security-redirect="+window.location.href;
@@ -28,24 +39,35 @@ $('#inviteCurators').click(function(){
     });
 });
 
-$("#inviteCuratorButton").click(function(){
-    $('#curatorUserIds').val(curators_autofillUsersComp[0].getEmailAndIdsList().join(","));
+$(".inviteButton").click(function(){
+    var $dialog = $(this).parent().parent();
     var selectedNodes = $(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
-    $('#inviteCuratorsForm').ajaxSubmit({ 
-        url:window.params.inviteCuratorsFormUrl,
+    var invitetype = $dialog.find('input[name="invitetype"]').val();
+
+    var $autofillUsers;
+    if(invitetype === 'curator') {
+        $autofillUsers = curators_autofillUsersComp[0]
+    } else {
+        $autofillUsers = contributors_autofillUsersComp[0]
+    }
+    $dialog.find('input[name="userIds"]').val($autofillUsers.getEmailAndIdsList().join(","));
+
+    var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes}
+    $dialog.find('form').ajaxSubmit({ 
+        url: window.params.requestPermissionFormUrl,
         dataType: 'json', 
         clearForm: true,
         resetForm: true,
         type: 'POST',
-        data:{message:$('#inviteCuratorMsg').val(), selectedNodes : selectedNodes},
-        success: function(data, statusText, xhr, form) {
+        data:data,
+        success: function(data, statusText, xhr) {
             if(data.statusComplete) {
-                $('#inviteCuratorsDialog').modal('hide');
+                $dialog.modal('hide');
                 $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             } else {
-                $("#invite_CuratorMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-            }
-            $('#inviteCuratorsForm')[0].reset()
+                $dialog.find(".inviteMsg_status").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg).show();
+            }    
+            $dialog.find('form')[0].reset();
         }, error:function (xhr, ajaxOptions, thrownError){
             //successHandler is used when ajax login succedes
             var successHandler = this.success;
@@ -53,7 +75,7 @@ $("#inviteCuratorButton").click(function(){
                 var response = $.parseJSON(xhr.responseText);
 
             });
-            $('#inviteCuratorsForm')[0].reset()
+            $dialog.find('form')[0].reset()
         } 
     });	
 });

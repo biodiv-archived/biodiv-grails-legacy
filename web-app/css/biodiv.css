@@ -2701,3 +2701,6 @@ small {
     position:relative;
 }
 
+#inviteContributors, #inviteCurators {
+    padding: 5px 10px;
+}

@@ -290,9 +290,15 @@ function init_group_header() {
 	experts_autofillUsersComp = $("#userAndEmailList_"+window.experts_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
-        curators_autofillUsersComp = $("#userAndEmailList_"+window.params.curators_autofillUsersId).autofillUsers({
+    
+    curators_autofillUsersComp = $("#userAndEmailList_curator").autofillUsers({
 		usersUrl : window.params.userTermsUrl
 	});
+
+    contributors_autofillUsersComp = $("#userAndEmailList_contributor").autofillUsers({
+		usersUrl : window.params.userTermsUrl
+	});
+
 }
 
 /*

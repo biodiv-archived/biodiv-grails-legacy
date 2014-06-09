@@ -272,10 +272,8 @@ class TaxonController {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);					
-                    println list
                     reg = reg.parentTaxon;
                 }
-                println list
                 //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};
                     speciesHier.addAll(list);
@@ -329,19 +327,33 @@ class TaxonController {
                 if(r.path && r.path.lastIndexOf("_")!=-1) {
                     parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
                 }
-                row(id:r.id) {
-                    cell(r.id)
+                def id;
+                if(r.containsKey(id)) {
+                    id = r.id;
+                } else {
+                    id = r.path;
+                }
+                row(id:id) {
+                    cell(id)
                     cell(r.path)
                     cell (r.name.trim())
                     cell (r.count)
                     cell (r["speciesid"])
                     cell (r["classsystem"])
                     cell (r.rank)
+                    if(r.containsKey('parentId')) {
                     cell (r.parentId)
+                    } else {
+                    cell (null)
+                    }
                     cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)
                     cell (r.expanded?:false) //for expanded
                     cell (r.loaded?:false) //for loaded
-                    cell (r.isContributor?:false) //for edit/delete
+                    if(r.containsKey('isContributor')) {
+                        cell (r.isContributor?:false) //for edit/delete
+                    } else {
+                        cell (false) //for edit/delete
+                    }
                 }
             }
             records (size)
@@ -435,6 +447,11 @@ class TaxonController {
 //        }
 
             try {
+                for (int i=0; i< t.size(); i++) {
+                    if(!t[TaxonomyRank.list()[i].ordinal()]) {
+                        errors << TaxonomyRank.list()[i].value() + " is missing";
+                    }
+                }
 
                 if(!taxonService.validateHierarchy(t)) {
                     render ([success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors] as JSON)

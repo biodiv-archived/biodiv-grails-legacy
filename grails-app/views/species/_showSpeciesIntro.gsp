@@ -7,7 +7,8 @@
 
 
 <div class="span4 pull-right">
-    <t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor]"/>
+    <g:render template="/species/showTaxonBrowserTemplate" model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor]"/>
+    <g:render template="/species/inviteForContribution"/>
 </div>
 
 <!-- media gallery -->
