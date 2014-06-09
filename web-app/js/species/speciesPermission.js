@@ -43,7 +43,7 @@ $("#inviteCuratorButton").click(function(){
                 $('#inviteCuratorsDialog').modal('hide');
                 $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             } else {
-                $("#invite_CuratorMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+                $("#invite_curatorMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg).show();
             }
             $('#inviteCuratorsForm')[0].reset()
         }, error:function (xhr, ajaxOptions, thrownError){

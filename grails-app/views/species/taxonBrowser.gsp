@@ -71,7 +71,6 @@
 
         <r:script>
         $(document).ready(function() {
-        console.log("sdf");
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false
             });	

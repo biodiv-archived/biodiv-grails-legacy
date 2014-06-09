@@ -42,11 +42,11 @@
                         el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
                     }
 
-                    el+= "</span>";
+                    //el+= "</span>";
 
-                    /*if("${speciesInstance}".length == 0){
-                      el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'><input class='taxDefIdCheck' type='checkbox' value='werw' onClick='setTaxonId(this,\""+cellVal.rowId+"\")'></span>"
-                      }*/
+                    //if("${speciesInstance}".length == 0){
+                      el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck' type='checkbox'></input></span>"
+                    //}
                 //}
 
 
@@ -59,8 +59,7 @@
 
                 return el;	   
             }
-
-
+            
             this.$element.find('#taxonHierarchy').jqGrid({
                 url:window.params.taxon.classification.listUrl,
                 datatype: "xml",
@@ -71,7 +70,7 @@
                 {name:'name',index:'name',formatter:heirarchyLevelFormatter},
                 {name:'count', index:'count',hidden:true, width:50},
                 {name:'speciesId',index:'speciesId', hidden:true},
-                {name:'classSystem', index:'classSystem', hidden:true}
+                {name:'classSystem', index:'classSystem', hidden:true},
                 ],   		
                 width: "${width?:'100%'}",
                 height: "${height?:'100%'}", 
@@ -94,6 +93,7 @@
                         me.$element.find(me.addSelector).prevAll('.addFieldButton, .editFieldButton, .deleteFieldButton').remove();
                         me.initEditables(me.editSelector, me.addSelector);
                     }
+                    console.log('loadComplete');
                 },
                 loadError : function(xhr, status, error) {
                     if(xhr.status == 401) {
@@ -101,10 +101,54 @@
                     } else {	    
                         alert(error);
                     }
-                } 
+                },
+                beforeSelectRow: function (rowid, e) {
+                    console.log('bfrselectrow');
+                    var $this = $(this),
+
+                    isLeafName = $this.jqGrid("getGridParam", "treeReader").leaf_field,
+
+                    localIdName = $this.jqGrid("getGridParam", "localReader").id,
+
+                    localData,
+
+                    state;
+
+/*                    setChechedStateOfChildrenItems = function (children) {
+
+                        $.each(children, function () {
+
+                            $("#" + this[localIdName] + " input.taxDefIdCheck").prop("checked", state);
+
+                            if (!this[isLeafName]) {
+
+                                setChechedStateOfChildrenItems($this.jqGrid("getNodeChildren", this));
+
+                            }
+
+                        });
+
+                    }
+*/
+
+                    if (e.target.nodeName === "INPUT" && $(e.target).hasClass("taxDefIdCheck")) {
+
+                        state = $(e.target).prop("checked");
+                        var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
+                        console.log($(e.target).parent("span").find(".taxDefIdVal"));
+                        $(e.target).parent("span").find(".taxDefIdVal").val(last);
+
+                        //localData = $this.jqGrid("getLocalRow", rowid);
+
+                       //setChechedStateOfChildrenItems($this.jqGrid("getNodeChildren", localData), state);
+
+                    }
+
+                }
+
             });
 
-            $("#taxaHierarchy").change($.proxy(this.onChange, this));
+            $(".taxaHierarchy").change($.proxy(this.onChange, this));
             
             $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
             $('.ui-jqgrid-hdiv').hide();
@@ -113,6 +157,7 @@
         },
 
         onChange : function(e) {
+            console.log('onChange');
             var me = this;
             var postData = $("#taxonHierarchy").getGridParam('postData');
             postData["expand_species"] = me.options.expandSpecies;

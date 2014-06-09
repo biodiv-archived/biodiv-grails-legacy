@@ -164,9 +164,14 @@ class SpeciesPermissionService {
         return res
     }
 
-    def sendSpeciesCuratorInvitation(selectedNodes, members, domain, message=null) {
+    String sendSpeciesCuratorInvitation(String selectedNodes, List<SUser> members, String domain, String message=null) {
+        if(!selectedNodes) return "Please select a node";
         def rankLevel
-        def rankArray = ["Kingdom", "Phylum", "Class", "Order", "Family", "Sub Family", "Genus", "Sub Genus", "Species"]
+        def rankArray = [];
+        TaxonomyDefinition.TaxonomyRank.each {
+            rankArray << it.value()
+        }
+
         String mailSubject = "Invitation for curatorship"
         String msg = ""
         String usernameFieldName = 'name'

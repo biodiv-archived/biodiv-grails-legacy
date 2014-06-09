@@ -748,8 +748,12 @@ class SpeciesController extends AbstractObjectController {
         log.debug " inviting curators " + params
         List members = Utils.getUsersList(params.curatorUserIds);
         def selectedNodes = params.selectedNodes
-        def msg = speciesPermissionService.sendSpeciesCuratorInvitation(selectedNodes, members, Utils.getDomainName(request), params.message)
-        render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+        if(selectedNodes) {
+            def msg = speciesPermissionService.sendSpeciesCuratorInvitation(selectedNodes, members, Utils.getDomainName(request), params.message)
+            render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+        } else {
+            render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
+        }
 		return
     }
 
