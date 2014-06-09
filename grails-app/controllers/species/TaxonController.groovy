@@ -412,7 +412,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_CREATED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress);
                 }
 
 
@@ -480,7 +480,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_UPDATED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress);
                 }
 
                 render result as JSON
@@ -517,7 +517,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
                     activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_DELETED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress);
                 }
 
                 render result as JSON;

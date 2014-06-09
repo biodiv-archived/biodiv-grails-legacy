@@ -1762,7 +1762,33 @@ class ObservationService extends AbstractObjectService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
-                
+
+            case [activityFeedService.SPECIES_FIELD_CREATED, activityFeedService.SPECIES_SYNONYM_CREATED, activityFeedService.SPECIES_COMMONNAME_CREATED, activityFeedService.SPECIES_HIERARCHY_CREATED] :
+                mailSubject = notificationType;
+                bodyView = "/emailtemplates/addObservation"
+                templateMap["message"] = " added information to the following species:"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(getOwner(obv))
+                break
+
+
+            case [activityFeedService.SPECIES_FIELD_UPDATED, activityFeedService.SPECIES_SYNONYM_UPDATED, activityFeedService.SPECIES_COMMONNAME_UPDATED, activityFeedService.SPECIES_HIERARCHY_UPDATED] :
+                mailSubject = notificationType;
+                bodyView = "/emailtemplates/addObservation"
+                templateMap["message"] = " updated the following species:"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(getOwner(obv))
+                break
+
+            case [activityFeedService.SPECIES_FIELD_DELETED, activityFeedService.SPECIES_SYNONYM_DELETED, activityFeedService.SPECIES_COMMONNAME_DELETED, activityFeedService.SPECIES_HIERARCHY_DELETED] :
+                mailSubject = notificationType;
+                bodyView = "/emailtemplates/addObservation"
+                templateMap["message"] = " deleted information from the following species:"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.add(getOwner(obv))
+                break
+
+
             default:
                 log.debug "invalid notification type"
             }
