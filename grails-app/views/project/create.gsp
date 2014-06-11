@@ -456,11 +456,11 @@ CKEDITOR.replace('misc', config);
             });
             $(".tagit-hiddenSelect").css('display','none');
             $( ".date" ).datepicker({ 
-    changeMonth: true,
-    changeYear: true,
-    format: 'dd/mm/yyyy' 
-});
-            
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'dd/mm/yy' 
+            });
+
 
 		
         });
