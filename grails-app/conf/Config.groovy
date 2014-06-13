@@ -513,6 +513,8 @@ environments {
                     'grails.app.controllers.com.odobo',
                     'grails.app.services.com.odobo',
                     'org.pac4j'
+            debug 'org.hibernate.SQL'
+            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
         }
     }
 	test {

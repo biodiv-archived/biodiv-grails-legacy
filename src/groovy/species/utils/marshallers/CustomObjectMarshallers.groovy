@@ -35,6 +35,7 @@ import species.participation.Observation
 class CustomObjectMarshallers {
     
     def grailsApplication;
+    def userGroupService;
 
     List marshallers = []
 

@@ -14,8 +14,6 @@ class TaxonomyRegistry extends NamesSorucedata {
 		taxonDefinition(unique:['classification', 'path'])
 	}
 
-	static mappings = {
-		version : false
-	}
-	
+    static mapping = {
+    }
 }

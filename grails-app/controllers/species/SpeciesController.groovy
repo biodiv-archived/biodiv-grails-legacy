@@ -622,11 +622,10 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	def taxonBrowser() {
-		render (view:"taxonBrowser");
 	}
 
 	def contribute() {
-		render (view:"contribute");
+		//render (view:"contribute");
 	}
 
 	///////////////////////////////////////////////////////////////////////////////

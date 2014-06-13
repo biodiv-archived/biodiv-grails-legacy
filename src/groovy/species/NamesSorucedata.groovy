@@ -4,12 +4,18 @@ import species.auth.SUser
 
 abstract class NamesSorucedata extends Sourcedata {
 
+    List<SUser> contributors;
 	static hasMany = [contributors: SUser]
 	
     static constraints = {
     
 	}
-	
+
+    static mapping = {
+        tablePerHierarchy false
+        //tablePerSubClass true
+    }
+
 	def beforeInsert(){
 		super.beforeInsert()
 		if(!contributors){

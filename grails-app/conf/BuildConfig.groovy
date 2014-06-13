@@ -142,12 +142,12 @@ grails.project.dependency.resolution = {
         compile (':cache:1.1.6') {
                 excludes "servlet-api" 
         }
-        //runtime ":database-migration:1.3.8"
+        runtime ":database-migration:1.4.0"
 
-        compile ':hibernate:3.6.10.7'
+        compile ':hibernate:3.6.10.15'
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
-        runtime ":resources:1.2.1"
+        runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
         compile ":spring-security-acl:2.0-RC1"
@@ -169,7 +169,7 @@ grails.project.dependency.resolution = {
         compile ":cache-headers:1.1.5"
         runtime ":cached-resources:1.0"
         compile ":ckeditor:3.6.3.0"
-        //        compile ':scaffolding:1.0.0' 
+        compile ':scaffolding:2.0.3' 
         compile ':email-confirmation:1.0.5'
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
