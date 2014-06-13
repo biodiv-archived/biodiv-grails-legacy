@@ -1,6 +1,6 @@
 package species
 
-class GeographicEntity { //extends SpeciesField {
+class GeographicEntity extends SpeciesField {
 
 	Country country;
 	static mappping = {

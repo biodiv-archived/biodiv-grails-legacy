@@ -71,7 +71,7 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	static mapping = {
 		description type:"text";
 //		tablePerHierarchy true;
-		tablePerHierarchy false
+//		tablePerHierarchy false
 		references cascade: "all-delete-orphan"
 //        discriminator value:"species.SpeciesField"
 	}
