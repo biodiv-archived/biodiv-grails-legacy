@@ -24,7 +24,7 @@ class Species implements Rateable {
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
-	Float percentOfInfo; 
+	Float percentOfInfo;  
     Date updatedOn;
     int featureCount = 0;
 	Date createdOn = new Date();
@@ -76,7 +76,13 @@ class Species implements Rateable {
 	
 	//used for debugging
 	static transients = [ "sLog" ]
-	
+
+    Species() {
+        super();
+        println "Species Initialization +++++++++++++++++++++++++++++++"
+        //new Throwable("init").printStackTrace() 
+
+    }
 	Resource mainImage() {
         def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
 		if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {

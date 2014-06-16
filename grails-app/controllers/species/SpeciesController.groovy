@@ -747,6 +747,51 @@ class SpeciesController extends AbstractObjectController {
 	}
 	
     def requestPermission = {
+        def selectedNodes = params.selectedNodes
+        if(selectedNodes) {
+            List members = [springSecurityService.currentUser];
+            def msg = speciesPermissionService.sendPermissionRequest(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
+            render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+        } else {
+            render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
+        }
+		return
+    }
+
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def confirmPermissionRequest = {
+        if(params.userId && params.taxonConcept){
+            SUser user = SUser.get(params.userId.toLong())
+            TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
+            String invitetype = params.invitetype;
+            switch (invitetype) {
+                case 'curator':
+                speciesPermissionService.addCurator(user, taxonConcept)
+                break;
+ 
+                case 'contributor':
+                speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
+                break;
+                default: log.error "No invite type"
+            }
+
+            def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
+            if(conf) {
+                log.debug "Deleting confirmation code and usertoken params";
+                conf.delete();
+                UserToken.get(params.tokenId.toLong())?.delete();
+            }
+            flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
+        }else{
+            flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+        }
+        def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
+        redirect url: url
+		return;
+    }
+
+	@Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
+    def invite = {
         log.debug " inviting curators " + params
         List members = Utils.getUsersList(params.userIds);
         def selectedNodes = params.selectedNodes

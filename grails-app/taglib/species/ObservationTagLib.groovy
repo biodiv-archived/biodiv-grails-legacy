@@ -270,7 +270,6 @@ class ObservationTagLib {
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
             int userRating = springSecurityService.currentUser?((resource.userRating(springSecurityService.currentUser).size()==1)?1:0):0;
-            
             out << """
                 <div class="pull-right">
             """

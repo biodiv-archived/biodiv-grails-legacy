@@ -37,10 +37,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 						class="mailme">${supportEmail}</span>
 					</li>
 	
-					<li><b>On-line creating of species pages</b> : We are still
-						working on the facility of creating species pages on-line on the
-						portal. Please let us know your interest and we will inform you
-						once the feature is available. Please email <span class="mailme">${supportEmail}</span>
+                    <li><b>On-line creating of species pages</b> : In order to create a new species you should have write permission on the parent hierarchy. <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary">Request Permission</a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary">Create new species</a>.
 					</li>
 				</ol>
 				
