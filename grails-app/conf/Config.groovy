@@ -484,7 +484,6 @@ environments {
                 error 'stdout'
             }
             error stdout:"StackTrace"
-
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages', //  GSP
                     'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -498,23 +497,27 @@ environments {
 
             warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.plugin',
                     'grails.app'
             info   'org.springframework.security'
-            debug   'org.springframework.security.web'
-            debug   'org.springframework.security.authentication'
+            info   'org.springframework.security.web'
+            info   'org.springframework.security.authentication'
 
             debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
                     'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
+            info   'species.auth'
+            info   'com.odobo',
                     'grails.app.controllers.com.odobo',
                     'grails.app.services.com.odobo',
                     'org.pac4j'
-            debug 'org.hibernate.SQL'
-            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+//            debug 'org.hibernate.SQL'
+//            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+            error "grails.plugin" 
+            error 'grails.app.services.org.grails.plugin.resource'
+            error 'grails.app.taglib.org.grails.plugin.resource'
+            error 'grails.app.resourceMappers.org.grails.plugin.resource'
+            //debug "org.grails.plugin.resource"
         }
     }
 	test {
@@ -1332,6 +1335,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/securityinfo':    ['ROLE_ADMIN'],
     '/securityinfo.*':  ['ROLE_ADMIN'],
     '/securityinfo/**': ['ROLE_ADMIN'],
+    '/**/js/**':       ['permitAll'],
+    '/**/css/**':      ['permitAll'],
+    '/**/images/**':   ['permitAll'],
     '/**':['permitAll']
  ]
 

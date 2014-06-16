@@ -25,7 +25,7 @@
                     <%
                     def classifications = [];
                     Classification.list().each {
-                    classifications.add([null, it, null]);
+                    classifications.add([it.id, it, null]);
                     }
                     classifications = classifications.sort {return it[1].name};
                     %>

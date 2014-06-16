@@ -1,3 +1,4 @@
+<div class="invite">
 <a id="inviteCurators" class="btn btn-primary" href="#inviteCuratorsDialog" role="button" data-toggle="modal" data-invitetype='curator'><i
         class="icon-envelope"></i> <g:message code="userGroup.members.label"
     default="Invite Curators" /> </a>
@@ -58,4 +59,5 @@
     </div>
 </div>
 
-
+<div id="userNameSuggestions"></div>
+</div>

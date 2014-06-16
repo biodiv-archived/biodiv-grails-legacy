@@ -61,7 +61,6 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
-        //println attrs.model;
 			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	
@@ -234,11 +233,8 @@ class ObservationTagLib {
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource
         boolean hideForm = attrs.model.hideForm?:false
-        println "1111"
         int index = attrs.model.index?:0
-        println "1111"
         String divClass = attrs.model.class?:'rating'
-        println "1111"
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
             long averageRating = resource.averageRating ?: 0
@@ -268,11 +264,13 @@ class ObservationTagLib {
 
     def like = {attrs, body->
         def resource = attrs.model.resource
-        println "1111"
         String divClass = attrs.model.class?:'rating'
         boolean hideForm = attrs.model.hideForm
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
+            println "++++++++++++++++++++++++"
+            println resource.metaClass.methods
+            println "++++++++++++++++++++++++"
             int userRating = springSecurityService.currentUser?((resource.userRating(springSecurityService.currentUser).size()==1)?1:0):0;
             
             out << """

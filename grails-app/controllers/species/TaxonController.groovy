@@ -59,7 +59,8 @@ class TaxonController {
         if(expandSpecies) {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
-            getSpeciesHierarchy(speciesid, rs, classSystem);
+            long regId = classSystem;
+            getSpeciesHierarchy(speciesid, rs, regId);
         } else {
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
         }
@@ -411,7 +412,6 @@ class TaxonController {
                 result.action = 'create';
 
                 if(result.success) {
-                    println result;
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType );
                     observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
@@ -480,7 +480,6 @@ class TaxonController {
                 result.action = 'update';
 
                 if(result.success) {
-                    println result;
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
                     observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
@@ -518,7 +517,6 @@ class TaxonController {
                 result.action = 'delete';
 
                 if(result.success) {
-                    println result;
                     def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
                     observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
