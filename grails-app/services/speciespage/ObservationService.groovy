@@ -94,6 +94,7 @@ class ObservationService extends AbstractObjectService {
     static final String UNFEATURED = "UnFeatured";
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
+    static final String NEW_SPECIES_PERMISSION = "New permission on species"
     /**
      * 
      * @param params
@@ -1786,13 +1787,22 @@ class ObservationService extends AbstractObjectService {
                 break
 
             case [activityFeedService.SPECIES_FIELD_DELETED, activityFeedService.SPECIES_SYNONYM_DELETED, activityFeedService.SPECIES_COMMONNAME_DELETED, activityFeedService.SPECIES_HIERARCHY_DELETED] :
-                mailSubject = notificationType;
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = Introspector.decapitalize(otherParams['info']);
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(getOwner(obv))
+                mailsubject = notificationType;
+                bodyview = "/emailtemplates/addobservation"
+                templatemap["message"] = introspector.decapitalize(otherparams['info']);
+                populatetemplate(obv, templatemap, usergroupwebaddress, feedinstance, request)
+                tousers.add(getowner(obv))
                 break
-
+            
+            case NEW_SPECIES_PERMISSION : 
+                mailSubject = notificationType
+                bodyView = "/emailtemplates/grantedPermission"
+                def user = getOwner(otherParams['speciesPermission']);
+                templateMap["speciesPermission"] = otherParams["speciesPermission"]
+                templateMap["user"] = user
+                toUsers.add(user)
+                break
+ 
 
             default:
                 log.debug "invalid notification type"

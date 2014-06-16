@@ -16,6 +16,8 @@ $('#inviteCurators, #inviteContributors').click(function(e){
         $dialog = $('#inviteContributorsDialog');
         $autofillUsers = contributors_autofillUsersComp;
     }
+    $dialog.find(".inviteMsg_status").removeClass('alert alert-success alert-error').html('');
+
     $.ajax({ 
         url:window.params.isLoggedInUrl,
         success: function(data, statusText, xhr) {
@@ -40,6 +42,7 @@ $('#inviteCurators, #inviteContributors').click(function(e){
 });
 
 $(".inviteButton").click(function(){
+    console.log('invite');
     var $dialog = $(this).parent().parent();
     var selectedNodes = $(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
     var invitetype = $dialog.find('input[name="invitetype"]').val();
@@ -79,6 +82,41 @@ $(".inviteButton").click(function(){
         } 
     });	
 });
+
+$(".requestButton").click(function(){
+    console.log('request');
+    var $dialog = $(this).parent().parent();
+    var selectedNodes = $(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
+    var invitetype = $dialog.find('input[name="invitetype"]').val();
+
+    var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes}
+    $dialog.find('form').ajaxSubmit({ 
+        url: window.params.requestPermissionFormUrl,
+        dataType: 'json', 
+        clearForm: true,
+        resetForm: true,
+        type: 'POST',
+        data:data,
+        success: function(data, statusText, xhr) {
+            if(data.statusComplete) {
+                $dialog.modal('hide');
+                $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            } else {
+                $dialog.find(".inviteMsg_status").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg).show();
+            }    
+            $dialog.find('form')[0].reset();
+        }, error:function (xhr, ajaxOptions, thrownError){
+            //successHandler is used when ajax login succedes
+            var successHandler = this.success;
+            handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+                var response = $.parseJSON(xhr.responseText);
+
+            });
+            $dialog.find('form')[0].reset()
+        } 
+    });	
+});
+
 
 $("#addSpeciesImagesBtn").click(function(){
     $(".speciesImage-wrapper").toggle();

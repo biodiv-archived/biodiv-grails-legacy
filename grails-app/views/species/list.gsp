@@ -5,6 +5,9 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.Species"%>
+<%@ page import="species.Classification"%>
 
 <html>
 <head>
@@ -29,8 +32,11 @@
 			<ul class="nav nav-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
 				</li>
+				<li><a href="#taxonBrowser" data-toggle="tab">Taxon Browser</a>
+				</li>
 				<li><a href="#contribute" data-toggle="tab">Contribute</a>
 				</li>
+
 			</ul>
 
 			<div class="tab-content">
@@ -44,6 +50,26 @@
 							<s:showSpeciesList/>
 						</div>
 				</div>
+                <div id="taxonBrowser" class="tab-pane">
+                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}">
+                        <h5>Classifications</h5>	
+
+                        <div id="taxaHierarchy" style="width:100%">
+
+                            <%
+                            def classifications = [];
+                            Classification.list().each {
+                            classifications.add([it.id, it, null]);
+                            }
+                            classifications = classifications.sort {return it[1].name};
+                            %>
+
+                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                        </div>
+                    </div>
+                    <g:render template="/species/inviteForContribution"/>
+				</div>
+
 				<div id="contribute" class="tab-pane">
                                     <g:render template="contributeTemplate"/>
 				</div>
@@ -60,13 +86,24 @@
                                 });
 
                                 		});
-		
+	        var taxonRanks = [];
+            <g:each in="${TaxonomyRank.list()}" var="t">
+            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            </g:each>
+
+	
 	</g:javascript>
 	<r:script>
-	    $('.list').on('updatedGallery', function(event) {
-    		$(".grid_view").show();
-    	    });
-		
+    $('.list').on('updatedGallery', function(event) {
+    $(".grid_view").show();
+    });
+
+    $(document).ready(function() {
+    var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+    expandAll:false
+    });	
+    });
+
 	</r:script>
-</body>
+    </body>
 </html>

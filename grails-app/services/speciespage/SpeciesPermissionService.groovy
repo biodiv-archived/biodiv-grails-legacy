@@ -23,6 +23,8 @@ class SpeciesPermissionService {
 
     def springSecurityService;
     def emailConfirmationService;
+    def observationService;
+
 
     List<SUser> getCurators(Species speciesInstance) {
         def result = getUsers(speciesInstance, PermissionType.ROLE_CURATOR) 
@@ -92,9 +94,13 @@ class SpeciesPermissionService {
                     newCon.errors.allErrors.each { log.error it }
                     return false
                 }
+
+                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, [speciesPermission:newCon]);
                 log.error "done"
                 return true;
             } catch (Exception e) {
+                e.printStackTrace();
+
                 log.error "error adding new contributor ${e.getMessage()}"
                 return false;
             }
@@ -248,9 +254,54 @@ class SpeciesPermissionService {
                 rankLevel = rankArray[sn.rank]
                 def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
                 userToken.save(flush: true)
-                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission'], userToken.token);
+                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/invitePermission'], userToken.token);
 
                 msg += " Successfully sent invitation to ${mem.name} for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
+            }
+        }
+        return msg
+    }
+
+    String sendPermissionRequest(String selectedNodes, List<SUser> members, String domain, String invitetype, String message=null) {
+        if(!selectedNodes) return "Please select a node";
+        def rankLevel
+        def rankArray = [];
+        TaxonomyDefinition.TaxonomyRank.each {
+            rankArray << it.value()
+        }
+
+        String mailSubject = "Request for ${invitetype}"
+        String msg = ""
+        String usernameFieldName = 'name'
+        def selNodes = selectedNodes.split(",")
+        members.each { mem ->
+            def hadPermissionFor;
+            if(invitetype == 'curator')
+                hadPermissionFor = curatorFor(mem)
+            else
+                hadPermissionFor = contributorFor(mem)
+
+            selNodes.each { snid ->
+                def sn = TaxonomyDefinition.get(snid.toLong())
+                def allParents = sn.parentTaxon()
+                if(hadPermissionFor) {
+                    if(hadPermissionFor.intersect(allParents)) {
+                        //he is already has permission for a parent node, no need to add for child node
+                        rankLevel = rankArray[sn.rank]
+                        msg += " ${mem.name} is already a ${invitetype} of " + rankLevel + " : ${sn.name} ";
+                        return msg
+                    }
+                }
+                rankLevel = rankArray[sn.rank]
+                def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
+                userToken.save(flush: true)
+
+                List<SUser> speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
+                speciesAdmins.each {
+                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:observationService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission'], userToken.token);
+                }
+
+                msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
             }
         }
         return msg
@@ -264,6 +315,8 @@ class SpeciesPermissionService {
                 if(!newCu.save(flush:true)){
                     newCu.errors.allErrors.each { log.error it }
                     return null
+                } else {
+                    
                 }
 
             }catch (org.springframework.dao.DataIntegrityViolationException e) {

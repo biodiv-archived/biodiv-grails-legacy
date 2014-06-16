@@ -136,7 +136,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
     boolean hasObvLockPerm(obvId) {
         def observationInstance = Observation.get(obvId.toLong());
         def taxCon = observationInstance.maxVotedReco?.taxonConcept 
-        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
     }
 
     boolean permToReorderPages(uGroup){

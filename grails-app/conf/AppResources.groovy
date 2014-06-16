@@ -185,7 +185,7 @@ modules = {
 		resource url:'/css/jquery.tocify.css'
 		
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js'
+		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
 		resource url:'/js/jquery/jquery.tocify.min.js'
 		resource url:'/js/galleria/1.2.7/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
@@ -200,6 +200,11 @@ modules = {
 	
 	species_list {
 		dependsOn 'observations_list'
+
+		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
+		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
+		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
+        resource url:'/js/species/speciesPermission.js'
 
 	}
 

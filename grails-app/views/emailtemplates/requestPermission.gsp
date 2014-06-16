@@ -1,9 +1,9 @@
 <%@ page contentType="text/html"%>
 
-Hi ${curator.name.capitalize()},
+Hi ${admin.name.capitalize()},
 <br/><br/> 
-You have been invited as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
-Please <a href="${uri}" title="Confirmation code">click here</a> to accept being a ${invitetype}.<br/>
+<a href="${requesterUrl}" title="${requester.name}">${requester.name.capitalize()}</a> has requested for permission as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
+Please <a href="${uri}" title="Confirmation code">click here</a> to confim granting a ${invitetype} permission.<br/>
 <br/><br/>
 Thank you,<br/>
 The Portal Team
