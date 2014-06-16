@@ -50,8 +50,8 @@
 							<s:showSpeciesList/>
 						</div>
 				</div>
-                <div id="taxonBrowser" class="tab-pane">
-                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}">
+                <div id="taxonBrowser" class="tab-pane" style="position:relative">
+                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
                         <h5>Classifications</h5>	
 
                         <div id="taxaHierarchy" style="width:100%">
