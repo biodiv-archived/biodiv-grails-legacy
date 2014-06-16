@@ -17,7 +17,7 @@
                 <form method="post"
                     style="background-color: #F2F2F2;">
                     <input type="hidden" name="invitetype" value="contributor"></input>
-                    <textarea class="requestMsg comment-textbox" placeholder="Please write a note why do you need to have permission for this taxon."></textarea>
+                    <textarea class="inviteMsg comment-textbox" placeholder="Please write a note why do you need to have permission for this taxon."></textarea>
                 </form>
             </div>
         </div>

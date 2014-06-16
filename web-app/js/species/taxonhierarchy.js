@@ -68,7 +68,7 @@
                 {name:'id',index:'id',hidden:true},
                 {name:'_id_',index:'id',hidden:true},
                 {name:'name',index:'name',formatter:heirarchyLevelFormatter},
-                {name:'count', index:'count',hidden:true, width:50},
+                {name:'count', index:'count',hidden:true},
                 {name:'speciesId',index:'speciesId', hidden:true},
                 {name:'classSystem', index:'classSystem', hidden:true},
                 ],   		

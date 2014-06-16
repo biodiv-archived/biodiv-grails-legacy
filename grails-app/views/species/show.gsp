@@ -332,7 +332,6 @@
                 var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
-                
             });
  
             </r:script>

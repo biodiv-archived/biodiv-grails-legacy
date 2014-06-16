@@ -16,7 +16,6 @@ $('#inviteCurators, #inviteContributors').click(function(e){
         $dialog = $('#inviteContributorsDialog');
         $autofillUsers = contributors_autofillUsersComp;
     }
-    $dialog.find(".inviteMsg_status").removeClass('alert alert-success alert-error').html('');
 
     $.ajax({ 
         url:window.params.isLoggedInUrl,
@@ -27,6 +26,7 @@ $('#inviteCurators, #inviteContributors').click(function(e){
             $($autofillUsers[0]).parent().children('li').each(function(){
                 $autofillUsers[0].removeChoice($(this).find('span')[0]);
             });
+            $dialog.find(".inviteMsg_status").removeClass('alert alert-success alert-error').html('');
 
             $dialog.find('form')[0].reset()
             $dialog.modal('show');
@@ -57,7 +57,7 @@ $(".inviteButton").click(function(){
 
     var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes}
     $dialog.find('form').ajaxSubmit({ 
-        url: window.params.requestPermissionFormUrl,
+        url: window.params.inviteFormUrl,
         dataType: 'json', 
         clearForm: true,
         resetForm: true,

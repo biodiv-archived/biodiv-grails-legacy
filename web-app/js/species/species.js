@@ -935,6 +935,13 @@ $(document).ready(function() {
             initEditableFields();
             return false;
         });
+        
+        var editMode = getParameterByName('editMode');
+
+        if(editMode == "true" || editMode == "1") {
+            $('#editSpecies').click();
+        }
+
     }
 });
 

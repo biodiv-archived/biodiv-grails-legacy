@@ -28,7 +28,7 @@
 
                             <div class="input-prepend input-block-level">
                             <select id="rank" name="rank" class="add-on" style="height:auto;">
-                                <g:each in="${TaxonomyRank.list()}" var="rank">
+                                <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
                                     <option value="${rank.ordinal()}">${rank.value()}</option>
                                 </g:each>
                             </select>
@@ -118,7 +118,9 @@
                 success:function(data) {
                     if(data.success == true) {
                         if(data.id) {
-                            data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
+                            window.location.href = '/species/show/'+data.id+'?editMode=true'
+                            return;
+                            //data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
                         }
                         $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
                         //$('#validateSpeciesSubmit').hide()

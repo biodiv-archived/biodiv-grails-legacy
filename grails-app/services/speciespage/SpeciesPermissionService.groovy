@@ -254,7 +254,7 @@ class SpeciesPermissionService {
                 rankLevel = rankArray[sn.rank]
                 def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
                 userToken.save(flush: true)
-                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/invitePermission'], userToken.token);
+                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/invitePermission', message:message], userToken.token);
 
                 msg += " Successfully sent invitation to ${mem.name} for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
             }
@@ -298,7 +298,9 @@ class SpeciesPermissionService {
 
                 List<SUser> speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
                 speciesAdmins.each {
-                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:observationService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission'], userToken.token);
+                    println "+++++++++++++++++++++++++++++"
+                    println message
+                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:observationService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
                 }
 
                 msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        

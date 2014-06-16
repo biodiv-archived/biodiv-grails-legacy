@@ -81,7 +81,6 @@ class Species implements Rateable {
         super();
         println "Species Initialization +++++++++++++++++++++++++++++++"
         //new Throwable("init").printStackTrace() 
-
     }
 	Resource mainImage() {
         def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
