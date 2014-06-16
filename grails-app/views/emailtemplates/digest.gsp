@@ -36,7 +36,7 @@
                             def controller = observationInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = observationInstance.id
                             %>
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
                         </tr>
                     </table>
@@ -54,7 +54,7 @@
                             def controller = uniObvInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = uniObvInstance.id
                             %>
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
                         </tr>
                     </table>
@@ -84,7 +84,7 @@
                             imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;
                             def spId = speciesInstance.id
                             %>
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
                         </tr>
                     </table>
@@ -102,8 +102,8 @@
                     <table>
                         <tr align="left">
                             <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
-                            <td class="w640" height="30" width="120"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
-                                    <img src="${userInstance.profilePicture()}" title="${userInstance.name}" style="border: 0px solid ; width: 120px; height: 101px;" />
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: center;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
+                                    <img src="${userInstance.profilePicture()}" title="${userInstance.name}" style="border: 0px solid ; max-height: 120px; width:auto;" />
                             </a></td>
                             </g:each>
                         </tr>
