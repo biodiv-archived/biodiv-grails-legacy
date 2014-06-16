@@ -743,6 +743,7 @@ class SpeciesController extends AbstractObjectController {
 		render m as JSON
 	}
 	
+    @Secured(['ROLE_USER'])
     def requestPermission() {
         def selectedNodes = params.selectedNodes
         if(selectedNodes) {
