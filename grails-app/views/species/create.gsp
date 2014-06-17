@@ -151,7 +151,10 @@
 
                         $('#addSpeciesSubmit').show();
                     } else {
-                         $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                        if(data.status == 'requirePermission') 
+                            window.location.href = '/species/contribute'
+                        else 
+                            $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
                     }
                 }, error: function(xhr, status, error) {
                     handleError(xhr, status, error, this.success, function() {

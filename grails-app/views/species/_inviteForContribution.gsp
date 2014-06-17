@@ -17,7 +17,7 @@
                 <form method="post"
                     style="background-color: #F2F2F2;">
                     <input type="hidden" name="invitetype" value="contributor"></input>
-                    <textarea class="inviteMsg comment-textbox" placeholder="Please write a note why do you need to have permission for this taxon."></textarea>
+                    <textarea class="inviteMsg comment-textbox" placeholder="Please briefly tell us about your expertise in this taxa and what content you intend contribute to enrich the species pages."></textarea>
                 </form>
             </div>
         </div>

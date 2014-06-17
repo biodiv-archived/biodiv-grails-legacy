@@ -124,7 +124,6 @@ class SpeciesService extends AbstractObjectService  {
             //StringWriter str1 = new StringWriter();
             lastRevisedStartDate = dateFormatter.format(s)
             //DateUtil.formatDate(s, cal, str1)
-            //println str1
             //lastRevisedStartDate = str1;
 
         }
@@ -139,7 +138,6 @@ class SpeciesService extends AbstractObjectService  {
             e = new Date(cal.getTimeInMillis())
             //			StringWriter str2 = new StringWriter();
             //			DateUtil.formatDate(e, cal, str2)
-            //			println str2
             lastRevisedEndDate = dateFormatter.format(e);
         }
 
@@ -1148,9 +1146,7 @@ class SpeciesService extends AbstractObjectService  {
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
-        
-        if(speciesInstance.taxonConcept) {
-
+         if(speciesInstance.taxonConcept) {
             speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
             //taxonconcept is being used as guid
             speciesInstance.guid = converter.constructGUID(speciesInstance);
@@ -1167,6 +1163,11 @@ class SpeciesService extends AbstractObjectService  {
                     return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
                 }
                 return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+            }
+
+            //CHK if current user has permission to add details to the species
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                return [success:false, status:'requirePermission', msg:'Please request for permission to contribute.', errors:errors]
             }
  
             //save taxonomy hierarchy
@@ -1560,7 +1561,6 @@ class SpeciesService extends AbstractObjectService  {
     }
     
      def getLatestUpdatedSpecies(webaddress, sortBy, max, offset ){
-        println "===SERVICE SPECIES++++++++++GET LATEST==="
         def p = [:]
         p.webaddress = webaddress
         p.sort = sortBy
@@ -1571,7 +1571,6 @@ class SpeciesService extends AbstractObjectService  {
         result.each{
             res.add(["observation":it, 'title':it.title])
         }
-        println "=====RESULT SPECIES ++++++ RETURNED====== " + res
         return ['observations':res]
     }
 }

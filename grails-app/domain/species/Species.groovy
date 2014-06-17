@@ -85,41 +85,41 @@ class Species implements Rateable {
 
 	Resource mainImage() {
         def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-		if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
+        if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
             def images = this.getImages();
-			this.reprImage = images ? images[0]:null;
+            this.reprImage = images ? images[0]:null;
             if(reprImage) {
                 log.debug " Saving representative image for species ===  $reprImage.fileName" ;
 
                 if(!this.save(flush:true)) {
                     this.errors.each { log.error it }
                 }
-			}			
-		}
-		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim()).exists())) {
-			    return reprImage;
-		} else {
-			return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-		}
-	}
+            }			
+        }
+        if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim()).exists())) {
+            return reprImage;
+        } else {
+            return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+        }
+    }
 
     /** 
-    * Ordering resources basing on rating
-    **/
-	List<Resource> getImages() { 
+     * Ordering resources basing on rating
+     **/
+    List<Resource> getImages() { 
         def params = [:]
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
 
-		def sql =  Sql.newInstance(dataSource);
+        def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
         params['type'] = type;
 
         def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id and r.type ='"+ResourceType.IMAGE+"' and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
-        
+
         def res = sql.rows("select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref where o.type ='"+ResourceType.IMAGE+"' and o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id)) order by avg desc, id asc", [id:this.id])
 
-        def idList = results.collect {it[0]}
+            def idList = results.collect {it[0]}
 
         res.each {
             if(!idList.contains(it[0])) {
@@ -242,7 +242,7 @@ class Species implements Rateable {
     def afterInsert() {
 		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
 		//http://jira.grails.org/browse/GRAILS-4453
-		Species.withNewSession{
+/*		Species.withNewSession{
 	        HashSet contributors = new HashSet();
 	
 	        //TODO:looks like this is gonna be heavy on every save ... gotta change
@@ -257,7 +257,7 @@ class Species implements Rateable {
                 log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
             }
 		}
-    }
+*/    }
 
     def beforeDelete(){
         activityFeedService.deleteFeed(this)
