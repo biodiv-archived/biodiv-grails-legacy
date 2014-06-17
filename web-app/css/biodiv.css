@@ -2710,3 +2710,7 @@ small {
     margin-top: 1px \9;
     line-height: normal;
 }
+
+.rank a {
+    color: #16509E;
+}
