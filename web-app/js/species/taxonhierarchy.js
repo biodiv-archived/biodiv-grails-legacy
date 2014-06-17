@@ -31,23 +31,24 @@
                 });
 
                 //el+= taxonId;
-                //if(level == me.options.speciesLevel) {
-                //    el = "<a href='/species/show/"+me.options.speciesId+"'>"+el+"</a>";
-                //} else {
+                if(speciesId && speciesId != -1) {
+                    el = levelTxt+": "+"<span class='rank rank"+level+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
+                } else {
                     // el = "<a href='${createLink(action:"taxon")}/"+taxonId+"'
                     // class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
-                    el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
+                    el = levelTxt+": "+"<span class='rank rank"+level+"'>"+el;
+                }
+                
+                if(this.expandAllIcon) {
+                    el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
+                }
+            
+                var postData = $(this).getGridParam('postData');
+                var expandSpecies = postData['expand_species'];
 
-                    if(this.expandAllIcon) {
-                        el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
-                    }
-
-                    //el+= "</span>";
-
-                    //if("${speciesInstance}".length == 0){
-                      el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox' type='checkbox'></input></span>"
+                //if("${speciesInstance}".length == 0){
+                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='checkbox'></input></span>"
                     //}
-                //}
 
 
                 var isContributor= $(cells[11]).text();
@@ -93,7 +94,6 @@
                         me.$element.find(me.addSelector).prevAll('.addFieldButton, .editFieldButton, .deleteFieldButton').remove();
                         me.initEditables(me.editSelector, me.addSelector);
                     }
-                    console.log('loadComplete');
                 },
                 loadError : function(xhr, status, error) {
                     if(xhr.status == 401) {
@@ -103,7 +103,6 @@
                     }
                 },
                 beforeSelectRow: function (rowid, e) {
-                    console.log('bfrselectrow');
                     var $this = $(this),
 
                     isLeafName = $this.jqGrid("getGridParam", "treeReader").leaf_field,
@@ -135,7 +134,6 @@
 
                         state = $(e.target).prop("checked");
                         var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
-                        console.log($(e.target).parent("span").find(".taxDefIdVal"));
                         $(e.target).parent("span").find(".taxDefIdVal").val(last);
 
                         //localData = $this.jqGrid("getLocalRow", rowid);
@@ -157,7 +155,6 @@
         },
 
         onChange : function(e) {
-            console.log('onChange');
             var me = this;
             var postData = $("#taxonHierarchy").getGridParam('postData');
             postData["expand_species"] = me.options.expandSpecies;

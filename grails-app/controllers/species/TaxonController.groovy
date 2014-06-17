@@ -24,8 +24,10 @@ class TaxonController {
     def springSecurityService;
     def activityFeedService;
     def observationService;
+    def grailsApplication;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
     /**
      * 
@@ -48,11 +50,10 @@ class TaxonController {
         long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
-        def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
-        combinedHierarchy.merge();
+        /*combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
             classSystem = null;
-        }
+        }*/
 
         long startTime = System.currentTimeMillis();
         def rs = new ArrayList<GroovyRowResult>();
@@ -258,7 +259,7 @@ class TaxonController {
                 def list = [] 
                 while(reg != null) {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()]
-                    populateSpeciesDetails(speciesTaxonId, result);
+                    populateSpeciesDetails(reg.taxonDefinition.id, result);
                     list.add(result);
                     reg = reg.parentTaxon;
                 }
