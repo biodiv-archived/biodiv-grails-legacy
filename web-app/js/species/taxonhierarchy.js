@@ -45,7 +45,7 @@
                     //el+= "</span>";
 
                     //if("${speciesInstance}".length == 0){
-                      el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck' type='checkbox'></input></span>"
+                      el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox' type='checkbox'></input></span>"
                     //}
                 //}
 

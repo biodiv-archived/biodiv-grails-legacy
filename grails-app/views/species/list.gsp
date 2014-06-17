@@ -53,7 +53,9 @@
                 <div id="taxonBrowser" class="tab-pane" style="position:relative">
                     <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
                         <h5>Classifications</h5>	
-
+                        <div class="alert" style="margin-bottom:0px;">
+                            Please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. You will be able to contribute once you have been allotted edit/create rights for the taxa.
+                        </div>
                         <div id="taxaHierarchy" style="width:100%">
 
                             <%
@@ -83,25 +85,34 @@
 			$('#speciesGallerySort').change(function(){
 				updateGallery(window.location.pathname + window.location.search, ${params.limit?:40}, 0, undefined, false);
 				return false;
-                                });
+            });
 
-                                		});
-	        var taxonRanks = [];
-            <g:each in="${TaxonomyRank.list()}" var="t">
-            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
-            </g:each>
+            // Javascript to enable link to tab
+            var url = document.location.toString();
+            if (url.match('#')) {
+            $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+            } 
 
-	
+            // Change hash for page-reload
+            $('.nav-tabs a').on('shown', function (e) {
+                window.location.hash = e.target.hash;
+            })
+        });
+        var taxonRanks = [];
+        <g:each in="${TaxonomyRank.list()}" var="t">
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+        </g:each>
 	</g:javascript>
+
 	<r:script>
     $('.list').on('updatedGallery', function(event) {
-    $(".grid_view").show();
+        $(".grid_view").show();
     });
 
     $(document).ready(function() {
-    var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-    expandAll:false
-    });	
+        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+            expandAll:false
+        });	
     });
 
 	</r:script>
