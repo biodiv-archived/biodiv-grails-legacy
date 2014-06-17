@@ -18,6 +18,10 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	
 				<p>You can contribute to species pages in three ways:</p>
 				<ol>
+	
+                    <li><b>On-line creating of species pages</b> : In order to create a new species you should have write permission on the parent hierarchy. <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary">Request Permission</a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary">Create new species</a>.
+					</li>
+
 					<li><b>Multiple species pages in one spreadsheet</b> : Download
 						the xlsx spreadsheet <a
 						href="${createLinkTo(dir: '/../static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">here</a>,
@@ -35,9 +39,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 						pages fields available on the portal with appropriate attribution
 						and license. Mail the completed species page to us <span
 						class="mailme">${supportEmail}</span>
-					</li>
-	
-                    <li><b>On-line creating of species pages</b> : In order to create a new species you should have write permission on the parent hierarchy. <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary">Request Permission</a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary">Create new species</a>.
 					</li>
 				</ol>
 				

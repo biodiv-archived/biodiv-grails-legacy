@@ -36,7 +36,7 @@ class SpeciesPermissionService {
         return result
     } 
 
-    private List getUsers(Species speciesInstance, permissionType) {
+    private List getUsers(Species speciesInstance, SpeciesPermission.PermissionType permissionType) {
         def taxonConcept = species.taxonConcept;
         List parentTaxons = taxonConcept.parentTaxon()
         def res = SpeciesPermission.findAllByPermissionTypeAndTaxonConceptInList(permissionType, parentTaxons)
@@ -111,7 +111,7 @@ class SpeciesPermissionService {
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) ||SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
+        return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) );//||SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
     boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes) {
@@ -119,7 +119,6 @@ class SpeciesPermissionService {
         if(!taxonConcept) return false;
         List parentTaxons = taxonConcept.parentTaxon()
         parentTaxons.add(taxonConcept);
-        println parentTaxons
         def permissions = permissionTypes.collect {it.value()};
         def res = SpeciesPermission.withCriteria {
             eq('author', user)
@@ -298,8 +297,6 @@ class SpeciesPermissionService {
 
                 List<SUser> speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
                 speciesAdmins.each {
-                    println "+++++++++++++++++++++++++++++"
-                    println message
                     emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:observationService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
                 }
 

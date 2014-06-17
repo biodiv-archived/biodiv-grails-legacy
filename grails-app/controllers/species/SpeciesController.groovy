@@ -107,16 +107,16 @@ class SpeciesController extends AbstractObjectController {
     def save = {
         List errors = [];
         Map result = [errors:errors];
-        if(params.taxonRegistry && params.page && params.rank) {
-            Map list = params.taxonRegistry?:[];
+        if(params.page && params.rank) {
+            Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
             int rank;
-            list.each { key, value ->
+            list.each { key, value -> 
                 if(value) {
                     t.putAt(Integer.parseInt(key).intValue(), value);
-                }
-            }
+                 }
+            } 
 
             speciesName = params.page
             rank = params.int('rank');
@@ -128,9 +128,16 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.createSpecies(speciesName, rank, t);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
+                    if(result.status == 'requirePermission') {
+                        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
+                        def url = uGroup.createLink(controller:"species", action:"contribute");
+                        redirect url: url
+                        return;
+                    } else {
                     flash.message = result.msg ? result.msg+result.errors:"Error while creating page"+result.errors
                     redirect(action: "create")
                     return;
+                    }
                 }
 
                 Species speciesInstance = result.speciesInstance;
@@ -138,18 +145,17 @@ class SpeciesController extends AbstractObjectController {
 
                     if (!speciesInstance.hasErrors() && speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
-                        if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
-
-                            flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
-                        } else {
+                        //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
+                            //flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
+                        //} else {
                             flash.message = "Successfully created species."
-                        }
+                        //}
                         
                         activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
                         observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, null, params.webaddress);
 
 
-                        redirect(action: "show", id: speciesInstance.id)
+                        redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
                         return;
                     } else {
                         flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
@@ -175,6 +181,15 @@ class SpeciesController extends AbstractObjectController {
 			redirect(action: "list")
 		}
 		else {
+            if(params.editMode) {
+                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
+                    def url = uGroup.createLink(controller:"species", action:"contribute");
+                    redirect url: url
+            		return;
+                }
+            }
+
 			def c = Field.createCriteria();
 			def fields = c.list(){
 				and{ order('displayOrder','asc') }
