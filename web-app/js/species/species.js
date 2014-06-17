@@ -897,9 +897,9 @@ $(document).ready(function() {
         var initEditableFields = function(e) {
             if($(document).find('.editFieldButton').length == 0) {
                 refreshEditables($('body'));
-                $("#requestPermission").show();
-                $("#inviteCurators").show();
-                $("#inviteContributors").show();
+                //$("#requestPermission").show();
+                //$("#inviteCurators").show();
+                //$("#inviteContributors").show();
             } else {
                 /*    $('.editable').editable('disable');
                       $('.addField').hide();
