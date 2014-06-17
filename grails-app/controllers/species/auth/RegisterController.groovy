@@ -32,6 +32,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	//def recaptchaService;	
     //def grailsApplication
 
+	static allowedMethods = [user:"POST", register:"POST"]
+
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl

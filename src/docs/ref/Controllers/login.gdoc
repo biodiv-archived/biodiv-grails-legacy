@@ -2,9 +2,17 @@ h3. Login
 
 h4. Basic Login
 
-1. http://indiabiodiversity.saturn.strandls.com/api/login?username=emailAddress&password=password
-
-If successful a return type of following format is returned
+* *Path* : /api/login
+* *Parameters* :
+** username : a valid email address
+** password : password
+* *REST Method* : POST
+* *Request* : 
+{code}
+http://indiabiodiversity.saturn.strandls.com/api/login?username=emailAddress&password=password
+{code}
+* *Response* :
+** on success
 {code}
 {
     "username": "pearlsravanthi@gmail.com",
@@ -17,17 +25,63 @@ If successful a return type of following format is returned
             ]
 }
 {code}
-If unsuccessful a 401 unauthorized status code is sent
-
-2. http://indiabiodiversity.saturn.strandls.com/api/observation/create with header X-Auth-Token= token value 
-
-would return result for any secure action.
+** in case of error
+ a 401 unauthorized status code is sent
 
 h4. OAuth Login
 
 1. Login to oauth service providers by sending a request at the respective urls. 
 
-* Facebook : http://indiabiodiversity.saturn.strandls.com/api/oauth/authenticate/facebook  
-* Google : http://indiabiodiversity.saturn.strandls.com/api/oauth/authenticate/google
+Facebook 
 
-2. Upon successful login a token value is returned else a error message will be sent back in JSON format.
+* *Path* : /api/oauth/callback/facebook  
+* *Parameters* :
+** access_token : valid fb access_token
+* *REST Method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/oauth/callback/facebook?access_token=CAAE7wX9joZBUBAP6LcCLyelAGFA3X6YgZBZBAVj9NMSv7ZC6ZCTCMr3ce4PBMZARJzcP5tQ3i0NoxVbPc7ghmjmrYXaZAHnl1MLKh2lkVaDA6ClU1QLTMZC1tMfCzmhVvJUaxV2lYsypG2zkJ1WRE68oebnifeAmqi1p1Nca6jlZB8lGZBZCoKy7JyV
+{code}
+* *Response* :
+** on success
+{code}
+{
+        "token": "20efurbcrh4fg441m8e9fg5fjb4us3ut"
+}
+{code}
+** in case of error
+{code}
+{
+    "message": "No access token",
+    "error": "500",
+    "token": ""
+}
+{code}
+
+Google 
+
+* *Path* : /api/oauth/callback/facebook  
+* *Parameters* :
+** access_token : valid fb access_token
+* *REST Method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/oauth/callback/facebook?access_token=CAAE7wX9joZBUBAP6LcCLyelAGFA3X6YgZBZBAVj9NMSv7ZC6ZCTCMr3ce4PBMZARJzcP5tQ3i0NoxVbPc7ghmjmrYXaZAHnl1MLKh2lkVaDA6ClU1QLTMZC1tMfCzmhVvJUaxV2lYsypG2zkJ1WRE68oebnifeAmqi1p1Nca6jlZB8lGZBZCoKy7JyV
+{code}
+* *Response* :
+** on success
+{code}
+{
+        "token": "20efurbcrh4fg441m8e9fg5fjb4us3ut"
+}
+{code}
+** in case of error
+{code}
+{
+    "message": "No access token",
+    "error": "500",
+    "token": ""
+}
+{code}
+
+

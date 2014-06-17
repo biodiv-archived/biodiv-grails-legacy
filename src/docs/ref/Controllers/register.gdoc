@@ -1,45 +1,50 @@
 h4. Register
 
-1. Following details can be sent to /register/register to register a new user. Only email address and password are mandatory.
-* String username
-* String email
-* String password
-* String password2
-* String name
-* String website
-* String aboutMe;
-* String location;
-
-For example
+* *Path* : /api/register/user
+* *Parameters* :
+** String username
+** String email
+** String password
+** String password2
+** String name
+** String website
+** String aboutMe;
+** String location;
+* *REST method* : POST
+* *Request* :
 {code}
 http://indiabiodiversity.localhost.org/api/register/user?email=username@gmail.com&password=password&password2=password&name=User
 {code}
-
-2. Upon successful registration following response is sent and a verification link is sent at the given address along with a registration code. 
+* *Response* :
+** Successful response : 
+Upon successful registration following response is sent and a verification link is sent at the given address along with a registration code. 
 {code}
 {"success":true,"message":"Welcome user Devaki. A verification link has been sent to devaki.anugu@gmail.com. Please click on the verification link in the email to activate your account."}
 {code}
-
-Upon error the reason for error is provided in the response json in the following format
+** in case of error
 {code}
 {"success":false,"message":"Failed to register the user because of the following errors: [[field:email, message:This email id is already registered.]]"}
 {code}
 
 h4. Resend the verification email
 
+* *Path* : /api/register/resend
+* *Parameters" : 
+** email
+* *Rest Method* : GET
+* *Request* :
 {code}
 http://indiabiodiversity.localhost.org/api/register/resend?email=username@gmail.com
 {code}
-and a successful response would be 
+* *Response* :
+** on success
 {code}
 {"success":true,"msg":"Successfully sent verification email to username@gmail.com. Please check your inbox."}
 {code}
-if there was any error response would be 
+** in case of error 
 {code}
 {"success":false,"msg":"Registration code for the email address devak213i.anugu@gmail.com is not found"}
 {code}
 
 h4. Forgot Password 
-
-h4. Reset Password 
 
