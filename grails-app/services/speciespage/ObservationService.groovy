@@ -1555,6 +1555,7 @@ class ObservationService extends AbstractObjectService {
             def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
             templateMap["currentUser"] = springSecurityService.currentUser
             templateMap["action"] = notificationType;
+			templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
             def mailSubject = ""
             def bodyContent = ""
             String htmlContent = ""

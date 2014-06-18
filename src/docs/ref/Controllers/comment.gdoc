@@ -16,17 +16,17 @@ h4. addComment
 * *REST method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/comment/addComment?commentBody=test comment&commentHolderId=1&commentHolderType=species.participation.RecommendationVote&rootHolderId=2&rootHolderType=species.participation.Observation&parentId=3&mainParentId=4&subject=test subject
+http://indiabiodiversity.localhost.org/api/comment/addComment?commentHolderId=268292&rootHolderId=268292&rootHolderType=species.participation.Observation&commentHolderType=species.participation.Observation&newerTimeRef=1403071938526&commentBody=test comment
 {code}
 For example
 {code}
 commentBody:test comment
-commentHolderId:1
-commentHolderType:species.participation.RecommendationVote
-rootHolderId:2
+commentHolderId:268292
+commentHolderType:species.participation.Observation
+rootHolderId:268292
 rootHolderType:species.participation.Observation
-parentId:3
-mainParentId:4
+parentId:
+mainParentId:
 subject:test subject
 
 * *Response* :
@@ -34,10 +34,39 @@ subject:test subject
 {code}
 {
     "success": true,
-    clearForm":true,
-    commentList:[
-    	{'id':id, 'text':body, 'authorId':author.id, 'lastUpdated' : lastUpdated, 'commentHolderType':commentHolderType }
-    ]
+    "newerTimeRef": "1403072802813",
+    "newlyAddedCommentCount": 4,
+    "commentList": [
+        {
+            "id": 12383,
+            "text": "test comment 1",
+            "authorId": 1188,
+            "lastUpdated": "2014-06-18T06:26:42Z",
+            "commentHolderType": "species.participation.Observation"
+        },
+        {
+            "id": 12382,
+            "text": "test comment",
+            "authorId": 1188,
+            "lastUpdated": "2014-06-18T06:26:04Z",
+            "commentHolderType": "species.participation.Observation"
+        },
+        {
+            "id": 12381,
+            "text": "tc2",
+            "authorId": 1188,
+            "lastUpdated": "2014-06-18T06:25:52Z",
+            "commentHolderType": "species.participation.Observation"
+        },
+        {
+            "id": 12380,
+            "text": "tc1",
+            "authorId": 1188,
+            "lastUpdated": "2014-06-18T06:25:42Z",
+            "commentHolderType": "species.participation.Observation"
+        }
+    ],
+    "clearForm": true
 }
 {code}
 
@@ -56,11 +85,11 @@ h4. removeComment
 * *REST method* : GET
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/comment/removeComment?commentId=4
+http://indiabiodiversity.localhost.org/api/comment/removeComment?commentId=12375
 {code}
 For example
 {code}
-commentId:4
+commentId:12375
 
 * *Response* :
 ** Successful response :
@@ -90,26 +119,33 @@ h4. getComments
 * *REST method* : GET
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/comment/getComments?commentHolderId=1&commentHolderType=species.participation.RecommendationVote&rootHolderId=2&rootHolderType=species.participation.Observation&parentId=3&max=3&refTime=12386340000&timeLine=older
+http://indiabiodiversity.localhost.org/api/comment/getComments?commentHolderId=268292&rootHolderId=268292&rootHolderType=species.participation.Observation&commentHolderType=species.participation.Observation&refTime=1403071938526&max=3&timeLine=older
 {code}
 For example
 {code}
-commentHolderId:1
-commentHolderType:species.participation.RecommendationVote
-rootHolderId:2
+commentHolderId:268292
+commentHolderType:species.participation.Observation
+rootHolderId:268292
 rootHolderType:species.participation.Observation
-parentId:3
+parentId:
 max:3
-refTime:12386340000
+refTime:1403071938526
 timeLine:older
 
 * *Response* :
 {code}
 {
-    "olderTimeRef": time offset in milliseconds ,
-    "remainingCommentCount":remaining comment count,
-    commentList:[
-    	{'id':id, 'text':body, 'authorId':author.id, 'lastUpdated' : lastUpdated, 'commentHolderType':commentHolderType }
+{
+    "olderTimeRef": "1359906933122",
+    "remainingCommentCount": 0,
+    "commentList": [
+        {
+            "id": 1392,
+            "text": "Combining common and Sc names",
+            "authorId": 1426,
+            "lastUpdated": "2013-02-03T15:55:33Z",
+            "commentHolderType": "species.participation.Recommendation"
+        }
     ]
 }
 {code}
