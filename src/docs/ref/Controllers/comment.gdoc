@@ -13,6 +13,7 @@ h4. addComment
 ** parentId : Id of parent comment in case of reply 
 ** mainParentId: Id of main comment in case of discussion thread
 ** subject: subject
+** newerTimeRef : current time in milliseconds
 * *REST method* : POST
 * *Request* :
 {code}
@@ -28,6 +29,7 @@ rootHolderType:species.participation.Observation
 parentId:
 mainParentId:
 subject:test subject
+newerTimeRef:1403071938526
 
 * *Response* :
 ** Successful response :
