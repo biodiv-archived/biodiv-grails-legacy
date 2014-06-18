@@ -995,7 +995,12 @@ class TaxonService {
 
     boolean validateHierarchy(List<String> taxonEntries) {
         for (int i=0; i< taxonEntries.size(); i++) {
-            if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) return false;
+            if(TaxonomyRank.list()[i] != TaxonomyRank.SUB_FAMILY && TaxonomyRank.list()[i] != TaxonomyRank.SUB_GENUS) {
+                if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) {
+                    log.debug "${TaxonomyRank.list()[i]} is missing" 
+                    return false;
+                }
+            }
         }
         return true;
     }

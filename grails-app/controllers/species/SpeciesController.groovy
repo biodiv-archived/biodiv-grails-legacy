@@ -133,7 +133,7 @@ class SpeciesController extends AbstractObjectController {
                         return;
                     } else {
                     flash.message = result.msg ? result.msg+result.errors:"Error while creating page"+result.errors
-                    redirect(action: "create")
+			        render(view: "create", model: result)
                     return;
                     }
                 }
@@ -168,7 +168,7 @@ class SpeciesController extends AbstractObjectController {
                 flash.message = result.msg ? result.msg+result.errors : "Error while saving species "+result.errors
             }
         }
-        render(view: "create")
+        render(view: "create", model:result)
     }
 
 	def show() {
@@ -960,20 +960,20 @@ class SpeciesController extends AbstractObjectController {
                     }
                 }
                 if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
-                    result = ['success':false, 'msg':"Not a valid name ${page.name}."]
+                    result = ['success':false, 'msg':"Not a valid name ${page.name}.", requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
                 }
                 } else {
-                    result = ['success':false, 'msg':"Not a valid name ${page.name}."]
+                    result = ['success':false, 'msg':"Not a valid name ${page.name}.", requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
                 }
 
 
             } catch(e) {
                 e.printStackTrace();
-                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}"]
+                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}", requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
             }
 
         } else {
-            result = ['success':false, 'msg':'Not a valid name.']
+            result = ['success':false, 'msg':'Not a valid name.', requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
         }
         render result as JSON
     }
