@@ -22,7 +22,7 @@ class CommentController {
 				result['msg'] = commentRes['msgCode']? "${message(code: commentRes['msgCode'])}":'Error in saving'
 				result["status"] = 'Error'
 			}else{
-				result = getResultForResponse(params);
+				result = getResultForResponse(params, request);
 				result["clearForm"] = true;
 			}
 		} else if(params.ajax_login_error == "1") {
