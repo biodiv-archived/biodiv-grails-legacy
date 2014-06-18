@@ -257,7 +257,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
             map.put("isLocked", this.isLocked);
-			String cNames = fetchSuggestedCommonNames()
+			String cNames = suggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			map.put("disAgree", (currentUser in map.authors));
             if(this.isLocked == false){
