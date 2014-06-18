@@ -1,4 +1,26 @@
-h3. Status and Release notes
+
+h3. Status
+
+as on June 18th 2014
+
+* *Completed :*
+** login -> basic, oauth
+** register -> register, resend verification code
+** observations -> create, show, list, related
+** users -> show, resetPassword
+** logout 
+
+* *In progress :*
+** login -> google 
+** register -> forgot password
+** observations -> add recommendation (optional), delete (optional)
+** users -> settings
+
+* *under testing :*
+** comments -> add, remove, list
+
+
+h3. Release Notes
 
 *June 18 2014*
 
