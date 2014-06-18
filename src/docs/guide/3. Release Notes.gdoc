@@ -1,0 +1,34 @@
+Status and Release notes
+
+*June 18 2014*
+
+* updated facebook call back api with access token
+* Enhanced incorrect login response
+* updated docs for login and added release notes
+* added comments api .. under testing
+* New API Collection for testing is available as JSON at : https://www.getpostman.com/collections/716c1af56921f3235dcf can be imported in Chrome postman extension which is available at https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm?hl=en
+
+*June 5, 2014*
+
+* User API and its doc 
+* added neater json marshallers for observation and resource. 
+* Improved error reporting in Observation save
+
+*June 3, 2014*
+
+* addred register api 
+* observation show and save api
+
+*June 2, 2014*
+
+* added api for oauth login for facebook and google
+* made all api calls to go in as /api
+
+*May 23, 2014 - May 30, 2014*
+
+* Upgraded to new grails version 2.3.8
+* and installed new spring-security rest plugin and upgraded existing plugins
+
+*May 22, 2014*
+
+* added api call to get observations near by given lat long
