@@ -1142,7 +1142,7 @@ class SpeciesService extends AbstractObjectService  {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
-        Map result = [errors:errors];
+        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames], errors:errors];
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
@@ -1160,23 +1160,30 @@ class SpeciesService extends AbstractObjectService  {
 
             if(!taxonService.validateHierarchy(taxonRegistryNames)) {
                 if(!speciesInstance.fetchTaxonomyRegistry()) {
-                    return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                    result['success'] = false;
+                    result['msg'] = 'Mandatory level(s) is/are missing in the hierarchy';
+                    return result
                 }
-                return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                result['success'] = false;
+                result['msg'] = 'Mandatory level(s) is/are missing in the hierarchy';
+                return result
             }
 
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                return [success:false, status:'requirePermission', msg:'Please request for permission to contribute.', errors:errors]
+                result['success'] = false;
+                result['status'] = 'requirePermission';
+                result['msg'] = 'Please request for permission to contribute.'
+                return result
             }
  
             //save taxonomy hierarchy
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-            result = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
-
+            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+            result.addAll(result1);
             result.speciesInstance = speciesInstance;
             result.taxonRegistry = taxonRegistry;
-            result.errors = errors;
+            result.errors.addAll(errors);
         }
        return result;
     }

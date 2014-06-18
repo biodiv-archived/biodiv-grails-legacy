@@ -29,13 +29,13 @@
                             <div class="input-prepend input-block-level">
                             <select id="rank" name="rank" class="add-on" style="height:auto;">
                                 <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
-                                    <option value="${rank.ordinal()}">${rank.value()}</option>
+                                    <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}>${rank.value()}</option>
                                 </g:each>
                             </select>
 
                             <input id="page" 
                             data-provide="typeahead" type="text" class="input-block-level taxonRank"
-                            name="page" value="${page}" data-rank="${TaxonomyRank.KINGDOM.ordinal()}"
+                            name="page" value="${requestParams?requestParams.speciesName:''}" data-rank="${requestParams?requestParams.rank:TaxonomyRank.SPECIES.ordinal()}"
                             placeholder="Add Page" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
@@ -44,7 +44,7 @@
                             <div id="errorMsg" class="alert hide"></div>
                         </div>
                     </div>  
-                    <g:render template="/common/createTaxonRegistryTemplate"/>
+                    <g:render template="/common/createTaxonRegistryTemplate" model='[requestParams:requestParams, errors:errors]'/>
 
 
                 </div>   
@@ -94,13 +94,29 @@
 
         var taxonRanks = [];
         <g:each in="${TaxonomyRank.list()}" var="t">
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+        <g:if test="${t == TaxonomyRank.SUB_GENUS || t == TaxonomyRank.SUB_FAMILY}">
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        </g:if>
+        <g:else>
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        </g:else>
         </g:each>
 
         $('#rank').change(function() {
             $('#page').attr('data-rank', $('#rank').find(':selected').val());
         });
-        
+
+        <g:if test="${requestParams}">
+            var $hier = $('#taxonHierachyInput');
+            $hier.empty();
+            var rank = <%=requestParams?requestParams.rank:0%> ;
+            for (var i=0; i<rank; i++) {
+                $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+            }
+            if(rank > 0) $('#taxonHierarchyInputForm').show();
+            $('#addSpeciesSubmit').show();
+        </g:if>
+
         $(".taxonRank").autofillNames();
 
         $('#validateSpeciesSubmit').click(function() {
@@ -142,7 +158,7 @@
                         var $hier = $('#taxonHierachyInput');
                         $hier.empty()
                         for (var i=0; i<data.rank; i++) {
-                            $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                            $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }
                         if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 
