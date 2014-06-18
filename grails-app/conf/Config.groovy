@@ -506,7 +506,7 @@ environments {
                     'species'
             debug   'com.the6hours', 
                     'grails.app.taglib.com.the6hours'
-            info   'species.auth'
+            debug   'species.auth'
             debug   'com.odobo',
                     'grails.app.controllers.com.odobo',
                     'grails.app.services.com.odobo',

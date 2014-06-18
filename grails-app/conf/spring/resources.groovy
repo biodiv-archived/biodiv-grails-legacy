@@ -12,6 +12,7 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;
 
+import javax.servlet.http.HttpServletResponse
 import species.auth.ConsumerManager;
 import species.auth.FacebookAuthCookieFilter;
 import species.auth.FacebookAuthCookieLogoutHandler;
@@ -35,6 +36,7 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import species.auth.DefaultOauthUserDetailsService;
 import species.auth.MyOauthService;
 import species.utils.marshallers.*;
+import species.auth.RestAuthenticationFailureHandler;
 
 // Place your Spring DSL code here
 beans = {
@@ -346,4 +348,22 @@ beans = {
             new ObservationMarshaller()
         ]
     }
+
+
+    restAuthenticationFailureHandler(species.auth.RestAuthenticationFailureHandler) {
+        statusCode = conf.rest.login.failureStatusCode?:HttpServletResponse.SC_FORBIDDEN
+    }
+
+    /* restAuthenticationFilter */
+    restAuthenticationFilter(species.auth.RestAuthenticationFilter) {
+        authenticationManager = ref('authenticationManager')
+        authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
+        authenticationFailureHandler = ref('restAuthenticationFailureHandler')
+        authenticationDetailsSource = ref('authenticationDetailsSource')
+        credentialsExtractor = ref('credentialsExtractor')
+        endpointUrl = conf.rest.login.endpointUrl
+        tokenGenerator = ref('tokenGenerator')
+        tokenStorageService = ref('tokenStorageService')
+    }
+
 }
