@@ -26,7 +26,26 @@ http://indiabiodiversity.saturn.strandls.com/api/login?username=emailAddress&pas
 }
 {code}
 ** in case of error
- a 401 unauthorized status code is sent
+a 401 unauthorized status code is sent
+in case of missing credentials
+{code}
+{
+    'error':'400', 
+    'message':'Username and/or password parameters are missing.'
+}
+{code}
+in case of incorrect credentials
+{code}
+{'error':'401', 'message':'Bad credentials'}
+{code}
+in case of incorrect methos
+{code}
+{
+    "error": "405",
+    "message": "GET HTTP method is not supported."
+}
+{code}
+
 
 h4. OAuth Login
 
