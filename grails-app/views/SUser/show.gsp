@@ -116,7 +116,7 @@
                                     <li><a href="#groups"><i class="icon-group"></i>Groups</a></li>
                                     <li class="divider-vertical"></li>
                                     <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
-                                    <g:if test="${user.allowIdentifactionMail}">
+                                    <g:if test="${user.hideEmailId}">
                                         <li style="padding:5px 0px">
                                         <% String staticMessage = '';
                                         if(currentUser) {

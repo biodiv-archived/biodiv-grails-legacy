@@ -89,24 +89,24 @@
     </body>
     <r:script>
     $(document).ready(function() {
-        /*$("#species").autofillNames({
+        $("#page").autofillNames({
             'appendTo' : '#nameSuggestions',
             'nameFilter':'scientificNames',
             focus: function( event, ui ) {
                 $("#canName").val("");
-                $("#species").val( ui.item.label.replace(/<.*?>/g,"") );
+                $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
                 $("#nameSuggestions li a").css('border', 0);
                 return false;
             },
             select: function( event, ui ) {
-                $("#species").val( ui.item.label.replace(/<.*?>/g,"") );
+                $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
                 $("#canName").val( ui.item.value );
                 $("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
                 return false;
             },open: function(event, ui) {
-                $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+                //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
             }
-        });*/
+        });
 
         var taxonRanks = [];
         <g:each in="${TaxonomyRank.list()}" var="t">
@@ -133,7 +133,8 @@
             $('#addSpeciesSubmit').show();
         </g:if>
 
-        $(".taxonRank").autofillNames();
+        if($(".taxonRank:not(#page)").length > 0)
+            $(".taxonRank:not(#page)").autofillNames();
 
         $('#validateSpeciesSubmit').click(function() {
             var params = {};
@@ -178,7 +179,8 @@
                         }
                         if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 
-                        $(".taxonRank").autofillNames();
+                        if($(".taxonRank:not(#page)").length > 0)
+                            $(".taxonRank:not(#page)").autofillNames();
 
 
                         $('#addSpeciesSubmit').show();
