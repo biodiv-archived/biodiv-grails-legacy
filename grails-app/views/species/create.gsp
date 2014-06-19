@@ -175,7 +175,9 @@
                         var $hier = $('#taxonHierachyInput');
                         $hier.empty()
                         for (var i=0; i<data.rank; i++) {
-                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                            var taxonRegistry = data.requestParams? data.requestParams.taxonRegistry:undefined;
+                            var taxonValue = (taxonRegistry && taxonRegistry[i]) ?taxonRegistry[i]:taxonRanks[i].taxonValue;
+                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }
                         if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 

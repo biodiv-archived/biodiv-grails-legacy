@@ -19,7 +19,7 @@
 
             <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
                 <h5>Classifications</h5>	
-                        <div class="alert" style="margin-bottom:0px;">
+                        <div class="alert alert-info" style="margin-bottom:0px;">
                             Please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. You will be able to contribute once you have been allotted edit/create rights for the taxa.
                         </div>
  

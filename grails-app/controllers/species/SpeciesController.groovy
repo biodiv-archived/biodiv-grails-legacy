@@ -130,7 +130,7 @@ class SpeciesController extends AbstractObjectController {
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
                         //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
-                        flash.message = "Sorry, you don't have permission to contribute to species ${params.id}. Please request for permission below."
+                        flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
 
                         def url = uGroup.createLink(controller:"species", action:"contribute");
                         redirect url: url
@@ -186,7 +186,7 @@ class SpeciesController extends AbstractObjectController {
             if(params.editMode) {
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
 			        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
-                    flash.message = "Sorry, you don't have permission to contribute to species ${params.id}. Please request for permission below."
+                    flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
                     def url = uGroup.createLink(controller:"species", action:"contribute");
                     redirect url: url
             		return;
@@ -927,7 +927,7 @@ class SpeciesController extends AbstractObjectController {
         }
 */        NamesParser namesParser = new NamesParser();
 
-        def result = [:];
+        def result = [requestParams:[taxonRegistry:params.taxonRegistry]];
         if(params.page && params.rank) {
             try {
                 //List<TaxonomyDefinition> names = namesParser.parse(hierarchy);
@@ -948,15 +948,15 @@ class SpeciesController extends AbstractObjectController {
                 }
 
                 if(!taxon) {
-                    result = ['success':true, 'msg':"Adding a new taxon concept ${page.name}", rank:rank]
+                    result = ['success':true, 'msg':"Adding a new taxon concept ${page.name}", rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
                 } else {
                     //CHK if a species page exists for this concept
                     Species species = Species.findByTaxonConcept(taxon);
                     def taxonRegistry = taxon.parentTaxonRegistry();
                     if(species) {
-                        result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title, rank:taxon.rank];
+                        result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                     } else {
-                        result = ['success':true, 'msg':"Adding a new species page for an existing concept ${page.name}", rank:taxon.rank];
+                        result = ['success':true, 'msg':"Adding a new species page for an existing concept ${page.name}", rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                     }
                     result['taxonRegistry'] = [:];
                     taxonRegistry.each {classification, h ->
@@ -966,20 +966,20 @@ class SpeciesController extends AbstractObjectController {
                     }
                 }
                 if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
-                    result = ['success':false, 'msg':"Not a valid name ${page.name}.", requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
+                    result = ['success':false, 'msg':"Not a valid name ${page.name}.", requestParams:[taxonRegistry:params.taxonRegistry]]
                 }
                 } else {
-                    result = ['success':false, 'msg':"Not a valid name ${page.name}.", requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
+                    result = ['success':false, 'msg':"Not a valid name ${page.name}.", requestParams:[taxonRegistry:params.taxonRegistry]]
                 }
 
 
             } catch(e) {
                 e.printStackTrace();
-                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}", requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
+                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}", requestParams:[taxonRegistry:params.taxonRegistry]]
             }
 
         } else {
-            result = ['success':false, 'msg':'Not a valid name.', requestParams:[taxonRegistryNames:params.taxonRegistryNames]]
+            result = ['success':false, 'msg':'Not a valid name.', requestParams:[taxonRegistry:params.taxonRegistry]]
         }
         render result as JSON
     }
