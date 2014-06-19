@@ -8,7 +8,7 @@ Hi ${admin.name.capitalize()},
 Message : ${message}
 <br/>
 </g:if>
-Please <a href="${uri}" title="Confirmation code">click here</a> to confim granting a ${invitetype} permission.<br/>
+Please <a href="${uri}" title="Confirmation code">click here</a> to confirm granting a ${invitetype} permission.<br/>
 <br/><br/>
 Thank you,<br/>
 The Portal Team
