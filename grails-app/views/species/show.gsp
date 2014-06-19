@@ -134,7 +134,8 @@
 
         occurrenceCount = undefined
         function getOccurrenceCount(data) {
-        occurrenceCount = ${speciesInstance.fetchOccurrence()} + data.count;
+            occurrenceCount = ${speciesInstance.fetchOccurrence()} + data.count;
+            console.log(occurrenceCount);
         }
 
         window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
@@ -274,6 +275,7 @@
                     <div id="map1311326056727" class="occurenceMap"
                         style="height: 350px; width: 100%"></div>
                     <div class="alert alert-info">
+                        <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
                         The current map showing distribution of species is only indicative.
                     </div>
 

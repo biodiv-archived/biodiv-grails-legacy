@@ -10,24 +10,22 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 %>
 		<div class="">
 				<div class="section">
-				<p>We request you to contribute to the species pages and build
-					rich and reliable information on the biodiversity of India.</p>
-	
-				<p>All information published on the Portal will be on public
-					access and under the Creative Commons License of your choice.</p>
-	
-				<p>You can contribute to species pages in three ways:</p>
+                    <p>
+                    
+                    Species pages are descriptions of species, with one page for every species. Each species can be described with over 60 standard set of fields. Species pages are contributed and curated by experts. All information published on the Portal will be on public access and under the Creative Commons License of your choice.
+                    </p>
 				<ol>
 	
-                    <li><b>On-line creating of species pages</b> : In order to create a new species you should have write permission on the parent hierarchy. <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary">Request Permission</a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary">Create new species</a>.
+                    <li  style="margin-bottom:15px;"><b>On-line creating of species pages</b> : To create a new species you should have write permission on the page. Permissions can be requested for a taxa. Please request permissions using the buttons below: <br/>
+                    <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary">Request Permission</a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary">Create new species</a>
 					</li>
 
-					<li><b>Multiple species pages in one spreadsheet</b> : Download
+					<li style="margin-bottom:15px;"><b>Multiple species pages in one spreadsheet</b> : Download
 						the xlsx spreadsheet <a
 						href="${createLinkTo(dir: '/../static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">here</a>,
 						fill in multiple species descriptions in the spreadsheet, have a
 						directory of images, zip the directory and send it to us <span
-						class="mailme">${supportEmail}</span>
+                            class="mailme">${supportEmail}</span>
 					</li>
 	
 					<li><b>One species page in one spreadsheet</b> : If you have

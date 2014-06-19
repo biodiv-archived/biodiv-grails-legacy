@@ -9,6 +9,7 @@
         style="height: 600px; width: 100%"></div>
     <div class="alert alert-info">
         The current map showing distribution of species is only indicative.
+        <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
     </div>
 
     <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />       
