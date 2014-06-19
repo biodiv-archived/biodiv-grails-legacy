@@ -127,7 +127,9 @@ class SpeciesController extends AbstractObjectController {
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
-                        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
+                        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
+                        flash.message = "Sorry, you don't have permission to contribute to species ${params.id}. Please request for permission below."
+
                         def url = uGroup.createLink(controller:"species", action:"contribute");
                         redirect url: url
                         return;
