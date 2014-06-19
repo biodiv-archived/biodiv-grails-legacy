@@ -53,10 +53,10 @@
                 <div id="taxonBrowser" class="tab-pane" style="position:relative">
                     <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
                         <h5>Classifications</h5>	
-                        <div class="alert" style="margin-bottom:0px;">
+                        <div class="alert alert-info" style="margin-bottom:0px;">
                             Please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. You will be able to contribute once you have been allotted edit/create rights for the taxa.
                         </div>
-                        <div id="taxaHierarchy" style="width:100%">
+                        <div id="taxaHierarchy" style="width:940px;padding:0px">
 
                             <%
                             def classifications = [];

@@ -6,6 +6,22 @@
         <g:set var="title" value="Species"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
+        <style>
+            #addSpecies .add-on {
+            height:20px;
+            width:98px;
+            }
+            #addSpecies select.add-on {
+            height:30px;
+            width:110px;
+            }
+
+
+            #addSpecies .taxonRank {
+            min-height:20px;
+            width:575px;   
+            }
+        </style>
     </head>
     <body>
 
@@ -21,20 +37,20 @@
             <form id="addSpecies" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
 
                 <div class="span12 super-section" style="clear:both;">
-
+                    <div class="section">
                     <div class="control-group">
                         <label class="control-label span3" for="name">Add page</label> 
-                        <div class="span8">
+                        <div class="pull-left" style="width:700px;margin-left:20px;">
 
-                            <div class="input-prepend input-block-level">
-                            <select id="rank" name="rank" class="add-on" style="height:auto;">
+                            <div class="input-prepend">
+                                <select id="rank" name="rank" class="add-on">
                                 <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
                                     <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}>${rank.value()}</option>
                                 </g:each>
                             </select>
 
                             <input id="page" 
-                            data-provide="typeahead" type="text" class="input-block-level taxonRank"
+                            data-provide="typeahead" type="text" class="taxonRank" style=""
                             name="page" value="${requestParams?requestParams.speciesName:''}" data-rank="${requestParams?requestParams.rank:TaxonomyRank.SPECIES.ordinal()}"
                             placeholder="Add Page" />
                             <input type="hidden" name="canName" id="canName" value=""/>
@@ -45,7 +61,7 @@
                         </div>
                     </div>  
                     <g:render template="/common/createTaxonRegistryTemplate" model='[requestParams:requestParams, errors:errors]'/>
-
+                    </div>
 
                 </div>   
                 <div class="span12 submitButtons">
@@ -111,7 +127,7 @@
             $hier.empty();
             var rank = <%=requestParams?requestParams.rank:0%> ;
             for (var i=0; i<rank; i++) {
-                $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
             }
             if(rank > 0) $('#taxonHierarchyInputForm').show();
             $('#addSpeciesSubmit').show();
@@ -158,7 +174,7 @@
                         var $hier = $('#taxonHierachyInput');
                         $hier.empty()
                         for (var i=0; i<data.rank; i++) {
-                            $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }
                         if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 
