@@ -13,7 +13,7 @@
         _options = $.extend({}, defaults, _options);
         this.options = _options;
         cache[this.options.nameFilter] = {}
-        return $(this).catcomplete({
+        var result = $(this).catcomplete({
                appendTo:_options.appendTo,
                source:function( request, response ) {
                    var term = request.term;
@@ -49,7 +49,8 @@
                focus: _options.focus,
                select: _options.select,
                open: _options.open
-        }).data( "catcomplete" )._renderItem = function( ul, item ) {
+        });
+        result.data( "catcomplete" )._renderItem = function( ul, item ) {
             ul.removeClass().addClass("dropdown-menu")
                 if(item.category == "General") {
                     return $( "<li class='span3'></li>" )
@@ -66,5 +67,6 @@
                         .appendTo( ul );
                 }
         };
+        return result;
     }
 }(window.jQuery));
