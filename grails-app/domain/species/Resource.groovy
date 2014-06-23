@@ -103,9 +103,14 @@ class Resource extends Sourcedata implements Rateable {
 				String videoId = Utils.getYouTubeVideoId(this.url);
 				thumbnailUrl = "http://img.youtube.com/vi/${videoId}/default.jpg"
 				break;
+			case ResourceType.AUDIO :								
+				thumbnailUrl = "/images/audioicon.png"
+				break;	
 			default :
 				log.error "Not a valid type"
 		}		 
+
+		println "==============thumbnail url=========== "+thumbnailUrl
 		return thumbnailUrl;
 	}
 	

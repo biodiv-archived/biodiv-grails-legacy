@@ -224,6 +224,7 @@ class AbstractObjectService {
         def resources = builder.createNode("resources");
         Node images = new Node(resources, "images");
         Node videos = new Node(resources, "videos");
+        Node audios = new Node(resources, "audios");
         
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" ){
@@ -232,6 +233,7 @@ class AbstractObjectService {
         else{
             uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
         }
+        BitSet indexes = new BitSet();
         List files = [];
         List titles = [];
         List licenses = [];
@@ -241,13 +243,25 @@ class AbstractObjectService {
         List ratings = [];
         List contributor = [];
         //List resContext = [];
+
+        
         params.each { key, val ->
+        
             int index = -1;
-            if(key.startsWith('file_')|| key.startsWith('url_')) {
+            if(key.startsWith('file_') || key.startsWith('url_')) {
+
                 index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+                if(indexes.get(index)) {
+                    index = -1;
+                } else {
+                    indexes.set(index);
+                }
+
             }
-            if(index != -1) {
+           
+            if(index != -1) {                
                 files.add(val);
+                
                 titles.add(params.get('title_'+index));
                 licenses.add(params.get('license_'+index));
                 type.add(params.get('type_'+index));
@@ -260,8 +274,10 @@ class AbstractObjectService {
                 }
             }
         }
+         
         files.eachWithIndex { file, key ->
             Node image;
+          
             if(file) {
                 if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
                     image = new Node(images, "image");
@@ -271,7 +287,13 @@ class AbstractObjectService {
                     image = new Node(videos, "video");
                     new Node(image, "fileName", file);
                     new Node(image, "source", url.getAt(key));
-                }				
+                } else if(type.getAt(key).equalsIgnoreCase(ResourceType.AUDIO.value())) {
+                    image = new Node(audios, "audio");
+                    new Node(image, "fileName", file);
+                    new Node(image, "source", url.getAt(key));
+                }	
+
+              			
                 new Node(image, "caption", titles.getAt(key));
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
@@ -309,7 +331,11 @@ class AbstractObjectService {
         converter.setResourcesRootDir(rootDir);
         def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
         relImagesContext = new File(relImagesContext).getParent();
+
+        
         return converter.createMedia(resourcesXML, relImagesContext);
     }
+
+
 
 }

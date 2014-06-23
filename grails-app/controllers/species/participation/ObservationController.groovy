@@ -445,7 +445,7 @@ class ObservationController extends AbstractObjectController {
             message = [status:401, error:'Please login to continue']
 			render message as JSON 
 			return;
-		} else if(!params.resources && !params.videoUrl) {
+		} else if(!params.resources && !params.videoUrl && !params.audioUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
 			response.setStatus(500)
 			message = [error:message]
@@ -471,7 +471,7 @@ class ObservationController extends AbstractObjectController {
                 }
                 File obvDir 
 
-				if(!params.resources && !params.videoUrl) {
+				if(!params.resources && !params.videoUrl && !params.audioUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
 				
@@ -554,6 +554,23 @@ class ObservationController extends AbstractObjectController {
 						}
 					} else {
 						message = "Not a valid video url"
+					}
+				}
+
+				if(params.audioUrl) {
+					//TODO:validate url;
+					def audioUrl = params.audioUrl;
+					if(audioUrl && Utils.isURL(audioUrl)) {
+						
+						if(audioUrl) {
+						def res = new Resource(fileName:'a', type:ResourceType.AUDIO);		
+						res.setUrl(audioUrl);				
+						resourcesInfo.add([fileName:'a', url:audioUrl, thumbnail:'http://indiabiodiversity.localhost.org/biodiv/static/images/audioicon.png', type:res.type]);
+						} else {
+						message = "Not a valid Audio url"
+						}
+					} else {
+						message = "Not a valid Audio url"
 					}
 				}
 				

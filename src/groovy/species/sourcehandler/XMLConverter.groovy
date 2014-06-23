@@ -104,7 +104,7 @@ class XMLConverter extends SourceConverter {
 
             //XXX: sending just the first element need to decide on this if list has multiple elements
             def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
-			addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
+            addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
             if(speciesName) {
                 //getting classification hierarchies and saving these taxon definitions
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
@@ -130,15 +130,15 @@ class XMLConverter extends SourceConverter {
                         if(defaultSaveAction == SaveAction.OVERWRITE || existingSpecies.percentOfInfo == 0){
                             log.info "Cleraring old version of species : "+existingSpecies.id;
                             try {
-								existingSpecies.clearBasicContent()
-								s = existingSpecies;
+                                existingSpecies.clearBasicContent()
+                                s = existingSpecies;
                             }
                             catch(org.springframework.dao.DataIntegrityViolationException e) {
                                 e.printStackTrace();
                                 log.error "Could not clear species ${existingSpecies.id} : "+e.getMessage();
-								addToSummary("Could not clear species ${existingSpecies.id} : "+e.getMessage())
-								addToSummary(e);
-								return;
+                                addToSummary("Could not clear species ${existingSpecies.id} : "+e.getMessage())
+                                addToSummary(e);
+                                return;
                             }
                         } else if(defaultSaveAction == SaveAction.MERGE){
                             log.info "Merging with already existing species information : "+existingSpecies.id;
@@ -147,7 +147,7 @@ class XMLConverter extends SourceConverter {
                             s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
-							addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
+                            addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
                             return;
                         }
                     }
@@ -155,9 +155,9 @@ class XMLConverter extends SourceConverter {
                     List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
                     log.debug "Resources ${resources}"
                     resources.each { 
-						it.saveResourceContext(s)
-						s.addToResources(it); 
-					}
+                        it.saveResourceContext(s)
+                        s.addToResources(it); 
+                    }
 
                     List<Synonyms> synonyms;
 
@@ -165,7 +165,7 @@ class XMLConverter extends SourceConverter {
                         if(fieldNode.name().equals("field")) {
                             if(!isValidField(fieldNode)) {
                                 log.warn "NOT A VALID FIELD : "+fieldNode;
-								addToSummary("NOT A VALID FIELD : "+fieldNode)
+                                addToSummary("NOT A VALID FIELD : "+fieldNode)
                                 continue;
                             }
 
@@ -180,7 +180,7 @@ class XMLConverter extends SourceConverter {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
                                 //synonyms.each { s.addToSynonyms(it); }
                             }
-							 else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+                             else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
@@ -201,7 +201,7 @@ class XMLConverter extends SourceConverter {
                                         s.addToIndianDistributionEntities(it);
                                     }
                                 }
-                            }	else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+                            }   else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
@@ -210,7 +210,7 @@ class XMLConverter extends SourceConverter {
                                 }
 
                             } 
-							else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
+                            else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
                                 //ignore
                                 println "ignoring hierarchy" 
                             } else {
@@ -228,26 +228,26 @@ class XMLConverter extends SourceConverter {
                     //adding taxonomy classifications
                     taxonHierarchy.each {it.save();}
 
-                    //					if(defaultSaveAction == SaveAction.MERGE){
-                    //						log.info "Merging with already existing species information : "+existingSpecies.id;
-                    //						mergeSpecies(existingSpecies, s);
-                    //						s = existingSpecies;
-                    //					}
+                    //                  if(defaultSaveAction == SaveAction.MERGE){
+                    //                      log.info "Merging with already existing species information : "+existingSpecies.id;
+                    //                      mergeSpecies(existingSpecies, s);
+                    //                      s = existingSpecies;
+                    //                  }
 
                     s.reprImage = null;
                     return s;
                 } else {
-					log.error "TaxonConcept is not found"
-					addToSummary("TaxonConcept is not found")
+                    log.error "TaxonConcept is not found"
+                    addToSummary("TaxonConcept is not found")
                 }
             } else {
                 log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
-				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
+                addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
             }
         } catch(Exception e) {
             log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
             e.printStackTrace();
-			addToSummary(e);
+            addToSummary(e);
         }
     }
 
@@ -260,7 +260,7 @@ class XMLConverter extends SourceConverter {
             if(fieldNode.name().equals("field")) {
                 if(!isValidField(fieldNode)) {
                     log.warn "NOT A VALID FIELD. IGNORING : "+fieldNode;
-					addToSummary("NOT A VALID FIELD. IGNORING : "+fieldNode)
+                    addToSummary("NOT A VALID FIELD. IGNORING : "+fieldNode)
                     fieldNode.parent().remove(fieldNode);
                     continue;
                 }
@@ -311,7 +311,7 @@ class XMLConverter extends SourceConverter {
         Field field = getField(fieldNode, false);
         if(field == null) {
             log.warn "NO SUCH FIELD : "+field?.name;
-			addToSummary("NO SUCH FIELD : "+field?.name)
+            addToSummary("NO SUCH FIELD : "+field?.name)
             return;
         }
       
@@ -321,12 +321,12 @@ class XMLConverter extends SourceConverter {
              sFields = SpeciesField.withCriteria() {
                 eq("field", field)
                 eq('species', s)
-				fetchMode 'references', FetchMode.JOIN
-				fetchMode 'contributors', FetchMode.JOIN
-				fetchMode 'licenses', FetchMode.JOIN
-				fetchMode 'audienceTypes', FetchMode.JOIN
-				fetchMode 'resources', FetchMode.JOIN
-				fetchMode 'attributors', FetchMode.JOIN
+                fetchMode 'references', FetchMode.JOIN
+                fetchMode 'contributors', FetchMode.JOIN
+                fetchMode 'licenses', FetchMode.JOIN
+                fetchMode 'audienceTypes', FetchMode.JOIN
+                fetchMode 'resources', FetchMode.JOIN
+                fetchMode 'attributors', FetchMode.JOIN
             }
         }
 
@@ -386,9 +386,9 @@ class XMLConverter extends SourceConverter {
 
             if(!speciesField) {
                 log.debug "Adding new field to species ${s} ===  " + "  field " + field + "  data " + data
-				//XXX giving default uploader now. At the time of actual save updating this with logged in user.
+                //XXX giving default uploader now. At the time of actual save updating this with logged in user.
                 speciesField = sFieldClass.newInstance(field:field, description:data);
-		    } else {
+            } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
                 //TODO: Will have to clean up orphaned entries from following tables
@@ -397,32 +397,32 @@ class XMLConverter extends SourceConverter {
                 speciesField.audienceTypes?.clear()
                 speciesField.attributors?.clear()
                 speciesField.resources?.clear()
-				speciesField.references?.clear()
+                speciesField.references?.clear()
             }
-			
-		    if(speciesField && contributors) {
+            
+            if(speciesField && contributors) {
                 contributors.each {speciesField.addToContributors(it); }
                 licenses.each { speciesField.addToLicenses(it); }
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
                 references.each { println it; speciesField.addToReferences(it); }
-				speciesFields.add(speciesField);
+                speciesFields.add(speciesField);
             } else {
                 log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
-				addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
-            }			
+                addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
+            }           
         }
         println speciesFields
         return speciesFields;
     } 
 
-	private String getData(NodeList dataNodes) {
-		//log.info "It should be one node only but got list of nodes " + dataNodes
-		if(!dataNodes) return "";
-		return getData(dataNodes[0]);
-	}
-	
+    private String getData(NodeList dataNodes) {
+        //log.info "It should be one node only but got list of nodes " + dataNodes
+        if(!dataNodes) return "";
+        return getData(dataNodes[0]);
+    }
+    
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
@@ -434,7 +434,7 @@ class XMLConverter extends SourceConverter {
     * 
     **/
     private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, attributors, data) {
-		return (new HashSet(sField.contributors) == new HashSet(contributors)) && (new HashSet(sField.attributors) == new HashSet(attributors))
+        return (new HashSet(sField.contributors) == new HashSet(contributors)) && (new HashSet(sField.attributors) == new HashSet(attributors))
 //        for(c1 in sField.contributors) {
 //            for(c2 in contributors) {
 //                if(c1.id == c2.id) {
@@ -489,8 +489,8 @@ class XMLConverter extends SourceConverter {
         cleanString = cleanString.replaceAll('<i>\\s+<i>','<i>').replaceAll('</i>\\s+</i>','</i>')
         return cleanString;
         //} else {
-        //	log.error result.errorMessages
-        //	return ''
+        //  log.error result.errorMessages
+        //  return ''
         //}
     }
 
@@ -545,31 +545,31 @@ class XMLConverter extends SourceConverter {
                 contributors.add(contributor);
             } else {
                 log.warn "NOT A VALID CONTIBUTOR : "+contributorName;
-				addToSummary("NOT A VALID CONTIBUTOR : "+contributorName)
+                addToSummary("NOT A VALID CONTIBUTOR : "+contributorName)
             }
         }
         return contributors;
     }
-	
-	private List<SUser> getUserContributors(NodeList dataNodes ) {
-		//log.info "It should be one node only but got list of nodes " + dataNodes
-		return getUserContributors(dataNodes[0])
-	}
-	
-	private List<SUser> getUserContributors(Node dataNode) {
-		List<SUser> contributors = new ArrayList<SUser>();
-		dataNode.contributor.each {
-			String contributorEmail = it.text()?.trim();
-			SUser contributor = SUser.findByEmail(contributorEmail)
-			if(contributor) {
-				contributors.add(contributor);
-			} else {
-				log.warn "NOT A VALID CONTIBUTOR : "+contributorEmail;
-				addToSummary("NOT A VALID CONTIBUTOR : "+contributorEmail)
-			}
-		}
-		return contributors;
-	}
+    
+    private List<SUser> getUserContributors(NodeList dataNodes ) {
+        //log.info "It should be one node only but got list of nodes " + dataNodes
+        return getUserContributors(dataNodes[0])
+    }
+    
+    private List<SUser> getUserContributors(Node dataNode) {
+        List<SUser> contributors = new ArrayList<SUser>();
+        dataNode.contributor.each {
+            String contributorEmail = it.text()?.trim();
+            SUser contributor = SUser.findByEmail(contributorEmail)
+            if(contributor) {
+                contributors.add(contributor);
+            } else {
+                log.warn "NOT A VALID CONTIBUTOR : "+contributorEmail;
+                addToSummary("NOT A VALID CONTIBUTOR : "+contributorEmail)
+            }
+        }
+        return contributors;
+    }
 
     /**
      * 
@@ -605,7 +605,7 @@ class XMLConverter extends SourceConverter {
                 licenses.add(license);
             } else {
                 log.warn "NOT A SUPPORTED LICENSE TYPE: "+licenseType;
-				addToSummary("NOT A SUPPORTED LICENSE TYPE: "+licenseType)
+                addToSummary("NOT A SUPPORTED LICENSE TYPE: "+licenseType)
             }
         }
 
@@ -636,7 +636,7 @@ class XMLConverter extends SourceConverter {
             if(licenseType.startsWith('CC-')) {
                 licenseType = licenseType.replaceFirst('CC-','CC ');
             }
-			type = License.fetchLicenseType(licenseType)
+            type = License.fetchLicenseType(licenseType)
         }
 
         if(!type) return null;
@@ -666,7 +666,7 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.add(audienceType);
             } else {
                 log.warn "NOT A SUPPORTED AUDIENCE TYPE: "+audienceType;
-				addToSummary("NOT A SUPPORTED AUDIENCE TYPE: "+audienceType)
+                addToSummary("NOT A SUPPORTED AUDIENCE TYPE: "+audienceType)
             }
         }
         return audienceTypes;
@@ -702,9 +702,11 @@ class XMLConverter extends SourceConverter {
             def audiosNode = resourcesXML.audios;
             def videosNode = resourcesXML.videos;
 
+            println "==============Video Node================"+videosNode[0]
+
             resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
             resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, "icons"));
-            //resources.addAll(createResourceByType(audiosNode, ResourceType.AUDIO));
+            resources.addAll(createResourceByType(audiosNode[0], ResourceType.AUDIO, relResFolder));
             resources.addAll(createResourceByType(videosNode[0], ResourceType.VIDEO, relResFolder));
         }
 
@@ -746,7 +748,12 @@ class XMLConverter extends SourceConverter {
                 resourceNode?.audio.each { if(!it?.id) resources.add(createAudio(it)); }
                 break;
                 case ResourceType.VIDEO:
-                resourceNode?.video.each { if(!it?.id) resources.add(createVideo(it)); }
+
+                println "====Create Video ===============" + resourceNode?.video
+                resourceNode?.video.each { if(!it?.id) 
+                    println "================Create Video==================="+ createVideo(it)
+                    resources.add(createVideo(it));
+                }
             }
         }
         return resources;
@@ -772,18 +779,18 @@ class XMLConverter extends SourceConverter {
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
-				addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
+                addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
             }
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-			if(!imageFile.exists()) {
+            if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-					ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+                    ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                 } catch(FileNotFoundException e) {
                     log.error "File not found : "+tempFile.absolutePath;
-					addToSummary("File not found : "+tempFile.absolutePath)
+                    addToSummary("File not found : "+tempFile.absolutePath)
                 }
             }
 
@@ -830,7 +837,7 @@ class XMLConverter extends SourceConverter {
             return res;
         } else {
             log.error "File not found : "+tempFile?.absolutePath;
-			addToSummary("File not found : "+tempFile?.absolutePath)
+            addToSummary("File not found : "+tempFile?.absolutePath)
         }
     }
 
@@ -840,7 +847,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     File getImageFile(Node imageNode, String imagesDir="") {
-		String fileName = imageNode?.fileName?.text()?.trim();
+        String fileName = imageNode?.fileName?.text()?.trim();
         String sourceUrl = imageNode.source?.text();
         if(!fileName && !sourceUrl) return;
 
@@ -875,39 +882,69 @@ class XMLConverter extends SourceConverter {
         return tempFile;
     }
 
-    //	private Resource createIcon(Node iconNode) {
-    //		String fileName = iconNode.text()?.trim();
-    //		log.debug "Creating icon : "+fileName;
+    //  private Resource createIcon(Node iconNode) {
+    //      String fileName = iconNode.text()?.trim();
+    //      log.debug "Creating icon : "+fileName;
     //
-    //		def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
-    //		def res = new Resource(type : ResourceType.ICON, fileName:fileName);
-    //		res.addToLicenses(l);
-    //		if(!res.save(flush:true)) {
-    //			res.errors.each { log.error it }
-    //		}
-    //		iconNode.appendNode("resource", res);
-    //		return res;
-    //	}
+    //      def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
+    //      def res = new Resource(type : ResourceType.ICON, fileName:fileName);
+    //      res.addToLicenses(l);
+    //      if(!res.save(flush:true)) {
+    //          res.errors.each { log.error it }
+    //      }
+    //      iconNode.appendNode("resource", res);
+    //      return res;
+    //  }
 
     private Resource createAudio(Node audioNode) {
-        String fileName = imageNode.get("fileName");
+         log.debug "Creating video from data $audioNode"
+        def sourceUrl = audioNode.source?.text() ? audioNode.source?.text() : "";
+        def rate = audioNode.rating?.text() ? audioNode.rating?.text() : "";
 
-        //		def fieldCriteria = Resource.createCriteria();
-        //		def res = fieldCriteria.get {
-        //			and {
-        //				eq("fileName", fileName);
-        //				eq("type", ResourceType.AUDIO);
-        //			}
-        //		}
-        //		if(!res) {
-        def attributors = getAttributions(audioNode, true);
-        def res = new Resource(type : ResourceType.AUDIO, fileName:audioNode.get("fileName"), description:audioNode.get("caption"), license:getLicenses(audioNode, true), contributor:getContributors(audioNode, true));
-        res.url = audioNode.get("source")
-        for(Contributor con : attributors) {
-            res.addToAttributors(con);
+        if(!sourceUrl) return;
+
+        def res = Resource.findByUrlAndType(sourceUrl, ResourceType.AUDIO);
+
+        if(!res) {
+            
+            def attributors = getAttributions(audioNode, true);
+            String description = (audioNode.caption?.text()) ? (audioNode.caption?.text()) : "";
+            res = new Resource(type : ResourceType.AUDIO, fileName:audioNode.get("fileName")?.text(), description:description, license:getLicenses(audioNode, true), contributor:getContributors(audioNode, true));
+            res.url = sourceUrl;
+            if(rate) res.rating = Integer.parseInt(rate);
+
+            for(Contributor con : getContributors(audioNode, true)) {
+                res.addToContributors(con);
+            }
+            for(Contributor con : getAttributions(audioNode, true)) {
+                res.addToAttributors(con);
+            }
+            for(License l : getLicenses(audioNode, true)) {
+                res.addToLicenses(l);
+            }
+        } else {
+            res.fileName = audioNode.get("fileName")?.text(); 
+            res.url = sourceUrl
+            if(rate) res.rating = Integer.parseInt(rate);
+            res.description = (audioNode.caption?.text()) ? (audioNode.caption?.text()) : "";
+            res.licenses?.clear()
+            res.contributors?.clear()
+            res.attributors?.clear();
+            for(Contributor con : getContributors(audioNode, true)) {
+                res.addToContributors(con);
+            }
+            for(Contributor con : getAttributions(audioNode, true)) {
+                res.addToAttributors(con);
+            }
+            for(License l : getLicenses(audioNode, true)) {
+                res.addToLicenses(l);
+            }
+
         }
-        //		}
+
+        //s.addToResources(res);
         audioNode.appendNode("resource", res);
+        log.debug "Successfully created resource";
         return res;
     }
 
@@ -921,8 +958,10 @@ class XMLConverter extends SourceConverter {
         def res = Resource.findByUrlAndType(sourceUrl, ResourceType.VIDEO);
 
         if(!res) {
+            
             def attributors = getAttributions(videoNode, true);
-            res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
+            String description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
+            res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:description, license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
             res.url = sourceUrl;
             if(rate) res.rating = Integer.parseInt(rate);
 
@@ -939,7 +978,10 @@ class XMLConverter extends SourceConverter {
             res.fileName = videoNode.get("fileName")?.text(); 
             res.url = sourceUrl
             if(rate) res.rating = Integer.parseInt(rate);
-            res.description = videoNode.caption?.text();
+            res.description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
+
+
+            println res.description
             res.licenses?.clear()
             res.contributors?.clear()
             res.attributors?.clear();
@@ -964,10 +1006,10 @@ class XMLConverter extends SourceConverter {
     private List<Resource> getResources(Node dataNode, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
         List<Resource> resources = new ArrayList<Resource>();
         List<Resource> res =  getImages(dataNode.images?.image, imagesNode);
-		if(res) resources.addAll(res);
-		res =  getImages(dataNode.icons?.icon, iconsNode);
-		if(res) resources.addAll(res);
-		log.debug "Getting resources for dataNode : "+resources;
+        if(res) resources.addAll(res);
+        res =  getImages(dataNode.icons?.icon, iconsNode);
+        if(res) resources.addAll(res);
+        log.debug "Getting resources for dataNode : "+resources;
         return resources;
     }
 
@@ -978,7 +1020,7 @@ class XMLConverter extends SourceConverter {
         imagesRefNode.each {
             String fileName = it?.text()?.trim();
             def imageNode = imagesNode.image.find { it?.refKey?.text()?.trim() == fileName };
-			myPrint("========== image node  " + imageNode);
+            myPrint("========== image node  " + imageNode);
 
             if(imageNode) {
                 def res;
@@ -990,7 +1032,7 @@ class XMLConverter extends SourceConverter {
                     resources.add(res);
                 } else {
                     log.error "IMAGE NOT FOUND : "+imageNode
-					addToSummary("IMAGE NOT FOUND : "+imageNode)
+                    addToSummary("IMAGE NOT FOUND : "+imageNode)
                 }
 
             } else {
@@ -998,48 +1040,48 @@ class XMLConverter extends SourceConverter {
                 if(tempFile) {
                     //check if the fileName is a physical file on disk and create a resource from it
                     def resource = createImage(it, s.taxonConcept.canonicalForm, ResourceType.IMAGE);
-				    if(resource) {
+                    if(resource) {
                         resources.add(resource)
                     }
                 } else {
                     log.error "COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}"
-					addToSummary("COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}")
+                    addToSummary("COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}")
                 }
             }
         }
-		return resources;
+        return resources;
     }
 
-    //	private List<Resource> getIcons(Node dataNode, Node iconsNode) {
-    //		List<Resource> resources = new ArrayList<Resource>();
+    //  private List<Resource> getIcons(Node dataNode, Node iconsNode) {
+    //      List<Resource> resources = new ArrayList<Resource>();
     //
-    //		if(!dataNode) return resources;
+    //      if(!dataNode) return resources;
     //
-    //		dataNode.icons.icon.each {
-    //			String fileName = it.text();
-    //			def fieldCriteria = Resource.createCriteria();
-    //			def res = fieldCriteria.get {
-    //				and {
-    //					eq("fileName", fileName);
-    //					eq("type", ResourceType.ICON);
-    //				}
-    //			}
+    //      dataNode.icons.icon.each {
+    //          String fileName = it.text();
+    //          def fieldCriteria = Resource.createCriteria();
+    //          def res = fieldCriteria.get {
+    //              and {
+    //                  eq("fileName", fileName);
+    //                  eq("type", ResourceType.ICON);
+    //              }
+    //          }
     //
-    //			if(!res) {
-    //				log.debug "Creating icon : "+fileName
-    //				res = new Resource(type : ResourceType.ICON, fileName:fileName);
-    //				def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
-    //				res.addToLicenses(l);
-    //				if(!res.save(flush:true)) {
-    //					res.errors.each { log.error it }
-    //				}
-    //			}
+    //          if(!res) {
+    //              log.debug "Creating icon : "+fileName
+    //              res = new Resource(type : ResourceType.ICON, fileName:fileName);
+    //              def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
+    //              res.addToLicenses(l);
+    //              if(!res.save(flush:true)) {
+    //                  res.errors.each { log.error it }
+    //              }
+    //          }
     //
-    //			resources.add(res);
-    //			s.addToResources(res);
-    //		}
-    //		return resources;
-    //	}
+    //          resources.add(res);
+    //          s.addToResources(res);
+    //      }
+    //      return resources;
+    //  }
 
     private List<Resource> getAudio(Node dataNode, Node audiosNode) {
         List<Resource> resources = new ArrayList<Resource>();
@@ -1168,17 +1210,17 @@ class XMLConverter extends SourceConverter {
                     sfield.language = lang;
                 else {
                     log.warn "NOT A SUPPORTED LANGUAGE: " + n.language;
-					addToSummary("NOT A SUPPORTED LANGUAGE: " + n.language)
+                    addToSummary("NOT A SUPPORTED LANGUAGE: " + n.language)
                 }
-				
+                
                 if(!sfield.save(flush:true)) {
-					sfield.errors.each { log.error it }
+                    sfield.errors.each { log.error it }
                 }
             }
-			
-			//adding contributors to common name
-			sfield.updateContributors(getUserContributors(n))
-			
+            
+            //adding contributors to common name
+            sfield.updateContributors(getUserContributors(n))
+            
             commonNames.add(sfield);
         }
         return commonNames;
@@ -1216,8 +1258,8 @@ class XMLConverter extends SourceConverter {
             } 
         }
 
-        log.debug "Creating new language ${name} and ${threeLetterCode}"		
-        Language lang = Language.getLanguage(name);	
+        log.debug "Creating new language ${name} and ${threeLetterCode}"        
+        Language lang = Language.getLanguage(name); 
         return lang;
     }
 
@@ -1237,13 +1279,13 @@ class XMLConverter extends SourceConverter {
                 def parsedNames = namesParser.parse([cleanName]);
                 def sfield = saveSynonym(parsedNames[0], rel, taxonConcept);
                 if(sfield) {
-					//adding contributors
-					sfield.updateContributors(getUserContributors(n))
-		            synonyms.add(sfield);
+                    //adding contributors
+                    sfield.updateContributors(getUserContributors(n))
+                    synonyms.add(sfield);
                 }
             } else {
                 log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
-				addToSummary("NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text())
+                addToSummary("NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text())
             }
         }
         return synonyms;
@@ -1279,7 +1321,7 @@ class XMLConverter extends SourceConverter {
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
-			addToSummary("Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name)
+            addToSummary("Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name)
         }
 
     }
@@ -1328,11 +1370,11 @@ class XMLConverter extends SourceConverter {
                     }
                 } else {
                     log.warn "NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text();
-					addToSummary("NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text())
+                    addToSummary("NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text())
                 }
             } else {
                 log.error " NO COUNTRY IS SPECIFIED in $c"
-				addToSummary(" NO COUNTRY IS SPECIFIED in $c")
+                addToSummary(" NO COUNTRY IS SPECIFIED in $c")
             }
         }
         return geographicEntities;
@@ -1415,10 +1457,10 @@ class XMLConverter extends SourceConverter {
             log.debug "Taxon : "+name+" and rank : "+rank;
             if(name && rank >= 0) {
                 //TODO:HACK to populate sciName in species level of taxon hierarchy
-                //				if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
-                //					def cleanSciName = cleanSciName(scientificName);
-                //					name = cleanSciName
-                //				}
+                //              if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
+                //                  def cleanSciName = cleanSciName(scientificName);
+                //                  name = cleanSciName
+                //              }
 
                 def parsedName = parsedNames.get(i++);
                 log.debug "Parsed name ${parsedName?.canonicalForm}"
@@ -1438,11 +1480,11 @@ class XMLConverter extends SourceConverter {
                         if(!taxon.save()) {
                             taxon.errors.each { log.error it }
                         }
-						taxon.updateContributors(getUserContributors(fieldNode.data))
+                        taxon.updateContributors(getUserContributors(fieldNode.data))
                     } else if(taxon.name != parsedName.name) {
                         def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
-						if(synonym)
-							synonym.updateContributors(getUserContributors(fieldNode.data))
+                        if(synonym)
+                            synonym.updateContributors(getUserContributors(fieldNode.data))
                     }
 
 
@@ -1462,7 +1504,7 @@ class XMLConverter extends SourceConverter {
 
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
-						registry.updateContributors(getUserContributors(fieldNode.data))
+                        registry.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(registry);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;
@@ -1471,21 +1513,21 @@ class XMLConverter extends SourceConverter {
                         } else {
                             log.debug "Saved taxon registry entity : "+ent;
                         }
-						ent.updateContributors(getUserContributors(fieldNode.data))
+                        ent.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(ent);
                     }
 
 
                 } else {
                     log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
-					addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
+                    addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                 }
             }
             }
         }
-        //		if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {
-        //			updateSpeciesGroup(taxonEntities);
-        //		}
+        //      if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {
+        //          updateSpeciesGroup(taxonEntities);
+        //      }
         return taxonEntities;
     }
 
@@ -1594,19 +1636,19 @@ class XMLConverter extends SourceConverter {
     static Species findDuplicateSpecies(s) {
         def species = Species.withCriteria() {
                 eq("guid", s.guid);
-				fetchMode 'userGroups', FetchMode.JOIN
-				fetchMode 'resources', FetchMode.JOIN
-				fetchMode 'fields', FetchMode.JOIN
-				fetchMode 'globalDistributionEntities', FetchMode.JOIN
-				fetchMode 'globalEndemicityEntities', FetchMode.JOIN
-				fetchMode 'indianDistributionEntities', FetchMode.JOIN
-				fetchMode 'indianEndemicityEntities', FetchMode.JOIN
-        //		if(!species.isAttached()) {
-        //			species.attach();
-        //		}
+                fetchMode 'userGroups', FetchMode.JOIN
+                fetchMode 'resources', FetchMode.JOIN
+                fetchMode 'fields', FetchMode.JOIN
+                fetchMode 'globalDistributionEntities', FetchMode.JOIN
+                fetchMode 'globalEndemicityEntities', FetchMode.JOIN
+                fetchMode 'indianDistributionEntities', FetchMode.JOIN
+                fetchMode 'indianEndemicityEntities', FetchMode.JOIN
+        //      if(!species.isAttached()) {
+        //          species.attach();
+        //      }
         }
-		if(species)
-			return species[0]
+        if(species)
+            return species[0]
     }
 
     /**
@@ -1615,18 +1657,18 @@ class XMLConverter extends SourceConverter {
      * @param newSpecies
      */
     void mergeSpecies(Species existingSpecies, Species newSpecies) {
-        //				newSpecies.fields.each { field ->
-        //					existingSpecies.addToFields(field);
-        //				}
-        //				newSpecies.synonyms.each { field ->
-        //					existingSpecies.addToSynonyms(field);
-        //				}
-        //				newSpecies.commonNames.each { field ->
-        //					existingSpecies.addToFields(field);
-        //				}
-        //				newfields,
-        //				synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
-        //				taxonomyRegistry;
+        //              newSpecies.fields.each { field ->
+        //                  existingSpecies.addToFields(field);
+        //              }
+        //              newSpecies.synonyms.each { field ->
+        //                  existingSpecies.addToSynonyms(field);
+        //              }
+        //              newSpecies.commonNames.each { field ->
+        //                  existingSpecies.addToFields(field);
+        //              }
+        //              newfields,
+        //              synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
+        //              taxonomyRegistry;
 
     }
 
@@ -1663,7 +1705,7 @@ class XMLConverter extends SourceConverter {
             } catch(ConstraintViolationException e) {
                 e.printStackTrace()
             }
-            //		   hibSession.clear()
+            //         hibSession.clear()
         }
     }
 

@@ -121,7 +121,7 @@ if(r) {
                                             <r:img uri="${grailsApplication.config.grails.serverURL}/images/spinner.gif" width="20" height="20"/>
                                         </div>
                                     </center>
-                                     
+                                      
 					<div id="gallery1" style="visibility:hidden">
 
 						<g:if test="${observationInstance.resource}">
@@ -144,9 +144,10 @@ if(r) {
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
 									<g:imageAttribution model="['resource':r]" />
 								</g:elseif>
-	
+                                    <a><img src="sdafs.jpg" /></a>
 
-                                                                </g:each>
+
+                            </g:each>
                                                 
 						</g:if>
 						<g:else>
@@ -159,6 +160,22 @@ if(r) {
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 			
+
+                        <% def IsOtherResources = 0;  %>
+                            <g:each in="${observationInstance.listResourcesByRating()}" var="r">
+                                     <g:if test="${r.type != ResourceType.AUDIO}">
+                                            <%   IsOtherResources = 1;   %>
+                                     </g:if>        
+                                     <g:if test="${r.type == ResourceType.AUDIO}">
+                                            <audio controls style="float: right;padding: 10px 0px;width: 100%;">                                              
+                                              <source src="${r.url }" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                            
+                                     </g:if>
+                        </g:each>
+
+
 					<div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
 						<div>
 							<ul id="recoSummary" class="pollBars">

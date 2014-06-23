@@ -50,8 +50,36 @@ function removeResource(event, imageId) {
                 title : 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
             };
 
+
+
+            var audioOptions = {
+                type : 'text',
+                mode : 'popup',
+                emptytext : '',
+                placement : 'bottom', 
+                url : function(params) {
+                    var d = new $.Deferred;
+                    if(!params.value) {
+                        return d.reject('This field is required'); //returning error via deferred object
+                    } else {
+                        me.$form.find('.audioUrl').val(params.value);
+                        me.submitRes();
+                        d.resolve();
+                    }
+                    return d.promise() 
+                }, 
+                    validate :  function(value) {
+                        if($.trim(value) == '') {
+                            return 'This field is required';
+                        }
+                    }, 
+                title : 'Enter Audio url like http://test.com/sample.mp3'
+            };
+
+
             $.extend( videoOptions, options);
             me.$ele.find('.add_video').editable(videoOptions);
+            me.$ele.find('.add_audio').editable(audioOptions);
 
 
 
@@ -141,6 +169,8 @@ function removeResource(event, imageId) {
                 images.push({i:x+i, file:fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
                 x--;
             });
+
+            console.log(images);
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
             metadataEle.each(function() {
@@ -156,7 +186,9 @@ function removeResource(event, imageId) {
             me.$ele.find(".image-resources-msg").html("");
             me.$form.find("input[name='resources']").remove();
             me.$ele.find('.videoUrl').val('');
-            me.$ele.find('.add_video').editable('setValue','', false);		
+            me.$ele.find('.audioUrl').val('');
+            me.$ele.find('.add_video').editable('setValue','', false);
+            me.$ele.find('.add_audio').editable('setValue','', false);		
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
@@ -170,8 +202,10 @@ function removeResource(event, imageId) {
                 me.$ele.find("#addObservationSubmit").removeClass('disabled');
                 me.$form("input[name='resources']").remove();
                 me.$ele.find('.videoUrl').val('');
+                me.$ele.find('.audioUrl').val('');
                 me.$ele.find(".progress").css('z-index',90);
                 me.$ele.find('.add_video').editable('setValue','', false);
+                me.$ele.find('.add_audio').editable('setValue','', false);
                 //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 
                 var response = $.parseJSON(xhr.responseText);
