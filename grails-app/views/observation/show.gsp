@@ -51,7 +51,7 @@ if(r) {
 .btn .caret {
     margin-top: 3px;
 }
-#commonName {
+.nameContainer.textbox #commonName {
 	width: 200px;
 }
 .nameContainer .combobox-container {
