@@ -1183,6 +1183,10 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def getFullObvImage() {
+        if(!params.id ) {
+            render '';
+            return
+        }
 		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def gallImagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix):null

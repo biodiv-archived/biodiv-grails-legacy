@@ -1425,7 +1425,7 @@ grails.plugin.springsecurity.useSessionFixationPrevention = false
 
 grails.databinding.useSpringBinder=true
 // What URL patterns should be processed by the resources plugin
-grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*', '/bootstrap/*']
+grails.resources.adhoc.includes = ['/images/**', '/css/**', '/js/**', '/plugins/**', '/bootstrap/**']
 
 // Legacy setting for codec used to encode data with ${}
 grails.views.default.codec = "html"
