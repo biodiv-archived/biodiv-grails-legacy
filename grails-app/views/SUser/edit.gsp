@@ -340,18 +340,6 @@
 
 
 
-									<s2ui:tab name='speciesPermissions' height='275'>
-										<table>
-                                            <tbody>
-                                                <g:each in="${contributorForTaxonConcepts}" var="${taxonConcept}">
-                                                <tr>
-                                                    <td>${TaxonomyRank.list()[taxonConcept.rank].value()} : ${taxonConcept.italicisedForm}</td>
-                                                </tr>
-                                                </g:each>
-											</tbody>
-										</table>
-									</s2ui:tab>
-
 
 								</s2ui:tabs>
 							</div>

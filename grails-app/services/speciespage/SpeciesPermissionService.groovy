@@ -36,16 +36,21 @@ class SpeciesPermissionService {
         return result
     } 
 
-    private List getUsers(Species speciesInstance, SpeciesPermission.PermissionType permissionType) {
+    List<SUser> getUsers(Species speciesInstance, SpeciesPermission.PermissionType permissionType) {
         def taxonConcept = species.taxonConcept;
+        return getUsers(taxonConcept, permissionType);
+    }
+
+    List<SUser> getUsers(TaxonomyDefinition taxonConcept, SpeciesPermission.PermissionType permissionType) {
         List parentTaxons = taxonConcept.parentTaxon()
-        def res = SpeciesPermission.findAllByPermissionTypeAndTaxonConceptInList(permissionType, parentTaxons)
+        def res = SpeciesPermission.findAllByPermissionTypeAndTaxonConceptInList(permissionType.toString(), parentTaxons)
         def result = []
         res.each { r-> 
             result.add(r.author)            
         }
         return result
     }
+
 
     boolean addCurator(SUser author, List<Species> species) {
         def result = addUsers(author, species, PermissionType.ROLE_CURATOR)
@@ -95,7 +100,7 @@ class SpeciesPermissionService {
                     return false
                 }
 
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, [speciesPermission:newCon]);
+                //observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, [speciesPermission:newCon]);
                 log.error "done"
                 return true;
             } catch (Exception e) {
@@ -111,6 +116,8 @@ class SpeciesPermissionService {
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
+        println "IS SPECIES CONTRIBUTOR -----------------"
+        println speciesInstance.taxonConcept;
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
@@ -119,6 +126,8 @@ class SpeciesPermissionService {
         if(!taxonConcept) return false;
         List parentTaxons = taxonConcept.parentTaxon()
         parentTaxons.add(taxonConcept);
+        println "PARENT TAXONS-----------------------"
+        println parentTaxons
         def permissions = permissionTypes.collect {it.value()};
         def res = SpeciesPermission.withCriteria {
             eq('author', user)

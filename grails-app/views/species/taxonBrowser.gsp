@@ -37,8 +37,46 @@
                 </div>
             </div>
             <g:render template="/species/inviteForContribution"/>
-
         </div>
+        <!--div>
+            <form id="searchPermission" action="${uGroup.createLink(action:'search', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+
+                <div class="span12 super-section" style="clear:both;">
+                    <div class="section">
+                        <div class="control-group">
+                            <label class="control-label span3" for="name">Revoke</label> 
+                            <div class="pull-left" style="width:700px;margin-left:20px;">
+
+                                <div class="input-prepend">
+                                    <select id="rank" name="rank" class="add-on">
+                                        <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
+                                        <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}>${rank.value()}</option>
+                                        </g:each>
+                                    </select>
+
+                                    <input id="page" 
+                                    data-provide="typeahead" type="text" class="taxonRank" style=""
+                                    name="page" value="" data-rank="${TaxonomyRank.SPECIES.ordinal()}"
+                                    placeholder="Select taxon or" />
+                                    <div id="nameSuggestions" style="display: block;position:relative;"></div>
+                                </div>
+                                    <sUser:selectUsers model="['id':'user']" /> 
+                                <div id="errorMsg" class="alert hide"></div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>   
+                <div class="span12 submitButtons">
+                    <a id="searchPermissions" class="btn btn-primary"
+                        style="float: right; margin-right: 5px;">Search</a>
+
+                    <a id="revokeSpeciesPermission" class="btn btn-primary"
+                        style="float: right; margin-right: 5px;"> Revoke</a>
+                </div>
+
+            </form>
+        </div-->
+
         <g:javascript>
         var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
@@ -52,6 +90,55 @@
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false
             });	
+            /*$("#searchPermission").autofillNames({
+                'appendTo' : '#nameSuggestions',
+                'nameFilter':'scientificNames',
+                focus: function( event, ui ) {
+                    $("#canName").val("");
+                    $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
+                    $("#nameSuggestions li a").css('border', 0);
+                    return false;
+                },
+                select: function( event, ui ) {
+                    $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
+                    $("#canName").val( ui.item.value );
+                    $("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
+                    return false;
+                },open: function(event, ui) {
+                    //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+                }
+            });
+
+            var users_autofillUsersComp = $("#userAndEmailList_user").autofillUsers({
+                usersUrl : window.params.userTermsUrl
+            });
+
+            $('#searchPermission').click(function() {
+                var params = {};
+                $("#addSpecies input").each(function(index, ele) {
+                    if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
+                });
+                params['rank'] = $('#rank').find(":selected").val(); 
+                $.ajax({
+                    url:'/species/searchPermission',
+                    data:params,
+                    method:'POST',
+                    dataType:'json',
+                    success:function(data) {
+                    console.log(data);
+                        if(data.success == true) {
+
+                        } else {
+                            $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                        }
+                    }, error: function(xhr, status, error) {
+                        handleError(xhr, status, error, this.success, function() {
+                            var msg = $.parseJSON(xhr.responseText);
+                            $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                        });
+                    }
+                });
+            });*/
         });
         </r:script>
     </body>

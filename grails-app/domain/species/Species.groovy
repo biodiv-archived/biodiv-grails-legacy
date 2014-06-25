@@ -256,7 +256,9 @@ class Species implements Rateable {
             } else {
                 log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
             }
+
 		}
+        
     }
 
     def beforeDelete(){

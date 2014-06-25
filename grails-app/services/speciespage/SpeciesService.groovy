@@ -1174,7 +1174,7 @@ class SpeciesService extends AbstractObjectService  {
                 result['success'] = false;
                 result['status'] = 'requirePermission';
                 result['msg'] = 'Please request for permission to contribute.'
-                result['errors'] = errors
+                //result['errors'] = errors
                 return result
             }
  
