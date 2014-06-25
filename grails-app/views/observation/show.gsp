@@ -51,16 +51,13 @@ if(r) {
 .btn .caret {
     margin-top: 3px;
 }
-#commonName {
+.nameContainer.textbox #commonName {
 	width: 200px;
 }
 .nameContainer .combobox-container {
 	left:198px;
 }
  
-.combobox-container .add-on {
-	right: -91px;
-}
 .observation_story .observation_footer {
     margin-top:50px;
 }
@@ -265,6 +262,12 @@ if(r) {
 
 
                             </div>
+<g:javascript>
+$(document).ready(function(){
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
+});
+</g:javascript>
+
 
 	<r:script>
 	
@@ -275,16 +278,16 @@ if(r) {
 <%--		dcorateCommentBody($('.yj-message-body')); --%>
 
 		$("#seeMoreMessage").hide();
-                		$(".readmore").readmore({
+      		$(".readmore").readmore({
 			substr_len : 400,
 			more_link : '<a class="more readmore">&nbsp;More</a>'
 		});
 		
 		$('#gallery1').galleria({
 			height : 400,
-                        preload : 1,
-                        lightbox: false,
-			carousel : false,
+            preload : 1,
+            lightbox: false,
+            carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -293,10 +296,10 @@ if(r) {
 			thumbQuality : false,
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
-                        _toggleInfo: false,
-                        thumbnails:true,
-                        showCounter:true,
-                        idleMode:false,
+            _toggleInfo: false,
+            thumbnails:true,
+            showCounter:true,
+            idleMode:false,
 			youtube : {
                             modestbranding: 1,
                             autohide: 1,
@@ -392,35 +395,29 @@ if(r) {
 	     	event.preventDefault();
      	});
         
-                $(".nav a.disabled").click(function() {
-			return false;
-		})
+        $(".nav a.disabled").click(function() {
+            return false;
+        })
 
-                $("#seeMore").click(function(){
-                    preLoadRecos(-1, 3, true);
-                });
-
-                preLoadRecos(3, 0, false);
-                //loadObjectInGroups();
-                var obvLock = ${obvLock};
-                if(obvLock){
-                    showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
-                    $('.nameContainer input').attr("disabled", "disabled");
-                    $('.iAgree button').addClass("disabled");
-                }
-                else{
-                    $('.nameContainer input').removeAttr("disabled");
-                    $('.iAgree button').removeClass("disabled");
-                } 
-                
+        $("#seeMore").click(function(){
+            preLoadRecos(-1, 3, true);
         });
 
-</r:script>
-<g:javascript>
-$(document).ready(function(){
-    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
-});
-</g:javascript>
+        preLoadRecos(3, 0, false);
+        //loadObjectInGroups();
+        var obvLock = ${obvLock};
+        if(obvLock){
+            showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+            $('.nameContainer input').attr("disabled", "disabled");
+            $('.iAgree button').addClass("disabled");
+        }
+        else{
+            $('.nameContainer input').removeAttr("disabled");
+            $('.iAgree button').removeClass("disabled");
+        } 
 
+    });
+
+</r:script>
 </body>
 </html>

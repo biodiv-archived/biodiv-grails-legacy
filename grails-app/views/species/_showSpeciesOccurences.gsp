@@ -5,7 +5,7 @@
 <g:showSpeciesFieldToolbar model="${category.value[0]}" />
 <br />
 
-<div id="map">
+<div id="map" style="height:auto;">
     <div class="alert alert-info">
         The current map showing distribution of species is only indicative.
         <img src="${resource(dir:'images',file:'maplegend.png', absolute:true)}"/>
