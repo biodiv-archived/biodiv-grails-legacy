@@ -37,11 +37,23 @@
             <form id="addSpecies" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
 
                 <div class="span12 super-section" style="clear:both;">
+
+            <div class="section help-block"> 
+                <ul>
+                    <li>
+                    Contributors need to have create rights on the species page in order to add content. If you have not already been allotted rights, please request permission for the taxa of your interest <a href="${uGroup.createLink('controller':'species', 'action':'taxonBrowser')}">here</a>.
+                    </li>
+                    <li>
+                    Please input a species name and validate. If a name is validated and found to already exist on the portal, you will be taken to the species page to add content. If the name is validated and found to be new, you can fill in the taxonomic hierarchy so that the new species page can be created.
+                    </li>
+                </ul>
+           </div>
+
                     <div class="section">
                     <div class="control-group">
                         <label class="control-label span3" for="name">Add page</label> 
                         <div class="pull-left" style="width:700px;margin-left:20px;">
-
+ 
                             <div class="input-prepend">
                                 <select id="rank" name="rank" class="add-on">
                                 <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
@@ -175,7 +187,9 @@
                         var $hier = $('#taxonHierachyInput');
                         $hier.empty()
                         for (var i=0; i<data.rank; i++) {
-                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                            var taxonRegistry = data.requestParams? data.requestParams.taxonRegistry:undefined;
+                            var taxonValue = (taxonRegistry && taxonRegistry[i]) ?taxonRegistry[i]:taxonRanks[i].taxonValue;
+                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }
                         if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 

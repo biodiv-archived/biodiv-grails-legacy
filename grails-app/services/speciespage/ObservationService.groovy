@@ -1767,7 +1767,7 @@ class ObservationService extends AbstractObjectService {
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = " added the following species:"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(getOwner(obv))
+                toUsers.addAll(getParticipants(obv))
                 break
 
             case [activityFeedService.SPECIES_FIELD_CREATED, activityFeedService.SPECIES_SYNONYM_CREATED, activityFeedService.SPECIES_COMMONNAME_CREATED, activityFeedService.SPECIES_HIERARCHY_CREATED] :
@@ -1775,7 +1775,7 @@ class ObservationService extends AbstractObjectService {
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(getOwner(obv))
+                toUsers.addAll(getParticipants(obv))
                 break
 
 
@@ -1784,7 +1784,7 @@ class ObservationService extends AbstractObjectService {
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(getOwner(obv))
+                toUsers.addAll(getParticipants(obv))
                 break
 
             case [activityFeedService.SPECIES_FIELD_DELETED, activityFeedService.SPECIES_SYNONYM_DELETED, activityFeedService.SPECIES_COMMONNAME_DELETED, activityFeedService.SPECIES_HIERARCHY_DELETED] :
@@ -1792,15 +1792,14 @@ class ObservationService extends AbstractObjectService {
                 bodyview = "/emailtemplates/addobservation"
                 templatemap["message"] = introspector.decapitalize(otherparams['info']);
                 populatetemplate(obv, templatemap, usergroupwebaddress, feedinstance, request)
-                tousers.add(getowner(obv))
+                toUsers.addAll(getParticipants(obv))
                 break
             
             case NEW_SPECIES_PERMISSION : 
                 mailSubject = notificationType
                 bodyView = "/emailtemplates/grantedPermission"
-                def user = getOwner(otherParams['speciesPermission']);
-                templateMap["speciesPermission"] = otherParams["speciesPermission"]
-                templateMap["user"] = user
+                def user = otherParams['user'];
+                templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
  
@@ -2180,7 +2179,6 @@ class ObservationService extends AbstractObjectService {
         if(!reco) return;
 		def speciesId = reco.taxonConcept?.findSpeciesId()
 		if(!speciesId){
-            println "RECONAME : "+reco
 			return reco.name
 		}
 		

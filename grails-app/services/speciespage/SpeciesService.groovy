@@ -1174,13 +1174,14 @@ class SpeciesService extends AbstractObjectService  {
                 result['success'] = false;
                 result['status'] = 'requirePermission';
                 result['msg'] = 'Please request for permission to contribute.'
+                //result['errors'] = errors
                 return result
             }
  
             //save taxonomy hierarchy
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
-            result.addAll(result1);
+            result.putAll(result1);
             result.speciesInstance = speciesInstance;
             result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
