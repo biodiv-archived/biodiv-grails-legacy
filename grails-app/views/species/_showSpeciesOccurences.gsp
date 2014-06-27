@@ -4,11 +4,12 @@
 
 <g:showSpeciesFieldToolbar model="${category.value[0]}" />
 <br />
-
-<div id="map">
-
+<div>
+    <div id="map">
     <div id="map1311326056727" class="occurenceMap"
         style="height: 600px; width: 100%"></div>
+    </div>
+
     <div class="alert alert-info">
         The current map showing distribution of species is only indicative.
         <img src="${resource(dir:'images',file:'maplegend.png', absolute:true)}"/>
