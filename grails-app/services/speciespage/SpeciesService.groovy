@@ -1169,17 +1169,22 @@ class SpeciesService extends AbstractObjectService  {
                 return result
             }
 
+            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                result['success'] = false;
-                result['status'] = 'requirePermission';
-                result['msg'] = 'Please request for permission to contribute.'
-                //result['errors'] = errors
-                return result
+                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
+                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
+                if(!speciesPermissionService.isTaxonContributor(tR, springSecurityService.currentUser)) {
+                    result['success'] = false;
+                    result['status'] = 'requirePermission';
+                    result['msg'] = 'Please request for permission to contribute.'
+                    //result['errors'] = errors
+                    return result
+                }
             }
- 
+
             //save taxonomy hierarchy
-            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;

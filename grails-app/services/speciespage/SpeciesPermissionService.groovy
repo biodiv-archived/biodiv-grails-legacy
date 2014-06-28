@@ -121,11 +121,15 @@ class SpeciesPermissionService {
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
-    boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes) {
+    boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes = [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
         if(!user) return false;
         if(!taxonConcept) return false;
         List parentTaxons = taxonConcept.parentTaxon()
         parentTaxons.add(taxonConcept);
+        return isTaxonContributor(parentTaxons, user, permissionTypes);
+    }
+
+    boolean isTaxonContributor(List<TaxonomyDefinition> parentTaxons, SUser user, List<PermissionType> permissionTypes = [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
         println "PARENT TAXONS-----------------------"
         println parentTaxons
         def permissions = permissionTypes.collect {it.value()};

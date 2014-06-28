@@ -1388,8 +1388,6 @@ class XMLConverter extends SourceConverter {
         List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
 
         fieldNodes.each { fieldNode ->
-            println fieldNode
-            println fieldNode.data
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
@@ -1440,7 +1438,7 @@ class XMLConverter extends SourceConverter {
                             taxon.errors.each { log.error it }
                         }
 						taxon.updateContributors(getUserContributors(fieldNode.data))
-                    } else if(taxon.name != parsedName.name) {
+                    } else if(taxon.name != parsedName.name && saveTaxonHierarchy) {
                         def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
 						if(synonym)
 							synonym.updateContributors(getUserContributors(fieldNode.data))
@@ -1463,7 +1461,8 @@ class XMLConverter extends SourceConverter {
 
                     if(registry) {
                         log.debug "Taxon registry already exists : "+registry;
-						registry.updateContributors(getUserContributors(fieldNode.data))
+                        if(saveTaxonHierarchy)
+    						registry.updateContributors(getUserContributors(fieldNode.data))
                         taxonEntities.add(registry);
                     } else if(saveTaxonHierarchy) {
                         log.debug "Saving taxon registry entity : "+ent;

@@ -26,6 +26,7 @@ class TaxonService {
 	def externalLinksService;
     def springSecurityService;
     def activityFeedService;
+    def speciesPermissionService;
 
 	static int BATCH_SIZE = 100;
 
@@ -781,7 +782,15 @@ class TaxonService {
             return [success:false, msg:"Not a valid classification ${classification?.name}."]
         }
 
-        def taxonRegistry = addTaxonEntries(speciesName, (new XMLConverter()), taxonRegistryNames, classification.name, contributor);
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor);
+        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);
+/*        //check if user has permission to contribute to the taxon hierarchy
+        if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {
+            taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);            
+        } else {
+            return ['success':false, code:'requirePermission', msg:"Sorry, you dont have persmission to edit taxon registry nodes ${taxonRegistry}"]
+        }
+*/
         if(taxonRegistry) {
             int maxRank = 0;
             TaxonomyRegistry reg;
@@ -798,11 +807,6 @@ class TaxonService {
             return ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
         }
         return ['success':false, msg:'Error while adding hierarchy', errors:errors]
-    }
-
-    private List<TaxonomyRegistry> addTaxonEntries(String speciesName, converter, List taxonRegistryNames, String classificationName, SUser contributor) {
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor);
-        return converter.getClassifications(taxonRegistryNodes, speciesName, true); 
     }
 
     def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {

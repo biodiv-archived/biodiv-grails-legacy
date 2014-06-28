@@ -189,7 +189,7 @@ class SpeciesController extends AbstractObjectController {
             if(params.editMode) {
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
 			        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
-                    flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
+                    flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesInstance.title+' ( '+params.id+' )':''}. Please request for permission below."
                     def url = uGroup.createLink(controller:"species", action:"contribute");
                     redirect url: url
             		return;
