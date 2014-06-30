@@ -79,7 +79,6 @@ class Species implements Rateable {
 
     Species() {
         super();
-        println "Species Initialization +++++++++++++++++++++++++++++++"
         //new Throwable("init").printStackTrace() 
     }
 
@@ -251,6 +250,7 @@ class Species implements Rateable {
 	
 	        //TODO:looks like this is gonna be heavy on every save ... gotta change
 			this.fields?.each { contributors.addAll(it.contributors)}
+            contributors.addAll(this.taxonConcept.contributors)
 	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        

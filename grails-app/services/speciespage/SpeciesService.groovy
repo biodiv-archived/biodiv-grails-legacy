@@ -1173,8 +1173,13 @@ class SpeciesService extends AbstractObjectService  {
 
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                println "checking permissions +++++++++++++++++++++++++++++++++++++++++"
                 def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
+                println taxonRegistryNodes
+
                 List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
+                println tR
+                println "tR: .... +++++++++++++++++++++++++++++++++++"
                 if(!speciesPermissionService.isTaxonContributor(tR, springSecurityService.currentUser)) {
                     result['success'] = false;
                     result['status'] = 'requirePermission';
