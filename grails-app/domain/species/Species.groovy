@@ -20,7 +20,7 @@ import species.participation.Flag;
 import species.participation.Featured;
 
 class Species implements Rateable { 
-	String title;
+ 	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
@@ -79,14 +79,17 @@ class Species implements Rateable {
 
     Species() {
         super();
-        println "Species Initialization +++++++++++++++++++++++++++++++"
         //new Throwable("init").printStackTrace() 
     }
 
 	Resource mainImage() {
         def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+        def images = this.getImages();
+        def reprImageMaxRated = images ? images[0]:null;
+        /*
         if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
             def images = this.getImages();
+            println "=========IMAGES========== " + images;
             this.reprImage = images ? images[0]:null;
             if(reprImage) {
                 log.debug " Saving representative image for species ===  $reprImage.fileName" ;
@@ -95,9 +98,9 @@ class Species implements Rateable {
                     this.errors.each { log.error it }
                 }
             }			
-        }
-        if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim()).exists())) {
-            return reprImage;
+        }*/
+        if(reprImageMaxRated && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImageMaxRated.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImageMaxRated.fileName.trim()).exists())) {
+            return reprImageMaxRated;
         } else {
             return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
         }
@@ -247,6 +250,7 @@ class Species implements Rateable {
 	
 	        //TODO:looks like this is gonna be heavy on every save ... gotta change
 			this.fields?.each { contributors.addAll(it.contributors)}
+            contributors.addAll(this.taxonConcept.contributors)
 	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        

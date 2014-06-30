@@ -14,7 +14,12 @@ function showRecos(data, textStatus) {
     showUpdateStatus(data.msg, data.status);
 }
 
-function lockObv(url, lockType, recoId, obvId) {
+function lockObv(url, lockType, recoId, obvId, ele) {
+    if($(ele).hasClass('disabled')) {
+        alert("This species ID has already been locked!!");
+        event.preventDefault();
+        return false; 		 		
+    }
     $.ajax({
         url:url,
         dataType: "json",

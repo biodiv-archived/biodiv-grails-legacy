@@ -154,8 +154,8 @@
                 showOccurence('${speciesName}');
                 //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
                 } else {
-                $("#map .alert").html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.");
-                $('#map1311326056727').hide();
+                $("#map").next('.alert').html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.").css('height','auto');
+                $('#map').hide();
                 }
             } else {
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
