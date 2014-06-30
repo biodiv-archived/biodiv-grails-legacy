@@ -745,15 +745,18 @@ class XMLConverter extends SourceConverter {
                 }
                 break;
                 case ResourceType.AUDIO:
-                resourceNode?.audio.each { if(!it?.id) resources.add(createAudio(it)); }
-                break;
-                case ResourceType.VIDEO:
-
-                println "====Create Video ===============" + resourceNode?.video
-                resourceNode?.video.each { if(!it?.id) 
-                    println "================Create Video==================="+ createVideo(it)
-                    resources.add(createVideo(it));
+                    //resourceNode?.audio.each { if(!it?.id) resources.add(createAudio(it)); }
+                resourceNode?.audio.each {
+                    if(!it?.id) {
+                        def resource = createImage(it, relResFolder, ResourceType.AUDIO);
+                        if(resource) {
+                            resources.add(resource);
+                        }
+                    }
                 }
+                break;
+                case ResourceType.VIDEO:                
+                resourceNode?.video.each { if(!it?.id) resources.add(createVideo(it)); }
             }
         }
         return resources;
@@ -787,7 +790,9 @@ class XMLConverter extends SourceConverter {
             if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-                    ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+                    if( resourceType == "IMAGE"){
+                        ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+                      }  
                 } catch(FileNotFoundException e) {
                     log.error "File not found : "+tempFile.absolutePath;
                     addToSummary("File not found : "+tempFile.absolutePath)

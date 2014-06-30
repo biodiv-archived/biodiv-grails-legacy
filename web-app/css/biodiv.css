@@ -452,25 +452,32 @@ div.errors {
 }
 
 .add_image {
-	background-image: url('../images/add-photo.png');
+	background-image: url('../images/add_photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height:90px;
+	height: 65px;
 	cursor: pointer;
 	border-bottom: 3px red;
 }
 .add_video {
-	background-image: url('../images/add-video.png');
+	background-image: url('../images/add_video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height:90px;
+	height: 57px;
 	cursor: pointer;
 }
-
+.add_audio {
+	background-image: url('../../images/add_audio.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../../images/add-audio.png'),sizingMethod='crop');
+	background-repeat: no-repeat;
+	width: 200px;
+	height: 65px;
+	cursor: pointer;
+}
 
 .add_file .progress {
 	border-radius: 3px 3px 3px 3px;
@@ -485,6 +492,7 @@ div.errors {
 }
 
 .add_file_container {
+	padding: 5px 8px;
 	position:relative;
 	z-index:100;
 }

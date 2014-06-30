@@ -288,9 +288,9 @@ class AbstractObjectService {
                     new Node(image, "fileName", file);
                     new Node(image, "source", url.getAt(key));
                 } else if(type.getAt(key).equalsIgnoreCase(ResourceType.AUDIO.value())) {
-                    image = new Node(audios, "audio");
-                    new Node(image, "fileName", file);
-                    new Node(image, "source", url.getAt(key));
+                    image = new Node(audios, "audio");                    
+                    File f = new File(uploadDir, file);
+                    new Node(image, "fileName", f.absolutePath);
                 }	
 
               			
@@ -329,11 +329,16 @@ class AbstractObjectService {
             break;
         }
         converter.setResourcesRootDir(rootDir);
-        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
-        relImagesContext = new File(relImagesContext).getParent();
-
         
-        return converter.createMedia(resourcesXML, relImagesContext);
+
+        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
+
+        if(relImagesContext == ""){
+            relImagesContext = resourcesXML.audios.audio?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
+        }
+        relImagesContext = new File(relImagesContext).getParent();
+       
+       return converter.createMedia(resourcesXML, relImagesContext);
     }
 
 

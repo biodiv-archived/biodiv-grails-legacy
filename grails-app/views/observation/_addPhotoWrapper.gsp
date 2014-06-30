@@ -12,7 +12,7 @@
     <div
         class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
         <ul class="imagesList thumbwrap thumbnails"
-            style='list-style: none; margin-left: 0px; min-height: 330px;'>
+            style='list-style: none; margin-left: 0px;'>
             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <input type="hidden" id='relatedImagesOffset' name='relatedImagesOffset' value = ''/>

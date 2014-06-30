@@ -25,6 +25,7 @@ function removeResource(event, imageId) {
         initForm : function(options) {
             var me = this;
             me.$ele.find('.add_image').bind('click', $.proxy(me.filePick, me));
+            me.$ele.find('.add_audio').bind('click', $.proxy(me.filePickAudio, me));
 
             var videoOptions = {
                 type : 'text',
@@ -79,7 +80,7 @@ function removeResource(event, imageId) {
 
             $.extend( videoOptions, options);
             me.$ele.find('.add_video').editable(videoOptions);
-            me.$ele.find('.add_audio').editable(audioOptions);
+           // me.$ele.find('.add_audio').editable(audioOptions);
 
 
 
@@ -140,6 +141,44 @@ function removeResource(event, imageId) {
             }
                                     
         },
+
+
+
+
+
+
+         filePickAudio : function(e) {
+            var me = this;
+            var onSuccess = function(FPFiles){
+                $.each(FPFiles, function(){
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'resources',
+                        value:JSON.stringify(this)
+                    }).appendTo(me.$form);
+                });
+                me.submitRes();
+            };
+
+            var filepickerOptions1 = {
+                maxSize: 104857600,
+                services:['COMPUTER'],
+                mimetypes: ['audio/*']
+            };
+            try {
+            filepicker.pickMultiple(filepickerOptions1, onSuccess, function(FPError){ 
+                console.log(FPError.toString());
+            });
+            } catch(e) {
+                console.log('filepicker error : '+e);
+            }
+                                    
+        },
+
+
+
+
+
         onUploadResourceSuccess : function(responseXML, statusText, xhr, form) {
             var me = this;
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
@@ -188,7 +227,7 @@ function removeResource(event, imageId) {
             me.$ele.find('.videoUrl').val('');
             me.$ele.find('.audioUrl').val('');
             me.$ele.find('.add_video').editable('setValue','', false);
-            me.$ele.find('.add_audio').editable('setValue','', false);		
+           // me.$ele.find('.add_audio').editable('setValue','', false);		
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
@@ -205,7 +244,7 @@ function removeResource(event, imageId) {
                 me.$ele.find('.audioUrl').val('');
                 me.$ele.find(".progress").css('z-index',90);
                 me.$ele.find('.add_video').editable('setValue','', false);
-                me.$ele.find('.add_audio').editable('setValue','', false);
+              //  me.$ele.find('.add_audio').editable('setValue','', false);
                 //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 
                 var response = $.parseJSON(xhr.responseText);

@@ -109,8 +109,6 @@ class Resource extends Sourcedata implements Rateable {
 			default :
 				log.error "Not a valid type"
 		}		 
-
-		println "==============thumbnail url=========== "+thumbnailUrl
 		return thumbnailUrl;
 	}
 	

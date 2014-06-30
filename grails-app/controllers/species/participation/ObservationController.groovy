@@ -445,7 +445,7 @@ class ObservationController extends AbstractObjectController {
             message = [status:401, error:'Please login to continue']
 			render message as JSON 
 			return;
-		} else if(!params.resources && !params.videoUrl && !params.audioUrl) {
+		} else if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
 			response.setStatus(500)
 			message = [error:message]
@@ -471,9 +471,12 @@ class ObservationController extends AbstractObjectController {
                 }
                 File obvDir 
 
-				if(!params.resources && !params.videoUrl && !params.audioUrl) {
+				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
+
+
+
 				
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
@@ -487,21 +490,35 @@ class ObservationController extends AbstractObjectController {
 
 					// List of OK mime-types
 					//TODO Move to config
-					def okcontents = [
-						'image/png',
-						'image/jpeg',
-						'image/pjpeg',
-						'image/gif',
-						'image/jpg'
-					]
 
+					def resourcetype = f.mimetype.substring(0, f.mimetype.indexOf('/'))
+					def okcontents
+					def maxSizeAllow
+					if(resourcetype == 'image'){
+						okcontents = [
+										'image/png',
+										'image/jpeg',
+										'image/pjpeg',
+										'image/gif',
+										'image/jpg'
+										]
+						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
+
+					}else if(resourcetype == 'audio'){
+						okcontents = [
+										'audio/mp3'
+										]
+						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
+
+					}
+					
 					if (! okcontents.contains(f.mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
 							f.filename
 						])
 					}
-					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
+					else if(f.size > maxSizeAllow) {
 						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
 							f.filename,
@@ -512,6 +529,7 @@ class ObservationController extends AbstractObjectController {
 //						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
 //					}
 					else {
+
 						if(!obvDir) {
 							if(!params.obvDir) {
                                 obvDir = new File(rootDir);
@@ -525,18 +543,27 @@ class ObservationController extends AbstractObjectController {
 								obvDir.mkdir();
 							}
 						}
-
+						
 						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
-						download(f.url, file );
-						ImageUtils.createScaledImages(file, obvDir);
-						
+						download(f.url, file );						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
-						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
-                        //context specific baseUrl for location picker script to work
-						def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
-						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
-						
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
+						def thumbnail
+						def type
+						if(resourcetype == 'image'){
+								ImageUtils.createScaledImages(file, obvDir);
+								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
+		                        //context specific baseUrl for location picker script to work
+								def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
+								thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);	
+								type = ResourceType.IMAGE	
+														
+						}else if(resourcetype == 'audio'){
+								thumbnail = "http://indiabiodiversity.localhost.org/biodiv/static/images/audioicon.png"
+								type = ResourceType.AUDIO	
+								
+
+						}		
+						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
 					}
 				}
 				
@@ -557,23 +584,7 @@ class ObservationController extends AbstractObjectController {
 					}
 				}
 
-				if(params.audioUrl) {
-					//TODO:validate url;
-					def audioUrl = params.audioUrl;
-					if(audioUrl && Utils.isURL(audioUrl)) {
-						
-						if(audioUrl) {
-						def res = new Resource(fileName:'a', type:ResourceType.AUDIO);		
-						res.setUrl(audioUrl);				
-						resourcesInfo.add([fileName:'a', url:audioUrl, thumbnail:'http://indiabiodiversity.localhost.org/biodiv/static/images/audioicon.png', type:res.type]);
-						} else {
-						message = "Not a valid Audio url"
-						}
-					} else {
-						message = "Not a valid Audio url"
-					}
-				}
-				
+			
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {

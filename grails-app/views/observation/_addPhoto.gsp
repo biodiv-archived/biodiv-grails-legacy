@@ -15,26 +15,14 @@
                 def counter = 0 
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
-            <li class="add_file addedResource" style ="min-height: 330px;">
+            <li class="add_file addedResource" >
             
             <div class="add_file_container">
                 <div class="add_image"></div> 
-                <div style="text-align:center;">
-                    or
-                </div> 
+               
                 <div class="add_video editable"></div>
-                <div style="text-align:center;">
-                    or
-                </div> 
-                <div class="add_audio editable" style="
-                        background-image: url('../../images/add-audio.png');
-filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../../images/add-audio.png'),sizingMethod='crop');
-background-repeat: no-repeat;
-width: 200px;
-height: 90px;
-cursor: pointer;">
-                        
-                </div>
+                
+                <div class="add_audio"></div>
 
             </div>
             <div class="progress">
