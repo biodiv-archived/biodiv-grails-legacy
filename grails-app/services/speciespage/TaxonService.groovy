@@ -781,7 +781,8 @@ class TaxonService {
         if(!classification) {
             return [success:false, msg:"Not a valid classification ${classification?.name}."]
         }
-
+        
+        XMLConverter converter = new XMLConverter();
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor);
         List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);
 /*        //check if user has permission to contribute to the taxon hierarchy
