@@ -1438,7 +1438,7 @@ class XMLConverter extends SourceConverter {
                             taxon.errors.each { log.error it }
                         }
 						taxon.updateContributors(getUserContributors(fieldNode.data))
-                    } else if(taxon.name != parsedName.name && saveTaxonHierarchy) {
+                    } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
                         def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
 						if(synonym)
 							synonym.updateContributors(getUserContributors(fieldNode.data))
