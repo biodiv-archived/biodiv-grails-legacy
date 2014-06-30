@@ -132,16 +132,21 @@ class SpeciesPermissionService {
     boolean isTaxonContributor(List<TaxonomyDefinition> parentTaxons, SUser user, List<PermissionType> permissionTypes = [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
         println "PARENT TAXONS-----------------------"
         println parentTaxons
+        if(!parentTaxons || !user || !permissionTypes) return false;
         def permissions = permissionTypes.collect {it.value()};
         def res = SpeciesPermission.withCriteria {
             eq('author', user)
             inList('permissionType', permissions)
             inList('taxonConcept',  parentTaxons)
         }
-
+        println "^^^^^^^^^^^^^^^++++++++++++++++"
+println res;
+        println "^^^^^^^^^^^^^^^++++++++++++++++"
         if(res && res.size() > 0) {
+            println true
             return true
         } else {
+            println false
             return false
         }
     }

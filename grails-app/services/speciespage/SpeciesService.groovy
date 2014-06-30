@@ -1170,7 +1170,7 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
                 println "checking permissions +++++++++++++++++++++++++++++++++++++++++"
@@ -1180,7 +1180,8 @@ class SpeciesService extends AbstractObjectService  {
                 List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
                 println tR
                 println "tR: .... +++++++++++++++++++++++++++++++++++"
-                if(!speciesPermissionService.isTaxonContributor(tR, springSecurityService.currentUser)) {
+                def tD = tR.taxonDefinition
+                if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;
                     result['status'] = 'requirePermission';
                     result['msg'] = 'Please request for permission to contribute.'
