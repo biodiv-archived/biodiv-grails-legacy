@@ -261,7 +261,9 @@ class ObservationService extends AbstractObjectService {
         } else if(params.filterProperty == "nearByRelated"){
             relatedObv = getNearbyObservationsRelated(params.id, max, offset)
         } else if(params.filterProperty == "nearBy"){
-            relatedObv = getNearbyObservations(params.lat?.toFloat(), params.long?.toFloat(), max, offset)
+            float lat = params.lat?params.lat.toFloat():-1;
+            float lng = params.long?params.long.toFloat():-1;
+            relatedObv = getNearbyObservations(lat,lng, max, offset)
         } else if(params.filterProperty == "taxonConcept") {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "latestUpdatedObservations") {
@@ -588,15 +590,22 @@ class ObservationService extends AbstractObjectService {
    
 
     Map findAllTagsSortedByObservationCount(int max){
-        def sql =  Sql.newInstance(dataSource);
-        //query with observation delete handle
-        String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + max ;
 
-        //String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
         LinkedHashMap tags = [:]
-        sql.rows(query).each{
-            tags[it.getProperty("name")] = it.getProperty("obv_count");
-        };
+        def sql =  Sql.newInstance(dataSource);
+        try {
+            //query with observation delete handle
+            String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + max ;
+
+            //String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+            sql.rows(query).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
+        } catch(e) {
+            e.printStackTrace();
+        } finally {
+            sql.close();
+        }
         sql.close();
         return tags;
     }
@@ -610,14 +619,22 @@ class ObservationService extends AbstractObjectService {
         int maxRadius = 200;
         int maxObvs = 50;
         def sql =  Sql.newInstance(dataSource);
-        def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
-        def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
-        limit = Math.min(limit, maxObvs - offset);
-        def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
-
+        long totalResultCount = 0;
         def nearbyObservations = []
-        for (row in resultSet){
-            nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
+
+        try {
+            def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+            totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
+            limit = Math.min(limit, maxObvs - offset);
+            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
+
+            for (row in resultSet){
+                nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
+            }
+        } catch (e) {
+            e.printStackTrace();
+        } finally {
+            sql.close();
         }
         return ["observations":nearbyObservations, "count":totalResultCount]
     }
@@ -626,31 +643,43 @@ class ObservationService extends AbstractObjectService {
         if(!latitude || ! longitude) return [count:0];
         int maxRadius = 200;
         int maxObvs = 50;
-        def sql =  Sql.newInstance(dataSource);
-
-        String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-        def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true", [maxRadius:maxRadius]);
-        def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
-        limit = Math.min(limit, maxObvs - offset);
-        def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true order by ST_Distance(${point}, g2.topology), g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
-
         def nearbyObservations = []
-        for (row in resultSet){
-            nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
+        long totalResultCount = 0;
+        def sql =  Sql.newInstance(dataSource);
+        try {
+            String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true", [maxRadius:maxRadius]);
+            totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
+            limit = Math.min(limit, maxObvs - offset);
+            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true order by ST_Distance(${point}, g2.topology), g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
+
+            for (row in resultSet){
+                nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
+            }
+        } catch (e) {
+            e.printStackTrace();
+        } finally {
+            sql.close();
         }
         return ["observations":nearbyObservations, "count":totalResultCount]
-
     }
 
     Map getAllTagsOfUser(userId){
         def sql =  Sql.newInstance(dataSource);
-        String query = "select t.name as name,  count(t.name) as obv_count from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id and obv.is_deleted = false group by t.name order by count(t.name) desc, t.name asc ";
-
         LinkedHashMap tags = [:]
-        sql.rows(query).each{
-            tags[it.getProperty("name")] = it.getProperty("obv_count");
-        };
+        try {
+            String query = "select t.name as name,  count(t.name) as obv_count from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id and obv.is_deleted = false group by t.name order by count(t.name) desc, t.name asc ";
+
+            sql.rows(query).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
+        } catch(e) {
+            e.printStackTrace();
+        } finally {
+            sql.close();
+        }
         return tags;
+
     }
 
     Map getAllRelatedObvTags(params){
@@ -671,13 +700,19 @@ class ObservationService extends AbstractObjectService {
         if(tagNames.isEmpty()){
             return tags
         }
-
+        
         Sql sql =  Sql.newInstance(dataSource);
-        String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and tl.type = '"+GrailsNameUtils.getPropertyName(obv.class).toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+        try {
+            String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and tl.type = '"+GrailsNameUtils.getPropertyName(obv.class).toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
-        sql.rows(query, tagNames).each{
-            tags[it.getProperty("name")] = it.getProperty("obv_count");
-        };
+            sql.rows(query, tagNames).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
+        } catch(e) {
+            e.printStackTrace();
+        } finally {
+            sql.close();
+        }
         return tags;
     }
 
@@ -689,11 +724,17 @@ class ObservationService extends AbstractObjectService {
         }
 
         def sql =  Sql.newInstance(dataSource);
+        try {
         String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getSqlInCluase(obvIds)  + " and tl.tag_ref = obv.id and tl.type = '"+GrailsNameUtils.getPropertyName(Observation.class).toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
         sql.rows(query, obvIds).each{
             tags[it.getProperty("name")] = it.getProperty("obv_count");
         };
+        } catch(e) {
+            e.printStackTrace();
+        } finally {
+            sql.close();
+        }
         return tags;
     }
 

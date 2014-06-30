@@ -71,7 +71,7 @@
                 {name:'name',index:'name',formatter:heirarchyLevelFormatter},
                 {name:'count', index:'count',hidden:true},
                 {name:'speciesId',index:'speciesId', hidden:true},
-                {name:'classSystem', index:'classSystem', hidden:true},
+                {name:'classSystem', index:'classSystem', hidden:true}
                 ],   		
                 width: "100%",
                 height: "100%", 
