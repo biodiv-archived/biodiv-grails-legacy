@@ -87,7 +87,7 @@ modules = {
 
 	gallery {
 //		resource url:[dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css']
-		resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
+//		resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
 	}
 
 	carousel {

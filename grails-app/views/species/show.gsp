@@ -146,7 +146,7 @@
 
         <r:script>
         //google.load("search", "1");
-        Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
+        // Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 
         $(document).ready(function(){
             if(${sparse}) {
@@ -197,6 +197,10 @@
     </head>
 
     <body>
+
+    <link rel="stylesheet" href="/js/galleria/1.2.7/themes/classic/galleria.classic.css">
+    <script src="/js/galleria/1.2.7/galleria-1.2.7.min.js"></script>
+    <script src="/js/galleria/1.2.7/themes/classic/galleria.classic.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
