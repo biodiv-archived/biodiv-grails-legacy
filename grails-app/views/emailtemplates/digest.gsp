@@ -83,6 +83,7 @@
                             else
                             imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;
                             def spId = speciesInstance.id
+                            imagePath = imagePath.replaceAll(' ','%20')
                             %>
                             <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
                             </g:each>
