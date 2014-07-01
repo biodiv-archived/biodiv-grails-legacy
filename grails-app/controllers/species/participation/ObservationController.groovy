@@ -245,8 +245,12 @@ class ObservationController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
 	def flagDeleted() {
-        
 		def result = observationService.delete(params)
+        if(request.getHeader('X-Auth-Token')) {
+            result.remove('url')
+            render result as JSON;
+            return;
+        }
 		flash.message = result.message
 		redirect (url:result.url)
 	}
@@ -416,6 +420,7 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_CEPF_ADMIN'])
 	def delete() {
+        if(!params.id) return;
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			try {

@@ -341,7 +341,43 @@ h4. addRecommendation
 
 h4. agreeRecommendation
 
-h4. delete
+h4. flagDelete
+
+* *Path* : /api/observation/flagDelete
+* *Parameters* :
+** id : observation id
+* *REST Method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/observation/flagDeleted?id=234
+{code}
+* *Response* :
+** on success
+{code}
+{
+    "success": true,
+    "msg": "Observation 234 deleted",
+    "errors": []
+}
+{code}
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Observation 234sdf could not be deleted",
+    "errors": [
+    {
+        "message": "For input string: \"234sdf\""
+    }
+    ]
+}
+
+{
+    "success": false,
+    "msg": "Observation not found with id null",
+    "errors": []
+}
+{code}
 
 h4. flag
 

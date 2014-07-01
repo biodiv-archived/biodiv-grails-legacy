@@ -1529,46 +1529,75 @@ class ObservationService extends AbstractObjectService {
     } 
 
     def delete(params){
-        def messageCode, url, label = Utils.getTitleCase(params.controller)
+        String messageCode;
+        String url = generateLink(params.controller, 'list', []);
+        String label = Utils.getTitleCase(params.controller?:'Observation')
         def messageArgs = [label, params.id]
-        def observationInstance = Observation.get(params.id.toLong())
-        observationInstance.removeResourcesFromSpecies()
-        if (observationInstance) {
-            boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
-            if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
-                def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
-                try {
-                    observationInstance.isDeleted = true;
-                    if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
-                        sendNotificationMail(mailType, observationInstance, null, params.webaddress);
-                        observationsSearchService.delete(observationInstance.id);
-                        messageCode = 'default.deleted.message'
-                        url = generateLink(params.controller, 'list', [])
-                        ActivityFeed.updateIsDeleted(observationInstance)
-                    } else {
-                        messageCode = 'default.not.deleted.message'
-                        url = generateLink(params.controller, 'show', [id: params.id])
-                        observationInstance.errors.allErrors.each { log.error it }
-                    }
-                }
-                catch (org.springframework.dao.DataIntegrityViolationException e) {
-                    messageCode = 'default.not.deleted.message'
-                    url = generateLink(params.controller, 'show', [id: params.id])
-                    e.printStackTrace();
-                    log.error e.getMessage();
-                }
-            } else {
-                if(!isFeatureDeleted) log.warn "Couldnot delete feature"
-                else log.warn "${observationInstance.author} doesnt own observation to delete"
-            }
-
-        }
-        else {
+        def errors = [];
+        boolean success = false;
+        if(!params.id) {
             messageCode = 'default.not.found.message'
-            url = generateLink(params.controller, 'list', [])
-        }
+        } else {
+            try {
+                def observationInstance = Observation.get(params.id.toLong())
+                if (observationInstance) {
+                    observationInstance.removeResourcesFromSpecies()
+                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
+                    if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
+                        def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
+                        try {
+                            observationInstance.isDeleted = true;
+                            if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
+                                sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                                observationsSearchService.delete(observationInstance.id);
+                                messageCode = 'default.deleted.message'
+                                url = generateLink(params.controller, 'list', [])
+                                ActivityFeed.updateIsDeleted(observationInstance)
+                                success = true;
+                            } else {
+                                messageCode = 'default.not.deleted.message'
+                                url = generateLink(params.controller, 'show', [id: params.id])
+                                observationInstance.errors.allErrors.each { log.error it }
+                                observationInstance.errors.allErrors .each {
+                                    def formattedMessage = messageSource.getMessage(it, null);
+                                    errors << [field: it.field, message: formattedMessage]
+                                }
 
-        return [url:url, messageCode:messageCode, messageArgs: messageArgs]
+                            }
+                        }
+                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                            messageCode = 'default.not.deleted.message'
+                            url = generateLink(params.controller, 'show', [id: params.id])
+                            e.printStackTrace();
+                            log.error e.getMessage();
+                            errors << [message:e.getMessage()];
+                        }
+                    } else {
+                        if(!isFeatureDeleted) {
+                            messageCode = 'default.not.deleted.message'
+                            log.warn "Couldnot delete feature"
+                        }
+                        else {
+                            messageArgs.add(0,'delete');
+                            messageCode = 'default.not.permitted.message'
+                            log.warn "${observationInstance.author} doesn't own observation to delete"
+                        }
+                    }
+                } else {
+                    messageCode = 'default.not.found.message'
+                    url = generateLink(params.controller, 'list', [])
+                }
+            } catch(e) {
+                e.printStackTrace();
+                url = generateLink(params.controller, 'list', [])
+                messageCode = 'default.not.deleted.message'
+                errors << [message:e.getMessage()];
+            }
+        }
+        
+        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
+				
+        return [success:success, url:url, msg:message, errors:errors]
     }
 
     /**
