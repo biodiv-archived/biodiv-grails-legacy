@@ -32,7 +32,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	//def recaptchaService;	
     //def grailsApplication
 
-	static allowedMethods = [user:"POST", register:"POST"]
+	static allowedMethods = [user:"POST", register:"POST", 'forgotPassword':'POST', 'forgotPasswordMobile':'POST']
 
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
@@ -265,27 +265,36 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		redirect url: conf.ui.register.postRegisterUrl 
 	}
 
-	def forgotPassword = {
-		if (!request.post) {
-			// show the form
-			return
-		}
-		
-		String username = params.username
+	def forgotPasswordMobile () {
+        params.isMobileApp = true;
+        forgotPassword();
+    }
+
+	def forgotPassword () {
+		String username = params.username?:params.email
 		if (!username) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
-			redirect action: 'forgotPassword'
-			return
+            flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
+            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+                render (['success':false, 'msg':flash.error] as JSON);
+                return;
+            } else {
+                redirect action: 'forgotPassword'
+                return
+            }
 		}
 		
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
-			redirect action: 'forgotPassword'
-			return
+            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+                render (['success':false, 'msg':flash.error] as JSON);
+                return;
+            } else {
+			    redirect action: 'forgotPassword'
+			    return
+            }
 		}
-		
 		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
 		registrationCode.save(flush: true)
 		
@@ -295,7 +304,6 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		if (body.contains('$')) {
 			body = evaluate(body, [username: user.name.capitalize(), url: url])
 		}
-		
 		try {
 			mailService.sendMail {
 				to user.email
@@ -303,16 +311,26 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 				subject conf.ui.forgotPassword.emailSubject
 				html body.toString()
 			}
-		
-			[emailSent: true]
-		}catch(all)  {
+            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+                render (['success':true, 'msg':"An email has been sent to ${user.email}. Please click on the link in the email."] as JSON);
+                return;
+            } else {
+			    [emailSent: true]
+            }
+		} catch(all)  {
+            all.printStackTrace();
+            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+		        log.error all.getMessage()
+                render (['success':false, 'msg':"Error while generating token. ${all.getMessage()}"] as JSON);
+                return;
+            } else {
 		      log.error all.getMessage()
 		      [emailSent:false]
+            }
 		}
 	}
 
     def resetPassword = { ResetPasswordCommand2 command ->
-        log.debug params
         String token = params.t
 
         def registrationCode = token ? RegistrationCode.findByToken(token) : null
