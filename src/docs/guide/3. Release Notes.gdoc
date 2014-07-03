@@ -3,16 +3,15 @@ h3. Status
 
 as on Jul 1st 2014
 
-* *Completed :*
+* *Completed :* 
 ** login -> basic, oauth(facebook, google)
 ** register -> register, resend verification code, forgotPassword
-** observations -> create, show, list, related, flagDeleted, getRecommendationVotes, addRecommendationVote
+** observations -> create, show, list, related, flagDeleted, getRecommendationVotes, addRecommendationVote, removeRecommendationVote
 ** users -> show, resetPassword
+** comments -> add, get, remove
 ** logout 
 
-* *In progress :*
-** observation -> remove recommendation vote
-** users -> settings (not reqd)
+* New API Collection for testing is available as JSON at : https://www.getpostman.com/collections/293677305aa08bd5296e can be imported in Chrome postman extension which is available at https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm?hl=en
 
 as on June 18th 2014
 
@@ -34,6 +33,16 @@ as on June 18th 2014
 
 
 h3. Release Notes
+
+*July 2nd 2014*
+
+* observation get and add recommendation vote api
+
+*July 1st 2014*
+
+* observation flagDeleted api
+* forgot password api
+* added google oauth 2 client for token based auth
 
 *June 18 2014*
 

@@ -105,11 +105,22 @@ class CustomObjectMarshallers {
         }
  
         JSON.registerObjectMarshaller(Recommendation) {
-            return ['name':it.name, 'taxonomyDefinition' : it.taxonConcept];
+            def r = ['id':it.id, 'name':it.name];
+            if(it.taxonConcept) {
+                r['taxonomyDefinition'] = it.taxonConcept;
+            }
+            return r;
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
-            return [recommendation:it.recommendation, commonNameReco:it.commonNameReco, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn, comment:it.comment] 
+            def r = [id:it.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
+            if(it.commonNameReco) {
+                r['commonNameReco'] = it.commonNameReco
+            };
+            if(it.comment) {
+                r['comment'] = it.comment;
+            }
+            return r;
         }
 
         JSON.registerObjectMarshaller(UserGroup) {

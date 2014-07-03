@@ -148,8 +148,12 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
         }
     }
 
-	boolean ifOwns(id) {
+	boolean ifOwns(Long id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean ifOwnsByEmail(String email) {
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
 
 	boolean isAdmin(id) {

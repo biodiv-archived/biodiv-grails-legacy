@@ -88,6 +88,7 @@ h4. resetPassword
 
 * *Path* : /api/user/resetPassword
 * *Parameters* : 
+** email : email address of the logged in user
 ** currentPassword : old password 
 ** password : new password
 ** password2 : confirmation for new password

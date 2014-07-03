@@ -175,7 +175,7 @@ class SUserController extends UserController {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById()
 			if (!user) return
@@ -194,9 +194,7 @@ class SUserController extends UserController {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
-
-
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = findById()
 
 			if (!user) return
@@ -700,8 +698,6 @@ class SUserController extends UserController {
 
 	@Secured(['ROLE_USER'])
 	def upload_resource() {
-		log.debug params;
-
 		try {
 			if(ServletFileUpload.isMultipartContent(request)) {
 				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -802,7 +798,7 @@ class SUserController extends UserController {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
         String msg;
         boolean success = false;
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = springSecurityService.currentUser
 			def command2 = new ResetPasswordCommand(username:user.username?:email, currentPassword:command.currentPassword, password:command.password, password2:command.password2, springSecurityService:springSecurityService
 ,saltSource:saltSource);

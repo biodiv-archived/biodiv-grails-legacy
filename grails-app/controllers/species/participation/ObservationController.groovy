@@ -650,7 +650,7 @@ class ObservationController extends AbstractObjectController {
 					if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(request.getHeader('X-Auth-Token')){
-						render (['status':'error', 'success':'false', 'msg':'No recommendation vote'] as JSON);
+						render (['status':'error', 'success':'false', 'msg':msg] as JSON);
 					} else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
