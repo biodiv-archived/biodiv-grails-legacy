@@ -335,7 +335,7 @@ class ImageUtils {
 	}
 
 	static String getFileName(String name, ImageType type, String defaultFileType=null) {
-		if(!name) return;
+        if(!name) return;
 
 		if(!type) type = ImageType.NORMAL;
 

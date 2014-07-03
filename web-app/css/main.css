@@ -954,7 +954,7 @@ ul.thumbwrap li.poor_species_content div.poor_species_content {
 	background-color: #fbfbfb !important;
 }
 
-#addObservation #imagesList {
+.addObservation .imagesList {
 	background-color: #eeeeee;
 	borderdisplay_value-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;

@@ -84,7 +84,7 @@
 <r:script>
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
-            initialize(document.getElementById("big_map_canvas"), false);
+            var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             <g:if test="${!observationInstance.isChecklist}">
             showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()});
             </g:if>
@@ -105,10 +105,10 @@
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
             }
 
-            initArea(false, undefined, undefined, {icon:icon, layer:'Current Observation' });
+            mapLocationPicker.initArea(false, undefined, undefined, undefined,{icon:icon, layer:'Current Observation' });
             //HACK
-            if(searchMarker)
-                map.panTo(searchMarker.getLatLng());
+            if(mapLocationPicker.searchMarker)
+                map.panTo(mapLocationPicker.searchMarker.getLatLng());
 
             <g:if test="${!observationInstance.isChecklist}">
                 resetMap();

@@ -1,6 +1,7 @@
 package species
 
 import grails.converters.JSON;
+import species.participation.UsersResource;
 
 import grails.plugins.springsecurity.Secured
 class ResourceController {
@@ -8,6 +9,7 @@ class ResourceController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def resourcesService;
+    def springSecurityService;
 
     def index = {
         redirect(action: "list", params: params)
@@ -150,4 +152,17 @@ class ResourceController {
             }
         }
     }
+    
+    def createResource = {
+        println "=========CREATE RESOURCES =========== " + params
+        def user = springSecurityService.currentUser;
+        List<Resource> resources = resourcesService.createResource(params, user);
+        resources.each{
+            def flag = resourcesService.createUsersRes(user, it, UsersResource.UsersResourceStatus.NOT_USED)
+        }
+        println "==========CREATED THESE RESOURCES ========== " + resources
+        def res = [status:true]
+        render res as JSON
+    }
+
 }

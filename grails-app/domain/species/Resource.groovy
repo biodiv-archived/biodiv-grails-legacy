@@ -1,11 +1,15 @@
 package species
 
 import species.participation.Observation;
+import species.participation.Checklists;
+import species.auth.SUser;
+
 import species.utils.ImageUtils;
 import species.utils.ImageType;
 import species.utils.Utils;
 import org.grails.rateable.*
 import content.eml.Document;
+import species.participation.UsersResource;
 
 class Resource extends Sourcedata implements Rateable {
 	
@@ -40,7 +44,8 @@ class Resource extends Sourcedata implements Rateable {
         SPECIES("SPECIES"),
         DOCUMENT("DOCUMENT"),
         SPECIES_FIELD("SPECIES_FIELD"),
-		CHECKLIST("CHECKLIST")
+		CHECKLIST("CHECKLIST"),
+        USER("USER")
 		
         private String value;
 
@@ -150,7 +155,7 @@ class Resource extends Sourcedata implements Rateable {
 	
 	void saveResourceContext(objInstance){
 		//saving only if context is null earlier
-		if(this.context) return;
+		//if(this.context) return;
 		
 		switch(objInstance.class.name){
 			case Species.class.name:
@@ -168,6 +173,10 @@ class Resource extends Sourcedata implements Rateable {
 			case Checklists.class.name:
 				this.context = ResourceContext.CHECKLIST
 				break
+            case SUser.class.name:
+                this.context = ResourceContext.USER
+                break
+
 			default:
 				break
 		}

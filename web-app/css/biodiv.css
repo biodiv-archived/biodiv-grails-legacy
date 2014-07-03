@@ -680,7 +680,7 @@ ul#recoSummary {
 	background-color: #ffffff;
 }
 
-#addObservation .imagesList, #addResourcesModal .imagesList {
+.addObservation .imagesList, #addResourcesModal .imagesList {
 	background-color: #fefad5;
 	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;

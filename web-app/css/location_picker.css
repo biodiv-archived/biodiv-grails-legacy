@@ -8,7 +8,7 @@
     z-index:1;
 }    
 
-#latlng {
+.latlng {
     margin: auto;
     width: 500px;
     position: absolute;
@@ -24,7 +24,7 @@
 	border-radius: 5px;
 }
 
-#map_canvas {
+.map_canvas {
     height:500px;
     clear:both; 
     border: 2px solid #ffffff;      
@@ -68,7 +68,7 @@ float:left;
 padding:5px;      
 }
 
-#map_area {
+.map_area {
 /*padding:10px;*/
 text-align:left;
 }

@@ -694,6 +694,7 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
+        println "==========CREATE MEDIA CALLED========== " + resourcesXML +" ====== "+ relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -767,10 +768,12 @@ class XMLConverter extends SourceConverter {
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
+            println "=====TEMPFILE EXISTS==== " 
             //copying file
             relImagesFolder = relImagesFolder.trim();
-
+            println "=========RES ROOT DIR ========= " + resourcesRootDir +"================= "+ relImagesFolder
             File root = new File(resourcesRootDir , relImagesFolder);
+            println "==============ROOT ====== " + root
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
 				addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
@@ -778,6 +781,7 @@ class XMLConverter extends SourceConverter {
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
+            println "=========IMAGE FILE ========== " + imageFile
 			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);

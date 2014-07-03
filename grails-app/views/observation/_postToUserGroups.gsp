@@ -6,7 +6,7 @@
             <%
             def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
             %>
-            <div id="userGroups" class="${obvActionMarkerClass}" name="userGroups" style="list-style:none;clear:both;">
+            <div class="userGroupsClass ${obvActionMarkerClass}" name="userGroups" style="list-style:none;clear:both;">
                 <uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
             </div>
         </div>

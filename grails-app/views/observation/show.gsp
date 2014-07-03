@@ -396,7 +396,7 @@ if(r) {
                     $('.nameContainer input').removeAttr("disabled");
                     $('.iAgree button').removeClass("disabled");
                 } 
-                
+                initializeLanguage(); 
         });
 
 </r:script>

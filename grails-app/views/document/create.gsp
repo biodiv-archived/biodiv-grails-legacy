@@ -302,17 +302,18 @@ CKEDITOR.replace('description', config);
 	<r:script>
 	
 	$(document).ready(function() {
-		$('#use_dms').click(function(){
-            if ($('#use_dms').is(':checked')) {
-                $('.dms_field').fadeIn();
-                $('.degree_field').hide();
-            } else {
-                $('.dms_field').hide();
-                $('.degree_field').fadeIn();
-            }
-    });
     
-    	   
+        $('.use_dms').click(function(){
+            var map_class = $(this).closest(".map_class");
+            if ($(this).is(':checked')) {
+                $(map_class).find('.dms_field').fadeIn();
+                $(map_class).find('.degree_field').hide();
+            } else {
+                $(map_class).find('.dms_field').hide();
+                $(map_class).find('.degree_field').fadeIn();
+            }
+
+        });
     
     			$("#documentFormSubmit").click(function(){
     			
@@ -334,7 +335,7 @@ CKEDITOR.replace('description', config);
 		       				var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
 							$('#documentForm').append($(input));	
 		       			})
-		       			$("#userGroupsList").val(getSelectedUserGroups());	
+		       			$(".userGroupsList").val(getSelectedUserGroups());	
                                         
                                         
                                         if(drawnItems) {
@@ -353,7 +354,7 @@ CKEDITOR.replace('description', config);
                                             if(areas.length > 0) {
                                                 var wkt = new Wkt.Wkt();
                                                 wkt.fromObject(areas[0]);
-                                                $("input#areas").val(wkt.write());
+                                                $("input.areas").val(wkt.write());
                                             }
                                         }
 

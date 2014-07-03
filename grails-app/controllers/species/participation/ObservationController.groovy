@@ -383,6 +383,10 @@ class ObservationController extends AbstractObjectController {
                     case Species.class.name:
                         rootDir = grailsApplication.config.speciesPortal.resources.rootDir
                     break;
+
+                    case SUser.class.name:
+                        rootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+                    break;
                 }
                 File obvDir 
 
@@ -545,7 +549,7 @@ class ObservationController extends AbstractObjectController {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					if(params["createNew"] && params.oldAction == "save") {
+					if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
 						mailType = observationService.OBSERVATION_ADDED;
 						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
@@ -555,20 +559,25 @@ class ObservationController extends AbstractObjectController {
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id]as JSON);
 					}else{
-						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
-						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                        if(params.oldAction != "bulkSave"){
+						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                        } else {
+                            def output = [:]
+                            output = [statusComplete : true]
+                            render output as JSON
+                        }		//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
-					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+                    log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending email
-					if(params["createNew"] && params.oldAction == "save" ) {
+					if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
 						mailType = observationService.OBSERVATION_ADDED;
 					} else {
 						mailType = observationService.SPECIES_RECOMMENDED;
@@ -582,23 +591,43 @@ class ObservationController extends AbstractObjectController {
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
 					}else {
-						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
-						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                        if(params.oldAction != "bulkSave"){
+						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                        } else {
+                            def output = [:]
+                            output = [statusComplete : true]
+                            render output as JSON
+                        }
+                        //redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 				}
 				else {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-					render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                    if(params.oldAction != "bulkSave"){
+                        render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                    } else {
+                        def output = [:]
+                        output = [statusComplete : true]
+                        render output as JSON
+                    }
+
 				}
 			} catch(e) {
 				e.printStackTrace()
 				if(params["isMobileApp"]?.toBoolean()){
 					render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
 				}else{
-					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
-				}
+                    if(params.oldAction != "bulkSave"){
+					    render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                    } else {
+                        def output = [:]
+                        def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+                        output = [miniObvCreateHtml: miniObvCreateHtml, observationInstance: observationInstance, lastCreatedObv:null, statusComplete: false]
+                        render output as JSON
+                    }
+                }
 			}
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
@@ -1287,5 +1316,33 @@ class ObservationController extends AbstractObjectController {
         }
         def result = ['msg': msg]
         render result as JSON
+    }
+
+    @Secured(['ROLE_USER'])
+    def bulkCreate = {
+        def observationInstance = new Observation()
+		observationInstance.properties = params;
+		def author = springSecurityService.currentUser;
+		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
+		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author] 
+    }
+
+    @Secured(['ROLE_USER'])
+    def bulkSave = {
+        log.debug params;
+        if(request.method == 'POST') {
+            //TODO:edit also calls here...handle that wrt other domain objects
+            def result = observationService.saveObservation(params, false)
+            if(result.success){
+                chain(action: 'addRecommendationVote', model:['chainedParams':params]);
+            } else {
+                def output = [:]
+                def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: result.observationInstance]);
+                output = [miniObvCreateHtml: miniObvCreateHtml, observationInstance: result.observationInstance, lastCreatedObv:null, statusComplete: false]
+                render output as JSON
+            }
+        } else {
+            redirect (url:uGroup.createLink(action:'bulkCreate', controller:"observation", 'userGroupWebaddress':params.webaddress))
+        }
     }
 }

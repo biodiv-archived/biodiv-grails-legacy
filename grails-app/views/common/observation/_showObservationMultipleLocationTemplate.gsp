@@ -11,7 +11,7 @@
                     </g:else>
                 });
                 </g:javascript>
-		<div class="map_wrapper">
+		<div class="map_wrapper map_class">
                     <div id="big_map_canvas">
                         <center>
                             <div id="spinner" class="spinner">

@@ -6,10 +6,10 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 List userGroupsList = params.userGroupsList?params.userGroupsList.split(','):[]
 def parentGroupId = ''
 %>
-<input type="hidden" id="userGroupsList" name="userGroupsList" value="${params.userGroupsList}" />
+<input type="hidden" class="userGroupsList" name="userGroupsList" value="${params.userGroupsList}" />
 <g:if test="${exclusiveUsergroups}">
 	<div>Share with either of these groups</div>
-	<div id="groupsWithSharingNotAllowed" class="btn-group userGroups"
+	<div class="groupsWithSharingNotAllowed btn-group userGroups"
 		data-toggle="buttons-radio">
 		
 		<br />
@@ -62,7 +62,7 @@ def parentGroupId = ''
 <g:if test="${exclusiveUsergroups && otherUsergroups}">
 	<div>or with any of these groups</div>
 </g:if>
-<div id="groupsWithSharingAllowed" class="btn-group userGroups"
+<div class="groupsWithSharingAllowed btn-group userGroups"
 	data-toggle="buttons-checkbox">
 	<ul class="thumbnails" style="clear: both;">
 		<g:each in="${otherUsergroups}" var="userGroup" status="i">

@@ -11,6 +11,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.text.SimpleDateFormat;
+import groovy.io.FileType;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import species.Resource;
 import species.Habitat;
@@ -61,6 +66,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
+import species.participation.UsersResource;
 
 class ObservationService extends AbstractObjectService {
 
@@ -93,6 +99,7 @@ class ObservationService extends AbstractObjectService {
     static final String UNFEATURED = "UnFeatured";
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
+    static final String REMOVE_USERS_RESOURCE = "deleteUsersResource";
     /**
      * 
      * @param params
@@ -122,6 +129,8 @@ class ObservationService extends AbstractObjectService {
         observation.group = params.group?:SpeciesGroup.get(params.group_id);
         observation.notes = params.notes;
         if( params.fromDate != ""){
+            println "================DATE ======= " + parseDate(params.fromDate);
+
             observation.fromDate = parseDate(params.fromDate);
             observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
         }
@@ -156,12 +165,91 @@ class ObservationService extends AbstractObjectService {
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
 	        def resourcesXML = createResourcesXML(params);
-	        def resources = saveResources(observation, resourcesXML);
+            println "==================================== " + resourcesXML
+            def instance = observation
+            if(params.action == "bulkSave"){
+                instance = springSecurityService.currentUser
+            }
+	        def resources = saveResources(instance, resourcesXML);
+            println "===================================== " + resources
 	        observation.resource?.clear();
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            String uuidRand =  UUID.randomUUID().toString()
+            println "=======UUID GENERATED ====== " + uuidRand
 	        resources.each { resource ->
+				println "========RESOURCE ========= " + resource
+                if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
+                    def usersResFolder = resource.fileName.tokenize('/')[0]
+                    println "=========USERSRES FOLDER ===== " + usersResFolder
+					def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
+                    if(!obvDir.exists()) {
+                        obvDir.mkdir();
+                    }
+                    /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
+                    obvDir = new File(obvDir, uuidRand);
+                    obvDir.mkdir();                
+                    /////change filename of resource to this uuid and inside that check for clash of filename
+                    File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
+                    println "========NEW UNIQ FILE========= " + newUniq
+                    def a = newUniq.getAbsolutePath().tokenize('/')[-1]
+                    def newFileName = a.tokenize('.')[0]
+					
+					//ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
+                    String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+                    println "=============USERS ROOT DIR========== " + userRootDir
+                    def usersResDir = new File(userRootDir, usersResFolder)
+                    println "=============USERS ROOT DIR file ========== " + usersResDir
+                    def finalSuffix = ""
+                    usersResDir.eachFileRecurse (FileType.FILES) { file ->
+                        println "=======DIRECTORY FILES ======= " + file
+						def fName = file.getName();
+						def tokens = fName.tokenize("_");
+                        def nameSuffix = ""
+                        if(tokens.size() == 1){
+                            nameSuffix = "."+fName.tokenize(".")[-1] 
+                            finalSuffix = nameSuffix
+                        }
+                        else {
+                            tokens.each{ t->
+                                if(!t.isNumber()){
+                                    nameSuffix = nameSuffix + "_" + t
+                                }
+                            }
+                        }
+                        Path source = Paths.get(file.getAbsolutePath());
+						Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
+
+                        println "=======SOURCE =============== " + source +" ===========DESTINATION====== "+ destination
+						try {
+                            //Files moved but empty folder there
+							Files.move(source, destination);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+                    }
+					//// UPDATING FILE NAME OF RES IN DB
+					////check format of filename---- slash kaise hai
+					resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+                }
+				/////////////////////////////////////////////////////////////////////////////////////////////////
                 resource.saveResourceContext(observation)
 	            observation.addToResource(resource);
+                
 	        }
+            resources.each { resource ->
+                println "========RESOURCE ========= " + resource
+                if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
+                    def usersRes = UsersResource.findByRes(resource)
+                    ////////////////////
+                    ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
+                    usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
+                    if(!usersRes.save(flush:true)){
+                        usersRes.errors.allErrors.each { log.error it }
+                        return false
+                    }
+
+                }
+            }
 		}
     }
 
@@ -169,9 +257,10 @@ class ObservationService extends AbstractObjectService {
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
+        println "==============================" + params
         try {
 
-            if(params.action == "save"){
+            if(params.action == "save" || params.action == "bulkSave"){
                 observationInstance = createObservation(params);
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
@@ -1402,6 +1491,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     File getUniqueFile(File root, String fileName){
+        println "==========UNIQUE FILE ======= " + root +"============ "+ fileName
         File imageFile = new File(root, fileName);
 
         if(!imageFile.exists()) {
@@ -1725,6 +1815,16 @@ class ObservationService extends AbstractObjectService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
+
+            case REMOVE_USERS_RESOURCE:
+                mailSubject = "Attn: Your image uploads are due for deletion"
+                bodyView = "/emailtemplates/deleteUsersResource"
+                templateMap["uploadedDate"] = otherParams["uploadedDate"]
+                templateMap["toDeleteDate"] = otherParams["toDeleteDate"]
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(otherParams["usersList"])
+                break
+
                 
             default:
                 log.debug "invalid notification type"

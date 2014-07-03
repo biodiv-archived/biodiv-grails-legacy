@@ -23,18 +23,22 @@ import species.groups.SpeciesGroup;
 import species.participation.Follow;
 import species.utils.ImageType;
 import species.utils.Utils;
+import java.text.SimpleDateFormat;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
+import species.AbstractObjectService;
+import species.participation.UsersResource;
+import species.participation.UsersResource.UsersResourceStatus;
+import species.participation.Observation;
+import species.Species;
+import speciespage.ObservationService;
 
-class ResourcesService {
+class ResourcesService extends AbstractObjectService {
 
 	static transactional = false
 
-	def grailsApplication;
-	def dataSource;
-	def springSecurityService;
     def observationService;
 
     /**
@@ -172,5 +176,65 @@ class ResourcesService {
 		}
 		return null;
 	}
-	
+
+///////////////////////////////////////////
+///////////////APIs related to bulk upload////////////////////////////
+    ////////////////////////////
+    
+    
+    boolean createUsersRes(user, res, status){
+        def userRes = new UsersResource(user:user,res:res,status:status)
+        if(!userRes.save(flush:true)){
+            userRes.errors.allErrors.each { log.error it }
+            return false
+        };
+        return true
+    }
+
+    List<Resource> createResource(params, context){
+        def resourcesXML = createResourcesXML(params);
+        def resources = saveResources(context, resourcesXML);
+        resources.each{
+            it.saveResourceContext(context)
+            if(!it.save(flush:true)){
+                it.errors.allErrors.each { log.error it }
+            }
+        }
+        return resources;
+    }
+
+    def deleteUsersResources(){
+        def result = UsersResource.findAllByStatus(UsersResourceStatus.NOT_USED)
+        def res = []
+        result.each{
+            res.add(it.res)
+        }
+        Date d = new Date()
+        def sdf = new SimpleDateFormat("dd/MM/yyyy")
+        def otherParams = [:]
+        def storingDays = 20;
+        otherParams['uploadedDate'] = sdf.format(d - storingDays)
+        otherParams['toDeleteDate'] = sdf.format(d + 1)
+        def usersList = []
+        res.each{ r->
+            if((r.uploadTime >= (d - storingDays)) && (r.uploadTime <= (d - (storingDays - 1)))) {
+                //   prepare users list & send mail that resource deleting tomo
+                println "=======RES FOR WHICH MAIL WILL GO ============= " + r
+                if(!usersList.contains(r.uploader)){
+                    usersList << r.uploader 
+                }
+            }
+            else if(r.uploadTime <= (d - storingDays)) {
+                println "===========RES TO DELETE ========== " + r
+                def toDelete = UsersResource.findByRes(r)
+                toDelete.delete(flush:true, failOnError:true)
+            }
+        }
+        if(usersList.size() > 0) {
+            otherParams['usersList'] = usersList
+            println "========USERS LIST FOR RES DELETION MAIL ============ " + usersList
+            def sp = new Species();
+            observationService.sendNotificationMail(ObservationService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
+        }
+    }
 }	

@@ -14,7 +14,12 @@ function showRecos(data, textStatus) {
     showUpdateStatus(data.msg, data.status);
 }
 
-function lockObv(url, lockType, recoId, obvId) {
+function lockObv(url, lockType, recoId, obvId, ele) {
+    if($(ele).hasClass('disabled')) {
+        alert("This species ID has already been locked!!");
+        event.preventDefault();
+        return false; 		 		
+    } 
     $.ajax({
         url:url,
         dataType: "json",
@@ -166,12 +171,13 @@ function preLoadRecos(max, offset, seeAllClicked) {
 
 function showObservationMapView(obvId, observedOn) {
     var params = {filterProperty:'speciesName',limit:-1,id:obvId}
+    var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
     refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
         google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
             data.observations.push({'observedOn':observedOn});
             drawVisualization(data.observations);
         }});
-    });
+    }, mapLocationPicker);
     $('#big_map_canvas').trigger('maploaded');
 }
 

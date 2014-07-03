@@ -3,6 +3,7 @@
 <%@ page import="species.utils.Utils"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.Species"%>
+<%@ page import="species.utils.ImageType"%>
 
             <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
@@ -38,11 +39,13 @@
             def imagePath = '';
             if(r) {
             if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString() || r.context.value() == Resource.ResourceContext.CHECKLIST.toString()){
-                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
-            }else{
+                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations', null, ImageType.LARGE )?:null;
+            } else if(r.context.value() == Resource.ResourceContext.USER.toString()){
+                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/usersRes', null, ImageType.LARGE)?:null;    
+            } else{
                 def spFolder = grailsApplication.config.speciesPortal.resources.rootDir
                 def finalFolder = spFolder.substring(spFolder.lastIndexOf("/"), spFolder.size())
-                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + finalFolder)?:null;   
+                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + finalFolder, null, ImageType.LARGE)?:null;   
             }
             }
             def resSource = r.url
@@ -54,9 +57,8 @@
             }
             %>
             <div class='figure' style="height: 200px; overflow: hidden;">
-                <span> <img id="image_${i}" style="width: auto; height: auto;"
-                    src='${imagePath}'
-                    class='geotagged_image' exif='true' /> </span>
+                <span> <img class="image_${i} geotagged_image" style="width: auto; height: auto;"
+                    src='${imagePath}' exif='true' /> </span>
             </div>
 
 
@@ -110,7 +112,7 @@
     <li class="addedResource thumbnail addedResource_{{>i}}">
     <div class='figure' style='height: 200px; overflow:hidden;'>
         <span> 
-            <img id='image_{{>i}}' style="width:auto; height: auto;" src='{{>thumbnail}}' class='geotagged_image' exif='true'/> 
+            <img class='image_{{>i}} geotagged_image' style="width:auto; height: auto;" src='{{>thumbnail}}' exif='true'/> 
         </span>
     </div>
 
@@ -123,7 +125,7 @@
         <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
 
         {{if type == '${ResourceType.IMAGE}'}}
-        <div id="license_div_{{>i}}" class="licence_div pull-left dropdown">
+        <div id="license_div_{{>i}}" class="license_div pull-left dropdown">
             <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                 <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                 <b class="caret"></b>

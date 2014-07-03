@@ -9,7 +9,7 @@
     <h5>Classifications</h5>	
 
     <div id="taxaHierarchy">
-        <g:set var="classifications" value="${speciesInstance.classifications()}" />
+        <g:set var="classifications" value="${speciesInstance?.classifications()}" />
         <g:if test="${speciesInstance && classifications}">
         <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
             <g:each in="${classifications}" var="classification">
@@ -48,13 +48,13 @@
             <div>
                 <div class="editable-input">
                     <g:each in="${TaxonomyRank.list()}" var="taxonRank">
-                    <g:if test="${taxonRank.ordinal() == speciesInstance.taxonConcept.rank}">
+                    <g:if test="${taxonRank.ordinal() == speciesInstance?.taxonConcept?.rank}">
                     <input type="hidden"  data-rank ="${taxonRank.ordinal()}"
                     type="text" name="taxonRegistry.${taxonRank.ordinal()}" 
-                    value="${speciesInstance.taxonConcept.name}"
+                    value="${speciesInstance?.taxonConcept?.name}"
                     placeholder="Add ${taxonRank.value()}" readonly/>
                     </g:if>
-                    <g:elseif test="${taxonRank.ordinal() < speciesInstance.taxonConcept.rank}">
+                    <g:elseif test="${taxonRank.ordinal() < speciesInstance?.taxonConcept?.rank}">
                     <div class="input-prepend">
                         <span class="add-on"> ${taxonRank.value()}</span>
                         <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"

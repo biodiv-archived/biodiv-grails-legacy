@@ -1,5 +1,5 @@
 
-function refreshMarkers(p, url, callback) {
+function refreshMarkers(p, url, callback, mapLocationPicker) {
     if(!p) p = new Array()
 
     p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
@@ -9,10 +9,10 @@ function refreshMarkers(p, url, callback) {
     if(!url) url = window.params.observation.occurrencesUrl+'?'+decodeURIComponent($.param(p));
     else url = url+'?'+decodeURIComponent($.param(p));
 
-    if(markers) {
-        markers.clearLayers();
+    if(mapLocationPicker.markers) {
+        mapLocationPicker.markers.clearLayers();
     } else 
-        markers = new M.MarkerClusterGroup({maxClusterRadius:50});
+        mapLocationPicker.markers = new mapLocationPicker.M.MarkerClusterGroup({maxClusterRadius:50});
 
     $.ajax({
         url: url,
@@ -29,7 +29,7 @@ function refreshMarkers(p, url, callback) {
                 	latitude += obv.geoPrivacyAdjust;
                 	longitude += obv.geoPrivacyAdjust;
                 }
-                var marker = createMarker(latitude, longitude, {
+                var marker = mapLocationPicker.createMarker(latitude, longitude, {
                     draggable: false,
                     clusterable: true,
                     icon:icon,
@@ -38,8 +38,8 @@ function refreshMarkers(p, url, callback) {
                 });
                 if(marker) m.push(marker);
             }
-            markers.addLayers(m);
-            markers.addTo(map);
+            mapLocationPicker.markers.addLayers(m);
+            mapLocationPicker.markers.addTo(mapLocationPicker.map);
             if(callback)
                 callback(data);
         }

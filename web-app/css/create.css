@@ -49,8 +49,8 @@
     color: #444444;
 }
 
-#help-identify {
-	height: 0;
+.help-identify {
+    height: 0;
     left: 139px;
     padding: 0;
     position: relative;
