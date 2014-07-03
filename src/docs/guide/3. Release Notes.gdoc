@@ -1,6 +1,19 @@
 
 h3. Status
 
+as on Jul 1st 2014
+
+* *Completed :*
+** login -> basic, oauth(facebook, google)
+** register -> register, resend verification code, forgotPassword
+** observations -> create, show, list, related, flagDeleted, getRecommendationVotes, addRecommendationVote
+** users -> show, resetPassword
+** logout 
+
+* *In progress :*
+** observation -> remove recommendation vote
+** users -> settings (not reqd)
+
 as on June 18th 2014
 
 * *Completed :*

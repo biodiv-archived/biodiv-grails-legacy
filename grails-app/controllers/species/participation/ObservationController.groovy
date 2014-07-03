@@ -650,7 +650,7 @@ class ObservationController extends AbstractObjectController {
 					if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(request.getHeader('X-Auth-Token')){
-						render (['status':'error', 'success':'false', 'msg':'No recommendation vote got added'] as JSON);
+						render (['status':'error', 'success':'false', 'msg':'No recommendation vote'] as JSON);
 					} else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -726,6 +726,14 @@ class ObservationController extends AbstractObjectController {
 	def addAgreeRecommendationVote() {
 
 		params.author = springSecurityService.currentUser;
+ 
+        try {
+            params.obvId = params.obvId?.toLong();
+        } catch(e) {
+            e.printStackTrace();
+            params.obvId = null;
+        }
+
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
@@ -749,7 +757,7 @@ class ObservationController extends AbstractObjectController {
 					render r as JSON
 					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, msg:msg])
 					return
-				}else if(recommendationVoteInstance.save(flush: true)) {
+				} else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
@@ -768,12 +776,33 @@ class ObservationController extends AbstractObjectController {
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
+                    if(request.getHeader('X-Auth-Token')) {
+                        def errors = [];
+                        recommendationVoteInstance.errors.allErrors .each {
+                            def formattedMessage = messageSource.getMessage(it, null);
+                            errors << [field: it.field, message: formattedMessage]
+                        }
+                        render (['status':'error', 'success' : 'false', 'msg':'Failed to save recommendation vote', 'errors':errors] as JSON)
+                    }            
 				}
 			} catch(e) {
 				e.printStackTrace();
+                if(request.getHeader('X-Auth-Token')){
+                    render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
+                } else{
+                    //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                }
+
 			}
 		} else {
-			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+		    flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+			log.error flash.message;
+            if(request.getHeader('X-Auth-Token')){
+                render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
+            } else{
+                //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+            }
+		
 		}
 	}
 	
@@ -784,10 +813,26 @@ class ObservationController extends AbstractObjectController {
    def removeRecommendationVote() {
 
 	   def author = springSecurityService.currentUser;
-
+ 
+       try {
+           params.obvId = params.obvId?.toLong();
+       } catch(e) {
+           e.printStackTrace();
+           params.obvId = null;
+       }
+	
 	   if(params.obvId) {
 		   def observationInstance = Observation.get(params.obvId);
 		   def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
+           if(!observationInstance || !recommendationVoteInstance) {
+            	   def r = [
+				   status : 'error',
+				   success : 'false',
+				   msg:"${message(code: 'default.not.found.message', args: ['Recommendation', params.recoId])}"]
+			   render r as JSON
+			   return
+
+           }
 		   try {
 			   recommendationVoteInstance.delete(flush: true, failOnError:true)
 			   log.debug "Successfully deleted reco vote : "+recommendationVoteInstance
@@ -804,9 +849,21 @@ class ObservationController extends AbstractObjectController {
 			   return
 		   } catch(e) {
 			   e.printStackTrace();
+               if(request.getHeader('X-Auth-Token')){
+                   render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
+               } else{
+                   //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+               }
 		   }
 	   } else {
-		   flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+           flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+           log.error flash.message;
+           if(request.getHeader('X-Auth-Token')){
+               render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
+           } else{
+               //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+           }
+
 	   }
    }
 
