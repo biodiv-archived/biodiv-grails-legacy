@@ -8,6 +8,7 @@ import groovy.text.SimpleTemplateEngine
 import groovy.xml.MarkupBuilder;
 import groovy.xml.StreamingMarkupBuilder;
 import groovy.xml.XmlUtil;
+import org.codehaus.groovy.grails.web.json.JSONObject;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -460,18 +461,21 @@ class ObservationController extends AbstractObjectController {
 		}
 		
 		try {
-			//if(ServletFileUpload.isMultipartContent(request)) {
-				//MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 				def rs = [:]
-				//Utils.populateHttpServletRequestParams(request, rs);
+                if(ServletFileUpload.isMultipartContent(request)) {
+                    MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                    Utils.populateHttpServletRequestParams(request, rs);
+                }
 				def resourcesInfo = [];
                 def rootDir
-                switch(params.resType) {
-                    case [Observation.class.name,Checklists.class.name ]:
+                println params;
+                println Observation.class.name.toLowerCase()
+                switch(params.resType.toLowerCase()) {
+                    case [Observation.class.name.toLowerCase(),Checklists.class.name.toLowerCase() ]:
                         rootDir = grailsApplication.config.speciesPortal.observations.rootDir
                     break;
 
-                    case Species.class.name:
+                    case Species.class.name.toLowerCase():
                         rootDir = grailsApplication.config.speciesPortal.resources.rootDir
                     break;
                 }
@@ -485,11 +489,20 @@ class ObservationController extends AbstractObjectController {
 						params.resources = [params.resources]
 				}
 				params.resources.each { f ->					
-					f = JSON.parse(f);
-					if(f.size instanceof String) {
-						f.size = Integer.parseInt(f.size)
-					}
-					log.debug "Saving observation file ${f.filename}"
+                    String mimetype,filename;
+                    if(f instanceof String) {
+                        f = JSON.parse(f);
+                        if(f.size instanceof String) {
+                            f.size = Integer.parseInt(f.size)
+                        }
+                        mimetype = f.mimetype
+                        filename = f.filename
+                        log.debug "Saving observation file ${f.filename}"
+                    } else {
+                        mimetype = f.contentType
+                        filename = f.originalFilename
+					    log.debug "Saving user file ${f.originalFilename}"
+                    }
 
 					// List of OK mime-types
 					//TODO Move to config
@@ -501,16 +514,16 @@ class ObservationController extends AbstractObjectController {
 						'image/jpg'
 					]
 
-					if (! okcontents.contains(f.mimetype)) {
+					if (! okcontents.contains(mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
-							f.filename
+							filename
 						])
 					}
 					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
 						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
-							f.filename,
+							filename,
 							f.size/1024
 						], default:'File size cannot exceed ${104857600/1024}KB');
 					}
@@ -532,8 +545,12 @@ class ObservationController extends AbstractObjectController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
-						download(f.url, file );
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
+                        if(f instanceof JSONObject) {
+						    download(f.url, file );
+                        } else {
+						    f.transferTo( file );
+                        }
 						ImageUtils.createScaledImages(file, obvDir);
 						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
@@ -578,18 +595,18 @@ class ObservationController extends AbstractObjectController {
 					}
 				} else {
 					response.setStatus(500)
-					message = [error:message]
+					message = [success:false, error:message]
 					render message as JSON
 				}
 			/*} else {
 				response.setStatus(500)
-				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				def message = [success:false, error:g.message(code: 'no.file.attached', default:'No file is attached')]
 				render message as JSON
 			}*/
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			message = [success:false, error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}

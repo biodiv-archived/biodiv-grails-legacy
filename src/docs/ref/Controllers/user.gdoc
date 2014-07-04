@@ -119,6 +119,35 @@ http://indiabiodiversity.saturn.strandls.com/api/user/resetPassword?currentPassw
 }
 {code}
 
+h4. Upload Resource
+
+* *Path* : /api/user/upload_resource
+* *Parameters* : 
+** resources : file attachment
+** usersDir : directory into which the resource should be put into. If null, a new folder is created.
+* *REST method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/user/upload_resource
+{code}
+* *Response* : 
+** Successfull response
+{code}
+<users>
+    <dir>/28bc2245-4a21-4c51-9cde-5904c8ed8085/resources</dir>
+    <resources>
+        <image fileName='950.jpeg' size='111343'></image>
+    </resources>
+</users>
+{code}
+** in case of error
+{code}
+{
+    success:false,
+    "error": "No file is attached"
+}
+{code}
+
 h4. Settings
 
 h6. Notifications

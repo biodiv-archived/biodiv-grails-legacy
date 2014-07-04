@@ -6,8 +6,8 @@ as on Jul 1st 2014
 * *Completed :* 
 ** login -> basic, oauth(facebook, google)
 ** register -> register, resend verification code, forgotPassword
-** observations -> create, show, list, related, flagDeleted, getRecommendationVotes, addRecommendationVote, removeRecommendationVote
-** users -> show, resetPassword
+** observations -> create, show, list, related, flagDeleted, getRecommendationVotes, addRecommendationVote, removeRecommendationVote, upload_resource
+** users -> show, resetPassword, upload_resource
 ** comments -> add, get, remove
 ** logout 
 
@@ -33,6 +33,10 @@ as on June 18th 2014
 
 
 h3. Release Notes
+
+*July 4th 2014*
+
+* observation upload_resource, suser upload_resource
 
 *July 2nd 2014*
 
