@@ -423,7 +423,16 @@ class Observation extends Metadata implements Taggable, Rateable {
 		res[ObvUtilService.NOTES] = notes
 		
 		
-		res[ObvUtilService.TAGS] =this.tags.join(", ")
+		//XXX: During download of large number of observation some time following exception coming
+		//an assertion failure occured (this may indicate a bug in Hibernate, but is more likely due to unsafe use of the session)
+		try{
+			res[ObvUtilService.TAGS] =this.tags.join(", ")
+		}catch(e){
+			log.debug e.printStackTrace()
+			Observation.withNewSession {
+				res[ObvUtilService.TAGS] = this.tags.join(", ")
+			}
+		}
 		def ugList = []
 		
 		this.userGroups.each{ ug ->
