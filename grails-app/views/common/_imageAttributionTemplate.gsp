@@ -2,14 +2,16 @@
 <%@page import="species.Resource.ResourceType"%>
 
 <g:if test="${resource}">
-<div class="notes" style="text-align: left;">
+<div class="notes" style="text-align: left;font: italic 12px/1.4 georgia,serif;margin: 0;color: black;">
     <div>
 
         <div class="license license_div">
+
+        <g:if test="${resource.type != ResourceType.AUDIO}">
             <i class="slideUp icon-chevron-up pull-right"></i>
 
             <obv:rating model="['resource':resource, 'class':'gallery_rating']"/>
-
+        </g:if>    
             <g:each in="${resource?.licenses}" var="l">
             <a href="${l?.url}" target="_blank"> <img class="icon" style="height:auto;margin-right:2px;"
                 src="${createLinkTo(dir:'images/license', file: l?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
@@ -25,7 +27,7 @@
 
                 <div style="clear:both;"></div>
             </g:if>
-
+            
 
         </div>
         <g:if test="${resource.contributors?.size() > 0}">

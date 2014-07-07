@@ -488,6 +488,8 @@ http://indiabiodiversity.localhost.org/api/observation/addRecommendationVote?obv
 }
 {code}
 
+
+
 h4. removeRecommendationVote
 
 * *Path* : /api/observation/removeRecommendationVote

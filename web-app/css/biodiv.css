@@ -452,25 +452,32 @@ div.errors {
 }
 
 .add_image {
-	background-image: url('../images/add-photo.png');
+	background-image: url('../images/add_photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height:90px;
+	height: 65px;
 	cursor: pointer;
 	border-bottom: 3px red;
 }
 .add_video {
-	background-image: url('../images/add-video.png');
+	background-image: url('../images/add_video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height:90px;
+	height: 57px;
 	cursor: pointer;
 }
-
+.add_audio {
+	background-image: url('../../images/add_audio.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../../images/add-audio.png'),sizingMethod='crop');
+	background-repeat: no-repeat;
+	width: 200px;
+	height: 65px;
+	cursor: pointer;
+}
 
 .add_file .progress {
 	border-radius: 3px 3px 3px 3px;
@@ -485,6 +492,7 @@ div.errors {
 }
 
 .add_file_container {
+	padding: 5px 8px;
 	position:relative;
 	z-index:100;
 }
@@ -1311,31 +1319,31 @@ span.cke_skin_kama {
 }
 
 .galleria-info-text {
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgb(0, 0, 0) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)"; /* IE8 */
         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000);   /* IE6 & 7 */
-    zoom: 1;
+    zoom: 1 !important;
 }
 
 .galleria-info-description {
-    color:black;
+    color:black !important;
 }
 
 .galleria-info {
-    width: 100%;
-    top: 350px;
-    z-index: 2;
-    position: absolute;
-    background-color: white;
-    overflow:hidden;
+    width: 100% !important;
+    top: 350px ;
+    z-index: 2 !important;
+    position: absolute !important;
+    background-color: white !important;
+    overflow:hidden !important;
 }
 .galleria-info-text {
-    padding:2px;
+    padding:2px !important;
 }
 
 .galleria-counter {
-    bottom : 318px;
+    bottom : 318px !important;
 }
 
 .galleria-thumbnails-container {

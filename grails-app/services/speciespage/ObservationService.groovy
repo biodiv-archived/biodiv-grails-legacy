@@ -157,8 +157,16 @@ class ObservationService extends AbstractObjectService {
 		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
+
+
 	        def resourcesXML = createResourcesXML(params);
+
+             println "==========RESOURCESXML RETURNED ================== " + resourcesXML
+             
 	        def resources = saveResources(observation, resourcesXML);
+
+            println "==========RESOURCES RETURNED ================== " + resources
+
 	        observation.resource?.clear();
 	        resources.each { resource ->
                 resource.saveResourceContext(observation)

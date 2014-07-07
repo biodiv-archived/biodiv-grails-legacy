@@ -83,8 +83,8 @@
             background-color : #fff;
             }
             .resources .addedResource {
-            height: 315px;
-            max-height:315px;
+            height: 315px !important;
+            max-height:315px !important;
             }
             
         </style>
@@ -146,7 +146,7 @@
 
         <r:script>
         //google.load("search", "1");
-        Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
+        // Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 
         $(document).ready(function(){
             if(${sparse}) {
@@ -197,6 +197,12 @@
     </head>
 
     <body>
+
+    <link rel="stylesheet" href="/js/galleria/1.2.7/themes/classic/galleria.classic.css" />
+    <script type="text/javascript" src="/js/galleria/1.2.7/galleria-1.2.7.min.js" ></script> 
+    <script type="text/javascript" src="/js/galleria/1.2.7/themes/classic/galleria.classic.min.js" ></script>   
+  
+     
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
@@ -223,10 +229,9 @@
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
                 <div class="span12" style="margin-left:0px">
 
-                    <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+                    <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
+
                     <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
-
-
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
@@ -296,8 +301,7 @@
                 
 
 
-            </div>		
-
+            </div>	 
             <g:javascript>
            var licenseSelectorOptions = [];
             <g:each in="${License.LicenseType.toList()}" var="l">
@@ -337,6 +341,7 @@
             });
  
             </r:script>
+
         </body>
 
     </html>

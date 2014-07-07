@@ -56,7 +56,7 @@ class UrlMappings {
 
         name oauth: "/api/oauth/${action}/${provider}"(controller: 'oauth')
 
-        "/api/register/forgotPassword" {
+        "/api/register/$forgotPassword" {
             controller = 'register'
             action = 'forgotPasswordMobile'
         }

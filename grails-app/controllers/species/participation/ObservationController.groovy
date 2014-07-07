@@ -484,6 +484,9 @@ class ObservationController extends AbstractObjectController {
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
+
+
+
 				
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
@@ -506,21 +509,35 @@ class ObservationController extends AbstractObjectController {
 
 					// List of OK mime-types
 					//TODO Move to config
-					def okcontents = [
-						'image/png',
-						'image/jpeg',
-						'image/pjpeg',
-						'image/gif',
-						'image/jpg'
-					]
 
-					if (! okcontents.contains(mimetype)) {
+					def resourcetype = f.mimetype.substring(0, f.mimetype.indexOf('/'))
+					def okcontents
+					def maxSizeAllow
+					if(resourcetype == 'image'){
+						okcontents = [
+										'image/png',
+										'image/jpeg',
+										'image/pjpeg',
+										'image/gif',
+										'image/jpg'
+										]
+						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
+
+					}else if(resourcetype == 'audio'){
+						okcontents = [
+										'audio/mp3'
+										]
+						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
+
+					}
+					
+					if (! okcontents.contains(f.mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
 							filename
 						])
 					}
-					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
+					else if(f.size > maxSizeAllow) {
 						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
 							filename,
@@ -531,6 +548,7 @@ class ObservationController extends AbstractObjectController {
 //						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
 //					}
 					else {
+
 						if(!obvDir) {
 							if(!params.obvDir) {
                                 obvDir = new File(rootDir);
@@ -545,21 +563,27 @@ class ObservationController extends AbstractObjectController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
-                        if(f instanceof JSONObject) {
-						    download(f.url, file );
-                        } else {
-						    f.transferTo( file );
-                        }
-						ImageUtils.createScaledImages(file, obvDir);
-						
+				
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
+						download(f.url, file );						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
-						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
-                        //context specific baseUrl for location picker script to work
-						def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
-						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
-						
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
+						def thumbnail
+						def type
+						if(resourcetype == 'image'){
+								ImageUtils.createScaledImages(file, obvDir);
+								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
+		                        //context specific baseUrl for location picker script to work
+								def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
+								thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);	
+								type = ResourceType.IMAGE	
+														
+						}else if(resourcetype == 'audio'){
+								thumbnail = "http://indiabiodiversity.localhost.org/biodiv/static/images/audioicon.png"
+								type = ResourceType.AUDIO	
+								
+
+						}		
+						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
 					}
 				}
 				
@@ -579,7 +603,8 @@ class ObservationController extends AbstractObjectController {
 						message = "Not a valid video url"
 					}
 				}
-				
+
+			
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
@@ -891,6 +916,8 @@ class ObservationController extends AbstractObjectController {
 	def getRecommendationVotes = {
 		params.max = params.max ? params.int('max') : 1
 		params.offset = params.offset ? params.long('offset'): 0
+
+
         if(!params.id) {
 			def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:'Invalid observation id')];
 			render message as JSON
@@ -1341,6 +1368,12 @@ class ObservationController extends AbstractObjectController {
 		render r as JSON
 	}
 	
+
+
+
+
+
+
 	
 	@Secured(['ROLE_USER'])
 	def downloadFile() {
@@ -1461,4 +1494,14 @@ class ObservationController extends AbstractObjectController {
         def result = ['msg': msg]
         render result as JSON
     }
+
+    def getRecommendationListJSON(LinkedHashMap result){
+
+    	if(result){	    	
+	   		def test = ['result' : result];
+	   		return test; // as JSON;
+   		}
+
+	} 
+   
 }
