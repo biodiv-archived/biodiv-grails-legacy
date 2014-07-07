@@ -123,7 +123,7 @@ h4. Upload Resource
 
 * *Path* : /api/user/upload_resource
 * *Parameters* : 
-** resources : file attachment
+** resources : file attachment (MAX_IMAGE_SIZE = 2097000)
 ** usersDir : directory into which the resource should be put into. If null, a new folder is created.
 * *REST method* : POST
 * *Request* :

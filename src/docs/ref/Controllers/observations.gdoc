@@ -512,7 +512,7 @@ h4. Upload Resource
 
 * *Path* : /api/observation/upload_resource
 * *Parameters* : 
-** resources : file attachment
+** resources : file attachment (MAX_IMAGE_SIZE = 104857600)
 ** obvDir : directory into which the resource should be put into. If null, a new folder is created.
 ** resType : species.participation.observation | species.participation.checklists | species.Species
 * *REST method* : POST
