@@ -51,6 +51,7 @@ class ObservationController extends AbstractObjectController {
 	def SUserService;
 	def obvUtilService;
     def chartService;
+    def messageSource;
 
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -245,8 +246,12 @@ class ObservationController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
 	def flagDeleted() {
-        
 		def result = observationService.delete(params)
+        if(request.getHeader('X-Auth-Token')) {
+            result.remove('url')
+            render result as JSON;
+            return;
+        }
 		flash.message = result.message
 		redirect (url:result.url)
 	}
@@ -416,6 +421,7 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_CEPF_ADMIN'])
 	def delete() {
+        if(!params.id) return;
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			try {
@@ -638,6 +644,13 @@ class ObservationController extends AbstractObjectController {
 			params.action = 'addRecommendationVote'
 		}
 		params.author = springSecurityService.currentUser;
+        
+        try {
+            params.obvId = params.obvId?.toLong();
+        } catch(e) {
+            e.printStackTrace();
+            params.obvId = null;
+        }
 
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
@@ -661,17 +674,17 @@ class ObservationController extends AbstractObjectController {
 						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
-					if(!params["createNew"]){
+					if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					}else if(params["isMobileApp"]?.toBoolean()){
-						render (['status':'success', 'success':'true', 'obvId':observationInstance.id]as JSON);
-					}else{
+					} else if(request.getHeader('X-Auth-Token')){
+						render (['status':'error', 'success':'false', 'msg':'No recommendation vote got added'] as JSON);
+					} else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 
-				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
+				} else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
@@ -687,26 +700,35 @@ class ObservationController extends AbstractObjectController {
 					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
-                    if(!params["createNew"]){
+                    if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
 						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					}else if(params["isMobileApp"]?.toBoolean()){
-						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
-					}else {
+					} else if(request.getHeader('X-Auth-Token')){
+						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
+					} else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
-				}
-				else {
+				} else {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-					render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+
+                    if(request.getHeader('X-Auth-Token')) {
+                        def errors = [];
+                        recommendationVoteInstance.errors.allErrors .each {
+                            def formattedMessage = messageSource.getMessage(it, null);
+                            errors << [field: it.field, message: formattedMessage]
+                        }
+                        render (['status':'error', 'success' : 'false', 'msg':'Failed to save recommendation vote', 'errors':errors] as JSON)
+                    } else {
+					    render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                    }
 				}
 			} catch(e) {
 				e.printStackTrace()
-				if(params["isMobileApp"]?.toBoolean()){
-					render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
+				if(request.getHeader('X-Auth-Token')){
+					render (['status':'error', 'success':'false', 'msg':e.getMessage()] as JSON);
 				}else{
 					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
 				}
@@ -714,7 +736,11 @@ class ObservationController extends AbstractObjectController {
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
 			log.error flash.message;
-			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+            if(request.getHeader('X-Auth-Token')){
+                render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
+            } else{
+                redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+            }
 			//redirect(action: "list")
 		}
 	}
@@ -819,18 +845,22 @@ class ObservationController extends AbstractObjectController {
 		params.max = params.max ? params.int('max') : 1
 		params.offset = params.offset ? params.long('offset'): 0
 
+
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			try {
 				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
 				log.debug results;
 				def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
+				def customHTML = getRecommendationListJSON(results); 
+				println "==========customHTML========"+customHTML
 				def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
 				def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
 				def result = [
 					'status' : 'success',
 					canMakeSpeciesCall:params.canMakeSpeciesCall,
 					recoHtml:html?:'',
+					customHTML:customHTML?:'',
 					uniqueVotes:results.uniqueVotes?:'',
 					msg:params.msg?:'',
 					speciesNameTemplate:speciesNameHtml?:'',
@@ -862,8 +892,59 @@ class ObservationController extends AbstractObjectController {
 		else {
 			//response.setStatus(500)
 			def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')]
+
 			render message as JSON
-		}
+            return;
+        }
+
+        try {
+          //  def observationInstance = Observation.get(params.id.toLong())
+            if (observationInstance) {
+                def results = observationInstance.getRecommendationVotes(params.max, params.offset);
+                def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
+                def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
+                def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
+                def result = [
+                'status' : 'success',
+                canMakeSpeciesCall:params.canMakeSpeciesCall,
+                recoHtml:html?:'',
+                uniqueVotes:results.uniqueVotes?:'',
+                msg:params.msg?:'',
+                speciesNameTemplate:speciesNameHtml?:'',
+                speciesExternalLinkHtml:speciesExternalLinkHtml?:'',
+                speciesName:observationInstance.fetchSpeciesCall()?:'']
+
+                if(results?.recoVotes.size() > 0) {
+                    if(request.getHeader('X-Auth-Token')) {
+                        result = results;
+                        result.success = true;
+                    } 
+                    render result as JSON
+                    return
+                } else {
+                    //response.setStatus(500);
+                    def message = "";
+                    if(params.offset > 0) {
+                        message = g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest');
+                    } else {
+                        message = g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest');
+                    }
+                    result["msg"] = message
+                    render result as JSON
+                    return
+                }
+
+            } else {
+                //response.setStatus(500)
+                def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:"No observation found with ${params.id}")]
+                render message as JSON
+            }
+        } catch(e){
+            e.printStackTrace();
+            //response.setStatus(500);
+            def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:"Error while processing the request : ${e.getMessage()}")];
+            render message as JSON
+        }
 	}
 
 	/**
@@ -1260,6 +1341,12 @@ class ObservationController extends AbstractObjectController {
 		render r as JSON
 	}
 	
+
+
+
+
+
+
 	
 	@Secured(['ROLE_USER'])
 	def downloadFile() {
@@ -1380,4 +1467,14 @@ class ObservationController extends AbstractObjectController {
         def result = ['msg': msg]
         render result as JSON
     }
+
+    def getRecommendationListJSON(LinkedHashMap result){
+
+    	if(result){	    	
+	   		def test = ['result' : result];
+	   		return test; // as JSON;
+   		}
+
+	} 
+   
 }

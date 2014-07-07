@@ -83,8 +83,8 @@
             background-color : #fff;
             }
             .resources .addedResource {
-            height: 315px;
-            max-height:315px;
+            height: 315px !important;
+            max-height:315px !important;
             }
             
         </style>
@@ -154,8 +154,8 @@
                 showOccurence('${speciesName}');
                 //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
                 } else {
-                $("#map .alert").html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.");
-                $('#map1311326056727').hide();
+                $("#map").next('.alert').html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.").css('height','auto');
+                $('#map').hide();
                 }
             } else {
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
@@ -198,9 +198,11 @@
 
     <body>
 
-    <link rel="stylesheet" href="/js/galleria/1.2.7/themes/classic/galleria.classic.css">
-    <script src="/js/galleria/1.2.7/galleria-1.2.7.min.js"></script>
-    <script src="/js/galleria/1.2.7/themes/classic/galleria.classic.min.js"></script>
+    <link rel="stylesheet" href="/js/galleria/1.2.7/themes/classic/galleria.classic.css" />
+    <script type="text/javascript" src="/js/galleria/1.2.7/galleria-1.2.7.min.js" ></script> 
+    <script type="text/javascript" src="/js/galleria/1.2.7/themes/classic/galleria.classic.min.js" ></script>   
+  
+     
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
@@ -227,10 +229,9 @@
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
                 <div class="span12" style="margin-left:0px">
 
-                    <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+                    <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
+
                     <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
-
-
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
@@ -300,8 +301,7 @@
                 
 
 
-            </div>		
-
+            </div>	 
             <g:javascript>
            var licenseSelectorOptions = [];
             <g:each in="${License.LicenseType.toList()}" var="l">
@@ -341,6 +341,7 @@
             });
  
             </r:script>
+
         </body>
 
     </html>

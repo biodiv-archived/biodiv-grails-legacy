@@ -337,12 +337,191 @@ http://indiabiodiversity.org/observation/occurrences?sGroup=829&habitat=267835&o
 http://indiabiodiversity.org/observation/distinctReco?sGroup=829&habitat=267835&offset=0&fl=id&bounds=4.8282597468669755%2C69.521484375%2C37.09023980307208%2C95.888671875
 {code}
 
-h4. addRecommendation
+h4. flagDelete
 
-h4. agreeRecommendation
+* *Path* : /api/observation/flagDelete
+* *Parameters* :
+** id : observation id
+* *REST Method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/observation/flagDeleted?id=234
+{code}
+* *Response* :
+** on success
+{code}
+{
+    "success": true,
+    "msg": "Observation 234 deleted",
+    "errors": []
+}
+{code}
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Observation 234sdf could not be deleted",
+    "errors": [
+    {
+        "message": "For input string: \"234sdf\""
+    }
+    ]
+}
 
-h4. delete
+{
+    "success": false,
+    "msg": "Observation not found with id null",
+    "errors": []
+}
+{code}
 
 h4. flag
+
+h4. getRecommendationVotes
+
+* *Path* : /api/observation/getRecommendationVotes
+* *Parameters* :
+** id : observation id
+* *REST Method* : GET
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/observation/getRecommendationVotes?id=245
+{code}
+* *Response* :
+** on success
+{code}
+{
+    "recoVotes": [
+    {
+        "recoId": 2693,
+            "isScientificName": true,
+            "name": "Test4",
+            "authors": [
+            {
+                "id": 2,
+                "name": "Sravanthi Mutyala",
+                "email": "pearlsravanthi@gmail.com",
+                "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+            }
+            ],
+            "votedOn": [
+                "2014-06-24T14:21:47Z"
+                ],
+            "noOfVotes": 1,
+            "totalVotes": 1,
+            "recoComments": [],
+            "obvId": 245,
+            "isLocked": false,
+            "commonNames": "",
+            "disAgree": true,
+            "showLock": true
+        }
+        ],
+        "totalVotes": 1,
+        "uniqueVotes": 1,
+        "success": true
+}
+
+{code}
+** on error
+{code}
+{
+    "success": false,
+    "status": "error",
+    "msg": "Error while processing the request. Please report the necessary details to <span class='mailme'>support(at)indiabiodiversity(dot)org</span>"
+}
+{code}
+
+h4. addRecommendationVote
+
+* *Path* : /api/observation/getRecommendationVotes
+* *Parameters* :
+** obvId: observation id
+** recoName: scientific name
+** commonName: common name
+** languageName: language
+** recoComment: comment text
+* *REST Method* : GET
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/observation/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
+{code}
+* *Response* :
+** on success
+{code}
+{
+    "status": "success",
+    "success": "true",
+    "recoVote": {
+        "recommendation": {
+            "name": "Animalia",
+            "taxonomyDefinition": {
+                "id": 1,
+                "name": "Animalia",
+                "canonicalForm": "Animalia",
+                "italicisedForm": "<i>Animalia</i>",
+                "rank": "Kingdom"
+            }
+        },
+        "commonNameReco": {
+            "name": "Common Name",
+            "taxonomyDefinition": null
+        },
+        "author": {
+            "id": 2,
+            "name": "Sravanthi Mutyala",
+            "email": "pearlsravanthi@gmail.com",
+            "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+        },
+        "confidence": "I am certain",
+        "votedOn": "2014-07-01T19:25:30Z",
+        "comment": null
+    }
+}
+{code}
+** on error
+{code}
+{
+    "status": "error",
+    "success": "false",
+    "msg": "No recommendation vote got added"
+}
+{code}
+
+
+h4. agreeRecommendationVote
+
+* *Path* : /api/observation/getRecommendationVotes
+* *Parameters* :
+* *REST Method* : GET
+* *Request* :
+{code}
+{code}
+* *Response* :
+** on success
+{code}
+{code}
+** on error
+{code}
+{code}
+
+
+h4. removeRecommendationVote
+
+* *Path* : /api/observation/getRecommendationVotes
+* *Parameters* :
+* *REST Method* : GET
+* *Request* :
+{code}
+{code}
+* *Response* :
+** on success
+{code}
+{code}
+** on error
+{code}
+{code}
+
+
 
 

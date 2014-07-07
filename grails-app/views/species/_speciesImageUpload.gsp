@@ -2,7 +2,7 @@
     <ul class="nav nav-tabs" id="speciesImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
             <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab">Add Observation Images</a></li>
-            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload Images</a></li>
+            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload/Edit Images</a></li>
             <li id="speciesImage-li2"><a href="#speciesImage-tab2" class="btn" data-toggle="tab">Add Species Field Images</a></li>   
         </g:if>
     </ul>
@@ -24,7 +24,7 @@
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
                     <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Upload Images </a>
+                        style="float: right; margin-right: 5px;"> Save </a>
 
                 </form>
                 <%
@@ -38,7 +38,7 @@
                     class="${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}">
 
                     <span class="msg" style="float: right"></span>
-                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                    <input class="videoUrl" type="hidden" name='videoUrl'value="" />
                     <input type="hidden" name='obvDir' value="${obvDir}" />
                     <input type="hidden" name='resType' value='${speciesInstance.class.name}'>
                 </form>

@@ -39,17 +39,19 @@
                 <div class="story-footer" style="right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
                     <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE, images.size()]]]"/>
                 </div>
+                
                 <div id="gallery1" class="gallery">
                     <g:if test="${images}">
                     <s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
-                        </g:if>
-                        <g:else>
-                        <% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
-                        <img class="group_icon galleryImage" src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
-                        title="Contribute!!!"/>
-                        </g:else>
+                    </g:if>
+                    <g:else>
+                    <% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
+                    <img class="group_icon galleryImage" 
+                             src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
+                             title="Contribute!!!"/>
+                    </g:else>
 
-                    </div>
+                </div>
                 </div>
                 <div id="resourceTabs-3">						
                     <div id="gallery3"></div>
@@ -58,6 +60,9 @@
                 </div> 
             </div>
         </div>
+
+
+        <g:render template="/species/speciesaudio" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
 
         <div style="background-color:white">
 

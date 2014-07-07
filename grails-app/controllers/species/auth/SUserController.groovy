@@ -42,6 +42,7 @@ class SUserController extends UserController {
     def chartService;
     def SUserSearchService;
     def messageSource;
+    def speciesPermissionService;
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST", resetPassword: "POST"]
 
@@ -178,8 +179,10 @@ class SUserController extends UserController {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById()
 			if (!user) return
-
-				return buildUserModel(user)
+			def model = buildUserModel(user);
+            def contributorForTaxonConcepts = speciesPermissionService.contributorFor(springSecurityService.currentUser);
+            model['contributorForTaxonConcepts'] = contributorForTaxonConcepts;
+            return model; 
 		}
 		flash.message = "${message(code: 'edit.denied.message')}";
 		redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))

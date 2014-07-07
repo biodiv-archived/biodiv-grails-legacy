@@ -20,7 +20,7 @@ import species.participation.Flag;
 import species.participation.Featured;
 
 class Species implements Rateable { 
-	String title;
+ 	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
@@ -79,14 +79,17 @@ class Species implements Rateable {
 
     Species() {
         super();
-        println "Species Initialization +++++++++++++++++++++++++++++++"
         //new Throwable("init").printStackTrace() 
     }
 
 	Resource mainImage() {
         def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+        def images = this.getImages();
+        def reprImageMaxRated = images ? images[0]:null;
+        /*
         if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
             def images = this.getImages();
+            println "=========IMAGES========== " + images;
             this.reprImage = images ? images[0]:null;
             if(reprImage) {
                 log.debug " Saving representative image for species ===  $reprImage.fileName" ;
@@ -95,9 +98,9 @@ class Species implements Rateable {
                     this.errors.each { log.error it }
                 }
             }			
-        }
-        if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim()).exists())) {
-            return reprImage;
+        }*/
+        if(reprImageMaxRated && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImageMaxRated.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImageMaxRated.fileName.trim()).exists())) {
+            return reprImageMaxRated;
         } else {
             return fetchSpeciesGroup().icon(ImageType.ORIGINAL)
         }
@@ -118,6 +121,45 @@ class Species implements Rateable {
         def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id and r.type ='"+ResourceType.IMAGE+"' and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
 
         def res = sql.rows("select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref where o.type ='"+ResourceType.IMAGE+"' and o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id)) order by avg desc, id asc", [id:this.id])
+
+            def idList = results.collect {it[0]}
+
+        res.each {
+            if(!idList.contains(it[0])) {
+                idList<<it[0]
+            }
+        }
+        //def idList = results.collect { it[0] }
+        if(idList) {
+            def instances = Resource.withCriteria {  
+                inList 'id', idList 
+                cache params.cache
+            }
+            def finalRes = results.collect {  r -> 
+                instances.find { i -> (r[0] == i.id) } 
+            }
+            return finalRes
+        } else {
+            []
+        }
+    }
+
+
+    /** 
+     * Ordering resources basing on rating
+     **/
+    List<Resource> getListResources() { 
+        def params = [:]
+        def clazz = Resource.class;
+        def type = GrailsNameUtils.getPropertyName(clazz);
+
+        def sql =  Sql.newInstance(dataSource);
+        params['cache'] = true;
+        params['type'] = type;
+
+        def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id  and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
+
+        def res = sql.rows("select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref where o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id)) order by avg desc, id asc", [id:this.id])
 
             def idList = results.collect {it[0]}
 
@@ -247,6 +289,7 @@ class Species implements Rateable {
 	
 	        //TODO:looks like this is gonna be heavy on every save ... gotta change
 			this.fields?.each { contributors.addAll(it.contributors)}
+            contributors.addAll(this.taxonConcept.contributors)
 	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        
@@ -256,7 +299,9 @@ class Species implements Rateable {
             } else {
                 log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
             }
+
 		}
+        
     }
 
     def beforeDelete(){

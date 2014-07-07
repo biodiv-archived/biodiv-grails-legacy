@@ -16,7 +16,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                     </p>
 				<ol>
 	
-                    <li  style="margin-bottom:15px;"><b>On-line creating of species pages</b> : To create a new species you should have write permission on the page. Permissions can be requested for a taxa. Please request permissions using the buttons below: <br/>
+                    <li  style="margin-bottom:15px;"><b>Online creation of species pages</b> : To create a new species you should have write permission on the page. Permissions can be requested for a taxa. Please request permissions using the buttons below: <br/>
                     <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary">Request Permission</a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary">Create new species</a>
 					</li>
 
@@ -28,19 +28,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					</li>
 	
 				</ol>
-				
-				<h3>Downloads</h3>
-				<ol>
-					<li><a
-						href="${createLinkTo(dir: '/../static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">Simple
-							Species Template</a>
-					</li>
-					<li><a
-						href="${createLinkTo(dir: '/../static/templates/spreadsheet/', file:'speciesTemplateExpanded_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">Expanded
-							Species Template</a>
-					</li>
-				</ol>
-				<br /> If you have any question please provide feedback and email us
+
+                If you have any question please provide feedback and email us
 				at <span class="mailme">${supportEmail}</span>
 				</div>
 	

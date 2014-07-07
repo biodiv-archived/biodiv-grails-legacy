@@ -904,8 +904,9 @@ $(document).ready(function() {
                 /*    $('.editable').editable('disable');
                       $('.addField').hide();
                       $('.editFieldButton').hide();
-                      */  
-                window.location.reload(true);
+                      */ 
+                window.location = window.location.href.split("?")[0];
+                //window.open(window.location.href);
             }
             if(e) e.stopPropagation();
         }

@@ -53,9 +53,13 @@
                 <div id="taxonBrowser" class="tab-pane" style="position:relative">
                     <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
                         <h5>Classifications</h5>	
-                        <div class="alert alert-info" style="margin-bottom:0px;">
-                            Please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. You will be able to contribute once you have been allotted edit/create rights for the taxa.
-                        </div>
+                <div class="section help-block"> 
+                    <ul>
+                        <li>
+                        Species page content is sourced from researchers and experts who have been authenticated by curators. If you are a researcher and would like to contribute, please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. Please also follow up by sending an email to  <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> with a brief curriculum vitae (CV) or summary of your expertise so that curators can evaluate your application. You will be able to contribute once you have been allotted create/edit rights for the taxa.
+                        </li>
+                    </ul>
+                </div>
                         <div id="taxaHierarchy" style="width:940px;padding:0px">
 
                             <%

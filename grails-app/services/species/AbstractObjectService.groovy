@@ -254,7 +254,9 @@ class AbstractObjectService {
                 if(indexes.get(index)) {
                     index = -1;
                 } else {
-                    indexes.set(index);
+                    if(val != ""){
+                        indexes.set(index);
+                    }    
                 }
 
             }

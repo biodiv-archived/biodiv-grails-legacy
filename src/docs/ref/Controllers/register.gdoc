@@ -43,8 +43,25 @@ http://indiabiodiversity.localhost.org/api/register/resend?email=username@gmail.
 {code}
 ** in case of error 
 {code}
-{"success":false,"msg":"Registration code for the email address devak213i.anugu@gmail.com is not found"}
+{"success":false,"msg":"Registration code for the email address devaki.anugu@gmail.com is not found"}
 {code}
 
 h4. Forgot Password 
 
+* *Path* : /api/register/forgotPassword
+* *Parameters" : 
+** email
+* *REST Method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/register/forgotPassword?email=username@gmail.com
+{code}
+* *Response* :
+** on success
+{code}
+{"success":true,"msg":"An email has been sent to pearlsravanthi@gmail.com. Please click on the link in the email."}
+{code}
+** in case of error 
+{code}
+{"success":false,"msg":"No user was found with that email"}
+{code}

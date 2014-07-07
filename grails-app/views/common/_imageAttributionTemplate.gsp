@@ -2,7 +2,7 @@
 <%@page import="species.Resource.ResourceType"%>
 
 <g:if test="${resource}">
-<div class="notes" style="text-align: left;">
+<div class="notes" style="text-align: left;font: italic 12px/1.4 georgia,serif;margin: 0;color: black;">
     <div>
 
         <div class="license license_div">

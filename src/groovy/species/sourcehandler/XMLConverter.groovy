@@ -1434,8 +1434,6 @@ class XMLConverter extends SourceConverter {
         List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
 
         fieldNodes.each { fieldNode ->
-            println fieldNode
-            println fieldNode.data
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
@@ -1485,44 +1483,49 @@ class XMLConverter extends SourceConverter {
                         if(!taxon.save()) {
                             taxon.errors.each { log.error it }
                         }
-                        taxon.updateContributors(getUserContributors(fieldNode.data))
-                    } else if(taxon.name != parsedName.name) {
+
+						taxon.updateContributors(getUserContributors(fieldNode.data))
+                    } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
+
                         def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
                         if(synonym)
                             synonym.updateContributors(getUserContributors(fieldNode.data))
                     }
 
-
-                    def ent = new TaxonomyRegistry();
-                    ent.taxonDefinition = taxon
-                    ent.classification = classification;
-                    ent.parentTaxon = getParentTaxon(taxonEntities, rank);
-                    log.debug("Parent Taxon : "+ent.parentTaxon)
-                    ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
-                    //same taxon at same parent and same path may exist from same classification.
-                    def criteria = TaxonomyRegistry.createCriteria()
-                    TaxonomyRegistry registry = criteria.get {
-                        eq("taxonDefinition", ent.taxonDefinition);
-                        eq("path", ent.path);
-                        eq("classification", ent.classification);
-                    }
-
-                    if(registry) {
-                        log.debug "Taxon registry already exists : "+registry;
-                        registry.updateContributors(getUserContributors(fieldNode.data))
-                        taxonEntities.add(registry);
-                    } else if(saveTaxonHierarchy) {
-                        log.debug "Saving taxon registry entity : "+ent;
-                        if(!ent.save()) {
-                            ent.errors.each { log.error it }
-                        } else {
-                            log.debug "Saved taxon registry entity : "+ent;
+                    
+                    if(taxon) {
+                        def ent = new TaxonomyRegistry();
+                        ent.taxonDefinition = taxon
+                        ent.classification = classification;
+                        ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                        log.debug("Parent Taxon : "+ent.parentTaxon)
+                        ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
+                        //same taxon at same parent and same path may exist from same classification.
+                        def criteria = TaxonomyRegistry.createCriteria()
+                        TaxonomyRegistry registry = criteria.get {
+                            eq("taxonDefinition", ent.taxonDefinition);
+                            eq("path", ent.path);
+                            eq("classification", ent.classification);
                         }
-                        ent.updateContributors(getUserContributors(fieldNode.data))
-                        taxonEntities.add(ent);
+
+
+                        if(registry) {
+                            log.debug "Taxon registry already exists : "+registry;
+                            if(saveTaxonHierarchy)
+                                registry.updateContributors(getUserContributors(fieldNode.data))
+                            taxonEntities.add(registry);
+                        } else if(saveTaxonHierarchy) {
+                            log.debug "Saving taxon registry entity : "+ent;
+                            if(!ent.save()) {
+                                ent.errors.each { log.error it }
+                            } else {
+                                log.debug "Saved taxon registry entity : "+ent;
+                            }
+                            ent.updateContributors(getUserContributors(fieldNode.data))
+                            taxonEntities.add(ent);
+                        }
+
                     }
-
-
                 } else {
                     log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
                     addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
