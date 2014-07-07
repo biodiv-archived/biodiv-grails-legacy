@@ -175,7 +175,7 @@ class SUserController extends UserController {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById()
 			if (!user) return
@@ -194,9 +194,7 @@ class SUserController extends UserController {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
-
-
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = findById()
 
 			if (!user) return
@@ -700,8 +698,6 @@ class SUserController extends UserController {
 
 	@Secured(['ROLE_USER'])
 	def upload_resource() {
-		log.debug params;
-
 		try {
 			if(ServletFileUpload.isMultipartContent(request)) {
 				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -717,7 +713,7 @@ class SUserController extends UserController {
 				}
 
 				params.resources.each { f ->
-					log.debug "Saving userGroup logo file ${f.originalFilename}"
+					log.debug "Saving user file ${f.originalFilename}"
 
 					// List of OK mime-types
 					//TODO Move to config
@@ -770,7 +766,7 @@ class SUserController extends UserController {
 				// render some XML markup to the response
 				if(usersDir && resourcesInfo) {
 					render(contentType:"text/xml") {
-						userGroup {
+						users {
 							dir(usersDir.absolutePath.replace(rootDir, ""))
 							resources {
 								for(r in resourcesInfo) {
@@ -781,18 +777,18 @@ class SUserController extends UserController {
 					}
 				} else {
 					response.setStatus(500)
-					message = [error:message]
+					message = [success:false, error:message]
 					render message as JSON
 				}
 			} else {
 				response.setStatus(500)
-				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				def message = [success:false, error:g.message(code: 'no.file.attached', default:'No file is attached')]
 				render message as JSON
 			}
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			def message = [success:false, error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
@@ -802,7 +798,7 @@ class SUserController extends UserController {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
         String msg;
         boolean success = false;
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = springSecurityService.currentUser
 			def command2 = new ResetPasswordCommand(username:user.username?:email, currentPassword:command.currentPassword, password:command.password, password2:command.password2, springSecurityService:springSecurityService
 ,saltSource:saltSource);

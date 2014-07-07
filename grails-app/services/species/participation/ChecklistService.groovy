@@ -624,7 +624,7 @@ class ChecklistService {
 		}
 
 		writer.writeNext("## Checklist Data:")
-		writer.writeNext(cl.fetchColumnNames())
+		writer.writeNext(cl.fetchColumnNames().toArray(new String[0]))
 		for(item in m[cl.DATA]){
 			writer.writeNext(item.toArray(new String[0]))
 		}

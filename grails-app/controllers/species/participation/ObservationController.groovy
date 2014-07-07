@@ -8,6 +8,7 @@ import groovy.text.SimpleTemplateEngine
 import groovy.xml.MarkupBuilder;
 import groovy.xml.StreamingMarkupBuilder;
 import groovy.xml.XmlUtil;
+import org.codehaus.groovy.grails.web.json.JSONObject;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -460,18 +461,21 @@ class ObservationController extends AbstractObjectController {
 		}
 		
 		try {
-			//if(ServletFileUpload.isMultipartContent(request)) {
-				//MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 				def rs = [:]
-				//Utils.populateHttpServletRequestParams(request, rs);
+                if(ServletFileUpload.isMultipartContent(request)) {
+                    MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                    Utils.populateHttpServletRequestParams(request, rs);
+                }
 				def resourcesInfo = [];
                 def rootDir
-                switch(params.resType) {
-                    case [Observation.class.name,Checklists.class.name ]:
+                println params;
+                println Observation.class.name.toLowerCase()
+                switch(params.resType.toLowerCase()) {
+                    case [Observation.class.name.toLowerCase(),Checklists.class.name.toLowerCase() ]:
                         rootDir = grailsApplication.config.speciesPortal.observations.rootDir
                     break;
 
-                    case Species.class.name:
+                    case Species.class.name.toLowerCase():
                         rootDir = grailsApplication.config.speciesPortal.resources.rootDir
                     break;
                 }
@@ -488,11 +492,20 @@ class ObservationController extends AbstractObjectController {
 						params.resources = [params.resources]
 				}
 				params.resources.each { f ->					
-					f = JSON.parse(f);
-					if(f.size instanceof String) {
-						f.size = Integer.parseInt(f.size)
-					}
-					log.debug "Saving observation file ${f.filename}"
+                    String mimetype,filename;
+                    if(f instanceof String) {
+                        f = JSON.parse(f);
+                        if(f.size instanceof String) {
+                            f.size = Integer.parseInt(f.size)
+                        }
+                        mimetype = f.mimetype
+                        filename = f.filename
+                        log.debug "Saving observation file ${f.filename}"
+                    } else {
+                        mimetype = f.contentType
+                        filename = f.originalFilename
+					    log.debug "Saving user file ${f.originalFilename}"
+                    }
 
 					// List of OK mime-types
 					//TODO Move to config
@@ -521,13 +534,13 @@ class ObservationController extends AbstractObjectController {
 					if (! okcontents.contains(f.mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
-							f.filename
+							filename
 						])
 					}
 					else if(f.size > maxSizeAllow) {
 						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
-							f.filename,
+							filename,
 							f.size/1024
 						], default:'File size cannot exceed ${104857600/1024}KB');
 					}
@@ -549,6 +562,14 @@ class ObservationController extends AbstractObjectController {
 								obvDir.mkdir();
 							}
 						}
+
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
+                        if(f instanceof JSONObject) {
+						    download(f.url, file );
+                        } else {
+						    f.transferTo( file );
+                        }
+						ImageUtils.createScaledImages(file, obvDir);
 						
 						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
 						download(f.url, file );						
@@ -606,18 +627,18 @@ class ObservationController extends AbstractObjectController {
 					}
 				} else {
 					response.setStatus(500)
-					message = [error:message]
+					message = [success:false, error:message]
 					render message as JSON
 				}
 			/*} else {
 				response.setStatus(500)
-				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				def message = [success:false, error:g.message(code: 'no.file.attached', default:'No file is attached')]
 				render message as JSON
 			}*/
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			message = [success:false, error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
@@ -652,6 +673,7 @@ class ObservationController extends AbstractObjectController {
             params.obvId = null;
         }
 
+    
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
 			//Saves recommendation if its not present
@@ -677,7 +699,7 @@ class ObservationController extends AbstractObjectController {
 					if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(request.getHeader('X-Auth-Token')){
-						render (['status':'error', 'success':'false', 'msg':'No recommendation vote got added'] as JSON);
+						render (['status':'error', 'success':'false', 'msg':msg] as JSON);
 					} else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -753,6 +775,14 @@ class ObservationController extends AbstractObjectController {
 	def addAgreeRecommendationVote() {
 
 		params.author = springSecurityService.currentUser;
+ 
+        try {
+            params.obvId = params.obvId?.toLong();
+        } catch(e) {
+            e.printStackTrace();
+            params.obvId = null;
+        }
+
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
@@ -776,7 +806,7 @@ class ObservationController extends AbstractObjectController {
 					render r as JSON
 					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, msg:msg])
 					return
-				}else if(recommendationVoteInstance.save(flush: true)) {
+				} else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
@@ -795,12 +825,33 @@ class ObservationController extends AbstractObjectController {
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
+                    if(request.getHeader('X-Auth-Token')) {
+                        def errors = [];
+                        recommendationVoteInstance.errors.allErrors .each {
+                            def formattedMessage = messageSource.getMessage(it, null);
+                            errors << [field: it.field, message: formattedMessage]
+                        }
+                        render (['status':'error', 'success' : 'false', 'msg':'Failed to save recommendation vote', 'errors':errors] as JSON)
+                    }            
 				}
 			} catch(e) {
 				e.printStackTrace();
+                if(request.getHeader('X-Auth-Token')){
+                    render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
+                } else{
+                    //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                }
+
 			}
 		} else {
-			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+		    flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+			log.error flash.message;
+            if(request.getHeader('X-Auth-Token')){
+                render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
+            } else{
+                //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+            }
+		
 		}
 	}
 	
@@ -811,10 +862,26 @@ class ObservationController extends AbstractObjectController {
    def removeRecommendationVote() {
 
 	   def author = springSecurityService.currentUser;
-
+ 
+       try {
+           params.obvId = params.obvId?.toLong();
+       } catch(e) {
+           e.printStackTrace();
+           params.obvId = null;
+       }
+	
 	   if(params.obvId) {
 		   def observationInstance = Observation.get(params.obvId);
 		   def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
+           if(!observationInstance || !recommendationVoteInstance) {
+            	   def r = [
+				   status : 'error',
+				   success : 'false',
+				   msg:"${message(code: 'default.not.found.message', args: ['Recommendation', params.recoId])}"]
+			   render r as JSON
+			   return
+
+           }
 		   try {
 			   recommendationVoteInstance.delete(flush: true, failOnError:true)
 			   log.debug "Successfully deleted reco vote : "+recommendationVoteInstance
@@ -831,9 +898,21 @@ class ObservationController extends AbstractObjectController {
 			   return
 		   } catch(e) {
 			   e.printStackTrace();
+               if(request.getHeader('X-Auth-Token')){
+                   render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
+               } else{
+                   //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+               }
 		   }
 	   } else {
-		   flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+           flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+           log.error flash.message;
+           if(request.getHeader('X-Auth-Token')){
+               render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
+           } else{
+               //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+           }
+
 	   }
    }
 
@@ -846,59 +925,14 @@ class ObservationController extends AbstractObjectController {
 		params.offset = params.offset ? params.long('offset'): 0
 
 
-		def observationInstance = Observation.get(params.id)
-		if (observationInstance) {
-			try {
-				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
-				log.debug results;
-				def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
-				def customHTML = getRecommendationListJSON(results); 
-				println "==========customHTML========"+customHTML
-				def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
-				def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
-				def result = [
-					'status' : 'success',
-					canMakeSpeciesCall:params.canMakeSpeciesCall,
-					recoHtml:html?:'',
-					customHTML:customHTML?:'',
-					uniqueVotes:results.uniqueVotes?:'',
-					msg:params.msg?:'',
-					speciesNameTemplate:speciesNameHtml?:'',
-					speciesExternalLinkHtml:speciesExternalLinkHtml?:'',
-					speciesName:observationInstance.fetchSpeciesCall()?:'']
-				
-				if(results?.recoVotes.size() > 0) {
-					render result as JSON
-					return
-				} else {
-					//response.setStatus(500);
-					def message = "";
-					if(params.offset > 0) {
-						message = g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest');
-					} else {
-						message = g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest');
-					}
-					result["msg"] = message
-					render result as JSON
-					return
-				}
-			} catch(e){
-				e.printStackTrace();
-				//response.setStatus(500);
-				def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
-				render message as JSON
-			}
-		}
-		else {
-			//response.setStatus(500)
-			def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')]
-
+        if(!params.id) {
+			def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:'Invalid observation id')];
 			render message as JSON
             return;
         }
 
         try {
-          //  def observationInstance = Observation.get(params.id.toLong())
+            def observationInstance = Observation.get(params.id.toLong())
             if (observationInstance) {
                 def results = observationInstance.getRecommendationVotes(params.max, params.offset);
                 def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);

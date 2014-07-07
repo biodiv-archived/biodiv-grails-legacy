@@ -489,30 +489,17 @@ http://indiabiodiversity.localhost.org/api/observation/addRecommendationVote?obv
 {code}
 
 
-h4. agreeRecommendationVote
-
-* *Path* : /api/observation/getRecommendationVotes
-* *Parameters* :
-* *REST Method* : GET
-* *Request* :
-{code}
-{code}
-* *Response* :
-** on success
-{code}
-{code}
-** on error
-{code}
-{code}
-
 
 h4. removeRecommendationVote
 
-* *Path* : /api/observation/getRecommendationVotes
+* *Path* : /api/observation/removeRecommendationVote
 * *Parameters* :
+** obvId : obsevrationId
+** recoId : recommendationId
 * *REST Method* : GET
 * *Request* :
 {code}
+
 {code}
 * *Response* :
 ** on success
@@ -520,6 +507,37 @@ h4. removeRecommendationVote
 {code}
 ** on error
 {code}
+{code}
+
+
+h4. Upload Resource
+
+* *Path* : /api/observation/upload_resource
+* *Parameters* : 
+** resources : file attachment (MAX_IMAGE_SIZE = 104857600)
+** obvDir : directory into which the resource should be put into. If null, a new folder is created.
+** resType : species.participation.observation | species.participation.checklists | species.Species
+* *REST method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=species.participation.observation
+{code}
+* *Response* : 
+** Successfull response
+{code}
+<observations>
+    <dir>/a1006639-331f-4916-915a-78f688bd6fdb</dir>
+    <resources>
+        <res fileName='/a1006639-331f-4916-915a-78f688bd6fdb/817.jpeg' url='' thumbnail='http://indiabiodiversity.localhost.org/biodiv/observations//a1006639-331f-4916-915a-78f688bd6fdb/817_gall.jpg' type='IMAGE'></res>
+    </resources>
+</observations>
+{code}
+** in case of error
+{code}
+{
+    success:false,
+    "error": "No file is attached"
+}
 {code}
 
 
