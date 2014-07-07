@@ -7,11 +7,13 @@ import species.auth.SUser
 
 
 class ActivityFeedController {
-
+	
+	static defaultAction = "list"
+	
 	def activityFeedService;
 	def springSecurityService;
 	
-	def getFeeds = {
+	def getFeeds(){
 		//log.debug params;
 		params.author = springSecurityService.currentUser;
 		
@@ -37,13 +39,13 @@ class ActivityFeedController {
 		}
 	}
 	
-	def getServerTime = {
+	def getServerTime () {
 		log.debug params
 		render ("" + new Date().getTime()) as JSON
 	}
 	
-	def index = {
-		redirect(action:list, params:params)
+	def index() {
+		redirect(params:params)
 	}
 	
 	def list() {
