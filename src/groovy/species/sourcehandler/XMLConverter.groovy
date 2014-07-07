@@ -1487,9 +1487,6 @@ class XMLConverter extends SourceConverter {
 						taxon.updateContributors(getUserContributors(fieldNode.data))
                     } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
                  
-                        }
-
-
                         if(registry) {
                             log.debug "Taxon registry already exists : "+registry;
                             if(saveTaxonHierarchy)
@@ -1505,25 +1502,7 @@ class XMLConverter extends SourceConverter {
                             ent.updateContributors(getUserContributors(fieldNode.data))
                             taxonEntities.add(ent);
                         }
-=======
-                        }
 
-                        if(registry) {
-                            log.debug "Taxon registry already exists : "+registry;
-                            if(saveTaxonHierarchy)
-                                registry.updateContributors(getUserContributors(fieldNode.data))
-                            taxonEntities.add(registry);
-                        } else if(saveTaxonHierarchy) {
-                            log.debug "Saving taxon registry entity : "+ent;
-                            if(!ent.save()) {
-                                ent.errors.each { log.error it }
-                            } else {
-                                log.debug "Saved taxon registry entity : "+ent;
-                            }
-                            ent.updateContributors(getUserContributors(fieldNode.data))
-                            taxonEntities.add(ent);
-                        }
->>>>>>> deb390b3b68ff8ab77c313d4368796b8bfbce2f4
 
                     }
                 } else {

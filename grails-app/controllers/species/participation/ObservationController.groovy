@@ -563,14 +563,7 @@ class ObservationController extends AbstractObjectController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
-                        if(f instanceof JSONObject) {
-						    download(f.url, file );
-                        } else {
-						    f.transferTo( file );
-                        }
-						ImageUtils.createScaledImages(file, obvDir);
-						
+				
 						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
 						download(f.url, file );						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
