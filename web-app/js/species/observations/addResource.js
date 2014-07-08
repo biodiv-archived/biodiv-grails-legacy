@@ -245,9 +245,9 @@ function removeResource(event, imageId) {
               //  me.$ele.find('.add_audio').editable('setValue','', false);
                 //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 
-                var response = $.parseJSON(xhr.responseText);                
-                alert(response.error);
+                var response = $.parseJSON(xhr.responseText);               
                 if(response.error){
+                    alert(response.error);
                     me.$ele.find(".image-resources-msg").parent(".resources").addClass("error");
                     me.$ele.find(".image-resources-msg").html(response.error);
                 }
