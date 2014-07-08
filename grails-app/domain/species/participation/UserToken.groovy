@@ -1,6 +1,6 @@
 package species.participation
 
-import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import grails.plugin.springsecurity.ui.RegistrationCode;
 
 class UserToken extends RegistrationCode {
 

@@ -24,7 +24,6 @@ class Language {
 		sort 'name';
 	}
 	
-	
 	public static Language getLanguage(String languageName){
 		Language lang = null;
 		
@@ -34,7 +33,7 @@ class Language {
 			lang = Language.findByNameIlike(languageName.trim());
 			if(!lang){
 				//inserting new language
-				lang = new Language(name:languageName.trim(), threeLetterCode:getThreeLetterCode(languageName), isDirty:true);
+				lang = new Language(name:languageName.trim(), threeLetterCode:_getThreeLetterCode(languageName), isDirty:true);
 				if(!lang.save(flush:true)){
 					//println "Error during new language save $languageName"
 					lang = null;
@@ -44,7 +43,7 @@ class Language {
 		return lang;
     }
 	
-	private static String getThreeLetterCode(String languageName){
+	private static String _getThreeLetterCode(String languageName){
 		//TODO fix this
 		int i = 0;
 		while(++i < 100){

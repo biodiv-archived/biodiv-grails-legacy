@@ -1,6 +1,4 @@
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 import species.Field;
 import species.UserGroupTagLib;
@@ -43,6 +41,7 @@ class BootStrap {
 	 * 
 	 */
 	def init = { servletContext ->
+        log.debug "Initializing biodiv application" 
 		//grailsApplication.config.'grails.web.disable.multipart' = true
 		initDefs();
 		initUsers();
@@ -136,9 +135,6 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
-		if(grailsApplication.config.checkin.drupal) {
-			SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
-		}
 	}
 
 	def initEmailConfirmationService() {
@@ -176,75 +172,9 @@ class BootStrap {
 	}
 	
     def initJSONMarshallers() {
-        JSON.registerObjectMarshaller(Geometry) {
-            String geomStr = "error"
-            WKTWriter wkt = new WKTWriter();
-            try {
-                geomStr = wkt.write(it);
-            } catch(Exception e) {
-                log.error "Error writing polygon wkt : ${it}"
-            }
-            return geomStr;
-        }
+        def ctx = org.codehaus.groovy.grails.web.context.ServletContextHolder.servletContext.getAttribute(org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes.APPLICATION_CONTEXT);
 
-        JSON.registerObjectMarshaller(SpeciesGroup) {
-            return ['id':it.id, 'name': it.name, 'groupOrder':it.groupOrder]
-        }
-
-        JSON.registerObjectMarshaller(Habitat) {
-            return ['id':it.id, 'name': it.name, 'habitatOrder':it.habitatOrder]
-        }
-
-        JSON.registerObjectMarshaller(License) {
-            return ['name': it.name.value(), 'url':it.name]
-        }
-
-        JSON.registerObjectMarshaller(Featured) {
-            if(it.userGroup) 
-                return ['createdOn':it.createdOn, 'notes': it.notes, 'userGroupId':it.userGroup.id, 'userGroupName':it.userGroup.name, 'userGroupUrl':userGroupService.userGroupBasedLink(['mapping':'userGroup', 'controller':'userGroup', 'action':'show', 'userGroup':it.userGroup])]
-            else
-                return ['createdOn':it.createdOn, 'notes': it.notes]
-        }
-
-        JSON.registerObjectMarshaller(Synonyms) {
-            def syn =  ['id':it.id, 'name':it.name,  'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor()]
-            if(it.relationship) {
-                syn['relationship'] = ['name':it.relationship.value()] 
-            }
-            return syn;
-        }
-
-        JSON.registerObjectMarshaller(CommonNames) {
-            def commonname = ['id':it.id, 'name':it.name, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ];
-            if(it.language) {
-                commonname ['language'] =  ['id':it.language.id, 'name':it.language.name]
-            }
-            return commonname;
-        }
-        
-        JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value()]
-        }
-
-        JSON.registerObjectMarshaller(Classification) {
-            return ['id':it.classification.id, name : it.classification.name]
-        }
-
-        JSON.registerObjectMarshaller(TaxonomyRegistry) {
-            return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
-        }
-        
-        JSON.registerObjectMarshaller(SUser) {
-            return ['id':it.id, 'name':it.name, 'email': it.email, 'icon':it.profilePicture()]
-        }
- 
-        JSON.registerObjectMarshaller(Recommendation) {
-            return ['name':it.name, 'taxonomyDefinition' : it.taxonConcept];
-        }
-
-        JSON.registerObjectMarshaller(UserGroup) {
-            return ['id':it.id, 'name':it.name, 'description' : it.description, 'domainName':it.domainName, 'webaddress':it.webaddress, 'foundedOn':it.foundedOn, 'icon':it.icon, ];
-        }
+        ctx.getBean( "customObjectMarshallers" ).register();
 
     }
 

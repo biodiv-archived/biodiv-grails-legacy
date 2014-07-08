@@ -1,0 +1,106 @@
+h3. Login
+
+h4. Basic Login
+
+* *Path* : /api/login
+* *Parameters* :
+** username : a valid email address
+** password : password
+* *REST Method* : POST
+* *Request* : 
+{code}
+http://indiabiodiversity.saturn.strandls.com/api/login?username=emailAddress&password=password
+{code}
+* *Response* :
+** on success
+{code}
+{
+    "username": "pearlsravanthi@gmail.com",
+        "token": "8huintdfo716d329qnpndlj0srdbufgl",
+        "roles": [
+            "ROLE_ADMIN",
+        "ROLE_CEPF_ADMIN",
+        "ROLE_SPECIES_ADMIN",
+        "ROLE_USER"
+            ]
+}
+{code}
+** in case of error
+a 401 unauthorized status code is sent
+in case of missing credentials
+{code}
+{
+    'error':'400', 
+    'message':'Username and/or password parameters are missing.'
+}
+{code}
+in case of incorrect credentials
+{code}
+{'error':'401', 'message':'Bad credentials'}
+{code}
+in case of incorrect methos
+{code}
+{
+    "error": "405",
+    "message": "GET HTTP method is not supported."
+}
+{code}
+
+
+h4. OAuth Login
+
+1. Login to oauth service providers by sending a request at the respective urls. 
+
+Facebook 
+
+* *Path* : /api/oauth/callback/facebook  
+* *Parameters* :
+** access_token : valid fb access_token
+* *REST Method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/oauth/callback/facebook?access_token=CAAE7wX9joZBUBAP6LcCLyelAGFA3X6YgZBZBAVj9NMSv7ZC6ZCTCMr3ce4PBMZARJzcP5tQ3i0NoxVbPc7ghmjmrYXaZAHnl1MLKh2lkVaDA6ClU1QLTMZC1tMfCzmhVvJUaxV2lYsypG2zkJ1WRE68oebnifeAmqi1p1Nca6jlZB8lGZBZCoKy7JyV
+{code}
+* *Response* :
+** on success
+{code}
+{
+        "token": "20efurbcrh4fg441m8e9fg5fjb4us3ut"
+}
+{code}
+** in case of error
+{code}
+{
+    "message": "No access token",
+    "error": "500",
+    "token": ""
+}
+{code}
+
+Google 
+
+* *Path* : /api/oauth/callback/facebook  
+* *Parameters* :
+** access_token : valid fb access_token
+* *REST Method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/oauth/callback/google?access_token=ya29.NQAgcZ76JSRLPiEAAAAyQqVUs71Vg5mwee3MZYI8oYKkTDToIPLRabO42Aamki3LSBWmLTfYw49PqbRIlBs&token_type=Bearer&expires_in=3600
+{code}
+* *Response* :
+** on success
+{code}
+{
+        "token": "20efurbcrh4fg441m8e9fg5fjb4us3ut"
+}
+{code}
+** in case of error
+{code}
+{
+    "message": "No access token",
+    "error": "500",
+    "token": ""
+}
+{code}
+
+

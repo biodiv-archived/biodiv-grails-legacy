@@ -1,0 +1,153 @@
+h3. User
+
+h4. show 
+
+* *Path* : /api/user/show/id
+* *Parameters* : id :long
+* *REST method* : GET
+* *Request* :
+{code}
+http://indiabiodiversity.saturn.strandls.com/api/user/show/1
+{code}
+* *Response* : 
+** Successful response
+{code}
+{
+    "success": true,
+        "user": {
+            "id": 1,
+            "name": "admin",
+            "email": "admin@strandls.com",
+            "icon": "http://indiabiodiversity.localhost.org/biodiv/img/user_large.png"
+        },
+        "roles": [
+            "ROLE_ADMIN",
+            "ROLE_USER"
+            ],
+        "stat": {
+            "data": [
+                [
+                "Others",
+                1,
+                0
+                ]
+            ],
+            "columns": [
+                [
+                    "string",
+                    "Species Group"
+                ],
+                [
+                    "number",
+                    "Observations"
+                ],
+                [
+                    "number",
+                    "Identifications"
+                ]
+            ],
+            "htmlData": [
+                [
+                    "<button class=\"btn species_groups_sprites others_gall_th active\" title=\"Others\"></button>",
+                    "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=2&user=1\">Others</a>",
+                    "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=2&user=1\">1</a>",
+                    "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=2&user=1\">0</a>"
+                ]
+            ],
+            "htmlColumns": [
+                [
+                    "string",
+                    ""
+                ],
+                [
+                    "string",
+                    "Species Group"
+                ],
+                [
+                    "string",
+                    "Observations"
+                ],
+                [
+                    "string",
+                    "Identifications"
+                ]
+            ]
+        }
+}
+{code}
+
+** in case of error
+{code}
+{
+    "success": false,
+        "msg": "Coudn't find user with id 1dsdf"
+}
+{code}
+
+h4. resetPassword
+
+* *Path* : /api/user/resetPassword
+* *Parameters* : 
+** email : email address of the logged in user
+** currentPassword : old password 
+** password : new password
+** password2 : confirmation for new password
+* *REST method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.saturn.strandls.com/api/user/resetPassword?currentPassword=kmvrgbsr&password=123123&password2=123123
+{code}
+* *Response* : 
+** Successfull response
+{code}
+{
+    "success": true,
+        "msg": "Successfully updated password"
+}
+{code}
+** in case of error
+{code}
+{
+    "success": false,
+    "msg": "Failed to reset password",
+    "errors": [
+    {
+        "field": "currentPassword",
+        "message": "Current password doesnt match"
+    }
+    ]
+}
+{code}
+
+h4. Upload Resource
+
+* *Path* : /api/user/upload_resource
+* *Parameters* : 
+** resources : file attachment (MAX_IMAGE_SIZE = 2097000)
+** usersDir : directory into which the resource should be put into. If null, a new folder is created.
+* *REST method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/user/upload_resource
+{code}
+* *Response* : 
+** Successfull response
+{code}
+<users>
+    <dir>/28bc2245-4a21-4c51-9cde-5904c8ed8085/resources</dir>
+    <resources>
+        <image fileName='950.jpeg' size='111343'></image>
+    </resources>
+</users>
+{code}
+** in case of error
+{code}
+{
+    success:false,
+    "error": "No file is attached"
+}
+{code}
+
+h4. Settings
+
+h6. Notifications

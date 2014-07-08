@@ -1,7 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 class CommentController {
 
@@ -9,8 +9,7 @@ class CommentController {
 	def commentService;
 
 	@Secured(['ROLE_USER'])
-	def addComment = {
-		log.debug params;
+	def addComment() {
 		params.author = springSecurityService.currentUser;
 		
 		
@@ -23,7 +22,7 @@ class CommentController {
 				result['msg'] = commentRes['msgCode']? "${message(code: commentRes['msgCode'])}":'Error in saving'
 				result["status"] = 'Error'
 			}else{
-				result = getResultForResponse(params);
+				result = getResultForResponse(params, request);
 				result["clearForm"] = true;
 			}
 		} else if(params.ajax_login_error == "1") {
@@ -36,8 +35,7 @@ class CommentController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def removeComment = {
-		log.debug params;
+	def removeComment() {
 		if(commentService.removeComment(params)){
 			render (['success:true']as JSON);
 		}else{
@@ -48,49 +46,52 @@ class CommentController {
 	}
 	
 	def getAllNewerComments = {
-		log.debug params;
-		render getResultForResponse(params) as JSON;
+		render getResultForResponse(params, request) as JSON;
 	}
 
 	def getComments = {
-		log.debug params;
 		def comments = commentService.getComments(params);
-		def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
 		def olderTimeRef = (comments) ? (comments.last().lastUpdated.time.toString()) : null
 		def remainingCommentCount = (comments) ? getRemainingCommentCount(comments.last().lastUpdated.time.toString(), params) : 0
-		def result = [showCommentListHtml:showCommentListHtml, olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
+		def result = [olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
+		if(request.getHeader('X-Auth-Token')) {
+			result['commentList'] = comments	
+		}else{
+			result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+		}
 		render result as JSON
 	}
 	
 	def getCommentByType = {
 		commentService.getCommentByType(params)
 	}
-	
 
 	@Secured(['ROLE_USER'])
-	def likeComment = {
-		log.debug params;
+	def likeComment() {
 		params.author = springSecurityService.currentUser;
 		render commentService.likeComment(params)
 	}
 	
 	@Secured(['ROLE_USER'])
-	def editComment = {
-		log.debug params;
+	def editComment() {
 		render "To do edit"
 	}
 	
-	private getResultForResponse(params){
+	private getResultForResponse(params, request){
 		def result = ["success":true];
-		def comments = getAllNewerComments(params);
+		def comments = _getAllNewerComments(params);
 		if(!comments.isEmpty()){
-			def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
-			result.putAll([showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
+			result.putAll([newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
+			if(request.getHeader('X-Auth-Token')) {
+				result['commentList'] = comments
+			}else{
+				result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+			}
 		}	
 		return result
 	}
 	
-	private getAllNewerComments(params){
+	private _getAllNewerComments(params){
 		params.max = 100
 		params.timeLine = "newer"
 		params.refTime = params.newerTimeRef ?: new Date().previous().time.toString()

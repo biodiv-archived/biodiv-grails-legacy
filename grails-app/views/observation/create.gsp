@@ -114,6 +114,7 @@
 
                 <span class="msg" style="float: right"></span>
                 <input class="videoUrl" type="hidden" name='videoUrl' value="" />
+                <input class="audioUrl" type="hidden" name='audioUrl' value="" />
                 <input type="hidden" name='obvDir' value="${obvDir}" />
                 <input type="hidden" name='resType' value='${observationInstance.class.name}'>
             </form>

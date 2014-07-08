@@ -101,7 +101,12 @@ class Checklists extends Observation {
 	}
 
 	def fetchColumnNames(){
-		return JSON.parse(columns)
+		def itr =  JSON.parse(columns).iterator()
+		def res = []
+		while(itr.hasNext()){
+			res << itr.next()
+		}
+		return res
 	}
 	
 	def fetchAttributions(){

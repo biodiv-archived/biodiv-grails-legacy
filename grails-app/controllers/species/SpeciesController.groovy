@@ -12,13 +12,12 @@ import species.sourcehandler.SpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
 import grails.converters.JSON;
 import grails.converters.XML;
-import grails.web.JSONBuilder;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import java.text.DateFormat;
@@ -29,14 +28,13 @@ import org.hibernate.FetchMode;
 import species.SpeciesPermission.PermissionType;
 
 import species.utils.Utils;
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 import species.participation.UserToken;
 
 class SpeciesController extends AbstractObjectController {
 
 	def dataSource
-	def grailsApplication
 	def speciesSearchService;
 	def namesIndexerService;
     def speciesUploadService;
@@ -54,11 +52,11 @@ class SpeciesController extends AbstractObjectController {
     
     String contentRootDir = config.speciesPortal.content.rootDir
 
-	def index = {
+	def index() {
 		redirect(action: "list", params: params)
 	}
 
-	def list = {
+	def list() {
 		def model = speciesService.getSpeciesList(params, 'list');
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
@@ -84,7 +82,7 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	def listXML = {
+	def listXML() {
 		//cache "taxonomy_results"
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		def speciesList = Species.list(params) as XML;
@@ -98,14 +96,14 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		def speciesInstance = new Species()
 		speciesInstance.properties = params
 		return [speciesInstance: speciesInstance]
 	}
 
     @Secured(['ROLE_USER'])
-    def save = {
+    def save() {
         List errors = [];
         Map result = [errors:errors];
         if(params.page && params.rank) {
@@ -178,7 +176,7 @@ class SpeciesController extends AbstractObjectController {
         render(view: "create", model:result)
     }
 
-	def show = {
+	def show() {
 		//cache "content"
 		def speciesInstance = Species.get(params.long('id'))
 		if (!speciesInstance) {
@@ -404,7 +402,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
 		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
 			if (!speciesInstance) {
@@ -422,7 +420,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-    def update = {
+    def update() {
         if(!(params.name && params.pk)) {
             render ([success:false, msg:'Either field name or field id is missing'] as JSON)
             return;
@@ -561,7 +559,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def addResource = {
+	def addResource() {
 		if(!params.id) {
 			render ([success:false, errors:[msg:'Species id is missing']] as JSON)
 			return;
@@ -612,10 +610,10 @@ class SpeciesController extends AbstractObjectController {
 			render ([success:false, errors:[msg:'Error adding resource: $e.message']] as JSON)
 		}
 
-	}
+	} 
 
 	@Secured(['ROLE_ADMIN'])
-	def delete = {
+	def delete() {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
@@ -634,22 +632,21 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	def count = {
+	def count() {
 		//cache "search_results"
 		render Species.count();
 	}
 
-	def countSpeciesWithRichness = {
+	def countSpeciesWithRichness() {
 		//cache "search_results"
 		render Species.countByPercentOfInfoGreaterThan(0);
 	}
 
-	def taxonBrowser = {
-		render (view:"taxonBrowser");
+	def taxonBrowser() {
 	}
 
-	def contribute = {
-		render (view:"contribute");
+	def contribute() {
+		//render (view:"contribute");
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -659,7 +656,7 @@ class SpeciesController extends AbstractObjectController {
 	/**
 	 *
 	 */
-	def search = {
+	def search() {
 		def model = speciesService.getSpeciesList(params, 'search')
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		model['isSearch'] = true;
@@ -693,7 +690,7 @@ class SpeciesController extends AbstractObjectController {
 	/**
 	 *
 	 */
-	def terms = {
+	def terms() {
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
 		List result = speciesService.nameTerms(params)
 		render result.value as JSON;
@@ -726,7 +723,7 @@ class SpeciesController extends AbstractObjectController {
 	//	}
 
 	@Secured(['ROLE_ADMIN'])
-	def requestExport = {
+	def requestExport() {
 		log.debug "Export of species requested" + params
 		speciesService.requestExport(params)
 		def r = [:]
@@ -738,7 +735,7 @@ class SpeciesController extends AbstractObjectController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def upload = {
+	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
 			def res = speciesUploadService.basicUploadValidation(params)
@@ -748,27 +745,27 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 	
-	def getDataColumns = {
+	def getDataColumns() {
         List res = speciesUploadService.getDataColumns();
         render res as JSON
     }
     
     @Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
-	def rollBackUpload = {
+	def rollBackUpload() {
 		log.debug params
 		def m = [success:true, msg:speciesUploadService.rollBackUpload(params)]
 		render m as JSON
 	}
 
 	@Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
-	def abortBulkUpload = {
+	def abortBulkUpload() {
 		log.debug params
 		def m = [success:true, msg:speciesUploadService.abortBulkUpload(params)]
 		render m as JSON
 	}
 	
-	@Secured(['ROLE_USER'])
-    def requestPermission = {
+    @Secured(['ROLE_USER'])
+    def requestPermission() {
         def selectedNodes = params.selectedNodes
         if(selectedNodes) {
             List members = [springSecurityService.currentUser];
@@ -781,7 +778,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
     @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-    def confirmPermissionRequest = {
+    def confirmPermissionRequest () {
         if(params.userId && params.taxonConcept){
             SUser user = SUser.get(params.userId.toLong())
             TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
@@ -819,7 +816,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
 	@Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
-    def invite = {
+    def invite () {
         log.debug " inviting curators " + params
         List members = Utils.getUsersList(params.userIds);
         def selectedNodes = params.selectedNodes
@@ -833,7 +830,7 @@ class SpeciesController extends AbstractObjectController {
     } 
 
     @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-    def confirmPermissionInviteRequest = {
+    def confirmPermissionInviteRequest() {
         if(params.userId && params.taxonConcept){
             SUser user = SUser.get(params.userId.toLong())
             TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
@@ -865,7 +862,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
     @Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
-    def searchPermission = {
+    def searchPermission() {
         if(params.rank && params.page) {
             int rank = params.rank?params.int('rank'):null;
             try {
@@ -892,7 +889,7 @@ class SpeciesController extends AbstractObjectController {
         return;
     }
 
-    def uploadImage = {
+    def uploadImage() {
         log.debug params
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
@@ -907,7 +904,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
-    def getRelatedObvForSpecies = {
+    def getRelatedObvForSpecies() {
         log.debug params
         def spInstance = Species.get(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
@@ -919,7 +916,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
-    def pullObvImage = {
+    def pullObvImage() {
         log.debug params  
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
@@ -934,7 +931,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
-    def pullSpeciesFieldImage = {
+    def pullSpeciesFieldImage() {
         log.debug params
         def species = Species.get(params.speciesId.toLong())
         def out = speciesService.updateSpecies(params, species)
@@ -949,7 +946,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
     @Secured(['ROLE_USER'])
-    def validate = {
+    def validate() {
 /*        List hierarchy = [];
         if(params.taxonRegistry) {
             hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);

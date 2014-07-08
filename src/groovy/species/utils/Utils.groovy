@@ -18,7 +18,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.EmailValidator;
-import org.codehaus.groovy.grails.plugins.springsecurity.ReflectionUtils;
+import grails.plugin.springsecurity.ReflectionUtils;
 import org.codehaus.groovy.grails.validation.routines.UrlValidator
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
@@ -43,8 +43,6 @@ class Utils {
 	private static final MIN_FLOAT = 0.2;
 	private static final MAX_FLOAT = 0.7;
 	
-	def grailsApplication;
-
 	static boolean copy(File src, File dst) throws IOException {
 		try {
 			InputStream inS = new FileInputStream(src);

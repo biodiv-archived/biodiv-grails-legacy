@@ -61,7 +61,6 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
-        //println attrs.model;
 			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	
@@ -233,8 +232,8 @@ class ObservationTagLib {
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource
-        boolean hideForm = attrs.model.hideForm
-        int index = attrs.model.index
+        boolean hideForm = attrs.model.hideForm?:false
+        int index = attrs.model.index?:0
         String divClass = attrs.model.class?:'rating'
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);

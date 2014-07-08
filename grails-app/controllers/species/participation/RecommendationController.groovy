@@ -1,6 +1,6 @@
 package species.participation
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import grails.converters.JSON
 import java.util.List;
 
@@ -14,28 +14,28 @@ class RecommendationController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+    def grailsApplication
 	def namesIndexerService;
 	def recommendationService;
-	def searchFieldsConfig = grailsApplication.config.speciesPortal.nameSearchFields
 
     def index = {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [recommendationInstanceList: Recommendation.list(params), recommendationInstanceTotal: Recommendation.count()]
     }
 
 	@Secured(['ROLE_USER'])
-    def create = {
+    def create() {
         def recommendationInstance = new Recommendation()
         recommendationInstance.properties = params
         return [recommendationInstance: recommendationInstance]
     }
 
 	@Secured(['ROLE_USER'])
-    def save = {
+    def save() {
         def recommendationInstance = new Recommendation(params)
         if (recomendationService.save(recommendationInstance)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'recommendation.label', default: 'Recommendation'), recommendationInstance.id])}"
@@ -46,7 +46,7 @@ class RecommendationController {
         }
     }
 
-    def show = {
+    def show() {
         def recommendationInstance = Recommendation.get(params.id)
         if (!recommendationInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'recommendation.label', default: 'Recommendation'), params.id])}"
@@ -58,7 +58,7 @@ class RecommendationController {
     }
 
 	@Secured(['ROLE_USER'])
-    def edit = {
+    def edit() {
         def recommendationInstance = Recommendation.get(params.id)
         if (!recommendationInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'recommendation.label', default: 'Recommendation'), params.id])}"
@@ -70,7 +70,7 @@ class RecommendationController {
     }
 
 	@Secured(['ROLE_USER'])
-    def update = {
+    def update() {
         def recommendationInstance = Recommendation.get(params.id)
         if (recommendationInstance) {
             if (params.version) {
@@ -100,7 +100,7 @@ class RecommendationController {
     }
 
 	@Secured(['ROLE_ADMIN'])
-    def delete = {
+    def delete() {
         def recommendationInstance = Recommendation.get(params.id)
         if (recommendationInstance) {
             try {

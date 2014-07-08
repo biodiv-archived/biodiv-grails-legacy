@@ -86,20 +86,20 @@ thead th {
 <g:javascript>
 $(document).ready(function(){
 	
-	$(".joinUs").unbind('click').live('click', function() {
+	$(".joinUs").unbind('click').on('click', function() {
 		console.log('livejoin ');
 		var joinUsUrl =  "${uGroup.createLink(controller:'userGroup', action:'joinUs') }";
 		joinUsUrl = joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";
 		joinAction($(this), joinUsUrl);
 	});
 	
-	$(".requestMembership").unbind('click').live('click', function() {
+	$(".requestMembership").unbind('click').on('click', function() {
 		var requestMembershipUrl = "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }";
 		requestMembershipUrl = requestMembershipUrl+"/?id="+$(this).attr('data-group-id')//+"/requestMembership";
 		requestMembershipAction($(this), requestMembershipUrl);
 	});
 	
-	$(".leaveUs").unbind('click').live('click', function() {
+	$(".leaveUs").unbind('click').on('click', function() {
 		var leaveUrl = "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }";
 		leaveUrl = leaveUrl //+"/"+$(this).attr('data-group-id')+"/leaveUs";
 		$("#leave").attr('data-group-id', $(this).attr('data-group-id'))

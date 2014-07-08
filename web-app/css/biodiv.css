@@ -452,25 +452,32 @@ div.errors {
 }
 
 .add_image {
-	background-image: url('../images/add-photo.png');
+	background-image: url('../images/add_photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height:90px;
+	height: 65px;
 	cursor: pointer;
 	border-bottom: 3px red;
 }
 .add_video {
-	background-image: url('../images/add-video.png');
+	background-image: url('../images/add_video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height:90px;
+	height: 57px;
 	cursor: pointer;
 }
-
+.add_audio {
+	background-image: url('../images/add_audio.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-audio.png'),sizingMethod='crop');
+	background-repeat: no-repeat;
+	width: 200px;
+	height: 65px;
+	cursor: pointer;
+}
 
 .add_file .progress {
 	border-radius: 3px 3px 3px 3px;
@@ -485,6 +492,7 @@ div.errors {
 }
 
 .add_file_container {
+	padding: 5px 8px;
 	position:relative;
 	z-index:100;
 }
@@ -588,21 +596,13 @@ textarea#featureNotes {
 }
 
 .featured {
-    background: url(../images/featured_star.png) no-repeat right top;
+    background: url('../images/featured_star.png') no-repeat right top;
     width: 35px; 
     height: 50px;
     left:0px;
     top:0px;
  }
-/*
-.obvLocked {
-    background: url(../images/lock-icon.png) no-repeat right top;
-    width: 35px; 
-    height: 50px;
-    left:0px;
-    top:0px;
-}
-*/
+
 .badge {
     padding:0px;
     z-index: 1000;
@@ -690,7 +690,7 @@ ul#recoSummary {
 }
 
 .close_button {
-	background: url(../images/close.png) no-repeat center left;
+	background: url('../images/close.png') no-repeat center left;
 	width: 24px;
 	height: 24px;
 	position: absolute;
@@ -1015,7 +1015,7 @@ i {
 }
 
 .toolbar a.close {
-	background: url(../images/close.png) no-repeat;
+	background: url('../images/close.png') no-repeat;
 	cursor: pointer;
 	float: right;
 }
@@ -1025,7 +1025,7 @@ i {
 }
 
 .taxaHierarchy {
-	background: url(../images/tree.png) 5px 25% no-repeat;
+	background: url('../images/tree.png') 5px 25% no-repeat;
 	margin-left: 0;
 	margin-right: 5px;
 	padding-left: 5px;
@@ -1052,7 +1052,7 @@ i {
 
 /* MESSAGES AND ERRORS */
 .message {
-	background: #f3f8fc url(../images/skin/information.png) 8px 50%
+	background: #f3f8fc url('../images/skin/information.png') 8px 50%
 		no-repeat;
 	border: 1px solid #b2d1ff;
 	color: #006dba;
@@ -1074,7 +1074,7 @@ i {
 }
 
 .errors li {
-	background: url(../images/skin/exclamation.png) no-repeat 8px 0%;
+	background: url('../images/skin/exclamation.png') no-repeat 8px 0%;
 	line-height: 16px;
 	padding-left: 30px;
 }
@@ -1173,11 +1173,11 @@ input,button,select,textarea {
 }
 
 .icon-red {
-	background-image: url(../bootstrap/img/glyphicons-halflings-red.png);
+	background-image: url('../bootstrap/img/glyphicons-halflings-red.png');
 }
 
 .icon-gray {
-	background-image: url(../bootstrap/img/glyphicons-halflings-gray.png);
+	background-image: url('../bootstrap/img/glyphicons-halflings-gray.png');
 }
 
 li.reco_block {
@@ -1319,31 +1319,31 @@ span.cke_skin_kama {
 }
 
 .galleria-info-text {
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgb(0, 0, 0) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)"; /* IE8 */
         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000);   /* IE6 & 7 */
-    zoom: 1;
+    zoom: 1 !important;
 }
 
 .galleria-info-description {
-    color:black;
+    color:black !important;
 }
 
 .galleria-info {
-    width: 100%;
-    top: 350px;
-    z-index: 2;
-    position: absolute;
-    background-color: white;
-    overflow:hidden;
+    width: 100% !important;
+    top: 350px ;
+    z-index: 2 !important;
+    position: absolute !important;
+    background-color: white !important;
+    overflow:hidden !important;
 }
 .galleria-info-text {
-    padding:2px;
+    padding:2px !important;
 }
 
 .galleria-counter {
-    bottom : 318px;
+    bottom : 318px !important;
 }
 
 .galleria-thumbnails-container {
@@ -1405,7 +1405,7 @@ span.cke_skin_kama {
 	border-bottom: 3px solid #003846;
 }
 
-#ibp-footer { /* 	background-image: url(../images/footer-big.jpg); */
+#ibp-footer { /* 	background-image: url('../images/footer-big.jpg'); */
 	/* 	background-size: 100%; */
 	background-color: #ffffff;
 	color: #5E5E5E;
@@ -2208,13 +2208,13 @@ line-height: 11px;
 .icon-chevron-up {
     margin-top: -4px;
     margin-left: 463px;
-    background-image: url(../bootstrap/img/glyphicons-halflings.png);
+    background-image: url('../bootstrap/img/glyphicons-halflings.png');
 }
 
 .icon-chevron-down {
     margin-top: -4px;
     margin-left: 463px;
-    background-image: url(../bootstrap/img/glyphicons-halflings.png);
+    background-image: url('../bootstrap/img/glyphicons-halflings.png');
 }
 */
 
@@ -2351,7 +2351,7 @@ div.noOfRatings {
 .pdficon {
 	width: 16px;
 	height: 16px;
-	background: url(../images/pdficon.jpg);
+	background: url('../images/pdficon.jpg');
 	cursor: pointer;
 }
 
@@ -2566,22 +2566,22 @@ small {
 }
 
 #home #species_entry {
-    background-image: url(../images/species.png);
+    background-image: url('../images/species.png');
 }
 #home #explore {
-    background-image: url(../images/explore.png);
+    background-image: url('../images/explore.png');
 }
 #home #documents {
-    background-image: url(../images/documents.png);
+    background-image: url('../images/documents.png');
 }
 #home #observations {
-    background-image: url(../images/observations.png);
+    background-image: url('../images/observations.png');
 }
 #home #groups_entry {
-    background-image: url(../images/groups.png);
+    background-image: url('../images/groups.png');
 }
 #home #dashboard {
-    background-image: url(../images/dashboard.png);
+    background-image: url('../images/dashboard.png');
 }   
 
 #home .entry:hover {

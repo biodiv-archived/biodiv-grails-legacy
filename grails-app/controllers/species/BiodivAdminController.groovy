@@ -5,11 +5,11 @@ import java.lang.Float;
 import species.NamesParser;
 import species.Synonyms;
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 import species.auth.SUser;
 
-import grails.plugins.springsecurity.Secured;
+import grails.plugin.springsecurity.annotation.Secured;
 
 @Secured(['ROLE_ADMIN'])
 class BiodivAdminController {

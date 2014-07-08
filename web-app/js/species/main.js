@@ -143,7 +143,7 @@ jQuery(document).ready(function($) {
 
     // IE caching the request in ajax so setting it false globally for all browser
     $.ajaxSetup({cache:false});
-    $("body").bind("ajaxStart", function(){
+    $(document).bind("ajaxStart", function(){
         $(this).addClass('busy');
     }).bind("ajaxStop", function(){
         $(this).removeClass('busy');
@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
             $("#nameSuggestionsMain ul").removeAttr('style').addClass('dropdown-menu');
             $("#nameSuggestionsMain .dropdown-toggle").dropdown('toggle');				
         }
-    }).data( "catcomplete" )._renderItem = function( ul, item ) {
+    }).data( "customCatcomplete" )._renderItem = function( ul, item ) {
         ul.removeClass().addClass("dropdown-menu")
             if(item.category != "Names") {
                 return $( "<li class='span3'  style='list-style:none;'></li>" )

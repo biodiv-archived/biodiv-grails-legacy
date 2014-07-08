@@ -19,13 +19,13 @@ class SpeciesGroupController {
 		render SpeciesGroup.list().collect{it.name} as JSON
 	}
 	
-	def create = {
+	def create() {
 		def speciesGroupInstance = new SpeciesGroup()
 		speciesGroupInstance.properties = params
 		return [speciesGroupInstance: speciesGroupInstance]
 	}
 
-	def save = {
+	def save() {
 		def speciesGroupInstance = new SpeciesGroup(params)
 		if (speciesGroupInstance.save(flush: true)) {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'speciesGroup.label', default: 'SpeciesGroup'), speciesGroupInstance.id])}"
@@ -36,7 +36,7 @@ class SpeciesGroupController {
 		}
 	}
 
-	def show = {
+	def show() {
 		def speciesGroupInstance = SpeciesGroup.get(params.id)
 		def groupsConfig = grailsApplication.config.speciesPortal.group
 
@@ -56,7 +56,7 @@ class SpeciesGroupController {
 		[speciesGroupInstance: speciesGroupInstance]
 	}
 
-	def edit = {
+	def edit() {
 		def speciesGroupInstance = SpeciesGroup.get(params.id)
 		if (!speciesGroupInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'speciesGroup.label', default: 'SpeciesGroup'), params.id])}"
@@ -67,7 +67,7 @@ class SpeciesGroupController {
 		}
 	}
 
-	def update = {
+	def update() {
 		def speciesGroupInstance = SpeciesGroup.get(params.id)
 		if (speciesGroupInstance) {
 			if (params.version) {
@@ -96,7 +96,7 @@ class SpeciesGroupController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def speciesGroupInstance = SpeciesGroup.get(params.id)
 		if (speciesGroupInstance) {
 			try {

@@ -24,7 +24,7 @@ import species.participation.Follow;
 import species.utils.ImageType;
 import species.utils.Utils;
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 

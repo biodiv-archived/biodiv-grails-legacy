@@ -175,7 +175,7 @@ $(document).ready(function(){
 	    return true;   
     });
 
-    $(".paginateButtons a").live('click', function() {
+    $(".paginateButtons a").on('click', function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
         updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
@@ -183,13 +183,13 @@ $(document).ready(function(){
     });
     
 //    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
-    $(".observation_story li.tagit-choice").live('click', function(){
+    $(".observation_story li.tagit-choice").on('click', function(){
         setActiveTag($(this).contents().first().text());
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
     });
 
-//   $('#tc_tagcloud a').live('click', function(){
+//   $('#tc_tagcloud a').on('click', function(){
 //   		setActiveTag($(this).contents().first().text());
 //		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 //		return false;
@@ -198,7 +198,7 @@ $(document).ready(function(){
     /*$(".resource_in_groups li:has('.featured')").popover({ 
                     trigger:(is_touch_device ? "click" : "hover"),
                 });*/
-    $("#removeTagFilter").live('click', function(){
+    $("#removeTagFilter").on('click', function(){
         var oldActiveTag = $("li.tagit-choice.active");
         if(oldActiveTag){
             oldActiveTag.removeClass('active');
@@ -212,7 +212,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $("#removeUserFilter").live('click', function(){
+    $("#removeUserFilter").on('click', function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
         return false;
     });
@@ -226,19 +226,19 @@ $(document).ready(function(){
         }
     });
 
-    $("#removeObvFilter").live('click', function(){
+    $("#removeObvFilter").on('click', function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);
         return false;
     });
 
-    $("#removeDateRange").live('click', function(){
+    $("#removeDateRange").on('click', function(){
         $("input[name='daterangepicker_start']").val("");
         $("input[name='daterangepicker_end']").val("");
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate);
         return false;
     });
 
-    $(".removeQueryFilter").live('click', function(){
+    $(".removeQueryFilter").on('click', function(){
         var removeParam = undefined;
         if($($(this).attr('data-target').replace('.','\\.')).length != 0)
         $($(this).attr('data-target').replace('.','\\.')).val('')
@@ -250,14 +250,14 @@ $(document).ready(function(){
     return false;
     });
 
-    $('select[name="limit"]').live('change', function() {
+    $('select[name="limit"]').on('change', function() {
         updateGallery(undefined, $(this).val(), window.params.offset, false, window.params.isGalleryUpdate);
     });
 
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-/*    $('.list_view_bttn').live('click', function() {
+/*    $('.list_view_bttn').on('click', function() {
         $('.grid_view').hide();
         $('.list_view').show();
         $(this).addClass('active');
@@ -266,7 +266,7 @@ $(document).ready(function(){
         adjustHeight();
     });
 
-    $('.grid_view_bttn').live('click', function() {
+    $('.grid_view_bttn').on('click', function() {
         $('.grid_view').show();
         $('.list_view').hide();
         $(this).addClass('active');
@@ -276,7 +276,7 @@ $(document).ready(function(){
 */    
    
 
-    $('.loadMore').live('click', function() {
+    $('.loadMore').on('click', function() {
         console.log('loadmore');
         $.autopager({
 

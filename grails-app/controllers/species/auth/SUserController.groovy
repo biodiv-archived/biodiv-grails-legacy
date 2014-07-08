@@ -2,11 +2,11 @@ package species.auth
 
 import groovy.sql.Sql;
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured;
-import grails.plugins.springsecurity.ui.AbstractS2UiController;
-import grails.plugins.springsecurity.ui.RegisterController;
-import grails.plugins.springsecurity.ui.SpringSecurityUiService
-import grails.plugins.springsecurity.ui.UserController;
+import grails.plugin.springsecurity.annotation.Secured;
+import grails.plugin.springsecurity.ui.AbstractS2UiController;
+import grails.plugin.springsecurity.ui.RegisterController;
+import grails.plugin.springsecurity.ui.SpringSecurityUiService
+import grails.plugin.springsecurity.ui.UserController;
 import grails.util.GrailsNameUtils
 
 import java.util.List
@@ -14,8 +14,8 @@ import java.util.Map
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.solr.common.util.NamedList;
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -41,9 +41,10 @@ class SUserController extends UserController {
     def dataSource;
     def chartService;
     def SUserSearchService;
+    def messageSource;
     def speciesPermissionService;
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST", resetPassword: "POST"]
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
 
@@ -51,7 +52,7 @@ class SUserController extends UserController {
 		redirect(action: "list", params: params)
 	}
 
-	def list = {
+	def list() {
 		params.max = Math.min(params.max ? params.int('max') : 24, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
@@ -96,13 +97,13 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def create = {
+	def create() {
 		def user = lookupUserClass().newInstance(params)
 		[user: user, authorityList: sortedRoles()]
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def save = {
+	def save() {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
@@ -120,34 +121,61 @@ class SUserController extends UserController {
 		redirect action: edit, id: user.id
 	}
 
-	def show = {
+	def show() {
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
 		}
 
 		def SUserInstance = SUser.get(params.long("id"))
-		if (!SUserInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			def result = buildUserModel(SUserInstance)
-			result.put('userGroupWebaddress', params.webaddress)
-            result.put('obvData', chartService.getUserStats(SUserInstance));
-//            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
-//            result.put('totalObservationInstanceList', totalObservationInstanceList); 
-            result['currentUser'] = springSecurityService.currentUser;
-            result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
-			return result
-		}
+        
+        if(request.getHeader('X-Auth-Token')) {
+            if(!params.id) {
+                render (['success':false, 'msg':"Id is required"] as JSON)
+                return
+            } else {
+                if (!SUserInstance) {
+                    render (['success':false, 'msg':"Coudn't find user with id ${params.id}"] as JSON)
+                    return
+                } else {
+                    def result = [:];
+                    result['success'] = true;
+                    result['user'] = SUserInstance
+                    result['roles'] = [];
+                    def r = buildUserModel(SUserInstance)
+                    r.roleMap.each {role, granted ->
+                        if(granted) {
+                            result.roles << role.authority
+                        }                    
+                    }
+                    result['stat'] = chartService.getUserStats(SUserInstance);
+                    render result as JSON
+                    return;
+                }
+            } 
+        } else {
+            if (!SUserInstance) {
+                flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
+                redirect(action: "list")
+            }
+            else {
+                def result = buildUserModel(SUserInstance)
+                result.put('userGroupWebaddress', params.webaddress)
+                result.put('obvData', chartService.getUserStats(SUserInstance));
+    //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
+    //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
+                result['currentUser'] = springSecurityService.currentUser;
+                result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                return result
+            }
+        }
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
-	def edit = {
+	def edit() {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById()
 			if (!user) return
@@ -162,13 +190,11 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
-	def update = {
+	def update() {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
-
-
-		if(SUserService.ifOwns(params.long('id'))) {
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = findById()
 
 			if (!user) return
@@ -229,7 +255,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_ADMIN'])
-	def delete = {
+	def delete() {
 		def user = findById()
 		if (!user) return
 
@@ -671,9 +697,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def upload_resource = {
-		log.debug params;
-
+	def upload_resource() {
 		try {
 			if(ServletFileUpload.isMultipartContent(request)) {
 				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -689,7 +713,7 @@ class SUserController extends UserController {
 				}
 
 				params.resources.each { f ->
-					log.debug "Saving userGroup logo file ${f.originalFilename}"
+					log.debug "Saving user file ${f.originalFilename}"
 
 					// List of OK mime-types
 					//TODO Move to config
@@ -742,7 +766,7 @@ class SUserController extends UserController {
 				// render some XML markup to the response
 				if(usersDir && resourcesInfo) {
 					render(contentType:"text/xml") {
-						userGroup {
+						users {
 							dir(usersDir.absolutePath.replace(rootDir, ""))
 							resources {
 								for(r in resourcesInfo) {
@@ -753,62 +777,73 @@ class SUserController extends UserController {
 					}
 				} else {
 					response.setStatus(500)
-					message = [error:message]
+					message = [success:false, error:message]
 					render message as JSON
 				}
 			} else {
 				response.setStatus(500)
-				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				def message = [success:false, error:g.message(code: 'no.file.attached', default:'No file is attached')]
 				render message as JSON
 			}
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			def message = [success:false, error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
 
 	@Secured(['ROLE_USER'])
-	def resetPassword = {  ResetPasswordCommand command ->
-		log.debug params;
+	def resetPassword (ResetPasswordCommand command ) {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		if(SUserService.ifOwns(params.long('id'))) {
-
-			if (!request.post) {
-				return [command: new ResetPasswordCommand()]
-			}
+        String msg;
+        boolean success = false;
+		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
 			def user = springSecurityService.currentUser
-//			command.username = user.username?:email
-//			println command.username;
-//			String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def command2 = new ResetPasswordCommand(username:user.username?:email, currentPassword:command.currentPassword, password:command.password, password2:command.password2, springSecurityService:springSecurityService
 ,saltSource:saltSource);
 			command2.validate()
-//
 			if (command2.hasErrors()) {
-				return [command: command2]
+                if(request.getHeader('X-Auth-Token')) {
+                    def errors = [];
+                    command2.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                    }
+                    render (['success' : false, 'msg':'Failed to reset password', 'errors':errors] as JSON); 
+                    return
+                } else {
+    				return [command: command2]
+                }
 			}
 			
-			println 'no errors'
-
 			String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
 			SUser.withTransaction { status ->
 				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
 				user.password = command2.password
 				if(!user.save()) {
-					log.error "Error saving password"
-				}
+					msg = "Error saving password"
+				} else {
+                    success = true;
+					msg = "Successfully updated password"
+                }
 			}
 
-			//springSecurityService.reauthenticate command.username
-
-			flash.message = message(code: 'spring.security.ui.resetPassword.success')
-			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
-
+            if(request.getHeader('X-Auth-Token')) {
+                render (['success' : success, 'msg':msg] as JSON); 
+                return
+            } else {
+			    flash.message = message(code: 'spring.security.ui.resetPassword.success')
+			    redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+            }
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}";
-			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+            if(request.getHeader('X-Auth-Token')) {
+                render (['success' : false, 'msg':flash.message] as JSON); 
+                return
+            } else {
+			    redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+            }
 		}
 	}
 
@@ -892,7 +927,7 @@ class SUserController extends UserController {
 	}
 
 	@Secured(['ROLE_USER'])
-    def myprofile = {
+    def myprofile() {
 		def user = springSecurityService.currentUser
 		redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
     }
@@ -915,11 +950,10 @@ class ResetPasswordCommand {
 			def currentUser = command.springSecurityService.currentUser;
 			String salt = command.saltSource instanceof NullSaltSource ? null : params.username
 			if (!currentUser.password.equals(command.springSecurityService.encodePassword(value, salt))) { 
-				println "doesn't match"
 				return 'spring.security.ui.resetPassword.currentPassword.doesnt.match' 
 			}
 		} 
-		password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
+		password blank: false, nullable: false, validator: grails.plugin.springsecurity.ui.RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }

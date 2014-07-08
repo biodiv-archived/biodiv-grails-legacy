@@ -3,6 +3,7 @@ package species
 class GeographicEntity extends SpeciesField {
 
 	Country country;
-	static constraints = {
+	static mappping = {
+        discriminator value:"species.GeographicEntity"
 	}
 }

@@ -1323,7 +1323,8 @@ function AugmentedMap(map_div, options) {
              units: "m", // set the resolution units
              mapExtent: getMapExtent(),
              maxExtent: getMaxExtent(),
-             restrictedExtent: getRestrictedExtent() // restrict the extent of the map to India
+             restrictedExtent: getRestrictedExtent(), // restrict the extent of the map to India
+            theme:false
             }
         );
 

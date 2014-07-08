@@ -1,17 +1,19 @@
 package species.participation
 
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import species.participation.Follow
 import species.auth.SUser
 
 
 class ActivityFeedController {
-
+	
+	static defaultAction = "list"
+	
 	def activityFeedService;
 	def springSecurityService;
 	
-	def getFeeds = {
+	def getFeeds(){
 		//log.debug params;
 		params.author = springSecurityService.currentUser;
 		
@@ -37,16 +39,16 @@ class ActivityFeedController {
 		}
 	}
 	
-	def getServerTime = {
+	def getServerTime () {
 		log.debug params
 		render ("" + new Date().getTime()) as JSON
 	}
 	
-	def index = {
-		redirect(action:list, params:params)
+	def index() {
+		redirect(params:params)
 	}
 	
-	def list = {
+	def list() {
 		log.debug params
 		['feedType':params.feedType, 'feedCategory':params.feedCategory]
 	}
@@ -55,7 +57,7 @@ class ActivityFeedController {
 	////////////////////////////////////// Follow Related////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Secured(['ROLE_USER'])
-	def follow = {
+	def follow() {
 		log.debug params
 		def author = springSecurityService.currentUser;
 		def domainObj = activityFeedService.getDomainObject(params.className, params.id);
@@ -79,7 +81,7 @@ class ActivityFeedController {
 	///////////////////////////////////////// COMMENT THIS /////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Secured(['ROLE_ADMIN'])
-	def migrateFeedForPost = {
+	def migrateFeedForPost() {
 		def wgpGroup = species.groups.UserGroup.read(1)
 		def author = SUser.read(1426)
 		def resList = wgpGroup.species.collect{it}

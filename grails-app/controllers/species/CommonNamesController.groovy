@@ -1,5 +1,7 @@
 package species
 
+import grails.plugin.springsecurity.annotation.Secured
+
 class CommonNamesController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -8,18 +10,20 @@ class CommonNamesController {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [commonNamesInstanceList: CommonNames.list(params), commonNamesInstanceTotal: CommonNames.count()]
     }
 
-    def create = {
+	@Secured(['ROLE_ADMIN'])
+    def create() {
         def commonNamesInstance = new CommonNames()
         commonNamesInstance.properties = params
         return [commonNamesInstance: commonNamesInstance]
     }
 
-    def save = {
+	@Secured(['ROLE_ADMIN'])
+    def save() {
         def commonNamesInstance = new CommonNames(params)
         if (commonNamesInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'commonNames.label', default: 'CommonNames'), commonNamesInstance.id])}"
@@ -30,7 +34,7 @@ class CommonNamesController {
         }
     }
 
-    def show = {
+    def show() {
         def commonNamesInstance = CommonNames.get(params.id)
         if (!commonNamesInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'commonNames.label', default: 'CommonNames'), params.id])}"
@@ -41,7 +45,8 @@ class CommonNamesController {
         }
     }
 
-    def edit = {
+	@Secured(['ROLE_ADMIN'])
+    def edit() {
         def commonNamesInstance = CommonNames.get(params.id)
         if (!commonNamesInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'commonNames.label', default: 'CommonNames'), params.id])}"
@@ -52,7 +57,8 @@ class CommonNamesController {
         }
     }
 
-    def update = {
+	@Secured(['ROLE_ADMIN'])
+    def update() {
         def commonNamesInstance = CommonNames.get(params.id)
         if (commonNamesInstance) {
             if (params.version) {
@@ -79,7 +85,8 @@ class CommonNamesController {
         }
     }
 
-    def delete = {
+	@Secured(['ROLE_ADMIN'])
+    def delete() {
         def commonNamesInstance = CommonNames.get(params.id)
         if (commonNamesInstance) {
             try {

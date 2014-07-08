@@ -1,10 +1,10 @@
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationFailureHandler;
-import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccessHandler;
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdUserDetailsService;
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler;
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler;
+import grails.plugin.springsecurity.userdetails.DefaultPostAuthenticationChecks;
+import grails.plugin.springsecurity.userdetails.DefaultPreAuthenticationChecks;
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;
@@ -12,6 +12,7 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;
 
+import javax.servlet.http.HttpServletResponse
 import species.auth.ConsumerManager;
 import species.auth.FacebookAuthCookieFilter;
 import species.auth.FacebookAuthCookieLogoutHandler;
@@ -21,17 +22,21 @@ import species.auth.OpenIDAuthenticationFilter;
 import species.auth.OpenIDAuthenticationProvider;
 import species.auth.OpenIdAuthenticationFailureHandler;
 
-import species.auth.drupal.DrupalAuthCookieFilter;
-import species.auth.drupal.DrupalAuthUtils;
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
-import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoint
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache
+import species.auth.DefaultOauthUserDetailsService;
+import species.auth.MyOauthService;
+import species.utils.marshallers.*;
+import species.auth.RestAuthenticationFailureHandler;
 
 // Place your Spring DSL code here
 beans = {
@@ -46,6 +51,31 @@ beans = {
         useReferer = true // false
         redirectStrategy = ref('redirectStrategy')
     }
+
+    // default 'authenticationEntryPoint'
+    //overriding entry point defined in rest plugin to redirect to login page on accessdenied exception. Workd only when anonymous auth is present in the session
+    authenticationEntryPoint(AjaxAwareAuthenticationEntryPoint, conf.auth.loginFormUrl) { // '/login/auth'
+        ajaxLoginFormUrl = conf.auth.ajaxLoginFormUrl // '/login/authAjax'
+        forceHttps = conf.auth.forceHttps // false
+        useForward = conf.auth.useForward // false
+        portMapper = ref('portMapper')
+        portResolver = ref('portResolver')
+    }
+
+    /** securityContextRepository */
+    securityContextRepository(HttpSessionSecurityContextRepository) {
+        allowSessionCreation = conf.scr.allowSessionCreation // true
+        disableUrlRewriting = conf.scr.disableUrlRewriting // true
+        springSecurityContextKey = conf.scr.springSecurityContextKey // SPRING_SECURITY_CONTEXT
+    }
+
+          
+    requestCache(HttpSessionRequestCache) {
+        portResolver = ref('portResolver')
+        createSessionAllowed = conf.requestCache.createSession // true
+        requestMatcher = ref('requestMatcher')
+    }
+
 
     userDetailsService(OpenIdUserDetailsService) { grailsApplication = ref('grailsApplication') }
 
@@ -193,7 +223,7 @@ beans = {
     dbConf.facebook.bean.dao = 'facebookAuthDao'
     facebookAuthDao(DefaultFacebookAuthDao) {
         domainClassName = dbConf.facebook.domain.classname
-        connectionPropertyName = dbConf.facebook.domain.connectionPropertyName
+        appUserConnectionPropertyName = dbConf.facebook.domain.appUserConnectionPropertyName
         userDomainClassName = dbConf.userLookup.userDomainClassName
         rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
     }
@@ -212,7 +242,7 @@ beans = {
         exceptionMappings = conf.failureHandler.exceptionMappings // [:]
     }
 
-    facebookAuthCookieFilter(FacebookAuthCookieFilter) {
+    facebookAuthCookieTransparentFilter(FacebookAuthCookieFilter) {
         grailsApplication = ref('grailsApplication')
         authenticationManager = ref('authenticationManager')
         facebookAuthUtils = ref('facebookAuthUtils')
@@ -295,4 +325,45 @@ beans = {
         arguments = ["classpath:log4j.properties"]
     }
     }*/
+
+    /* oauthUserDetailsService */
+    oauthUserDetailsService(DefaultOauthUserDetailsService) {
+        userDetailsService = ref('userDetailsService')
+    }
+    
+    oauthService(MyOauthService) {
+        tokenGenerator = ref('tokenGenerator')
+        tokenStorageService = ref('tokenStorageService')
+        userDetailsService = ref('userDetailsService')
+        grailsApplication = ref('grailsApplication')
+        grailsLinkGenerator = ref('grailsLinkGenerator')
+        oauthUserDetailsService = ref('oauthUserDetailsService')
+    }
+
+    customObjectMarshallers( CustomObjectMarshallers ) {
+        grailsApplication = ref('grailsApplication') 
+        userGroupService = ref('userGroupService') 
+
+        marshallers = [
+            new ObservationMarshaller()
+        ]
+    }
+
+
+    restAuthenticationFailureHandler(species.auth.RestAuthenticationFailureHandler) {
+        statusCode = conf.rest.login.failureStatusCode?:HttpServletResponse.SC_FORBIDDEN
+    }
+
+    /* restAuthenticationFilter */
+    restAuthenticationFilter(species.auth.RestAuthenticationFilter) {
+        authenticationManager = ref('authenticationManager')
+        authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
+        authenticationFailureHandler = ref('restAuthenticationFailureHandler')
+        authenticationDetailsSource = ref('authenticationDetailsSource')
+        credentialsExtractor = ref('credentialsExtractor')
+        endpointUrl = conf.rest.login.endpointUrl
+        tokenGenerator = ref('tokenGenerator')
+        tokenStorageService = ref('tokenStorageService')
+    }
+
 }

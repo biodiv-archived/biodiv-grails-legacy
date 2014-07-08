@@ -9,7 +9,7 @@ modules = {
             defaultBundle 'core' 
         }
 
-		'jquery-ui' {
+		/*'jquery-ui' {
 			defaultBundle 'core'
 			resource id:'js', url:[dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js'],
 					nominify: true, disposition: 'defer'
@@ -21,7 +21,8 @@ modules = {
 					url:[dir: 'css',
 						file:'jquery-ui.css'],
 					attrs:[media:'screen, projection']
-		}
+		
+        }*/
 
 	}
 
@@ -66,7 +67,7 @@ modules = {
 		//resource url:'/js/species/ajaxLogin.js'
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
 		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']
-		resource url:'/js/jquery/trunk8.js'
+		resource url:'/js/jquery/trunk8.min.js'
 		resource url:'/js/species/membership.js'
 		resource url:'/js/date.js'
 		resource url:'/js/daterangepicker.js'
@@ -86,7 +87,7 @@ modules = {
 
 	gallery {
 //		resource url:[dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css']
-		resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
+//		resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
 	}
 
 	carousel {
@@ -369,6 +370,5 @@ modules = {
 		resource url:'/js/species/maps/map-search.js'
 		resource url:'/js/species/maps/mapapp.js'
 		resource url:'/js/species/maps/cookie-chef.js'
-
     }
 }

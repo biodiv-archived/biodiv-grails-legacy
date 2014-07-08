@@ -21,7 +21,8 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import grails.converters.JSON
 import static org.codehaus.groovy.grails.commons.ConfigurationHolder.config as Config
 import org.springframework.http.HttpStatus
 import uk.co.desirableobjects.ajaxuploader.exception.FileUploadException
@@ -31,10 +32,9 @@ import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
- 
 import speciespage.ObservationService
 import species.utils.Utils
 import content.eml.Document
@@ -85,7 +85,7 @@ class UFileController {
 	 */
 
 	@Secured(['ROLE_USER'])
-	def fileUpload = {
+	def fileUpload() {
 		log.debug params
 		try {
 
@@ -149,7 +149,7 @@ class UFileController {
 	 * Document is created after uploading of file. THe document id is passed to form and for further tracking.
 	 */
 	@Secured(['ROLE_USER'])
-	def upload = {
+	def upload() {
 		log.debug params
 		try {
 

@@ -85,6 +85,7 @@ return value === autofillUsers || value === undefined ? this
                                     event.preventDefault();
                                 }
                     }).autocomplete({
+                        //appendTo:_options.appendTo,
                         source : function(request, response) {
                             $.getJSON(_options.usersUrl, {
                                 term : request.term

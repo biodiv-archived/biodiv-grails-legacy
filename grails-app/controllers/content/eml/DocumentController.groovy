@@ -1,6 +1,6 @@
 package content.eml
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 import grails.converters.JSON
 import org.grails.taggable.*
@@ -25,14 +25,14 @@ class DocumentController extends AbstractObjectController {
 
 
 	@Secured(['ROLE_USER'])
-	def create = {
+	def create() {
 		def documentInstance = new Document()
 		documentInstance.properties = params
 		return [documentInstance: documentInstance]
 	}
 
 	@Secured(['ROLE_USER'])
-	def save = {
+	def save() {
 
 		log.debug "params in document save "+ params
 
@@ -69,7 +69,7 @@ class DocumentController extends AbstractObjectController {
 		}
 	}
 
-	def show = {
+	def show() {
 		def documentInstance = Document.get(params.id)
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
@@ -81,7 +81,7 @@ class DocumentController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def edit = {
+	def edit() {
 		def documentInstance = Document.get(params.id)
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
@@ -95,7 +95,7 @@ class DocumentController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])	
-	def update = {
+	def update() {
 		log.debug "Params in Document update >> "+ params
 		def documentInstance = Document.get(params.id)
 		if (documentInstance) {
@@ -141,7 +141,7 @@ class DocumentController extends AbstractObjectController {
 	}
 
 	@Secured(['ROLE_USER'])	
-	def delete = {
+	def delete() {
 		def documentInstance = Document.get(params.id)
 		if (documentInstance) {
 			try {

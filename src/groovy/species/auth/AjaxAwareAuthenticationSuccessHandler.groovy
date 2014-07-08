@@ -1,4 +1,4 @@
-package species.auth
+package species.auth;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import species.utils.Utils;
 
 class AjaxAwareAuthenticationSuccessHandler
 extends
-org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccessHandler {
+grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler {
 
 	/**
 	 * {@inheritDoc}
@@ -37,7 +37,9 @@ org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccess
 		cookie.domain = "."+Utils.getDomain(request);
 		response.addCookie(cookie)
 
-		
+println ")))))))))))))))))))))))))))))))))"
+println 		request.getSession().getAttribute("SAVED_REQUEST");
+println ")))))))))))))))))))))))))))))))))"
 		super.onAuthenticationSuccess(request, response, authentication);
 		//removing login referrer
 		request.getSession().removeAttribute("LOGIN_REFERRER");

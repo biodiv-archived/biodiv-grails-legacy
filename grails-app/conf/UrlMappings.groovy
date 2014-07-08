@@ -32,6 +32,7 @@ class UrlMappings {
 
 
 		"/user/$action?/$id?" { controller = 'SUser' }
+		"/api/user/$action?/$id?" { controller = 'SUser' }
 
 		"/" {view="index"}
 		//"/login/$action?"(controller: "login")
@@ -41,6 +42,26 @@ class UrlMappings {
 		"/$controller/$action?/$id?"{ 
             constraints { // apply constraints here
 			} 
+        }
+
+        "/api/login" {
+            
+        }
+
+        "/api/validate" {
+        }
+
+        "/api/logout" {
+        }
+
+        name oauth: "/api/oauth/${action}/${provider}"(controller: 'oauth')
+
+        "/api/register/$forgotPassword" {
+            controller = 'register'
+            action = 'forgotPasswordMobile'
+        }
+
+        "/api/$controller/$action?/$id?"{ 
         }
 
 		"/static/$path"(controller:"species", action:"staticContent")
@@ -167,5 +188,10 @@ class UrlMappings {
     if (uploadPrefix) { 
         delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
     }
+    
+
+    "/admin/manage/$action?"(controller: "adminManage")
+    "/adminManage/$action?"(controller: "errors", action: "urlMapping")
+     
     }
 }

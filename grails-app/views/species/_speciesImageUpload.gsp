@@ -38,7 +38,7 @@
                     class="${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}">
 
                     <span class="msg" style="float: right"></span>
-                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                    <input class="videoUrl" type="hidden" name='videoUrl'value="" />
                     <input type="hidden" name='obvDir' value="${obvDir}" />
                     <input type="hidden" name='resType' value='${speciesInstance.class.name}'>
                 </form>
