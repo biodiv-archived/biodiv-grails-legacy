@@ -169,9 +169,9 @@ function preLoadRecos(max, offset, seeAllClicked) {
     });
 }
 
-function showObservationMapView(obvId, observedOn) {
+function showObservationMapView(obvId, observedOn, mapLocationPicker) {
     var params = {filterProperty:'speciesName',limit:-1,id:obvId}
-    var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+    //var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
     refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
         google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
             data.observations.push({'observedOn':observedOn});

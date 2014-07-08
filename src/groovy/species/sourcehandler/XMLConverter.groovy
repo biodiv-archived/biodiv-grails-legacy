@@ -727,6 +727,8 @@ class XMLConverter extends SourceConverter {
                 case ResourceType.IMAGE:
                 resourceNode?.image.each {
                     if(!it?.id) {
+                        def relFolder = it.fileName?.getAt(0)?.text()?.replace(resourcesRootDir.toString(), "")?:""
+                        relResFolder = new File(relFolder).getParent(); 
                         def resource = createImage(it, relResFolder, ResourceType.IMAGE);
                         if(resource) {
                             resources.add(resource);

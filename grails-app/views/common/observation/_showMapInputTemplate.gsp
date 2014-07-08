@@ -1,5 +1,5 @@
 <%@ page import="species.utils.Utils"%>
-<div class="row control-group map_class">
+<div class="control-group map_class">
 
     <label for="topology" class="control-label">
         <i class="icon-map-marker"></i>
@@ -20,7 +20,7 @@
                 <div id="current_location" class="section-item" style="display:none">
                     <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
                 </div>
-                <div  style="position:relative; text-align:center;width:100%">
+                <div  style="text-align:center;width:100%">
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:3;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level" style="width:96%;"
                         class="section-item" value="${observationInstance?.placeName}"/>
@@ -115,19 +115,33 @@
 
 </div>
 
-<r:script>
+<g:javascript>
+function update_geotagged_images_list_for_bulkUpload(ele){
+    console.log("update_geotagged_images_list_for_bulkUpload");
+    console.log("============YAHAN TOH NAI ANA THA========");
+    var imgs = $(ele).closest(".addObservation").find('.geotagged_image')
+    $.each(imgs, function(index, value){
+        $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
+    });
+}
+
 function loadMapInput() {
+    //$(".address .add-on").trigger("click"); 
+    var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
     $(map_class).find(".map_canvas").show();
     $(map_class).find(".latlng").show();
-    //if(!isMapViewLoaded) {
+    console.log($(map_class).data('locationpicker'));
+    if($(map_class).data('locationpicker') == undefined) {
+        console.log("===================================================================");
         loadGoogleMapsAPI(function() {
-
             var locationPicker = new $.fn.components.LocationPicker(map_class);
             locationPicker.initialize();
             $(map_class).data('locationpicker', locationPicker);
+            console.log("======LOCATION PICKER==");
+            console.log($(map_class).data('locationpicker'));
             $(map_class).find('.spinner').hide();
-            var drawControls, editControls;
+            
             <g:if test="${params.controller == 'checklist'}">
                 drawControls = {
                     rectangle:true,
@@ -139,13 +153,13 @@ function loadMapInput() {
                 editControls = {featureGroup: new L.FeatureGroup()}
             </g:if>
             locationPicker.initArea(drawControls, editControls, undefined);
-            /*if(flag){
-                flag = false;
-                $(".address .add-on").trigger('click');
-            }
-            */
+            update_geotagged_images_list_for_bulkUpload(map_class);
         });
-    //} 
+    
+    }else {
+        $(map_class).data('locationpicker').mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
+        update_geotagged_images_list_for_bulkUpload(map_class)
+    }
 }
 
 $(document).ready(function() {
@@ -158,8 +172,7 @@ $(document).ready(function() {
         }
     });
     $(".address").unbind('click').click(loadMapInput);
-    $(".address").trigger('click');
 
 });
-</r:script>
+</g:javascript>
 </div>

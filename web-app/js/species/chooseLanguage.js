@@ -1,7 +1,6 @@
 var langComboBoxArray = new Array($('.languageComboBox').size());
 
 function doCustomization(langCombo){
-    console.log("AGAIN");
     var inputTextEle = langCombo.data('combobox').$element
     inputTextEle.unbind('blur');
     inputTextEle.attr('name', 'languageName');
@@ -21,7 +20,6 @@ function initializeLanguage(){
         $(this).combobox();
     });
     $.each(langComboBoxArray, function(index,value){
-        console.log( index + ": " + value );
         var langCombo = value;
         doCustomization(langCombo);
         var defaultLang = $(value).data("defaultlanguage");

@@ -1,4 +1,5 @@
 $("#addBulkObservationsSubmit").click(function(event){
+    var me = this;
     if($(this).hasClass('disabled')) {
         alert("Uploading is in progress. Please submit after it is over.");
         event.preventDefault();
@@ -6,9 +7,7 @@ $("#addBulkObservationsSubmit").click(function(event){
     }
 
     if (document.getElementById('agreeTerms').checked) {
-        var me = this;
         $(me).addClass("disabled");
-
         var allForms = $(".addObservation");
         var formsWithData = [] 
         $.each(allForms, function(index, value){
@@ -18,6 +17,7 @@ $("#addBulkObservationsSubmit").click(function(event){
             }
         });
         var size = formsWithData.length;
+
         submitForms(0, size, formsWithData); 
         $(me).removeClass("disabled");
         return false;
@@ -45,21 +45,36 @@ function formHasData(form){
     return flag;
 }
 
-var gotError = false;
+var gotError;
+var miniObvCreateHtmlSuccess;
 function submitForms(counter, size, allForms){
+    if(counter == 0){
+        gotError = false;
+    }
     if(counter == size){
         console.log("breaking recursion========" + gotError);
         if(!gotError){
-            location.reload();
+            //location.reload();
+            alert("Successfully created "+ counter +" observations!!!");
+            $.each(allForms, function(index, value){
+                var wrapper = $(value).parent();
+                $(value).replaceWith(miniObvCreateHtmlSuccess);
+            });
         }
+        $( ".date" ).datepicker({ 
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'dd/mm/yy' 
+        });
         return;
     } else {
         console.log("going to submit form no : " + counter);
         var form = allForms[counter];
+        console.log(allForms[counter]);
         $(form).find(".userGroupsList").val(getSelectedUserGroups($(form)));
            
         var locationpicker = $(form).find(".map_class").data('locationpicker'); 
-        if(locationpicker.mapLocationPicker.drawnItems) {
+        if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
             var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
             if(areas.length > 0) {
                 var wkt = new Wkt.Wkt();
@@ -78,6 +93,7 @@ function submitForms(counter, size, allForms){
                 console.log("HERE HERE");
                 if(data.statusComplete) {
                     console.log("HELLO IN SUCCESS");
+                    miniObvCreateHtmlSuccess = data.miniObvCreateHtml;
                     $(form).find('input').attr('disabled', 'disabled');
                     $(form).find('button').attr('disabled', 'disabled');
                     $(form).find('.span4').css('opacity', '0.6');
@@ -85,13 +101,18 @@ function submitForms(counter, size, allForms){
                     //disable click on div
                 } else {
                     gotError = true;
-                    var miniObvCreateHtml = data.miniObvCreateHtml;
+                    var miniObvCreateHtmlError = data.miniObvCreateHtml;
                     var wrapper = $(form).parent();
-                    $(form).replaceWith(miniObvCreateHtml);
-                    console.log($(miniObvCreateHtml));
+                    $(form).replaceWith(miniObvCreateHtmlError);
+                    console.log($(miniObvCreateHtmlError));
                     $(wrapper).find(".imageHolder").append(imagesPulled);
                     $(wrapper).find(".group_options li[value='"+group_id+"']").trigger("click");
                     $(wrapper).find(".habitat_options li[value='"+habitat_id+"']").trigger("click");
+                }
+                $(".resourceListType").val($(".resourceListTypeFilled").val());
+                if($(".userGroupsSuperDiv").hasClass("span12")){
+                    $(".userGroupsSuperDiv").removeClass("span12");
+                    $(".userGroupsSuperDiv").addClass("span4");
                 }
                 submitForms(counter+1, size, allForms);
             }, error : function (xhr, ajaxOptions, thrownError){
@@ -133,6 +154,7 @@ $(".obvCreateTags").tagit({
 });
 
 $(".applyAll").click(function(){
+    var me = this;
     var licenseVal = $(".propagateLicense").find("input").val();
     var dateVal = $(".propagateDate").find("input[name='fromDate']").val();
     var tagValues = []
@@ -140,25 +162,37 @@ $(".applyAll").click(function(){
         tagValues.push($(this).text()); // This is your rel value
     });
     var groups = getSelectedUserGroups($(".propagateGroups"));
-    console.log(groups);
     var latVal = $(".propagateLocation").find(".latitude_field").val();
     var longVal = $(".propagateLocation").find(".longitude_field").val();
+    var spGrpVal = $(".propagateGrpHab").find("input[name='group_id']").val();
+    var habVal = $(".propagateGrpHab").find("input[name='habitat_id']").val();
     var allForms = $(".addObservation");
+    var locationpicker = $(".propagateLocation").find(".map_class").data('locationpicker'); 
+    var placeName = $(".propagateLocation").find(".placeName").val();
+    var wkt;
+    if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
+        var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
+        if(areas.length > 0) {
+            wkt = new Wkt.Wkt();
+            wkt.fromObject(areas[0]);
+        }
+    }
     $.each(allForms, function(index,value){
         $(value).find(".imageHolder li span:contains('"+licenseVal+"')").first().trigger("click");
         $(value).find('.fromDate').datepicker("setDate", dateVal);
         $.each(tagValues, function(index, tagVal){
-            $(value).find(".obvCreateTags").tagit("createTag", tagVal);//select ul in this and create new tags//createTag
+            $(value).find(".obvCreateTags").tagit("createTag", tagVal);
         });
         $.each(groups, function(index, grpVal){
             var sel = ".userGroupsClass .checkbox button[value='"+grpVal+"']"
-            $(value).find(sel).trigger("click");//select ul in this and create new tags//createTag
+            $(value).find(sel).trigger("click");
         });
+        $(value).find(".group_options li[value='"+spGrpVal+"']").trigger("click");
+        $(value).find(".habitat_options li[value='"+habVal+"']").trigger("click");
         $(value).find(".latitude_field").val(latVal);
         $(value).find(".longitude_field").val(longVal);
-        var e = $.Event("keypress"); /* || keydown || keyup */
-        e.which = 13; /* set the key code here */
-        $(value).find(".latitude_field").trigger(e);
-        $(value).find(".longitude_field").trigger(e);
+        if(wkt) $(value).find("input.areas").val(wkt.write());
+        $(value).find(".placeName").val(placeName);    
     });
 });
+

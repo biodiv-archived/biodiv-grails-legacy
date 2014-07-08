@@ -431,8 +431,14 @@ class ObservationController extends AbstractObjectController {
 //						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
 //					}
 					else {
-						if(!obvDir) {
+                        println "================FILES ================ " + f
+                        println "======================HOW MANY TIMES IN HERE============="
+						if(params.resType == SUser.class.name){
+                            obvDir = null;
+                        }
+                        if(!obvDir) {
 							if(!params.obvDir) {
+                                println "=========================================PARAMS OBV DIR NOT PRESENT========================"
                                 obvDir = new File(rootDir);
 								if(!obvDir.exists()) {
 									obvDir.mkdir();
@@ -563,7 +569,8 @@ class ObservationController extends AbstractObjectController {
 						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
                         } else {
                             def output = [:]
-                            output = [statusComplete : true]
+                            def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+                            output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             render output as JSON
                         }		//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
@@ -595,7 +602,8 @@ class ObservationController extends AbstractObjectController {
 						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
                         } else {
                             def output = [:]
-                            output = [statusComplete : true]
+                            def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+                            output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             render output as JSON
                         }
                         //redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -609,7 +617,8 @@ class ObservationController extends AbstractObjectController {
                         render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
                     } else {
                         def output = [:]
-                        output = [statusComplete : true]
+                        def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+                        output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                         render output as JSON
                     }
 

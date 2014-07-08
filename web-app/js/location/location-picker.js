@@ -613,7 +613,7 @@ if(!Array.prototype.last) {
                 console.log("LAT LONG PRESENT ");
                 if(me.isMapViewLoaded){
                     console.log("mapview is loaded");
-                    me.addSearchMarker({lat:lat,lng:lng},undefined,map_class);
+                    me.addSearchMarker({lat:lat,lng:lng},undefined);
                 }else{
                     $(".address").trigger("click");
                 }		
@@ -646,21 +646,22 @@ if(!Array.prototype.last) {
             var me = this;
             console.log("==========================================");
             console.log(this.$ele.find(".placeName"));
+            var temp =  me.$ele.find(".address .add-on");
             me.$ele.find(".placeName").click(function(){
                 console.log("hewfhrsfsfewsf============================sedf");
                 $("#suggestions").remove();
                 var placeName = this
-                $(placeName).after("<div id='suggestions' style='display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;'></div>");
+                $(temp).after("<div id='suggestions' style='display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;'></div>");
                 var cacheSN = {};
                 $(placeName).catcomplete({
                     appendTo:"#suggestions",
                     source: function(request, response) {
                         console.log("===============IN SOURCE=====");
                         var term = request.term;
-                        /*if ( term in cacheSN ) {
+                        if ( term in cacheSN ) {
                             response( cacheSN[ term ] );
                             return;
-                        }*/
+                        }
                         console.log(me.mapLocationPicker);
                         me.mapLocationPicker.geocoder.geocode( {'address': request.term +'+india', 'region':'in'}, function(results, status) {
                             console.log("in here============");

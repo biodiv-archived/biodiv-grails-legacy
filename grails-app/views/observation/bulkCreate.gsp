@@ -20,12 +20,72 @@
                 padding: 10px;
                 min-height: 212px;
             }
-            th {
-                border:1px solid black;
-            }
             td {
-                border:1px solid black;
                 text-align:center;
+            }
+            .map_canvas {
+                position: absolute;
+                width: 100%;
+                display: block;
+                left: 0px;
+            }
+            .map_search {
+                position:inherit;
+            }
+            .selected_habitat, .selected_group{
+                position:relative;
+            }
+            .habitat_options, .group_options{
+                position:absolute;
+                z-index:10;
+            }
+            .userGroupsSuperDiv{
+                position:absolute !important;
+                z-index:10;
+            }
+            .section {
+                overflow:auto;
+            }
+            .column.block_row {
+                width:442px;
+            }
+            .miniObvWrapper.column {
+                width:290px;
+                margin:2px;
+                height:auto;
+                background-color: #a6dfc8;
+            }
+            .column {
+                width:221px;
+                float: left;
+                padding: 10px 0px;
+                margin:0px;
+                border: 1px solid #c6c6c6;
+                border-collapse: separate;
+                border-left: 0;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+                height:70px;
+            }
+            .selected_habitat, .selected_group {
+                padding: 4px 3px;
+                width:97%;
+                text-align:left;
+            }
+            .block_row {
+                margin-left:0px;
+            }
+            .section label {
+                padding: 0px; 
+            }
+            .help-identify{
+                left:10px;
+            }
+            .propagateBlock {
+                clear:both;
+                background-color: #a6dfc8;
+                overflow:auto;
             }
         </style>
     </head>
@@ -33,79 +93,85 @@
         <div class="bulk_observation_create">
             <div class="span12">
                 <%
-                    def form_id = "addBulkObservations"
-                    def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-                    def form_button_name = "Submit All"
-                    def form_button_val = "Submit All"
+                def form_id = "addBulkObservations"
+                def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
+                def form_button_name = "Submit All"
+                def form_button_val = "Submit All"
                 %>
-                    <div class="span12 super-section">
-                        <div class="section">
-                            <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
-                            <% 
-                                /*
-                                    propagate karne wale options
-                                */
-                            %>
-                                    <table style="border:1px solid black;width:914px">
-                                        <tr >
-                                            <th>License</th>
-                                            <th>Date</th>		
-                                            <th>Tags</th>
-                                            <th>Location</th>
-                                            <th>Groups</th>
-                                            <th>Propagate</th>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="propagateLicense">
-                                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':null]"/>
-                                                </span>
-                                            </td>
-                                            <td><span class="propagateDate">
-                                                    <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
-                                                </span>
-                                            </td>		
-                                            <td><span class="propagateTags">
-                                                    <div class="create_tags section-item" style="clear: both;">
-                                                        <ul class="obvCreateTags">
-                                                            <g:each in="${obvTags}" var="tag">
-                                                            <li>${tag}</li>
-                                                            </g:each>
-                                                        </ul>
-                                                    </div>
-                                                </span>
-                                            </td>
-                                            <td><span class="propagateLocation">
-                                                <%
-                                                def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
-                                                %>
-                                                <div>
-                                                    <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
-                                                </div>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="propagateGroups">
-                                                    <button type="button" class="btn toggleGrpsDiv" > Groups </button> 
-                                                    <div class="postToGrpsToggle" style="display:none;">
-                                                        <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
-                                                    </div>
-                                                </span>
+                <div class="super-section">
+                    <div class="section">
+                        <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
+                    </div>
+                    <div class="section">
+                        <div>
+                            <a class="btn togglePropagateDiv"
+                                style="float: left; margin-right: 5px;"> Show Bulk Action <b class="caret"></b>
+                            </a>
+                        </div>
+                        <div class= "propagateBlock hide">
+                            <div >
+                                <div class="column propagateLicense">
+                                    <label>License</label>
+                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':null]"/>
+                                </div>
+                                <div class="column propagateGrpHab">
+                                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+                                </div>
+                                <div class="column propagateGrpHab">
+                                    <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+                                </div>
+                                <div class="column propagateDate">
+                                    <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="column span6 propagateTags block_row">
+                                    <label>Tags</label>
+                                    <div class="create_tags" style="clear: both;">
+                                        <ul class="obvCreateTags">
+                                            <g:each in="${obvTags}" var="tag">
+                                            <li>${tag}</li>
+                                            </g:each>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="column span6 propagateLocation block_row" style="width:440px;">
+                                    <%
+                                    def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
+                                    %>
+                                    <div>
+                                        <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="column span6 propagateGroups block_row">
+                                    <label>User Groups</label>
+                                    <div style="clear:both">
+                                        <button type="button" class="btn toggleGrpsDiv"> Groups </button> 
+                                        <div class="postToGrpsToggle" style="display:none;">
+                                            <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column span6 block_row">
+                                    <a class="applyAll btn btn-primary"
+                                        style=" margin-right: 5px;"> Apply 
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
 
-                                            </td>
-                                            <td>
-                                                <a class="applyAll btn btn-primary"
-                                                    style=" margin-right: 5px;"> Apply 
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </table>
-                            <div class="miniObvWrapper">
+                    </div>
+
+                        <div class="section">
+                            <div class="miniObvWrapper column">
                                 <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>
-                            <div class="miniObvWrapper">
+                            <div class="miniObvWrapper column">
                             <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>
-                            <div class="miniObvWrapper">
+                            <div class="miniObvWrapper column">
                                 <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>
                         </div>
@@ -145,7 +211,7 @@
 
                 <form action="${form_create_resource}" method="post" class="createResource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" >
                     <input type="hidden" name='resType' value='${userInstance.class.name}'>
-                    <input class="resourceListType" type="hidden" name='resourceListType' value= />
+                    <input class="resourceListType" type="hidden" name='resourceListType' value=>
                 </form>
 
             </div>
@@ -164,7 +230,16 @@
                     out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
                 }
             %>
-            
+            $(".togglePropagateDiv").click(function(){
+                $(".propagateBlock").slideToggle("")
+            });
+            $(".propagateGrpHab .help-inline").css("display","none");
+        /*
+            if($(".userGroupsSuperDiv").hasClass("span12")){
+                $(".userGroupsSuperDiv").removeClass("span12");
+                $(".userGroupsSuperDiv").addClass("span4");
+            } 
+        */
             if($( "input[name='resType']" ).val() == "species.auth.SUser") {
                 $(".addedResource.thumbnail").draggable({helper:'clone'});  
 
@@ -199,10 +274,9 @@
                         rate($ratingCont);
                         var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
                         $("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+                        $(ui.draggable).appendTo(".imagesList");
                         $(ui.draggable).css("opacity","0.3");
-                        $(form).find('.geotagged_image', this).load(function(){
-                            $(form).find(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
-                        });
+                        $(form).find(".address").trigger('click');
                         $(".imageHolder .addedResource").click(function(){
                             console.log("changing z-index");
                             form.find(".addedResource").css('z-index','0')

@@ -4,12 +4,14 @@ function removeResource(event, imageId) {
     if (event.target) targ = event.target;
     else if (event.srcElement) targ = event.srcElement; //for IE
     else {}
+    $(targ).parent('.addedResource').remove();
+    $(targ).find(".image_"+imageId).remove();
     if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+        console.log($(".image_"+imageId).first().closest(".addedResource"));
         $(".image_"+imageId).first().closest(".addedResource").draggable({helper:'clone'});
         $(".image_"+imageId).first().closest(".addedResource").css('opacity', '1');
     }
-    $(targ).parent('.addedResource').remove();
-    $(targ).find(".image_"+imageId).remove();
+
 }
 
 /**
@@ -97,6 +99,7 @@ function removeResource(event, imageId) {
                     count = count + 1;
                 });
                 if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    $("input[name='obvDir']").val('');
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'lastUploaded',
@@ -156,13 +159,16 @@ function removeResource(event, imageId) {
             });
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
-            metadataEle.each(function() {
-                $('.geotagged_image', this).load(function(){
-                    $(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+            if($( "input[name='resType']" ).val() == "species.participation.Observation") {
+                metadataEle.each(function() {
+                    me.$ele.find(".address").trigger('click'); 
+                    /*$('.geotagged_image', this).load(function(){
+                        $(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+                    });*/
+                    var $ratingContainer = $(this).find('.star_obvcreate');
+                    rate($ratingContainer);
                 });
-                var $ratingContainer = $(this).find('.star_obvcreate');
-                rate($ratingContainer);
-            });
+            }
             me.$ele.find(".imagesList li:first" ).after (metadataEle);
             me.$ele.find(".add_file" ).fadeIn(3000);
             me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
@@ -208,7 +214,7 @@ function removeResource(event, imageId) {
                                 var lastTop = parseInt($(draggedImages[(countOfImages - 2)]).css("top"));
                                 draggedImages.last().css({
                                     "position":"absolute",
-                                    "top":lastTop + 10
+                                    "top":lastTop + 20
                                 });
 
                             }
@@ -221,10 +227,9 @@ function removeResource(event, imageId) {
                             console.log($(ui.draggable));
                             var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
                             $("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+                            $(ui.draggable).appendTo(".imagesList");
                             $(ui.draggable).css("opacity","0.3");
-                            $(form).find('.geotagged_image', this).load(function(){
-                                $(form).find(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
-                            });
+                            $(form).find(".address").trigger('click'); 
                             $(".imageHolder .addedResource").click(function(){
                                 console.log("changing z-index");
                                 form.find(".addedResource").css('z-index','0')

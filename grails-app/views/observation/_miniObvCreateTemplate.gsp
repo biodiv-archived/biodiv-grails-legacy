@@ -2,9 +2,9 @@
 def form_class = "addObservation"
 def form_action = uGroup.createLink(action:'bulkSave', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 %>
-<form class="${form_class}" action="${form_action}" method="POST" class="form-horizontal">
+<form class="${form_class}" action="${form_action}" method="POST">
 
-    <div class="span4" style="width:275px;border:1px solid black;">
+    <div>
         <div class="createdObv" style="display:none;">OBSERVATION CREATED</div>
         
         <div class="control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
@@ -13,10 +13,11 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 field="resource" />
             </div>
         </div>    
-        <div class="imageHolder ui-widget-header" style="position: relative; left: 0; top: 0; width: 150px; height: 250px; padding: 0.5em; float: left; margin: 10px;"></div>
+        <div class="imageHolder ui-widget-header" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;"></div>
 
-        <g:render template="/common/speciesGroupHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
-        <div class="section" style="margin:40px 0 0;">
+        <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+        <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+        <div class="" style="margin:40px 0 0;">
             <g:if
             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
             <div class="help-identify" class="control-label">
@@ -27,7 +28,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
             <reco:create />
         </div>
 
-        <div class="section" style="margin:0px;">
+        <div class="" style="margin:0px;">
             <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
             <%
             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance

@@ -1,6 +1,6 @@
 
 <div
-    class="row control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')} ${hasErrors(bean: observationInstance, field: 'toDate', 'error')}">
+    class=" control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')} ${hasErrors(bean: observationInstance, field: 'toDate', 'error')}">
 
     <label for="fromOn" class="control-label"><i
             class="icon-calendar"></i>

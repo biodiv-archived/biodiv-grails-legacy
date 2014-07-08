@@ -4,7 +4,7 @@
 <div id="license_div_${i}" class="license_div pull-left dropdown">
 
     <a id="selected_license_${i}"
-        class="btn dropdown-toggle btn-mini"
+        class="btn dropdown-toggle"
         data-toggle="dropdown">
 
         <img

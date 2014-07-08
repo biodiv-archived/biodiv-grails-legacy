@@ -517,25 +517,27 @@ div.errors {
 	font-weight: bold;
 }
 
-.license_options {
+.group_options, .habitat_options, .license_options {
 	background-color: #FFFFFF;
 	border-width: 0 1px 1px;
 	box-shadow: 0 8px 6px -6px black;
 	display: none;
 	position: absolute;
 	z-index: 7;
+        list-style:none;
 }
 
-.license_options li {
+.license_options li, .group_options li, .habitat_options li {
 	border-top: 1px solid #e3e3e3;
 	padding: 3px;
+        list-style:none;
 }
 
-.license_options li:hover {
+.license_options li:hover , .group_options li:hover, .habitat_options li:hover{
 	background-color: #9acc57;
 }
 
-.license_options span {
+.license_options span, .group_options span, .habitat_options span {
 	padding: 10px;
 }
 

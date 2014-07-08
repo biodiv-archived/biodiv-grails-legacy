@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.io.FileUtils;
 
 import species.Resource;
 import species.Habitat;
@@ -174,82 +175,16 @@ class ObservationService extends AbstractObjectService {
             println "===================================== " + resources
 	        observation.resource?.clear();
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-            String uuidRand =  UUID.randomUUID().toString()
-            println "=======UUID GENERATED ====== " + uuidRand
+            
 	        resources.each { resource ->
-				println "========RESOURCE ========= " + resource
-                if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
-                    def usersResFolder = resource.fileName.tokenize('/')[0]
-                    println "=========USERSRES FOLDER ===== " + usersResFolder
-					def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
-                    if(!obvDir.exists()) {
-                        obvDir.mkdir();
-                    }
-                    /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
-                    obvDir = new File(obvDir, uuidRand);
-                    obvDir.mkdir();                
-                    /////change filename of resource to this uuid and inside that check for clash of filename
-                    File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
-                    println "========NEW UNIQ FILE========= " + newUniq
-                    def a = newUniq.getAbsolutePath().tokenize('/')[-1]
-                    def newFileName = a.tokenize('.')[0]
-					
-					//ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
-                    String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
-                    println "=============USERS ROOT DIR========== " + userRootDir
-                    def usersResDir = new File(userRootDir, usersResFolder)
-                    println "=============USERS ROOT DIR file ========== " + usersResDir
-                    def finalSuffix = ""
-                    usersResDir.eachFileRecurse (FileType.FILES) { file ->
-                        println "=======DIRECTORY FILES ======= " + file
-						def fName = file.getName();
-						def tokens = fName.tokenize("_");
-                        def nameSuffix = ""
-                        if(tokens.size() == 1){
-                            nameSuffix = "."+fName.tokenize(".")[-1] 
-                            finalSuffix = nameSuffix
-                        }
-                        else {
-                            tokens.each{ t->
-                                if(!t.isNumber()){
-                                    nameSuffix = nameSuffix + "_" + t
-                                }
-                            }
-                        }
-                        Path source = Paths.get(file.getAbsolutePath());
-						Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
-
-                        println "=======SOURCE =============== " + source +" ===========DESTINATION====== "+ destination
-						try {
-                            //Files moved but empty folder there
-							Files.move(source, destination);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-                    }
-					//// UPDATING FILE NAME OF RES IN DB
-					////check format of filename---- slash kaise hai
-					resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+                if(!resource.context){
+                    println "=============CONTEXT NOT PRESENT= "
+                    resource.saveResourceContext(observation)
                 }
-				/////////////////////////////////////////////////////////////////////////////////////////////////
-                resource.saveResourceContext(observation)
 	            observation.addToResource(resource);
                 
 	        }
-            resources.each { resource ->
-                println "========RESOURCE ========= " + resource
-                if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
-                    def usersRes = UsersResource.findByRes(resource)
-                    ////////////////////
-                    ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
-                    usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
-                    if(!usersRes.save(flush:true)){
-                        usersRes.errors.allErrors.each { log.error it }
-                        return false
-                    }
-
-                }
-            }
+            
 		}
     }
 
@@ -289,6 +224,82 @@ class ObservationService extends AbstractObjectService {
 
                 params["createNew"] = true
                 params["oldAction"] = params.action
+                String uuidRand =  UUID.randomUUID().toString()
+                println "=======UUID GENERATED ====== " + uuidRand
+                observationInstance.resource.each { resource ->
+                    println "========RESOURCE ========= " + resource
+                    if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
+                        def usersResFolder = resource.fileName.tokenize('/')[0]
+                        println "=========USERSRES FOLDER ===== " + usersResFolder
+                        def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
+                        if(!obvDir.exists()) {
+                            obvDir.mkdir();
+                        }
+                        /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
+                        obvDir = new File(obvDir, uuidRand);
+                        obvDir.mkdir();                
+                        /////change filename of resource to this uuid and inside that check for clash of filename
+                        File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
+                        println "========NEW UNIQ FILE========= " + newUniq
+                        def a = newUniq.getAbsolutePath().tokenize('/')[-1]
+                        def newFileName = a.tokenize('.')[0]
+
+                        //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
+                        String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+                        println "=============USERS ROOT DIR========== " + userRootDir
+                        def usersResDir = new File(userRootDir, usersResFolder)
+                        println "=============USERS ROOT DIR file ========== " + usersResDir
+                        def finalSuffix = ""
+                        usersResDir.eachFileRecurse (FileType.FILES) { file ->
+                            println "=======DIRECTORY FILES ======= " + file
+                            def fName = file.getName();
+                            def tokens = fName.tokenize("_");
+                            def nameSuffix = ""
+                            if(tokens.size() == 1){
+                                nameSuffix = "."+fName.tokenize(".")[-1] 
+                                finalSuffix = nameSuffix
+                            }
+                            else {
+                                tokens.each{ t->
+                                    if(!t.isNumber()){
+                                        nameSuffix = nameSuffix + "_" + t
+                                    }
+                                }
+                            }
+                            Path source = Paths.get(file.getAbsolutePath());
+                            Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
+
+                            println "=======SOURCE =============== " + source +" ===========DESTINATION====== "+ destination
+                            try {
+                                //Files moved but empty folder there
+                                Files.move(source, destination);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        try{
+                            println "==================SHOULD DELETE DIR COMP=============="
+                            FileUtils.deleteDirectory(usersResDir);
+
+                        }catch(IOException e){
+                            e.printStackTrace();
+                        }
+                        //// UPDATING FILE NAME OF RES IN DB
+                        ////check format of filename---- slash kaise hai
+                        resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+                        resource.saveResourceContext(observationInstance)
+
+                        def usersRes = UsersResource.findByRes(resource)
+                        ////////////////////
+                        ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
+                        usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
+                        if(!usersRes.save(flush:true)){
+                            usersRes.errors.allErrors.each { log.error it }
+                            return false
+                        }
+
+                    }
+                }
                 return ['success' : true, observationInstance:observationInstance]
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
