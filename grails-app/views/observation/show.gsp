@@ -211,12 +211,6 @@ if(r) {
                     </g:each>
                     </g:if>
 
-                    <g:if test="${audioCount > 1}" > 
-
-                             <br><br><br>
-
-                    </g:if>
-
                     <obv:showStory
                         model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 
