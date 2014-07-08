@@ -43,12 +43,12 @@
                     <div class="heading">
                         <g:if test="${observationInstance.isChecklist}">
                         <g:link url="${uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
-                            <span class="ellipsis">${raw(observationInstance.title)}</span>
+                            <span class="ellipsis">${observationInstance.title}</span>
                         </g:link>
                         </g:if>
                         <g:else>
                         <g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
-                            <span class="ellipsis">${raw(observationInstance.fetchFormattedSpeciesCall())}</span>
+                            <span class="ellipsis">${observationInstance.fetchFormattedSpeciesCall()}</span>
                         </g:link>
                         </g:else>
                     </div>
@@ -162,12 +162,12 @@
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i>Notes</span>
                     <div class="value notes_view linktext">
-                        ${raw(Utils.linkifyYoutubeLink(observationInstance.notes))}
+                        ${Utils.linkifyYoutubeLink(observationInstance.notes)}
                     </div>
                     </g:if>
                     <g:else>
                     <div class="value notes_view linktext ${showDetails?'':'ellipsis'}">
-                        ${raw(Utils.stripHTML(observationInstance.notes))}
+                        ${Utils.stripHTML(observationInstance.notes)}
                     </div>
 
                     </g:else>

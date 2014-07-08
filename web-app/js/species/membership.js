@@ -282,7 +282,7 @@ function membership_actions() {
 
 //this is called from domain/_headerTemplate
 function init_group_header() {
-console.log('init_group_header');	
+	
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
@@ -292,12 +292,10 @@ console.log('init_group_header');
 	});
     
     curators_autofillUsersComp = $("#userAndEmailList_curator").autofillUsers({
-        //appendTo:"#userNameSuggestions",
 		usersUrl : window.params.userTermsUrl
 	});
 
     contributors_autofillUsersComp = $("#userAndEmailList_contributor").autofillUsers({
-        //appendTo:"#userNameSuggestions",
 		usersUrl : window.params.userTermsUrl
 	});
 
@@ -376,13 +374,13 @@ function last_actions() {
                 tooltip:false,
                 fill: '&hellip; <a id="read-more" href="#">more</a>'
 	});
-        $('#read-more').on('click', function (event) {
+        $('#read-more').live('click', function (event) {
               $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
                 
                 return false;
         });
 
-        $('#read-less').on('click', function (event) {
+        $('#read-less').live('click', function (event) {
               $(this).parent().trunk8();
                 
                 return false;

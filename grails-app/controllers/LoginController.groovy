@@ -1,11 +1,9 @@
-package species.auth
-
 import grails.converters.JSON
 
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
-import grails.plugin.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
@@ -17,9 +15,8 @@ import org.springframework.security.web.authentication.AbstractAuthenticationTar
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
-import grails.plugin.springsecurity.ui.RegistrationCode;
+import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import species.utils.Utils;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 
@@ -67,7 +64,7 @@ class LoginController {
 
 	def authSuccess = {
 		if(params.uid) {
-			def targetUrl = request.getParameter(SpringSecurityUtils.DEFAULT_TARGET_PARAMETER);
+			def targetUrl = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
 			if (StringUtils.hasText(targetUrl)) {
 				try {
 					targetUrl = URLDecoder.decode(targetUrl, "UTF-8");
@@ -80,9 +77,7 @@ class LoginController {
 				return;
 			}
 
-            def requestCache = new HttpSessionRequestCache();
-		    def defaultSavedRequest = requestCache.getRequest(request, response);
-			//def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+			def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 			log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
 			if(defaultSavedRequest) {
 				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
@@ -91,11 +86,7 @@ class LoginController {
 				redirect uri:"/";
 				return;
 			}
-		} else {
-            params.remove('action');
-            params.remove('controller');
-            render params as JSON
-        }
+		}
 	}
 
 	/**
@@ -152,8 +143,8 @@ class LoginController {
 				//check if the email has been verified and give option to resend the email
 				def registerationCode = RegistrationCode.findAllByUsername(username.decodeHTML()) 
 				if(registerationCode) {
-					def url = Utils.getDomainServerUrl(request) + "/register/resend?email="+username	
-					msg = g.message(code: "You have not verified your email yet! Please resend the email by clicking on this url ${url}")
+					def url = Utils.getDomainServerUrl(request) + "/register/resend"	
+					msg = g.message(code: "You have not verified your email yet! <a href=\"${url}\">Resend Verification Email</a>")
 				}else 
 					msg = g.message(code: "springSecurity.errors.login.locked")
 			}

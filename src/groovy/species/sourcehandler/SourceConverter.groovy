@@ -13,7 +13,7 @@ import species.TaxonomyDefinition.TaxonomyRank;
 
 class SourceConverter {
     protected Map licenseUrlMap;
-    protected static final log = LogFactory.getLog(this);
+    private static final log = LogFactory.getLog(this);
 	
 	//to keep track of current species index. used for reporting error.
 	public int currentRowIndex = 1;

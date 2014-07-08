@@ -1,6 +1,6 @@
 package species.participation
 
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 
 class RecommendationVoteController {
 
@@ -13,20 +13,20 @@ class RecommendationVoteController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
+    def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [recommendationVoteInstanceList: RecommendationVote.list(params), recommendationVoteInstanceTotal: RecommendationVote.count()]
     }
 
 	@Secured(['ROLE_USER'])
-    def create() {
+    def create = {
         def recommendationVoteInstance = new RecommendationVote()
         recommendationVoteInstance.properties = params
         return [recommendationVoteInstance: recommendationVoteInstance]
     }
 
 	@Secured(['ROLE_USER'])
-    def save() {
+    def save = {
 		params.author = springSecurityService.currentUser;
 		
         def recommendationVoteInstance = new RecommendationVote(params)
@@ -41,7 +41,7 @@ class RecommendationVoteController {
         }
     }
 
-    def show() {
+    def show = {
         def recommendationVoteInstance = RecommendationVote.get(params.id)
         if (!recommendationVoteInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'recommendationVote.label', default: 'RecommendationVote'), params.id])}"
@@ -53,7 +53,7 @@ class RecommendationVoteController {
     }
 
 	@Secured(['ROLE_USER'])
-    def edit() {
+    def edit = {
         def recommendationVoteInstance = RecommendationVote.get(params.id)
         if (!recommendationVoteInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'recommendationVote.label', default: 'RecommendationVote'), params.id])}"
@@ -65,7 +65,7 @@ class RecommendationVoteController {
     }
 
 	@Secured(['ROLE_USER'])
-    def update() {
+    def update = {
         def recommendationVoteInstance = RecommendationVote.get(params.id)
         if (recommendationVoteInstance) {
             if (params.version) {
@@ -93,7 +93,7 @@ class RecommendationVoteController {
     }
 
 	@Secured(['ROLE_ADMIN'])
-    def delete() {
+    def delete = {
         def recommendationVoteInstance = RecommendationVote.get(params.id)
         if (recommendationVoteInstance) {
             try {

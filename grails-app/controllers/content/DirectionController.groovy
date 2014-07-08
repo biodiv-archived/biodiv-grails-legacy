@@ -1,6 +1,6 @@
 package content
 
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 
 
 class DirectionController {
@@ -11,20 +11,20 @@ class DirectionController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
+    def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [strategicDirectionInstanceList: StrategicDirection.list(params), strategicDirectionInstanceTotal: StrategicDirection.count()]
     }
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-    def create() {
+    def create = {
         def strategicDirectionInstance = new StrategicDirection()
         strategicDirectionInstance.properties = params
         return [strategicDirectionInstance: strategicDirectionInstance]
     }
 
 	@Secured(['ROLE_CEPF_ADMIN'])	
-    def save() {
+    def save = {
         def strategicDirectionInstance = new StrategicDirection(params)
         if (strategicDirectionInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'strategicDirection.label', default: 'StrategicDirection'), strategicDirectionInstance.id])}"
@@ -35,7 +35,7 @@ class DirectionController {
         }
     }
 
-    def show() {
+    def show = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (!strategicDirectionInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'strategicDirection.label', default: 'StrategicDirection'), params.id])}"
@@ -47,7 +47,7 @@ class DirectionController {
     }
 
 	@Secured(['ROLE_CEPF_ADMIN'])	
-    def edit() {
+    def edit = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (!strategicDirectionInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'strategicDirection.label', default: 'StrategicDirection'), params.id])}"
@@ -56,10 +56,10 @@ class DirectionController {
         else {
             return [strategicDirectionInstance: strategicDirectionInstance]
         }
-    } 
+    }
 	
 	@Secured(['ROLE_CEPF_ADMIN'])
-    def update() {
+    def update = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (strategicDirectionInstance) {
             if (params.version) {
@@ -87,7 +87,7 @@ class DirectionController {
     }
 
 	@Secured(['ROLE_CEPF_ADMIN'])	
-    def delete() {
+    def delete = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (strategicDirectionInstance) {
             try {

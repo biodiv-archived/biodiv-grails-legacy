@@ -1,5 +1,5 @@
 <%@page import="species.participation.ActivityFeedService"%>
-<%@page import="grails.plugin.springsecurity.SpringSecurityUtils"%>
+<%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 
 
 <g:showSpeciesFieldToolbar model="${category.value[0]}" />

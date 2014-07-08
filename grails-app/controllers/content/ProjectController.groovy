@@ -3,7 +3,7 @@ package content
 
 import grails.converters.JSON
 import content.Location
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 import org.grails.taggable.*
 import species.groups.UserGroup
 
@@ -22,7 +22,7 @@ class ProjectController {
 		redirect(action: "list", params: params)
 	}
 
-	def list() {
+	def list = {
 		log.debug params
 
 		def model = getProjectList(params)
@@ -43,14 +43,14 @@ class ProjectController {
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-	def create() {
+	def create = {
 		def projectInstance = new Project()
 		projectInstance.properties = params
 		return [projectInstance: projectInstance]
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-	def save() {
+	def save = {
 		log.debug params
 
 		params.author = springSecurityService.currentUser;
@@ -79,7 +79,7 @@ class ProjectController {
 		}
 	}
 
-	def show() {
+	def show = {
 		def projectInstance = Project.get(params.id)
 		if (!projectInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'project.label', default: 'Project'), params.id])}"
@@ -91,7 +91,7 @@ class ProjectController {
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-	def edit() {
+	def edit = {
 		def projectInstance = Project.get(params.id)
 		if (!projectInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'project.label', default: 'Project'), params.id])}"
@@ -103,7 +103,7 @@ class ProjectController {
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-	def update() {
+	def update = {
 		def projectInstance = Project.get(params.id)
 		if (projectInstance) {
 			if (params.version) {
@@ -136,7 +136,7 @@ class ProjectController {
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
-	def delete() {
+	def delete = {
 		def projectInstance = Project.get(params.id)
 		if (projectInstance) {
 			try {

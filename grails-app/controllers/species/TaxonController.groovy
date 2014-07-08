@@ -8,7 +8,7 @@ import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
 import grails.converters.JSON;
 import grails.converters.XML;
-import grails.plugin.springsecurity.annotation.Secured;
+import grails.plugins.springsecurity.Secured;
 import grails.web.JSONBuilder;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
@@ -60,8 +60,7 @@ class TaxonController {
         if(expandSpecies) {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
-            long regId = classSystem;
-            getSpeciesHierarchy(speciesid, rs, regId);
+            getSpeciesHierarchy(speciesid, rs, classSystem);
         } else {
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
         }
@@ -389,7 +388,7 @@ class TaxonController {
     }
 
 	@Secured(['ROLE_USER'])
-    def create() {
+    def create = {
         def errors = [], result=[success:false];
         if(params.classification) {
             String speciesName;
@@ -437,7 +436,7 @@ class TaxonController {
     }
 
 	@Secured(['ROLE_USER'])
-    def update()  {
+    def update = {
         def errors = [], result=[success:false];
         if(params.classification) {
             String speciesName;
@@ -504,7 +503,7 @@ class TaxonController {
     }
 
 	@Secured(['ROLE_USER'])
-    def delete() {
+    def delete = {
         def errors = [];
         if(params.reg) {
 

@@ -5,8 +5,6 @@ class FacebookUser {
 
 	long uid
 	String accessToken
-    Date accessTokenExpires
-
 	boolean isFirstLogin = true;
 	
 

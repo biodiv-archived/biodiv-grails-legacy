@@ -1,6 +1,6 @@
 <div>
 	<g:if test="${tags}">
-		<tc:tagCloud tags="${tags}" action="list" sort="${true}"  
+		<tc:tagCloud tags="${tags}" action="list" sort="${true}" style 
 						color="${[start: '#084B91', end: '#9FBBE5']}"
 						size="${[start: 12, end: 30, unit: 'px']}"
 						paramName='tag'/>

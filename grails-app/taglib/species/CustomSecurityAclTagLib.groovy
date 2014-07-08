@@ -1,6 +1,6 @@
 package species;
 
-import grails.plugin.springsecurity.acl.SecurityAclTagLib;
+import grails.plugins.springsecurity.acl.SecurityAclTagLib;
 
 import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl
 import org.springframework.security.acls.model.ObjectIdentityGenerator
@@ -14,6 +14,8 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 
 	static namespace = "customsecurity"
 
+	def grailsApplication;
+	
 	private ObjectIdentityGenerator objectIdentityGenerator = new ObjectIdentityRetrievalStrategyImpl();
 
 	def isPermittedAsPerGroups = { attrs, body ->
@@ -29,6 +31,7 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 	def hasPermissionAsPerGroups = {attrs ->
 		out << hasPermissionAsPerGroup(attrs, 'permitted');
 	}
+
 	//resolving permissions basing on the usergroups object belongs to in most liberal fashion
 	boolean hasPermissionAsPerGroup(attrs, String tagName) {
 
@@ -61,6 +64,7 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 		return false;
 
 	}
+
 
 	protected boolean resolvePermissionsAsPerGroups(auth, object, specialProperty, propertyCondition, permissions) {
 		def userGroups = getObjectUserGroups(object);

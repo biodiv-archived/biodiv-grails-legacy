@@ -1,7 +1,7 @@
 package utils
 
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 
 class ChartController {
 
@@ -12,14 +12,14 @@ class ChartController {
 	}
 	
 	@Secured(['ROLE_ADMIN'])
-	def test() {
+	def test = {
 		//render chartService.getObservationStats(params, null) as JSON
 		//render chartService.getSpeciesPageStats(params) as JSON
 		//render chartService.getPortalActivityStatsByDay(params) as JSON
 		[]
 	}
 	//@Secured(['ROLE_ADMIN'])
-	def show() {
+	def show = {
 		log.debug params
 		[obvData:chartService.getObservationStats(params, null, request), speciesData: chartService.getSpeciesPageStats(params, request), userData:chartService.activeUserStats(params, request),  activityData:chartService.getPortalActivityStatsByDay(params)]
 	}

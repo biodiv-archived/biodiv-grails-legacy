@@ -24,7 +24,7 @@ class AbstractObjectService {
 	def springSecurityService;
 	def sessionFactory;
 
-	protected static final log = LogFactory.getLog(this);
+	private static final log = LogFactory.getLog(this);
 
     /**
     */
@@ -41,17 +41,35 @@ class AbstractObjectService {
 	protected static List createUrlList2(observations, String iconBasePath){
 		List urlList = []
 		for(param in observations){
-            def obv = param['observation'];
-
-			def item = asJSON(obv, iconBasePath) 
-            
-            def controller = getTargetController(obv);
-			item.url = "/" + controller + "/show/" + obv.id
+			def item = [:];
+            def controller = getTargetController(param['observation']);
+            item.id = param['observation'].id
+			item.url = "/" + controller + "/show/" + param['observation'].id
 			item.title = param['title']
             item.type = controller
-    		if(param.inGroup) {
+			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			Resource image = param['observation'].mainImage()
+            def sGroup = param['observation'].fetchSpeciesGroup()
+            if(sGroup)
+			    item.sGroup = sGroup.name
+            if(param['observation'].habitat)
+			    item.habitat = param['observation'].habitat?.name
+			if(image){
+				if(image.type == ResourceType.IMAGE) {
+                    boolean isChecklist = param['observation'].hasProperty("isChecklist")?param['observation'].isChecklist:false ;
+					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
+				} else if(image.type == ResourceType.VIDEO) {
+					item.imageLink = image.thumbnailUrl()
+				}
+			}else{
+				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
+			} 			
+			if(param.inGroup) {
 				item.inGroup = param.inGroup;
 			} 
+			
+            item.notes = param['observation'].notes()
+  			item.summary = param['observation'].summary();				
             
             if(param['featuredNotes']) {
                 item.featuredNotes = param['featuredNotes']
@@ -60,39 +78,7 @@ class AbstractObjectService {
             if(param['featuredOn']) {
                 item.featuredOn = param['featuredOn'].getTime();
             }
-
-	        
-			urlList << item;
-		}
-		return urlList
-	}
-
-    protected static asJSON(def obv, String iconBasePath) {
-            def item = [:] 
-            item.id = obv.id
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-            def sGroup = obv.fetchSpeciesGroup()
-            if(sGroup)
-			    item.sGroup = sGroup.name
-            if(obv.habitat)
-			    item.habitat = obv.habitat?.name
-			
-            Resource image = obv.mainImage()
-			if(image){
-				if(image.type == ResourceType.IMAGE) {
-                    boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
-				} else if(image.type == ResourceType.VIDEO) {
-					item.imageLink = image.thumbnailUrl()
-				}
-			}else{
-				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
-			} 			
-		
-            item.notes = obv.notes()
-  			item.summary = obv.summary();				
-            
-            def obj = obv;
+            def obj = param['observation'];
             if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
             if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
             if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
@@ -101,8 +87,10 @@ class AbstractObjectService {
 				item.geoPrivacy = obj.geoPrivacy
 				item.geoPrivacyAdjust = obj.fetchGeoPrivacyAdjustment()
 			}
-            return item;
-    }
+			urlList << item;
+		}
+		return urlList
+	}
 
     //XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
 	// to resolve controller name
@@ -224,7 +212,6 @@ class AbstractObjectService {
         def resources = builder.createNode("resources");
         Node images = new Node(resources, "images");
         Node videos = new Node(resources, "videos");
-        Node audios = new Node(resources, "audios");
         
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" ){
@@ -233,7 +220,6 @@ class AbstractObjectService {
         else{
             uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
         }
-        BitSet indexes = new BitSet();
         List files = [];
         List titles = [];
         List licenses = [];
@@ -243,27 +229,14 @@ class AbstractObjectService {
         List ratings = [];
         List contributor = [];
         //List resContext = [];
-
-        
         params.each { key, val ->
-        
             int index = -1;
-            if(key.startsWith('file_') || key.startsWith('url_')) {
-
+            if(key.startsWith('file_')) {
                 index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
-                if(indexes.get(index)) {
-                    index = -1;
-                } else {
-                    if(val != ""){
-                        indexes.set(index);
-                    }    
-                }
 
             }
-           
-            if(index != -1) {                
+            if(index != -1) {
                 files.add(val);
-                
                 titles.add(params.get('title_'+index));
                 licenses.add(params.get('license_'+index));
                 type.add(params.get('type_'+index));
@@ -276,10 +249,8 @@ class AbstractObjectService {
                 }
             }
         }
-         
         files.eachWithIndex { file, key ->
             Node image;
-          
             if(file) {
                 if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
                     image = new Node(images, "image");
@@ -289,13 +260,7 @@ class AbstractObjectService {
                     image = new Node(videos, "video");
                     new Node(image, "fileName", file);
                     new Node(image, "source", url.getAt(key));
-                } else if(type.getAt(key).equalsIgnoreCase(ResourceType.AUDIO.value())) {
-                    image = new Node(audios, "audio");                    
-                    File f = new File(uploadDir, file);
-                    new Node(image, "fileName", f.absolutePath);
-                }	
-
-              			
+                }				
                 new Node(image, "caption", titles.getAt(key));
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
@@ -331,18 +296,11 @@ class AbstractObjectService {
             break;
         }
         converter.setResourcesRootDir(rootDir);
-        
-
         def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
-
-        if(relImagesContext == ""){
-            relImagesContext = resourcesXML.audios.audio?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
-        }
         relImagesContext = new File(relImagesContext).getParent();
-       
-       return converter.createMedia(resourcesXML, relImagesContext);
+        println "+++++++++++++++++++++"
+        println resourcesXML
+        return converter.createMedia(resourcesXML, relImagesContext);
     }
-
-
 
 }

@@ -38,8 +38,6 @@ class NamesIndexerService {
 	 * Existing lookup is present 
 	 */
 	void rebuild() {
-
-		
 		log.info "Publishing names to autocomplete index";
 		Lookup lookup1 = new TSTLookup();
 
@@ -75,8 +73,6 @@ class NamesIndexerService {
 
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		store(indexStoreDir);
-
-		
 	}
 
 	/**
@@ -89,7 +85,7 @@ class NamesIndexerService {
 		/* setOutputUnigrams(boolean outputUnigrams) is deprecated....Confgure outputUnigrams during construction as shown below.*/
 		//def analyzer = new ShingleAnalyzerWrapper(Analyzer, minShingleSize, maxShingleSize, tokenSeprator, outputUnigram, outputUnigramsIfNoShingles)
 		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true)
-		return addRecoWithAnalyzer(reco, analyzer, lookup);
+		return add(reco, analyzer, lookup);
 	}
 
 	/**
@@ -99,7 +95,7 @@ class NamesIndexerService {
 	 * @param lookup
 	 * @return
 	 */
-	private boolean addRecoWithAnalyzer(Recommendation reco, Analyzer analyzer, lookup) {
+	private boolean add(Recommendation reco, Analyzer analyzer, lookup) {
 		if(isDirty()) {
 			log.info "Rebuilding index as its dirty"
 			rebuild();

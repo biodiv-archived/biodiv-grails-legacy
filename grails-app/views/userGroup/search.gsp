@@ -31,7 +31,7 @@
 			return false;
 		});
 
-		$("#removeQueryFilter").on('click', function(){
+		$("#removeQueryFilter").live('click', function(){
            	$( "#searchTextField" ).val('');
           	$("#search").click();
            	return false;

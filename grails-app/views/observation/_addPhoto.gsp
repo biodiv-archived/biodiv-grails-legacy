@@ -15,15 +15,14 @@
                 def counter = 0 
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
-            <li class="add_file addedResource" >
+            <li class="add_file addedResource">
             
             <div class="add_file_container">
                 <div class="add_image"></div> 
-               
+                <div style="text-align:center;">
+                    or
+                </div> 
                 <div class="add_video editable"></div>
-                
-                <div class="add_audio"></div>
-
             </div>
             <div class="progress">
                 <div class="translucent_box"></div>
@@ -67,10 +66,8 @@
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
                 <!--input name="resContext_${i}" type="hidden" value='${r.context.value()}'/-->
-                
-                <g:if test="${r.type != ResourceType.AUDIO}">  
-                    <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
-                </g:if>
+                <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
+                <g:if test="${r.type == ResourceType.IMAGE}">
                 <%
                     def licenseList = r?.licenses?.asList()
                     def firstLicense
@@ -79,7 +76,7 @@
                     }
                 %>
                 <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense]"/>
-               
+                </g:if>
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
@@ -122,13 +119,11 @@
         <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
         <input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
         
-        
-    {{if type != "AUDIO"}}  
-        <%def r = new Resource();%>        
+        <%def r = new Resource();%>
         <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
-    {{/if}}
-        
-        <div id="license_div_{{>i}}" class="licence_div dropdown">
+
+        {{if type == '${ResourceType.IMAGE}'}}
+        <div id="license_div_{{>i}}" class="licence_div pull-left dropdown">
             <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                 <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                 <b class="caret"></b>
@@ -149,14 +144,14 @@
                 <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span>Choose a license</span>
                 <g:each in="${species.License.list()}" var="l">
-                    <li class="license_option" onclick="selectLicense($(this), {{>i}})">
-                    <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
+                <li class="license_option" onclick="selectLicense($(this), {{>i}})">
+                <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                 </li>
                 </g:each>
             </ul>
             <input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
         </div>	
-     
+        {{/if}}
    
     </div>
     <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>

@@ -10,7 +10,7 @@ import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
 import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
 import com.octo.captcha.component.image.color.SingleColorGenerator
 import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
-import grails.plugin.springsecurity.SecurityConfigType;
+import grails.plugins.springsecurity.SecurityConfigType;
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
 import org.apache.log4j.Priority
 
@@ -71,7 +71,7 @@ grails.enable.native2ascii = true
 // whether to install the java.util.logging bridge for sl4j. Disable for AppEngine!
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
-grails.spring.bean.packages = ['species.*']
+grails.spring.bean.packages = []
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
@@ -160,7 +160,7 @@ else if (new File(System.getenv(ENV_NAME)).exists()) {
 	grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
 else {
-	//println "*** No external configuration file defined. ***"
+	println "*** No external configuration file defined. ***"
 }
 
 
@@ -472,55 +472,7 @@ environments {
             }
         }
 
-        log4jConsoleLogLevel = Priority.DEBUG
-        log4j = {
 
-            appenders {
-                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-                 //console name:'stacktrace'
-                 //'null' name:'stacktrace'//to disable stacktraces on stdout
-             }
-            root {
-                error 'stdout'
-            }
-            error stdout:"StackTrace"
-            error   'net.sf.ehcache.hibernate'
-            error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
-                    'org.codehaus.groovy.grails.plugins', // plugins
-                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource',
-                    'org.hibernate',
-                    'grails.util'
-
-            warn    'org.springframework.security',
-                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.app'
-            info   'org.springframework.security'
-            info   'org.springframework.security.web'
-            info   'org.springframework.security.authentication'
-
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
-//            debug 'org.hibernate.SQL'
-//            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            error "grails.plugin" 
-            error 'grails.app.services.org.grails.plugin.resource'
-            error 'grails.app.taglib.org.grails.plugin.resource'
-            error 'grails.app.resourceMappers.org.grails.plugin.resource'
-            //debug "org.grails.plugin.resource"
-        }
-    }
-	test {
         log4jConsoleLogLevel = Priority.DEBUG
 	    log4j = {
             // By default, messages are logged at the warn level to the console and the app.log
@@ -547,7 +499,10 @@ environments {
             debug   'grails.app.filters.species.SecurityFilters'
             info    'species.auth',
             'com.mchange.v2.resourcepool.BasicResourcePool'
+
         }
+    }	
+    test {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
 	}
@@ -620,8 +575,8 @@ environments {
 	    ibp.domain='ibp.saturn.strandls.com'
         wgp.domain='wgp.saturn.strandls.com' 
 		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
                     upload {
@@ -646,7 +601,7 @@ environments {
 		}
 	}
 	pambaTest {
-		appName = "biodiv"
+		appName = "biodiv_test"
 		grails.serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}"
 		
 		speciesPortal {
@@ -654,7 +609,7 @@ environments {
 			data.rootDir = "${app.rootDir}/data"
 
 			resources {
-				rootDir = "${app.rootDir}/img"
+				rootDir = "${app.rootDir}/images"
 				serverURL = "http://saturn.strandls.com/${appName}/img"
 			}
 
@@ -697,8 +652,8 @@ environments {
 	    ibp.domain='indiabiodiversity.saturn.strandls.com'
             wgp.domain='thewesternghats.indiabiodiversity.saturn.strandls.com' 
 		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
                     upload {
@@ -716,43 +671,11 @@ environments {
 			appenders {
 				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
 			}
-/*			info	'species',
+			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
             debug   'grails.app.filters.species.SecurityFilters'
-*/
-            error stdout:"StackTrace"
-
-            error   'net.sf.ehcache.hibernate'
-            error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
-                    'org.codehaus.groovy.grails.plugins', // plugins
-                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource',
-                    'org.hibernate',
-                    'grails.util'
-
-            warn    'org.springframework.security',
-                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.plugin',
-                    'grails.app'
-            info   'org.springframework.security'
-            debug   'org.springframework.security.web'
-            debug   'org.springframework.security.authentication'
-
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
- 
-        }
+		}
 
 	}
 
@@ -805,8 +728,8 @@ environments {
         ibp.domain='indiabiodiversity.org'
         wgp.domain='thewesternghats.indiabiodiversity.org'   
 		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
@@ -975,28 +898,28 @@ jquery {
 
 
 // Added by the Spring Security Core plugin:
-grails.plugin.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
-grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
-grails.plugin.springsecurity.authority.className = 'species.auth.Role'
-grails.plugin.springsecurity.userLookup.usernamePropertyName = 'email'
-//grails.plugin.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
-grails.plugin.springsecurity.successHandler.useReferer = true;
+grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
+grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
+grails.plugins.springsecurity.authority.className = 'species.auth.Role'
+grails.plugins.springsecurity.userLookup.usernamePropertyName = 'email'
+//grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
+grails.plugins.springsecurity.successHandler.useReferer = true;
 
-//grails.plugin.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
-//grails.plugin.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
-//grails.plugin.springsecurity.providerNames = [
+//grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
+//grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
+//grails.plugins.springsecurity.providerNames = [
 //	'drupalAuthentiactionProvider',
 //	'daoAuthenticationProvider',
 //	'anonymousAuthenticationProvider',
 //	'rememberMeAuthenticationProvider'
 //];
 
-//grails.plugin.springsecurity.openid.nonceMaxSeconds =  600;
+//grails.plugins.springsecurity.openid.nonceMaxSeconds =  600;
 
 //
-//grails.plugin.springsecurity.facebook.appId='308606395828381'
-//grails.plugin.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
-//grails.plugin.springsecurity.facebook.bean.dao='facebookAuthDao'
+//grails.plugins.springsecurity.facebook.appId='308606395828381'
+//grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
+//grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDao'
 
 //disabling as uid and name params sent for drupalauthcookiefilter needs to be parsed and
 //multipart requests stream cant be read twice.
@@ -1005,15 +928,15 @@ grails.plugin.springsecurity.successHandler.useReferer = true;
 
 checkin.drupal = false;
 
-grails.plugin.springsecurity.openid.domainClass = 'species.auth.OpenID'
-grails.plugin.springsecurity.openid.userLookup.openIdsPropertyName = "openIds"
-grails.plugin.springsecurity.rememberMe.persistent = true
-grails.plugin.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
-grails.plugin.springsecurity.roleHierarchy = '''
+grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'
+grails.plugins.springsecurity.openid.userLookup.openIdsPropertyName = "openIds"
+grails.plugins.springsecurity.rememberMe.persistent = true
+grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
+grails.plugins.springsecurity.roleHierarchy = '''
 	ROLE_ADMIN > ROLE_USER
 '''
 
-grails.plugin.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
+grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
  
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
@@ -1021,22 +944,22 @@ grails.taggable.tagLink.autoImport=true
 grails.mail.default.from="notification@indiabiodiversity.org"
 emailConfirmation.from="notification@indiabiodiversity.org"
 
-grails.plugin.springsecurity.password.algorithm = 'MD5'
+grails.plugins.springsecurity.password.algorithm = 'MD5'
 
-grails.plugin.springsecurity.ui.password.minLength=6
-grails.plugin.springsecurity.ui.password.maxLength=64
-grails.plugin.springsecurity.ui.password.validationRegex='^.*$'
-grails.plugin.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/user/myprofile" // use defaultTargetUrl if not set
-grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
+grails.plugins.springsecurity.ui.password.minLength=6
+grails.plugins.springsecurity.ui.password.maxLength=64
+grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
+grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/user/myprofile" // use defaultTargetUrl if not set
+grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
-//grails.plugin.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
+//grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
 
-grails.plugin.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
-//grails.plugin.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
+grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
+//grails.plugins.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
-grails.plugin.springsecurity.ui.newuser.emailBody = '''\
+grails.plugins.springsecurity.ui.newuser.emailBody = '''\
 Hi $username,<br/>
 <br/>
 Thank you for registering with us at <b>$domain</b>.<br/>
@@ -1048,22 +971,20 @@ Please update your <a href="$userProfileUrl">user profile</a>.<br/>
 <br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
--The portal team
-'''
-//grails.plugin.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
+-The portal team'''
+//grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
 
-grails.plugin.springsecurity.ui.userdeleted.emailBody = '''\
+grails.plugins.springsecurity.ui.userdeleted.emailBody = '''\
 Hi Admin,<br/>
 <br/>
 A user with email address $email is being deleted from <b>$domain</b>.<br/>
 <br/>
--The portal team
-'''
-//grails.plugin.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
+-The portal team'''
+//grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
 
-grails.plugin.springsecurity.ui.forgotPassword.emailBody = '''\
+grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
 Hi $username,<br/>
 <br/>
 You (or someone pretending to be you) requested that your password be reset.<br/>
@@ -1072,25 +993,24 @@ If you didn't make this request then ignore the email; no changes have been made
 <br/>
 If you did make the request, then click <a href="$url">here</a> to reset your password.
 '''
-//grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
+//grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
-grails.plugin.springsecurity.ui.addObservation.emailSubject = 'Observation added'
-grails.plugin.springsecurity.ui.addObservation.emailBody = '''\
-    Hi $username,<br/>
-    <br/>
-    You have uploaded an observation to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
-    <br/>
-    You will be notified by mail on any social activity on the observation.<br/>
-    If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-    <br/>
-    Thank you for your contribution to the portal.<br/>
-    <br/>
-    -The portal team
-    '''
+grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
+grails.plugins.springsecurity.ui.addObservation.emailBody = '''
+Hi $username,<br/>
+<br/>
+You have uploaded an observation to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
 
-grails.plugin.springsecurity.ui.addChecklist.emailSubject = 'Checklist added'
-grails.plugin.springsecurity.ui.addChecklist.emailBody = '''\
+grails.plugins.springsecurity.ui.addChecklist.emailSubject = 'Checklist added'
+grails.plugins.springsecurity.ui.addChecklist.emailBody = '''
 Hi $username,<br/>
 <br/>
 You have uploaded a checklist to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
@@ -1103,12 +1023,12 @@ Thank you for your contribution to the portal.<br/>
 -The portal team'''
 
 
-grails.plugin.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
-grails.plugin.springsecurity.ui.addRecommendationVote.emailBody = '''\
+grails.plugins.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
+grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
 Hi $username,<br/>
 <br/>
 
-                       <a href="$actorProfileUrl">
+                       <a href="${actorProfileUrl}">
                                <img class="small_profile_pic"
                                        src="$actorIconUrl"
                                        title="$actorName" /> $actorName
@@ -1122,8 +1042,8 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.newComment.emailSubject = 'New comment'
-grails.plugin.springsecurity.ui.newComment.emailBody = '''
+grails.plugins.springsecurity.ui.newComment.emailSubject = 'New comment'
+grails.plugins.springsecurity.ui.newComment.emailBody = '''
 Hi $username,<br/>
 <br/>
 A new comment got added to your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
@@ -1135,8 +1055,8 @@ Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.removeComment.emailSubject = 'Removed a comment'
-grails.plugin.springsecurity.ui.removeComment.emailBody = '''
+grails.plugins.springsecurity.ui.removeComment.emailSubject = 'Removed a comment'
+grails.plugins.springsecurity.ui.removeComment.emailBody = '''
 Hi $username,<br/>
 <br/>
 A comment got removed from your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
@@ -1148,7 +1068,7 @@ Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.observationFlagged.emailBody ='''
+grails.plugins.springsecurity.ui.observationFlagged.emailBody ='''
 Hi $username,<br/>
 <br/>
 Your <a href="$obvUrl">observation</a> has some social activity.<br/>
@@ -1161,10 +1081,10 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
-grails.plugin.springsecurity.ui.askIdentification.staticMessage = '''
+grails.plugins.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
+grails.plugins.springsecurity.ui.askIdentification.staticMessage = '''
 The user $currentUser has shared this $activitySource from $domain with you.'''
-grails.plugin.springsecurity.ui.askIdentification.emailBody = '''
+grails.plugins.springsecurity.ui.askIdentification.emailBody = '''
 Message from <a href="$currentUserProfileLink">$currentUser</a> on $domain <% print activitySource != null ? 'about <a href="'+activitySourceUrl+'">'+activitySource+'</a>':''%>.
 <br/>
 $userMessage
@@ -1174,8 +1094,8 @@ If you do not want to receive such mails please click <a href="$unsubscribeUrl">
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.observationDeleted.emailSubject = 'Observation deleted'
-grails.plugin.springsecurity.ui.observationDeleted.emailBody = '''
+grails.plugins.springsecurity.ui.observationDeleted.emailSubject = 'Observation deleted'
+grails.plugins.springsecurity.ui.observationDeleted.emailBody = '''
 Hi $username,<br/>
 <br/>
 Your <a href="$obvUrl">observation</a> has been deleted on <b>$domain</b>.<br/>
@@ -1184,8 +1104,8 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.checklistDeleted.emailSubject = 'Checklist deleted'
-grails.plugin.springsecurity.ui.checklistDeleted.emailBody = '''
+grails.plugins.springsecurity.ui.checklistDeleted.emailSubject = 'Checklist deleted'
+grails.plugins.springsecurity.ui.checklistDeleted.emailBody = '''
 Hi $username,<br/>
 <br/>
 Your <a href="$obvUrl">checklist</a> has been deleted on <b>$domain</b>.<br/>
@@ -1195,8 +1115,8 @@ If you do not want to receive notifications please go to your <a href="$userProf
 -The portal team'''
 
 
-grails.plugin.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
-grails.plugin.springsecurity.ui.userGroup.inviteMember.emailBody = '''
+grails.plugins.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
+grails.plugins.springsecurity.ui.userGroup.inviteMember.emailBody = '''
 Hi $username,<br/>
 <br/>
 $user has invited you to be member of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
@@ -1205,8 +1125,8 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
-grails.plugin.springsecurity.ui.userGroup.inviteFounder.emailSubject = 'Request to be founder of the group'
-grails.plugin.springsecurity.ui.userGroup.inviteFounder.emailBody = '''
+grails.plugins.springsecurity.ui.userGroup.inviteFounder.emailSubject = 'Request to be founder of the group'
+grails.plugins.springsecurity.ui.userGroup.inviteFounder.emailBody = '''
 Hi $username,<br/>
 <br/>
 $user has invited you to be founder of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
@@ -1214,9 +1134,38 @@ $user has invited you to be founder of the group <a href="$groupUrl">$group</a> 
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugin.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
-grails.plugin.springsecurity.ui.downloadRequest.message = " data download request has been processed. The download link will be visible once you log in to your profile."
-grails.plugin.springsecurity.ui.downloadRequest.emailBody = '''\
+grails.plugins.springsecurity.ui.bBird.emailSubject = "Welcome to the ${app.siteName}"
+grails.plugins.springsecurity.ui.bBird.emailBody = '''\
+Hi $username,<br/>
+<br/>
+An account has been created for you on <b>$domain</b> as part of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a>. You are now a member of the group on the portal.
+<br/>
+Please use the following details to login<br/>
+email : $email <br/>
+password : $password
+<br/>
+Please change your password from the <a href="$changePasswordUrl">reset password</a> page.
+<br/>
+<br/>
+We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
+The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>
+We will appreciate any feedback you may have to offer.<br/><br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.bBirdExistingUser.emailBody = '''\
+Hi $username,<br/>
+<br/>
+You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a> group on the ${app.siteName}. Please use your existing credentials to login. <br/>
+<br/>
+We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
+The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>
+We will appreciate any feedback you may have to offer.<br/><br/>
+-The portal team
+'''
+
+grails.plugins.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
+grails.plugins.springsecurity.ui.downloadRequest.message = " data download request has been processed. The download link will be visible once you log in to your profile."
+grails.plugins.springsecurity.ui.downloadRequest.emailBody = '''\
 Hi $username,<br/>
 <br/>
 Your data download request on the <b>$domain</b> has been processed. 
@@ -1228,10 +1177,10 @@ Please note that you will need to be logged in to see the download link.
 -The portal team
 '''
 
-grails.plugin.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
+grails.plugins.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
 
-grails.plugin.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observation posted to group'
-grails.plugin.springsecurity.ui.observationPostedToGroup.emailBody = '''\
+grails.plugins.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observation posted to group'
+grails.plugins.springsecurity.ui.observationPostedToGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
 <a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
@@ -1239,8 +1188,8 @@ Hi $username,<br/>
 -The portal team
 '''
 
-grails.plugin.springsecurity.ui.checklistPostedToGroup.emailSubject = 'Checklist posted to group'
-grails.plugin.springsecurity.ui.checklistPostedToGroup.emailBody = '''\
+grails.plugins.springsecurity.ui.checklistPostedToGroup.emailSubject = 'Checklist posted to group'
+grails.plugins.springsecurity.ui.checklistPostedToGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
 <a href="$actorProfileUrl">$actorName</a> has posted a <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
@@ -1249,8 +1198,8 @@ Hi $username,<br/>
 '''
 
 
-grails.plugin.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
-grails.plugin.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
+grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
+grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
 <a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
@@ -1258,8 +1207,8 @@ Hi $username,<br/>
 -The portal team
 '''
 
-grails.plugin.springsecurity.ui.checklistRemovedFromGroup.emailSubject = 'Checklist removed from group'
-grails.plugin.springsecurity.ui.checklistRemovedFromGroup.emailBody = '''\
+grails.plugins.springsecurity.ui.checklistRemovedFromGroup.emailSubject = 'Checklist removed from group'
+grails.plugins.springsecurity.ui.checklistRemovedFromGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
 <a href="$actorProfileUrl">$actorName</a> has removed a <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
@@ -1268,8 +1217,8 @@ Hi $username,<br/>
 '''
 
 
-grails.plugin.springsecurity.ui.addDocument.emailSubject = 'Document added'
-grails.plugin.springsecurity.ui.addDocument.emailBody = '''
+grails.plugins.springsecurity.ui.addDocument.emailSubject = 'Document added'
+grails.plugins.springsecurity.ui.addDocument.emailBody = '''
 Hi $username,<br/>
 <br/>
 You have uploaded a document to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
@@ -1283,10 +1232,10 @@ Thank you for your contribution to the portal.<br/>
 
 
 
-grails.plugin.springsecurity.ui.encodePassword = false
+grails.plugins.springsecurity.ui.encodePassword = false
 
-grails.plugin.springsecurity.useSecurityEventListener = true
-grails.plugin.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
+grails.plugins.springsecurity.useSecurityEventListener = true
+grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
 	Class<?> User = SUser.class
 	println "updating lastlogin date : "+appCtx.springSecurityService.principal.id
 	if (!User) {
@@ -1302,22 +1251,19 @@ grails.plugin.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appC
 	}
 }
 
-grails.plugin.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
+grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
 
 
 //TODO:Need to change
-grails.plugin.springsecurity.useRunAs = true
-grails.plugin.springsecurity.runAs.key = 'run-asKey'
+grails.plugins.springsecurity.useRunAs = true
+grails.plugins.springsecurity.runAs.key = 'run-asKey'
 
-grails.plugin.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
-grails.plugin.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
-grails.plugin.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
+grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
+grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
+grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
-grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation 
-//grails.plugin.springsecurity.rejectIfNoRule = false;
-grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-    '/*/create/**':                  ['ROLE_USER'],
-    '/*/edit/**':                  ['ROLE_USER'],
+grails.plugins.springsecurity.securityConfigType = SecurityConfigType.Annotation 
+grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/role/**': ['ROLE_ADMIN'],
 	'/persistentLogin/**': ['ROLE_ADMIN'],
 	'/abstractS2Ui/**': ['ROLE_ADMIN'],
@@ -1329,16 +1275,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/requestmap/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
-    '/rateable/rate/**': ['ROLE_USER'],
-    '/adminmanage/**': ['ROLE_ADMIN'],
-    '/biodivAdmin/**':['ROLE_ADMIN'],
-    '/securityinfo':    ['ROLE_ADMIN'],
-    '/securityinfo.*':  ['ROLE_ADMIN'],
-    '/securityinfo/**': ['ROLE_ADMIN'],
-    '/**/js/**':       ['permitAll'],
-    '/**/css/**':      ['permitAll'],
-    '/**/images/**':   ['permitAll'],
-    '/**':['permitAll']
+    '/rateable/rate/**': ['ROLE_USER']
  ]
 
 
@@ -1392,103 +1329,7 @@ grails.rateable.rater.evaluator = {
         return user
     }
 }
-
-// Uncomment and edit the following lines to start using Grails encoding & escaping improvements
-
-/* remove this line 
-// GSP settings
-grails {
-    views {
-        gsp {
-            encoding = 'UTF-8'
-            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
-            codecs {
-                expression = 'html' // escapes values inside null
-                scriptlet = 'none' // escapes output from scriptlets in GSPs
-                taglib = 'none' // escapes output from taglibs
-                staticparts = 'none' // escapes output from static template parts
-            }
-        }
-        // escapes all not-encoded output at final stage of outputting
-        filteringCodecForContentType {
-            //'text/html' = 'html'
-        }
-    }
-}
-remove this line */
-//grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
-//TODO remove this client side fb authentication ... as this is legacy code in plugin
-grails.plugin.springsecurity.facebook.filter.type='cookie,transparent'
-//TODO:In Spring Security 3.0 and earlier, the username was stored in the HTTP session under the key "SPRING_SECURITY_LAST_USERNAME". This no longer done, but the plugin will use the old behavior if the grails.plugin.springsecurity.apf.storeLastUsername setting is set to true (the default is false ). Further, the name is no longer escaped before storing, it is stored exactly as entered by the user, so you must escape it when redisplaying to avoid XSS attacks.
-grails.plugin.springsecurity.apf.storeLastUsername=true
-grails.plugin.springsecurity.useSessionFixationPrevention = false
-
-grails.databinding.useSpringBinder=true
-// What URL patterns should be processed by the resources plugin
-grails.resources.adhoc.includes = ['/images/**', '/css/**', '/js/**', '/plugins/**', '/bootstrap/**']
-
-// Legacy setting for codec used to encode data with ${}
-grails.views.default.codec = "html"
-
-// The default scope for controllers. May be prototype, session or singleton.
-// If unspecified, controllers are prototype scoped.
-grails.controllers.defaultScope = 'singleton'
-
-// request parameters to mask when logging exceptions
-grails.exceptionresolver.params.exclude = ['password', 'password2', 'j_password']
-grails.exceptionresolver.logRequestParameters=true
-
-
-grails.plugin.springsecurity.logout.postOnly = false
-grails.plugin.springsecurity.logout.handlerNames = ['securityContextLogoutHandler', 'facebookAuthCookieLogout'];
-
 grails.doc.authors='Prabhakar R, Thomas Vattakaven, Sravanthi M, Sandeep Tandekar, Rahul kumar Sinha'
 grails.doc.license=''
 grails.doc.copyright=''
 grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
-
-//REST
-//grails.plugin.springsecurity.rest.login.useJsonCredentials = true
-grails.plugin.springsecurity.rest.login.useRequestParamsCredentials=true
-grails.plugin.springsecurity.rest.token.storage.useGorm=true
-grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName='species.auth.AuthenticationToken'
-grails.plugin.springsecurity.rest.token.storage.gorm.tokenValuePropertyName='tokenValue'
-grails.plugin.springsecurity.rest.token.storage.gorm.usernamePropertyName='email'
-grails.plugin.springsecurity.rest.login.endpointUrl='/api/login'
-grails.plugin.springsecurity.rest.login.failureStatusCode=401
-grails.plugin.springsecurity.rest.logout.endpointUrl='/api/logout'
-grails.plugin.springsecurity.rest.token.validation.headerName='X-Auth-Token'
-
-//APPINFO
-
-grails.plugins.dynamicController.mixins = [
-'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
-
-'app.info.custom.example.MyConfigControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController'
-]
-
-
-grails.plugin.springsecurity.filterChain.chainMap = [
-    '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',  // Stateless chain
-    '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
-]

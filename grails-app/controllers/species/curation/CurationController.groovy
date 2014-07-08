@@ -1,7 +1,7 @@
 package species.curation
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import species.NamesParser;
@@ -14,7 +14,7 @@ class CurationController {
 	def springSecurityService;
 	
 	@Secured(['ROLE_SPECIES_ADMIN'])
-	def names() {
+	def names = {
 
 		log.debug params;
 		if(!params.namesFile) {

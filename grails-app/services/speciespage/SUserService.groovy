@@ -1,11 +1,11 @@
 package speciespage
 
-import grails.plugin.springsecurity.ui.SpringSecurityUiService;
+import grails.plugins.springsecurity.ui.SpringSecurityUiService;
 import grails.util.Environment;
 import groovy.text.SimpleTemplateEngine;
 
-import grails.plugin.springsecurity.SpringSecurityUtils;
-import grails.plugin.springsecurity.ui.RegistrationCode;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -43,12 +43,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
 
-        if(propsMap.containsKey('metaClass')) {
-		    propsMap.remove('metaClass')
-        }
-        if(propsMap.containsKey('class')) {
-            propsMap.remove('class')
-        }
+		propsMap.remove('metaClass')
+		propsMap.remove('class')
 
 		String userDomainClassName = SpringSecurityUtils.securityConfig.userLookup.userDomainClassName
 
@@ -148,12 +144,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
         }
     }
 
-	boolean ifOwns(Long id) {
+	boolean ifOwns(id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
-	}
-
-	boolean ifOwnsByEmail(String email) {
-		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
 
 	boolean isAdmin(id) {
@@ -216,13 +208,11 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
 
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 					try {
 						mailService.sendMail {
-
-				            if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
-				            }
 							from conf.ui.notification.emailFrom
 							subject mailSubject
 							html bodyContent.toString()
@@ -230,6 +220,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					}catch(all)  {
 					    log.error all.getMessage()
 					}
+				}
 				break
 			default:
 				log.debug "invalid notification type"

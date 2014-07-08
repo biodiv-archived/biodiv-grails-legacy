@@ -1,8 +1,8 @@
 <g:each in="${featuredNotes}" var="${featuredNotesItem}">
 <div class="featured_notes linktext">
-    ${raw(featuredNotesItem.notes)}
+    ${featuredNotesItem.notes}
     <small>
-        <div class="ellipsis" style="margin:0px;height:${instance.summary()?'20px':'0px'};">${raw(instance.summary())}</div>
+        <div class="ellipsis" style="margin:0px;height:${instance.summary()?'20px':'0px'};">${instance.summary()}</div>
         <div class="ellipsis" style="height:20px;">Featured on 
             <b>${featuredNotesItem.createdOn.format('MMMMM dd, yyyy')}</b> 
             <g:if test="${featuredNotesItem.userGroup}">

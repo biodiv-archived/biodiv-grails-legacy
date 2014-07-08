@@ -32,7 +32,7 @@
     }
 
     //bind click event on delete buttons using jquery live
-    $('.del-dataLink').on('click', function() {
+    $('.del-dataLink').live('click', function() {
         //find the parent div
         var prnt = $(this).parents(".dataLink-div");
         //find the deleted hidden input

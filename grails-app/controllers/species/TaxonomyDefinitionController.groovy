@@ -8,18 +8,18 @@ class TaxonomyDefinitionController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
+    def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [taxonomyDefinitionInstanceList: TaxonomyDefinition.list(params), taxonomyDefinitionInstanceTotal: TaxonomyDefinition.count()]
     }
 
-    def create() {
+    def create = {
         def taxonomyDefinitionInstance = new TaxonomyDefinition()
         taxonomyDefinitionInstance.properties = params
         return [taxonomyDefinitionInstance: taxonomyDefinitionInstance]
     }
 
-    def save() {
+    def save = {
         def taxonomyDefinitionInstance = new TaxonomyDefinition(params)
         if (taxonomyDefinitionInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'taxonomyDefinition.label', default: 'TaxonomyDefinition'), taxonomyDefinitionInstance.id])}"
@@ -30,7 +30,7 @@ class TaxonomyDefinitionController {
         }
     }
 
-    def show() {
+    def show = {
         def taxonomyDefinitionInstance = TaxonomyDefinition.get(params.id)
         if (!taxonomyDefinitionInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'taxonomyDefinition.label', default: 'TaxonomyDefinition'), params.id])}"
@@ -41,7 +41,7 @@ class TaxonomyDefinitionController {
         }
     }
 
-    def edit() {
+    def edit = {
         def taxonomyDefinitionInstance = TaxonomyDefinition.get(params.id)
         if (!taxonomyDefinitionInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'taxonomyDefinition.label', default: 'TaxonomyDefinition'), params.id])}"
@@ -52,7 +52,7 @@ class TaxonomyDefinitionController {
         }
     }
 
-    def update() {
+    def update = {
         def taxonomyDefinitionInstance = TaxonomyDefinition.get(params.id)
         if (taxonomyDefinitionInstance) {
             if (params.version) {
@@ -79,7 +79,7 @@ class TaxonomyDefinitionController {
         }
     }
 
-    def delete() {
+    def delete = {
         def taxonomyDefinitionInstance = TaxonomyDefinition.get(params.id)
         if (taxonomyDefinitionInstance) {
             try {

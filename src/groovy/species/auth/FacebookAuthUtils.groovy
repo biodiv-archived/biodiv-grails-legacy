@@ -15,7 +15,7 @@ import javax.servlet.http.Cookie;
 
 import species.utils.Utils;
 
-class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils {
+class FacebookAuthUtils {
 
 	private static def log = Logger.getLogger(this)
 
@@ -105,15 +105,13 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 
 	public boolean verifySign(String sign, String payload, String secret) {
 		String signer = 'HMACSHA256'
-
+		//log.debug("Secret $secret")
+		SecretKeySpec sks = new SecretKeySpec(secret.getBytes(), signer)
+		//log.debug("Payload1: `$payload`")
+		payload = payload.replaceAll("-", "+").replaceAll("_", "/").trim()
+		//log.debug("Payload2: `$payload`")
+		sign = sign.replaceAll("-", "+").replaceAll("_", "/")
 		try {
-            //log.debug("Secret $secret")
-            SecretKeySpec sks = new SecretKeySpec(secret?.getBytes(), signer)
-            //log.debug("Payload1: `$payload`")
-            payload = payload.replaceAll("-", "+").replaceAll("_", "/").trim()
-            //log.debug("Payload2: `$payload`")
-            sign = sign.replaceAll("-", "+").replaceAll("_", "/")
-
 			Mac mac = Mac.getInstance(signer)
 			mac.init(sks)
 			byte[] my = mac.doFinal(payload.getBytes('UTF-8'))
@@ -132,10 +130,11 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 
 	String getFacebookAppIdForDomain(String domain) {
 		if(!domain) return;
+		//log.debug "Looking facebook appId for domain $domain"
 
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else {
+		} else {//if(domain.equals(grailsApplication.config.ibp.domain)) {
 			return grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
 		return null;
@@ -144,9 +143,11 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 	String getFacebookAppSecretForDomain(String domain) {
 		if(!domain) return;
 
+		//log.debug "Looking facebook secret for domain $domain"
+
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.secret
-		} else {
+		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 			return grailsApplication.config.speciesPortal.ibp.facebook.secret
 		}
 		return null;

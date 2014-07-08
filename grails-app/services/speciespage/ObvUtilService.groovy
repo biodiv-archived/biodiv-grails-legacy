@@ -85,7 +85,7 @@ class ObvUtilService {
 	def export(params, dl){
 		log.debug(params)
 		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl).getAllResult()
-		log.debug " Obv total $observationInstanceList.size()" 
+		log.debug " Obv total $observationInstanceList.size " 
 		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}
 	

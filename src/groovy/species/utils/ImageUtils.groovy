@@ -149,8 +149,9 @@ class ImageUtils {
 	/**
 	 *Resizing Image to 200*200
 	 */
-    private static void doResize(File inImg, File outImg, int width, int height) throws Exception {
+    public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
         String fileName = inImg.getAbsolutePath();
+		//System.out.println(fileName);
 		String ext = checkMIME(inImg);
         BufferedImage im = null;
         try{       
@@ -164,7 +165,6 @@ class ImageUtils {
         }
         doResize(im, outImg, width, height, ext);
     }
-
 	//XXX change this method to private after running migration script
     private static void doResize(BufferedImage im, File outImg, int width, int height,String ext) throws Exception{
 	   //if(inImg != null){

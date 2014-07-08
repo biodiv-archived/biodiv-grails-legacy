@@ -41,8 +41,5 @@ class SpeciesPermission {
         permissionType nullable: false
     }
 
-	static void removeAll(SUser user) {
-		executeUpdate 'DELETE FROM SpeciesPermission WHERE author=:sUser', [sUser: user]
-	}
-	
+
 }

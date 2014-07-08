@@ -14,7 +14,7 @@ import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.Utils;
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.apache.commons.logging.LogFactory;
 
 class Featured extends AbstractAction {

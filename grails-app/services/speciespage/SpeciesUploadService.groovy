@@ -81,7 +81,7 @@ class SpeciesUploadService {
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static int BATCH_SIZE = 10;
-	//int noOfFields = Field.count();
+	int noOfFields = Field.count();
     String contentRootDir = config.speciesPortal.content.rootDir
 
 	/**

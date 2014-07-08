@@ -1,6 +1,5 @@
 $(document).ready(function(){
-    if(window.params)
-        $.fn.raty.defaults.path = window.params.imagesPath 
+    $.fn.raty.defaults.path = window.params.imagesPath 
     $.fn.raty.defaults.cancel = false
     $.fn.raty.defaults.space = false
 });

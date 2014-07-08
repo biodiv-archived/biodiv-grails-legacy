@@ -48,11 +48,11 @@ class ChecklistUtilService {
 	
 	def sessionFactory
 	
-	private void cleanUpGorm() {
+	private void cleanUpGorm(){
 		cleanUpGorm(true)
 	}
 	
-	private void cleanUpGorm(boolean clearSession) {
+	public void cleanUpGorm(boolean clearSession) {
 		
 	def hibSession = sessionFactory?.getCurrentSession();
 

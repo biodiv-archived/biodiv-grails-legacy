@@ -46,7 +46,7 @@
     }
 
     //bind click event on delete buttons using jquery live
-    $('.del-location').on('click', function() {
+    $('.del-location').live('click', function() {
         //find the parent div
         var prnt = $(this).parents(".location-div");
         //find the deleted hidden input

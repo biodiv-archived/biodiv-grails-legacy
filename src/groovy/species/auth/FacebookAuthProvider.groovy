@@ -11,10 +11,10 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.GrantedAuthorityImpl
 import org.springframework.security.core.userdetails.User
 import org.apache.log4j.Logger
-import grails.plugin.springsecurity.userdetails.DefaultPostAuthenticationChecks;
-import grails.plugin.springsecurity.userdetails.DefaultPreAuthenticationChecks;
-import grails.plugin.springsecurity.userdetails.GrailsUser;
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
+import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
+import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
@@ -84,9 +84,9 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 	}
 
 	protected UserDetails createUserDetails(Object fbUser, String secret) {
+		Collection<GrantedAuthority> roles = facebookAuthDao.getRoles(fbUser)
 		
 		def user = fbUser.user;
-		Collection<GrantedAuthority> roles = facebookAuthDao.getRoles(user)
 		
 		def conf = SpringSecurityUtils.securityConfig
 		String usernamePropertyName = conf.userLookup.usernamePropertyName

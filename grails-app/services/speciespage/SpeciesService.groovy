@@ -9,7 +9,7 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import species.License.LicenseType;
 import species.Contributor;
@@ -70,7 +70,7 @@ class SpeciesService extends AbstractObjectService  {
 
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
-    //static int noOfFields = Field.count();
+    int noOfFields = Field.count();
 
     def nameTerms(params) {
         List result = new ArrayList();

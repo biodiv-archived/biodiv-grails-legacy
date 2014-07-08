@@ -1,6 +1,0 @@
-h3. Logout
-
-1. Send a POST request to following url with X-Auth-Token key in the header along with the token value
-{code}
-/api/logout
-{code}

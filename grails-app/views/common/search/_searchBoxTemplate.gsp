@@ -33,7 +33,7 @@
 			data-target="#" href="#"></a>
 		</div>	
 </div>
-<script type="text/javascript">
+<g:javascript>
 $(document).ready(function() {
 	window.params = {
 		'offset':"${params.offset}",
@@ -106,4 +106,6 @@ $(document).ready(function() {
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });
         
-</script>
+
+
+</g:javascript>

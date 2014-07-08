@@ -2,7 +2,7 @@ package species
 
 import grails.converters.JSON;
 
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 class ResourceController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -13,7 +13,7 @@ class ResourceController {
         redirect(action: "list", params: params)
     }
 
-	def list() {
+	def list = {
 		log.debug params
 		
 		def model = getResourceList(params);
@@ -45,13 +45,13 @@ class ResourceController {
 	}
 	
 
-    def create() {
+    def create = {
         def resourceInstance = new Resource()
         resourceInstance.properties = params
         return [resourceInstance: resourceInstance]
     }
 
-    def save() {
+    def save = {
         def resourceInstance = new Resource(params)
         if (resourceInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'resource.label', default: 'Resource'), resourceInstance.id])}"
@@ -62,7 +62,7 @@ class ResourceController {
         }
     }
 
-    def show() {
+    def show = {
         def resourceInstance = Resource.get(params.id)
         if (!resourceInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'resource.label', default: 'Resource'), params.id])}"
@@ -74,7 +74,7 @@ class ResourceController {
     }
 
     @Secured("ROLE_USER")
-    def edit() {
+    def edit = {
         def resourceInstance = Resource.get(params.id)
         if (!resourceInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'resource.label', default: 'Resource'), params.id])}"
@@ -86,7 +86,7 @@ class ResourceController {
     }
 
     @Secured("ROLE_USER")
-    def update() {
+    def update = {
         def resourceInstance = Resource.get(params.id)
         if (resourceInstance) {
             if (params.version) {
@@ -114,7 +114,7 @@ class ResourceController {
     }
 
     @Secured("ROLE_ADMIN")
-    def delete() {
+    def delete = {
         def resourceInstance = Resource.get(params.id)
         if (resourceInstance) {
             try {

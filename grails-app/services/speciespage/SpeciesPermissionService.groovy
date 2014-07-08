@@ -10,7 +10,7 @@ import species.SpeciesPermission;
 import species.Field;
 import species.SpeciesField;
 import species.Species;
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import species.auth.Role;
 import species.auth.SUserRole;
 import species.participation.UserToken;

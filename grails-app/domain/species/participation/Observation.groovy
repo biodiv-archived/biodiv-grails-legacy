@@ -1,6 +1,6 @@
 package species.participation
 
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import species.utils.ImageType;
 import species.utils.Utils
@@ -172,12 +172,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 		if(!maxVotedReco){
 			return "";
 		}else{
-			return suggestedCommonNames(maxVotedReco.id, false);
+			return fetchSuggestedCommonNames(maxVotedReco.id, false);
 		}
 	}
 
 
-	private String suggestedCommonNames(recoId, boolean addLanguage){
+	private String fetchSuggestedCommonNames(recoId, boolean addLanguage){
 		def englistId = Language.getLanguage(null).id
 		Map langToCommonName = new HashMap()
 		this.recommendationVote.each{ rv ->
@@ -257,7 +257,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
             map.put("isLocked", this.isLocked);
-			String cNames = suggestedCommonNames(reco.id, true)
+			String cNames = fetchSuggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			map.put("disAgree", (currentUser in map.authors));
             if(this.isLocked == false){
@@ -423,16 +423,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		res[ObvUtilService.NOTES] = notes
 		
 		
-		//XXX: During download of large number of observation some time following exception coming
-		//an assertion failure occured (this may indicate a bug in Hibernate, but is more likely due to unsafe use of the session)
-		try{
-			res[ObvUtilService.TAGS] =this.tags.join(", ")
-		}catch(e){
-			log.debug e.printStackTrace()
-			Observation.withNewSession {
-				res[ObvUtilService.TAGS] = this.tags.join(", ")
-			}
-		}
+		res[ObvUtilService.TAGS] =this.tags.join(", ")
 		def ugList = []
 		
 		this.userGroups.each{ ug ->

@@ -20,7 +20,7 @@
 	<g:else>
 	<g:if test="${sName == 'Unknown'}">
 		<div class="sci_name ellipsis" title="${sNameTitle}">
-			${raw(sName)} <a
+			${sName} <a
 				href="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress) }">Help
 				identify</a>
 		</div>
@@ -33,19 +33,19 @@
 		</g:if>
 		<g:elseif test="${observationInstance.maxVotedReco.isScientificName}">
 			<div class="sci_name ellipsis" title="${sNameTitle}">
-				 ${raw(sName)}
+				 ${sName}
 			</div>
 		</g:elseif>
 		<g:else>
                         <div class="ellipsis" title="${sNameTitle}">
-                            ${raw(sName)}
+                            ${sName}
                         </div>
 		</g:else>
 	</g:elseif>
 	<g:else>
 		<g:if test="${observationInstance.maxVotedReco.isScientificName}">
 			<div class="sci_name ellipsis" title="${sNameTitle }">
-                ${raw(sName)} ${speciesLink}
+				${sName + speciesLink}
 			</div>
 			<div class="common_name ellipsis" title="${commonName }">
 				${commonName}
@@ -53,7 +53,7 @@
 		</g:if>
 		<g:else>
 			<div class="ellipsis" title="${sNameTitle}">
-                ${raw(sName)} ${speciesLink}
+				${sName + speciesLink}
 			</div>
 		</g:else>
 	</g:else>

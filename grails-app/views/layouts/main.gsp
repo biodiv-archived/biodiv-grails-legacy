@@ -2,7 +2,7 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.utils.Utils"%>
 <%@page
-	import="grails.plugin.springsecurity.SpringSecurityUtils"%>
+	import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 <html  xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" 
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
@@ -12,15 +12,14 @@
 
 <title><g:layoutTitle/></title>
 
-<r:require modules="observations_list" />
-<g:layoutHead />
-<ckeditor:resources />
 <r:layoutResources />
+<ckeditor:resources />
+<g:layoutHead />
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 
+<r:require modules="observations_list" />
 
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">

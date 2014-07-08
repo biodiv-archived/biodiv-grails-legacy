@@ -11,12 +11,12 @@ import groovy.xml.XmlUtil;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.converters.XML;
 
-import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.Flag.FlagType
@@ -41,7 +41,7 @@ class AbstractObjectController {
     
     def observsationService;
    
-    def related() {
+    def related = {
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 
 		if(relatedObv) {

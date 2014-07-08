@@ -45,7 +45,7 @@ import org.apache.solr.common.util.NamedList
 
 import java.net.URLDecoder;
 import org.apache.solr.common.util.DateUtil;
-import grails.plugin.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 
@@ -76,7 +76,6 @@ class ObservationService extends AbstractObjectService {
     def SUserService;
     def speciesPermissionService;
     def speciesService;
-    def messageSource;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
@@ -157,16 +156,8 @@ class ObservationService extends AbstractObjectService {
 		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
-
-
 	        def resourcesXML = createResourcesXML(params);
-
-             println "==========RESOURCESXML RETURNED ================== " + resourcesXML
-             
 	        def resources = saveResources(observation, resourcesXML);
-
-            println "==========RESOURCES RETURNED ================== " + resources
-
 	        observation.resource?.clear();
 	        resources.each { resource ->
                 resource.saveResourceContext(observation)
@@ -213,16 +204,11 @@ class ObservationService extends AbstractObjectService {
                 return ['success' : true, observationInstance:observationInstance]
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
-                def errors = [];
-                observationInstance.errors.allErrors .each {
-                    def formattedMessage = messageSource.getMessage(it, null);
-                    errors << [field: it.field, message: formattedMessage]
-                }
-                return ['success' : false, 'msg':'Failed to save observation', 'errors':errors, observationInstance:observationInstance]
+                return ['success' : false, observationInstance:observationInstance]
             }
         } catch(e) {
             e.printStackTrace();
-            return ['success' : false, 'msg':e.getMessage(), observationInstance:observationInstance]
+            return ['success' : false, observationInstance:observationInstance]
         }
     }
 
@@ -259,6 +245,7 @@ class ObservationService extends AbstractObjectService {
      * @return
      */
     Map getRelatedObservations(params) {
+        log.debug params;
         int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
         int offset = params.offset ? params.offset.toInteger() : 0
         def relatedObv = [observations:[],max:max];
@@ -1537,75 +1524,46 @@ class ObservationService extends AbstractObjectService {
     } 
 
     def delete(params){
-        String messageCode;
-        String url = generateLink(params.controller, 'list', []);
-        String label = Utils.getTitleCase(params.controller?:'Observation')
+        def messageCode, url, label = Utils.getTitleCase(params.controller)
         def messageArgs = [label, params.id]
-        def errors = [];
-        boolean success = false;
-        if(!params.id) {
-            messageCode = 'default.not.found.message'
-        } else {
-            try {
-                def observationInstance = Observation.get(params.id.toLong())
-                if (observationInstance) {
-                    observationInstance.removeResourcesFromSpecies()
-                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
-                    if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
-                        def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
-                        try {
-                            observationInstance.isDeleted = true;
-                            if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
-                                sendNotificationMail(mailType, observationInstance, null, params.webaddress);
-                                observationsSearchService.delete(observationInstance.id);
-                                messageCode = 'default.deleted.message'
-                                url = generateLink(params.controller, 'list', [])
-                                ActivityFeed.updateIsDeleted(observationInstance)
-                                success = true;
-                            } else {
-                                messageCode = 'default.not.deleted.message'
-                                url = generateLink(params.controller, 'show', [id: params.id])
-                                observationInstance.errors.allErrors.each { log.error it }
-                                observationInstance.errors.allErrors .each {
-                                    def formattedMessage = messageSource.getMessage(it, null);
-                                    errors << [field: it.field, message: formattedMessage]
-                                }
-
-                            }
-                        }
-                        catch (org.springframework.dao.DataIntegrityViolationException e) {
-                            messageCode = 'default.not.deleted.message'
-                            url = generateLink(params.controller, 'show', [id: params.id])
-                            e.printStackTrace();
-                            log.error e.getMessage();
-                            errors << [message:e.getMessage()];
-                        }
+        def observationInstance = Observation.get(params.id.toLong())
+        observationInstance.removeResourcesFromSpecies()
+        if (observationInstance) {
+            boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
+            if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
+                def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
+                try {
+                    observationInstance.isDeleted = true;
+                    if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
+                        sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                        observationsSearchService.delete(observationInstance.id);
+                        messageCode = 'default.deleted.message'
+                        url = generateLink(params.controller, 'list', [])
+                        ActivityFeed.updateIsDeleted(observationInstance)
                     } else {
-                        if(!isFeatureDeleted) {
-                            messageCode = 'default.not.deleted.message'
-                            log.warn "Couldnot delete feature"
-                        }
-                        else {
-                            messageArgs.add(0,'delete');
-                            messageCode = 'default.not.permitted.message'
-                            log.warn "${observationInstance.author} doesn't own observation to delete"
-                        }
+                        messageCode = 'default.not.deleted.message'
+                        url = generateLink(params.controller, 'show', [id: params.id])
+                        observationInstance.errors.allErrors.each { log.error it }
                     }
-                } else {
-                    messageCode = 'default.not.found.message'
-                    url = generateLink(params.controller, 'list', [])
                 }
-            } catch(e) {
-                e.printStackTrace();
-                url = generateLink(params.controller, 'list', [])
-                messageCode = 'default.not.deleted.message'
-                errors << [message:e.getMessage()];
+                catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    messageCode = 'default.not.deleted.message'
+                    url = generateLink(params.controller, 'show', [id: params.id])
+                    e.printStackTrace();
+                    log.error e.getMessage();
+                }
+            } else {
+                if(!isFeatureDeleted) log.warn "Couldnot delete feature"
+                else log.warn "${observationInstance.author} doesnt own observation to delete"
             }
+
         }
-        
-        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
-				
-        return [success:success, url:url, msg:message, errors:errors]
+        else {
+            messageCode = 'default.not.found.message'
+            url = generateLink(params.controller, 'list', [])
+        }
+
+        return [url:url, messageCode:messageCode, messageArgs: messageArgs]
     }
 
     /**
@@ -1633,7 +1591,6 @@ class ObservationService extends AbstractObjectService {
             def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
             templateMap["currentUser"] = springSecurityService.currentUser
             templateMap["action"] = notificationType;
-			templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
             def mailSubject = ""
             def bodyContent = ""
             String htmlContent = ""
@@ -2352,7 +2309,6 @@ class ObservationService extends AbstractObjectService {
         String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+obv.topology.toText()+"', t.topology)order by t.type" ;
         log.debug query;
         def features = [:]
-        if(!Environment.getCurrent().getName().equalsIgnoreCase("development")) {
         try {
             def sql =  Sql.newInstance(dataSource);
             //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
@@ -2370,7 +2326,6 @@ class ObservationService extends AbstractObjectService {
         } catch(e) {
             e.printStackTrace();
             log.error e.getMessage();
-        }
         }
         return features
     } 

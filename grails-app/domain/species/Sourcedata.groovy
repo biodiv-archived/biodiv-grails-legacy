@@ -13,12 +13,7 @@ abstract class Sourcedata {
 		uploader nullable:true;
 		uploadTime nullable:true;
     }
-
-	static mapping = {
-        tablePerHierarchy false
-//        tablePerSubClass true
-    }
-
+	
 	def beforeInsert(){
 		updateSoruce()
 	}

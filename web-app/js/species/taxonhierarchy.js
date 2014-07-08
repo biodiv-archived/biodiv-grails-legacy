@@ -146,7 +146,7 @@
 
             });
 
-            $("#taxaHierarchy>select[name='taxaHierarchy']").change($.proxy(this.onChange, this));
+            $(".taxaHierarchy").change($.proxy(this.onChange, this));
             
             $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
             $('.ui-jqgrid-hdiv').hide();

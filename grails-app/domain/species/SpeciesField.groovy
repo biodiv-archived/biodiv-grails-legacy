@@ -2,9 +2,8 @@ package species
 
 import org.grails.rateable.*
 import species.auth.SUser
-import species.NamesSorucedata;
 
-class SpeciesField extends NamesSorucedata implements Rateable {
+class SpeciesField extends Sourcedata implements Rateable {
 
 	def activityFeedService
 	
@@ -63,17 +62,16 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	String description;
 	Date dateCreated
 	Date lastUpdated
+    List<SUser> contributors;
     List<Contributor> attributors;
 	
-	static hasMany = [licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
+	static hasMany = [contributors:SUser, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
 	static mapping = {
 		description type:"text";
-//		tablePerHierarchy true;
-//		tablePerHierarchy false
+		tablePerHierarchy true;
 		references cascade: "all-delete-orphan"
-//        discriminator value:"species.SpeciesField"
 	}
 	
 	static constraints = {

@@ -33,7 +33,7 @@
                     <%
                     def classifications = [];
                     Classification.list().each {
-                    classifications.add([it.id, it, null]);
+                    classifications.add([null, it, null]);
                     }
                     classifications = classifications.sort {return it[1].name};
                     %>
