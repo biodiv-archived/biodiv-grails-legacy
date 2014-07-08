@@ -468,7 +468,7 @@ $(document).ready(function(){
 
 </r:script>
 
-
+<g:if test="${audioCount >= 1}"> 
 
 <script type="text/javascript">
 var audio;
@@ -510,6 +510,8 @@ function run(link, player){
         audio[0].play();
 }
 </script>
+
+</g:if>
 
 </body>
 </html>

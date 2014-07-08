@@ -525,7 +525,12 @@ class ObservationController extends AbstractObjectController {
 
 					}else if(resourcetype == 'audio'){
 						okcontents = [
-										'audio/mp3'
+										'audio/mp4','audio/m4a',
+										'audio/mpeg','audio/mp1','audio/mp2','audio/mp3','audio/mpg',
+										'audio/ogg','audio/oga',
+										'audio/wav',
+										'audio/webm',
+
 										]
 						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
 
@@ -578,7 +583,7 @@ class ObservationController extends AbstractObjectController {
 								type = ResourceType.IMAGE	
 														
 						}else if(resourcetype == 'audio'){
-								thumbnail = "http://indiabiodiversity.localhost.org/biodiv/static/images/audioicon.png"
+								thumbnail = "/images/audioicon.png"
 								type = ResourceType.AUDIO	
 								
 

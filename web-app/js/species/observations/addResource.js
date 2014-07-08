@@ -221,7 +221,7 @@ function removeResource(event, imageId) {
             me.$ele.find(".add_file" ).fadeIn(3000);
             me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
             me.$ele.find(".image-resources-msg").html("");
-            me.$form.find("input[name='resources']").remove();
+            //me.$form.find("input[name='resources']").remove();
             me.$ele.find('.videoUrl').val('');
             me.$ele.find('.audioUrl').val('');
             me.$ele.find('.add_video').editable('setValue','', false);
@@ -237,7 +237,7 @@ function removeResource(event, imageId) {
                     return; 
                 }
                 me.$ele.find("#addObservationSubmit").removeClass('disabled');
-                me.$form("input[name='resources']").remove();
+               //me.$form("input[name='resources']").remove();
                 me.$ele.find('.videoUrl').val('');
                 me.$ele.find('.audioUrl').val('');
                 me.$ele.find(".progress").css('z-index',90);
@@ -245,7 +245,8 @@ function removeResource(event, imageId) {
               //  me.$ele.find('.add_audio').editable('setValue','', false);
                 //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 
-                var response = $.parseJSON(xhr.responseText);
+                var response = $.parseJSON(xhr.responseText);                
+                alert(response.error);
                 if(response.error){
                     me.$ele.find(".image-resources-msg").parent(".resources").addClass("error");
                     me.$ele.find(".image-resources-msg").html(response.error);

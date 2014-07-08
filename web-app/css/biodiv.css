@@ -471,8 +471,8 @@ div.errors {
 	cursor: pointer;
 }
 .add_audio {
-	background-image: url('../../images/add_audio.png');
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../../images/add-audio.png'),sizingMethod='crop');
+	background-image: url('../images/add_audio.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-audio.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 	width: 200px;
 	height: 65px;
