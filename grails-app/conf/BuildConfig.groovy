@@ -85,8 +85,8 @@ grails.project.dependency.resolution = {
         compile ('org.quartz-scheduler:quartz:2.1.7') {
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
-        compile 'org.apache.lucene:lucene-analyzers:3.4.0'
-        compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
+//        compile 'org.apache.lucene:lucene-analyzers:3.4.0'
+//        compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
         compile (group:'org.apache.poi', name:'poi', version:'3.7'){
             excludes 'servlet-api'
         }
