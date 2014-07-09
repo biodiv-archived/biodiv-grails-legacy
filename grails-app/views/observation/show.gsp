@@ -66,9 +66,9 @@ if(r) {
 </head>
 <body>
 
-<link rel="stylesheet" href="/js/galleria/1.2.7/themes/classic/galleria.classic.css">
-<script src="/js/galleria/1.2.7/galleria-1.2.7.min.js"></script>
-<script src="/js/galleria/1.2.7/themes/classic/galleria.classic.min.js"></script>
+<link rel="stylesheet" href="/biodiv/js/galleria/1.2.7/themes/classic/galleria.classic.css">
+<script src="/biodiv/js/galleria/1.2.7/galleria-1.2.7.min.js"></script>
+<script src="/biodiv/js/galleria/1.2.7/themes/classic/galleria.classic.min.js"></script>
 
             <div class="observation  span12">
                             <obv:showSubmenuTemplate/>
