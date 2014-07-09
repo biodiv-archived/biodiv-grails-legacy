@@ -198,9 +198,9 @@
 
     <body>
 
-    <link rel="stylesheet" href="/js/galleria/1.2.7/themes/classic/galleria.classic.css" />
-    <script type="text/javascript" src="/js/galleria/1.2.7/galleria-1.2.7.min.js" ></script> 
-    <script type="text/javascript" src="/js/galleria/1.2.7/themes/classic/galleria.classic.min.js" ></script>   
+    <link rel="stylesheet" href="/biodiv/js/galleria/1.2.7/themes/classic/galleria.classic.css" />
+    <script type="text/javascript" src="/biodiv/js/galleria/1.2.7/galleria-1.2.7.min.js" ></script> 
+    <script type="text/javascript" src="/biodiv/js/galleria/1.2.7/themes/classic/galleria.classic.min.js" ></script>   
   
      
         <g:if test="${speciesInstance}">
