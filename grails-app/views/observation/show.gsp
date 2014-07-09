@@ -127,8 +127,10 @@ if(r) {
                          <% def audioResource = 0 
                             def audioCount    = 0  %>
                         <g:if test="${observationInstance.resource}">
-                            <%  isaudioResource = 0 %>
-                            <g:each in="${observationInstance.listResourcesByRating()}" var="r">
+                            <%  isaudioResource = 0 
+                                def observationInstanceListResources = observationInstance.listResourcesByRating()
+                            %>
+                            <g:each in="${observationInstanceListResources}" var="r">
                                 <g:if test="${r.type == ResourceType.IMAGE}">
                                 <% isaudioResource = 1 %>
                                 <%def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
@@ -161,61 +163,11 @@ if(r) {
                         </g:else>
 
                     </div>
-                                </div>
+                    </div>
 
+                
+<g:render template="/species/speciesaudio" model="['resourceInstance': observationInstance"/>
 
-                    <g:if test="${isaudioResource == 0}" >
-                    
-                        <style type="text/css">
-
-                                #gallery1{
-                                    display:none !important;
-                                }
-                                .noTitle{
-                                    display:none !important;
-                                }
-                        </style>
-                        
-
-                    </g:if>            
-
-                    <g:if test="${audioCount >=2 }" > 
-                            <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">
-                                <% def tempVar = 0 %>
-                                <g:each in="${observationInstance.listResourcesByRating()}" var="r">
-                                    <g:if test="${r.type == ResourceType.AUDIO}">
-                                        <%  tempVar = tempVar + 1 %>                                        
-                                        <li class="active" style="display: inline;">
-                                            <a href="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.observations.serverURL)}" class="btn btn-small btn-success" >Audio ${tempVar}</a>
-                                        </li>
-                                    </g:if>
-                                </g:each>
-                            </ul>    
-                    </g:if>
-                   
-                    <g:if test="${audioCount >= 1}"> 
-                    <g:each in="${observationInstance.listResourcesByRating()}" var="r">                            
-                            <g:if test="${r.type == ResourceType.AUDIO}">
-                            <g:if test="${audioResource == 0}" >                                               
-                                <% audioResource = 1; %>
-                                    <audio controls style="float: right;padding: 8px 0px;width: 100%;">                                              
-                                      <source src="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.observations.serverURL)}" type="audio/mpeg">
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                <g:if test="${isaudioResource == 0}" >
-                                     <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
-                                       <%  isaudioResource = isaudioResource+1 %>
-                                </g:if>            
-                            </g:if>
-                            </g:if>
-                    </g:each>
-                    </g:if>
-
-                    <g:if test="${audioCount > 1}" > 
-
-                             <br><br><br>
-
-                    </g:if>
 
                     <obv:showStory
                         model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
@@ -468,50 +420,6 @@ $(document).ready(function(){
 
 </r:script>
 
-<g:if test="${audioCount >= 1}"> 
-
-<script type="text/javascript">
-var audio;
-var playlist;
-var tracks;
-var current;
-
-init();
-function init(){
-    current = 0;
-    audio = $('audio');
-    playlist = $('#playlist');
-    tracks = playlist.find('li a');
-    len = tracks.length - 1;
-    audio[0].volume = .10;
-    //audio[0].play();
-    playlist.find('a').click(function(e){
-        e.preventDefault();
-        link = $(this);
-        current = link.parent().index();
-        run(link, audio[0]);    
-    });
-    audio[0].addEventListener('ended',function(e){
-        current++;
-        if(current == len){
-            current = 0;
-            link = playlist.find('a')[0];
-        }else{
-            link = playlist.find('a')[current];    
-        }
-        run($(link),audio[0]);
-    });
-}
-function run(link, player){
-        player.src = link.attr('href');
-        par = link.parent();
-        par.addClass('active').siblings().removeClass('active');
-        audio[0].load();
-        audio[0].play();
-}
-</script>
-
-</g:if>
 
 </body>
 </html>

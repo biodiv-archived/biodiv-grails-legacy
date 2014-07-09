@@ -163,7 +163,7 @@ function removeResource(event, imageId) {
             var filepickerOptions1 = {
                 maxSize: 104857600,
                 services:['COMPUTER', 
-                'FACEBOOK',                 
+                //'FACEBOOK',                 
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
                 mimetypes: ['audio/*']

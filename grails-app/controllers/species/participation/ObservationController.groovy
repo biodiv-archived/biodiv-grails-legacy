@@ -510,10 +510,13 @@ class ObservationController extends AbstractObjectController {
 					// List of OK mime-types
 					//TODO Move to config
 
-					def resourcetype = f.mimetype.substring(0, f.mimetype.indexOf('/'))
+					def resourcetype = f.mimetype.substring(0, f.mimetype.indexOf('/')).toLowerCase()
+					def resourceTypeAudio = ResourceType.AUDIO.value().toLowerCase()					
+					def resourceTypeImage = ResourceType.IMAGE.value().toLowerCase()		
+					
 					def okcontents
 					def maxSizeAllow
-					if(resourcetype == 'image'){
+					if(resourcetype == resourceTypeImage){
 						okcontents = [
 										'image/png',
 										'image/jpeg',
@@ -523,7 +526,7 @@ class ObservationController extends AbstractObjectController {
 										]
 						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
 
-					}else if(resourcetype == 'audio'){
+					}else if(resourcetype == resourceTypeAudio){						
 						okcontents = [
 										'audio/mp4','audio/m4a',
 										'audio/mpeg','audio/mp1','audio/mp2','audio/mp3','audio/mpg',
@@ -536,7 +539,7 @@ class ObservationController extends AbstractObjectController {
 
 					}
 					
-					if (! okcontents.contains(f.mimetype)) {
+					if (!okcontents.contains(f.mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
 							filename
@@ -574,7 +577,7 @@ class ObservationController extends AbstractObjectController {
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def thumbnail
 						def type
-						if(resourcetype == 'image'){
+						if(resourcetype == resourceTypeImage){
 								ImageUtils.createScaledImages(file, obvDir);
 								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
 		                        //context specific baseUrl for location picker script to work
@@ -582,7 +585,7 @@ class ObservationController extends AbstractObjectController {
 								thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);	
 								type = ResourceType.IMAGE	
 														
-						}else if(resourcetype == 'audio'){
+						}else if(resourcetype == resourceTypeAudio){
 								thumbnail = "/images/audioicon.png"
 								type = ResourceType.AUDIO	
 								
