@@ -41,8 +41,10 @@
                 </div>
                 
                 <div id="gallery1" class="gallery">
+                <% def resourcesInstanceList = speciesInstance.getListResources()%>
                     <g:if test="${images}">
-                    <s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
+                    
+                    <s:showSpeciesImages model="['speciesInstance':speciesInstance , 'resourcesInstanceList' : resourcesInstanceList]"></s:showSpeciesImages>
                     </g:if>
                     <g:else>
                     <% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
@@ -62,7 +64,7 @@
         </div>
 
 
-        <g:render template="/species/speciesaudio" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+        <g:render template="/species/speciesaudio" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor , 'resourcesInstanceList' : resourcesInstanceList]"/>
 
         <div style="background-color:white">
 

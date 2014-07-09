@@ -5,12 +5,12 @@
    def isOtherResource = 0
 %>   
 <g:if test="${params.controller == 'observation' }" > 
-   <% resourcesInstanceList = resourceInstance.listResourcesByRating()      
+   <% //resourcesInstanceList = resourceInstance.listResourcesByRating()      
       resourcesServerURL = grailsApplication.config.speciesPortal.observations.serverURL
     %>
 </g:if>
 <g:elseif test="${params.controller == 'species'}"> 
-   <% resourcesInstanceList = resourceInstance.getListResources() 
+   <% //resourcesInstanceList = resourceInstance.getListResources() 
       resourcesServerURL = grailsApplication.config.speciesPortal.resources.serverURL
     %>
 </g:elseif>
@@ -40,12 +40,9 @@
 </g:if>
 
  <g:if test="${audioCount >=2 }" > 
-        <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">
-            <% def tempVar = 0 %>
-            <g:each in="${resourcesInstanceList}" var="r">
-
-                <g:if test="${r.type == ResourceType.AUDIO}">
-                	<%  tempVar = tempVar + 1 %>                                        
+        <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">            
+            <g:each in="${resourcesInstanceList}" var="r" status="tempVar">
+                <g:if test="${r.type == ResourceType.AUDIO}">                	                                     
                     <li class="active" style="display: inline;">
                         <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${tempVar}</a>
                     </li>

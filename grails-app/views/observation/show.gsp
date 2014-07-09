@@ -125,14 +125,15 @@ if(r) {
                                       
                     <div id="gallery1" style="visibility:hidden">
                          <% def audioResource = 0 
-                            def audioCount    = 0  %>
+                            def audioCount    = 0
+                            def observationInstanceListResources  %>
                         <g:if test="${observationInstance.resource}">
-                            <%  isaudioResource = 0 
-                                def observationInstanceListResources = observationInstance.listResourcesByRating()
+                            <%  
+                                observationInstanceListResources = observationInstance.listResourcesByRating()
                             %>
                             <g:each in="${observationInstanceListResources}" var="r">
                                 <g:if test="${r.type == ResourceType.IMAGE}">
-                                <% isaudioResource = 1 %>
+                               
                                 <%def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
                                 <%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
                                 <a target="_blank"
@@ -147,7 +148,7 @@ if(r) {
                                 <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
                                 </g:if>
                                 <g:elseif test="${r.type == ResourceType.VIDEO}">
-                                <% isaudioResource = 1 %>
+                                
                                     <a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
                                     <g:imageAttribution model="['resource':r]" />
                                 </g:elseif>
@@ -165,8 +166,8 @@ if(r) {
                     </div>
                     </div>
 
-                
-<g:render template="/species/speciesaudio" model="['resourceInstance': observationInstance"/>
+               
+                <g:render template="/species/speciesaudio" model="['resourceInstance': observationInstance , 'resourcesInstanceList' : observationInstanceListResources]"/>
 
 
                     <obv:showStory
