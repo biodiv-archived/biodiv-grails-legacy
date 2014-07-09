@@ -2,27 +2,49 @@
 <%@page import="species.Resource.ResourceType"%>
 <% def audioResource = 0 
    def audioCount    = 0 
+   def isOtherResource = 0
 %>   
+<g:if test="${params.controller == 'observation' }" > 
+   <% //resourcesInstanceList = resourceInstance.listResourcesByRating()      
+      resourcesServerURL = grailsApplication.config.speciesPortal.observations.serverURL
+    %>
+</g:if>
+<g:elseif test="${params.controller == 'species'}"> 
+   <% //resourcesInstanceList = resourceInstance.getListResources() 
+      resourcesServerURL = grailsApplication.config.speciesPortal.resources.serverURL
+    %>
+</g:elseif>
 
 
-<g:each in="${speciesInstance.getListResources()}" var="r">
+<g:each in="${resourcesInstanceList}" var="r">
 
 
 <g:if test="${r.type == ResourceType.AUDIO}">                                                                    
     <% audioCount = audioCount +1 %>
 </g:if>
+<g:else>                                                                    
+    <% isOtherResource = isOtherResource +1 %>
+</g:else>
 
 </g:each>
 
- <g:if test="${audioCount >=2 }" > 
-        <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">
-            <% def tempVar = 0 %>
-            <g:each in="${speciesInstance.getListResources()}" var="r">
+<g:if test="${ isOtherResource == 0}">
 
-                <g:if test="${r.type == ResourceType.AUDIO}">
-                	<%  tempVar = tempVar + 1 %>                                        
+    <style type="text/css">
+            .noTitle{
+                display:none !important;
+            }
+
+    </style>    
+
+</g:if>
+
+ <g:if test="${audioCount >=2 }" > 
+        <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">            
+            <g:each in="${resourcesInstanceList}" var="r" status="tempVar">
+                <g:if test="${r.type == ResourceType.AUDIO}">                	                                     
                     <li class="active" style="display: inline;">
-                        <a href="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.resources.serverURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${tempVar}</a>
+                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${tempVar}</a>
                     </li>
                 </g:if>
             </g:each>
@@ -30,12 +52,12 @@
 </g:if>
 
 <g:if test="${audioCount >= 1}"> 
-<g:each in="${speciesInstance.getListResources()}" var="r">                            
+<g:each in="${resourcesInstanceList}" var="r">                            
         <g:if test="${r.type == ResourceType.AUDIO}">
         <g:if test="${audioResource == 0}" >                                               
             
                 <audio controls style="padding: 8px 0px;width: 100%;">                                              
-                  <source src="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.resources.serverURL)}" type="audio/mpeg">
+                  <source src="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>            	             
         </g:if>
@@ -46,7 +68,7 @@
     				display:none;	
     			</g:if>"
     		>
-             <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.resources.serverURL]" />
+             <g:imageAttribution model="['resource':r, base:resourcesServerURL]" />
             </div>
         </g:if>
 </g:each>

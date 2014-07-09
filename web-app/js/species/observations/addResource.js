@@ -162,7 +162,10 @@ function removeResource(event, imageId) {
 
             var filepickerOptions1 = {
                 maxSize: 104857600,
-                services:['COMPUTER'],
+                services:['COMPUTER', 
+                //'FACEBOOK',                 
+                'GOOGLE_DRIVE', 
+                'DROPBOX'],
                 mimetypes: ['audio/*']
             };
             try {
@@ -221,7 +224,7 @@ function removeResource(event, imageId) {
             me.$ele.find(".add_file" ).fadeIn(3000);
             me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
             me.$ele.find(".image-resources-msg").html("");
-            //me.$form.find("input[name='resources']").remove();
+            me.$form.find("input[name='resources']").remove();
             me.$ele.find('.videoUrl').val('');
             me.$ele.find('.audioUrl').val('');
             me.$ele.find('.add_video').editable('setValue','', false);
@@ -236,8 +239,8 @@ function removeResource(event, imageId) {
                     me.submitRes();
                     return; 
                 }
-                me.$ele.find("#addObservationSubmit").removeClass('disabled');
-               //me.$form("input[name='resources']").remove();
+                me.$ele.find("#addObservationSubmit").removeClass('disabled');                
+                me.$form.find("input[name='resources']").remove();
                 me.$ele.find('.videoUrl').val('');
                 me.$ele.find('.audioUrl').val('');
                 me.$ele.find(".progress").css('z-index',90);

@@ -1,7 +1,7 @@
 
 <g:if test="${heading}">
     <h1 class="${headingClass?:''}" title="${heading.replaceAll('<.*>','')}">
-		${heading}
+		${raw(heading)}
     </h1>
 </g:if>
 <g:if test="${subHeading}">

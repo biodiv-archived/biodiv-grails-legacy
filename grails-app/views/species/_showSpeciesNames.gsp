@@ -11,14 +11,14 @@
     <div id="taxonRecordName" class="speciesField collapse in">
         <table>
             <tr class="prop">
-                <td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td>
+                <td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${raw(speciesInstance.taxonConcept.italicisedForm)}</td>
             </tr>
             <g:each in="${nameRecords}">
             <g:if test="${it}">
             <tr class="prop">
 
                 <g:if test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-                <td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td class="linktext">${it?.description}</td>
+                <td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td class="linktext">${raw(it?.description)}</td>
                 </g:if> 
                 <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME)}">
 
@@ -58,7 +58,7 @@
                     ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
-                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?synonym.italicisedForm:'<i>'+(synonym?.name)+'</i>'} </span>
+                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):'<i>'+(synonym?.name)+'</i>'} </span>
             </div>    
             </li>
             </g:each>

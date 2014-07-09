@@ -5,7 +5,7 @@
 %>   
 
 
-<g:each in="${speciesInstance.getListResources()}" var="r">
+<g:each in="${resourcesInstanceList}" var="r">
 
 
  <g:if test="${r.type == ResourceType.IMAGE}">
