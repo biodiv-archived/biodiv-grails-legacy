@@ -20,7 +20,7 @@
                 <div id="current_location" class="section-item" style="display:none">
                     <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
                 </div>
-                <div  style="text-align:center;width:100%">
+                <div class="wrapperParent"  style="text-align:center;width:100%">
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:3;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level" style="width:96%;"
                         class="section-item" value="${observationInstance?.placeName}"/>
@@ -164,12 +164,19 @@ function loadMapInput() {
 
 $(document).ready(function() {
     $(".address .add-on").unbind('click').click(function(){
+        var me = this;
         var map_class = $(this).closest(".map_class");
         if($(map_class).find(".map_canvas").is(':visible')) {
+            $(me).find("i").removeClass("icon-remove").addClass("icon-chevron-down");
+            $(me).css("border","0px solid rgba(82,168,236,0.8)");
             $(map_class).find(".map_canvas").hide();
             $(map_class).find(".latlng").hide();
             return false;
+        } else{
+            $(me).css("border","2px solid rgba(82,168,236,0.8)");
+            $(me).find("i").removeClass("icon-chevron-down").addClass("icon-remove");
         }
+
     });
     $(".address").unbind('click').click(loadMapInput);
 

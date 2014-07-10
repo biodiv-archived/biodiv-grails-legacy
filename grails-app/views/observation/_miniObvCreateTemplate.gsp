@@ -3,10 +3,14 @@ def form_class = "addObservation"
 def form_action = uGroup.createLink(action:'bulkSave', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 %>
 <form class="${form_class}" action="${form_action}" method="POST">
+    <g:hasErrors bean="${observationInstance}">
+    <i class="icon-warning-sign"></i>
+        <span class="label label-important"> <g:message
+        code="fix.errors.before.proceeding" default="Fix errors" /> </span>
+    </g:hasErrors>
 
+   <span class="createdObv label label-success" style="display:none;"><i class="icon-check"></i> Successfully created </span>
     <div>
-        <div class="createdObv" style="display:none;">OBSERVATION CREATED</div>
-        
         <div class="control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
             <div class="image-resources-msg help-inline control-label">
                 <g:renderErrors bean="${observationInstance}" as="list"
@@ -17,7 +21,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
 
         <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
-        <div class="" style="margin:40px 0 0;">
+        <div style="margin:40px 0 0 20px;">
             <g:if
             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
             <div class="help-identify" class="control-label">

@@ -51,6 +51,7 @@ $(document).ready(function() {
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
+                'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}",
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}"

@@ -1,31 +1,40 @@
-$("#addBulkObservationsSubmit").click(function(event){
-    var me = this;
-    if($(this).hasClass('disabled')) {
+$("#addBulkObservationsSubmit").click(function(){bulkObservationSubmission(this, false)});
+
+$("#addBulkObservationsAndListPage").click(function(){bulkObservationSubmission(this, true)});
+
+function bulkObservationSubmission(ele, showListPage){
+    var me = ele;
+    console.log("==============WHICH BUTTON=============");
+    console.log(me);
+    if($(me).hasClass('disabled')) {
         alert("Uploading is in progress. Please submit after it is over.");
         event.preventDefault();
         return false; 		 		
     }
 
     if (document.getElementById('agreeTerms').checked) {
-        $(me).addClass("disabled");
+        $("#addBulkObservationsSubmit").addClass("disabled");
+        $("#addBulkObservationsAndListPage").addClass("disabled");
         var allForms = $(".addObservation");
         var formsWithData = [] 
-        $.each(allForms, function(index, value){
-            if(formHasData(value)){
-                console.log("==============================================");
-                formsWithData.push(value);
-            }
-        });
+            $.each(allForms, function(index, value){
+                if(formHasData(value)){
+                    console.log("==============================================");
+                    formsWithData.push(value);
+                }
+            });
         var size = formsWithData.length;
 
-        submitForms(0, size, formsWithData); 
+        submitForms(0, size, formsWithData, showListPage); 
         $(me).removeClass("disabled");
         return false;
     } else {
         alert("Please agree to the terms mentioned at the end of the form to submit the observation.");    
-        $(me).removeClass("disabled");
+        $("#addBulkObservationsSubmit").removeClass("disabled");
+        $("#addBulkObservationsAndListPage").removeClass("disabled");
     }
-});
+
+}
 
 function formHasData(form){
     if($(form).find(".createdObv").is(":visible")) {
@@ -46,17 +55,18 @@ function formHasData(form){
 }
 
 var gotError;
+var errorCount;
 var miniObvCreateHtmlSuccess;
-function submitForms(counter, size, allForms){
+function submitForms(counter, size, allForms, showListPage){
     if(counter == 0){
         gotError = false;
+        errorCount = 0;
     }
     if(counter == size){
         console.log("breaking recursion========" + gotError);
         if(!gotError){
-            //location.reload();
-            alert("Successfully created "+ counter +" observations!!!");
-            $.each(allForms, function(index, value){
+            var allFormsOnPage = $(".addObservation");
+            $.each(allFormsOnPage, function(index, value){
                 var wrapper = $(value).parent();
                 $(value).replaceWith(miniObvCreateHtmlSuccess);
             });
@@ -66,6 +76,32 @@ function submitForms(counter, size, allForms){
             changeYear: true,
             dateFormat: 'dd/mm/yy' 
         });
+        $(".obvCreateTags").tagit({
+            select:true, 
+            allowSpaces:true, 
+            placeholderText:'Add some tags',
+            fieldName: 'tags', 
+            autocomplete:{
+                source: '/observation/tags'
+            }, 
+            triggerKeys:['enter', 'comma', 'tab'], 
+            maxLength:30
+        });
+        if($(".userGroupsSuperDiv").hasClass("span12")){
+            $(".userGroupsSuperDiv").removeClass("span12");
+            $(".userGroupsSuperDiv").addClass("span4");
+        }
+        initializeLanguage();
+        $("#addBulkObservationsSubmit").removeClass("disabled");
+        $("#addBulkObservationsAndListPage").removeClass("disabled");
+        alert("Observations created successfully " + (counter - errorCount) + " & Errors in " +errorCount+ " observation submissions");
+        if(!showListPage) {
+            
+        } else {
+            /////open list page;/////////////////////////////////////////////////////////////////
+            //use windows.params.obvListPage
+            window.open(window.params.obvListPage,"_self");
+        }
         return;
     } else {
         console.log("going to submit form no : " + counter);
@@ -101,6 +137,7 @@ function submitForms(counter, size, allForms){
                     //disable click on div
                 } else {
                     gotError = true;
+                    errorCount = errorCount + 1;
                     var miniObvCreateHtmlError = data.miniObvCreateHtml;
                     var wrapper = $(form).parent();
                     $(form).replaceWith(miniObvCreateHtmlError);
@@ -110,11 +147,7 @@ function submitForms(counter, size, allForms){
                     $(wrapper).find(".habitat_options li[value='"+habitat_id+"']").trigger("click");
                 }
                 $(".resourceListType").val($(".resourceListTypeFilled").val());
-                if($(".userGroupsSuperDiv").hasClass("span12")){
-                    $(".userGroupsSuperDiv").removeClass("span12");
-                    $(".userGroupsSuperDiv").addClass("span4");
-                }
-                submitForms(counter+1, size, allForms);
+                submitForms(counter+1, size, allForms, showListPage);
             }, error : function (xhr, ajaxOptions, thrownError){
                 //successHandler is used when ajax login succedes
                 console.log("ERROR ERROR");
@@ -122,7 +155,7 @@ function submitForms(counter, size, allForms){
                 handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
                     var response = $.parseJSON(xhr.responseText);
                 });
-                submitForms(counter+1, size, allForms);
+                submitForms(counter+1, size, allForms, showListPage);
             }  
         });
     }

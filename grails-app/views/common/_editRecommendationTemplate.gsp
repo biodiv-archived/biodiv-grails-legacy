@@ -62,7 +62,7 @@
                     <div class="textbox nameContainer">
 
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
-                        <input type="text" name="recoName" class="recoName" value="${species_sn_name}"
+                        <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}"
                             placeholder='Suggest a scientific name'
                             class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                         <input type="hidden" name="canName" class="canName" value="${species_canonical_name }"/>

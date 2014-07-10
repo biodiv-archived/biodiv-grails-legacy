@@ -24,30 +24,29 @@
                 text-align:center;
             }
             .map_canvas {
+                border-color: rgba(82,168,236,0.8);
                 position: absolute;
                 width: 100%;
                 display: block;
                 left: 0px;
-            }
-            .map_search {
-                position:inherit;
+                z-index:1;
             }
             .selected_habitat, .selected_group{
                 position:relative;
             }
-            .habitat_options, .group_options{
-                position:absolute;
-                z-index:10;
+            .propagateBlock .group_options, .propagateBlock .habitat_options {
+                width : 218px;
+            }
+            .addObservation .group_options, .addObservation .habitat_options {
+                width : 287px;
             }
             .userGroupsSuperDiv{
                 position:absolute !important;
                 z-index:10;
-            }
-            .section {
-                overflow:auto;
+                background-color: rgb(106, 201, 162);
             }
             .column.block_row {
-                width:442px;
+                width:436px;
             }
             .miniObvWrapper.column {
                 width:290px;
@@ -56,7 +55,7 @@
                 background-color: #a6dfc8;
             }
             .column {
-                width:221px;
+                width:217px;
                 float: left;
                 padding: 10px 0px;
                 margin:0px;
@@ -83,9 +82,26 @@
                 left:10px;
             }
             .propagateBlock {
-                clear:both;
                 background-color: #a6dfc8;
-                overflow:auto;
+            }
+            .placeName{
+                width:90% !important;
+            }
+            .latlng {
+                z-index:2;
+            }
+            .map_search {
+                position:inherit;
+            }
+            .combobox-container {
+	        right:9% !important;
+	
+            }
+            .addObservation .wrapperParent {
+                width:96% !important; 
+            }
+            input[type="text"]:focus {
+                border-width:2px;
             }
         </style>
     </head>
@@ -95,20 +111,17 @@
                 <%
                 def form_id = "addBulkObservations"
                 def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-                def form_button_name = "Submit All"
-                def form_button_val = "Submit All"
+                def form_button_name = "Submit & and more"
+                def form_button_val = "Submit & Add More"
+                def submitFinish = "Submit & Finish"
                 %>
                 <div class="super-section">
                     <div class="section">
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
                     </div>
-                    <div class="section">
-                        <div>
-                            <a class="btn togglePropagateDiv"
-                                style="float: left; margin-right: 5px;"> Show Bulk Action <b class="caret"></b>
-                            </a>
-                        </div>
-                        <div class= "propagateBlock hide">
+                    <div class="section clearfix">
+                        <a class="btn togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
+                        <div class= "propagateBlock hide clearfix">
                             <div >
                                 <div class="column propagateLicense">
                                     <label>License</label>
@@ -125,17 +138,7 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="column span6 propagateTags block_row">
-                                    <label>Tags</label>
-                                    <div class="create_tags" style="clear: both;">
-                                        <ul class="obvCreateTags">
-                                            <g:each in="${obvTags}" var="tag">
-                                            <li>${tag}</li>
-                                            </g:each>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="column span6 propagateLocation block_row" style="width:440px;">
+                                <div class="column span6 propagateLocation block_row">
                                     <%
                                     def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                                     %>
@@ -143,6 +146,17 @@
                                         <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
                                     </div>
                                 </div>
+                                <div class="column span6 propagateTags block_row">
+                                    <label>Tags</label>
+                                    <div class="create_tags" style="clear: both;">
+                                        <ul class="obvCreateTags">
+                                            <g:each in="${obvTags}" var="tag">
+                                                <li>${tag}</li>
+                                            </g:each>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
                             </div>
                             <div>
                                 <div class="column span6 propagateGroups block_row">
@@ -154,9 +168,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="column span6 block_row">
+                                <div class="column span6 block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
-                                        style=" margin-right: 5px;"> Apply 
+                                        style=" margin-right: 5px;"> Apply to all
                                     </a>
                                 </div>
                             </div>
@@ -164,7 +178,7 @@
 
                     </div>
 
-                        <div class="section">
+                        <div class="section clearfix">
                             <div class="miniObvWrapper column">
                                 <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>
@@ -176,8 +190,8 @@
                             </div>
                         </div>
                     </div>
-                    <a class="btn btn-primary" href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}"
-                        style="float: right; margin-right: 5px;"> Show List Page 
+                    <a id="addBulkObservationsAndListPage" class="btn btn-primary"
+                        style="float: right; margin-right: 5px;"> ${submitFinish}
                     </a>
                     <a id="addBulkObservationsSubmit" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> ${form_button_val} 
@@ -234,12 +248,12 @@
                 $(".propagateBlock").slideToggle("")
             });
             $(".propagateGrpHab .help-inline").css("display","none");
-        /*
+        
             if($(".userGroupsSuperDiv").hasClass("span12")){
                 $(".userGroupsSuperDiv").removeClass("span12");
                 $(".userGroupsSuperDiv").addClass("span4");
             } 
-        */
+        
             if($( "input[name='resType']" ).val() == "species.auth.SUser") {
                 $(".addedResource.thumbnail").draggable({helper:'clone'});  
 
@@ -285,7 +299,7 @@
 
                     }
                 });
-                            }
+            }
             initializeLanguage();
         });
 
