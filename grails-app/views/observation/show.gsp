@@ -416,7 +416,7 @@ $(document).ready(function(){
             $('.nameContainer input').removeAttr("disabled");
             $('.iAgree button').removeClass("disabled");
         } 
-
+        initializeLanguage(); 
     });
 
 </r:script>

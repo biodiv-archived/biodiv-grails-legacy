@@ -32,55 +32,18 @@
 	}
 	if(params.action == 'save'){
 		species_sn_lang = saveParams?.languageName
-	}
+        }
+        if(species_sn_lang == "" || species_sn_lang == null){
+            species_sn_lang = Language.getLanguage(null).name;
+        }
+        if(species_sn_lang == "" || species_sn_lang == null){
+            species_sn_lang = "English"
+        }
 %>
-<r:script>
-$(document).ready(function() {
-	function doCustomization(langCombo){
-		var inputTextEle = langCombo.data('combobox').$element
-		inputTextEle.unbind('blur');
-	    inputTextEle.attr('name', 'languageName');
-	    inputTextEle.attr('autocomplete', 'off');
-		inputTextEle.on('blur', $.proxy(myBlur, langCombo.data('combobox')));
-	}
 
-	function myBlur(e){
-		var oldVal = this.$element.val();
-		this.blur(e);
-		this.$element.val(oldVal);
-	}
-
-	$('#languageComboBox').combobox();
-	var langCombo = $("#languageComboBox");
-	doCustomization(langCombo);
-	var defaultLang = "${species_sn_lang}";
-	if(defaultLang === ""){
-		defaultLang = "${Language.getLanguage(null).name}";
-	}
-	langCombo.val(defaultLang).attr("selected",true);
-	langCombo.data('combobox').refresh();
-});
-
-function updateCommonNameLanguage(){
-	var langCombo = $("#languageComboBox");
-	var langComboVal = langCombo.val();
-	if(langComboVal != null){
-		langComboVal = langComboVal.toLowerCase()
-	}
-	
-	var inputVal = $.trim(langCombo.data('combobox').$element.val());
-	if(inputVal.toLowerCase() !== langComboVal){
-		langCombo.append($('<option></option>').val(inputVal).html(inputVal));
-		langCombo.data('combobox').refresh();
-	}
-}
-
-</r:script>
-
-
-<select id="languageComboBox" class="combobox" style="display:none;" >
-<option></option>
-	<g:each in="${Language.filteredList()}">
-		<option value="${it}"> ${it}</option>
-	</g:each>
+<select class="languageComboBox combobox" style="display:none;" data-defaultlanguage="${species_sn_lang}" >
+    <option></option>
+    <g:each in="${Language.filteredList()}">
+        <option value="${it}"> ${it}</option>
+    </g:each>
 </select>

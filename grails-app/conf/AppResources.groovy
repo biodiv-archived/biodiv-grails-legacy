@@ -131,6 +131,7 @@ modules = {
 
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/jquery/jquery.sparkline.min.js'
+        resource url:'/js/species/chooseLanguage.js'
 	} 
 
 	observations_create {
@@ -142,6 +143,8 @@ modules = {
 		resource url:'/js/species/observations/create.js'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
         resource url:'http://api.filepicker.io/v1/filepicker.js'
+        resource url:'/js/species/observations/bulkObvCreate.js'
+        resource url:'/js/species/chooseLanguage.js'
 	}
 
     distinct_reco {

@@ -932,9 +932,14 @@ class SUserController extends UserController {
 		redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
     }
 
+    @Secured(['ROLE_USER'])
+    def myuploads(){
+        def author = springSecurityService.currentUser;
+		return ['springSecurityService':springSecurityService, 'userInstance':author] 
+    }
+
+
 }
-
-
 
 class ResetPasswordCommand {
 	String username

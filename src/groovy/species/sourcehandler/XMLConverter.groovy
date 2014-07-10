@@ -693,6 +693,7 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
+        println "==========CREATE MEDIA CALLED========== " + resourcesXML +" ====== "+ relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -727,6 +728,8 @@ class XMLConverter extends SourceConverter {
                 case ResourceType.IMAGE:
                 resourceNode?.image.each {
                     if(!it?.id) {
+                        def relFolder = it.fileName?.getAt(0)?.text()?.replace(resourcesRootDir.toString(), "")?:""
+                        relResFolder = new File(relFolder).getParent(); 
                         def resource = createImage(it, relResFolder, ResourceType.IMAGE);
                         if(resource) {
                             resources.add(resource);
@@ -776,10 +779,12 @@ class XMLConverter extends SourceConverter {
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
+            println "=====TEMPFILE EXISTS==== " 
             //copying file
             relImagesFolder = relImagesFolder.trim();
-
+            println "=========RES ROOT DIR ========= " + resourcesRootDir +"================= "+ relImagesFolder
             File root = new File(resourcesRootDir , relImagesFolder);
+            println "==============ROOT ====== " + root
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
                 addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
@@ -787,7 +792,8 @@ class XMLConverter extends SourceConverter {
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-            if(!imageFile.exists()) {
+            println "=========IMAGE FILE ========== " + imageFile
+			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
                     if( resourceType == "IMAGE"){

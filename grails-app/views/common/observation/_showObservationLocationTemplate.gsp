@@ -84,17 +84,17 @@
 <r:script>
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
-            initialize(document.getElementById("big_map_canvas"), false);
+            var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             <g:if test="${!observationInstance.isChecklist}">
-            showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()});
+            showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
             </g:if>
             var icon;
             
-            var ptIcon = M.AwesomeMarkers.icon({
+            var ptIcon = mapLocationPicker.M.AwesomeMarkers.icon({
                 icon: 'ok', 
                 color: 'red'
             });
-            var ctIcon = M.AwesomeMarkers.icon({
+            var ctIcon = mapLocationPicker.M.AwesomeMarkers.icon({
                 icon: 'list', 
                 color: 'red'
             });
@@ -105,13 +105,14 @@
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
             }
 
-            initArea(false, undefined, undefined, {icon:icon, layer:'Current Observation' });
+            console.log("INIT AREA ANA THA YAHAN");
+            mapLocationPicker.initArea(false, undefined, undefined, $("#areas").val(), {icon:icon, layer:'Current Observation' });
             //HACK
-            if(searchMarker)
-                map.panTo(searchMarker.getLatLng());
+            if(mapLocationPicker.searchMarker)
+                mapLocationPicker.map.panTo(mapLocationPicker.searchMarker.getLatLng());
 
             <g:if test="${!observationInstance.isChecklist}">
-                resetMap();
+                mapLocationPicker.resetMap();
             </g:if>
         });
     });

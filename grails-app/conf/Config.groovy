@@ -423,6 +423,10 @@ speciesPortal {
 		getAuthentication = "/getAuthentication.php"
 	}
 	flushImmediately = true
+    usersResource {
+        rootDir = "${app.rootDir}/usersRes"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
+    }
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -614,6 +618,10 @@ environments {
 					 port = 25
 				}
 			}
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://ibp.saturn.strandls.com/${appName}/usersRes"   
+            }
 		}
 		google.analytics.enabled = false
 
@@ -691,6 +699,10 @@ environments {
 					 port = 25
 				}
 			}
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/usersRes"   
+            }
 		}
 		google.analytics.enabled = false
 
@@ -800,6 +812,10 @@ environments {
                     port = 25
                 }
             }
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://indiabiodiversity.org/${appName}/usersRes"   
+            }
         }
 
         ibp.domain='indiabiodiversity.org'
@@ -868,6 +884,10 @@ environments {
             }	
             maps {
 		        serverURL = "http://${servername}/${appName}/maps"
+            }
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://${servername}/${appName}/usersRes"   
             }
 
             search.serverURL="http://${servername}:8080/solr"

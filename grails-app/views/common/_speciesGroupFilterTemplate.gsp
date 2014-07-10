@@ -8,7 +8,7 @@
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
 	$('#speciesGroupFilter button[value="${params.sGroup}"]').addClass('active');
-    $('#speciesGroupFilter button').tooltip({placement:'top'});
+        $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
 	
 	$("#habitatFilter").button();

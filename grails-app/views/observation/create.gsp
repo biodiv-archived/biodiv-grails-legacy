@@ -19,12 +19,12 @@
             <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
 
             <%
-            def form_id = "addObservation"
+            def form_class = "addObservation"
             def form_action = uGroup.createLink(action:'save', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
             def form_button_name = "Add Observation"
             def form_button_val = "Add Observation"
             if(params.action == 'edit' || params.action == 'update'){
-            //form_id = "updateObservation"
+            //form_class = "updateObservation"
             form_action = uGroup.createLink(action:'update', controller:'observation', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
             form_button_name = "Update Observation"
             form_button_val = "Update Observation"
@@ -32,9 +32,7 @@
 
             %>
 
-            <form id="${form_id}" action="${form_action}" method="POST"
-                class="form-horizontal">
-
+            <form class="${form_class} form-horizontal" action="${form_action}" method="POST">
                 <div class="span12 super-section">
                     <div class="section">
                         <h3>What did you observe?</h3>
@@ -47,7 +45,7 @@
                         <div class="section" style="margin:40px 0 0;">
                             <g:if
                             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
-                            <div id="help-identify" class="control-label">
+                            <div class="help-identify" class="control-label">
                                 <label class="checkbox" style="text-align: left;"> <input
                                     type="checkbox" name="help_identify" /> Help identify </label>
                             </div>
@@ -137,6 +135,7 @@ $(document).ready(function(){
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
     %>
+    initializeLanguage();
 });
 
 

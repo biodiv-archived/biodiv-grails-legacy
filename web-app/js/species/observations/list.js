@@ -399,57 +399,58 @@ function getSelectedHabitat() {
 
 function selectTickUserGroupsSignature(parentGroupId) {
     $(".userGroups button").click(function(e){
-		if($(this).hasClass('active')) {
-		    //trying to unselect group
-			//if on obv create page	and one group is coming as parent group		
-			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
-			    //this group is parent group
-				if($(this).hasClass('create') && parentGroupId != '' && $(this).hasClass("'"+parentGroupId+"'")){
-					alert("Can't unselect parent group");
-				}else{
-					//un selecting other group
-					$(this).removeClass('btn-success');
-					$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
-				}	
-			}else{
+        var ug = this;
+        if($(this).hasClass('active')) {
+            //trying to unselect group
+            //if on obv create page	and one group is coming as parent group		
+            if($(ug).closest(".userGroupsClass").hasClass('create') && ($(ug).closest(".userGroupsClass button.create").length > 0)){
+                //this group is parent group
+                if($(this).hasClass('create') && parentGroupId != '' && $(this).hasClass("'"+parentGroupId+"'")){
+                    alert("Can't unselect parent group");
+                }else{
+                    //un selecting other group
+                    $(this).removeClass('btn-success');
+                    $(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                }	
+            }else{
                 $(this).removeClass('btn-success');
-				$(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
-				if($(this).hasClass("single-post")) {
-					$("#groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
-					$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
-				} else {
-					if($("#groupsWithSharingAllowed button.active").length == 0) {
-						$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
-					}
-				}
-			}
-		} else {
+                $(this).find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                if($(this).hasClass("single-post")) {
+                    $(ug).closest(".userGroupsClass").find(".groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
+                    $(ug).closest(".userGroupsClass").find(".groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+                } else {
+                    if($(ug).closest(".userGroupsClass").find(".groupsWithSharingAllowed button.active").length == 0) {
+                        $(ug).closest(".userGroupsClass").find(".groupsWithSharingAllowed button.multi-post").removeClass('disabled')
+                    }
+                }
+            }
+        } else {
             //trying to select new group
-			//if on obv create page and one group is coming as parent group
-			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
-			    //either current one belongs to exclusive group or parent group is exclusive group
-			 	if($(this).hasClass("single-post") ||($("#groupsWithSharingNotAllowed button.create").length > 0)){
-					alert("Can't select this group because it will unselect parent group");
-				}else{
-					//parent group is multipost one and this new group is also belong to multi select so selecting it
-					$(this).removeClass('disabled').addClass('btn-success');
-					$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
-				}
-			}else{
+            //if on obv create page and one group is coming as parent group
+            if($(ug).closest(".userGroupsClass").hasClass('create') && ($(ug).closest(".userGroups button.create").length > 0)){
+                //either current one belongs to exclusive group or parent group is exclusive group
+                if($(this).hasClass("single-post") ||($(ug).closest(".userGroupsClass").find(".groupsWithSharingNotAllowed button.create").length > 0)){
+                    alert("Can't select this group because it will unselect parent group");
+                }else{
+                    //parent group is multipost one and this new group is also belong to multi select so selecting it
+                    $(this).removeClass('disabled').addClass('btn-success');
+                    $(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+                }
+            }else{
                 //on obv edit page
-				if($(this).hasClass("single-post")) {
-					$("#groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
-					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
-					$(this).removeClass('disabled').addClass('btn-success');
-				} else {
-					$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
-					$(this).removeClass('disabled').addClass('btn-success');
-				}
-				$(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
-			}
-		}
-		e.preventDefault();
-	});
+                if($(this).hasClass("single-post")) {
+                    $(ug).closest(".userGroupsClass").find(".groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                    $(ug).closest(".userGroupsClass").find(".groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                    $(this).removeClass('disabled').addClass('btn-success');
+                } else {
+                    $(ug).closest(".userGroupsClass").find(".groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success').find(".icon-ok").removeClass("icon-black").addClass("icon-white");
+                    $(this).removeClass('disabled').addClass('btn-success');
+                }
+                $(this).find(".icon-ok").removeClass("icon-white").addClass("icon-black");
+            }
+        }
+        e.preventDefault();
+    });
 }
 
 function getSelectedSortBy() {
@@ -761,11 +762,13 @@ function updateMapView (params, callback) {
     delete oldParams.bounds;
     //console.log(JSON.stringify(oldParams));
     //console.log(JSON.stringify(p));
-    if(isMapViewLoaded !== true) {
+    var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker'); 
+    if(mapLocationPicker == undefined) {
         loadGoogleMapsAPI(function() {
-            initialize(document.getElementById("big_map_canvas"), false);
-            refreshMarkers(p);
-            refreshMapBounds();
+            mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+            $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
+            refreshMarkers(p, undefined, undefined, mapLocationPicker);
+            refreshMapBounds(mapLocationPicker);
             oldParams = params;
 	    $('#big_map_canvas').trigger('maploaded');
         })
@@ -774,13 +777,13 @@ function updateMapView (params, callback) {
         //TODO:remove bounds before comparision
         //order of params is important for this test to pass
         if(JSON.stringify(oldParams) != JSON.stringify(p))
-            refreshMarkers(p);
+            refreshMarkers(p, undefined, undefined, mapLocationPicker);
         refreshMapBounds();
         oldParams = params;
     }
 }
 
-function refreshMapBounds() {
+function refreshMapBounds(mapLocationPicker) {
     var bounds = $('#bounds').val();
     if(bounds) {
         bounds = bounds.split(',');
@@ -791,7 +794,7 @@ function refreshMapBounds() {
                     ]);
         }
     } else {
-        resetMap();
+        mapLocationPicker.resetMap();
     }
 }
 
@@ -800,6 +803,8 @@ function showMapView() {
 }
 
 function refreshList(bounds){
+    console.log("called refresh list");
+    console.log(bounds);
     if (bounds !== undefined){
         $("#bounds").val(bounds);
     } else {

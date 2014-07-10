@@ -1,3 +1,4 @@
+<%@page import="species.Resource"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.Resource"%>

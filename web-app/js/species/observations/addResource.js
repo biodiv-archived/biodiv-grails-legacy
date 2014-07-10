@@ -3,9 +3,15 @@ function removeResource(event, imageId) {
     if (!event) var event = window.event;
     if (event.target) targ = event.target;
     else if (event.srcElement) targ = event.srcElement; //for IE
-
+    else {}
     $(targ).parent('.addedResource').remove();
-    $(".image_"+imageId).remove();
+    $(targ).find(".image_"+imageId).remove();
+    if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+        console.log($(".image_"+imageId).first().closest(".addedResource"));
+        $(".image_"+imageId).first().closest(".addedResource").draggable({helper:'clone'});
+        $(".image_"+imageId).first().closest(".addedResource").css('opacity', '1');
+    }
+
 }
 
 /**
@@ -112,13 +118,23 @@ function removeResource(event, imageId) {
         filePick : function(e) {
             var me = this;
             var onSuccess = function(FPFiles){
+                var count = 0;
                 $.each(FPFiles, function(){
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'resources',
                         value:JSON.stringify(this)
                     }).appendTo(me.$form);
+                    count = count + 1;
                 });
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    $("input[name='obvDir']").val('');
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'lastUploaded',
+                        value: count
+                    }).appendTo(me.$form);
+                }    
                 me.submitRes();
             };
 
@@ -213,13 +229,16 @@ function removeResource(event, imageId) {
             });
             var html = $( "#metadataTmpl" ).render( images );
             var metadataEle = $(html);
-            metadataEle.each(function() {
-                $('.geotagged_image', this).load(function(){
-                    update_geotagged_images_list($(this));		
+            if($( "input[name='resType']" ).val() == "species.participation.Observation") {
+                metadataEle.each(function() {
+                    me.$ele.find(".address").trigger('click'); 
+                    /*$('.geotagged_image', this).load(function(){
+                        $(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+                    });*/
+                    var $ratingContainer = $(this).find('.star_obvcreate');
+                    rate($ratingContainer);
                 });
-                var $ratingContainer = $(this).find('.star_obvcreate');
-                rate($ratingContainer)
-            })
+            }
             me.$ele.find(".imagesList li:first" ).after (metadataEle);
             me.$ele.find(".add_file" ).fadeIn(3000);
             me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
@@ -229,10 +248,79 @@ function removeResource(event, imageId) {
             me.$ele.find('.audioUrl').val('');
             me.$ele.find('.add_video').editable('setValue','', false);
            // me.$ele.find('.add_audio').editable('setValue','', false);		
-        },
+            me.$ele.find('.add_video').editable('setValue','', false);	
+            
+            if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                console.log("should add info");
+                var count = $("input[name='lastUploaded']").val();
+                console.log($(".metadata.prop:lt("+count+")") );
+                var metadataForForm = $(".metadata.prop:lt("+count+")").clone();
+                $(metadataForForm).css("display","none");
+                $("form.createResource").find(".metadata.prop").remove();
+                $(metadataForForm).appendTo($("form.createResource"));
 
-        onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
-            var successHandler = this.success, errorHandler;
+                $("form.createResource").ajaxSubmit({
+                url : $(this).attr("action"),
+                dataType : 'json', 
+                type : 'POST',
+                success : function(data, statusText, xhr, form) {
+                        console.log("========RESOURCE GOT CREATED==============");
+                    console.log(data);
+                    $(".addedResource.thumbnail").draggable({helper:'clone'});  
+
+                    $(".imageHolder").droppable({
+                        accept: ".addedResource.thumbnail",
+                        drop: function(event,ui){
+                            console.log("Item was Dropped");
+                            $(this).append($(ui.draggable).clone());
+                            var draggedImages = $(this).find(".addedResource");
+                            var countOfImages = draggedImages.length;
+                            if(countOfImages == 1){
+                                console.log("FIRST FIRST");
+                                draggedImages.css({
+                                    "position":"relative",
+                                    "top":"0"
+                                });
+
+                            } else{
+                                console.log("SECOND SECOND");
+                                var lastTop = parseInt($(draggedImages[(countOfImages - 2)]).css("top"));
+                                draggedImages.last().css({
+                                    "position":"absolute",
+                                    "top":lastTop + 20
+                                });
+
+                            }
+                            console.log("fffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+                            $(this).find(".star_obvcreate").children().remove();
+                            var form = $(this).closest(".addObservation");
+                            var $ratingCont = $(this).find(".star_obvcreate");
+                            console.log($ratingCont);
+                            rate($ratingCont);
+                            console.log($(ui.draggable));
+                            var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
+                            $("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+                            $(ui.draggable).appendTo(".imagesList");
+                            $(ui.draggable).css("opacity","0.3");
+                            $(form).find(".address").trigger('click'); 
+                            $(".imageHolder .addedResource").click(function(){
+                                console.log("changing z-index");
+                                form.find(".addedResource").css('z-index','0')
+                                $(this).css('z-index','1');
+                            });
+                        }
+                    });
+                }, error : function (xhr, ajaxOptions, thrownError){
+
+                }  
+                });
+                $("input[name='obvDir']").val('');
+            }
+
+            },
+
+                onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
+                    var successHandler = this.success, errorHandler;
             var me = this;
             handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
                 if(data && data.status == 401) {

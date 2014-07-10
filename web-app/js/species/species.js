@@ -835,10 +835,12 @@ function initLangSelector($ele, $selectorOptions, defaultValue) {
 
 
 function selectLicense($this, i) {
-    $('#license_'+i).val($.trim($this.text()));
-    $('#selected_license_'+i).find('img:first').replaceWith($this.html());
-    return false;
-}
+    var licenseDiv = $this.closest(".license_div");
+    $(licenseDiv).find("input").val($.trim($this.text()));
+    $(licenseDiv).find('img:first').replaceWith($this.html());
+    //$('#license_'+i).val($.trim($this.text()));
+    //$('#selected_license_'+i).find('img:first').replaceWith($this.html());
+    return false;}
 
 var initNameEditables = function ($e) {
     initEditables($e);
