@@ -5,6 +5,9 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.Species"%>
+<%@ page import="species.Classification"%>
 
 <html>
 <head>
@@ -29,8 +32,11 @@
 			<ul class="nav nav-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
 				</li>
+				<li><a href="#taxonBrowser" data-toggle="tab">Taxon Browser</a>
+				</li>
 				<li><a href="#contribute" data-toggle="tab">Contribute</a>
 				</li>
+
 			</ul>
 
 			<div class="tab-content">
@@ -44,6 +50,28 @@
 							<s:showSpeciesList/>
 						</div>
 				</div>
+                <div id="taxonBrowser" class="tab-pane" style="position:relative">
+                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+                        <h5>Classifications</h5>	
+                        <div class="alert alert-info" style="margin-bottom:0px;">
+                            Please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. You will be able to contribute once you have been allotted edit/create rights for the taxa.
+                        </div>
+                        <div id="taxaHierarchy" style="width:940px;padding:0px">
+
+                            <%
+                            def classifications = [];
+                            Classification.list().each {
+                            classifications.add([it.id, it, null]);
+                            }
+                            classifications = classifications.sort {return it[1].name};
+                            %>
+
+                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                        </div>
+                    </div>
+                    <g:render template="/species/inviteForContribution"/>
+				</div>
+
 				<div id="contribute" class="tab-pane">
                                     <g:render template="contributeTemplate"/>
 				</div>
@@ -57,16 +85,36 @@
 			$('#speciesGallerySort').change(function(){
 				updateGallery(window.location.pathname + window.location.search, ${params.limit?:40}, 0, undefined, false);
 				return false;
-                                });
+            });
 
-                                		});
-		
+            // Javascript to enable link to tab
+            var url = document.location.toString();
+            if (url.match('#')) {
+            $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+            } 
+
+            // Change hash for page-reload
+            $('.nav-tabs a').on('shown', function (e) {
+                window.location.hash = e.target.hash;
+            })
+        });
+        var taxonRanks = [];
+        <g:each in="${TaxonomyRank.list()}" var="t">
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+        </g:each>
 	</g:javascript>
+
 	<r:script>
-	    $('.list').on('updatedGallery', function(event) {
-    		$(".grid_view").show();
-    	    });
-		
+    $('.list').on('updatedGallery', function(event) {
+        $(".grid_view").show();
+    });
+
+    $(document).ready(function() {
+        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+            expandAll:false
+        });	
+    });
+
 	</r:script>
-</body>
+    </body>
 </html>

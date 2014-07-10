@@ -264,7 +264,7 @@ class Observation extends Metadata implements Taggable, Rateable {
                 map.put("showLock", true);
             }
             else{
-                def recVo = RecommendationVote.findWhere(recommendation: reco, observation:this, author: currentUser);
+                def recVo = RecommendationVote.findWhere(recommendation: reco, observation:this);
                 if(recVo && recVo.recommendation == this.maxVotedReco){
                     map.put("showLock", false);                   
                 }

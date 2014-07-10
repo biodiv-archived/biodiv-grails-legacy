@@ -899,12 +899,16 @@ $(document).ready(function() {
         var initEditableFields = function(e) {
             if($(document).find('.editFieldButton').length == 0) {
                 refreshEditables($('body'));
+                //$("#requestPermission").show();
+                //$("#inviteCurators").show();
+                //$("#inviteContributors").show();
             } else {
                 /*    $('.editable').editable('disable');
                       $('.addField').hide();
                       $('.editFieldButton').hide();
-                      */  
-                window.location.reload(true);
+                      */ 
+                window.location = window.location.href.split("?")[0];
+                //window.open(window.location.href);
             }
             if(e) e.stopPropagation();
         }
@@ -935,6 +939,13 @@ $(document).ready(function() {
             initEditableFields();
             return false;
         });
+        
+        var editMode = getParameterByName('editMode');
+
+        if(editMode == "true" || editMode == "1") {
+            $('#editSpecies').click();
+        }
+
     }
 });
 

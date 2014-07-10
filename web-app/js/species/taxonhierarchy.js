@@ -31,23 +31,24 @@
                 });
 
                 //el+= taxonId;
-                //if(level == me.options.speciesLevel) {
-                //    el = "<a href='/species/show/"+me.options.speciesId+"'>"+el+"</a>";
-                //} else {
+                if(speciesId && speciesId != -1) {
+                    el = levelTxt+": "+"<span class='rank rank"+level+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
+                } else {
                     // el = "<a href='${createLink(action:"taxon")}/"+taxonId+"'
                     // class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
-                    el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
+                    el = levelTxt+": "+"<span class='rank rank"+level+"'>"+el;
+                }
+                
+                if(this.expandAllIcon) {
+                    el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
+                }
+            
+                var postData = $(this).getGridParam('postData');
+                var expandSpecies = postData['expand_species'];
 
-                    if(this.expandAllIcon) {
-                        el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
-                    }
-
-                    el+= "</span>";
-
-                    /*if("${speciesInstance}".length == 0){
-                      el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'><input class='taxDefIdCheck' type='checkbox' value='werw' onClick='setTaxonId(this,\""+cellVal.rowId+"\")'></span>"
-                      }*/
-                //}
+                //if("${speciesInstance}".length == 0){
+                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='checkbox'></input></span>"
+                    //}
 
 
                 var isContributor= $(cells[11]).text();
@@ -59,8 +60,7 @@
 
                 return el;	   
             }
-
-
+            
             this.$element.find('#taxonHierarchy').jqGrid({
                 url:window.params.taxon.classification.listUrl,
                 datatype: "xml",
@@ -69,12 +69,12 @@
                 {name:'id',index:'id',hidden:true},
                 {name:'_id_',index:'id',hidden:true},
                 {name:'name',index:'name',formatter:heirarchyLevelFormatter},
-                {name:'count', index:'count',hidden:true, width:50},
+                {name:'count', index:'count',hidden:true},
                 {name:'speciesId',index:'speciesId', hidden:true},
-                {name:'classSystem', index:'classSystem', hidden:true}
+                {name:'classSystem', index:'classSystem', hidden:true},
                 ],   		
-                width: "${width?:'100%'}",
-                height: "${height?:'100%'}", 
+                width: "100%",
+                height: "100%", 
                 autowidth:true,   
                 scrollOffset: 0,
                 loadui:'block',
@@ -101,10 +101,52 @@
                     } else {	    
                         alert(error);
                     }
-                } 
+                },
+                beforeSelectRow: function (rowid, e) {
+                    var $this = $(this),
+
+                    isLeafName = $this.jqGrid("getGridParam", "treeReader").leaf_field,
+
+                    localIdName = $this.jqGrid("getGridParam", "localReader").id,
+
+                    localData,
+
+                    state;
+
+/*                    setChechedStateOfChildrenItems = function (children) {
+
+                        $.each(children, function () {
+
+                            $("#" + this[localIdName] + " input.taxDefIdCheck").prop("checked", state);
+
+                            if (!this[isLeafName]) {
+
+                                setChechedStateOfChildrenItems($this.jqGrid("getNodeChildren", this));
+
+                            }
+
+                        });
+
+                    }
+*/
+
+                    if (e.target.nodeName === "INPUT" && $(e.target).hasClass("taxDefIdCheck")) {
+
+                        state = $(e.target).prop("checked");
+                        var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
+                        $(e.target).parent("span").find(".taxDefIdVal").val(last);
+
+                        //localData = $this.jqGrid("getLocalRow", rowid);
+
+                       //setChechedStateOfChildrenItems($this.jqGrid("getNodeChildren", localData), state);
+
+                    }
+
+                }
+
             });
 
-            $("#taxaHierarchy").change($.proxy(this.onChange, this));
+            $(".taxaHierarchy").change($.proxy(this.onChange, this));
             
             $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
             $('.ui-jqgrid-hdiv').hide();
@@ -207,8 +249,11 @@
             var $sf = this; 
             var $form = $(e.currentTarget);
             var params = e.data?e.data:{};
-            var action = params.action; 
+            if(params.action) {
+                $(this).data('action', params.action);
+            }
 
+            var action = $(this).data('action'); 
             params['reg'] = $('#taxaHierarchy option:selected').val();
             delete params['context'];
             delete params['action'];

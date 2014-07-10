@@ -1,7 +1,8 @@
 (function($) {
 
     var window = this, options = {}, defaults = {};
-    var cache = {}, lastXhr;
+    //var cache = {}, 
+    //var lastXhr;
 
     $.fn.autofillNames = function(_options) {
         if (typeof _options === 'string' && $.isFunction(autofillNames[_options])) {
@@ -12,19 +13,20 @@
 
         _options = $.extend({}, defaults, _options);
         this.options = _options;
-        cache[this.options.nameFilter] = {}
-        return $(this).catcomplete({
+        //cache[this.options.nameFilter] = {}
+        var result = $(this).catcomplete({
                appendTo:_options.appendTo,
                source:function( request, response ) {
                    var term = request.term;
                    
-                   if ( term in cache[_options.nameFilter] ) {
+                   /*if ( term in cache[_options.nameFilter] ) {
                        response( cache[_options.nameFilter][ term ] );
                        return;
-                   }
+                   }*/
                    request.nameFilter = _options.nameFilter;
 
-                   lastXhr = $.ajax({
+                   //lastXhr = 
+                    $.ajax({
                        url:  window.params.recommendation.suggest,
                            dataType: "json",
                            data: {
@@ -32,10 +34,10 @@
                                 rank : $(this)[0].element.data('rank')
                            },
                            success: function(data, status, xhr) {
-                               cache[_options.nameFilter][ term ] = data;
-                               if ( xhr === lastXhr ) {
+                               //cache[_options.nameFilter][ term ] = data;
+                               //if ( xhr === lastXhr ) {
                                    response( data );
-                               }
+                               //}
 
                            }
                    });
@@ -49,7 +51,8 @@
                focus: _options.focus,
                select: _options.select,
                open: _options.open
-        }).data( "catcomplete" )._renderItem = function( ul, item ) {
+        });
+        result.data( "catcomplete" )._renderItem = function( ul, item ) {
             ul.removeClass().addClass("dropdown-menu")
                 if(item.category == "General") {
                     return $( "<li class='span3'></li>" )
@@ -66,5 +69,6 @@
                         .appendTo( ul );
                 }
         };
+        return result;
     }
 }(window.jQuery));

@@ -12,18 +12,10 @@ class SpeciesGroupController {
 	}
 
 	def list = {
-		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL)
-		if(allGroup) {
-			params.id = allGroup.id
-			redirect (action:'show', params:params)
-		} else {
-			params.max = Math.min(params.max ? params.int('max') : 10, 100)
-			[speciesGroupInstanceList: SpeciesGroup.list(params), speciesGroupInstanceTotal: SpeciesGroup.count()]
-		}
+        render SpeciesGroup.list() as JSON
 	}
 
 	def tags = {
-		log.debug params;
 		render SpeciesGroup.list().collect{it.name} as JSON
 	}
 	

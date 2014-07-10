@@ -704,6 +704,7 @@ class UserGroupController {
             	default: log.error "No proper role type defined"
         }
     }
+
     @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest = {
 		log.debug params;

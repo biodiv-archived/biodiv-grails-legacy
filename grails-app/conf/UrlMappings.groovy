@@ -149,24 +149,23 @@ class UrlMappings {
         controller = 'document'
         action = 'browser'
     }
-		"/group/$webaddress/document/list" {
-			controller='document'
-			action='browser'
-		}
 
-         def prefix = "/${CkeditorConfig.getConnectorsPrefix()}";
-         def uploadPrefix = CkeditorConfig.getUploadPrefix();
+    "/group/$webaddress/document/list" {
+        controller='document'
+        action='browser'
+    }
 
-         // Open File Manager
-         //using ofm index page
-         delegate.(prefix + "/biodivofm") (controller: "biodivOpenFileManagerConnector", action: "index")
-         delegate.(prefix + "/biodivofm/filemanager") (controller: "biodivOpenFileManagerConnector", action: "fileManager")
+    def prefix = "/${CkeditorConfig.getConnectorsPrefix()}";
+    def uploadPrefix = CkeditorConfig.getUploadPrefix();
 
-         // Images outside the web-app dir
-         if (uploadPrefix) { 
-             delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
-         }
+    // Open File Manager
+    //using ofm index page
+    delegate.(prefix + "/biodivofm") (controller: "biodivOpenFileManagerConnector", action: "index")
+    delegate.(prefix + "/biodivofm/filemanager") (controller: "biodivOpenFileManagerConnector", action: "fileManager")
 
-
+    // Images outside the web-app dir
+    if (uploadPrefix) { 
+        delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
+    }
     }
 }

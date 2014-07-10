@@ -212,9 +212,14 @@
             e.preventDefault();
             var $sf = this;
             var params = e.data?e.data:{};
-            var $container = params.$container;
-            var $form = params.$form;
-            console.log($container);
+            if(params.$container) {
+                $(e.target).data('$container', params.$container);
+                $(e.target).data('editor', params.editor);
+                $(e.target).data('contriEditor', params.contriEditor);
+                $(e.target).data('$form', params.$form);
+            }
+            var $container = $(e.target).data('$container');;
+            var $form = $(e.target).data('$form');;
             $form.find('textarea[name="description"]').val(params.editor.getData());
             
 		    $form.find('input[name="contributor"]').val(params.contriEditor.getEmailAndIdsList().join(","));

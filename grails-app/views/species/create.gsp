@@ -6,6 +6,22 @@
         <g:set var="title" value="Species"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
+        <style>
+            #addSpecies .add-on {
+            height:20px;
+            width:98px;
+            }
+            #addSpecies select.add-on {
+            height:30px;
+            width:110px;
+            }
+
+
+            #addSpecies .taxonRank {
+            min-height:20px;
+            width:575px;   
+            }
+        </style>
     </head>
     <body>
 
@@ -22,20 +38,32 @@
 
                 <div class="span12 super-section" style="clear:both;">
 
+            <div class="section help-block"> 
+                <ul>
+                    <li>
+                    Contributors need to have create rights on the species page in order to add content. If you have not already been allotted rights, please request permission for the taxa of your interest <a href="${uGroup.createLink('controller':'species', 'action':'taxonBrowser')}">here</a>.
+                    </li>
+                    <li>
+                    Please input a species name and validate. If a name is validated and found to already exist on the portal, you will be taken to the species page to add content. If the name is validated and found to be new, you can fill in the taxonomic hierarchy so that the new species page can be created.
+                    </li>
+                </ul>
+           </div>
+
+                    <div class="section">
                     <div class="control-group">
                         <label class="control-label span3" for="name">Add page</label> 
-                        <div class="span8">
-
-                            <div class="input-prepend input-block-level">
-                            <select id="rank" name="rank" class="add-on" style="height:auto;">
-                                <g:each in="${TaxonomyRank.list()}" var="rank">
-                                    <option value="${rank.ordinal()}">${rank.value()}</option>
+                        <div class="pull-left" style="width:700px;margin-left:20px;">
+ 
+                            <div class="input-prepend">
+                                <select id="rank" name="rank" class="add-on">
+                                <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
+                                    <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}>${rank.value()}</option>
                                 </g:each>
                             </select>
 
                             <input id="page" 
-                            data-provide="typeahead" type="text" class="input-block-level taxonRank"
-                            name="page" value="${page}" data-rank="${TaxonomyRank.KINGDOM.ordinal()}"
+                            data-provide="typeahead" type="text" class="taxonRank" style=""
+                            name="page" value="${requestParams?requestParams.speciesName:''}" data-rank="${requestParams?requestParams.rank:TaxonomyRank.SPECIES.ordinal()}"
                             placeholder="Add Page" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
@@ -44,8 +72,8 @@
                             <div id="errorMsg" class="alert hide"></div>
                         </div>
                     </div>  
-                    <g:render template="/common/createTaxonRegistryTemplate"/>
-
+                    <g:render template="/common/createTaxonRegistryTemplate" model='[requestParams:requestParams, errors:errors]'/>
+                    </div>
 
                 </div>   
                 <div class="span12 submitButtons">
@@ -73,35 +101,52 @@
     </body>
     <r:script>
     $(document).ready(function() {
-        /*$("#species").autofillNames({
+        $("#page").autofillNames({
             'appendTo' : '#nameSuggestions',
             'nameFilter':'scientificNames',
             focus: function( event, ui ) {
                 $("#canName").val("");
-                $("#species").val( ui.item.label.replace(/<.*?>/g,"") );
+                $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
                 $("#nameSuggestions li a").css('border', 0);
                 return false;
             },
             select: function( event, ui ) {
-                $("#species").val( ui.item.label.replace(/<.*?>/g,"") );
+                $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
                 $("#canName").val( ui.item.value );
                 $("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
                 return false;
             },open: function(event, ui) {
-                $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+                //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
             }
-        });*/
+        });
 
         var taxonRanks = [];
         <g:each in="${TaxonomyRank.list()}" var="t">
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+        <g:if test="${t == TaxonomyRank.SUB_GENUS || t == TaxonomyRank.SUB_FAMILY}">
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        </g:if>
+        <g:else>
+        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        </g:else>
         </g:each>
 
         $('#rank').change(function() {
             $('#page').attr('data-rank', $('#rank').find(':selected').val());
         });
-        
-        $(".taxonRank").autofillNames();
+
+        <g:if test="${requestParams}">
+            var $hier = $('#taxonHierachyInput');
+            $hier.empty();
+            var rank = <%=requestParams?requestParams.rank:0%> ;
+            for (var i=0; i<rank; i++) {
+                $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+            }
+            if(rank > 0) $('#taxonHierarchyInputForm').show();
+            $('#addSpeciesSubmit').show();
+        </g:if>
+
+        if($(".taxonRank:not(#page)").length > 0)
+            $(".taxonRank:not(#page)").autofillNames();
 
         $('#validateSpeciesSubmit').click(function() {
             var params = {};
@@ -118,7 +163,9 @@
                 success:function(data) {
                     if(data.success == true) {
                         if(data.id) {
-                            data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
+                            window.location.href = '/species/show/'+data.id+'?editMode=true'
+                            return;
+                            //data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
                         }
                         $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
                         //$('#validateSpeciesSubmit').hide()
@@ -140,16 +187,22 @@
                         var $hier = $('#taxonHierachyInput');
                         $hier.empty()
                         for (var i=0; i<data.rank; i++) {
-                            $('<div class="input-prepend input-block-level"><span class="add-on">'+taxonRanks[i].text+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="input-block-level taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
+                            var taxonRegistry = data.requestParams? data.requestParams.taxonRegistry:undefined;
+                            var taxonValue = (taxonRegistry && taxonRegistry[i]) ?taxonRegistry[i]:taxonRanks[i].taxonValue;
+                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }
                         if(data.rank > 0) $('#taxonHierarchyInputForm').show();
 
-                        $(".taxonRank").autofillNames();
+                        if($(".taxonRank:not(#page)").length > 0)
+                            $(".taxonRank:not(#page)").autofillNames();
 
 
                         $('#addSpeciesSubmit').show();
                     } else {
-                         $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
+                        if(data.status == 'requirePermission') 
+                            window.location.href = '/species/contribute'
+                        else 
+                            $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
                     }
                 }, error: function(xhr, status, error) {
                     handleError(xhr, status, error, this.success, function() {

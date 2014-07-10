@@ -124,7 +124,6 @@ class SpeciesService extends AbstractObjectService  {
             //StringWriter str1 = new StringWriter();
             lastRevisedStartDate = dateFormatter.format(s)
             //DateUtil.formatDate(s, cal, str1)
-            //println str1
             //lastRevisedStartDate = str1;
 
         }
@@ -139,7 +138,6 @@ class SpeciesService extends AbstractObjectService  {
             e = new Date(cal.getTimeInMillis())
             //			StringWriter str2 = new StringWriter();
             //			DateUtil.formatDate(e, cal, str2)
-            //			println str2
             lastRevisedEndDate = dateFormatter.format(e);
         }
 
@@ -310,7 +308,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field]
+                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:activityFeedService.SPECIES_FIELD_CREATED]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -345,7 +343,7 @@ class SpeciesService extends AbstractObjectService  {
                 } 
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field]
+            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_UPDATED]
         } catch(Exception e) {
             e.printStackTrace();
             return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
@@ -469,7 +467,7 @@ class SpeciesService extends AbstractObjectService  {
                     //sortAsPerRating(sameFieldSpeciesFieldInstances);
                     //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                     def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field]
+                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_DELETED]
                 } catch(e) {
                     e.printStackTrace();
                     log.error e.getMessage();
@@ -848,13 +846,16 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType;
-                if(oldSynonym)
+                String activityType, mailType;
+                if(oldSynonym) {
                     activityType = activityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                else
+                    mailType = activityFeedService.SPECIES_SYNONYM_UPDATED
+                } else {
                     activityType = activityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    mailType = activityFeedService.SPECIES_SYNONYM_CREATED
+                }
 
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType]
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
             }
         }
     }
@@ -909,14 +910,17 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = 'Successfully updated common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType;
-                if(oldCommonname)
+                String activityType, mailType;
+                if(oldCommonname) {
                     activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
-                else
+                    mailType = activityFeedService.SPECIES_COMMONNAME_UPDATED
+                } else {
                     activityType = activityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+                    mailType = activityFeedService.SPECIES_COMMONNAME_CREATED
+                }
 
 
-                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType]
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType]
             }
         }
     }
@@ -1071,7 +1075,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 msg = 'Successfully removed synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:activityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1121,7 +1125,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 msg = 'Successfully removed common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:activityFeedService.SPECIES_COMMONNAME_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1138,13 +1142,11 @@ class SpeciesService extends AbstractObjectService  {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
-        Map result = [errors:errors];
+        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames], errors:errors];
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
-        
-        if(speciesInstance.taxonConcept) {
-
+         if(speciesInstance.taxonConcept) {
             speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
             //taxonconcept is being used as guid
             speciesInstance.guid = converter.constructGUID(speciesInstance);
@@ -1158,18 +1160,42 @@ class SpeciesService extends AbstractObjectService  {
 
             if(!taxonService.validateHierarchy(taxonRegistryNames)) {
                 if(!speciesInstance.fetchTaxonomyRegistry()) {
-                    return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                    result['success'] = false;
+                    result['msg'] = 'Mandatory level(s) is/are missing in the hierarchy';
+                    return result
                 }
-                return [success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors]
+                result['success'] = false;
+                result['msg'] = 'Mandatory level(s) is/are missing in the hierarchy';
+                return result
             }
- 
-            //save taxonomy hierarchy
-            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-            result = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
 
+            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            //CHK if current user has permission to add details to the species
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                println "checking permissions +++++++++++++++++++++++++++++++++++++++++"
+                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
+                println taxonRegistryNodes
+
+                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
+                println tR
+                println "tR: .... +++++++++++++++++++++++++++++++++++"
+                def tD = tR.taxonDefinition
+                if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
+                    result['success'] = false;
+                    result['status'] = 'requirePermission';
+                    result['msg'] = 'Please request for permission to contribute.'
+                    //result['errors'] = errors
+                    return result
+                }
+            }
+
+            //save taxonomy hierarchy
+            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+            result.putAll(result1);
             result.speciesInstance = speciesInstance;
             result.taxonRegistry = taxonRegistry;
-            result.errors = errors;
+            result.errors.addAll(errors);
         }
        return result;
     }
@@ -1554,7 +1580,6 @@ class SpeciesService extends AbstractObjectService  {
     }
     
      def getLatestUpdatedSpecies(webaddress, sortBy, max, offset ){
-        println "===SERVICE SPECIES++++++++++GET LATEST==="
         def p = [:]
         p.webaddress = webaddress
         p.sort = sortBy
@@ -1565,7 +1590,6 @@ class SpeciesService extends AbstractObjectService  {
         result.each{
             res.add(["observation":it, 'title':it.title])
         }
-        println "=====RESULT SPECIES ++++++ RETURNED====== " + res
         return ['observations':res]
     }
 }

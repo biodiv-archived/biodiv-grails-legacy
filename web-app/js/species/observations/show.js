@@ -19,7 +19,7 @@ function lockObv(url, lockType, recoId, obvId, ele) {
         alert("This species ID has already been locked!!");
         event.preventDefault();
         return false; 		 		
-    } 
+    }
     $.ajax({
         url:url,
         dataType: "json",

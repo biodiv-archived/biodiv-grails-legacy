@@ -1,3 +1,4 @@
+<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <html>
 <%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder"%>
 
@@ -294,6 +295,7 @@
 	def tabData = []
 	tabData << [name: 'userinfo', icon: 'icon_user', messageCode: 'spring.security.ui.user.info']
 	tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.ui.user.roles']
+	tabData << [name: 'speciesPermissions',    icon: 'icon_leaf', messageCode: 'species.permission.label']
 	%>
 
 								<s2ui:tabs elementId='tabs' height='375' data="${tabData}">
@@ -335,6 +337,10 @@
 											</div>
 										</g:each>
 									</s2ui:tab>
+
+
+
+
 								</s2ui:tabs>
 							</div>
 						</sUser:isAdmin>

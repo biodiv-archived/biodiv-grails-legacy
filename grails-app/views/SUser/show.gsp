@@ -35,43 +35,103 @@
 </style>
 </head>
 <body>
-    <div class="span12">
-        <div class="page-header clearfix">
-            <div style="width: 100%;">
-                <div class="span8 main_heading" style="margin-left: 0px;">
-                    <h1>
-                        ${fieldValue(bean: user, field: "name")}
-                    </h1>
-                </div>
+	<div class="span12">
+		<div class="page-header clearfix">
+			<div style="width: 100%;">
+				<div class="span8 main_heading" style="margin-left: 0px;">
+					<h1>
+						${fieldValue(bean: user, field: "name")}
+					</h1>
+				</div>
 
-                <div style="float: right; margin: 10px 0;">
-                    <sUser:ifOwns model="['user':user]">
-                    <a class="btn btn-info" style="float: right; margin-right: 5px;"
-                        href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
-                            class="icon-edit"></i>Edit Profile </a>
-                    <a class="btn btn-info" style="float: right; margin-right: 5px;"
+				<div style="float: right; margin: 10px 0;">
+					<sUser:ifOwns model="['user':user]">
+
+						<a class="btn btn-info pull-right"
+							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
+                                                            class="icon-edit"></i>Edit Profile </a>
+                                                    <a class="btn btn-info" style="float: right; margin-right: 5px;"
                         href="${uGroup.createLink(action:'myuploads', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
                             class="icon-edit"></i>My Uploads </a>
-                    </sUser:ifOwns>
-                </div>
-            </div>
-        </div>
-        <div style="clear: both;"></div>
+					</sUser:ifOwns>
+				</div>
+			</div>
+		</div>
+		<div style="clear: both;"></div>
 
 
-        <%--				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
-        <div>
-            <div class="row section" style="">
-                <div class="figure span3"
-                    style="float: left; max-height: 220px; max-width: 220px; font-size: 75%;">
-                    <a
-                        href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                        <img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
-                    <div class="prop">
-                        <span class="name"><i class="icon-time"></i>Member since </span>
-                        <div class="value">
-                            <g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"
-                            type="datetime" style="MEDIUM" />
+		<%--				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
+		<div>
+			<div class="row section" style="">
+				<div class="figure span3"
+					style="float: left; max-height: 220px; max-width: 220px; font-size: 75%;">
+					<a
+						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
+					<div class="prop">
+						<span class="name"><i class="icon-time"></i>Member since </span>
+						<div class="value">
+							<g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"
+								type="datetime" style="MEDIUM" />
+						</div>
+					</div>
+					<g:if test="${user.lastLoginDate}">
+						<div class="prop">
+							<span class="name"><i class="icon-time"></i>Last visited </span>
+							<div class="value">
+								
+									<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
+										type="datetime" style="MEDIUM" />
+							
+							</div>
+						</div>
+					</g:if>
+				</div>
+                                <div style="width:660px;float:left;">
+                                    <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+                                </div>
+				
+			</div>
+			<%
+				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
+				def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
+			%>
+
+                        <div id="userprofilenavbar" class="navbar">
+                            <!--data-spy="affix affix-top" data-offset-top="10px" style="z-index:10000"-->
+                            <div class="navbar-inner">
+                                <ul class="nav">
+
+                                    <li><a href="#aboutMe"><i class="icon-user"></i>About Me</a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-book"></i> Content
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#observations"><i class="icon-screenshot"></i>Observations</a></li>
+                                                <li><a href="#identifications"><i class="icon-eye-open"></i>Identifications</a></li>
+                                                <li><a href="#downloads"><i class="icon-download"></i>Downloads</a></li>
+                                            </ul>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#groups"><i class="icon-group"></i>Groups</a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
+                                    <g:if test="${user.hideEmailId}">
+                                        <li style="padding:5px 0px">
+                                        <% String staticMessage = '';
+                                        if(currentUser) {
+                                            staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
+                                        }
+                                        %>
+                            			    <obv:identificationByEmail
+                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:'Contact Me', titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+                                        </li>
+                                    </g:if>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <g:if test="${user.lastLoginDate}">

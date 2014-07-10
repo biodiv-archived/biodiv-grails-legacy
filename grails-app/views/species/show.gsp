@@ -134,7 +134,8 @@
 
         occurrenceCount = undefined
         function getOccurrenceCount(data) {
-        occurrenceCount = ${speciesInstance.fetchOccurrence()} + data.count;
+            occurrenceCount = ${speciesInstance.fetchOccurrence()} + data.count;
+            console.log(occurrenceCount);
         }
 
         window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
@@ -153,8 +154,8 @@
                 showOccurence('${speciesName}');
                 //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
                 } else {
-                $("#map .alert").html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.");
-                $('#map1311326056727').hide();
+                $("#map").next('.alert').html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.").css('height','auto');
+                $('#map').hide();
                 }
             } else {
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
@@ -274,6 +275,7 @@
                     <div id="map1311326056727" class="occurenceMap"
                         style="height: 350px; width: 100%"></div>
                     <div class="alert alert-info">
+                        <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
                         The current map showing distribution of species is only indicative.
                     </div>
 
@@ -332,7 +334,6 @@
                 var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
-                
             });
  
             </r:script>

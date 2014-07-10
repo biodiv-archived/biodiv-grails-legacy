@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
 import species.NamesParser
 import org.hibernate.FetchMode;
+import species.SpeciesPermission.PermissionType;
 
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
@@ -107,16 +108,16 @@ class SpeciesController extends AbstractObjectController {
     def save = {
         List errors = [];
         Map result = [errors:errors];
-        if(params.taxonRegistry && params.page && params.rank) {
-            Map list = params.taxonRegistry?:[];
+        if(params.page && params.rank) {
+            Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
             int rank;
-            list.each { key, value ->
+            list.each { key, value -> 
                 if(value) {
                     t.putAt(Integer.parseInt(key).intValue(), value);
-                }
-            }
+                 }
+            } 
 
             speciesName = params.page
             rank = params.int('rank');
@@ -128,9 +129,18 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.createSpecies(speciesName, rank, t);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
+                    if(result.status == 'requirePermission') {
+                        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
+                        flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
+
+                        def url = uGroup.createLink(controller:"species", action:"contribute");
+                        redirect url: url
+                        return;
+                    } else {
                     flash.message = result.msg ? result.msg+result.errors:"Error while creating page"+result.errors
-                    redirect(action: "create")
+			        render(view: "create", model: result)
                     return;
+                    }
                 }
 
                 Species speciesInstance = result.speciesInstance;
@@ -138,18 +148,19 @@ class SpeciesController extends AbstractObjectController {
 
                     if (!speciesInstance.hasErrors() && speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
-                        if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
-
-                            flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
-                        } else {
+                        //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
+                            //flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
+                        //} else {
                             flash.message = "Successfully created species."
-                        }
+                            speciesUploadService.postProcessSpecies([speciesInstance]);
+                        //}
                         
-                        activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
-                        observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, null, params.webaddress);
+                        def feedInstance = activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
+
+                        observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
 
 
-                        redirect(action: "show", id: speciesInstance.id)
+                        redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
                         return;
                     } else {
                         flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
@@ -164,7 +175,7 @@ class SpeciesController extends AbstractObjectController {
                 flash.message = result.msg ? result.msg+result.errors : "Error while saving species "+result.errors
             }
         }
-        render(view: "create")
+        render(view: "create", model:result)
     }
 
 	def show = {
@@ -175,6 +186,16 @@ class SpeciesController extends AbstractObjectController {
 			redirect(action: "list")
 		}
 		else {
+            if(params.editMode) {
+                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+			        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
+                    flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesInstance.title+' ( '+params.id+' )':''}. Please request for permission below."
+                    def url = uGroup.createLink(controller:"species", action:"contribute");
+                    redirect url: url
+            		return;
+                }
+            }
+
 			def c = Field.createCriteria();
 			def fields = c.list(){
 				and{ order('displayOrder','asc') }
@@ -518,9 +539,11 @@ class SpeciesController extends AbstractObjectController {
             }
  
             if(result.success) {
+                def feedInstance;
                 if(result.activityType)
-                    activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                if(result.mailType) 
+                    observationService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
@@ -744,40 +767,129 @@ class SpeciesController extends AbstractObjectController {
 		render m as JSON
 	}
 	
-    def inviteCurator = {
-        log.debug " inviting curators " + params
-        List members = Utils.getUsersList(params.curatorUserIds);
+	@Secured(['ROLE_USER'])
+    def requestPermission = {
         def selectedNodes = params.selectedNodes
-        def msg = speciesPermissionService.sendSpeciesCuratorInvitation(selectedNodes, members, Utils.getDomainName(request), params.message)
-        render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+        if(selectedNodes) {
+            List members = [springSecurityService.currentUser];
+            def msg = speciesPermissionService.sendPermissionRequest(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
+            render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+        } else {
+            render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
+        }
 		return
     }
 
-    def confirmCuratorInviteRequest = {
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def confirmPermissionRequest = {
         if(params.userId && params.taxonConcept){
-            def user = SUser.get(params.userId.toLong())
-            def taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
-            speciesPermissionService.addCurator(user, taxonConcept)
-            def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
-            if(conf) {
-                log.debug "Deleting confirmation code and usertoken params";
-                conf.delete();
-                UserToken.get(params.tokenId.toLong())?.delete();
+            SUser user = SUser.get(params.userId.toLong())
+            TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
+            String invitetype = params.invitetype;
+            boolean success = false;
+            switch (invitetype) {
+                case 'curator':
+                success = speciesPermissionService.addCurator(user, taxonConcept)
+                break;
+ 
+                case 'contributor':
+                success = speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
+                break;
+                default: log.error "No invite type"
             }
-            flash.message="Successfully added ${user} as a curator to ${taxonConcept.name}"
+
+            if(success) {
+                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
+                def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
+                if(conf) {
+                    log.debug "Deleting confirmation code and usertoken params";
+                    conf.delete();
+                    UserToken.get(params.tokenId.toLong())?.delete();
+                }
+                flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
+            } else {
+                flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+            }
         }else{
-            flash.error="Couldn't add ${user} as curator to ${taxonConcept.name} because of missing information."            
+            flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
 		return;
     }
 
-   def speciesPermission = {
-        def s = (new SpeciesPermission(['author':springSecurityService.currentUser, 'permissionType':SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.value(), 'taxonConcept':TaxonomyDefinition.get(1912L)]))
-        if(!s.save(flush:true))
-					s.errors.each { log.error it }
-        render "done"
+	@Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
+    def invite = {
+        log.debug " inviting curators " + params
+        List members = Utils.getUsersList(params.userIds);
+        def selectedNodes = params.selectedNodes
+        if(selectedNodes) {
+            def msg = speciesPermissionService.sendPermissionInvitation(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
+            render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+        } else {
+            render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
+         }
+		return
+    } 
+
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def confirmPermissionInviteRequest = {
+        if(params.userId && params.taxonConcept){
+            SUser user = SUser.get(params.userId.toLong())
+            TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
+            String invitetype = params.invitetype;
+            switch (invitetype) {
+                case 'curator':
+                speciesPermissionService.addCurator(user, taxonConcept)
+                break;
+ 
+                case 'contributor':
+                speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
+                break;
+                default: log.error "No invite type"
+            }
+
+            def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
+            if(conf) {
+                log.debug "Deleting confirmation code and usertoken params";
+                conf.delete();
+                UserToken.get(params.tokenId.toLong())?.delete();
+            }
+            flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
+        }else{
+            flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+        }
+        def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
+        redirect url: url
+		return;
+    }
+
+    @Secured(['ROLE_SPECIES_ADMIN', 'ROLE_ADMIN'])
+    def searchPermission = {
+        if(params.rank && params.page) {
+            int rank = params.rank?params.int('rank'):null;
+            try {
+                Map r = getTaxon(params.page, rank);
+                if(r.success) {
+                    if(r.taxon) {
+                        render speciesPermissionService.getUsers(r.taxon, PermissionType.ROLE_CONTRIBUTOR) as JSON
+                        return;
+                    }
+                }
+            } catch(e) {
+                e.printStackTrace();
+            }
+        } else if(params.user) {
+            List<SUser> users = Utils.getUsersList(params.userIdsAndEmailIds);
+            def result = [];
+            users.each { user -> 
+                result[user.id] = speciesPermissionService.contributorFor(user);
+            }
+            render (result as JSON)
+            return;
+        } 
+        render '';
+        return;
     }
 
     def uploadImage = {
@@ -842,62 +954,68 @@ class SpeciesController extends AbstractObjectController {
         if(params.taxonRegistry) {
             hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
         }
-*/        NamesParser namesParser = new NamesParser();
+*/
 
-        def result = [:];
+        def result = [requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
         if(params.page && params.rank) {
             try {
-                //List<TaxonomyDefinition> names = namesParser.parse(hierarchy);
-                List<TaxonomyDefinition> names = namesParser.parse([params.page]);
-                TaxonomyDefinition page = names[0];
-                int i=0, rank = params.rank?params.int('rank'):null;
-                /*for(i = 0; i< names.size(); i++) {
-                    if(names[i] != null) {
-                        page = names[i];
-                        rank = i;
-                    }
-                }*/
-                if(page && page.canonicalForm) {
-                def taxonCriteria = TaxonomyDefinition.createCriteria();
-                TaxonomyDefinition taxon = taxonCriteria.get {
-                    eq("rank", rank);
-                    ilike("canonicalForm", page.canonicalForm);
-                }
-
-                if(!taxon) {
-                    result = ['success':true, 'msg':"Adding a new taxon concept ${page.name}", rank:rank]
-                } else {
-                    //CHK if a species page exists for this concept
-                    Species species = Species.findByTaxonConcept(taxon);
-                    def taxonRegistry = taxon.parentTaxonRegistry();
-                    if(species) {
-                        result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title, rank:taxon.rank];
+                int rank = params.rank?params.int('rank'):null;
+                Map r = getTaxon(params.page, rank);
+                if(r.success) {
+                    TaxonomyDefinition taxon = r.taxon;
+                    if(!taxon) {
+                        result = ['success':true, 'msg':"Name validated and no match was found with existing species names on the portal. Please fill in the taxonomic hierarchy so that a species page can be created. Taxa marked with * are compulsory fields.", rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
                     } else {
-                        result = ['success':true, 'msg':"Adding a new species page for an existing concept ${page.name}", rank:taxon.rank];
+                        //CHK if a species page exists for this concept
+                        Species species = Species.findByTaxonConcept(taxon);
+                        def taxonRegistry = taxon.parentTaxonRegistry();
+                        if(species) {
+                            result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
+                        } else {
+                            result = ['success':true, 'msg':"Adding a new species page for an existing concept ${taxon.name}", rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
+                        }
+                        result['taxonRegistry'] = [:];
+                        taxonRegistry.each {classification, h ->
+                            if(!result['taxonRegistry'][classification.name])
+                                result['taxonRegistry'][classification.name] = [];
+                            result['taxonRegistry'][classification.name] << h
+                        }
                     }
-                    result['taxonRegistry'] = [:];
-                    taxonRegistry.each {classification, h ->
-                        if(!result['taxonRegistry'][classification.name])
-                            result['taxonRegistry'][classification.name] = [];
-                        result['taxonRegistry'][classification.name] << h
-                    }
-                }
-                if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
-                    result = ['success':false, 'msg':"Not a valid name ${page.name}."]
-                }
                 } else {
-                    result = ['success':false, 'msg':"Not a valid name ${page.name}."]
+                    result.putAll(r);
                 }
-
-
             } catch(e) {
                 e.printStackTrace();
-                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}"]
+                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}", requestParams:[taxonRegistry:params.taxonRegistry]]
             }
 
         } else {
-            result = ['success':false, 'msg':'Not a valid name.']
+            result = ['success':false, 'msg':'Not a valid name.', requestParams:[taxonRegistry:params.taxonRegistry]]
         }
         render result as JSON
+    }
+    
+    private Map getTaxon(String name, int rank) {
+        def result = [:];
+        if(!name || rank == null) return result;
+
+        NamesParser namesParser = new NamesParser();
+        List<TaxonomyDefinition> names = namesParser.parse([name]);
+        TaxonomyDefinition page = names[0];
+        if(page && page.canonicalForm) {
+            def taxonCriteria = TaxonomyDefinition.createCriteria();
+            TaxonomyDefinition taxon = taxonCriteria.get {
+                eq("rank", rank);
+                ilike("canonicalForm", page.canonicalForm);
+            }
+            if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
+                result = ['success':false, 'msg':"Not a valid name ${name}."]
+            } else {
+                result = ['success':true, 'taxon':taxon];        
+            }
+        } else {
+            result = ['success':false, 'msg':"Not a valid name ${name}."]
+        }
+        return result;
     }
 }

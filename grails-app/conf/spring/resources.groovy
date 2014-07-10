@@ -282,9 +282,17 @@ beans = {
         debugUnreturnedConnectionStackTraces = true
       } 
 
-/*    log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
+    /*if (Environment.current == Environment.DEVELOPMENT) {
+    log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
+        targetClass = "org.springframework.util.Log4jConfigurer"
+        targetMethod = "initLogging"
+        arguments = ["file:/home/sravanthi/git/biodiv/lib/log4j.properties"]
+    }
+    } else {
+    log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
         targetClass = "org.springframework.util.Log4jConfigurer"
         targetMethod = "initLogging"
         arguments = ["classpath:log4j.properties"]
+    }
     }*/
 }

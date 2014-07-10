@@ -23,9 +23,11 @@ class TaxonController {
     def taxonService;
     def springSecurityService;
     def activityFeedService;
+    def observationService;
+    def grailsApplication;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-    def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
+    //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
     /**
      * 
@@ -48,10 +50,10 @@ class TaxonController {
         long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
-        combinedHierarchy.merge();
+        /*combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
             classSystem = null;
-        }
+        }*/
 
         long startTime = System.currentTimeMillis();
         def rs = new ArrayList<GroovyRowResult>();
@@ -256,7 +258,7 @@ class TaxonController {
                 def list = [] 
                 while(reg != null) {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()]
-                    populateSpeciesDetails(speciesTaxonId, result);
+                    populateSpeciesDetails(reg.taxonDefinition.id, result);
                     list.add(result);
                     reg = reg.parentTaxon;
                 }
@@ -272,10 +274,8 @@ class TaxonController {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
                     list.add(result);					
-                    println list
                     reg = reg.parentTaxon;
                 }
-                println list
                 //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};
                     speciesHier.addAll(list);
@@ -329,19 +329,33 @@ class TaxonController {
                 if(r.path && r.path.lastIndexOf("_")!=-1) {
                     parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
                 }
-                row(id:r.id) {
-                    cell(r.id)
+                def id;
+                if(r.containsKey(id)) {
+                    id = r.id;
+                } else {
+                    id = r.path;
+                }
+                row(id:id) {
+                    cell(id)
                     cell(r.path)
                     cell (r.name.trim())
                     cell (r.count)
                     cell (r["speciesid"])
                     cell (r["classsystem"])
                     cell (r.rank)
+                    if(r.containsKey('parentId')) {
                     cell (r.parentId)
+                    } else {
+                    cell (null)
+                    }
                     cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)
                     cell (r.expanded?:false) //for expanded
                     cell (r.loaded?:false) //for loaded
-                    cell (r.isContributor?:false) //for edit/delete
+                    if(r.containsKey('isContributor')) {
+                        cell (r.isContributor?:false) //for edit/delete
+                    } else {
+                        cell (false) //for edit/delete
+                    }
                 }
             }
             records (size)
@@ -399,8 +413,8 @@ class TaxonController {
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
-                    activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_CREATED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType );
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
 
@@ -435,6 +449,11 @@ class TaxonController {
 //        }
 
             try {
+                for (int i=0; i< t.size(); i++) {
+                    if(!t[TaxonomyRank.list()[i].ordinal()]) {
+                        errors << TaxonomyRank.list()[i].value() + " is missing";
+                    }
+                }
 
                 if(!taxonService.validateHierarchy(t)) {
                     render ([success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors] as JSON)
@@ -462,8 +481,8 @@ class TaxonController {
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
-                    activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_UPDATED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON
@@ -499,8 +518,8 @@ class TaxonController {
 
                 if(result.success) {
                     def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
-                    activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, activityFeedService.SPECIES_HIERARCHY_DELETED);
-                    //observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, speciesInstance, null, params.webaddress);
+                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
+                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON;

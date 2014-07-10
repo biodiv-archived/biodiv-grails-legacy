@@ -2703,3 +2703,16 @@ small {
     position:relative;
 }
 
+#inviteContributors, #inviteCurators {
+    padding: 5px 10px;
+}
+
+.ui-jqgrid td input.taxDefIdCheck {
+    margin: 4px;
+    margin-top: 1px \9;
+    line-height: normal;
+}
+
+.rank a {
+    color: #16509E;
+}

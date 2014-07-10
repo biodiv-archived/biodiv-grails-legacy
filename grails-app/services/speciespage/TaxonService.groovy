@@ -25,6 +25,8 @@ class TaxonService {
 	def speciesService;
 	def externalLinksService;
     def springSecurityService;
+    def activityFeedService;
+    def speciesPermissionService;
 
 	static int BATCH_SIZE = 100;
 
@@ -779,11 +781,21 @@ class TaxonService {
         if(!classification) {
             return [success:false, msg:"Not a valid classification ${classification?.name}."]
         }
-
-        def taxonRegistry = addTaxonEntries(speciesName, (new XMLConverter()), taxonRegistryNames, classification.name, contributor);
+        
+        XMLConverter converter = new XMLConverter();
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor);
+        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);
+/*        //check if user has permission to contribute to the taxon hierarchy
+        if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {
+            taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);            
+        } else {
+            return ['success':false, code:'requirePermission', msg:"Sorry, you dont have persmission to edit taxon registry nodes ${taxonRegistry}"]
+        }
+*/
         if(taxonRegistry) {
             int maxRank = 0;
             TaxonomyRegistry reg;
+            String hier = ""
             taxonRegistry.each { 
                 if(it.errors.getErrorCount() > 0)
                     errors.addAll(it.errors.collect {it.toString()})
@@ -791,20 +803,16 @@ class TaxonService {
                     reg = it;
                     maxRank = it.taxonDefinition.rank;
                 }
+                hier += it.taxonDefinition.name +" > "
             }
-            return ['success':true, msg:'Successfully added hierarchy', 'reg' : reg, errors:errors]
+            return ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
         }
         return ['success':false, msg:'Error while adding hierarchy', errors:errors]
     }
 
-    private List<TaxonomyRegistry> addTaxonEntries(String speciesName, converter, List taxonRegistryNames, String classificationName, SUser contributor) {
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classificationName, contributor);
-        return converter.getClassifications(taxonRegistryNodes, speciesName, true); 
-    }
-
     def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
         return deleteTaxonEntries(reg, force);
-    }
+    } 
 
     private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
         String msg = '';
@@ -816,9 +824,9 @@ class TaxonService {
 
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
-        } 
+         } 
 
-        if(!reg.isContributor()) {
+         if(!reg.isContributor()) {
             return [success:false, msg:"You don't have permission to delete as you are not a contributor.", errors:errors]
         }
 
@@ -839,6 +847,7 @@ class TaxonService {
 
         try {
             if(reg) {
+                String hier = "";
                 def contributor = springSecurityService.currentUser;
                 while(reg != null) {
                     def c = TaxonomyRegistry.withCriteria () {
@@ -861,8 +870,10 @@ class TaxonService {
                     //reg.removeFromContributors(contributor);
 
                     toDelete << reg;
+                    hier += reg.taxonDefinition.name +" > "
                         //reg.delete(failOnError:true)
                     reg = reg.parentTaxon;
+
                 } 
                 
                 int maxRank = 0, regId;
@@ -890,6 +901,7 @@ class TaxonService {
                 }
                 r.success = true;
                 r.msg = 'Successfully removed registry';
+                r.activityType = activityFeedService.SPECIES_HIERARCHY_DELETED+" : "+hier;
                 r.errors << errors
                 r.regId = regId
                 return r;
@@ -988,7 +1000,12 @@ class TaxonService {
 
     boolean validateHierarchy(List<String> taxonEntries) {
         for (int i=0; i< taxonEntries.size(); i++) {
-            if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) return false;
+            if(TaxonomyRank.list()[i] != TaxonomyRank.SUB_FAMILY && TaxonomyRank.list()[i] != TaxonomyRank.SUB_GENUS) {
+                if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) {
+                    log.debug "${TaxonomyRank.list()[i]} is missing" 
+                    return false;
+                }
+            }
         }
         return true;
     }

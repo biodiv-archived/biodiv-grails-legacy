@@ -164,7 +164,6 @@ else {
 }
 
 
-
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
     app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
@@ -480,6 +479,7 @@ environments {
 
         log4jConsoleLogLevel = Priority.DEBUG
 	    log4j = {
+            // By default, messages are logged at the warn level to the console and the app.log
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
             }
@@ -774,7 +774,7 @@ environments {
 		}
 	}
 	kk {
-		servername = 'ibp.kk.strandls.com'
+		servername = 'indiabiodiversity.org'
 		grails.serverURL = "http://${servername}/${appName}"
 		
         speciesPortal {

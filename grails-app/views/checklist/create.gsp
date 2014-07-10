@@ -110,7 +110,7 @@
 
                         <div id="gridSection" class="section checklist-slickgrid ${params.action=='create'?'hide':''}">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
-                            <span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span>
+                            <span class="help-inline"> (Mark scientific and common name column using <img src="${resource(dir:'images', file:'dropdown_active.gif',absolute:'true')}"/>)</span>
                             
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
