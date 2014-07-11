@@ -24,7 +24,7 @@
                 text-align:center;
             }
             .map_canvas {
-                border-color: rgba(82,168,236,0.8);
+                border-color: rgba(82,168,236,0.8) !important;
                 position: absolute;
                 width: 100%;
                 display: block;
@@ -113,6 +113,10 @@
                 height: 22px !important;
                 left: 68px !important;
             }
+            .small_block_row {
+                width:291px;
+                margin-left:0px;
+            }
         </style>
     </head>
     <body>
@@ -169,7 +173,7 @@
                                 
                             </div>
                             <div>
-                                <div class="column span6 propagateGroups block_row">
+                                <div class="column propagateGroups small_block_row">
                                     <label>User Groups</label>
                                     <div style="clear:both">
                                         <button type="button" class="btn toggleGrpsDiv"> Groups </button> 
@@ -178,9 +182,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="column span6 block_row" style="text-align:center">
+                                <div class="column propagateHelpID small_block_row">
+                                    <label>Help Identify</label>
+                                    <div style="margin-left:40px;clear:both">
+                                        <input class="helpID" type="checkbox">
+                                    </div>
+                                </div>
+                                <div class="column small_block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
-                                        style=" margin-right: 5px;"> Apply to all
+                                        style=" margin-right: 5px; margin-top:17px;"> Apply to all
                                     </a>
                                 </div>
                             </div>

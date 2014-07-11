@@ -200,6 +200,7 @@ $(".applyAll").click(function(){
     $('.propagateTags span.tagit-label').each(function(i){
         tagValues.push($(this).text()); // This is your rel value
     });
+    var helpID = $(".propagateHelpID .helpID").is(':checked');
     var groups = getSelectedUserGroups($(".propagateGroups"));
     var latVal = $(".propagateLocation").find(".latitude_field").val();
     var longVal = $(".propagateLocation").find(".longitude_field").val();
@@ -217,6 +218,9 @@ $(".applyAll").click(function(){
         }
     }
     $.each(allForms, function(index,value){
+        if(helpID) {
+            $(value).find("input[name='help_identify']").trigger("click");    
+        }
         $(value).find(".imageHolder li span:contains('"+licenseVal+"')").first().trigger("click");
         $(value).find('.fromDate').datepicker("setDate", dateVal);
         $.each(tagValues, function(index, tagVal){
