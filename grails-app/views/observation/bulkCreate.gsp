@@ -70,10 +70,10 @@
             .selected_habitat, .selected_group {
                 padding: 4px 3px;
                 width:97%;
-                text-align:left;
+                text-align:left !important;
             }
             .block_row {
-                margin-left:0px;
+                margin-left:0px !important;
             }
             .section label {
                 padding: 0px; 
@@ -102,6 +102,12 @@
             }
             input[type="text"]:focus {
                 border-width:2px;
+            }
+            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div {
+                width:194px;
+            }
+            .addObservation .groups_super_div, .addObservation .habitat_super_div {
+                width : 273px;
             }
         </style>
     </head>

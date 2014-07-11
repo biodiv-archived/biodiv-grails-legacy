@@ -25,7 +25,7 @@
     </g:each>
     </select-->
     <div class="groups_div dropdown" style="z-index:3;">
-        <div class="selected_group selected_value dropdown-toggle btn" data-toggle="dropdown">
+        <div class="dropdown-toggle btn selected_group selected_value " data-toggle="dropdown">
             <img src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/>
             <span class="display_value">Select group</span>
             <b class="caret"></b>
