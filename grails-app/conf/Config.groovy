@@ -770,59 +770,59 @@ environments {
 
 
 	pamba {
-		grails.serverURL = "http://indiabiodiversity.org/${appName}"
-		jpegOptimProg = '/usr/local/bin/jpegoptim'
+		servername = 'indiabiodiversity.pamba.org'
+		grails.serverURL = "http://${servername}/${appName}"
 		
         speciesPortal {
-            app.rootDir = "/data/species"
+            app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
 
             resources {
-                rootDir = "${app.rootDir}/images"
-                serverURL = "http://pamba.strandls.com/${appName}/images"
+                rootDir = "${app.rootDir}/img"
+                serverURL = "http://${servername}/${appName}/img"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
                 rootDir = "${app.rootDir}/observations"
-                serverURL = "http://indiabiodiversity.org/${appName}/observations"
+                serverURL = "http://${servername}/${appName}/observations"
 				//filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
-                serverURL = "http://indiabiodiversity.org/${appName}/userGroups"
+                serverURL = "http://${servername}/${appName}/userGroups"
             }
             users {
                 rootDir = "${app.rootDir}/users"
-                serverURL = "http://indiabiodiversity.org/${appName}/users"
+                serverURL = "http://${servername}/${appName}/users"
             }
 
             content{
                 rootDir = "${app.rootDir}/content"
-                serverURL = "http://indiabiodiversity.org/${appName}/content"
+                serverURL = "http://${servername}/${appName}/content"
             }	
             maps {
-		        serverURL = "http://indiabiodiversity.org/${appName}/maps"
+		        serverURL = "http://${servername}/${appName}/maps"
+            }
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://${servername}/${appName}/usersRes"   
             }
 
-            search.serverURL="http://indiabiodiversity.org:8080/solr"
+            search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {
                     host = "127.0.0.1"
                     port = 25
                 }
             }
-            usersResource {
-                rootDir = "${app.rootDir}/usersRes"
-                serverURL = "http://indiabiodiversity.org/${appName}/usersRes"   
-            }
         }
 
-        ibp.domain='indiabiodiversity.org'
-        wgp.domain='thewesternghats.indiabiodiversity.org'   
+        ibp.domain=servername
+        wgp.domain="thewesternghats.${servername}" 
 		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
@@ -837,9 +837,9 @@ environments {
         }
 		log4jConsoleLogLevel = Priority.DEBUG
 		log4j = {
-            appenders {
-                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-            }
+			appenders {
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+			}
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 

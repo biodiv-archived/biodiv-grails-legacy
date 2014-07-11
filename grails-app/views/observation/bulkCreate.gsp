@@ -79,7 +79,7 @@
                 padding: 0px; 
             }
             .help-identify{
-                left:10px;
+                left:10px !important;
             }
             .propagateBlock {
                 background-color: #a6dfc8;
@@ -108,6 +108,10 @@
             }
             .addObservation .groups_super_div, .addObservation .habitat_super_div {
                 width : 273px;
+            }
+            .combobox-container .add-on {
+                height: 22px !important;
+                left: 68px !important;
             }
         </style>
     </head>
