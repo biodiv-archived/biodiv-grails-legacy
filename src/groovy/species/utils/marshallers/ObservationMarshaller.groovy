@@ -24,6 +24,7 @@ class ObservationMarshaller {
                 
                 author : obv.author,
 
+                thumbnail : obv.mainImage()?.thumbnailUrl(null, !obv.resource ? '.png':null),
                 notes : obv.notes,
                 summary : obv.summary(),
 
@@ -31,7 +32,7 @@ class ObservationMarshaller {
 
                 maxVotedReco : obv.maxVotedReco,
 
-                resource : obv.resource,
+                resource : obv.listResourcesByRating(),
                 recommendationVote : obv.recommendationVote,
                 userGroups : obv.userGroups,
                 annotations : obv.annotations,

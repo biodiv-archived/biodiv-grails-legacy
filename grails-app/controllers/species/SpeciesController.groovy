@@ -178,19 +178,31 @@ class SpeciesController extends AbstractObjectController {
 
 	def show() {
 		//cache "content"
-		def speciesInstance = Species.get(params.long('id'))
-		if (!speciesInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-			redirect(action: "list")
+        params.id = params.long('id');
+
+		def speciesInstance = params.id ? Species.get(params.id):null;
+		if (!params.id || !speciesInstance) {
+            if(request.getHeader('X-Auth-Token')) {
+                render (['success':false, 'msg':"Coudn't find species with id ${params.id}"] as JSON)
+                return
+            } else {
+			    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+			    redirect(action: "list")
+            }
 		}
 		else {
             if(params.editMode) {
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
 			        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
                     flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesInstance.title+' ( '+params.id+' )':''}. Please request for permission below."
-                    def url = uGroup.createLink(controller:"species", action:"contribute");
-                    redirect url: url
-            		return;
+                    if(request.getHeader('X-Auth-Token')) {
+                        render (['success':false, 'msg':flash.message] as JSON)
+                        return
+                    } else {
+                        def url = uGroup.createLink(controller:"species", action:"contribute");
+                        redirect url: url
+            		    return;
+                    }
                 }
             }
 
@@ -198,6 +210,11 @@ class SpeciesController extends AbstractObjectController {
 			def fields = c.list(){
 				and{ order('displayOrder','asc') }
 			};
+            if(request.getHeader('X-Auth-Token')) {
+                render speciesInstance as JSON;
+                return;
+            } 
+
 			Map map = getTreeMap(speciesInstance, fields);
 			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
 			def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
@@ -205,6 +222,7 @@ class SpeciesController extends AbstractObjectController {
 			def instanceTotal = relatedObservations?relatedObservations.count:0
 
 			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], observationInstanceList:observationInstanceList, instanceTotal:instanceTotal, queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
+
             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
                 result['newSpeciesFieldInstance'] = newSpeciesFieldInstance
@@ -217,6 +235,8 @@ class SpeciesController extends AbstractObjectController {
         def user = springSecurityService.currentUser;
 
 		Map map = new LinkedHashMap();
+        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user)
+
 		for(Field field : fields) {
 			Map finalLoc;
 			Map conceptMap, categoryMap, subCategoryMap;
@@ -249,7 +269,7 @@ class SpeciesController extends AbstractObjectController {
 					}
 				}
 				finalLoc.put ("field", field);
-                if(user && speciesPermissionService.isSpeciesContributor(speciesInstance, user)) {
+                if(user && isSpeciesContributor) {
                     finalLoc.put('isContributor', 1);
                 }
 			}

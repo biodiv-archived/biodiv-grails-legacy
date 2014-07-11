@@ -35,14 +35,13 @@
             </ul>
             <div id="resourceTabs-1">
                 <!--a class="myeditable" href="#">Contribute Images</a-->
-                <g:set var="images" value="${speciesInstance.getImages()}"/>
+                <g:set var="resourcesInstanceList" value="${speciesInstance.listResourcesByRating()}"/>
                 <div class="story-footer" style="right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
-                    <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE, images.size()]]]"/>
+                    <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;']"/>
                 </div>
                 
                 <div id="gallery1" class="gallery">
-                <% def resourcesInstanceList = speciesInstance.getListResources()%>
-                    <g:if test="${images}">
+                    <g:if test="${resourcesInstanceList}">
                     
                     <s:showSpeciesImages model="['speciesInstance':speciesInstance , 'resourcesInstanceList' : resourcesInstanceList]"></s:showSpeciesImages>
                     </g:if>

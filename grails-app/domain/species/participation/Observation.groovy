@@ -475,7 +475,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return Follow.fetchIsFollowing(this, user)
 	}
 
-    def listResourcesByRating(max = -1) {
+    def listResourcesByRating(int max = -1) {
         def params = [:]
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
@@ -507,7 +507,7 @@ class Observation extends Metadata implements Taggable, Rateable {
         }
     }
 
-	def fetchResourceCount(){
+	List fetchResourceCount(){
         def result = Observation.executeQuery ('''
             select r.type, count(*) from Observation obv join obv.resource r where obv.id=:obvId group by r.type order by r.type
             ''', [obvId:this.id]);
