@@ -84,7 +84,7 @@ class Species implements Rateable {
 
 	Resource mainImage() {
         def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-        def images = this.getImages();
+        def images = this.listResourcesByRating(ResourceType.IMAGE, 1);
         def reprImageMaxRated = images ? images[0]:null;
         /*
         if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
@@ -109,7 +109,7 @@ class Species implements Rateable {
     /** 
      * Ordering resources basing on rating
      **/
-    List<Resource> getImages() { 
+    List<Resource> listResourcesByRating(ResourceType resourceType=null, int max=-1) { 
         def params = [:]
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
@@ -118,11 +118,44 @@ class Species implements Rateable {
         params['cache'] = true;
         params['type'] = type;
 
-        def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id and r.type ='"+ResourceType.IMAGE+"' and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
+        def queryParams = [:];
+        queryParams['id'] = this.id;
 
-        def res = sql.rows("select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref where o.type ='"+ResourceType.IMAGE+"' and o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id)) order by avg desc, id asc", [id:this.id])
+        def query = "select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id  and species_resources_id=:id ";
 
-            def idList = results.collect {it[0]}
+        if(resourceType) {
+            query += " and r.type = :resourceType "
+            queryParams['resourceType'] = resourceType.toString();
+        }
+
+        query += " order by avg desc, resource_id asc";
+
+        if(max && max > 0) {
+            query += " limit :max"
+            queryParams['max'] = max;
+        } 
+        
+
+        def results = sql.rows(query, queryParams);
+
+        query = "select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref ";
+         if(resourceType) {
+            query += " and o.type = :resourceType "
+            queryParams['resourceType'] = resourceType.toString();
+        }
+
+        query += " where o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id))";
+
+        query += " order by avg desc, id asc";
+
+        if(max && max > 0) {
+            query += " limit :max"
+            queryParams['max'] = max;
+        } 
+        
+        def res = sql.rows(query, queryParams)
+
+        def idList = results.collect {it[0]}
 
         res.each {
             if(!idList.contains(it[0])) {
@@ -138,48 +171,11 @@ class Species implements Rateable {
             def finalRes = results.collect {  r -> 
                 instances.find { i -> (r[0] == i.id) } 
             }
+            println "+======================+++++"
+            println finalRes;
             return finalRes
         } else {
-            []
-        }
-    }
-
-
-    /** 
-     * Ordering resources basing on rating
-     **/
-    List<Resource> getListResources() { 
-        def params = [:]
-        def clazz = Resource.class;
-        def type = GrailsNameUtils.getPropertyName(clazz);
-
-        def sql =  Sql.newInstance(dataSource);
-        params['cache'] = true;
-        params['type'] = type;
-
-        def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id  and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
-
-        def res = sql.rows("select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref where o.id in (select resource_id from species_field_resources where species_field_id in(select id from species_field where species_id=:id)) order by avg desc, id asc", [id:this.id])
-
-            def idList = results.collect {it[0]}
-
-        res.each {
-            if(!idList.contains(it[0])) {
-                idList<<it[0]
-            }
-        }
-        //def idList = results.collect { it[0] }
-        if(idList) {
-            def instances = Resource.withCriteria {  
-                inList 'id', idList 
-                cache params.cache
-            }
-            def finalRes = results.collect {  r -> 
-                instances.find { i -> (r[0] == i.id) } 
-            }
-            return finalRes
-        } else {
-            []
+            return []
         }
     }
 
@@ -199,16 +195,6 @@ class Species implements Rateable {
 			}
 		}
 		return icons;
-	}
-
-	List<Resource> getVideos() {
-		def res = new ArrayList<Resource>();
-		resources.each {
-			if(it?.type == species.Resource.ResourceType.VIDEO) {
-				res.add(it);
-			}
-		}
-		return res;
 	}
 	
 	String notes() {
@@ -427,4 +413,12 @@ class Species implements Rateable {
 		
 		return ['allSpeciesUpdated':allSpeciesUpdateCount, 'speciesUpdated':speciesUpdateCount, 'speciesCreated':speciesCreateCount, 'stubsCreated':(allSpeciesUpdateCount - speciesUpdateCount - speciesCreateCount)]
 	}
+
+    List fetchResourceCount(){
+        def result = Species.executeQuery ('''
+            select r.type, count(*) from Species species join species.resources r where species.id=:speciesId group by r.type order by r.type
+            ''', [speciesId:this.id]);
+        return result;
+	}
+
 }

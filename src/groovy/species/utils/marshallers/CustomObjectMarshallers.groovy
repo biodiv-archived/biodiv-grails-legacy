@@ -93,7 +93,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(Classification) {
-            return ['id':it.classification.id, name : it.classification.name]
+            return ['id':it.id, 'name':it.name, 'citation':it.citation]
         }
 
         JSON.registerObjectMarshaller(TaxonomyRegistry) {
@@ -108,6 +108,10 @@ class CustomObjectMarshallers {
             def r = ['id':it.id, 'name':it.name];
             if(it.taxonConcept) {
                 r['taxonomyDefinition'] = it.taxonConcept;
+            }
+            Long speciesId = it.taxonConcept?.findSpeciesId();
+            if(speciesId) {
+                r['speciesId'] = speciesId;
             }
             return r;
         }
