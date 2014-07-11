@@ -84,7 +84,9 @@ class AbstractObjectService {
 					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
-				}
+				} else if(image.type == ResourceType.AUDIO) {
+                    item.imageLink = config.grails.serverURL+"/images/audioicon.png"
+                }                
 			}else{
 				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
 			} 			

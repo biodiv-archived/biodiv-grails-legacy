@@ -104,7 +104,7 @@ class Resource extends Sourcedata implements Rateable {
 				thumbnailUrl = "http://img.youtube.com/vi/${videoId}/default.jpg"
 				break;
 			case ResourceType.AUDIO :								
-				thumbnailUrl = "/images/audioicon.png"
+				thumbnailUrl = grailsApplication.config.grails.serverURL+"/images/audioicon.png"
 				break;	
 			default :
 				log.error "Not a valid type"
