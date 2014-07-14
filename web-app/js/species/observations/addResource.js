@@ -7,9 +7,8 @@ function removeResource(event, imageId) {
     $(targ).parent('.addedResource').remove();
     $(targ).find(".image_"+imageId).remove();
     if($( "input[name='resType']" ).val() == "species.auth.SUser") {
-        console.log($(".image_"+imageId).first().closest(".addedResource"));
-        $(".image_"+imageId).first().closest(".addedResource").draggable({helper:'clone'});
         $(".image_"+imageId).first().closest(".addedResource").css('opacity', '1');
+        $(".image_"+imageId).first().closest(".addedResource").draggable('enable');
     }
 
 }
@@ -298,8 +297,9 @@ function removeResource(event, imageId) {
                             console.log($ratingCont);
                             rate($ratingCont);
                             console.log($(ui.draggable));
-                            var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
-                            $("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+                            $(ui.draggable).draggable('disable');
+                            //var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
+                            //$("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
                             $(ui.draggable).appendTo(".imagesList");
                             $(ui.draggable).css("opacity","0.3");
                             $(form).find(".address").trigger('click'); 

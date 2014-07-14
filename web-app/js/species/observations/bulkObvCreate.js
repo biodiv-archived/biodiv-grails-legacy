@@ -67,43 +67,42 @@ function submitForms(counter, size, allForms, showListPage){
     }
     if(counter == size){
         console.log("breaking recursion========" + gotError);
-        if(!gotError){
-            var allFormsOnPage = $(".addObservation");
-            $.each(allFormsOnPage, function(index, value){
-                var wrapper = $(value).parent();
-                $(value).replaceWith(miniObvCreateHtmlSuccess);
-            });
-        }
-        $( ".date" ).datepicker({ 
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'dd/mm/yy' 
-        });
-        $(".obvCreateTags").tagit({
-            select:true, 
-            allowSpaces:true, 
-            placeholderText:'Add some tags',
-            fieldName: 'tags', 
-            autocomplete:{
-                source: '/observation/tags'
-            }, 
-            triggerKeys:['enter', 'comma', 'tab'], 
-            maxLength:30
-        });
-        if($(".userGroupsSuperDiv").hasClass("span12")){
-            $(".userGroupsSuperDiv").removeClass("span12");
-            $(".userGroupsSuperDiv").addClass("span4");
-        }
-        initializeLanguage();
-        $("#addBulkObservationsSubmit").removeClass("disabled");
-        $("#addBulkObservationsAndListPage").removeClass("disabled");
         alert("Observations created successfully = " + (counter - errorCount) + "\n Errors in observation submission = " +errorCount);
-        $('html, body').animate({
-            scrollTop: $(".togglePropagateDiv").offset().top
-        }, 1000);
+        
         if(!showListPage) {
-            $("#addBulkObservationsSubmit").addClass("disabled");
-            $("#addBulkObservationsAndListPage").addClass("disabled");
+            if(!gotError){
+                var allFormsOnPage = $(".addObservation");
+                $.each(allFormsOnPage, function(index, value){
+                    var wrapper = $(value).parent();
+                    $(value).replaceWith(miniObvCreateHtmlSuccess);
+                });
+            }
+            $( ".date" ).datepicker({ 
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'dd/mm/yy' 
+            });
+            $(".obvCreateTags").tagit({
+                select:true, 
+                allowSpaces:true, 
+                placeholderText:'Add some tags',
+                fieldName: 'tags', 
+                autocomplete:{
+                    source: '/observation/tags'
+                }, 
+                triggerKeys:['enter', 'comma', 'tab'], 
+                maxLength:30
+            });
+            if($(".userGroupsSuperDiv").hasClass("span12")){
+                $(".userGroupsSuperDiv").removeClass("span12");
+                $(".userGroupsSuperDiv").addClass("span4");
+            }
+            initializeLanguage();
+            $('html, body').animate({
+                scrollTop: $(".togglePropagateDiv").offset().top
+            }, 1000);
+            $("#addBulkObservationsSubmit").removeClass("disabled");
+            $("#addBulkObservationsAndListPage").removeClass("disabled");
         } else {
             window.open(window.params.obvListPage,"_self");
         }
@@ -113,7 +112,7 @@ function submitForms(counter, size, allForms, showListPage){
         var form = allForms[counter];
         console.log(allForms[counter]);
         $(form).find(".userGroupsList").val(getSelectedUserGroups($(form)));
-           
+
         var locationpicker = $(form).find(".map_class").data('locationpicker'); 
         if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
             var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
@@ -175,6 +174,7 @@ function dropAction(event, ui, ele) {
     console.log($ratingCont);
     rate($ratingCont);
     var imageID = $(ui.draggable).find("img").first().attr("id");
+    console.log("=======IMAGE ID=======" + imageID);
     $("#"+imageID).mousedown(function(){console.log("mouse down");return false;});
     $(ui.draggable).css("opacity","0.3");
 

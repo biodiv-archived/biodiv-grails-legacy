@@ -32,7 +32,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
             <reco:create />
         </div>
 
-        <div class="" style="margin:0px;">
+        <div style="margin:0px;">
             <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
             <%
             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
@@ -41,9 +41,16 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
             </div>
         </div>
-
-        <h5><label><i
-                    class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
+        
+        <h5 style="margin-top:20px;"><label><i
+                    class="icon-pencil"></i>Notes <small><g:message code="observation.notes.message" default="Description" /></small></label>
+        </h5>
+        <div class="section-item" style="margin-right: 10px;">
+            <textarea name="notes" style="margin: 0px 0px 10px; width:257px;max-width: 257px; height: 40px;">            
+            </textarea>
+        </div>
+        <h5><label>
+                <i class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
         </h5>
         <div class="create_tags section-item" style="clear: both;">
             <ul class="obvCreateTags">

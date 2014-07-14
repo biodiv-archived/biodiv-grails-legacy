@@ -117,6 +117,9 @@
                 width:291px;
                 margin-left:0px;
             }
+            .controls.textbox {
+                height:40px !important;
+            }
         </style>
     </head>
     <body>
@@ -306,8 +309,7 @@
                         var $ratingCont = $(this).find(".star_obvcreate");
                         console.log($ratingCont);
                         rate($ratingCont);
-                        var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
-                        $("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+                        $(ui.draggable).draggable('disable');
                         $(ui.draggable).appendTo(".imagesList");
                         $(ui.draggable).css("opacity","0.3");
                         $(form).find(".address").trigger('click');
