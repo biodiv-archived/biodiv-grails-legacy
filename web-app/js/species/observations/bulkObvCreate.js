@@ -137,7 +137,7 @@ function submitForms(counter, size, allForms, showListPage){
                     $(form).find('input').attr('disabled', 'disabled');
                     $(form).find('button').attr('disabled', 'disabled');
                     $(form).find('.createdObv').show();
-                    $(form).find('obvTemplate').css('opacity', '0.5');
+                    $(form).find('.obvTemplate').css('opacity', '0.3');
                     //disable click on div
                     //document.getElementById('my').style.pointerEvents = 'none';
                 } else {
