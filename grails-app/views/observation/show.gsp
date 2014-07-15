@@ -61,7 +61,9 @@ if(r) {
 .observation_story .observation_footer {
     margin-top:50px;
 }
-
+.commonName {
+    width:109% !important;
+}
 </style>
 </head>
 <body>
