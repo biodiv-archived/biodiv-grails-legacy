@@ -44,7 +44,7 @@
                 }
 
                 %>
-               <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal">
+                <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal ${form_id}">
                     <div class="span12 super-section">
                         <h3>What did you observe?</h3>
 
