@@ -89,7 +89,7 @@
                         </g:each>
                     </div>
                     <div class="readmore sidebar_section notes_view">
-                        ${speciesInstance.notes() }
+                        ${raw(speciesInstance.notes())}
                     </div>
                 </div>
             </div>
