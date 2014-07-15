@@ -3,7 +3,6 @@
 <% def audioResource = 0 
    def audioCount    = 0 
 %>   
-
 <g:each in="${resourcesInstanceList}" var="r">
 
 

@@ -9,7 +9,7 @@
         <g:if test="${!hideShare}">
 		<div class="footer-item">
 			<obv:identificationByEmail
-                        model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini']" />
+                        model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', title:'Share']" />
 		</div>
         </g:if>
 

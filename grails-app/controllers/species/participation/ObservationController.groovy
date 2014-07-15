@@ -595,7 +595,7 @@ class ObservationController extends AbstractObjectController {
 								type = ResourceType.IMAGE	
 														
 						}else if(resourcetype == resourceTypeAudio){
-								thumbnail = "/images/audioicon.png"
+								thumbnail = grailsApplication.config.grails.serverURL+"/images/audioicon.png"
 								type = ResourceType.AUDIO	
 								
 

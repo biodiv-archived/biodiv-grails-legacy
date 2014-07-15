@@ -21,7 +21,7 @@
             <div class="heading"> 
                 <g:link
                 url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}" title="${speciesInstance.taxonConcept.name}">
-                <span class="ellipsis">${speciesInstance.taxonConcept.italicisedForm }</span>
+                <span class="ellipsis">${raw(speciesInstance.taxonConcept.italicisedForm)}</span>
                 </g:link>
             </div>
         </div>
