@@ -19,17 +19,19 @@
                 box-shadow: 0 2px 11px -3px inset;
                 padding: 10px;
                 min-height: 212px;
+                height:240px;
+                width:870px;
             }
             td {
                 text-align:center;
             }
             .map_canvas {
                 border-color: rgba(82,168,236,0.8) !important;
-                position: absolute;
-                width: 100%;
+                position: absolute !important;
+                width: 100% !important;
                 display: block;
                 left: 0px;
-                z-index:1;
+                z-index:1 !important;
             }
             .selected_habitat, .selected_group{
                 position:relative;
@@ -79,7 +81,7 @@
                 padding: 0px; 
             }
             .help-identify{
-                left:10px !important;
+                left:21px !important;
             }
             .propagateBlock {
                 background-color: #a6dfc8;
@@ -119,6 +121,12 @@
             }
             .controls.textbox {
                 height:40px !important;
+            }
+            .imagesListWrapper {
+                overflow-x:scroll;
+                overflow-y:hidden;
+                height: 250px;
+                width:890px;
             }
         </style>
     </head>
@@ -179,7 +187,7 @@
                                 <div class="column propagateGroups small_block_row">
                                     <label>User Groups</label>
                                     <div style="clear:both">
-                                        <button type="button" class="btn toggleGrpsDiv"> Groups </button> 
+                                        <button type="button" class="btn toggleGrpsDiv"> User Groups </button> 
                                         <div class="postToGrpsToggle" style="display:none;">
                                             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                                         </div>

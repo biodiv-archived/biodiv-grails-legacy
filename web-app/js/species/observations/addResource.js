@@ -250,6 +250,14 @@ function removeResource(event, imageId) {
             me.$ele.find('.add_video').editable('setValue','', false);	
             
             if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                /*
+                if($(".imagesList li").size() > 4){
+                    console.log("=============INCREASING WIDTH===========");
+                    var w = $(".imagesList").css("width");
+                    var w = w + 150;
+                    $(".imagesList").css("width", w);
+                }
+                */
                 console.log("should add info");
                 var count = $("input[name='lastUploaded']").val();
                 console.log($(".metadata.prop:lt("+count+")") );

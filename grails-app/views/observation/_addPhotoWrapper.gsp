@@ -9,8 +9,7 @@
         single observation and species and rate images inorder to order them.</span>
 
     </g:if>
-    <div
-        class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
+    <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
         <g:if test="${resourceListType == 'usersResource'}">
         <%
             /*

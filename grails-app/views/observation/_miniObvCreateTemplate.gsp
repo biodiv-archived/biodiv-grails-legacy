@@ -59,7 +59,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 </g:each>
             </ul>
         </div>
-        <button type="button" class="btn toggleGrpsDiv" > Groups </button> 
+        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > User Groups </button> 
         <div class="postToGrpsToggle" style="display:none;">
             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
         </div>
