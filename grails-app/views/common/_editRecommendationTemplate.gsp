@@ -32,14 +32,14 @@
 		}
 	%>
 
-        <div class="row control-group commonNameDiv">
+        <div class="control-group commonNameDiv">
             <label for="recommendationVote" class="control-label"> <g:message
                 code="observation.recommendationVote.label" default="Common name" />
             </label>
             <div class="controls">
                 <div class="nameContainer textbox" style="position:relative;">
 
-                    <input type="text" name="commonName" class="commonName"
+                    <input type="text" name="commonName" class="commonName input-block-level" style="width:87%"
                         value="${species_cn_name}" placeholder='Suggest a common name'
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                     <input type="hidden" class="mappedRecoNameForcanName" />
@@ -54,7 +54,7 @@
 
 
 
-            <div class="row control-group sciNameDiv" style="margin-top:5px;">
+            <div class="control-group sciNameDiv" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
                     code="observation.recommendationVote.label" default="Scientific name" />
                 </label>
@@ -73,7 +73,7 @@
             </div>
 
 
-            <div class="row control-group recoCommentDiv"  style="margin-top:5px;">
+            <div class="control-group recoCommentDiv"  style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
                     code="observation.recommendationVote.label" default="Comment" />
                 </label>

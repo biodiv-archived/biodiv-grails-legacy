@@ -898,7 +898,7 @@ ul#recoSummary {
 
 #ui-datepicker-div {
 	width: auto;
-	z-index: 60 !important;
+	z-index: 1000 !important;
 }
 
 .normal_profile_pic {
