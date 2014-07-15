@@ -115,7 +115,7 @@
 
 </div>
 
-<g:javascript>
+<script type="text/javascript">
 function update_geotagged_images_list_for_bulkUpload(ele){
     console.log("update_geotagged_images_list_for_bulkUpload");
     console.log("============YAHAN TOH NAI ANA THA========");
@@ -188,5 +188,5 @@ $(document).ready(function() {
     $(".address").unbind('click').click(loadMapInput);
 
 });
-</g:javascript>
+</script>
 </div>

@@ -17,7 +17,7 @@ def action = action?action:'browser'
 		<span class="msg" style="padding-left: 50px;">No tags</span>
 	</g:else>
 	
-<g:javascript>
+<script type="text/javascript">
 	$(document).ready(function() {
 		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
                         $(".${controller}_tagit li.tagit-choice").click(function(){
@@ -26,5 +26,5 @@ def action = action?action:'browser'
 	                });
          }
 	})
-</g:javascript>
+</script>
 </div>

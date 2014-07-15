@@ -23,7 +23,7 @@
 
 
 
-<g:javascript>
+<script type="text/javascript">
 
 	window.reloadActionsHeaderUrl = "${uGroup.createLink(controller:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
 	window.joinUsUrl =  "${uGroup.createLink(controller:'userGroup',action:'joinUs','userGroup':userGroupInstance) }";
@@ -39,4 +39,4 @@
 	window.members_autofillUsersId = 1;
 	window.experts_autofillUsersId = 2;
 	// Don''t put any code here. Put it in init_header function in membership.js
-</g:javascript>
+</script>

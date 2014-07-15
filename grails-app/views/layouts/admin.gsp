@@ -47,11 +47,11 @@
 }
 </style>
 
-<g:javascript>
+<script type="text/javascript">
     window.appContext = '${request.contextPath}';
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
-</g:javascript>
+</script>
 <g:layoutHead />
 <s2ui:resources module='spring-security-ui' />
 <r:layoutResources />

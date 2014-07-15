@@ -45,7 +45,7 @@
 		
 		<div class="description bodymarker" >
 			
-			${newsletterInstance?.newsitem}
+			${raw(newsletterInstance?.newsitem)}
 			<g:if test="${newsletterInstance?.userGroup}">
 				<sec:permitted className='species.groups.UserGroup'
 							id='${newsletterInstance.userGroup.id}'

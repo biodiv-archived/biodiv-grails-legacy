@@ -32,7 +32,7 @@
 	</div>
 	<div class="clearfix"></div>
 </div>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function(){
 	$('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
 		var field = $(this).attr('name');
@@ -60,4 +60,4 @@ $(document).ready(function(){
 	
 	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();
 });
-</g:javascript>
+</script>

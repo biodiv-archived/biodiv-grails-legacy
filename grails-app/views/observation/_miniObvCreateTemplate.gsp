@@ -66,7 +66,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         <input class="resourceListType" type="hidden" name='resourceListType' value= />
     </div>
 </form>
-<g:javascript>
+<script type="text/javascript">
 
 $(document).ready(function(){
     $(".toggleGrpsDiv").click(function(){
@@ -74,4 +74,4 @@ $(document).ready(function(){
     }); 
 });
 
-</g:javascript>
+</script>

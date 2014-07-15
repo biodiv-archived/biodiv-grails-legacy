@@ -110,9 +110,9 @@ def parentGroupId = ''
 	<div class="modal-body"></div>
 
 </div>
-<g:javascript>
+<script type="text/javascript">
 //TODO: g:javascript because it is being loaded in ajax way ... needs to change 
 $(document).ready (function(){
     selectTickUserGroupsSignature("${parentGroupId}");
 });
-</g:javascript>
+</script>

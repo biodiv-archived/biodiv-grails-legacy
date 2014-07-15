@@ -108,7 +108,7 @@
 
 	<!-- main_content end -->
 </div>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function() {
     window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
 
@@ -141,4 +141,4 @@ $(document).ready(function() {
         updateDistinctRecoTable();
     });
 });
-</g:javascript>
+</script>

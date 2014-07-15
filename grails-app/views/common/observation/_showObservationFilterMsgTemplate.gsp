@@ -2,7 +2,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
-<g:javascript>
+<script type="text/javascript">
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
 		$(defId).click();
@@ -14,7 +14,7 @@
 	$(document).ready(function() {
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
-</g:javascript>
+</script>
 <div class="info-message" id="info-message">
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
                         class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}">and ${instanceTotal- speciesCountWithContent} species stubs are </g:if> found</g:if>

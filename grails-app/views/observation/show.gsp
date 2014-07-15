@@ -263,11 +263,11 @@ if(r) {
 
 
                             </div>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function(){
     window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
 });
-</g:javascript>
+</script>
 
 
     <r:script>

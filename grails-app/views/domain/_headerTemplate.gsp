@@ -1,9 +1,9 @@
 <%@page import="species.utils.Utils"%>
-<g:javascript>
+<script type="text/javascript">
     window.appContext = '';
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
-</g:javascript>
+</script>
 
 <div class="container group-theme navbar" style="width:100%;margin-bottom:0px;">
 	<div>
@@ -198,11 +198,11 @@
 		</div>
 	</div>
 </div>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function(){
 	//IMP:Header is loaded in drupal pages as well. Any code in this block is not run when loaded by ajax
 	//So please don't put any code here. Put it in init_header function in membership.js
 	 init_header();
 });
 
-</g:javascript>
+</script>

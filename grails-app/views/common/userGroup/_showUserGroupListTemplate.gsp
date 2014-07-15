@@ -83,7 +83,8 @@ thead th {
 	background-color: white;
 }
 </style>
-<g:javascript>
+
+<script type="text/javascript">
 $(document).ready(function(){
 	
 	$(".joinUs").unbind('click').on('click', function() {
@@ -107,4 +108,4 @@ $(document).ready(function(){
 		$('#leaveUsModalDialog').modal('show');
 	});
 });
-</g:javascript>
+</script>

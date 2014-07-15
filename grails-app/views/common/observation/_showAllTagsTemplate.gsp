@@ -1,4 +1,4 @@
-<g:javascript>
+<script type="text/javascript">
 	
 	$(document).ready(function(){
 		$('#as_list').click(function(){
@@ -30,7 +30,7 @@
 		
 		}
 	});
-</g:javascript>
+</script>
 
 <div id="tags_section">
 	<a data-toggle="collapse" href="#tags"><h5>

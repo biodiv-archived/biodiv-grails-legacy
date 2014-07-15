@@ -83,7 +83,7 @@
 		</div>
 	</div>
 	
-	<g:javascript>
+	<script type="text/javascript">
 		$(document).ready(function(){
 			window.params.tagsLink = "${uGroup.createLink(controller:'species', action: 'tags')}";
 			$('#speciesGallerySort').change(function(){
@@ -106,7 +106,7 @@
         <g:each in="${TaxonomyRank.list()}" var="t">
         taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
         </g:each>
-	</g:javascript>
+	</script>
 
 	<r:script>
     $('.list').on('updatedGallery', function(event) {

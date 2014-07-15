@@ -3,7 +3,7 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 
-<g:javascript>
+<script type="text/javascript">
 
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
@@ -19,7 +19,7 @@ $(document).ready(function(){
 		
 });
 
-</g:javascript>
+</script>
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">

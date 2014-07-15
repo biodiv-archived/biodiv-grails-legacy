@@ -68,7 +68,9 @@
         <%--				<obv:showRecoComment--%>
         <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>
 
-    </div> <g:javascript>
+    </div> 
+    
+    <script type="text/javascript">
     $(document).ready(function(){
     $('#voteCountLink_${r.recoId}').click(function() {
     $('#voteDetails_${r.recoId}').show();
@@ -79,7 +81,7 @@
     });
     });
 
-    </g:javascript></li>
+    </script></li>
     </g:each>
     </g:if>
     <%--<g:else>--%>

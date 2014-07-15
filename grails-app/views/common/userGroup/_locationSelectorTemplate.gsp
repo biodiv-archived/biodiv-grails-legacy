@@ -1,4 +1,4 @@
-<g:javascript>
+<script type="text/javascript">
     $(document).ready(function(){
     loadGoogleMapsAPI(function(){
     var swRestriction = new google.maps.LatLng('8', '69');
@@ -87,7 +87,7 @@
       });
       });
 
-</g:javascript>
+</script>
 <div class="observation_location">
 <div id="map_canvas" style="width:100%; height: 300px;"></div>
 </div>
