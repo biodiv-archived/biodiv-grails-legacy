@@ -21,6 +21,16 @@
         <g:else>
 
         <g:if test="${documentInstance.uFile}">
+
+        <% def extension = documentInstance?.uFile?.path.split("\\.")[-1] %>
+            <g:if test="${extension.toUpperCase() == 'PDF'}">
+                <% url = grailsApplication.config.speciesPortal.content.serverURL
+                   url = "/content"
+                   url = url+documentInstance?.uFile?.path  %>              
+                <iframe id="viewer" src = "/ViewerJS/#${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
+            </g:if>
+
+
         <div class="prop">
             <span class="name">File</span>
             <div class="value">
