@@ -43,7 +43,7 @@
             .userGroupsSuperDiv{
                 position:absolute !important;
                 z-index:10;
-                background-color: rgb(106, 201, 162);
+                background-color: rgb(106, 201, 162) !important;
             }
             .column.block_row {
                 width:436px;
