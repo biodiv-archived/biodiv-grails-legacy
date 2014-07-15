@@ -10,7 +10,7 @@
 	</div>
 	<b> ${feedInstance.author.name} :
 	<g:if test="${commentInstance.isMainThread()}">
-		<span class="yj-context"> ${commentContext} </span>
+		<span class="yj-context"> ${raw(commentContext)} </span>
 	</g:if>
 	<g:else>	
 		<span class="yj-context" title="${commentInstance.fetchParentText()}">In reply to</span><g:link controller="SUser" action="show"
@@ -18,7 +18,7 @@
 	</g:else>
 	</b>
 	<div class="feedActivityHolderContext yj-message-body">
-		${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
+		${raw(Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>')))}
 	</div>
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">
