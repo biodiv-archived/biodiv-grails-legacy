@@ -3,7 +3,7 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.utils.Utils"%>
 
-<div class="row control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')} ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
+<div class="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')} ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
     <label for="group" class="control-label"><g:message
         code="observation.groupHabitat.label" default="Group & Habitat" /> <span class="req">*</span></label>
     <div class="filters controls textbox" style="position: relative;">

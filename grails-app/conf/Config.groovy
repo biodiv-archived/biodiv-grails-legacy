@@ -1042,6 +1042,7 @@ grails.mail.default.from="notification@indiabiodiversity.org"
 emailConfirmation.from="notification@indiabiodiversity.org"
 
 grails.plugin.springsecurity.password.algorithm = 'MD5'
+grails.plugin.springsecurity.password.hash.iterations = 1
 
 grails.plugin.springsecurity.ui.password.minLength=6
 grails.plugin.springsecurity.ui.password.maxLength=64
