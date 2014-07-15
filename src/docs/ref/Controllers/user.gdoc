@@ -119,6 +119,34 @@ http://indiabiodiversity.saturn.strandls.com/api/user/resetPassword?currentPassw
 }
 {code}
 
+h4. update 
+
+* *Path* : /api/user/update
+* *Parameters* : 
+** id : long - user id
+** icon : string - relative path of the icon
+** username : string - username 
+** name : string - full name of the user
+** website : string - csv of websites
+** location : string 
+** aboutMe : text 
+** sendNotification : on
+** allowIdentifactionMail : on
+** hideEmailId : on
+** sendDigest : on
+* *REST method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/user/update
+{code}
+* *Response* : 
+** Successfull response
+{code}
+{code}
+** in case of error
+{code}
+{code}
+
 h4. Upload Resource
 
 * *Path* : /api/user/upload_resource

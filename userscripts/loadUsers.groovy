@@ -6,9 +6,12 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import species.auth.SUser;
 
+def s = ctx.getBean("springSecurityService");
+println s.encodePassword('prharasr');
+
 //SUser.executeUpdate("delete SUser s");
 def defaultRoleNames = ['ROLE_USER']
-
+/*
 new File("/home/cepf/git/biodiv/contributor.txt").splitEachLine("\\|") {
 	def fields = it;
 	def user = new SUser (
@@ -52,6 +55,6 @@ new File("/home/cepf/git/biodiv/contributor.txt").splitEachLine("\\|") {
 	}
 
 }
-
+*/
 
 
