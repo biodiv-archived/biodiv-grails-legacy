@@ -337,10 +337,11 @@ CKEDITOR.replace('description', config);
 		       			})
 		       			$(".userGroupsList").val(getSelectedUserGroups());	
                                         
-                                        
-                                        if(drawnItems) {
+                                        var locationpicker = $(".map_class").data('locationpicker'); 
+                                        if(locationpicker.mapLocationPicker.drawnItems) { 
+                                        //if(drawnItems) {
                                           /*var areaBounds = new Array();
-                                            drawnItems.eachLayer(function(layer){
+                                            locationpicker.mapLocationPicker.drawnItems.eachLayer(function(layer){
                                                 if(layer.constructor === L.MultiPolygon) {
                                                     for(var l in layer._layers) {
                                                         areaBounds.push(layer._layers[l].getLatLngs());    
@@ -350,7 +351,7 @@ CKEDITOR.replace('description', config);
                                             })
                                             var areas = new L.MultiPolygon(areaBounds);
                                             */
-                                            var areas = drawnItems.getLayers();
+                                            var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
                                             if(areas.length > 0) {
                                                 var wkt = new Wkt.Wkt();
                                                 wkt.fromObject(areas[0]);
