@@ -416,7 +416,7 @@ div.errors {
 }
 
 .addedResource.thumbnail  {
-    z-index:40;
+   /* z-index:40; Removed for overlapping dropdown */
 }
 .add_file.addedResource {
     z-index:41;
@@ -1316,6 +1316,7 @@ span.cke_skin_kama {
 
 .galleria-container {
 	background-color: #000000 !important;
+	overflow: initial !important; 
 }
 
 .galleria-info-text {
@@ -1332,7 +1333,8 @@ span.cke_skin_kama {
 
 .galleria-info {
     width: 100% !important;
-    top: 350px ;
+    top: 350px !important;
+    left: 0px !important;
     z-index: 2 !important;
     position: absolute !important;
     background-color: white !important;
@@ -1350,19 +1352,19 @@ span.cke_skin_kama {
     height: 82%;
     bottom: 0;
     position: absolute;
-    left: 10px;
-    right: 10px;
+    left: 0px !important;
+    right: 0px !important;
     z-index: 2;
-    top: 10px;
-    background-color:rgb(241,241,241);
-    background-color:rgba(241,241,241,0.48);
-        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#7AF1F1F1,endColorstr=#7AF1F1F1)"; /* IE8 */
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#7AF1F1F1,endColorstr=#7AF1F1F1);   /* IE6 & 7 */
-        zoom: 1; 
+    top: -60px !important;
+	padding-top: 10px !important;
+    background-color:#333;
     padding-top:3px;
 }
 .galleria-thumbnails .galleria-image {
     margin :2px 6px 3px 6px;
+}
+.galleria-thumb-nav-left, .galleria-thumb-nav-right{
+	margin: 10px 0px;
 }
 .notes_view { /* clear: both; */
 	background-color: whitesmoke;

@@ -66,9 +66,9 @@ if(r) {
 </head>
 <body>
 
-<link rel="stylesheet" href="/biodiv/js/galleria/1.2.7/themes/classic/galleria.classic.css">
-<script src="/biodiv/js/galleria/1.2.7/galleria-1.2.7.min.js"></script>
-<script src="/biodiv/js/galleria/1.2.7/themes/classic/galleria.classic.min.js"></script>
+<link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
+<script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
+<script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
 
             <div class="observation  span12">
                             <obv:showSubmenuTemplate/>
@@ -114,7 +114,7 @@ if(r) {
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
                 <div class="noTitle" style="height:400px;position:relative">
-                <div class="story-footer" style="right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
+                <div class="story-footer" style="padding: 3px 3px;right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
                 <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
                 </div>
                 <center>
@@ -123,7 +123,7 @@ if(r) {
                     </div>
                 </center>
                                       
-                    <div id="gallery1" style="visibility:hidden">
+                    <div id="gallery1" style="visibility:hidden; margin-top: 60px;">
                          <% def audioResource = 0 
                             def audioCount    = 0
                             def observationInstanceListResources  %>
@@ -288,7 +288,7 @@ $(document).ready(function(){
             height : 400,
             preload : 1,
             lightbox: false,
-            carousel : false,
+            carousel : true,
             transition : 'pulse',
             image_pan_smoothness : 5,
             showInfo : true,
@@ -338,7 +338,7 @@ $(document).ready(function(){
                     
                     $("#gallerySpinner").hide();
                     $("#gallery1").css('visibility', 'visible');
-                    $(".galleria-thumbnails-container").hide();
+                    //$(".galleria-thumbnails-container").hide();
 
                 });
     

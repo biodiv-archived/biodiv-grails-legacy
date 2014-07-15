@@ -41,10 +41,12 @@
 
  <g:if test="${audioCount >=2 }" > 
         <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">            
+            <% audioTextNum = 0 %>
             <g:each in="${resourcesInstanceList}" var="r" status="tempVar">
-                <g:if test="${r.type == ResourceType.AUDIO}">                	                                     
+                <g:if test="${r.type == ResourceType.AUDIO}"> 
+                    <% audioTextNum += 1 %>               	                                     
                     <li class="active" style="display: inline;">
-                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${tempVar}</a>
+                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${audioTextNum}</a>
                     </li>
                 </g:if>
             </g:each>
@@ -52,17 +54,17 @@
 </g:if>
 
 <g:if test="${audioCount >= 1}"> 
-<g:each in="${resourcesInstanceList}" var="r">                            
+<g:each in="${resourcesInstanceList}" var="r" status="tempVar">                            
         <g:if test="${r.type == ResourceType.AUDIO}">
         <g:if test="${audioResource == 0}" >                                               
             
-                <audio controls style="padding: 8px 0px;width: 100%;">                                              
+                <audio controls style="padding: 8px 0px 0px 0px;width: 100%;">                                              
                   <source src="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>            	             
         </g:if>
     		<% audioResource += 1; %>
-    		<div class="audio_metadata_wrapper audio_metadata_${audioResource}" 
+    		<div class="audio_metadata_wrapper audio_metadata_${tempVar}" 
     			style="background-color: rgb(235, 235, 235);padding: 10px;
     			<g:if test="${audioResource > 1}">
     				display:none;	
@@ -73,12 +75,7 @@
         </g:if>
 </g:each>
 </g:if>
-
-<g:if test="${audioCount > 1}" > 
-
-         <br><br><br>
-
-</g:if>
+<br>
 <g:if test="${audioCount >= 1}"> 
 <g:javascript>
 
