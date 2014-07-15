@@ -1,6 +1,6 @@
 
 <div
-    class="row control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')} ${hasErrors(bean: observationInstance, field: 'toDate', 'error')}">
+    class=" control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')} ${hasErrors(bean: observationInstance, field: 'toDate', 'error')}">
 
     <label for="fromOn" class="control-label"><i
             class="icon-calendar"></i>
@@ -50,7 +50,7 @@
         </g:if>
         <g:else>
 
-        <input name="fromDate" type="text" id="fromDate" class="date" class="input-block-level"
+        <input name="fromDate" type="text" class = "fromDate date input-block-level"
         value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"
         placeholder="Select date (dd/MM/yyyy)" />
 

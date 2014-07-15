@@ -172,7 +172,6 @@ class SUserController extends UserController {
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def edit() {
-		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
@@ -191,7 +190,6 @@ class SUserController extends UserController {
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def update() {
-		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
 		if((params.id && SUserService.ifOwns(params.long('id'))) || (params.email && SUserService.ifOwnsByEmail(params.email))) {
@@ -932,9 +930,14 @@ class SUserController extends UserController {
 		redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
     }
 
+    @Secured(['ROLE_USER'])
+    def myuploads(){
+        def author = springSecurityService.currentUser;
+		return ['springSecurityService':springSecurityService, 'userInstance':author] 
+    }
+
+
 }
-
-
 
 class ResetPasswordCommand {
 	String username

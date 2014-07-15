@@ -49,7 +49,9 @@
 
 						<a class="btn btn-info pull-right"
 							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
-							class="icon-edit"></i>Edit Profile </a>
+                                                            class="icon-edit"></i>Edit Profile </a>
+                                                    <a class="btn btn-info" style="float: right; margin-right: 5px;"href="${uGroup.createLink(action:'myuploads', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><iclass="icon-edit"></i>My Uploads </a>
+
 					</sUser:ifOwns>
 				</div>
 			</div>

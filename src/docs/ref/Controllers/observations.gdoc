@@ -133,8 +133,6 @@ habitat_id:267838
 }
 {code}
 
-h4. upload_resource
-
 h4. show 
 
 * *Path* : /api/observation/show/id 

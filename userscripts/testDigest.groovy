@@ -68,3 +68,10 @@ def createDigestIns(){
 
 //createDigestIns()
 
+def tryDeleteUsersRes() {
+    def resService = ctx.getBean("resourcesService");
+    resService.deleteUsersResources()
+}
+
+//tryDeleteUsersRes()
+

@@ -5,12 +5,12 @@
    def isOtherResource = 0
 %>   
 <g:if test="${params.controller == 'observation' }" > 
-   <% //resourcesInstanceList = resourceInstance.listResourcesByRating()      
+    <%
       resourcesServerURL = grailsApplication.config.speciesPortal.observations.serverURL
     %>
 </g:if>
 <g:elseif test="${params.controller == 'species'}"> 
-   <% //resourcesInstanceList = resourceInstance.getListResources() 
+    <%
       resourcesServerURL = grailsApplication.config.speciesPortal.resources.serverURL
     %>
 </g:elseif>
@@ -53,7 +53,7 @@
         </ul>    
 </g:if>
 
-<g:if test="${audioCount >= 1}"> 
+<g:if test="${audioCount >= 1}">
 <g:each in="${resourcesInstanceList}" var="r" status="tempVar">                            
         <g:if test="${r.type == ResourceType.AUDIO}">
         <g:if test="${audioResource == 0}" >                                               

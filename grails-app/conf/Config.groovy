@@ -423,6 +423,10 @@ speciesPortal {
 		getAuthentication = "/getAuthentication.php"
 	}
 	flushImmediately = true
+    usersResource {
+        rootDir = "${app.rootDir}/usersRes"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
+    }
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -614,6 +618,10 @@ environments {
 					 port = 25
 				}
 			}
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://ibp.saturn.strandls.com/${appName}/usersRes"   
+            }
 		}
 		google.analytics.enabled = false
 
@@ -691,6 +699,10 @@ environments {
 					 port = 25
 				}
 			}
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/usersRes"   
+            }
 		}
 		google.analytics.enabled = false
 
@@ -758,42 +770,46 @@ environments {
 
 
 	pamba {
-		grails.serverURL = "http://indiabiodiversity.org/${appName}"
-		jpegOptimProg = '/usr/local/bin/jpegoptim'
+		servername = 'indiabiodiversity.pamba.org'
+		grails.serverURL = "http://${servername}/${appName}"
 		
         speciesPortal {
-            app.rootDir = "/data/species"
+            app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
 
             resources {
-                rootDir = "${app.rootDir}/images"
-                serverURL = "http://pamba.strandls.com/${appName}/images"
+                rootDir = "${app.rootDir}/img"
+                serverURL = "http://${servername}/${appName}/img"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
                 rootDir = "${app.rootDir}/observations"
-                serverURL = "http://indiabiodiversity.org/${appName}/observations"
+                serverURL = "http://${servername}/${appName}/observations"
 				//filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
-                serverURL = "http://indiabiodiversity.org/${appName}/userGroups"
+                serverURL = "http://${servername}/${appName}/userGroups"
             }
             users {
                 rootDir = "${app.rootDir}/users"
-                serverURL = "http://indiabiodiversity.org/${appName}/users"
+                serverURL = "http://${servername}/${appName}/users"
             }
 
             content{
                 rootDir = "${app.rootDir}/content"
-                serverURL = "http://indiabiodiversity.org/${appName}/content"
+                serverURL = "http://${servername}/${appName}/content"
             }	
             maps {
-		        serverURL = "http://indiabiodiversity.org/${appName}/maps"
+		        serverURL = "http://${servername}/${appName}/maps"
+            }
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://${servername}/${appName}/usersRes"   
             }
 
-            search.serverURL="http://indiabiodiversity.org:8080/solr"
+            search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {
                     host = "127.0.0.1"
@@ -802,11 +818,11 @@ environments {
             }
         }
 
-        ibp.domain='indiabiodiversity.org'
-        wgp.domain='thewesternghats.indiabiodiversity.org'   
+        ibp.domain=servername
+        wgp.domain="thewesternghats.${servername}" 
 		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
@@ -821,9 +837,9 @@ environments {
         }
 		log4jConsoleLogLevel = Priority.DEBUG
 		log4j = {
-            appenders {
-                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-            }
+			appenders {
+				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+			}
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
@@ -868,6 +884,10 @@ environments {
             }	
             maps {
 		        serverURL = "http://${servername}/${appName}/maps"
+            }
+            usersResource {
+                rootDir = "${app.rootDir}/usersRes"
+                serverURL = "http://${servername}/${appName}/usersRes"   
             }
 
             search.serverURL="http://${servername}:8080/solr"
@@ -1022,6 +1042,7 @@ grails.mail.default.from="notification@indiabiodiversity.org"
 emailConfirmation.from="notification@indiabiodiversity.org"
 
 grails.plugin.springsecurity.password.algorithm = 'MD5'
+grails.plugin.springsecurity.password.hash.iterations = 1
 
 grails.plugin.springsecurity.ui.password.minLength=6
 grails.plugin.springsecurity.ui.password.maxLength=64

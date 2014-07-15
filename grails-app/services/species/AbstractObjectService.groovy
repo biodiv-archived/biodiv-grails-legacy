@@ -228,9 +228,14 @@ class AbstractObjectService {
         Node videos = new Node(resources, "videos");
         Node audios = new Node(resources, "audios");
         
+        println "===========PARAMS IN CREATE RESOURCE XML============ " + params
+
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
+        }
+        else if(params.resourceListType == "usersResource"){
+            uploadDir = grailsApplication.config.speciesPortal.usersResource.rootDir
         }
         else{
             uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
@@ -303,7 +308,10 @@ class AbstractObjectService {
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
                 //new Node(image, "resContext", resContext.getAt(key));
-                if( params.resourceListType == "ofObv" ){
+                if( params.resourceListType == "ofObv" || params.resourceListType == "usersResource" ){
+                    if(!params.author){
+                        params.author = springSecurityService.currentUser;
+                    }
                     new Node(image, "contributor", params.author.username); 
                 }
                 else{
@@ -321,6 +329,7 @@ class AbstractObjectService {
     }
 
     private List<Resource> saveResources(instance, resourcesXML) {
+        println "=========SAVE RESOURCES CALLED========" + instance+" ======= "+ resourcesXML
         XMLConverter converter = new XMLConverter();
         def rootDir
         switch(instance.class.name) {
@@ -330,6 +339,10 @@ class AbstractObjectService {
             
             case Species.class.name:
             rootDir = grailsApplication.config.speciesPortal.resources.rootDir
+            break;
+
+            case SUser.class.name:
+            rootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
             break;
         }
         converter.setResourcesRootDir(rootDir);

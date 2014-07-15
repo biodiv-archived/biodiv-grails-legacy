@@ -1,0 +1,25 @@
+
+h3. Species
+
+h4. show 
+
+* *Path* : /api/species/show/id 
+* *Parameters* : id
+* *REST method* : GET
+* *Request* : 
+http://indiabiodiversity.saturn.strandls.com/api/species/show/1
+* *Response* :
+** Successful response
+{code}
+
+{code}
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Valid id is required"
+}
+{code}
+
+h
+

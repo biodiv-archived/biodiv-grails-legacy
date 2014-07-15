@@ -9,20 +9,29 @@
         single observation and species and rate images inorder to order them.</span>
 
     </g:if>
-    <div
-        class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
+    <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
+        <g:if test="${resourceListType == 'usersResource'}">
+        <%
+            /*
+            def firstRes = resList[0]
+            def fName = firstRes.fileName
+            def resDir = fName ?  fName.substring(0, fName.lastIndexOf("/")) : ""
+            */
+        %>
+        <!--input type="hidden" name='resDir' value="${resDir}" /-->
+        </g:if>
         <ul class="imagesList thumbwrap thumbnails"
             style='list-style: none; margin-left: 0px;'>
             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <input type="hidden" id='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
             </g:if>
-            <input type="hidden" name='resourceListType' value="${resourceListType}" /> 
+            <input class="resourceListTypeFilled" type="hidden" name='resourceListType' value="${resourceListType}" /> 
             <g:if test="${resourceListType == 'fromRelatedObv'}" >
             <a class="btn" style="margin-right: 5px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" )'>Load More</a>
             </g:if>
         </ul>
-        <div id="image-resources-msg" class="help-inline">
+        <div class="image-resources-msg help-inline">
             <g:renderErrors bean="${observationInstance}" as="list"
             field="resource" />
         </div>
@@ -47,6 +56,7 @@
                 $('#speciesImage-tab2').hide();
             }
         }
+        $(".resourceListType").val($(".resourceListTypeFilled").val());
 
     });
 </r:script>

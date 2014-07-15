@@ -45,7 +45,7 @@
 	<g:else>
 		<g:if test="${observationInstance.maxVotedReco.isScientificName}">
 			<div class="sci_name ellipsis" title="${sNameTitle }">
-                ${raw(sName)} ${speciesLink}
+                ${raw(sName)} ${raw(speciesLink)}
 			</div>
 			<div class="common_name ellipsis" title="${commonName }">
 				${commonName}
@@ -53,7 +53,7 @@
 		</g:if>
 		<g:else>
 			<div class="ellipsis" title="${sNameTitle}">
-                ${raw(sName)} ${speciesLink}
+                ${raw(sName)} ${raw(speciesLink)}
 			</div>
 		</g:else>
 	</g:else>

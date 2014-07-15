@@ -62,12 +62,12 @@
                   		var mapBounds = big_map.getBounds()
                   		for (var i = 0; i < markers.length; i++) {
                       		var pos = markers[i].getPosition();
-                      		if(mapBounds.contains(pos)){
-									if($.inArray(pos.toString(), markerKeys) != -1){
-										markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
-									}else{
-										markerKeys.push(pos.toString());
-									}
+                            if(mapBounds.contains(pos)){
+                                            if($.inArray(pos.toString(), markerKeys) != -1){
+                                                    markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
+                                            }else{
+                                                    markerKeys.push(pos.toString());
+                                            }
                               }
                   			}
                       }

@@ -345,7 +345,8 @@ beans = {
         userGroupService = ref('userGroupService') 
 
         marshallers = [
-            new ObservationMarshaller()
+            new ObservationMarshaller(),
+            new SpeciesMarshaller()
         ]
     }
 

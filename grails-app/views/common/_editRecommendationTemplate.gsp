@@ -32,30 +32,29 @@
 		}
 	%>
 
-        <div class="row control-group ">
+        <div class="control-group commonNameDiv">
             <label for="recommendationVote" class="control-label"> <g:message
                 code="observation.recommendationVote.label" default="Common name" />
             </label>
             <div class="controls">
                 <div class="nameContainer textbox" style="position:relative;">
 
-                    <input type="text" name="commonName" id="commonName"
+                    <input type="text" name="commonName" class="commonName input-block-level" style="width:87%"
                         value="${species_cn_name}" placeholder='Suggest a common name'
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
-                    <input type="hidden" id="mappedRecoNameForcanName" />
+                    <input type="hidden" class="mappedRecoNameForcanName" />
 
                     <div style="width:90px;">
                         <s:chooseLanguage />
-                        </div>
-                        <div id="commonNameSuggestions" style="display: block;"></div>
+                    </div>
 
                     </div>
-                </div>
             </div>
+        </div>
 
 
 
-            <div class="row control-group " style="margin-top:5px;">
+            <div class="control-group sciNameDiv" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
                     code="observation.recommendationVote.label" default="Scientific name" />
                 </label>
@@ -63,18 +62,18 @@
                     <div class="textbox nameContainer">
 
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
-                        <input type="text" name="recoName" id="name" value="${species_sn_name}"
+                        <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}"
                             placeholder='Suggest a scientific name'
                             class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
-                        <input type="hidden" name="canName" id="canName" value="${species_canonical_name }"/>
-                        <div id="nameSuggestions" style="display: block;"></div>
+                        <input type="hidden" name="canName" class="canName" value="${species_canonical_name }"/>
+                        
 
                     </div>
                 </div>
             </div>
 
 
-            <div class="row control-group "  style="margin-top:5px;">
+            <div class="control-group recoCommentDiv"  style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
                     code="observation.recommendationVote.label" default="Comment" />
                 </label>
@@ -96,60 +95,66 @@
 			$('#reco-options').show();
 			$('#reco-action').hide();
 		});
-
-                $("#name").autofillNames({
-                    'appendTo' : '#nameSuggestions',
-                    'nameFilter':'scientificNames',
-                    focus: function( event, ui ) {
-                        $("#canName").val("");
-                        $("#name").val( ui.item.label.replace(/<.*?>/g,"") );
-                        $("#nameSuggestions li a").css('border', 0);
-                        return false;
-                    },
-                    select: function( event, ui ) {
-                        $("#name").val( ui.item.label.replace(/<.*?>/g,"") );
-                        $("#canName").val( ui.item.value );
-                        $("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
-                        return false;
-                    },open: function(event, ui) {
-                        $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
-                    }
-                });
-
-                $("#commonName").autofillNames({
-                    'appendTo' : '#commonNameSuggestions',
-                    'nameFilter':'commonNames',
-                    focus: function( event, ui ) {
-                        $( "#commonName" ).val( ui.item.label.replace(/<.*?>/g,"") );
-                        $("#commonNameSuggestions li a").css('border', 0);
-                        return false;
-                    },select: function( event, ui ) {
-                        $( "#commonName" ).val( ui.item.label.replace(/<.*?>/g,"") );
-                        $( "#canName" ).val( ui.item.value );
-                        $( "#name" ).val( ui.item.value );
-                        if(ui.item.languageName !== null){
-                            $("#languageComboBox").val(ui.item.languageName).attr("selected",true);
-                            $("#languageComboBox").data('combobox').refresh();
+                $(".commonName").click(function(){
+                    $("#commonNameSuggestions").remove();
+                    $(this).next().next().after("<div id='commonNameSuggestions' style='display: block;'></div>");
+                    $(this).autofillNames({
+                        'appendTo' : '#commonNameSuggestions',
+                        'nameFilter':'commonNames',
+                        focus: function( event, ui ) {
+                            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                            $("#commonNameSuggestions li a").css('border', 0);
+                            return false;
+                        },select: function( event, ui ) {
+                            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                            $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.value );
+                            $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.value );
+                            if(ui.item.languageName !== null){
+                                $(this).closest(".commonNameDiv").find(".languageComboBox").val(ui.item.languageName).attr("selected",true);
+                                $(this).closest(".commonNameDiv").find(".languageComboBox").data('combobox').refresh();
+                            }
+                            return false;
+                        },open: function(event, ui) {
+                            $("#commonNameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
                         }
-                        return false;
-                    },open: function(event, ui) {
-                        $("#commonNameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
-                    }
+
+                    });
 
                 });
-
-                $("#name").keypress(function() {
-                    if ($("#mappedRecoNameForcanName").val() !== $("#name").val()) {
-                        $("#canName").val('');
-                    }
+                
+                $(".recoName").click(function(){
+                    $("#nameSuggestions").remove();
+                    $(this).after("<div id='nameSuggestions' style='display: block;'></div>");
+                    $(this).autofillNames({
+                        'appendTo' : '#nameSuggestions',
+                        'nameFilter':'scientificNames',
+                        focus: function( event, ui ) {
+                            $(this).closest(".sciNameDiv").find(".canName").val("");
+                            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                            $("#nameSuggestions li a").css('border', 0);
+                            return false;
+                        },
+                        select: function( event, ui ) {
+                            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                            $(this).closest(".sciNameDiv").find(".canName").val( ui.item.value );
+                            $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
+                            return false;
+                        },open: function(event, ui) {
+                            $("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+                        }
+                    });
+                    
+                    $(".recoName").keypress(function() {
+                        if ($(this).closest(".sciNameDiv").prev().find(".mappedRecoNameForcanName").val() !== $(this).val()) {
+                            $(this).closest(".sciNameDiv").find(".canName").val('');
+                        }
+                    });
                 });
-
-
 	});
 
 	function cancelRecoComment() {
-		$('#recoComment').val('');
-		$('#reco-options').hide();
-		$('#reco-action').show();
+            $('#recoComment').val('');
+            $('#reco-options').hide();
+            $('#reco-action').show();
 	}
 </r:script>

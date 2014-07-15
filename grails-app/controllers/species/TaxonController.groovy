@@ -47,7 +47,9 @@ class TaxonController {
         def parentId = params.nodeid  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
         def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
-        long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
+        println "+++++++++++++++++"
+        println params.classSystem
+        Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
         /*combinedHierarchy.merge();
@@ -60,7 +62,7 @@ class TaxonController {
         if(expandSpecies) {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
-            long regId = classSystem;
+            Long regId = classSystem;
             getSpeciesHierarchy(speciesid, rs, regId);
         } else {
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);

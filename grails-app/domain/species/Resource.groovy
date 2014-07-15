@@ -1,11 +1,15 @@
 package species
 
 import species.participation.Observation;
+import species.participation.Checklists;
+import species.auth.SUser;
+
 import species.utils.ImageUtils;
 import species.utils.ImageType;
 import species.utils.Utils;
 import org.grails.rateable.*
 import content.eml.Document;
+import species.participation.UsersResource;
 
 class Resource extends Sourcedata implements Rateable {
 	
@@ -40,7 +44,8 @@ class Resource extends Sourcedata implements Rateable {
         SPECIES("SPECIES"),
         DOCUMENT("DOCUMENT"),
         SPECIES_FIELD("SPECIES_FIELD"),
-		CHECKLIST("CHECKLIST")
+		CHECKLIST("CHECKLIST"),
+        USER("USER")
 		
         private String value;
 
@@ -93,7 +98,17 @@ class Resource extends Sourcedata implements Rateable {
 	
 	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
 		String thumbnailUrl = '';
-		newBaseUrl = newBaseUrl?:(this.baseUrl?:grailsApplication.config.speciesPortal.observations.serverURL)
+
+        def basePath = '';
+        if(this?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
+            basePath = grailsApplication.config.speciesPortal.observations.serverURL
+        }
+        else if(this?.context?.value() == Resource.ResourceContext.SPECIES.toString() || this?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+            basePath = grailsApplication.config.speciesPortal.resources.serverURL
+        }
+
+		newBaseUrl = newBaseUrl?:(basePath?:grailsApplication.config.speciesPortal.observations.serverURL)
+
 		switch(type) {
 			case  ResourceType.IMAGE :
 				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
@@ -153,7 +168,7 @@ class Resource extends Sourcedata implements Rateable {
 	
 	void saveResourceContext(objInstance){
 		//saving only if context is null earlier
-		if(this.context) return;
+		//if(this.context) return;
 		
 		switch(objInstance.class.name){
 			case Species.class.name:
@@ -171,6 +186,10 @@ class Resource extends Sourcedata implements Rateable {
 			case Checklists.class.name:
 				this.context = ResourceContext.CHECKLIST
 				break
+            case SUser.class.name:
+                this.context = ResourceContext.USER
+                break
+
 			default:
 				break
 		}

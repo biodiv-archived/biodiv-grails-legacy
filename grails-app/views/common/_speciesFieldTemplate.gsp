@@ -79,7 +79,7 @@
                 var="para">
                 <g:if test="${para}">           
                 <p>
-                ${para.trim()} 
+                ${raw(para.trim())} 
                 </p>
                 </g:if>        
 
@@ -92,7 +92,7 @@
     var="para">
     <g:if test="${para}">
     <p>
-    ${para.trim()}
+    ${raw(para.trim())}
     </p>
     </g:if>
 

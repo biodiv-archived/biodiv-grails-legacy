@@ -1223,7 +1223,7 @@ class UserGroupController {
 		   mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 	   }
 
-	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 		   try {
 		   	mailService.sendMail {
 			   to user.email

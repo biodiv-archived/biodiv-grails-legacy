@@ -34,7 +34,7 @@
                     class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
         </h5>
         <div class="create_tags section-item" style="clear: both;">
-            <ul id="tags">
+            <ul id="tags" class="obvCreateTags">
                 <g:each in="${obvTags}" var="tag">
                 <li>${tag}</li>
                 </g:each>

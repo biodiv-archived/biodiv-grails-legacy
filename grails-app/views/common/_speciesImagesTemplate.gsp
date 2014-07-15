@@ -4,7 +4,6 @@
    def audioCount    = 0 
 %>   
 
-
 <g:each in="${resourcesInstanceList}" var="r">
 
 
@@ -65,7 +64,7 @@
 <g:if test="${audioCount >=2 }" > 
         <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">
             <% def tempVar = 0 %>
-            <g:each in="${speciesInstance.getListResources()}" var="r">
+            <g:each in="${speciesInstance.listResourcesByRating()}" var="r">
                 <g:if test="${r.type == ResourceType.AUDIO}">
                     <%  tempVar = tempVar + 1 %>                                        
                     <li class="active" style="display: inline;">
@@ -77,7 +76,7 @@
 </g:if>
 
 <g:if test="${audioCount >= 1}"> 
-<g:each in="${speciesInstance.getListResources()}" var="r">                            
+<g:each in="${speciesInstance.listResourcesByRating()}" var="r">                            
         <g:if test="${r.type == ResourceType.AUDIO}">
         <g:if test="${audioResource == 0}" >                                               
             <% audioResource = 1; %>

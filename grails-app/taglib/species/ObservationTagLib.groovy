@@ -9,6 +9,7 @@ import grails.util.GrailsNameUtils;
 import org.grails.rateable.RatingException;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
 import java.lang.Math;
+import species.participation.UsersResource;
 
 class ObservationTagLib {
 	static namespace = "obv"
@@ -219,10 +220,12 @@ class ObservationTagLib {
 	
 	def showMapInput = {attrs, body->
 		def model = attrs.model
+        println "=====================================" + model
 		model.sourceInstance = model.sourceInstance ?: model.observationInstance
 		model.placeNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
 		model.topologyNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
-		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
+        println "=====================================" + model
+        out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	
 	def showAnnotation = {attrs, body->
@@ -339,6 +342,7 @@ class ObservationTagLib {
         def resCount = 0
         def offset = 0 
         def resInstance = attrs.model.observationInstance
+        def userInstance = attrs.model.userInstance
         switch (attrs.model.resourceListType) {
             case "ofObv" :
                 resList = resInstance?.resource
@@ -364,6 +368,15 @@ class ObservationTagLib {
                     r.each{
                         resList.add(it)
                     }
+                }
+                resCount = resList.size()
+            break
+
+            case "usersResource" :
+                println "USERS RESOURCE" + "========== " + userInstance + " ===== " + UsersResource.UsersResourceStatus.NOT_USED.toString()
+                def usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
+                usersResList.each{
+                    resList.add(it.res)
                 }
                 resCount = resList.size()
             break

@@ -37,8 +37,8 @@
             lockButton = "Unlock"
         }
     %>
-    <a class="lockObvId pull-right btn btn-primary btn-small" style="margin-left: 1px; background: orangered;"
-        onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}', ${r.recoId}, ${r.obvId} )">
+    <a class="lockObvId pull-right btn btn-primary btn-small ${(lockButton == 'Lock' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
+        onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}', ${r.recoId}, ${r.obvId}, this )">
         <i class="icon-lock"></i>${lockButton}</a>
     </sUser:hasObvLockPerm>
 
