@@ -131,6 +131,11 @@ function loadMapInput() {
     var map_class = $(this).closest(".map_class");
     $(map_class).find(".map_canvas").show();
     $(map_class).find(".latlng").show();
+    var me = $(map_class).find(".address .add-on");
+    if($(map_class).find(".map_canvas").is(':visible')) {
+        $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
+        $(me).css("border","2px solid rgba(82,168,236,0.8)");
+    }
     console.log($(map_class).data('locationpicker'));
     if($(map_class).data('locationpicker') == undefined) {
         console.log("===================================================================");
@@ -167,12 +172,14 @@ $(document).ready(function() {
         var me = this;
         var map_class = $(this).closest(".map_class");
         if($(map_class).find(".map_canvas").is(':visible')) {
+            console.log("========IS OPEN==========");
             $(me).find("i").removeClass("icon-remove").addClass("icon-chevron-down");
             $(me).css("border","0px solid rgba(82,168,236,0.8)");
             $(map_class).find(".map_canvas").hide();
             $(map_class).find(".latlng").hide();
             return false;
         } else{
+            console.log("========NOT OPEN==========");
             $(me).css("border","2px solid rgba(82,168,236,0.8)");
             $(me).find("i").removeClass("icon-chevron-down").addClass("icon-remove");
         }
