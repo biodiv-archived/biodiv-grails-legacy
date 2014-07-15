@@ -21,7 +21,7 @@
                     <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
                 </div>
                 <div class="wrapperParent"  style="text-align:center;width:100%">
-                    <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:3;margin-bottom:0px;">
+                    <div class="address input-append control-group dropdown ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:3;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level" style="width:96%;"
                         class="section-item" value="${observationInstance?.placeName}"/>
                         <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>

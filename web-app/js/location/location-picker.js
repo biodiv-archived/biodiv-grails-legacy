@@ -651,7 +651,7 @@ if(!Array.prototype.last) {
                 console.log("hewfhrsfsfewsf============================sedf");
                 $("#suggestions").remove();
                 var placeName = this
-                $(temp).after("<div id='suggestions' style='display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;'></div>");
+                $(temp).after("<div id='suggestions' class='dropdown-menu'></div>");
                 var cacheSN = {};
                 $(placeName).catcomplete({
                     appendTo:"#suggestions",
