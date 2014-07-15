@@ -778,7 +778,7 @@ function updateMapView (params, callback) {
         //order of params is important for this test to pass
         if(JSON.stringify(oldParams) != JSON.stringify(p))
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
-        refreshMapBounds();
+        refreshMapBounds(mapLocationPicker);
         oldParams = params;
     }
 }
