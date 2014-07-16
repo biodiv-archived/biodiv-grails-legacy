@@ -740,7 +740,7 @@ $(document).ready(function(){
             
             $(".userGroupsList").val(getSelectedUserGroups());
             var locationpicker = $(".map_class").data('locationpicker'); 
-            if(locationpicker.mapLocationPicker.drawnItems) {
+            if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
                 var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
                 if(areas.length > 0) {
                     var wkt = new Wkt.Wkt();

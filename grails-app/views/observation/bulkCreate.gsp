@@ -132,11 +132,19 @@
                 border: 1px solid grey ;
                 background-color: lightgrey ;
             }
+            .imagesListWrapper ul {
+                width:20000px;
+                white-space:nowrap !important;
+            }
+            .imagesListWrapper ul li {
+                display : inline !important;
+            }
         </style>
     </head>
     <body>
         <div class="bulk_observation_create">
             <div class="span12">
+                <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Multiple Observations']"/>
                 <%
                 def form_id = "addBulkObservations"
                 def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
