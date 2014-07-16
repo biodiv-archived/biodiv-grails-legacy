@@ -729,7 +729,7 @@ function useTitle(obj){
                         };
 
                         $(this).data( "customCatcomplete" )._resizeMenu = function() {
-                            this.menu.element.outerWidth( '100%' );
+                            this.menu.element.outerWidth( 500 );
                         }
                     });
                 }

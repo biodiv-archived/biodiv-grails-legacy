@@ -771,7 +771,7 @@ ul#recoSummary {
 }
 
 .map_search {
-	position: relative;
+	/*position: relative;*/
 	background-color: #a6dfc8;
 	border-radius: 5px 0 0 5px;
 }
