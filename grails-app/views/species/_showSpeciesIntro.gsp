@@ -14,7 +14,7 @@
 <!-- media gallery -->
 <div class="span8 right-shadow-box" style="margin:0px;">
 
-    <div style="padding-bottom:10px;height:430px;">
+    <div style="padding-bottom:10px;height: 520px">
                 <center>
             <div id="gallerySpinner" class="spinner">
                 <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
@@ -40,7 +40,7 @@
                     <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;']"/>
                 </div>
                 
-                <div id="gallery1" class="gallery">
+                <div id="gallery1" class="gallery" style="margin-top: 60px;">
 
                     <g:if test="${resourcesInstanceList}">
                     
