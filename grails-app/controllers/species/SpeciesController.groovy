@@ -507,7 +507,7 @@ class SpeciesController extends AbstractObjectController {
                 }
                 break;
                 case 'synonym':
-                long sid = params.sid?params.long('sid'):null;
+                Long sid = params.sid?params.long('sid'):null;
                 String relationship = params.relationship?:null;
 
                 if(params.act == 'delete') {

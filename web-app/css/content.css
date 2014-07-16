@@ -50,4 +50,8 @@ ul.file-tags {
 .cke_cama {
 	max-width: 100%;
 }
+input.dms_field {
+	width: 15%;
+	display: none;       
+}
 
