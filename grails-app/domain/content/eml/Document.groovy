@@ -158,7 +158,7 @@ class Document extends Metadata implements Taggable, Rateable {
     Resource mainImage() {  
 		String reprImage = "Document.png"
 	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
-        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
+        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
 
 	def beforeUpdate(){

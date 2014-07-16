@@ -106,7 +106,9 @@ class Resource extends Sourcedata implements Rateable {
         else if(this?.context?.value() == Resource.ResourceContext.SPECIES.toString() || this?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
             basePath = grailsApplication.config.speciesPortal.resources.serverURL
         }
-
+        else if(this?.context?.value() == Resource.ResourceContext.DOCUMENT.toString()){
+            basePath = grailsApplication.config.speciesPortal.content.serverURL
+        }
 		newBaseUrl = newBaseUrl?:(basePath?:grailsApplication.config.speciesPortal.observations.serverURL)
 
 		switch(type) {

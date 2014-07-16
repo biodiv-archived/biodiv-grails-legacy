@@ -65,7 +65,7 @@
         <div class="prop">
             <span class="name">Description</span>
             <div class="notes_view linktext value">
-                ${documentInstance?.notes}
+                ${raw(documentInstance?.notes)}
             </div>
         </div>
         </g:if>
