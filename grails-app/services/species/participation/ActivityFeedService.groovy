@@ -401,14 +401,18 @@ class ActivityFeedService {
 	}
 	
 	def getUserHyperLink(user, userGroup){
-		return '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
+		String sb = '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
+
+        return sb.replaceAll('"','\\\\"')
 	}
 	
 	def getUserGroupHyperLink(userGroup){
         if(!userGroup){
             return ""
         }
-		return '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+		String sb = '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+
+        return sb.replaceAll('"','\\\\"')
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////

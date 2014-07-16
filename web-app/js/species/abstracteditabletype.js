@@ -264,7 +264,7 @@
 
                 if(data.act == 'add') {
                     //replaces dummy field
-                    $newEle = $(data.content).replaceAll($container).show();
+                    $newEle = $(data.content).replaceAll($container.parent()).show();
                     //$newEle = $container.html(data.content).show();
                 } else if(data.act == 'delete') {
                     if($container.nextAll('speciesField.contributor_entry').length == 0) {
