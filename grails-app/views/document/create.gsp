@@ -338,7 +338,7 @@ CKEDITOR.replace('description', config);
 		       			$(".userGroupsList").val(getSelectedUserGroups());	
                                         
                                         var locationpicker = $(".map_class").data('locationpicker'); 
-                                        if(locationpicker.mapLocationPicker.drawnItems) { 
+                                        if(locationpicker && locationpicker.mapLocationPicker.drawnItems) { 
                                         //if(drawnItems) {
                                           /*var areaBounds = new Array();
                                             locationpicker.mapLocationPicker.drawnItems.eachLayer(function(layer){
