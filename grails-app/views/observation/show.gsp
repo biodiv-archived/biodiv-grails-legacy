@@ -62,7 +62,7 @@ if(r) {
     margin-top:50px;
 }
 .commonName {
-    width:109% !important;
+    width:200px !important;
 }
 </style>
 </head>

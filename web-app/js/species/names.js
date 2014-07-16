@@ -14,6 +14,10 @@
         _options = $.extend({}, defaults, _options);
         this.options = _options;
         //cache[this.options.nameFilter] = {}
+        var appendTo = this.parent().find('.nameSuggestions');
+        if(_options.appendTo == undefined && appendTo.length > 0) {
+            _options.appendTo = appendTo;
+        }
         var result = $(this).catcomplete({
                appendTo:_options.appendTo,
                source:function( request, response ) {
@@ -36,6 +40,7 @@
                            success: function(data, status, xhr) {
                                //cache[_options.nameFilter][ term ] = data;
                                //if ( xhr === lastXhr ) {
+                               console.log(data);
                                    response( data );
                                //}
 
@@ -51,12 +56,11 @@
                focus: _options.focus,
                select: _options.select,
                open: _options.open
-        })
-        result.data( "customCatcomplete" )._renderItem = function( ul, item ) {
+        }).data( "customCatcomplete" )._renderItem = function( ul, item ) {
             ul.removeClass().addClass("dropdown-menu")
                 if(item.category == "General") {
                     return $( "<li class='span3'></li>" )
-                        .data( "item.autocomplete", item )
+                        .data( "ui-autocomplete-item", item )
                         .append( "<a>" + item.label + "</a>" )
                         .appendTo( ul );
                 } else {
@@ -64,7 +68,7 @@
                         item.icon =  window.params.noImageUrl
                     }  
                     return $( "<li class='span3'></li>" )
-                        .data( "item.autocomplete", item )
+                        .data( "ui-autocomplete-item", item )
                         .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
                         .appendTo( ul );
                 }
