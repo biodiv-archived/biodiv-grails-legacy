@@ -57,26 +57,30 @@
                open: _options.open 
         })
 
-        result.data( "customCatcomplete" )._renderItem = function( ul, item ) {
-            ul.removeClass().addClass("dropdown-menu")
-                if(item.category == "General") {
-                    return $( "<li class='span3'></li>" )
-                        .data( "ui-autocomplete-item", item )
-                        .append( "<a>" + item.label + "</a>" )
-                        .appendTo( ul );
-                } else {
-                    if(!item.icon) {
-                        item.icon =  window.params.noImageUrl
-                    }  
-                    return $( "<li class='span3'></li>" )
-                        .data( "ui-autocomplete-item", item )
-                        .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
-                        .appendTo( ul );
-                }
-        };
+        if(result.length > 0) {
+            result.each(function() {
+                $(this).data( "customCatcomplete" )._renderItem = function( ul, item ) {
+                    if(item.category == "General") {
+                        return $( "<li class='span3'></li>" )
+                            .data( "ui-autocomplete-item", item )
+                            .append( "<a>" + item.label + "</a>" )
+                            .appendTo( ul );
+                    } else {
+                        if(!item.icon) {
+                            item.icon =  window.params.noImageUrl
+                        }  
+                        return $( "<li class='span3'></li>" )
+                            .data( "ui-autocomplete-item", item )
+                            .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+                            .appendTo( ul );
+                    }
+                };
 
-        result.data( "customCatcomplete" )._resizeMenu = function() {
-            this.menu.element.outerWidth( 300 );
+                $(this).data( "customCatcomplete" )._resizeMenu = function() {
+                    this.menu.element.outerWidth( 300 );
+                }
+            });
+
         }
 
         return result;

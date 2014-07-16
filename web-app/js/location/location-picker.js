@@ -717,17 +717,21 @@ function useTitle(obj){
                     }
 
                 })
-                
-                result.data( "customCatcomplete" )._renderItem = function( ul, item ) {
-                    ul.removeClass().addClass("dropdown-menu")
-                    return $( "<li></li>" )
-                        .data( "ui-autocomplete-item", item )
-                        .append( "<a>" + item.label + "</a>" )
-                        .appendTo( ul );
-                };
+               
+                if(result.length > 0) {
+                    result.each(function() {
+                        $(this).data( "customCatcomplete" )._renderItem = function( ul, item ) {
+                            ul.removeClass().addClass("dropdown-menu")
+                            return $( "<li></li>" )
+                                .data( "ui-autocomplete-item", item )
+                                .append( "<a>" + item.label + "</a>" )
+                                .appendTo( ul );
+                        };
 
-                result.data( "customCatcomplete" )._resizeMenu = function() {
-                    this.menu.element.outerWidth( '100%' );
+                        $(this)..data( "customCatcomplete" )._resizeMenu = function() {
+                            this.menu.element.outerWidth( '100%' );
+                        }
+                    });
                 }
 
             //});
