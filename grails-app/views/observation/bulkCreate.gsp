@@ -128,6 +128,10 @@
                 height: 250px;
                 width:890px;
             }
+            .imageHolder {
+                border: 1px solid grey ;
+                background-color: lightgrey ;
+            }
         </style>
     </head>
     <body>
