@@ -728,7 +728,7 @@ function useTitle(obj){
                                 .appendTo( ul );
                         };
 
-                        $(this)..data( "customCatcomplete" )._resizeMenu = function() {
+                        $(this).data( "customCatcomplete" )._resizeMenu = function() {
                             this.menu.element.outerWidth( '100%' );
                         }
                     });
