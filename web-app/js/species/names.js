@@ -88,17 +88,21 @@
 }(window.jQuery));
 
 $(document).ready(function() {
-    //$('#recoComment').val('');
-    $('#reco-action').click(function() {
-        $('#reco-options').show();
-        $('#reco-action').hide();
-    });
+    initializeNameSuggestion();
+});
 
+function cancelRecoComment() {
+    $('#recoComment').val('');
+    $('#reco-options').hide();
+    $('#reco-action').show();
+}
+
+function initializeNameSuggestion() {
     $('.commonName').autofillNames({
         'nameFilter':'commonNames',
         focus: function( event, ui ) {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
-//            $(this).parent().find(".nameSuggestions li a").css('border', 0);
+            //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         }, select: function( event, ui ) {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
@@ -110,7 +114,7 @@ $(document).ready(function() {
             }
             return false;
         }, open: function(event, ui) {
-//            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+            //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
         }
 
     });
@@ -121,7 +125,7 @@ $(document).ready(function() {
         focus: function( event, ui ) {
             $(this).closest(".sciNameDiv").find(".canName").val("");
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
-//            $(this).parent().find(".nameSuggestions li a").css('border', 0);
+            //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         },
         select: function( event, ui ) {
@@ -130,7 +134,7 @@ $(document).ready(function() {
             $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
             return false;
         },open: function(event, ui) {
-//            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+            //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
         }
     });
 
@@ -139,11 +143,4 @@ $(document).ready(function() {
             $(this).closest(".sciNameDiv").find(".canName").val('');
         }
     });
-});
-
-function cancelRecoComment() {
-    $('#recoComment').val('');
-    $('#reco-options').hide();
-    $('#reco-action').show();
 }
-

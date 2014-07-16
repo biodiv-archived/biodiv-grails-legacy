@@ -77,27 +77,7 @@ function submitForms(counter, size, allForms, showListPage){
                     $(value).replaceWith(miniObvCreateHtmlSuccess);
                 });
             }
-            $( ".date" ).datepicker({ 
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: 'dd/mm/yy' 
-            });
-            $(".obvCreateTags").tagit({
-                select:true, 
-                allowSpaces:true, 
-                placeholderText:'Add some tags',
-                fieldName: 'tags', 
-                autocomplete:{
-                    source: '/observation/tags'
-                }, 
-                triggerKeys:['enter', 'comma', 'tab'], 
-                maxLength:30
-            });
-            if($(".userGroupsSuperDiv").hasClass("span12")){
-                $(".userGroupsSuperDiv").removeClass("span12");
-                $(".userGroupsSuperDiv").addClass("span4");
-            }
-            initializeLanguage();
+            initializers();
             $('html, body').animate({
                 scrollTop: $(".togglePropagateDiv").offset().top
             }, 1000);
@@ -239,3 +219,28 @@ $(".applyAll").click(function(){
     });
 });
 
+function initializers(){
+    $( ".date" ).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy' 
+    });
+    $(".fromDate").val('');
+    $(".obvCreateTags").tagit({
+        select:true, 
+        allowSpaces:true, 
+        placeholderText:'Add some tags',
+        fieldName: 'tags', 
+        autocomplete:{
+            source: '/observation/tags'
+        }, 
+        triggerKeys:['enter', 'comma', 'tab'], 
+        maxLength:30
+    });
+    if($(".userGroupsSuperDiv").hasClass("span12")){
+        $(".userGroupsSuperDiv").removeClass("span12");
+        $(".userGroupsSuperDiv").addClass("span4");
+    }
+    initializeLanguage();
+    initializeNameSuggestion();
+}
