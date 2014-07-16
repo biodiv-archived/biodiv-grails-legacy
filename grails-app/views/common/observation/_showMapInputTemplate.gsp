@@ -24,6 +24,7 @@
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:2;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level" style="width:94%;"
                         class="section-item" value="${observationInstance?.placeName}"/>
+
                         <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
                         
                         <div class="help-inline" style="display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;">
@@ -32,6 +33,8 @@
                             </g:hasErrors>
                         </div>
                         <input class='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'/>
+
+                        <div class='suggestions' class='dropdown'></div>
                     </div>
                     <div class="latlng ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')}" style="display:none;">
                         <div class="input-prepend pull-left control-group ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')}">
@@ -162,8 +165,8 @@ function loadMapInput() {
         });
     
     }else {
-        $(map_class).data('locationpicker').mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
-        update_geotagged_images_list_for_bulkUpload(map_class)
+        //$(map_class).data('locationpicker').mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
+        //update_geotagged_images_list_for_bulkUpload(map_class)
     }
 }
 

@@ -647,14 +647,14 @@ if(!Array.prototype.last) {
             console.log("==========================================");
             console.log(this.$ele.find(".placeName"));
             var temp =  me.$ele.find(".address .add-on");
-            me.$ele.find(".placeName").click(function(){
-                console.log("hewfhrsfsfewsf============================sedf");
-                $("#suggestions").remove();
-                var placeName = this
-                $(temp).after("<div id='suggestions' class='dropdown'></div>");
-                $("#suggestions ul").addClass("dropdown-menu");
+            //me.$ele.find(".placeName").click(function(){
+                //console.log("hewfhrsfsfewsf============================sedf");
+                //$("#suggestions").remove();
+                //var placeName = this
+                //$(temp).after("");
+                //$("#suggestions ul").addClass("dropdown-menu");
                 var cacheSN = {};
-                $(placeName).catcomplete({
+                me.$ele.find(".placeName").catcomplete({
                     appendTo:"#suggestions",
                     source: function(request, response) {
                         console.log("===============IN SOURCE=====");
@@ -681,18 +681,17 @@ if(!Array.prototype.last) {
                             $.getJSON( window.params.locationsUrl, request, function( data, status, xhr ) {
                                 console.log("==========" + window.params.locationsUrl);
                                 $.each(data, function(index, item) {
-                                    r.push( {
+                                    r.push({
                                         label: item.location[0]+' ('+item.location[1]+')',
-                                                   value: item.location[0],
-                                                   topology:item.topology,
-                                                   category:item.category
-                                                   })
+                                        value: item.location[0],
+                                        topology:item.topology,
+                                        category:item.category
                                         })
-                                    response(r);
-                                    });
-                                cacheSN[ term ] = r;
                                 })
-
+                                response(r);
+                            });
+                            cacheSN[ term ] = r;
+                        })
                     },
 
                     select: function(event, ui) {
@@ -707,19 +706,19 @@ if(!Array.prototype.last) {
 
                     focus: function(event, ui) {
                         //this.mapLocationPicker.set_location(ui.item.latitude, ui.item.longitude);
-                    },open: function(event, ui) {
-                        $("#suggestions ul").removeAttr('style').css({'display': 'block','width':'100%','z-index':'1001'}); 
+                    }, open: function(event, ui) {
+                        //$("#suggestions ul").removeAttr('style').css({'display': 'block','width':'100%','z-index':'1001'}); 
+                        $("#suggestions ul").addClass('dropdown-menu').css({'text-align':'left', 'z-index':'1001'});
                     }
 
 
                 });
-            });
+            //});
 
 
             me.$ele.find(".placeName,.latitude_field,.longitude_field").keypress(function(e) {
                 var code = (e.keyCode ? e.keyCode : e.which);
                 if (code == 13) {
-                    console.log("++++++++++++" + code);
                     me.mapLocationPicker.initLocation(undefined); 
                     e.preventDefault();
                 }
