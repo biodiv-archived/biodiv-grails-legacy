@@ -212,7 +212,7 @@ function initGalleryTabs() {
         $('.gallery').galleria({
             height : 400,
             preload : 1,
-            carousel : false,
+            carousel : true,
             lightbox:false,
             transition : 'pulse',
             image_pan_smoothness : 5,
@@ -268,7 +268,7 @@ function initGalleryTabs() {
         Galleria.ready(function() {
             $("#gallerySpinner").hide();
             $("#resourceTabs").css('visibility', 'visible');
-            $(".galleria-thumbnails-container").hide();
+           // $(".galleria-thumbnails-container").hide();
         });
 
     } else {
