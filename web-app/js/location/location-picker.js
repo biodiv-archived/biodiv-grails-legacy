@@ -659,7 +659,7 @@ function useTitle(obj){
                 //$(temp).after("");
                 //$("#suggestions ul").addClass("dropdown-menu");
                 var cacheSN = {};
-                me.$ele.find(".placeName").catcomplete({
+                var result = me.$ele.find(".placeName").catcomplete({
                     //appendTo:"#suggestions",
                     source: function(request, response) {
                         console.log("===============IN SOURCE=====");
@@ -716,13 +716,20 @@ function useTitle(obj){
                         //$("#suggestions ul").addClass('dropdown-menu').css({'text-align':'left', 'z-index':'1001'});
                     }
 
-                }).data( "customCatcomplete" )._renderItem = function( ul, item ) {
+                })
+                
+                result.data( "customCatcomplete" )._renderItem = function( ul, item ) {
                     ul.removeClass().addClass("dropdown-menu")
                     return $( "<li></li>" )
                         .data( "ui-autocomplete-item", item )
                         .append( "<a>" + item.label + "</a>" )
                         .appendTo( ul );
                 };
+
+                result.data( "customCatcomplete" )._resizeMenu = function() {
+                    this.menu.element.outerWidth( '100%' );
+                }
+
             //});
 
 
