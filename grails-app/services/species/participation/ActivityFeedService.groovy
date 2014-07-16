@@ -391,6 +391,7 @@ class ActivityFeedService {
 		String sb = ""
 		if(speciesId != null){
 			sb =  '<a href="' + observationService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
+            sb = sb.replaceAll('"','\\\\"')
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
 		}else{
