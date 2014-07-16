@@ -41,6 +41,7 @@
                 </div>
                 
                 <div id="gallery1" class="gallery">
+
                     <g:if test="${resourcesInstanceList}">
                     
                     <s:showSpeciesImages model="['speciesInstance':speciesInstance , 'resourcesInstanceList' : resourcesInstanceList]"></s:showSpeciesImages>

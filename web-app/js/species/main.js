@@ -208,8 +208,8 @@ jQuery(document).ready(function($) {
             $( "#search" ).click();
             return false;
         },open: function(event, ui) {
-            $("#nameSuggestionsMain ul").removeAttr('style').addClass('dropdown-menu');
-            $("#nameSuggestionsMain .dropdown-toggle").dropdown('toggle');				
+            $("#nameSuggestionsMain ul").addClass('dropdown-menu');
+            //$("#nameSuggestionsMain .dropdown-toggle").dropdown('open');	
         }
     }).data( "customCatcomplete" )._renderItem = function( ul, item ) {
         ul.removeClass().addClass("dropdown-menu")

@@ -25,9 +25,9 @@
         <% def extension = documentInstance?.uFile?.path.split("\\.")[-1] %>
             <g:if test="${extension.toUpperCase() == 'PDF'}">
                 <% url = grailsApplication.config.speciesPortal.content.serverURL
-                   url = "/content"
+                   //url = "/content"                                       
                    url = url+documentInstance?.uFile?.path  %>              
-                <iframe id="viewer" src = "/ViewerJS/#${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
+                <iframe id="viewer" src = "${grailsApplication.config.grails.serverURL}/ViewerJS/index.html#${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
             </g:if>
 
 
