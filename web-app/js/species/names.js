@@ -40,7 +40,6 @@
                            success: function(data, status, xhr) {
                                //cache[_options.nameFilter][ term ] = data;
                                //if ( xhr === lastXhr ) {
-                               console.log(data);
                                    response( data );
                                //}
 

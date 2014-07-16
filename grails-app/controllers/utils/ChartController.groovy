@@ -4,12 +4,14 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 class ChartController {
-
-	def chartService
-	
-    def index = { 
-		redirect (action:show, params:params)
-	}
+    
+    static defaultAction = "show"
+       
+       def chartService
+       
+    def index(){ 
+               redirect (params:params)
+       }
 	
 	@Secured(['ROLE_ADMIN'])
 	def test() {
