@@ -4,11 +4,12 @@ def iconClass='';
 def noOfResources = noOfResources?:instance.fetchResourceCount();
 %>
 
+<%--
 <g:if test="${bottom}">
     <button id="viewThumbnails" class="footer-item" style="margin-left:0px;float:right;">
         <i class="icon-th" title="View thumbnails"></i>
     </button>
-</g:if>
+</g:if> --%>
 
 <g:if test="${noOfResources}">
     <g:each in="${noOfResources}" var="no">
