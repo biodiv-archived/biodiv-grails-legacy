@@ -5,6 +5,11 @@ if(!Array.prototype.last) {
     }
 }
 
+function useTitle(obj){
+    var map_class = $(obj).closest(".map_class");
+    var locationPicker = $(map_class).data('locationpicker');
+    locationPicker.mapLocationPicker.useLocation(obj);
+}
 
 /**
   @class Map Location Picker
@@ -374,7 +379,7 @@ if(!Array.prototype.last) {
                     if (results) {
                         var content = '<ul>';
                         for(var i=0; i<Math.min(results.length,2); i++) {
-                            content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
+                            content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useTitle(this);">Use as title</a></li>'
                         }
                         content += '</ul>';
                         me.selectedMarker.bindPopup(content).openPopup();
