@@ -1118,7 +1118,7 @@ class ObservationService extends AbstractObjectService {
 
         String checklistObvCond = ""
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
-            checklistObvCond = " and obv.isShowable=false "
+            checklistObvCond = " and obv.id != obv.sourceId "
         }
 
         def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
