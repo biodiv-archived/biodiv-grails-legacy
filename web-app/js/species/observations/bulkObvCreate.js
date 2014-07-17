@@ -76,13 +76,18 @@ function submitForms(counter, size, allForms, showListPage){
                     var wrapper = $(value).parent();
                     $(value).replaceWith(miniObvCreateHtmlSuccess);
                 });
+                $('html, body').animate({
+                    scrollTop: $("#species_main_wrapper").offset().top
+                }, 1000); 
+            } else {
+                $('html, body').animate({
+                    scrollTop: $(".togglePropagateDiv").offset().top
+                }, 1000);
             }
             initializers();
-            $('html, body').animate({
-                scrollTop: $(".togglePropagateDiv").offset().top
-            }, 1000);
             $("#addBulkObservationsSubmit").removeClass("disabled");
             $("#addBulkObservationsAndListPage").removeClass("disabled");
+            
         } else {
             window.open(window.params.obvListPage,"_self");
         }
@@ -131,6 +136,9 @@ function submitForms(counter, size, allForms, showListPage){
                     $(wrapper).find(".group_options li[value='"+group_id+"']").trigger("click");
                     $(wrapper).find(".habitat_options li[value='"+habitat_id+"']").trigger("click");
                 }
+                console.log("========VALUES GOING IN OF RES TYPE=========");
+                console.log($(".resourceListTypeFilled").val());
+                console.log($(".resourceListType").val());
                 $(".resourceListType").val($(".resourceListTypeFilled").val());
                 submitForms(counter+1, size, allForms, showListPage);
             }, error : function (xhr, ajaxOptions, thrownError){
@@ -186,7 +194,7 @@ function dropAction(event, ui, ele) {
     $(".imageHolder .addedResource").click(function(){
         console.log("changing z-index");
         form.find(".addedResource").css('z-index','0')
-        $(ele).css('z-index','1');
+        $(this).css('z-index','1');
     });
 
     var $grpDD = $('.group_options');
@@ -207,6 +215,28 @@ function dropAction(event, ui, ele) {
     });
 }
 
+
+
+
+
+var $grpDD = $('.group_options');
+var $habDD = $('.habitat_options');
+//var $userGrpDD = $('.postToGrpsToggle')
+//var $userGrpBtn = $('.toggleGrpsDivWrapper')
+$(document.body).click(function(){
+    if (!$grpDD.has(this).length || !$habDD.has(this).length  ) { // if the click was not within $div
+        $grpDD.hide();
+        $habDD.hide();
+    }
+    /*
+       if(!$userGrpBtn.has(this).length && !$userGrpDD.has(this).length) {
+       console.log("============IDHAR HAI===============");
+       $userGrpDD.hide();
+       }
+       */
+});
+
+
 $(".obvCreateTags").tagit({
     select:true, 
     allowSpaces:true, 
@@ -221,6 +251,9 @@ $(".obvCreateTags").tagit({
 
 $(".applyAll").click(function(){
     var me = this;
+    if($(me).hasClass("applyToAll")){
+        $("input[name='applyToAll']").val("true");
+    }
     var licenseVal = $(".propagateLicense").find("input").val();
     var dateVal = $(".propagateDate").find("input[name='fromDate']").val();
     var tagValues = []
@@ -305,4 +338,7 @@ function initializers(){
     });
     initializeLanguage();
     initializeNameSuggestion();
+    if($("input[name='applyToAll']").val() == "true"){
+        $(".applyToAll").trigger("click");
+    }
 }

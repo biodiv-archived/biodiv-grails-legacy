@@ -486,6 +486,7 @@ function useTitle(obj){
         update_geotagged_images_list : function(image) {
             console.log(image);
             var me = this;
+            var $closestAddObservation = $(image).closest(".addObservation");
             $(image).exifLoad(function() {
                 var latlng = me.get_latlng_from_image(image);
                 var imageDate =  $(image).exif("DateTimeOriginal")[0];
@@ -515,7 +516,7 @@ function useTitle(obj){
                 //func += "$(this).addClass('active_location_picker_button');";
                 //func += "setInfoFromImage($(this));";
                 html = '<div  class="' + $(image).attr("id") +' leaflet-control location_picker_button " style="display:inline-block;">' + inputHtml + '<div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
-                var $closestAddObservation = $(image).closest(".addObservation");
+                
                 
                 $closestAddObservation.find(".geotagged_images>.title").show();
                 $closestAddObservation.find(".geotagged_images>.msg").show();
@@ -529,8 +530,11 @@ function useTitle(obj){
                 console.log(image);
                 var appendedImage = $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left")
                 $closestAddObservation.find(".geotagged_images").find(".location_picker_button").click(me.setInfoFromImage(appendedImage)).trigger('update_map');
+                
             }    		
             });
+            console.log($closestAddObservation.find(".map_search .add-on"));
+            //$closestAddObservation.find(".map_search .add-on").trigger("click");
         },
 
         get_latlng_from_image : function(img) {
@@ -794,6 +798,8 @@ function useTitle(obj){
                 $geotagged_images.find(".title").hide();
                 $geotagged_images.find(".msg").hide();
             }
+            console.log(me.$ele.find(".map_search .add-on"));
+            me.$ele.find(".map_search .add-on").trigger("click");
         });
 
         me.$ele.find('.latitude_field').change(function(){

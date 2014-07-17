@@ -234,11 +234,11 @@ class AbstractObjectService {
         if( params.resourceListType == "ofSpecies" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
         }
-        else if(params.resourceListType == "usersResource"){
-            uploadDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+        else if(params.resourceListType == "ofObv"){
+            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
         }
         else{
-            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
+            uploadDir = grailsApplication.config.speciesPortal.usersResource.rootDir
         }
         BitSet indexes = new BitSet();
         List files = [];

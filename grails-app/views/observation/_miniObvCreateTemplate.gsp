@@ -22,13 +22,10 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <div style="margin:40px 0 0 0px;">
-            <g:if
-            test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
             <div class="help-identify" class="control-label">
                 <label class="checkbox" style="text-align: left;"> <input
                     type="checkbox" name="help_identify" /> Help identify </label>
             </div>
-            </g:if>
             <reco:create />
         </div>
 
