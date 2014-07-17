@@ -855,25 +855,32 @@ class SpeciesController extends AbstractObjectController {
             SUser user = SUser.get(params.userId.toLong())
             TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(params.taxonConcept.toLong())
             String invitetype = params.invitetype;
+            boolean success = false
             switch (invitetype) {
                 case 'curator':
-                speciesPermissionService.addCurator(user, taxonConcept)
+                success = speciesPermissionService.addCurator(user, taxonConcept)
                 break;
  
                 case 'contributor':
-                speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
+                success = speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
                 break;
                 default: log.error "No invite type"
             }
 
-            def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
-            if(conf) {
-                log.debug "Deleting confirmation code and usertoken params";
-                conf.delete();
-                UserToken.get(params.tokenId.toLong())?.delete();
+            if(success) {
+                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
+                def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
+                if(conf) {
+                    log.debug "Deleting confirmation code and usertoken params";
+                    conf.delete();
+                    UserToken.get(params.tokenId.toLong())?.delete();
+                }
+
+                flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
+            } else{
+                flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
             }
-            flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
-        }else{
+        } else{
             flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
