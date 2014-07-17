@@ -135,12 +135,15 @@ function submitForms(counter, size, allForms, showListPage){
                 submitForms(counter+1, size, allForms, showListPage);
             }, error : function (xhr, ajaxOptions, thrownError){
                 //successHandler is used when ajax login succedes
+                alert("Sorry, a server error occured.Please refresh the page & try again or else report the error.");
                 console.log("ERROR ERROR");
                 var successHandler = this.success;
                 handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
                     var response = $.parseJSON(xhr.responseText);
                 });
                 submitForms(counter+1, size, allForms, showListPage);
+                $("#addBulkObservationsSubmit").removeClass("disabled");
+                $("#addBulkObservationsAndListPage").removeClass("disabled");
             }  
         });
     }
@@ -149,15 +152,42 @@ function submitForms(counter, size, allForms, showListPage){
 function dropAction(event, ui, ele) {
     console.log("Item was Dropped");
     $(ele).append($(ui.draggable).clone());
-    console.log($(ui.draggable));
-    var $ratingCont = $(ele).find(".star_obvcreate");
+    var draggedImages = $(ele).find(".addedResource");
+    var countOfImages = draggedImages.length;
+    if(countOfImages == 1){
+        console.log("FIRST FIRST");
+        draggedImages.css({
+            "position":"relative",
+            "top":"0"
+        });
+
+    } else{
+        console.log("SECOND SECOND");
+        var lastTop = parseInt($(draggedImages[(countOfImages - 2)]).css("top"));
+        draggedImages.last().css({
+            "position":"absolute",
+            "top":lastTop + 20
+        });
+
+    }
+    console.log("fffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+    $(ele).find(".star_obvcreate").last().children().remove();
+    var form = $(ele).closest(".addObservation");
+    var $ratingCont = $(ele).find(".star_obvcreate").last();
     console.log($ratingCont);
     rate($ratingCont);
-    var imageID = $(ui.draggable).find("img").first().attr("id");
-    console.log("=======IMAGE ID=======" + imageID);
-    $("#"+imageID).mousedown(function(){console.log("mouse down");return false;});
+    console.log($(ui.draggable));
+    $(ui.draggable).draggable('disable');
+    //var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
+    //$("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+    $(ui.draggable).appendTo(".imagesList");
     $(ui.draggable).css("opacity","0.3");
-
+    $(form).find(".address").trigger('click'); 
+    $(".imageHolder .addedResource").click(function(){
+        console.log("changing z-index");
+        form.find(".addedResource").css('z-index','0')
+        $(ele).css('z-index','1');
+    });
 }
 
 $(".obvCreateTags").tagit({
@@ -241,6 +271,13 @@ function initializers(){
         $(".userGroupsSuperDiv").removeClass("span12");
         $(".userGroupsSuperDiv").addClass("span4");
     }
+    $(".imageHolder").droppable({
+        accept: ".addedResource.thumbnail",
+        drop: function(event,ui){
+            dropAction(event, ui , this);    
+        }
+    });
+
     initializeLanguage();
     initializeNameSuggestion();
 }

@@ -302,43 +302,8 @@
 
                 $(".imageHolder").droppable({
                     accept: ".addedResource.thumbnail",
-                    drop: function(event,ui){
-                        console.log("Item was Dropped");
-                        $(this).append($(ui.draggable).clone());
-                        var draggedImages = $(this).find(".addedResource");
-                        var countOfImages = draggedImages.length;
-                        if(countOfImages == 1){
-                            console.log("FIRST FIRST");
-                            draggedImages.css({
-                                "position":"relative",
-                                "top":"0"
-                            });
-
-                        } else{
-                            console.log("SECOND SECOND");
-                            var lastTop = parseInt($(draggedImages[(countOfImages - 2)]).css("top"));
-                            draggedImages.last().css({
-                                "position":"absolute",
-                                "top":lastTop + 20
-                            });
-
-                        }
-                        console.log($(ui.draggable));
-                        $(this).find(".star_obvcreate").children().remove();
-                        var form = $(this).closest(".addObservation");
-                        var $ratingCont = $(this).find(".star_obvcreate");
-                        console.log($ratingCont);
-                        rate($ratingCont);
-                        $(ui.draggable).draggable('disable');
-                        $(ui.draggable).appendTo(".imagesList");
-                        $(ui.draggable).css("opacity","0.3");
-                        $(form).find(".address").trigger('click');
-                        $(".imageHolder .addedResource").click(function(){
-                            console.log("changing z-index");
-                            form.find(".addedResource").css('z-index','0')
-                            $(this).css('z-index','1');
-                        });
-
+                    drop: function(event, ui){
+                        dropAction(event,ui,this); 
                     }
                 });
             }
