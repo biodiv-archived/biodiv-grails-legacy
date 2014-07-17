@@ -130,25 +130,12 @@
         <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
     {{/if}}
         
-        {{if type == '${ResourceType.IMAGE}'}}
+        
         <div id="license_div_{{>i}}" class="license_div pull-left dropdown">
-            <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+            <a id="selected_license_{{>i}}" class="btn dropdown-toggle" data-toggle="dropdown">
                 <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                 <b class="caret"></b>
-            </a>
-            <g:if test="${observationInstance instanceof Species}">
-            <div >
-                <div class="imageMetadataForm" >
-                    <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
-                    <input name="source_{{>i}}" type="text" value="" placeholder="Source">
-                    <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
-                    <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->
-                </div>
-            </div>
-            </g:if>
-            <g:else>
-                <!--input name="resContext_{{>i}}" type="hidden" value = "OBSERVATION"-->
-            </g:else>
+            </a>            
                 <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span>Choose a license</span>
                 <g:each in="${species.License.list()}" var="l">
@@ -158,8 +145,22 @@
                 </g:each>
             </ul>
             <input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
-        </div>	
-        {{/if}}
+        </div>
+
+        <g:if test="${observationInstance instanceof Species}">
+            <div class="imageMetadataDiv" >
+                <div class="imageMetadataForm" >
+                    <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
+                    <input name="source_{{>i}}" type="text" value="" placeholder="Source">
+                    <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
+                    <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->
+                </div>
+            </div>
+        </g:if>
+        <g:else>
+            <!--input name="resContext_{{>i}}" type="hidden" value = "OBSERVATION"-->
+        </g:else>	
+        
    
     </div>
     <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>

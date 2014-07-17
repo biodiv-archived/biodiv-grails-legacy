@@ -1368,6 +1368,10 @@ span.cke_skin_kama {
 .galleria-thumb-nav-left, .galleria-thumb-nav-right{
 	margin: 10px 0px;
 }
+ .galleria-thumbnails-list{
+ 	margin-left: 30px;
+	margin-right: 30px;
+ }
 .notes_view { /* clear: both; */
 	background-color: whitesmoke;
 	/*padding: 10px;*/
