@@ -107,7 +107,7 @@ class SUserController extends UserController {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = SpringSecurityUiService.encodePassword(params.password, salt)
+			user.password = params.password; //SpringSecurityUiService.encodePassword(params.password, salt)
 		}
 		if (!user.save(flush: true)) {
 			render view: 'create', model: [user: user, authorityList: sortedRoles()]
