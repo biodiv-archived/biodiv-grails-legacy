@@ -188,7 +188,6 @@ function dropAction(event, ui, ele) {
         form.find(".addedResource").css('z-index','0')
         $(ele).css('z-index','1');
     });
-    $userGrpDD.hide();}
 
     var $grpDD = $('.group_options');
     var $habDD = $('.habitat_options');
@@ -206,7 +205,7 @@ function dropAction(event, ui, ele) {
            }
         */
     });
-
+}
 
 $(".obvCreateTags").tagit({
     select:true, 
@@ -273,7 +272,7 @@ function initializers(){
         changeYear: true,
         dateFormat: 'dd/mm/yy' 
     });
-    $(".fromDate").val('');
+    $(".addObservation .fromDate").val('');
     $(".obvCreateTags").tagit({
         select:true, 
         allowSpaces:true, 
@@ -295,7 +294,15 @@ function initializers(){
             dropAction(event, ui , this);    
         }
     });
-
+    $(".help-identify input").click(function(){
+        console.log($(this).closest('.section').find('.nameContainer input'));
+        if ($(this).is(':checked')){
+            $(this).closest('.addObservation').find('.nameContainer input').val('');
+            $(this).closest('.addObservation').find('.nameContainer input').attr('disabled', 'disabled');
+        }else{
+            $(this).closest('.addObservation').find('.nameContainer input').removeAttr('disabled');
+        }
+    });
     initializeLanguage();
     initializeNameSuggestion();
 }
