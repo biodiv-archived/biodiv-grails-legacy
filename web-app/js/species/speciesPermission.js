@@ -113,6 +113,7 @@ $(document).ready(function() {
             type: 'POST',
             data:data,
             success: function(data, statusText, xhr) {
+                console.log(data);
                 if(data.statusComplete) {
                     $dialog.modal('hide');
                     $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
@@ -127,7 +128,7 @@ $(document).ready(function() {
                     var response = $.parseJSON(xhr.responseText);
 
                 });
-                $dialog.find('form')[0].reset()
+                //$dialog.find('form')[0].reset()
             } 
         });	
     });
@@ -158,9 +159,8 @@ $(document).ready(function() {
                 var successHandler = this.success;
                 handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
                     var response = $.parseJSON(xhr.responseText);
-
+                    //$dialog.find('form')[0].reset()
                 });
-                $dialog.find('form')[0].reset()
             } 
         });	
     });

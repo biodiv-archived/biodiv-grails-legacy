@@ -141,6 +141,13 @@
                 display : inline !important;
                 z-index:1;
             }
+            li.group_option span, li.habitat_option span {
+                padding: 0px;
+                float: left;
+            }
+            li.group_option, li.habitat_option {
+            height: 35px;
+            }
         </style>
     </head>
     <body>

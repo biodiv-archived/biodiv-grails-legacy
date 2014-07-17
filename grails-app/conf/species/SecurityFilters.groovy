@@ -5,6 +5,7 @@ import grails.util.Environment;
 import species.utils.Utils;
 import species.groups.UserGroup;
 
+import grails.converters.JSON;
 class SecurityFilters {
 
 	def grailsApplication;
@@ -19,6 +20,11 @@ class SecurityFilters {
 				//println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
 				
 				def appName = grailsApplication.metadata['app.name']
+/*                if(params.ajax_login_error == "1") {
+                    render ([status:401, error:'Please login to continue'] as JSON)
+                    return;
+                } 
+*/ 
 //				println params;
 //				request.cookies.each{println it.name+" : "+it.value}
 //				def enames = request.getHeaderNames();
@@ -30,7 +36,7 @@ class SecurityFilters {
 				
             }
             after = { model ->
-				//setting user group and permission for view
+               //setting user group and permission for view
 				if(model){
 					def userGroupInstance = model.userGroupInstance
 					def userGroup = model.userGroup
@@ -58,9 +64,6 @@ class SecurityFilters {
 						model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
 					}
 				}
-//				if (!Environment.getCurrent().getName().startsWith("kk")) {
-					//log.debug "before view rendering "
-//				}  
             }
 			
             afterView = {
