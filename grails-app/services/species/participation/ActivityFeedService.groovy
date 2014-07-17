@@ -391,7 +391,7 @@ class ActivityFeedService {
 		String sb = ""
 		if(speciesId != null){
 			sb =  '<a href="' + observationService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
-            sb = sb.replaceAll('"','\\\\"')
+            sb = sb.replaceAll('"|\'','\\\\"')
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
 		}else{
@@ -403,7 +403,7 @@ class ActivityFeedService {
 	def getUserHyperLink(user, userGroup){
 		String sb = '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
 
-        return sb.replaceAll('"','\\\\"')
+        return sb.replaceAll('"|\'','\\\\"')
 	}
 	
 	def getUserGroupHyperLink(userGroup){
@@ -412,7 +412,7 @@ class ActivityFeedService {
         }
 		String sb = '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
 
-        return sb.replaceAll('"','\\\\"')
+        return sb.replaceAll('"|\'','\\\\"')
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
