@@ -33,14 +33,23 @@
 
         <div class="habitat_div dropdown" style="z-index:2;">
             <div class="selected_habitat selected_value dropdown-toggle btn" data-toggle="dropdown">
-                <img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/><span class="display_value">Select habitat</span>
+                <span style="float:left;"
+                    class="habitat_icon group_icon habitats_sprites active ${Habitat.findByName('All').iconClass()}"
+                    title="${Habitat.findByName('All').name}"></span>
+                <!--img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/-->
+                <span class="display_value">Select habitat</span>
             <b class="caret"></b>
             </div>
             <ul class="habitat_options dropdown-menu">                                       
                     <g:each in="${species.Habitat.list()}" var="h">
                     <li class="habitat_option" value="${h.id}">
                     <div>
-                        <img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/><span class="display_value">${h.name}</span>
+                        <span style="float:left;"
+                    class="habitat_icon group_icon habitats_sprites active ${h.iconClass()}"
+                    title="${h.name}"></span>
+
+                    <!--img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/-->
+                    <span class="display_value">${h.name}</span>
 
                     </div>
                     </li>
@@ -66,7 +75,7 @@ $(document).ready(function(){
         $(this).closest(".habitat_options").hide();
         //$(this).closest(".habitat_super_div").find(".selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         if($(this).closest(".habitat_super_div").find(".selected_habitat b").length == 0){
-            $('<b class="caret"></b>').insertAfter($(this).closest(".habitat_super_div").find(".selected_habitat span"));
+            $('<b class="caret"></b>').insertAfter($(this).closest(".habitat_super_div").find(".selected_habitat .display_value"));
         }
 
     });

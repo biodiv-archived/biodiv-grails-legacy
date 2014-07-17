@@ -59,7 +59,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 </g:each>
             </ul>
         </div>
-        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > User Groups </button> 
+        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > User Groups</button> 
         <div class="postToGrpsToggle" style="display:none;">
             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
         </div>
@@ -70,7 +70,15 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
 
 $(document).ready(function(){
     $(".toggleGrpsDiv").click(function(){
-        $(this).next().toggle();
+        var me = this;
+        $(me).next().toggle();
+        /*if( $(me).next().is(':visible')){
+            console.log("open hai");
+            $(me).find("caret").addClass("icon-remove").removeClass("caret");
+        } else {
+            console.log("CLOSED");
+            $(me).find("icon-remove").addClass("caret").removeClass("icon-remove");
+        }*/
     }); 
 });
 

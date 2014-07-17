@@ -131,6 +131,7 @@
             .imageHolder {
                 border: 1px solid grey ;
                 background-color: lightgrey ;
+                margin-bottom:90px !important;
             }
             .imagesListWrapper ul {
                 width:20000px;
@@ -138,6 +139,7 @@
             }
             .imagesListWrapper ul li {
                 display : inline !important;
+                z-index:1;
             }
         </style>
     </head>
@@ -199,7 +201,7 @@
                                 <div class="column propagateGroups small_block_row">
                                     <label>User Groups</label>
                                     <div style="clear:both">
-                                        <button type="button" class="btn toggleGrpsDiv"> User Groups </button> 
+                                        <button type="button" class="btn toggleGrpsDiv"> User Groups</button> 
                                         <div class="postToGrpsToggle" style="display:none;">
                                             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                                         </div>

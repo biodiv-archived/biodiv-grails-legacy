@@ -26,7 +26,10 @@
     </select-->
     <div class="groups_div dropdown" style="z-index:3;">
         <div class="dropdown-toggle btn selected_group selected_value " data-toggle="dropdown">
-            <img src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/>
+            <span style="float:left;"
+                        class="group_icon species_groups_sprites active ${SpeciesGroup.findByName('All').iconClass()}"
+                    title="${SpeciesGroup.findByName('All').name}"></span>
+            <!--img src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/-->
             <span class="display_value">Select group</span>
             <b class="caret"></b>
         </div>
@@ -36,7 +39,11 @@
                 test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}"-->
                 <li class="group_option" value="${g.id}">
                 <div>
-                    <img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/>
+                    <span style="float:left;"
+                        class="group_icon species_groups_sprites active ${g.iconClass()}"
+                    title="${g.name}"></span>
+
+                    <!--img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/-->
                     <span class="display_value">${g.name}</span>
                 </div>
                 </li>
@@ -61,7 +68,7 @@ $(document).ready(function(){
         $(this).closest(".group_options").hide();
         //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
-            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group span"));
+            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
         }
     });
 

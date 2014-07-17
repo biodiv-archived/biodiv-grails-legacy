@@ -188,7 +188,25 @@ function dropAction(event, ui, ele) {
         form.find(".addedResource").css('z-index','0')
         $(ele).css('z-index','1');
     });
-}
+    $userGrpDD.hide();}
+
+    var $grpDD = $('.group_options');
+    var $habDD = $('.habitat_options');
+    //var $userGrpDD = $('.postToGrpsToggle')
+    //var $userGrpBtn = $('.toggleGrpsDivWrapper')
+    $(document.body).click(function(){
+        if (!$grpDD.has(this).length || !$habDD.has(this).length  ) { // if the click was not within $div
+            $grpDD.hide();
+            $habDD.hide();
+        }
+        /*
+           if(!$userGrpBtn.has(this).length && !$userGrpDD.has(this).length) {
+           console.log("============IDHAR HAI===============");
+           $userGrpDD.hide();
+           }
+        */
+    });
+
 
 $(".obvCreateTags").tagit({
     select:true, 
