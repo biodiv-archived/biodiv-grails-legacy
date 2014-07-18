@@ -821,8 +821,8 @@ environments {
         ibp.domain=servername
         wgp.domain="thewesternghats.${servername}" 
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
@@ -902,8 +902,8 @@ environments {
         ibp.domain=servername
         wgp.domain="thewesternghats.${servername}" 
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
