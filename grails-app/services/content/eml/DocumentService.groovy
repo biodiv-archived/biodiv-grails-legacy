@@ -109,19 +109,19 @@ class DocumentService {
 	}
 
 
-	def setUserGroups(Document documentInstance, List userGroupIds) {
+	def setUserGroups(Document documentInstance, List userGroupIds, boolean sendMail = true) {
 		if(!documentInstance) return
 
 		def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  docInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			println 'removing document from usergroups'
-			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups);
+			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups, sendMail);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
-			userGroupService.postDocumenttoUserGroups(documentInstance, userGroupIds);
+			userGroupService.postDocumenttoUserGroups(documentInstance, userGroupIds, sendMail);
 			docInUserGroups.removeAll(toRemainInUserGroups)
-			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups);
+			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups, sendMail);
 		}
 	}
 
