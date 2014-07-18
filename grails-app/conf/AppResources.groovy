@@ -86,9 +86,9 @@ modules = {
 	}
 
 	gallery {
-		resource url:[dir:'js/galleria/1.3.5/themes/classic/',file:'galleria.classic.css']
-		resource url:'/js/galleria/1.3.5/galleria-1.3.5.js'
-		resource url:'/js/galleria/1.3.5/themes/classic/galleria.classic.min.js'
+		//resource url:[dir:'js/galleria/1.3.5/themes/classic/',file:'galleria.classic.css']
+		//resource url:'/js/galleria/1.3.5/galleria-1.3.5.js'
+		//resource url:'/js/galleria/1.3.5/themes/classic/galleria.classic.min.js'
 	}
 
 	carousel {
@@ -191,7 +191,7 @@ modules = {
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
 		resource url:'/js/jquery/jquery.tocify.min.js'
-		resource url:'/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js'
+		//resource url:'/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
 		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'
 		resource url:'/js/floating-1.7.js'

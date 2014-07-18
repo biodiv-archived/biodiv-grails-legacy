@@ -68,6 +68,10 @@ if(r) {
 </head>
 <body>
 
+<link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
+<script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
+<script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+
             <div class="observation  span12">
                             <obv:showSubmenuTemplate/>
                             
