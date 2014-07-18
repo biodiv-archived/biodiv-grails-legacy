@@ -1341,6 +1341,7 @@ span.cke_skin_kama {
     position: absolute !important;
     background-color: white !important;
     overflow:hidden !important;
+    bottom: 0;
 }
 .galleria-info-text {
     padding:2px !important;
