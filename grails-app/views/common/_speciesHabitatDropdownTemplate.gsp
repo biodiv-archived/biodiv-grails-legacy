@@ -69,7 +69,6 @@ $(document).ready(function(){
     });
 
     $(".habitat_option").unbind('click').click(function(){
-        console.log("clicked here habitat");
         $(this).closest(".habitat_super_div").find(".habitat").val($(this).val());
         $(this).closest(".habitat_super_div").find(".selected_habitat").html($(this).html());
         $(this).closest(".habitat_options").hide();

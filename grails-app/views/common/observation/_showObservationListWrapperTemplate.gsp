@@ -127,10 +127,8 @@ $(document).ready(function() {
     });
     
     $("#refreshListForBounds").click(function() {
-        console.log("refresh called");
         var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
         if(mapLocationPicker){
-            console.log("have the object");
         }
         refreshList(mapLocationPicker.getSelectedBounds());
     });

@@ -806,8 +806,6 @@ function showMapView() {
 }
 
 function refreshList(bounds){
-    console.log("called refresh list");
-    console.log(bounds);
     if (bounds !== undefined){
         $("#bounds").val(bounds);
     } else {

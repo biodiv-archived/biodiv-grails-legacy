@@ -171,8 +171,6 @@ class Species implements Rateable {
             def finalRes = results.collect {  r -> 
                 instances.find { i -> (r[0] == i.id) } 
             }
-            println "+======================+++++"
-            println finalRes;
             return finalRes
         } else {
             return []

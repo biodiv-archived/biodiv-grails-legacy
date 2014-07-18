@@ -94,7 +94,6 @@ class Utils {
 
 	static String generateSafeFileName(String name) {
 		//returning random integer (between 1-1000) as file name along with original extension
-		println "=======FILE NAME O SAFE FILE==========="  +name
         return "" + (FILE_NAME_GENEROTR.nextInt(1000-1+1)+1) + getCleanFileExtension(name) 
 	}
 

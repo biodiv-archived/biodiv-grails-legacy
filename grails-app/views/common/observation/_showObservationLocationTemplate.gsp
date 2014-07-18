@@ -105,7 +105,6 @@
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
             }
 
-            console.log("INIT AREA ANA THA YAHAN");
             mapLocationPicker.initArea(false, undefined, undefined, $("#areas").val(), {icon:icon, layer:'Current Observation' });
             //HACK
             if(mapLocationPicker.searchMarker)

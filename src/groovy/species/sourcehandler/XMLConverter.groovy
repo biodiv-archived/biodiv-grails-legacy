@@ -693,7 +693,6 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
-        println "==========CREATE MEDIA CALLED========== " + resourcesXML +" ====== "+ relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -703,7 +702,6 @@ class XMLConverter extends SourceConverter {
             def audiosNode = resourcesXML.audios;
             def videosNode = resourcesXML.videos;
 
-            println "==============Video Node================"+videosNode[0]
 
             resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
             resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, "icons"));
@@ -779,12 +777,9 @@ class XMLConverter extends SourceConverter {
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
-            println "=====TEMPFILE EXISTS==== " 
             //copying file
             relImagesFolder = relImagesFolder.trim();
-            println "=========RES ROOT DIR ========= " + resourcesRootDir +"================= "+ relImagesFolder
             File root = new File(resourcesRootDir , relImagesFolder);
-            println "==============ROOT ====== " + root
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
                 addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
@@ -792,7 +787,6 @@ class XMLConverter extends SourceConverter {
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-            println "=========IMAGE FILE ========== " + imageFile
 			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
@@ -992,7 +986,6 @@ class XMLConverter extends SourceConverter {
             res.description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
 
 
-            println res.description
             res.licenses?.clear()
             res.contributors?.clear()
             res.attributors?.clear();

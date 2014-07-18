@@ -228,7 +228,6 @@ class AbstractObjectService {
         Node videos = new Node(resources, "videos");
         Node audios = new Node(resources, "audios");
         
-        println "===========PARAMS IN CREATE RESOURCE XML============ " + params
 
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" ){
@@ -329,7 +328,6 @@ class AbstractObjectService {
     }
 
     private List<Resource> saveResources(instance, resourcesXML) {
-        println "=========SAVE RESOURCES CALLED========" + instance+" ======= "+ resourcesXML
         XMLConverter converter = new XMLConverter();
         def rootDir
         switch(instance.class.name) {

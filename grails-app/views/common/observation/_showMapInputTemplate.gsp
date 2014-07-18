@@ -120,8 +120,6 @@
 
 <script type="text/javascript">
 function update_geotagged_images_list_for_bulkUpload(ele){
-    console.log("update_geotagged_images_list_for_bulkUpload");
-    console.log("============YAHAN TOH NAI ANA THA========");
     var imgs = $(ele).closest(".addObservation").find('.geotagged_image')
     $.each(imgs, function(index, value){
         $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
@@ -139,15 +137,11 @@ function loadMapInput() {
         $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
         $(me).css("border","2px solid rgba(82,168,236,0.8)");
     }
-    console.log($(map_class).data('locationpicker'));
     if($(map_class).data('locationpicker') == undefined) {
-        console.log("===================================================================");
         loadGoogleMapsAPI(function() {
             var locationPicker = new $.fn.components.LocationPicker(map_class);
             locationPicker.initialize();
             $(map_class).data('locationpicker', locationPicker);
-            console.log("======LOCATION PICKER==");
-            console.log($(map_class).data('locationpicker'));
             $(map_class).find('.spinner').hide();
             
             <g:if test="${params.controller == 'checklist'}">
@@ -175,14 +169,12 @@ $(document).ready(function() {
         var me = this;
         var map_class = $(this).closest(".map_class");
         if($(map_class).find(".map_canvas").is(':visible')) {
-            console.log("========IS OPEN==========");
             $(me).find("i").removeClass("icon-remove").addClass("icon-chevron-down");
             $(me).css("border","0px solid rgba(82,168,236,0.8)");
             $(map_class).find(".map_canvas").hide();
             $(map_class).find(".latlng").hide();
             return false;
         } else{
-            console.log("========NOT OPEN==========");
             $(me).css("border","2px solid rgba(82,168,236,0.8)");
             $(me).find("i").removeClass("icon-chevron-down").addClass("icon-remove");
         }

@@ -258,9 +258,7 @@ function removeResource(event, imageId) {
                     $(".imagesList").css("width", w);
                 }
                 */
-                console.log("should add info");
                 var count = $("input[name='lastUploaded']").val();
-                console.log($(".metadata.prop:lt("+count+")") );
                 var metadataForForm = $(".metadata.prop:lt("+count+")").clone();
                 $(metadataForForm).css("display","none");
                 $("form.createResource").find(".metadata.prop").remove();
@@ -271,8 +269,6 @@ function removeResource(event, imageId) {
                 dataType : 'json', 
                 type : 'POST',
                 success : function(data, statusText, xhr, form) {
-                        console.log("========RESOURCE GOT CREATED==============");
-                    console.log(data);
                     $(".addedResource.thumbnail").draggable({helper:'clone'});  
 
                     $(".imageHolder").droppable({

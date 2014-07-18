@@ -220,11 +220,9 @@ class ObservationTagLib {
 	
 	def showMapInput = {attrs, body->
 		def model = attrs.model
-        println "=====================================" + model
 		model.sourceInstance = model.sourceInstance ?: model.observationInstance
 		model.placeNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
 		model.topologyNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
-        println "=====================================" + model
         out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	
@@ -373,7 +371,6 @@ class ObservationTagLib {
             break
 
             case "usersResource" :
-                println "USERS RESOURCE" + "========== " + userInstance + " ===== " + UsersResource.UsersResourceStatus.NOT_USED.toString()
                 def usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
                 usersResList.each{
                     resList.add(it.res)

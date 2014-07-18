@@ -28,7 +28,6 @@ function useTitle(obj){
 
         initialize : function(options) {
             console.log('initializing map');
-            console.log(this.$ele.context);
             var G = google.maps;
             this.M= L;
             this.M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
@@ -118,21 +117,15 @@ function useTitle(obj){
         }, 
         initLocation : function(drawable) {
             var me = this;
-            console.log("CALLED");
             var map_class = me.$ele.closest(".map_class");
-            console.log(map_class);
             var latitude = $(map_class).find('.latitude_field').val();
             var longitude = $(map_class).find('.longitude_field').val();
-            console.log(latitude);
-            console.log(longitude);
             if(latitude && longitude) {
-                console.log("BOTH PRESNET");
                 me.addSearchMarker({lat:latitude, lng:longitude}, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable, clickable:drawable});
             }
         },
 
         initArea : function(drawable, drawControls, editControls, areas, areaOptions) {
-            console.log("======INIT AREA====");
             this.drawnItems = (editControls != undefined) ? editControls.featureGroup : new this.M.FeatureGroup();
 
             if(drawable) {
@@ -242,7 +235,6 @@ function useTitle(obj){
 
         clearDrawnItems : function() {
             var me = this;
-            console.log('clear drawn items');
             if(me.drawnItems) {
                 me.drawnItems.eachLayer(function (layer) {
                     me.map.removeLayer(layer)
@@ -254,8 +246,6 @@ function useTitle(obj){
         },
 
         addDrawnItems:function(e) {
-            console.log("add Drawn Items");
-            console.log(this);
             var me = this;
             var type = e.layerType;
             var layer = e.layer;
@@ -270,7 +260,6 @@ function useTitle(obj){
 
         //TODO:remove this 
         addSearchMarker : function(latlng, options) {
-            console.log("called add search marker");
             options = $.extend({}, {
                 draggable:true, 
                     selected:true, 
@@ -290,7 +279,6 @@ function useTitle(obj){
         },
 
         createMarker : function(lat, lng, options) {
-            console.log("=========CRAETE MARKER=======================")
             if(!lat || !lng) return;
             if(options == undefined) options = {};
 
@@ -395,7 +383,6 @@ function useTitle(obj){
                     }
                 }
             });
-            console.log("calling this ");
             me.setLatLngFields(marker.getLatLng().lat, marker.getLatLng().lng);
             $(this.$ele).closest(".map_class").find('.latlng').show();
         },
@@ -484,7 +471,6 @@ function useTitle(obj){
         }*/
 
         update_geotagged_images_list : function(image) {
-            console.log(image);
             var me = this;
             var $closestAddObservation = $(image).closest(".addObservation");
             $(image).exifLoad(function() {
@@ -526,15 +512,11 @@ function useTitle(obj){
                     $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left").append(html);
                     //    this.addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: window.params.defaultMarkerIcon+"marker-icon.png", shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
                 }
-                console.log("printing image==========");
-                console.log(image);
                 var appendedImage = $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left")
                 $closestAddObservation.find(".geotagged_images").find(".location_picker_button").click(me.setInfoFromImage(appendedImage)).trigger('update_map');
                 
             }    		
             });
-            console.log($closestAddObservation.find(".map_search .add-on"));
-            //$closestAddObservation.find(".map_search .add-on").trigger("click");
         },
 
         get_latlng_from_image : function(img) {
@@ -606,12 +588,8 @@ function useTitle(obj){
 
         setInfoFromImage : function(image){
             var me = this;
-            console.log("SETTING INFO FROM IMAGE first");
-            console.log(image)
             var map_class = $(image).closest(".map_class");
-            console.log($(image).find('input[name="dateFromImage"]'));
             var date = $(image).find('input[name="dateFromImage"]').val();
-            console.log(date);
             if(date){
                 me.set_date(date, image);
             }
@@ -619,9 +597,7 @@ function useTitle(obj){
             var lat = $(image).find('input[name="latitudteFromImage"]').val();
             var lng = $(image).find('input[name="longitudeFromImage"]').val();
             if(lat && lng){
-                console.log("LAT LONG PRESENT ");
                 if(me.isMapViewLoaded){
-                    console.log("mapview is loaded");
                     me.addSearchMarker({lat:lat,lng:lng},undefined);
                 }else{
                     $(".address").trigger("click");
@@ -653,8 +629,6 @@ function useTitle(obj){
     LocationPicker.prototype = {
         initialize : function() {
             var me = this;
-            console.log("==========================================");
-            console.log(this.$ele.find(".placeName"));
             var temp =  me.$ele.find(".address .add-on");
             //me.$ele.find(".placeName").click(function(){
                 //console.log("hewfhrsfsfewsf============================sedf");
@@ -666,15 +640,12 @@ function useTitle(obj){
                 var result = me.$ele.find(".placeName").catcomplete({
                     //appendTo:"#suggestions",
                     source: function(request, response) {
-                        console.log("===============IN SOURCE=====");
                         var term = request.term;
                         if ( term in cacheSN ) {
                             response( cacheSN[ term ] );
                             return;
                         }
-                        console.log(me.mapLocationPicker);
                         me.mapLocationPicker.geocoder.geocode( {'address': request.term +'+india', 'region':'in'}, function(results, status) {
-                            console.log("in here============");
                             var r = [];
                             $.each(results, function(index, item) {
                                 if(r.length >= 5) return;
@@ -688,7 +659,6 @@ function useTitle(obj){
                             })        
                             
                             $.getJSON( window.params.locationsUrl, request, function( data, status, xhr ) {
-                                console.log("==========" + window.params.locationsUrl);
                                 $.each(data, function(index, item) {
                                     r.push({
                                         label: item.location[0]+' ('+item.location[1]+')',
@@ -788,13 +758,10 @@ function useTitle(obj){
            */
 
         me.$ele.find('.geotagged_images').on('update_map', function() {
-            console.log("triggered first");
             var $geotagged_images = $(this)
             if($geotagged_images.children(".location_picker_button").length >0){
-                console.log("gdsssssssssssss");
                 $geotagged_images.children(":last").trigger("click");
             }else{
-                console.log("gggggggggggggggggggggggggggg");
                 $geotagged_images.find(".title").hide();
                 $geotagged_images.find(".msg").hide();
             }
@@ -853,8 +820,6 @@ function useTitle(obj){
         initArea : function(drawControls, editControls, areaOptions) {
             var areas = $(this.$ele).find('input.areas').val();
             if(!areas) {
-                console.log("no area");
-                console.log($('input#areas').val());
                 areas = $('input#areas').val();
             }
             this.mapLocationPicker.initArea(true, drawControls, editControls, areas, areaOptions);
