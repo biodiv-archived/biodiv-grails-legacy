@@ -4,11 +4,15 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.Species"%>
 <div>
-    <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}"
+    <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField' && resourceListType != 'usersResource'}"
     <i class="icon-picture"></i><span>Upload photos of a
         single observation and species and rate images inorder to order them.</span>
 
     </g:if>
+    <g:if test="${resourceListType == 'usersResource'}"
+    <i class="icon-picture"></i><span>My Uploads</span>
+    </g:if>
+
     <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
         <g:if test="${resourceListType == 'usersResource'}">
         <%

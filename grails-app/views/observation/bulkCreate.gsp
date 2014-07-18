@@ -222,8 +222,12 @@
                                 </div>
                                 <div class="column small_block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
+                                        style=" margin-right: 5px; margin-top:17px;"> Apply
+                                    </a>
+                                    <a class="applyAll applyToAll btn btn-primary"
                                         style=" margin-right: 5px; margin-top:17px;"> Apply to all
                                     </a>
+                                     <input type="hidden" name='applyToAll' value="" />
                                 </div>
                             </div>
                         </div>
