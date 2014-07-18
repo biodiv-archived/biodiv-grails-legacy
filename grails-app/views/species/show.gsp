@@ -191,15 +191,13 @@
                 };
                 var speciesId = ${speciesInstance?.id}
             </r:script>
-
-<link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
- <script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
- <script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
- <script src="/biodiv/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
-
     </head>
 
     <body>
+    <link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
+    <script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
+    <script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+    <script src="/biodiv/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
