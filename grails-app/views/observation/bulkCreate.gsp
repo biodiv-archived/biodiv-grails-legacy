@@ -28,10 +28,10 @@
             .map_canvas {
                 border-color: rgba(82,168,236,0.8) !important;
                 position: absolute !important;
-                width: 100% !important;
+                width: 99% !important;
                 display: block;
                 left: 0px;
-                z-index:1 !important;
+                z-index:10 !important;
             }
             .selected_habitat, .selected_group{
                 position:relative;
@@ -72,7 +72,7 @@
             .selected_habitat, .selected_group {
                 padding: 4px 3px;
                 width:97%;
-                text-align:left !important;
+                text-align:center !important;
             }
             .block_row {
                 margin-left:0px !important;
@@ -146,7 +146,27 @@
                 float: left;
             }
             li.group_option, li.habitat_option {
-            height: 35px;
+                height: 35px;
+            }
+            .display_value {
+                display: inline-block !important;
+                margin-top: 4px !important;
+            }
+            .selected_group .caret, .selected_habitat .caret , .propagateLicense .caret {
+                margin-top: 12px !important;
+            }
+            .propagateDate .fromDate {
+                height:42px;
+            }
+            .propagateLicense .license_div {
+                width: 55% !important;
+                margin: 0 auto !important;
+            }
+            .propagateLicense a{
+                height:32px !important;
+            }
+            .propagateLicense .btn img{
+                margin-top: 8px !important; 
             }
         </style>
     </head>
@@ -171,7 +191,7 @@
                             <div >
                                 <div class="column propagateLicense">
                                     <label>License</label>
-                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':null]"/>
+                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
                                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
@@ -222,10 +242,10 @@
                                 </div>
                                 <div class="column small_block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply
+                                        style=" margin-right: 5px; margin-top:17px;"> Apply Below
                                     </a>
                                     <a class="applyAll applyToAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply to all
+                                        style=" margin-right: 5px; margin-top:17px;"> Apply to All
                                     </a>
                                      <input type="hidden" name='applyToAll' value="" />
                                 </div>
