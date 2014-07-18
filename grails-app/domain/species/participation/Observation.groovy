@@ -124,7 +124,7 @@ class Observation extends Metadata implements Taggable, Rateable {
         if(res) 
             return res[0]
 		else
-			return group.icon(ImageType.ORIGINAL)
+			return group?.icon(ImageType.ORIGINAL)
 	}
 
 	/**
