@@ -798,8 +798,8 @@ function useTitle(obj){
                 $geotagged_images.find(".title").hide();
                 $geotagged_images.find(".msg").hide();
             }
-            console.log(me.$ele.find(".map_search .add-on"));
-            me.$ele.find(".map_search .add-on").trigger("click");
+            //console.log(me.$ele.find(".map_search .add-on"));
+            //me.$ele.find(".map_search .add-on").trigger("click");
         });
 
         me.$ele.find('.latitude_field').change(function(){

@@ -93,7 +93,7 @@
                 z-index:2;
             }
             .map_search {
-                position:inherit;
+                position:inherit;btn:hover,
             }
             .combobox-container {
 	        right:9% !important;
@@ -186,7 +186,7 @@
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
                     </div>
                     <div class="section clearfix">
-                        <a class="btn togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
+                        <a class="btn btn-primary togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
                         <div class= "propagateBlock hide clearfix">
                             <div >
                                 <div class="column propagateLicense">
@@ -341,6 +341,20 @@
                 });
             }
             initializeLanguage();
+            
+            $(document).click(function(){
+                $(".group_options").hide();
+                $(".habitat_options").hide();
+            });
+
+            /* Clicks within the dropdown won't make
+            it past the dropdown itself */
+            $(".group_options").click(function(e){
+                e.stopPropagation();
+            });
+            $(".habitat_options").click(function(e){
+                e.stopPropagation();
+            });
         });
 
         </r:script>

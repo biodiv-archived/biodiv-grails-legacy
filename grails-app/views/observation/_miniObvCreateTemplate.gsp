@@ -66,17 +66,13 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
 <script type="text/javascript">
 
 $(document).ready(function(){
-    $(".toggleGrpsDiv").click(function(){
+    $(".toggleGrpsDiv").unbind("click").click(function(){
         var me = this;
         $(me).next().toggle();
-        /*if( $(me).next().is(':visible')){
-            console.log("open hai");
-            $(me).find("caret").addClass("icon-remove").removeClass("caret");
-        } else {
-            console.log("CLOSED");
-            $(me).find("icon-remove").addClass("caret").removeClass("icon-remove");
-        }*/
-    }); 
+    });
+    $(".close_user_group").unbind("click").click(function(){
+        $(this).closest(".postToGrpsToggle").toggle();      
+    });
 });
 
 </script>

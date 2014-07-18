@@ -1,5 +1,8 @@
 <uGroup:isUserGroupMember>
 <div class="userGroupsSuperDiv span12 super-section"  style="clear: both">
+    <g:if test="${params.action == 'bulkCreate' || params.oldAction == 'bulkSave'}">
+    <div class="close_button close_user_group"></div>
+    </g:if>
     <div class="section" style="position: relative; overflow: visible;">
         <h3>Post to User Groups</h3>
         <div>
@@ -13,5 +16,4 @@
     </div>
 </div>
 </uGroup:isUserGroupMember>
-
 
