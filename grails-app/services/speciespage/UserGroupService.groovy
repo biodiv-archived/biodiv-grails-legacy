@@ -1205,13 +1205,13 @@ class UserGroupService {
 	
 	
 	/////////////// DOCUMENTS RELATED /////////////////
-	void postDocumenttoUserGroups(Document document, List userGroupIds) {
+	void postDocumenttoUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
 		log.debug "Posting ${document} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
 				if(userGroup) {
-					postDocumentToUserGroup(document, userGroup)
+					postDocumentToUserGroup(document, userGroup, sendMail)
 				}
 			}
 		}
@@ -1219,24 +1219,24 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void postDocumentToUserGroup(Document document, UserGroup userGroup) {
+	void postDocumentToUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.addToDocuments(document);
 		if(!userGroup.save()) {
 			log.error "Could not add ${document} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, true);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
 			log.debug "Added ${document} to userGroup ${userGroup}"
 		}
 	}
 
-	void removeDocumentFromUserGroups(Document document, List userGroupIds) {
+	void removeDocumentFromUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
 		log.debug "Removing ${document} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong("" + it));
 				if(userGroup) {
-					removeDocumentFromUserGroup(document, userGroup)
+					removeDocumentFromUserGroup(document, userGroup, sendMail)
 				}
 			}
 		}
@@ -1244,13 +1244,13 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void removeDocumentFromUserGroup(Document document, UserGroup userGroup) {
+	void removeDocumentFromUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.documents.remove(document);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${document} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, false);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
 			log.debug "Removed ${document} from userGroup ${userGroup}"
 		}
 	}
