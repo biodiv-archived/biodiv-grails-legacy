@@ -868,7 +868,6 @@ class SpeciesController extends AbstractObjectController {
             }
 
             if(success) {
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
                 if(conf) {
                     log.debug "Deleting confirmation code and usertoken params";
@@ -876,6 +875,7 @@ class SpeciesController extends AbstractObjectController {
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
 
+                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
             } else{
                 flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
