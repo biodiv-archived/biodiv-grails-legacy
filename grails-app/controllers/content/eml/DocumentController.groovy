@@ -254,5 +254,12 @@ class DocumentController extends AbstractObjectController {
 		List result = documentService.nameTerms(params)
 		render result.value as JSON;
 	}
+	
+	@Secured(['ROLE_USER'])
+	def bulkUpload(){
+		log.debug params
+		documentService.processBatch(params)
+		render " done "
+	}
 
 }

@@ -18,6 +18,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
+import content.eml.Document.DocumentType;
 import species.utils.Utils;
 import species.License
 import content.Project
@@ -32,16 +33,29 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import static speciespage.ObvUtilService.*;
+import java.nio.file.Files;
+import species.formatReader.SpreadsheetReader;
+import species.auth.SUser;
+import species.groups.UserGroup;
+import static java.nio.file.StandardCopyOption.*
+import java.nio.file.Paths;
+
 class DocumentService {
 
 	static transactional = false
+	
+	private static final int BATCH_SIZE = 1
+	
 	def documentSearchService
 	def grailsApplication
 	def userGroupService
 	def dataSource
     def sessionFactory
     def observationService
-
+	def checklistUtilService
+	def activityFeedService
+	
 	Document createDocument(params) {
 
 
@@ -481,5 +495,136 @@ class DocumentService {
 		return "(" + list.collect {'?'}.join(", ") + ")"
 	}
 
+	
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////// BULK UPLOAD//////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	
+	def processBatch(params){
+		File fileDir = new File(params.fileDir)
+		if(!fileDir.exists()){
+			log.error "File dir not found. Aborting upload"
+			return
+		}
+		
+		File spreadSheet = new File(params.batchFileName)
+		if(!spreadSheet.exists()){
+			log.error "Main batch file not found. Aborting upload"
+			return
+		}
+		
+		def resultObv = []
+		int i = 0;
+		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
+			println "================" + m
+			
+			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+				uploadDoc(fileDir, m, resultObv)
+				i++
+				if(i > BATCH_SIZE){
+					checklistUtilService.cleanUpGorm(true)
+					def obvs = resultObv.collect { Document.read(it) }
+					try{
+						documentSearchService.publishSearchIndex(obvs, true);
+					}catch (Exception e) {
+						log.error e.printStackTrace();
+					}
+					resultObv.clear();
+					i = 0;
+				}
+			}
+		}
+	}
+	
+	private uploadDoc(fileDir, Map m, resultObv){
+		Document document = new Document()
+		
+		//setting ufile and uri
+		File sourceFile = new File(fileDir, m['file path'])
+		if(sourceFile.exists()){
+			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			String contentRootDir = config.speciesPortal.content.rootDir
+			File destinationFile = observationService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+			try{
+				Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
+				UFile f = new UFile()
+				f.size = destinationFile.length()
+				f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")
+				document.uFile = f
+				println "============== " + f.path
+			}catch(e){
+				e.printStackTrace()
+			}
+		}
+		
+		document.uri = m['uri']
+		document.title = m['title']
+		
+		if(!document.title){
+			log.error 'title cant be null'
+			return 
+		}
+		
+		if(!document.uFile  && !document.uri){
+			log.error "Either ufile or uri is null so ignoring this document"
+			return
+		}
+		//other params
+		document.author = SUser.findByEmail(m['user email'].trim())
+		document.type = Document.fetchDocumentType(m['type'])
+		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
+		
+		document.contributors =  m['contributors']
+		document.attribution =  m['attribution']
+		document.notes =  m['description']
+		
+		document.speciesGroups = []
+		m['species groups'].split(",").each {
+			def s = SpeciesGroup.findByName(it.trim())
+			if(s)
+				document.addToSpeciesGroups(s);
+		}
+
+		document.habitats  = []
+		m['habitat'].split(",").each {
+			def h = Habitat.findByName(it.trim())
+			document.addToHabitats(h);
+		}
+		
+		document.longitude = (m['longitude'] ?:76.658279)
+		document.latitude = (m['lattitude'] ?: 12.32112)
+		document.geoPrivacy = m["geoprivacy"]
+		
+		
+//		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+//		if(document.latitude && document.longitude) {
+//			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
+//		}
+//		
+		saveDoc(document, m)
+		
+		if(document.id){
+			resultObv << document.id
+		}
+	}
+	
+	private saveDoc(documentInstance, Map m) {
+		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
+		if (documentInstance.save(flush: true) && !documentInstance.hasErrors()) {
+			
+			activityFeedService.addActivityFeed(documentInstance, null, documentInstance.author, activityFeedService.DOCUMENT_CREATED);
+			
+			def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
+			println "================ tags " + tags
+			documentInstance.setTags(tags)
+			
+			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+			userGroupIds = userGroupIds.collect { "" + it }
+			setUserGroups(documentInstance, userGroupIds);
+		}
+		else {
+			documentInstance.errors.allErrors.each { log.error it }
+		}
+	}
 
 }

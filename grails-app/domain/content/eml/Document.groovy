@@ -112,6 +112,8 @@ class Document extends Metadata implements Taggable, Rateable {
 	static mapping = {
 		notes type:"text"
 		attribution type:"text"
+		contributors type:"text"
+		title type:"text"
 	}
 
      List fetchAllFlags(){
@@ -173,6 +175,16 @@ class Document extends Metadata implements Taggable, Rateable {
 	
 	def fetchList(params, max, offset){
 		return documentService.getFilteredDocuments(params, max, offset)
+	}
+	
+	static DocumentType fetchDocumentType(String documentType){
+		if(!documentType) return null;
+		for(DocumentType type : DocumentType) {
+			if(type.name().equals(documentType)) {
+				return type;
+			}
+		}
+		return null;
 	}
 
 }
