@@ -83,7 +83,7 @@
 
                                 <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} />Accurate 
                                 <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} />Approximate
-                                <input type="checkbox" class="input-block-level" name="geoPrivacy" value="${observationInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} />
+                                <input type="checkbox" class="" name="geoPrivacy" value="${observationInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} />
                                 Hide precise location
 
 

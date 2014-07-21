@@ -112,6 +112,19 @@ class UserGroup implements Taggable {
 			return false;
 
 		UserGroup other = (UserGroup) obj;
+		
+		//reading complete object again
+		try {
+			other = UserGroup.get(other.id)
+			log.debug other.name
+		}catch(e){
+			log.error e.getMessage()
+			UserGroup.withNewSession{
+				other = UserGroup.get(other.id)
+				log.debug other.name
+			}
+		}
+		
 		if (name == null) {
 			if (other.name != null)
 				return false;

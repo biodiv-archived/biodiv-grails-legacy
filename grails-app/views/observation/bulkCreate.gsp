@@ -48,7 +48,7 @@
                 background-color: rgb(106, 201, 162) !important;
             }
             .column.block_row {
-                width:436px;
+                width:444px;
             }
             .miniObvWrapper.column {
                 width:290px;
@@ -57,7 +57,7 @@
                 background-color: #a6dfc8;
             }
             .column {
-                width:217px;
+                width:221px;
                 float: left;
                 padding: 10px 0px;
                 margin:0px;
@@ -106,7 +106,7 @@
                 border-width:2px;
             }
             .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div {
-                width:194px;
+                width:200px;
             }
             .addObservation .groups_super_div, .addObservation .habitat_super_div {
                 width : 273px;
@@ -116,7 +116,7 @@
                 left: 68px !important;
             }
             .small_block_row {
-                width:291px;
+                width:295px;
                 margin-left:0px;
             }
             .controls.textbox {
@@ -159,14 +159,17 @@
                 height:42px;
             }
             .propagateLicense .license_div {
-                width: 55% !important;
                 margin: 0 auto !important;
             }
             .propagateLicense a{
                 height:32px !important;
+                width:89% !important;
             }
             .propagateLicense .btn img{
                 margin-top: 8px !important; 
+            }
+            .propagateLicense .license_options {
+                width:220px;
             }
         </style>
     </head>

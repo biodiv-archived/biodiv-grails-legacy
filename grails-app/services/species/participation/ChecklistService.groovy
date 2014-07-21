@@ -176,7 +176,10 @@ class ChecklistService {
 	    if(!params.checklistData && !isGlobalUpdate)
 			return
             
-		Checklists.withTransaction() {
+		//Checklists.withTransaction() {
+			
+			checklistInstance = Checklists.get(checklistInstance.id)
+			log.debug "adding observation to checklist " + checklistInstance.title
 			Set updatedObv = new HashSet()
 			Set newObv = new HashSet()
 			def commonObsParams = getParamsForObv(params, checklistInstance)
@@ -234,7 +237,11 @@ class ChecklistService {
 			}
 			//updating obv count
 			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
-		}
+			if(!checklistInstance.save(flush:true) || checklistInstance.hasErrors()){
+				checklistInstance.errors.allErrors.each { log.error it }
+			}
+		//}
+			
 		log.debug "saved checklist observations"
 	}
 	
