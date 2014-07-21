@@ -128,3 +128,31 @@ delete from species_field where field_id in (select id from field where category
 /*17th jul 2014*/
 alter table facebook_user  add column access_token_expires timestamp without time zone ;
 
+/* user account merging */
+ update activity_feed set author_id = 4509 where author_id=4507;
+ update activity_feed set author_id = 4509  where author_id=4507;
+ update observation  set author_id = 4509 where author_id=4507;
+ update comment  set author_id = 4509 where author_id=4507;
+ update document  set author_id = 4509 where author_id=4507;
+ update download_log  set author_id = 4509 where author_id=4507;
+ update featured  set author_id = 4509 where author_id=4507;
+ update flag  set author_id = 4509 where author_id=4507;
+ update follow  set author_id = 4509 where author_id=4507 and object_type !='species.groups.UserGroup' and object_type != 'species.auth.SUser';
+ delete from follow where author_id = 4507;
+ update project  set author_id = 4509 where author_id=4507;
+ update recommendation_vote  set author_id = 4509 where author_id=4507;
+ update species_bulk_upload  set author_id = 4509 where author_id=4507;
+ update species_permission  set author_id = 4509 where author_id=4507;
+ update un_curated_votes  set author_id = 4509 where author_id=4507;
+ update checklists_contributor  set contributor_id = 4509 where contributor_id=4507;
+ update resource_contributor  set contributor_id = 4509 where contributor_id=4507;
+ update species_field_contributor  set contributor_id = 4509 where contributor_id=4507;
+ update comment_suser set suser_id = 4509 where suser_id=4507;
+ update common_names_suser  set suser_id = 4509 where suser_id=4507;
+ update species_field_suser  set suser_id = 4509 where suser_id=4507;
+ update synonyms_suser  set suser_id = 4509 where suser_id=4507;
+ update taxonomy_definition_suser  set suser_id = 4509 where suser_id=4507;
+ update taxonomy_registry_suser  set suser_id = 4509 where suser_id=4507;
+ delete from user_group_member_role  where s_user_id = 4507;
+ update user_group_member_role  set s_user_id = 4509 where s_user_id=4507;
+

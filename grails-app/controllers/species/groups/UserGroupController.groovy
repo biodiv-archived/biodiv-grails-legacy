@@ -171,12 +171,12 @@ class UserGroupController {
 				int pos = params.int('pos');
 				def prevNext = getPrevNextUserGroups(pos);
 				if(prevNext) {
-					[userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams]
+					return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams]
 				} else {
-					[userGroupInstance: userGroupInstance]
+					return [userGroupInstance: userGroupInstance]
 				}
 			} else {
-				[userGroupInstance: userGroupInstance]
+				return [userGroupInstance: userGroupInstance]
 			}
 		}
 	}

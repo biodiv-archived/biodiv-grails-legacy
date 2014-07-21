@@ -1835,6 +1835,8 @@ class ObservationService extends AbstractObjectService {
                 templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
                 //templateMap['message'] = activityFeedService.getContextInfo(feedInstance, [:])
                 templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+                println "+++++++++++++++++++++++++++++++++++++++++++"
+ templateMap["groupNameWithlink"] 
                 toUsers.addAll(getParticipants(obv))
                 break
 

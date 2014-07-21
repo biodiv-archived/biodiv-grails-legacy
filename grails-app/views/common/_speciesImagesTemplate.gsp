@@ -28,7 +28,7 @@
             /> </a>
 
         <g:imageAttribution model="['resource':r, base:basePath]" />
-}
+
 </g:if>
 
 <g:elseif test="${r.type == ResourceType.VIDEO}">

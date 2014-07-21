@@ -289,7 +289,7 @@ class SUserController extends UserController {
 			}
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), user.name])}"
-			redirect action: search
+			redirect action: list
 		}
 		catch (DataIntegrityViolationException e) {
 			e.printStackTrace();

@@ -14,7 +14,7 @@
 		
 		<div class="">
 		<uGroup:showUserGroupsListWrapper
-			model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
+			model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':userGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 		</div>
 	</div>
 
