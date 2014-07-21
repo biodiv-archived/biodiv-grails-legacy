@@ -64,9 +64,11 @@ class SecurityFilters {
 						model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
 					}
 				}
+                log.debug "after rendering"
             }
 			
             afterView = {
+                log.debug "after view"
             }
         }
     }
