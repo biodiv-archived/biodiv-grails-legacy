@@ -1,5 +1,5 @@
 	<div class="observation_location">
-                <g:javascript>
+                <script type="text/javascript">
 
   
                 $(document).ready(function() {
@@ -10,7 +10,7 @@
                     window.params.filteredMapBasedObservationsListUrl = "${uGroup.createLink( controller:'observation', action: "list", 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" + location.search
                     </g:else>
                 });
-                </g:javascript>
+                </script>
 		<div class="map_wrapper map_class">
                     <div id="big_map_canvas">
                         <center>

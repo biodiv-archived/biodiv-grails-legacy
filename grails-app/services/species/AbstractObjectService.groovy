@@ -228,17 +228,16 @@ class AbstractObjectService {
         Node videos = new Node(resources, "videos");
         Node audios = new Node(resources, "audios");
         
-        println "===========PARAMS IN CREATE RESOURCE XML============ " + params
 
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
         }
-        else if(params.resourceListType == "usersResource"){
-            uploadDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+        else if(params.resourceListType == "ofObv"){
+            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
         }
         else{
-            uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
+            uploadDir = grailsApplication.config.speciesPortal.usersResource.rootDir
         }
         BitSet indexes = new BitSet();
         List files = [];
@@ -329,7 +328,6 @@ class AbstractObjectService {
     }
 
     private List<Resource> saveResources(instance, resourcesXML) {
-        println "=========SAVE RESOURCES CALLED========" + instance+" ======= "+ resourcesXML
         XMLConverter converter = new XMLConverter();
         def rootDir
         switch(instance.class.name) {

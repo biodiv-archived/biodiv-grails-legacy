@@ -24,7 +24,7 @@
 			</div>
 		</div>
 	</div>
-	<g:javascript>
+	<script type="text/javascript">
 <%--		alert("parent location" +window.opener.location );--%>
 <%--		alert("closing window " + window.location);--%>
 <%--		window.opener.mynewlocation = window.location.search;--%>
@@ -53,5 +53,5 @@
 			return params;
 	    }
 	    
-	</g:javascript>	
+	</script>	
 </body>

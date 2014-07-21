@@ -77,7 +77,7 @@
 </g:if>
 <br>
 <g:if test="${audioCount >= 1}"> 
-<g:javascript>
+<script type="text/javascript">
 
 
 $(document).ready(function(){
@@ -122,7 +122,7 @@ $(document).ready(function(){
                 audio[0].play();
         }
     });    
- </g:javascript>
+ </script>
  </g:if>
  <g:javascript>
 $(document).ready(function(){

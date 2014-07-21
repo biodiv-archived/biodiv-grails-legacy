@@ -5,6 +5,11 @@ if(!Array.prototype.last) {
     }
 }
 
+function useTitle(obj){
+    var map_class = $(obj).closest(".map_class");
+    var locationPicker = $(map_class).data('locationpicker');
+    locationPicker.mapLocationPicker.useLocation(obj);
+}
 
 /**
   @class Map Location Picker
@@ -23,7 +28,6 @@ if(!Array.prototype.last) {
 
         initialize : function(options) {
             console.log('initializing map');
-            console.log(this.$ele.context);
             var G = google.maps;
             this.M= L;
             this.M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
@@ -113,21 +117,15 @@ if(!Array.prototype.last) {
         }, 
         initLocation : function(drawable) {
             var me = this;
-            console.log("CALLED");
             var map_class = me.$ele.closest(".map_class");
-            console.log(map_class);
             var latitude = $(map_class).find('.latitude_field').val();
             var longitude = $(map_class).find('.longitude_field').val();
-            console.log(latitude);
-            console.log(longitude);
             if(latitude && longitude) {
-                console.log("BOTH PRESNET");
                 me.addSearchMarker({lat:latitude, lng:longitude}, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable, clickable:drawable});
             }
         },
 
         initArea : function(drawable, drawControls, editControls, areas, areaOptions) {
-            console.log("======INIT AREA====");
             this.drawnItems = (editControls != undefined) ? editControls.featureGroup : new this.M.FeatureGroup();
 
             if(drawable) {
@@ -237,7 +235,6 @@ if(!Array.prototype.last) {
 
         clearDrawnItems : function() {
             var me = this;
-            console.log('clear drawn items');
             if(me.drawnItems) {
                 me.drawnItems.eachLayer(function (layer) {
                     me.map.removeLayer(layer)
@@ -249,8 +246,6 @@ if(!Array.prototype.last) {
         },
 
         addDrawnItems:function(e) {
-            console.log("add Drawn Items");
-            console.log(this);
             var me = this;
             var type = e.layerType;
             var layer = e.layer;
@@ -265,7 +260,6 @@ if(!Array.prototype.last) {
 
         //TODO:remove this 
         addSearchMarker : function(latlng, options) {
-            console.log("called add search marker");
             options = $.extend({}, {
                 draggable:true, 
                     selected:true, 
@@ -285,7 +279,6 @@ if(!Array.prototype.last) {
         },
 
         createMarker : function(lat, lng, options) {
-            console.log("=========CRAETE MARKER=======================")
             if(!lat || !lng) return;
             if(options == undefined) options = {};
 
@@ -374,7 +367,7 @@ if(!Array.prototype.last) {
                     if (results) {
                         var content = '<ul>';
                         for(var i=0; i<Math.min(results.length,2); i++) {
-                            content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
+                            content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useTitle(this);">Use as title</a></li>'
                         }
                         content += '</ul>';
                         me.selectedMarker.bindPopup(content).openPopup();
@@ -390,7 +383,6 @@ if(!Array.prototype.last) {
                     }
                 }
             });
-            console.log("calling this ");
             me.setLatLngFields(marker.getLatLng().lat, marker.getLatLng().lng);
             $(this.$ele).closest(".map_class").find('.latlng').show();
         },
@@ -479,8 +471,8 @@ if(!Array.prototype.last) {
         }*/
 
         update_geotagged_images_list : function(image) {
-            console.log(image);
             var me = this;
+            var $closestAddObservation = $(image).closest(".addObservation");
             $(image).exifLoad(function() {
                 var latlng = me.get_latlng_from_image(image);
                 var imageDate =  $(image).exif("DateTimeOriginal")[0];
@@ -510,7 +502,7 @@ if(!Array.prototype.last) {
                 //func += "$(this).addClass('active_location_picker_button');";
                 //func += "setInfoFromImage($(this));";
                 html = '<div  class="' + $(image).attr("id") +' leaflet-control location_picker_button " style="display:inline-block;">' + inputHtml + '<div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
-                var $closestAddObservation = $(image).closest(".addObservation");
+                
                 
                 $closestAddObservation.find(".geotagged_images>.title").show();
                 $closestAddObservation.find(".geotagged_images>.msg").show();
@@ -520,10 +512,9 @@ if(!Array.prototype.last) {
                     $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left").append(html);
                     //    this.addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: window.params.defaultMarkerIcon+"marker-icon.png", shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
                 }
-                console.log("printing image==========");
-                console.log(image);
                 var appendedImage = $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left")
                 $closestAddObservation.find(".geotagged_images").find(".location_picker_button").click(me.setInfoFromImage(appendedImage)).trigger('update_map');
+                
             }    		
             });
         },
@@ -597,12 +588,8 @@ if(!Array.prototype.last) {
 
         setInfoFromImage : function(image){
             var me = this;
-            console.log("SETTING INFO FROM IMAGE first");
-            console.log(image)
             var map_class = $(image).closest(".map_class");
-            console.log($(image).find('input[name="dateFromImage"]'));
             var date = $(image).find('input[name="dateFromImage"]').val();
-            console.log(date);
             if(date){
                 me.set_date(date, image);
             }
@@ -610,9 +597,7 @@ if(!Array.prototype.last) {
             var lat = $(image).find('input[name="latitudteFromImage"]').val();
             var lng = $(image).find('input[name="longitudeFromImage"]').val();
             if(lat && lng){
-                console.log("LAT LONG PRESENT ");
                 if(me.isMapViewLoaded){
-                    console.log("mapview is loaded");
                     me.addSearchMarker({lat:lat,lng:lng},undefined);
                 }else{
                     $(".address").trigger("click");
@@ -644,28 +629,23 @@ if(!Array.prototype.last) {
     LocationPicker.prototype = {
         initialize : function() {
             var me = this;
-            console.log("==========================================");
-            console.log(this.$ele.find(".placeName"));
             var temp =  me.$ele.find(".address .add-on");
-            me.$ele.find(".placeName").click(function(){
-                console.log("hewfhrsfsfewsf============================sedf");
-                $("#suggestions").remove();
-                var placeName = this
-                $(temp).after("<div id='suggestions' class='dropdown'></div>");
-                $("#suggestions ul").addClass("dropdown-menu");
+            //me.$ele.find(".placeName").click(function(){
+                //console.log("hewfhrsfsfewsf============================sedf");
+                //$("#suggestions").remove();
+                //var placeName = this
+                //$(temp).after("");
+                //$("#suggestions ul").addClass("dropdown-menu");
                 var cacheSN = {};
-                $(placeName).catcomplete({
-                    appendTo:"#suggestions",
+                var result = me.$ele.find(".placeName").catcomplete({
+                    //appendTo:"#suggestions",
                     source: function(request, response) {
-                        console.log("===============IN SOURCE=====");
                         var term = request.term;
                         if ( term in cacheSN ) {
                             response( cacheSN[ term ] );
                             return;
                         }
-                        console.log(me.mapLocationPicker);
                         me.mapLocationPicker.geocoder.geocode( {'address': request.term +'+india', 'region':'in'}, function(results, status) {
-                            console.log("in here============");
                             var r = [];
                             $.each(results, function(index, item) {
                                 if(r.length >= 5) return;
@@ -679,20 +659,18 @@ if(!Array.prototype.last) {
                             })        
                             
                             $.getJSON( window.params.locationsUrl, request, function( data, status, xhr ) {
-                                console.log("==========" + window.params.locationsUrl);
                                 $.each(data, function(index, item) {
-                                    r.push( {
+                                    r.push({
                                         label: item.location[0]+' ('+item.location[1]+')',
-                                                   value: item.location[0],
-                                                   topology:item.topology,
-                                                   category:item.category
-                                                   })
+                                        value: item.location[0],
+                                        topology:item.topology,
+                                        category:item.category
                                         })
-                                    response(r);
-                                    });
-                                cacheSN[ term ] = r;
                                 })
-
+                                response(r);
+                            });
+                            cacheSN[ term ] = r;
+                        })
                     },
 
                     select: function(event, ui) {
@@ -707,19 +685,35 @@ if(!Array.prototype.last) {
 
                     focus: function(event, ui) {
                         //this.mapLocationPicker.set_location(ui.item.latitude, ui.item.longitude);
-                    },open: function(event, ui) {
-                        $("#suggestions ul").removeAttr('style').css({'display': 'block','width':'100%','z-index':'1001'}); 
+                    }, open: function(event, ui) {
+                        //$("#suggestions ul").removeAttr('style').css({'display': 'block','width':'100%','z-index':'1001'}); 
+                        //$("#suggestions ul").addClass('dropdown-menu').css({'text-align':'left', 'z-index':'1001'});
                     }
 
+                })
+               
+                if(result.length > 0) {
+                    result.each(function() {
+                        $(this).data( "customCatcomplete" )._renderItem = function( ul, item ) {
+                            ul.removeClass().addClass("dropdown-menu")
+                            return $( "<li></li>" )
+                                .data( "ui-autocomplete-item", item )
+                                .append( "<a>" + item.label + "</a>" )
+                                .appendTo( ul );
+                        };
 
-                });
-            });
+                        $(this).data( "customCatcomplete" )._resizeMenu = function() {
+                            this.menu.element.outerWidth( 500 );
+                        }
+                    });
+                }
+
+            //});
 
 
             me.$ele.find(".placeName,.latitude_field,.longitude_field").keypress(function(e) {
                 var code = (e.keyCode ? e.keyCode : e.which);
                 if (code == 13) {
-                    console.log("++++++++++++" + code);
                     me.mapLocationPicker.initLocation(undefined); 
                     e.preventDefault();
                 }
@@ -764,16 +758,15 @@ if(!Array.prototype.last) {
            */
 
         me.$ele.find('.geotagged_images').on('update_map', function() {
-            console.log("triggered first");
             var $geotagged_images = $(this)
             if($geotagged_images.children(".location_picker_button").length >0){
-                console.log("gdsssssssssssss");
                 $geotagged_images.children(":last").trigger("click");
             }else{
-                console.log("gggggggggggggggggggggggggggg");
                 $geotagged_images.find(".title").hide();
                 $geotagged_images.find(".msg").hide();
             }
+            //console.log(me.$ele.find(".map_search .add-on"));
+            //me.$ele.find(".map_search .add-on").trigger("click");
         });
 
         me.$ele.find('.latitude_field').change(function(){
@@ -827,8 +820,6 @@ if(!Array.prototype.last) {
         initArea : function(drawControls, editControls, areaOptions) {
             var areas = $(this.$ele).find('input.areas').val();
             if(!areas) {
-                console.log("no area");
-                console.log($('input#areas').val());
                 areas = $('input#areas').val();
             }
             this.mapLocationPicker.initArea(true, drawControls, editControls, areas, areaOptions);

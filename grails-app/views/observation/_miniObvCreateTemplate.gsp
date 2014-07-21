@@ -17,18 +17,15 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 field="resource" />
             </div>
         </div>    
-        <div class="imageHolder ui-widget-header" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;"></div>
+        <div class="imageHolder" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;"></div>
 
         <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <div style="margin:40px 0 0 0px;">
-            <g:if
-            test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
             <div class="help-identify" class="control-label">
                 <label class="checkbox" style="text-align: left;"> <input
                     type="checkbox" name="help_identify" /> Help identify </label>
             </div>
-            </g:if>
             <reco:create />
         </div>
 
@@ -59,19 +56,23 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 </g:each>
             </ul>
         </div>
-        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > User Groups </button> 
+        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > User Groups</button> 
         <div class="postToGrpsToggle" style="display:none;">
             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
         </div>
         <input class="resourceListType" type="hidden" name='resourceListType' value= />
     </div>
 </form>
-<g:javascript>
+<script type="text/javascript">
 
 $(document).ready(function(){
-    $(".toggleGrpsDiv").click(function(){
-        $(this).next().toggle();
-    }); 
+    $(".toggleGrpsDiv").unbind("click").click(function(){
+        var me = this;
+        $(me).next().toggle();
+    });
+    $(".close_user_group").unbind("click").click(function(){
+        $(this).closest(".postToGrpsToggle").toggle();      
+    });
 });
 
-</g:javascript>
+</script>

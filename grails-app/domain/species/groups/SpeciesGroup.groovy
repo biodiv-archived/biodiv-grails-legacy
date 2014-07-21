@@ -40,8 +40,9 @@ class SpeciesGroup {
 			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
-		
-		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.IMAGE, title:"You can contribute!!!", baseUrl:grailsApplication.config.grails.serverURL);
+		def r = new Resource('fileName':"group_icons/speciesGroups/${name}", 'type':ResourceType.IMAGE, 'title':"You can contribute!!!");
+        r['baseUrl'] = grailsApplication.config.grails.serverURL
+        return r;
 	}
 
 	/* (non-Javadoc)

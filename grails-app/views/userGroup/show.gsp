@@ -26,11 +26,11 @@
             </g:applyLayout>
         </g:if>
 	</div>
-	<g:javascript>
+	<script type="text/javascript">
 		$(document).ready(function() {
 			window.params.tagsLink = "${g.createLink(action: 'tags')}";
 		});
-	</g:javascript>
+	</script>
 	
 	<r:script>
 		$(document).ready(function(){

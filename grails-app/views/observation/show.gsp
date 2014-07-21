@@ -61,7 +61,9 @@ if(r) {
 .observation_story .observation_footer {
     margin-top:50px;
 }
-
+.commonName {
+    width:200px !important;
+}
 </style>
 </head>
 <body>
@@ -263,11 +265,11 @@ if(r) {
 
 
                             </div>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function(){
     window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
 });
-</g:javascript>
+</script>
 
 
     <r:script>

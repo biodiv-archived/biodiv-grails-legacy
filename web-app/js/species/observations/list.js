@@ -3,6 +3,9 @@ $(document).ready(function(){
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
 
+    console.log('updated gallery trigger');
+    $('.list').trigger('updatedGallery');
+
     $('#speciesNameFilter').button();
     if(window.params.speciesName == 'Unknown'){
         $("#speciesNameFilterButton").addClass('active');
@@ -339,7 +342,6 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
-    $('.list').trigger('updatedGallery');
 });
 
 /**
@@ -688,6 +690,7 @@ function updateListPage(activeTag) {
         updateRelativeTime();
         last_actions();
         eatCookies();			
+    console.log('updated gallery trigger');
         $('.list').trigger('updatedGallery');
     }
 }
@@ -778,7 +781,7 @@ function updateMapView (params, callback) {
         //order of params is important for this test to pass
         if(JSON.stringify(oldParams) != JSON.stringify(p))
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
-        refreshMapBounds();
+        refreshMapBounds(mapLocationPicker);
         oldParams = params;
     }
 }
@@ -803,8 +806,6 @@ function showMapView() {
 }
 
 function refreshList(bounds){
-    console.log("called refresh list");
-    console.log(bounds);
     if (bounds !== undefined){
         $("#bounds").val(bounds);
     } else {

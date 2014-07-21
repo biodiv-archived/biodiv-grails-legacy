@@ -468,8 +468,6 @@ class ObservationController extends AbstractObjectController {
                 }
 				def resourcesInfo = [];
                 String rootDir
-                println params;
-                println "===============PARAMS RES TYPE =========== " + params.resType
                 switch(params.resType) {
                     case [Observation.class.name,Checklists.class.name]:
                         rootDir = grailsApplication.config.speciesPortal.observations.rootDir
@@ -560,14 +558,11 @@ class ObservationController extends AbstractObjectController {
 //						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
 //					}
 					else {
-                        println "================FILES ================ " + f
-                        println "======================HOW MANY TIMES IN HERE============="
 						if(params.resType == SUser.class.name){
                             obvDir = null;
                         }
                         if(!obvDir) {
 							if(!params.obvDir) {
-                                println "=========================================PARAMS OBV DIR NOT PRESENT========================" + rootDir
                                 obvDir = new File(rootDir);
 								if(!obvDir.exists()) {
 									obvDir.mkdir();
@@ -974,6 +969,8 @@ class ObservationController extends AbstractObjectController {
                 def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
                 def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
                 def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
+
+                html = html.replaceAll('\\n|\\t','');
                 def result = [
                 'status' : 'success',
                 canMakeSpeciesCall:params.canMakeSpeciesCall,

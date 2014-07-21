@@ -219,20 +219,17 @@ class ResourcesService extends AbstractObjectService {
         res.each{ r->
             if((r.uploadTime >= (d - storingDays)) && (r.uploadTime <= (d - (storingDays - 1)))) {
                 //   prepare users list & send mail that resource deleting tomo
-                println "=======RES FOR WHICH MAIL WILL GO ============= " + r
                 if(!usersList.contains(r.uploader)){
                     usersList << r.uploader 
                 }
             }
             else if(r.uploadTime <= (d - storingDays)) {
-                println "===========RES TO DELETE ========== " + r
                 def toDelete = UsersResource.findByRes(r)
                 toDelete.delete(flush:true, failOnError:true)
             }
         }
         if(usersList.size() > 0) {
             otherParams['usersList'] = usersList
-            println "========USERS LIST FOR RES DELETION MAIL ============ " + usersList
             def sp = new Species();
             observationService.sendNotificationMail(ObservationService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
         }

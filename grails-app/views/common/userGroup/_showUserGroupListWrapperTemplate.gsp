@@ -61,7 +61,7 @@
 
 
 <!--container end-->
-<g:javascript>
+<script text="text/javascript">
 $(document).ready(function() {
 	window.params.tagsLink = "${uGroup.createLink(controller:'userGroup', action: 'tags')}";
 
@@ -71,4 +71,4 @@ $( "#search" ).click(function() {
 	updateGallery(undefined, ${queryParams?.max}, 0);
 	return false;
 });
-</g:javascript>
+</script>

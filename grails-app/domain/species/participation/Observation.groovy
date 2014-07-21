@@ -124,7 +124,7 @@ class Observation extends Metadata implements Taggable, Rateable {
         if(res) 
             return res[0]
 		else
-			return group.icon(ImageType.ORIGINAL)
+			return group?.icon(ImageType.ORIGINAL)
 	}
 
 	/**
@@ -329,9 +329,13 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	private updateIsShowable(){
-		//supprssing all checklist generated observation even if they have media
-		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
-		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
+//		//Suppressing all checklist generated observation even if they have media
+//		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
+//		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
+//		
+		
+		//showing all observation those have media
+		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
 	}
 	
 	private updateChecklistAnnotation(recoVote){

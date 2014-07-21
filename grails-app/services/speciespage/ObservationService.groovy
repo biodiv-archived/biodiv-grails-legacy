@@ -132,7 +132,6 @@ class ObservationService extends AbstractObjectService {
         observation.group = params.group?:SpeciesGroup.get(params.group_id);
         observation.notes = params.notes;
         if( params.fromDate != ""){
-            println "================DATE ======= " + parseDate(params.fromDate);
 
             observation.fromDate = parseDate(params.fromDate);
             observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
@@ -170,19 +169,16 @@ class ObservationService extends AbstractObjectService {
 
 
 	        def resourcesXML = createResourcesXML(params);
-            println "==================================== " + resourcesXML
             def instance = observation
             if(params.action == "bulkSave"){
                 instance = springSecurityService.currentUser
             }
 	        def resources = saveResources(instance, resourcesXML);
-            println "===================================== " + resources
 	        observation.resource?.clear();
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             
 	        resources.each { resource ->
                 if(!resource.context){
-                    println "=============CONTEXT NOT PRESENT= "
                     resource.saveResourceContext(observation)
                 }
 	            observation.addToResource(resource);
@@ -196,7 +192,6 @@ class ObservationService extends AbstractObjectService {
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
-        println "==============================" + params
         try {
 
             if(params.action == "save" || params.action == "bulkSave"){
@@ -229,12 +224,9 @@ class ObservationService extends AbstractObjectService {
                 params["createNew"] = true
                 params["oldAction"] = params.action
                 String uuidRand =  UUID.randomUUID().toString()
-                println "=======UUID GENERATED ====== " + uuidRand
                 observationInstance.resource.each { resource ->
-                    println "========RESOURCE ========= " + resource
                     if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
                         def usersResFolder = resource.fileName.tokenize('/')[0]
-                        println "=========USERSRES FOLDER ===== " + usersResFolder
                         def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
                         if(!obvDir.exists()) {
                             obvDir.mkdir();
@@ -244,18 +236,14 @@ class ObservationService extends AbstractObjectService {
                         obvDir.mkdir();                
                         /////change filename of resource to this uuid and inside that check for clash of filename
                         File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
-                        println "========NEW UNIQ FILE========= " + newUniq
                         def a = newUniq.getAbsolutePath().tokenize('/')[-1]
                         def newFileName = a.tokenize('.')[0]
 
                         //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
                         String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
-                        println "=============USERS ROOT DIR========== " + userRootDir
                         def usersResDir = new File(userRootDir, usersResFolder)
-                        println "=============USERS ROOT DIR file ========== " + usersResDir
                         def finalSuffix = ""
                         usersResDir.eachFileRecurse (FileType.FILES) { file ->
-                            println "=======DIRECTORY FILES ======= " + file
                             def fName = file.getName();
                             def tokens = fName.tokenize("_");
                             def nameSuffix = ""
@@ -273,7 +261,6 @@ class ObservationService extends AbstractObjectService {
                             Path source = Paths.get(file.getAbsolutePath());
                             Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
 
-                            println "=======SOURCE =============== " + source +" ===========DESTINATION====== "+ destination
                             try {
                                 //Files moved but empty folder there
                                 Files.move(source, destination);
@@ -282,7 +269,6 @@ class ObservationService extends AbstractObjectService {
                             }
                         }
                         try{
-                            println "==================SHOULD DELETE DIR COMP=============="
                             FileUtils.deleteDirectory(usersResDir);
 
                         }catch(IOException e){
@@ -1118,7 +1104,7 @@ class ObservationService extends AbstractObjectService {
 
         String checklistObvCond = ""
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
-            checklistObvCond = " and obv.isShowable=false "
+            checklistObvCond = " and obv.id != obv.sourceId "
         }
 
         def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
@@ -1588,7 +1574,6 @@ class ObservationService extends AbstractObjectService {
     }
 
     File getUniqueFile(File root, String fileName){
-        println "==========UNIQUE FILE ======= " + root +"============ "+ fileName
         File imageFile = new File(root, fileName);
 
         if(!imageFile.exists()) {

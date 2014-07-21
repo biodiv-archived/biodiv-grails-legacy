@@ -279,12 +279,12 @@
             //$('#userprofilenavbar').affix();
 	});
 </r:script>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function(){
     window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'SUser', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
     window.params.observation.listUrl = "${uGroup.createLink(controller:'observation', action: 'listJSON')}"
 });
-</g:javascript>
+</script>
 </body>
 
 </html>

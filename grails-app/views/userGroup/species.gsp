@@ -14,7 +14,7 @@
 </head>
 <body>
 	<g:include controller="species" action="list" model="['userGroup':userGroupInstance, 'params':params]"/>
-	<g:javascript>
+	<script type="text/javascript">
 		$(document).ready(function(){
 			window.params.tagsLink = "${uGroup.createLink(controller:'species', action: 'tags')}";
 			$('#speciesGallerySort').change(function(){
@@ -23,7 +23,7 @@
 			});
 		});
 		
-	</g:javascript>
+	</script>
 	<r:script>
 		$(document).ready(function(){
 			$(".grid_view").show();

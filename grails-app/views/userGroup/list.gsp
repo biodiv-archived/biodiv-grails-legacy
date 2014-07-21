@@ -18,11 +18,11 @@
 		</div>
 	</div>
 
-	<g:javascript>
+	<script type="text/javascript">
 		$(document).ready(function(){
 			window.params.tagsLink = "${uGroup.createLink(controller:'userGroup', action: 'tags')}";
 		});
-	</g:javascript>
+	</script>
 	<r:script>
 /*		$( "#search" ).unbind('click');
 		$( "#search" ).click(function() {          

@@ -32,7 +32,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	//def recaptchaService;	
     //def grailsApplication
 
-	static allowedMethods = [user:"POST", register:"POST", 'forgotPassword':'POST', 'forgotPasswordMobile':'POST']
+	static allowedMethods = [user:"POST", register:"POST", 'forgotPasswordMobile':'POST']
 
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
@@ -278,7 +278,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 render (['success':false, 'msg':flash.error] as JSON);
                 return;
             } else {
-                redirect action: 'forgotPassword'
+                render view: 'forgotPassword'
                 return
             }
 		}
@@ -291,10 +291,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 render (['success':false, 'msg':flash.error] as JSON);
                 return;
             } else {
-			    redirect action: 'forgotPassword'
+			    render view: 'forgotPassword'
 			    return
             }
 		}
+        flash.error = '';
 		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
 		registrationCode.save(flush: true)
 		
@@ -339,6 +340,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             return
         }
+        flash.error = '';
 
         if (!request.post) {
             return [token: token, command: new ResetPasswordCommand2()]
@@ -357,7 +359,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
         RegistrationCode.withTransaction { status ->
             def user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
-            user.password = springSecurityUiService.encodePassword(command.password, salt)
+            user.password = command.password;//springSecurityUiService.encodePassword(command.password, salt)
             user.accountLocked = false;
             user.save()
             registrationCode.delete()

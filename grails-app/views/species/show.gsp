@@ -124,13 +124,13 @@
         <!-- 
         <ckeditor:resources />
         <script type="text/javascript" src="${resource(dir:'plugins',file:'ckeditor-3.6.0.0/js/ckeditor/_source/adapters/jquery.js')}"></script>
-        <g:javascript src="ckEditorConfig.js" />
+        <script type="text/javascript" src="ckEditorConfig.js" />
 
         <script type="text/javascript"
             src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
         <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
         -->
-        <g:javascript>
+        <script type="text/javascript">
 
         occurrenceCount = undefined
         function getOccurrenceCount(data) {
@@ -139,7 +139,7 @@
         }
 
         window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
-        </g:javascript>
+        </script>
 
         <script type="text/javascript"
             src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
@@ -297,7 +297,7 @@
 
 
             </div>	 
-            <g:javascript>
+            <script type="text/javascript">
            var licenseSelectorOptions = [];
             <g:each in="${License.LicenseType.toList()}" var="l">
             licenseSelectorOptions.push({value:"${l.value()}", text:"${l.value()}"});
@@ -327,7 +327,7 @@
             taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
             </g:each>
 
-            </g:javascript>	
+            </script>	
             <r:script>
             $(document).ready(function() {
                 var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));

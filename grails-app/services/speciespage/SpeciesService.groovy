@@ -459,22 +459,22 @@ class SpeciesService extends AbstractObjectService  {
         } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
             def speciesInstance = speciesField.species;
             def field = speciesField.field;
-            SpeciesField.withTransaction {
-                try {
+            try {
+                SpeciesField.withTransaction {
                     speciesInstance.removeFromFields(speciesField);
                     speciesField.delete(failOnError:true);
-                    //List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
-                    //sortAsPerRating(sameFieldSpeciesFieldInstances);
-                    //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
-                    def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                    return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_DELETED]
-                } catch(e) {
-                    e.printStackTrace();
-                    log.error e.getMessage();
-                    return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
                 }
+                //List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                //sortAsPerRating(sameFieldSpeciesFieldInstances);
+                //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
+                def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
+                return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_DELETED]
+            } catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
             }
-       } else {
+        } else {
             return [success:false, msg:"You don't have persmission to delete this field"]
         }
     }

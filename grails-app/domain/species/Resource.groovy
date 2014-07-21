@@ -98,21 +98,22 @@ class Resource extends Sourcedata implements Rateable {
 	
 	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
 		String thumbnailUrl = '';
-
         def basePath = '';
-        if(this?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
+        if(this?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()) {
             basePath = grailsApplication.config.speciesPortal.observations.serverURL
-        }
-        else if(this?.context?.value() == Resource.ResourceContext.SPECIES.toString() || this?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+        } else if(this?.context?.value() == Resource.ResourceContext.SPECIES.toString() || this?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()) {
             basePath = grailsApplication.config.speciesPortal.resources.serverURL
+        } else if(this?.context?.value() == Resource.ResourceContext.DOCUMENT.toString()) {
+            basePath = grailsApplication.config.speciesPortal.content.serverURL
+        } else {
+            basePath = this.baseUrl;
         }
 
-		newBaseUrl = newBaseUrl?:(basePath?:grailsApplication.config.speciesPortal.observations.serverURL)
+		newBaseUrl = (newBaseUrl)?:(basePath?:grailsApplication.config.speciesPortal.observations.serverURL)
 
 		switch(type) {
 			case  ResourceType.IMAGE :
 				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
-				//thumbnailUrl = baseUrl + "/" + this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
 				break;
 			case ResourceType.VIDEO :				
 				String videoId = Utils.getYouTubeVideoId(this.url);

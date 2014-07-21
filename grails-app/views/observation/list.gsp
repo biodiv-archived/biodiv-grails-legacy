@@ -43,12 +43,12 @@
             <obv:showObservationsListWrapper />
 	</div>
 
-	<g:javascript>
+	<script type="text/javascript">
 		$(document).ready(function() {
 			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
                         initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
                         
                 });
-	</g:javascript>
+	</script>
 </body>
 </html>

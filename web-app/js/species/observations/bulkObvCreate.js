@@ -3,9 +3,8 @@ $("#addBulkObservationsSubmit").click(function(){bulkObservationSubmission(this,
 $("#addBulkObservationsAndListPage").click(function(){bulkObservationSubmission(this, true)});
 
 function bulkObservationSubmission(ele, showListPage){
+    $("body").css("cursor", "progress");
     var me = ele;
-    console.log("==============WHICH BUTTON=============");
-    console.log(me);
     if($(me).hasClass('disabled')) {
         alert("Uploading is in progress. Please submit after it is over.");
         event.preventDefault();
@@ -19,7 +18,6 @@ function bulkObservationSubmission(ele, showListPage){
         var formsWithData = [] 
             $.each(allForms, function(index, value){
                 if(formHasData(value)){
-                    console.log("==============================================");
                     formsWithData.push(value);
                 }
             });
@@ -36,7 +34,6 @@ function bulkObservationSubmission(ele, showListPage){
         $("#addBulkObservationsSubmit").removeClass("disabled");
         $("#addBulkObservationsAndListPage").removeClass("disabled");
     }
-
 }
 
 function formHasData(form){
@@ -66,7 +63,7 @@ function submitForms(counter, size, allForms, showListPage){
         errorCount = 0;
     }
     if(counter == size){
-        console.log("breaking recursion========" + gotError);
+        $("body").css("cursor", "default");
         alert("Observations created successfully = " + (counter - errorCount) + "\n Errors in observation submission = " +errorCount);
         
         if(!showListPage) {
@@ -76,41 +73,24 @@ function submitForms(counter, size, allForms, showListPage){
                     var wrapper = $(value).parent();
                     $(value).replaceWith(miniObvCreateHtmlSuccess);
                 });
+                $('html, body').animate({
+                    scrollTop: $("#species_main_wrapper").offset().top
+                }, 1000); 
+            } else {
+                $('html, body').animate({
+                    scrollTop: $(".togglePropagateDiv").offset().top
+                }, 1000);
             }
-            $( ".date" ).datepicker({ 
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: 'dd/mm/yy' 
-            });
-            $(".obvCreateTags").tagit({
-                select:true, 
-                allowSpaces:true, 
-                placeholderText:'Add some tags',
-                fieldName: 'tags', 
-                autocomplete:{
-                    source: '/observation/tags'
-                }, 
-                triggerKeys:['enter', 'comma', 'tab'], 
-                maxLength:30
-            });
-            if($(".userGroupsSuperDiv").hasClass("span12")){
-                $(".userGroupsSuperDiv").removeClass("span12");
-                $(".userGroupsSuperDiv").addClass("span4");
-            }
-            initializeLanguage();
-            $('html, body').animate({
-                scrollTop: $(".togglePropagateDiv").offset().top
-            }, 1000);
+            initializers();
             $("#addBulkObservationsSubmit").removeClass("disabled");
             $("#addBulkObservationsAndListPage").removeClass("disabled");
+            
         } else {
             window.open(window.params.obvListPage,"_self");
         }
         return;
     } else {
-        console.log("going to submit form no : " + counter);
         var form = allForms[counter];
-        console.log(allForms[counter]);
         $(form).find(".userGroupsList").val(getSelectedUserGroups($(form)));
 
         var locationpicker = $(form).find(".map_class").data('locationpicker'); 
@@ -130,9 +110,7 @@ function submitForms(counter, size, allForms, showListPage){
             dataType : 'json', 
             type : 'POST',
             success : function(data, statusText, xhr, form) {
-                console.log("HERE HERE");
                 if(data.statusComplete) {
-                    console.log("HELLO IN SUCCESS");
                     miniObvCreateHtmlSuccess = data.miniObvCreateHtml;
                     $(form).find('input').attr('disabled', 'disabled');
                     $(form).find('button').attr('disabled', 'disabled');
@@ -146,7 +124,6 @@ function submitForms(counter, size, allForms, showListPage){
                     var miniObvCreateHtmlError = data.miniObvCreateHtml;
                     var wrapper = $(form).parent();
                     $(form).replaceWith(miniObvCreateHtmlError);
-                    console.log($(miniObvCreateHtmlError));
                     $(wrapper).find(".imageHolder").append(imagesPulled);
                     $(wrapper).find(".group_options li[value='"+group_id+"']").trigger("click");
                     $(wrapper).find(".habitat_options li[value='"+habitat_id+"']").trigger("click");
@@ -155,30 +132,76 @@ function submitForms(counter, size, allForms, showListPage){
                 submitForms(counter+1, size, allForms, showListPage);
             }, error : function (xhr, ajaxOptions, thrownError){
                 //successHandler is used when ajax login succedes
-                console.log("ERROR ERROR");
+                alert("Sorry, a server error occured.Please refresh the page & try again or else report the error.");
                 var successHandler = this.success;
                 handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
                     var response = $.parseJSON(xhr.responseText);
                 });
                 submitForms(counter+1, size, allForms, showListPage);
+                $("#addBulkObservationsSubmit").removeClass("disabled");
+                $("#addBulkObservationsAndListPage").removeClass("disabled");
             }  
         });
     }
 }
 
 function dropAction(event, ui, ele) {
-    console.log("Item was Dropped");
     $(ele).append($(ui.draggable).clone());
-    console.log($(ui.draggable));
-    var $ratingCont = $(ele).find(".star_obvcreate");
-    console.log($ratingCont);
-    rate($ratingCont);
-    var imageID = $(ui.draggable).find("img").first().attr("id");
-    console.log("=======IMAGE ID=======" + imageID);
-    $("#"+imageID).mousedown(function(){console.log("mouse down");return false;});
-    $(ui.draggable).css("opacity","0.3");
+    var draggedImages = $(ele).find(".addedResource");
+    var countOfImages = draggedImages.length;
+    if(countOfImages == 1){
+        draggedImages.css({
+            "position":"relative",
+            "top":"0"
+        });
 
+    } else{
+        var lastTop = parseInt($(draggedImages[(countOfImages - 2)]).css("top"));
+        draggedImages.last().css({
+            "position":"absolute",
+            "top":lastTop + 20
+        });
+
+    }
+    $(ele).find(".star_obvcreate").last().children().remove();
+    var form = $(ele).closest(".addObservation");
+    var $ratingCont = $(ele).find(".star_obvcreate").last();
+    rate($ratingCont);
+    $(ui.draggable).draggable('disable');
+    //var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
+    //$("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
+    $(ui.draggable).appendTo(".imagesList");
+    $(ui.draggable).css("opacity","0.3");
+    //$(form).find(".address").trigger('click'); 
+    $(".imageHolder .addedResource").click(function(){
+        form.find(".addedResource").css('z-index','0')
+        $(this).css('z-index','1');
+    });
+/*
+    var $grpDD = $('.group_options');
+    var $habDD = $('.habitat_options');
+    //var $userGrpDD = $('.postToGrpsToggle')
+    //var $userGrpBtn = $('.toggleGrpsDivWrapper')
+    $(document.body).click(function(){
+        if (!$grpDD.has(this).length || !$habDD.has(this).length  ) { // if the click was not within $div
+            $grpDD.hide();
+            $habDD.hide();
+        }
+        /*
+           if(!$userGrpBtn.has(this).length && !$userGrpDD.has(this).length) {
+           console.log("============IDHAR HAI===============");
+           $userGrpDD.hide();
+           }
+        
+    });
+    */
 }
+
+
+
+
+
+
 
 $(".obvCreateTags").tagit({
     select:true, 
@@ -194,6 +217,9 @@ $(".obvCreateTags").tagit({
 
 $(".applyAll").click(function(){
     var me = this;
+    if($(me).hasClass("applyToAll")){
+        $("input[name='applyToAll']").val("true");
+    }
     var licenseVal = $(".propagateLicense").find("input").val();
     var dateVal = $(".propagateDate").find("input[name='fromDate']").val();
     var tagValues = []
@@ -239,3 +265,54 @@ $(".applyAll").click(function(){
     });
 });
 
+function initializers(){
+    $( ".date" ).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy' 
+    });
+    $(".addObservation .fromDate").val('');
+    $(".obvCreateTags").tagit({
+        select:true, 
+        allowSpaces:true, 
+        placeholderText:'Add some tags',
+        fieldName: 'tags', 
+        autocomplete:{
+            source: '/observation/tags'
+        }, 
+        triggerKeys:['enter', 'comma', 'tab'], 
+        maxLength:30
+    });
+    if($(".userGroupsSuperDiv").hasClass("span12")){
+        $(".userGroupsSuperDiv").removeClass("span12");
+        $(".userGroupsSuperDiv").addClass("span4");
+    }
+    $(".imageHolder").droppable({
+        accept: ".addedResource.thumbnail",
+        drop: function(event,ui){
+            dropAction(event, ui , this);    
+        }
+    });
+    $(".help-identify input").click(function(){
+        if ($(this).is(':checked')){
+            $(this).closest('.addObservation').find('.nameContainer input').val('');
+            $(this).closest('.addObservation').find('.nameContainer input').attr('disabled', 'disabled');
+        }else{
+            $(this).closest('.addObservation').find('.nameContainer input').removeAttr('disabled');
+        }
+    });
+    initializeLanguage();
+    initializeNameSuggestion();
+    /*var $grpDD = $('.group_options');
+    var $habDD = $('.habitat_options');
+    $(document.body).unbind('click').click(function(){
+        if (!$grpDD.has(this).length || !$habDD.has(this).length  ) { // if the click was not within $div
+            $grpDD.hide();
+            $habDD.hide();
+        }
+    });
+    */
+    if($("input[name='applyToAll']").val() == "true"){
+        $(".applyToAll").trigger("click");
+    }
+}

@@ -123,3 +123,8 @@ delete from species_field_license where species_field_licenses_id in (select id 
 delete from species_field_contributor where species_field_attributors_id in (select id from species_field where field_id in (select id from field where category='Author Contributed Taxonomy Hierarchy'));
 
 delete from species_field where field_id in (select id from field where category='Author Contributed Taxonomy Hierarchy');
+
+
+/*17th jul 2014*/
+alter table facebook_user  add column access_token_expires timestamp without time zone ;
+

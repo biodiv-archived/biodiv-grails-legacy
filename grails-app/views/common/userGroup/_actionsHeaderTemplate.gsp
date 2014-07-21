@@ -51,7 +51,7 @@
 		</div>
 	</div>
 </div>
-<g:javascript>
+<script type="text/javascript">
 //IMP:Header is loaded in drupal pages as well. Any code in this block is not run when loaded by ajax
 	//So please don't put any code here. Put it in init_header function in membership.js
-</g:javascript>
+</script>

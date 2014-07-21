@@ -25,6 +25,7 @@ class ActivityFeedController {
 			}
 			else{
 				def showFeedListHtml = g.render(template:"/common/activityfeed/showActivityFeedListTemplate", model:[feeds:feeds, feedType:params.feedType, feedPermission:params.feedPermission, feedHomeObject:activityFeedService.getDomainObject(params.feedHomeObjectType, params.feedHomeObjectId)]);
+                showFeedListHtml = showFeedListHtml.replaceAll('\\n|\\t','');
 				def newerTimeRef = (params.feedOrder == activityFeedService.LATEST_FIRST) ? feeds.first().lastUpdated.time.toString() : feeds.last().lastUpdated.time.toString()
 				def olderTimeRef = (params.feedOrder == activityFeedService.LATEST_FIRST) ? feeds.last().lastUpdated.time.toString() : feeds.first().lastUpdated.time.toString()
 				def result = [showFeedListHtml:showFeedListHtml, olderTimeRef:olderTimeRef, newerTimeRef:newerTimeRef, currentTime:new Date().getTime()]

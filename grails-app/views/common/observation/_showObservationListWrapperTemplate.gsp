@@ -108,7 +108,7 @@
 
 	<!-- main_content end -->
 </div>
-<g:javascript>
+<script type="text/javascript">
 $(document).ready(function() {
     window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
 
@@ -127,10 +127,8 @@ $(document).ready(function() {
     });
     
     $("#refreshListForBounds").click(function() {
-        console.log("refresh called");
         var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
         if(mapLocationPicker){
-            console.log("have the object");
         }
         refreshList(mapLocationPicker.getSelectedBounds());
     });
@@ -141,4 +139,4 @@ $(document).ready(function() {
         updateDistinctRecoTable();
     });
 });
-</g:javascript>
+</script>

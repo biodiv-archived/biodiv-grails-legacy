@@ -821,8 +821,8 @@ environments {
         ibp.domain=servername
         wgp.domain="thewesternghats.${servername}" 
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
@@ -902,8 +902,8 @@ environments {
         ibp.domain=servername
         wgp.domain="thewesternghats.${servername}" 
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
+		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
@@ -1359,6 +1359,12 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/**/js/**':       ['permitAll'],
     '/**/css/**':      ['permitAll'],
     '/**/images/**':   ['permitAll'],
+    '/js/**':       ['permitAll'],
+    '/css/**':      ['permitAll'],
+    '/images/**':   ['permitAll'],
+    '/plugins/ckeditor-3.6.3.0/**':   ['permitAll'],
+    '/bootstrap/img/*':['permitAll'],
+    '/plugins/jquery-ui-1.10.3/**':['permitAll'],
     '/**':['permitAll']
  ]
 
@@ -1510,6 +1516,10 @@ grails.plugins.dynamicController.mixins = [
 
 
 grails.plugin.springsecurity.filterChain.chainMap = [
+    '/**/js/**':'exceptionTranslationFilter',
+    '/**/css/**':'exceptionTranslationFilter',
+    '/**/images/**':'exceptionTranslationFilter',
+    '/**/img/**':'exceptionTranslationFilter',
     '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',  // Stateless chain
     '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]

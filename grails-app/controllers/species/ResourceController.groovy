@@ -154,13 +154,11 @@ class ResourceController {
     }
     
     def createResource(){
-        println "=========CREATE RESOURCES =========== " + params
         def user = springSecurityService.currentUser;
         List<Resource> resources = resourcesService.createResource(params, user);
         resources.each{
             def flag = resourcesService.createUsersRes(user, it, UsersResource.UsersResourceStatus.NOT_USED)
         }
-        println "==========CREATED THESE RESOURCES ========== " + resources
         def res = [status:true]
         render res as JSON
     }

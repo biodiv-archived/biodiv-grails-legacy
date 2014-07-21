@@ -28,10 +28,10 @@
             .map_canvas {
                 border-color: rgba(82,168,236,0.8) !important;
                 position: absolute !important;
-                width: 100% !important;
+                width: 99% !important;
                 display: block;
                 left: 0px;
-                z-index:1 !important;
+                z-index:10 !important;
             }
             .selected_habitat, .selected_group{
                 position:relative;
@@ -72,7 +72,7 @@
             .selected_habitat, .selected_group {
                 padding: 4px 3px;
                 width:97%;
-                text-align:left !important;
+                text-align:center !important;
             }
             .block_row {
                 margin-left:0px !important;
@@ -93,7 +93,7 @@
                 z-index:2;
             }
             .map_search {
-                position:inherit;
+                position:inherit;btn:hover,
             }
             .combobox-container {
 	        right:9% !important;
@@ -128,11 +128,52 @@
                 height: 250px;
                 width:890px;
             }
+            .imageHolder {
+                border: 1px solid grey ;
+                background-color: lightgrey ;
+                margin-bottom:90px !important;
+            }
+            .imagesListWrapper ul {
+                width:20000px;
+                white-space:nowrap !important;
+            }
+            .imagesListWrapper ul li {
+                display : inline !important;
+                z-index:1;
+            }
+            li.group_option span, li.habitat_option span {
+                padding: 0px;
+                float: left;
+            }
+            li.group_option, li.habitat_option {
+                height: 35px;
+            }
+            .display_value {
+                display: inline-block !important;
+                margin-top: 4px !important;
+            }
+            .selected_group .caret, .selected_habitat .caret , .propagateLicense .caret {
+                margin-top: 12px !important;
+            }
+            .propagateDate .fromDate {
+                height:42px;
+            }
+            .propagateLicense .license_div {
+                width: 55% !important;
+                margin: 0 auto !important;
+            }
+            .propagateLicense a{
+                height:32px !important;
+            }
+            .propagateLicense .btn img{
+                margin-top: 8px !important; 
+            }
         </style>
     </head>
     <body>
         <div class="bulk_observation_create">
             <div class="span12">
+                <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Multiple Observations']"/>
                 <%
                 def form_id = "addBulkObservations"
                 def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -145,12 +186,12 @@
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
                     </div>
                     <div class="section clearfix">
-                        <a class="btn togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
+                        <a class="btn btn-primary togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
                         <div class= "propagateBlock hide clearfix">
                             <div >
                                 <div class="column propagateLicense">
                                     <label>License</label>
-                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':null]"/>
+                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
                                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
@@ -187,7 +228,7 @@
                                 <div class="column propagateGroups small_block_row">
                                     <label>User Groups</label>
                                     <div style="clear:both">
-                                        <button type="button" class="btn toggleGrpsDiv"> User Groups </button> 
+                                        <button type="button" class="btn toggleGrpsDiv"> User Groups</button> 
                                         <div class="postToGrpsToggle" style="display:none;">
                                             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                                         </div>
@@ -201,8 +242,12 @@
                                 </div>
                                 <div class="column small_block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply to all
+                                        style=" margin-right: 5px; margin-top:17px;"> Apply Below
                                     </a>
+                                    <a class="applyAll applyToAll btn btn-primary"
+                                        style=" margin-right: 5px; margin-top:17px;"> Apply to All
+                                    </a>
+                                     <input type="hidden" name='applyToAll' value="" />
                                 </div>
                             </div>
                         </div>
@@ -290,47 +335,26 @@
 
                 $(".imageHolder").droppable({
                     accept: ".addedResource.thumbnail",
-                    drop: function(event,ui){
-                        console.log("Item was Dropped");
-                        $(this).append($(ui.draggable).clone());
-                        var draggedImages = $(this).find(".addedResource");
-                        var countOfImages = draggedImages.length;
-                        if(countOfImages == 1){
-                            console.log("FIRST FIRST");
-                            draggedImages.css({
-                                "position":"relative",
-                                "top":"0"
-                            });
-
-                        } else{
-                            console.log("SECOND SECOND");
-                            var lastTop = parseInt($(draggedImages[(countOfImages - 2)]).css("top"));
-                            draggedImages.last().css({
-                                "position":"absolute",
-                                "top":lastTop + 20
-                            });
-
-                        }
-                        console.log($(ui.draggable));
-                        $(this).find(".star_obvcreate").children().remove();
-                        var form = $(this).closest(".addObservation");
-                        var $ratingCont = $(this).find(".star_obvcreate");
-                        console.log($ratingCont);
-                        rate($ratingCont);
-                        $(ui.draggable).draggable('disable');
-                        $(ui.draggable).appendTo(".imagesList");
-                        $(ui.draggable).css("opacity","0.3");
-                        $(form).find(".address").trigger('click');
-                        $(".imageHolder .addedResource").click(function(){
-                            console.log("changing z-index");
-                            form.find(".addedResource").css('z-index','0')
-                            $(this).css('z-index','1');
-                        });
-
+                    drop: function(event, ui){
+                        dropAction(event,ui,this); 
                     }
                 });
             }
             initializeLanguage();
+            
+            $(document).click(function(){
+                $(".group_options").hide();
+                $(".habitat_options").hide();
+            });
+
+            /* Clicks within the dropdown won't make
+            it past the dropdown itself */
+            $(".group_options").click(function(e){
+                e.stopPropagation();
+            });
+            $(".habitat_options").click(function(e){
+                e.stopPropagation();
+            });
         });
 
         </r:script>

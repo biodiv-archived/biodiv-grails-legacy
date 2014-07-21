@@ -74,7 +74,8 @@ class UserGroupService {
 	def activityFeedService;
 	def speciesService;
 	def SUserService;
-	
+    def grailsLinkGenerator;
+
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -960,21 +961,21 @@ class UserGroupService {
 				attrs.remove('params');
 			}
 			if(base) {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
+				String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 				//				println url
 				//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
 			} else {
 
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
+					String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 					//					println url
 					//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
 				} else {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
+					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
 					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
 				}
 			}
@@ -995,21 +996,21 @@ class UserGroupService {
 				attrs.remove('params');
 			}
 			if(base) {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
+				String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 				//				println url
 				//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
 			} else {
 
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
+					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
+					String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
 					//					println url
 					//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
 				} else {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
+					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
 					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
 				}
 			}
@@ -1027,9 +1028,9 @@ class UserGroupService {
 				attrs.remove('params');
 			}
 			if(base) {
-				url = g.createLink(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+				url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 			} else {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
 			}
 		}
 		//println url;
@@ -1204,13 +1205,13 @@ class UserGroupService {
 	
 	
 	/////////////// DOCUMENTS RELATED /////////////////
-	void postDocumenttoUserGroups(Document document, List userGroupIds) {
+	void postDocumenttoUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
 		log.debug "Posting ${document} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
 				if(userGroup) {
-					postDocumentToUserGroup(document, userGroup)
+					postDocumentToUserGroup(document, userGroup, sendMail)
 				}
 			}
 		}
@@ -1218,24 +1219,24 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void postDocumentToUserGroup(Document document, UserGroup userGroup) {
+	void postDocumentToUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.addToDocuments(document);
 		if(!userGroup.save()) {
 			log.error "Could not add ${document} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, true);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
 			log.debug "Added ${document} to userGroup ${userGroup}"
 		}
 	}
 
-	void removeDocumentFromUserGroups(Document document, List userGroupIds) {
+	void removeDocumentFromUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
 		log.debug "Removing ${document} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong("" + it));
 				if(userGroup) {
-					removeDocumentFromUserGroup(document, userGroup)
+					removeDocumentFromUserGroup(document, userGroup, sendMail)
 				}
 			}
 		}
@@ -1243,13 +1244,13 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void removeDocumentFromUserGroup(Document document, UserGroup userGroup) {
+	void removeDocumentFromUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.documents.remove(document);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${document} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, false);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
 			log.debug "Removed ${document} from userGroup ${userGroup}"
 		}
 	}

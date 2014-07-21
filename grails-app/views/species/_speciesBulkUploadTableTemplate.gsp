@@ -33,7 +33,3 @@
 		</table>
 	</div>
 </g:if>
-<g:javascript>
-$(document).ready(function(){
-});
-</g:javascript>

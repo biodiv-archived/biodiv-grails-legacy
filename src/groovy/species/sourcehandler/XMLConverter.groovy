@@ -693,7 +693,6 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
-        println "==========CREATE MEDIA CALLED========== " + resourcesXML +" ====== "+ relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -703,7 +702,6 @@ class XMLConverter extends SourceConverter {
             def audiosNode = resourcesXML.audios;
             def videosNode = resourcesXML.videos;
 
-            println "==============Video Node================"+videosNode[0]
 
             resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
             resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, "icons"));
@@ -779,12 +777,9 @@ class XMLConverter extends SourceConverter {
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
-            println "=====TEMPFILE EXISTS==== " 
             //copying file
             relImagesFolder = relImagesFolder.trim();
-            println "=========RES ROOT DIR ========= " + resourcesRootDir +"================= "+ relImagesFolder
             File root = new File(resourcesRootDir , relImagesFolder);
-            println "==============ROOT ====== " + root
             if(!root.exists() && !root.mkdirs()) {
                 log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
                 addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
@@ -792,7 +787,6 @@ class XMLConverter extends SourceConverter {
             log.debug "in dir : "+root.absolutePath;
 
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-            println "=========IMAGE FILE ========== " + imageFile
 			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
@@ -992,7 +986,6 @@ class XMLConverter extends SourceConverter {
             res.description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
 
 
-            println res.description
             res.licenses?.clear()
             res.contributors?.clear()
             res.attributors?.clear();
@@ -1492,30 +1485,46 @@ class XMLConverter extends SourceConverter {
 
 						taxon.updateContributors(getUserContributors(fieldNode.data))
                     } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
-                 
-                        if(registry) {
-                            log.debug "Taxon registry already exists : "+registry;
-                            if(saveTaxonHierarchy)
-                                registry.updateContributors(getUserContributors(fieldNode.data))
-                            taxonEntities.add(registry);
-                        } else if(saveTaxonHierarchy) {
-                            log.debug "Saving taxon registry entity : "+ent;
-                            if(!ent.save()) {
-                                ent.errors.each { log.error it }
-                            } else {
-                                log.debug "Saved taxon registry entity : "+ent;
-                            }
-                            ent.updateContributors(getUserContributors(fieldNode.data))
-                            taxonEntities.add(ent);
-                        }
-
-
+                        def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+                        if(synonym)
+                            synonym.updateContributors(getUserContributors(fieldNode.data))
                     }
+
+                    def ent = new TaxonomyRegistry();
+                    ent.taxonDefinition = taxon
+                    ent.classification = classification;
+                    ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                    log.debug("Parent Taxon : "+ent.parentTaxon)
+                    ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
+                    //same taxon at same parent and same path may exist from same classification.
+                    def criteria = TaxonomyRegistry.createCriteria()
+                    TaxonomyRegistry registry = criteria.get {
+                        eq("taxonDefinition", ent.taxonDefinition);
+                        eq("path", ent.path);
+                        eq("classification", ent.classification);
+                    }
+                    
+                    if(registry) {
+                        log.debug "Taxon registry already exists : "+registry;
+                        if(saveTaxonHierarchy)
+                            registry.updateContributors(getUserContributors(fieldNode.data))
+                        taxonEntities.add(registry);
+                    } else if(saveTaxonHierarchy) {
+                        log.debug "Saving taxon registry entity : "+ent;
+                        if(!ent.save()) {
+                            ent.errors.each { log.error it }
+                        } else {
+                            log.debug "Saved taxon registry entity : "+ent;
+                        }
+                        ent.updateContributors(getUserContributors(fieldNode.data))
+                        taxonEntities.add(ent);
+                    }
+
                 } else {
-                    log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
-                    addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
+                        log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
+                        addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
+                    }
                 }
-            }
             }
         }
         //      if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {

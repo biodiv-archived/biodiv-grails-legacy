@@ -58,7 +58,7 @@
 }
 </style>
 
-<g:javascript>
+<script type="text/javascript">
 
 $(function() {
 	var autofillUsersComp = $("#userAndEmailList_${autofillUsersId}").autofillUsers({
@@ -143,7 +143,7 @@ $(function() {
  	
 });
 
-</g:javascript>
+</script>
 
 <style>
     /*

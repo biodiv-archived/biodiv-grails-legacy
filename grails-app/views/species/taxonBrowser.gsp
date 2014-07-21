@@ -82,13 +82,13 @@
             </form>
         </div-->
 
-        <g:javascript>
+        <script type="text/javascript">
         var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
             taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
             </g:each>
 
-            </g:javascript>	
+            </script>	
 
         <r:script>
         $(document).ready(function() {

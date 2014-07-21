@@ -24,6 +24,7 @@
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:2;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level" style="width:94%;"
                         class="section-item" value="${observationInstance?.placeName}"/>
+
                         <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
                         
                         <div class="help-inline" style="display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;">
@@ -32,6 +33,8 @@
                             </g:hasErrors>
                         </div>
                         <input class='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'/>
+
+                        <div class='suggestions' class='dropdown'></div>
                     </div>
                     <div class="latlng ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')}" style="display:none;">
                         <div class="input-prepend pull-left control-group ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')}">
@@ -115,10 +118,8 @@
 
 </div>
 
-<g:javascript>
+<script type="text/javascript">
 function update_geotagged_images_list_for_bulkUpload(ele){
-    console.log("update_geotagged_images_list_for_bulkUpload");
-    console.log("============YAHAN TOH NAI ANA THA========");
     var imgs = $(ele).closest(".addObservation").find('.geotagged_image')
     $.each(imgs, function(index, value){
         $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
@@ -136,15 +137,11 @@ function loadMapInput() {
         $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
         $(me).css("border","2px solid rgba(82,168,236,0.8)");
     }
-    console.log($(map_class).data('locationpicker'));
     if($(map_class).data('locationpicker') == undefined) {
-        console.log("===================================================================");
         loadGoogleMapsAPI(function() {
             var locationPicker = new $.fn.components.LocationPicker(map_class);
             locationPicker.initialize();
             $(map_class).data('locationpicker', locationPicker);
-            console.log("======LOCATION PICKER==");
-            console.log($(map_class).data('locationpicker'));
             $(map_class).find('.spinner').hide();
             
             <g:if test="${params.controller == 'checklist'}">
@@ -163,7 +160,7 @@ function loadMapInput() {
     
     }else {
         $(map_class).data('locationpicker').mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
-        update_geotagged_images_list_for_bulkUpload(map_class)
+        update_geotagged_images_list_for_bulkUpload(map_class);
     }
 }
 
@@ -172,14 +169,12 @@ $(document).ready(function() {
         var me = this;
         var map_class = $(this).closest(".map_class");
         if($(map_class).find(".map_canvas").is(':visible')) {
-            console.log("========IS OPEN==========");
             $(me).find("i").removeClass("icon-remove").addClass("icon-chevron-down");
             $(me).css("border","0px solid rgba(82,168,236,0.8)");
             $(map_class).find(".map_canvas").hide();
             $(map_class).find(".latlng").hide();
             return false;
         } else{
-            console.log("========NOT OPEN==========");
             $(me).css("border","2px solid rgba(82,168,236,0.8)");
             $(me).find("i").removeClass("icon-chevron-down").addClass("icon-remove");
         }
@@ -188,5 +183,5 @@ $(document).ready(function() {
     $(".address").unbind('click').click(loadMapInput);
 
 });
-</g:javascript>
+</script>
 </div>
