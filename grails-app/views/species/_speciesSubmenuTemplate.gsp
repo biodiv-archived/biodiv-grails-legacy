@@ -17,6 +17,12 @@
 
         </g:if>
 
+        <sUser:isAdmin>
+        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+            href="${uGroup.createLink(controller:'species', action:'delete', id:speciesInstance.id)}"
+            onclick="return confirm('${message(code: 'default.species.delete.confirm.message', default: 'This species will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+        </sUser:isAdmin>
+
     </div>
 
     <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]"/>		

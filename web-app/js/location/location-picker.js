@@ -1,11 +1,12 @@
-function update_geotagged_images_list_for_bulkUpload(ele){
-    var imgs = $(ele).closest(".addObservation").find('.geotagged_image')
+function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
+    console.log(geotaggedImages);
+    var imgs = geotaggedImages ? geotaggedImages : $(ele).closest(".addObservation").find('.geotagged_image')
     $.each(imgs, function(index, value){
         $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
     });
 }
 
-function loadMapInput() {
+function loadMapInput(geotaggedImages) {
     //$(".address .add-on").trigger("click"); 
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
@@ -21,12 +22,14 @@ function loadMapInput() {
     if($(map_class).data('locationpicker') == undefined) {
         locationPicker = new $.fn.components.LocationPicker(map_class);
         $(map_class).data('locationpicker', locationPicker);
+    } else {
+        locationPicker =  $(map_class).data('locationpicker');
     }
-    console.log("calling===============================sfsaefsdfsdfsd=================== " + $(map_class).data('locationpicker').isInitialised);
-    if($(map_class).data('locationpicker').isInitialised == false) {
-        console.log("calling================================================== " + $(map_class).data('locationpicker').isInitialised);
+    console.log("calling===============================sfsaefsdfsdfsd=================== " + locationPicker.isInitialised);
+    if(locationPicker.isInitialised == false || locationPicker.isInitialised == undefined) {
+        console.log("calling================================================== " + locationPicker.isInitialised);
         loadGoogleMapsAPI(function() {
-            $(map_class).data('locationpicker').initialize();
+            locationPicker.initialize();
             $(map_class).find('.spinner').hide();
             
             if(window.params.controller == 'checklist'){
@@ -40,12 +43,12 @@ function loadMapInput() {
                 editControls = {featureGroup: new L.FeatureGroup()}
             }
             locationPicker.initArea(drawControls, editControls, undefined);
-            //update_geotagged_images_list_for_bulkUpload(map_class);
+            update_geotagged_images_list_for_bulkUpload(geotaggedImages, map_class);
         });
     
-    }else {
-        $(map_class).data('locationpicker').mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
-        //update_geotagged_images_list_for_bulkUpload(map_class);
+    } else {
+        //locationPicker.mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
+        update_geotagged_images_list_for_bulkUpload(geotaggedImages, map_class);
     }
 }
 
