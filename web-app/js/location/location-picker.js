@@ -1,4 +1,53 @@
-  
+function update_geotagged_images_list_for_bulkUpload(ele){
+    var imgs = $(ele).closest(".addObservation").find('.geotagged_image')
+    $.each(imgs, function(index, value){
+        $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
+    });
+}
+
+function loadMapInput() {
+    //$(".address .add-on").trigger("click"); 
+    var drawControls, editControls;
+    var map_class = $(this).closest(".map_class");
+    $(map_class).find(".map_canvas").show();
+    $(map_class).find(".latlng").show();
+    var me = $(map_class).find(".address .add-on");
+    if($(map_class).find(".map_canvas").is(':visible')) {
+        $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
+        $(me).css("border","2px solid rgba(82,168,236,0.8)");
+    }
+    var locationPicker = new $.fn.components.LocationPicker(map_class);
+    $(map_class).data('locationpicker', locationPicker);
+    if($(map_class).data('locationpicker').isInitialised == false) {
+        loadGoogleMapsAPI(function() {
+            locationPicker.initialize();
+            $(map_class).find('.spinner').hide();
+            
+            if(window.params.controller == 'checklist'){
+                drawControls = {
+                    rectangle:true,
+                    polygon:true,
+                    polyline:true,
+                    marker:false
+                }
+
+                editControls = {featureGroup: new L.FeatureGroup()}
+            }
+            locationPicker.initArea(drawControls, editControls, undefined);
+            //update_geotagged_images_list_for_bulkUpload(map_class);
+        });
+    
+    }else {
+        $(map_class).data('locationpicker').mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
+        //update_geotagged_images_list_for_bulkUpload(map_class);
+    }
+}
+
+
+
+
+
+
 if(!Array.prototype.last) {
     Array.prototype.last = function() {
         return this[this.length - 1];
@@ -622,12 +671,14 @@ function useTitle(obj){
 
 
     var LocationPicker = function (ele) {
+        this.isInitialised = false;
         this.$ele = $(ele);
         this.mapLocationPicker = new $.fn.components.MapLocationPicker(this.$ele.find(".map_canvas")[0]);
     }
 
     LocationPicker.prototype = {
         initialize : function() {
+            this.isInitialised = true;
             var me = this;
             var temp =  me.$ele.find(".address .add-on");
             //me.$ele.find(".placeName").click(function(){
@@ -836,7 +887,24 @@ function useTitle(obj){
 $(document).ready(function() { 
   
   $('.placeName').watermark('Search');
- 
+
+  $(".address .add-on").unbind('click').click(function(){
+      var me = this;
+      var map_class = $(this).closest(".map_class");
+      if($(map_class).find(".map_canvas").is(':visible')) {
+          $(me).find("i").removeClass("icon-remove").addClass("icon-chevron-down");
+          $(me).css("border","0px solid rgba(82,168,236,0.8)");
+          $(map_class).find(".map_canvas").hide();
+          $(map_class).find(".latlng").hide();
+          return false;
+      } else{
+          $(me).css("border","2px solid rgba(82,168,236,0.8)");
+          $(me).find("i").removeClass("icon-chevron-down").addClass("icon-remove");
+      }
+
+  });
+  $(".address").unbind('click').click(loadMapInput);
+
   $(function() {
 
   });

@@ -195,6 +195,7 @@ function dropAction(event, ui, ele) {
         
     });
     */
+    $(ele).closest(".addObservation").find(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(ui.draggable).find(".geotagged_image"));
 }
 
 

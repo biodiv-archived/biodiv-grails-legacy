@@ -36,7 +36,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	window.params = {
-		'offset':"${params.offset}",
+                'controller': "${params.controller}",
+                'offset':"${params.offset}",
 		'isGalleryUpdate':'true',	
 		"queryParamsMax":"${queryParams?.max}",
 		'speciesName':"${params.speciesName }",

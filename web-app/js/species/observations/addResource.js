@@ -230,10 +230,10 @@ function removeResource(event, imageId) {
             var metadataEle = $(html);
             if($( "input[name='resType']" ).val() == "species.participation.Observation") {
                 metadataEle.each(function() {
-                    me.$ele.find(".address").trigger('click'); 
-                    /*$('.geotagged_image', this).load(function(){
+                    //me.$ele.find(".address").trigger('click'); 
+                    $('.geotagged_image', this).load(function(){
                         $(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
-                    });*/
+                    });
                     var $ratingContainer = $(this).find('.star_obvcreate');
                     rate($ratingContainer);
                 });
