@@ -91,13 +91,19 @@ function rate(ele, successHandler, inputName) {
 function galleryImageLoadFinish() {
         $(".slideUp").bind('click', function() {
             var galleriaInfo = $(".galleria-info");
-            var top = galleriaInfo.position().top
+            var top = galleriaInfo.position().top  
             if($(this).hasClass('open')) {
-                galleriaInfo.css({'top': '350px'});
+                galleriaInfo.css('cssText', 'top : 350px !important');
+                galleriaInfo.css({'height' : '50px'});
                 $(this).addClass('close icon-chevron-up').removeClass('icon-chevron-down open');
             } else {
-                var height = galleriaInfo.outerHeight();
-                galleriaInfo.css({'top': (top - height+50)+'px'});
+                if($(this).attr('rel') === undefined){
+                    rel_height = galleriaInfo.outerHeight();
+                    $(this).attr('rel' , rel_height);
+                }
+                var height = ($(this).attr('rel') != '') ? $(this).attr('rel') : galleriaInfo.outerHeight();
+                galleriaInfo.css('cssText', 'top : '+(top - height+50)+'px !important');
+                galleriaInfo.css({'height' : height});
                 $(this).addClass('open icon-chevron-down').removeClass('icon-chevron-up close');
            }
         });
