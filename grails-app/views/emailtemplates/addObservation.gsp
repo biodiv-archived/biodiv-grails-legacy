@@ -53,8 +53,7 @@
 							<a href="${actorProfileUrl}"> ${currentUser?.name} </a>
 					</g:else>
 				</g:else>
-
-				${message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1)}
+				${raw(message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1))}
 
 
 				<g:if test="${activity?.text }">
