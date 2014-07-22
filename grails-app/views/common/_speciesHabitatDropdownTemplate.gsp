@@ -2,7 +2,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.groups.SpeciesGroup"%>
 <%@page import="species.Habitat"%>
-<div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')} ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
+<div class ="control-group ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
 
     <label>Habitat</label>
     <div class="help-inline control-label">

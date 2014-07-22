@@ -2,7 +2,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.groups.SpeciesGroup"%>
 <%@page import="species.Habitat"%>
-<div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')} ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}" style="clear:both;">
+<div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}" style="clear:both;">
     <label for="group"><g:message
         code="observation.group.label" default="Group" />
     </label> 

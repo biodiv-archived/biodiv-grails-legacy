@@ -10,7 +10,7 @@
 
     </g:if>
     <g:if test="${resourceListType == 'usersResource'}"
-    <i class="icon-picture"></i><span>My Uploads</span>
+    <i class="icon-picture"></i><span style="font-weight:bold">My Uploads</span>
     </g:if>
 
     <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">

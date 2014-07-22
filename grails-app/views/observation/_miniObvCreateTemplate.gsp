@@ -4,9 +4,11 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
 %>
 <form class="${form_class}" action="${form_action}" method="POST">
     <g:hasErrors bean="${observationInstance}">
+    <div class="error-message">
     <i class="icon-warning-sign"></i>
         <span class="label label-important"> <g:message
         code="fix.errors.before.proceeding" default="Fix errors" /> </span>
+    </div>
     </g:hasErrors>
 
    <span class="createdObv label label-success" style="display:none;"><i class="icon-check"></i> Successfully created </span>
@@ -17,7 +19,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 field="resource" />
             </div>
         </div>    
-        <div class="imageHolder" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;"></div>
+        <div class="imageHolder" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;background: url(${createLinkTo(dir: 'images', file: 'dragndropgrey.png', absolute:true)})"></div>
 
         <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
