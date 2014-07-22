@@ -146,7 +146,9 @@ function submitForms(counter, size, allForms, showListPage){
 }
 
 function dropAction(event, ui, ele) {
-    $(ele).append($(ui.draggable).clone());
+    console.log('dropAction');
+    var clone = $(ui.draggable).clone()
+    $(ele).append(clone);
     var draggedImages = $(ele).find(".addedResource");
     var countOfImages = draggedImages.length;
     if(countOfImages == 1){
@@ -195,7 +197,8 @@ function dropAction(event, ui, ele) {
         
     });
     */
-    $(ele).closest(".addObservation").find(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(ui.draggable).find(".geotagged_image"));
+    //$(ele).closest(".addObservation").find(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(ui.draggable).find(".geotagged_image"));
+    $.proxy(loadMapInput, $(ele).closest(".addObservation").find(".map_class"), clone.find(".geotagged_image"))();
 }
 
 
