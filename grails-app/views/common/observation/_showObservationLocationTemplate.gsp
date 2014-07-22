@@ -85,6 +85,7 @@
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
             var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+            mapLocationPicker.initialize();
             <g:if test="${!observationInstance.isChecklist}">
             showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
             </g:if>

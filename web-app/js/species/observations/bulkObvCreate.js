@@ -245,7 +245,7 @@ $(".applyAll").click(function(){
         }
     }
     $.each(allForms, function(index,value){
-        if(helpID) {
+        if(helpID && !($(value).find("input[name='help_identify']").is(':checked'))) {
             $(value).find("input[name='help_identify']").trigger("click");    
         }
         $(value).find(".imageHolder li span:contains('"+licenseVal+"')").first().trigger("click");

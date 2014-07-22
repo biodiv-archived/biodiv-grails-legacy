@@ -769,6 +769,7 @@ function updateMapView (params, callback) {
     if(mapLocationPicker == undefined) {
         loadGoogleMapsAPI(function() {
             mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+            mapLocationPicker.initialize();
             $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
             refreshMapBounds(mapLocationPicker);

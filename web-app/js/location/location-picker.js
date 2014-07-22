@@ -16,11 +16,17 @@ function loadMapInput() {
         $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
         $(me).css("border","2px solid rgba(82,168,236,0.8)");
     }
-    var locationPicker = new $.fn.components.LocationPicker(map_class);
-    $(map_class).data('locationpicker', locationPicker);
+    console.log("calling TOP==================================================");
+    var locationPicker
+    if($(map_class).data('locationpicker') == undefined) {
+        locationPicker = new $.fn.components.LocationPicker(map_class);
+        $(map_class).data('locationpicker', locationPicker);
+    }
+    console.log("calling===============================sfsaefsdfsdfsd=================== " + $(map_class).data('locationpicker').isInitialised);
     if($(map_class).data('locationpicker').isInitialised == false) {
+        console.log("calling================================================== " + $(map_class).data('locationpicker').isInitialised);
         loadGoogleMapsAPI(function() {
-            locationPicker.initialize();
+            $(map_class).data('locationpicker').initialize();
             $(map_class).find('.spinner').hide();
             
             if(window.params.controller == 'checklist'){
@@ -70,7 +76,7 @@ function useTitle(obj){
     var MapLocationPicker = function (ele, options) {
         this.overlays = {}; 
         this.$ele = $(ele);
-        this.initialize(options);
+        //this.initialize(options);
     }
 
     MapLocationPicker.prototype = {
@@ -678,6 +684,7 @@ function useTitle(obj){
 
     LocationPicker.prototype = {
         initialize : function() {
+            this.mapLocationPicker.initialize();
             this.isInitialised = true;
             var me = this;
             var temp =  me.$ele.find(".address .add-on");
