@@ -1468,7 +1468,9 @@ class UserGroupService {
 					return false
 				}
 				log.debug submitType + " for group " + ug + "  resources size " +  obvs.size()
+				ug = ug.merge()
 				obvs.each { obv ->
+					obv = obv.merge()
 					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
 				}
 				try{
