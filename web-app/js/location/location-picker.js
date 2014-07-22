@@ -1,5 +1,4 @@
 function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
-    console.log(geotaggedImages);
     var imgs = geotaggedImages ? geotaggedImages : $(ele).closest(".addObservation").find('.geotagged_image')
     $.each(imgs, function(index, value){
         $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
@@ -17,7 +16,6 @@ function loadMapInput(geotaggedImages) {
         $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
         $(me).css("border","2px solid rgba(82,168,236,0.8)");
     }
-    console.log("calling TOP==================================================");
     var locationPicker
     if($(map_class).data('locationpicker') == undefined) {
         locationPicker = new $.fn.components.LocationPicker(map_class);
@@ -25,9 +23,7 @@ function loadMapInput(geotaggedImages) {
     } else {
         locationPicker =  $(map_class).data('locationpicker');
     }
-    console.log("calling===============================sfsaefsdfsdfsd=================== " + locationPicker.isInitialised);
     if(locationPicker.isInitialised == false || locationPicker.isInitialised == undefined) {
-        console.log("calling================================================== " + locationPicker.isInitialised);
         loadGoogleMapsAPI(function() {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
