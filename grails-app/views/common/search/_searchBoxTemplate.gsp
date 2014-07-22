@@ -37,6 +37,7 @@
 $(document).ready(function() {
 	window.params = {
                 'controller': "${params.controller}",
+                'actionForBulkCreate': "${params.action}",
                 'offset':"${params.offset}",
 		'isGalleryUpdate':'true',	
 		"queryParamsMax":"${queryParams?.max}",

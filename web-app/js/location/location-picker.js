@@ -10,7 +10,13 @@ function loadMapInput(geotaggedImages) {
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
     $(map_class).find(".map_canvas").show();
-    $(map_class).find(".latlng").show();
+    if(window.params.actionForBulkCreate == 'bulkCreate' ){
+        console.log("=====================BILK CREATE=====================");
+        $(map_class).find(".latlng").css("display", "none");
+    } else {
+        $(map_class).find(".latlng").css("display", "block");
+    
+    }
     var me = $(map_class).find(".address .add-on");
     if($(map_class).find(".map_canvas").is(':visible')) {
         $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
@@ -439,7 +445,11 @@ function useTitle(obj){
                 }
             });
             me.setLatLngFields(marker.getLatLng().lat, marker.getLatLng().lng);
-            $(this.$ele).closest(".map_class").find('.latlng').show();
+            if(window.params.actionForBulkCreate == 'bulkCreate' ){
+                $(this.$ele).closest(".map_class").find('.latlng').hide();
+            } else {
+                $(this.$ele).closest(".map_class").find('.latlng').show();
+            }
         },
 
         setLatLngFields : function(lat, lng) {
