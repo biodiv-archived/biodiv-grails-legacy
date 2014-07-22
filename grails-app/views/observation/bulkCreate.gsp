@@ -25,6 +25,9 @@
             td {
                 text-align:center;
             }
+            .map_class {
+                position:relative;
+            }
             .map_canvas {
                 border-color: rgba(82,168,236,0.8) !important;
                 position: absolute !important;
@@ -89,8 +92,9 @@
             .placeName{
                 width:90% !important;
             }
-            .latlng {
+            .map_search .latlng {
                 z-index:2;
+                width:100%;
             }
             .map_search {
                 position:inherit;btn:hover,

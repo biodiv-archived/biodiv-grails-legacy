@@ -47,8 +47,9 @@ function loadMapInput(geotaggedImages) {
         });
     
     } else {
-        //locationPicker.mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
-        update_geotagged_images_list_for_bulkUpload(geotaggedImages, map_class);
+        locationPicker.mapLocationPicker.addSearchMarker({lat:$(map_class).find('.latitude_field').val(), lng:$(map_class).find('.longitude_field').val()}, {selected:true, draggable:true});
+        if(geotaggedImages)
+            update_geotagged_images_list_for_bulkUpload(geotaggedImages, map_class);
     }
 }
 
