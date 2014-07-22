@@ -11,25 +11,41 @@
         <g:set var="title" value="Observations"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
+        <style>
+            .imagesList{
+                background-color: #fefad5;
+                border-bottom: 1px solid #9E9E9E;
+                border-top: 1px solid #9E9E9E;
+                box-shadow: 0 2px 11px -3px inset;
+                padding: 10px;
+                min-height: 212px;
+                height:240px;
+                width:870px;
+            }
+            .imagesListWrapper ul {
+                width:20000px;
+                white-space:nowrap !important;
+            }
+            .imagesListWrapper ul li {
+                display : inline !important;
+                z-index:1;
+            }
+            .imagesListWrapper {
+                overflow-x:scroll;
+                overflow-y:hidden;
+                height: 250px;
+                width:890px;
+            }
+        </style>
     </head>
     <body>
         <div class="bulk_observation_create">
             <div class="span12 super-section">
                 <div class="section">
                     <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
-                    <% 
-                    /*
-                    propagate karne wale options
-                    */
-                    %>
-
                 </div>
             </div>
             <%
-
-            //def obvTmpFileName = (observationInstance?.resource?.iterator()?.hasNext() ) ? (observationInstance.resource.iterator().next()?.fileName) : false 
-            //def obvDir = resDir     
-            //obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
             %>
             <form id="upload_resource" 
                 title="Add a photo for this observation"

@@ -114,6 +114,7 @@ function submitForms(counter, size, allForms, showListPage){
                     miniObvCreateHtmlSuccess = data.miniObvCreateHtml;
                     $(form).find('input').attr('disabled', 'disabled');
                     $(form).find('button').attr('disabled', 'disabled');
+                    $(form).find('.error-message').hide();
                     $(form).find('.createdObv').show();
                     $(form).find('.obvTemplate').css('opacity', '0.3');
                     //disable click on div
@@ -272,7 +273,12 @@ function initializers(){
         changeYear: true,
         dateFormat: 'dd/mm/yy' 
     });
-    $(".addObservation .fromDate").val('');
+    var allForms = $(".addObservation");
+    $.each(allForms, function(index, value){
+        if(!($(value).find(".error-message").is(":visible"))){
+            $(value).find(".fromDate").val('');
+        }
+    });
     $(".obvCreateTags").tagit({
         select:true, 
         allowSpaces:true, 
@@ -302,6 +308,23 @@ function initializers(){
             $(this).closest('.addObservation').find('.nameContainer input').removeAttr('disabled');
         }
     });
+    $(".address .add-on").unbind('click').click(function(){
+        var me = this;
+        var map_class = $(this).closest(".map_class");
+        if($(map_class).find(".map_canvas").is(':visible')) {
+            $(me).find("i").removeClass("icon-remove").addClass("icon-chevron-down");
+            $(me).css("border","0px solid rgba(82,168,236,0.8)");
+            $(map_class).find(".map_canvas").hide();
+            $(map_class).find(".latlng").hide();
+            return false;
+        } else{
+            $(me).css("border","2px solid rgba(82,168,236,0.8)");
+            $(me).find("i").removeClass("icon-chevron-down").addClass("icon-remove");
+        }
+
+    });
+    $(".address").unbind('click').click(loadMapInput);
+
     initializeLanguage();
     initializeNameSuggestion();
     /*var $grpDD = $('.group_options');
