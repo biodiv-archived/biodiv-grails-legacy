@@ -58,7 +58,7 @@
         <g:if test="${r.type == ResourceType.AUDIO}">
         <g:if test="${audioResource == 0}" >                                               
             
-                <audio controls style="padding: 8px 0px 0px 0px;width: 100%;">                                              
+                <audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;">                                              
                   <source src="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>            	             
@@ -103,7 +103,7 @@ $(document).ready(function(){
                 current = link.parent().index();
                 run(link, audio[0]);    
             });
-            audio[0].addEventListener('ended',function(e){
+        /*    audio[0].addEventListener('ended',function(e){
                 current++;
                 if(current == len){
                     current = 0;
@@ -112,7 +112,7 @@ $(document).ready(function(){
                     link = playlist.find('a')[current];    
                 }
                 run($(link),audio[0]);
-            });
+            }); */
         }
         function run(link, player){
                 player.src = link.attr('href');
@@ -124,3 +124,14 @@ $(document).ready(function(){
     });    
  </script>
  </g:if>
+ <g:javascript>
+$(document).ready(function(){
+
+    $(".audio_cls, #playlist li a").click(function(){
+        var div = document.getElementById("gallery1");
+        var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+        iframe.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+    });
+
+});    
+</g:javascript>

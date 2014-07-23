@@ -1335,12 +1335,13 @@ span.cke_skin_kama {
 
 .galleria-info {
     width: 100% !important;
-    top: 350px !important;
+   // top: 350px !important;
     left: 0px !important;
     z-index: 2 !important;
     position: absolute !important;
     background-color: white !important;
     overflow:hidden !important;
+    //bottom: 0;
 }
 .galleria-info-text {
     padding:2px !important;
