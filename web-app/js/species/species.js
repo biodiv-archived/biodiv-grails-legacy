@@ -939,7 +939,26 @@ $(document).ready(function() {
             initEditableFields();
             return false;
         });
-        
+
+        if($('#deleteSpecies').length > 0) {
+            $('#deleteSpecies').click (funtion() {
+                if(confirm('This species will be deleted. Are you sure ?')) {
+                    $.ajax({
+                        url:d.url?d.url:window.params.species.updateUrl,
+                        type:'POST',
+                        data:params,
+                        success : function( data, textStatus, jqXHR) {
+                           alert(data); 
+                        },error: function(xhr, status, error) {
+                            var msg = $.parseJSON(xhr.responseText);
+                            alert(msg);
+                            return false;
+                        }
+                    });
+                }
+            });
+        }
+
         var editMode = getParameterByName('editMode');
 
         if(editMode == "true" || editMode == "1") {

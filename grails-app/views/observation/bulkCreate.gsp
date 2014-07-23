@@ -96,6 +96,12 @@
                 z-index:2;
                 width:100%;
             }
+            .map_search .latlng .control_group {
+                margin-bottom:0px;
+            }
+            .latlng .input-prepend {
+                width:100%;
+            }
             .map_search {
                 position:inherit;btn:hover,
             }
