@@ -56,7 +56,8 @@ $(document).ready(function() {
                 'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}",
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
-                    'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}"
+                    'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
+                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
                 'isLoggedInUrl' : "${createLink(controller:'SUser', action:'isLoggedIn','userGroup':userGroupInstance)}",
