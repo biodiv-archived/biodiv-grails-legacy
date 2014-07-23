@@ -98,7 +98,7 @@ function galleryImageLoadFinish() {
                 $(this).addClass('close icon-chevron-up').removeClass('icon-chevron-down open');
             } else {
                 if($(this).attr('rel') === undefined){
-                    rel_height = galleriaInfo.outerHeight();
+                    rel_height = galleriaInfo.outerHeight()+8;
                     $(this).attr('rel' , rel_height);
                 }
                 var height = ($(this).attr('rel') != '') ? $(this).attr('rel') : galleriaInfo.outerHeight();

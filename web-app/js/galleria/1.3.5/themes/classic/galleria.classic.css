@@ -4,7 +4,7 @@
 
 .galleria-container {
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; */
     background: #000;
 }
 .galleria-container img {
