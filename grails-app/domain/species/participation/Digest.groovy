@@ -10,6 +10,9 @@ class Digest {
     boolean forSp
     boolean forDoc
     boolean forUsers
+    boolean sendTopContributors
+    boolean sendTopIDProviders
+    Date startDateStats
     static constraints = {
     }
 }

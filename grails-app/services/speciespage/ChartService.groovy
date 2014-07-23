@@ -285,31 +285,8 @@ class ChartService {
 		def startDate = new Date().minus(days)
 		DateGroovyMethods.clearTime(startDate)
 		
-		def result = Observation.withCriteria(){
-			projections {
-				groupProperty('author')
-				rowCount('total') //alias given to count
-			}
-			and{
-				// taking undeleted observation
-				eq('isDeleted', false)
-				eq('isShowable', true)
-				eq('isChecklist', false)
+		def result = activeUserStatsAuthorAndCount(max, userGroupInstance, startDate);		
 
-				ge('createdOn', startDate)
-				
-
-				//filter by usergroup
-				if(userGroupInstance){
-					userGroups{
-						eq('id', userGroupInstance.id)
-					}
-				}
-			}
-			maxResults max
-			order 'total', 'desc'
-		}
-		
 		def obvCount = Observation.createCriteria().count {
 			and{
 				// taking undeleted observation
@@ -667,4 +644,33 @@ class ChartService {
 		
 		return getActivityCount(null, null, typeToIdFilterMap, userGroup)
 	}
+
+    def activeUserStatsAuthorAndCount(max, userGroupInstance , startDate){ 
+
+        def result = Observation.withCriteria(){
+            projections {
+                groupProperty('author')
+                rowCount('total') //alias given to count
+            }
+            and{
+                // taking undeleted observation
+                eq('isDeleted', false)
+                eq('isShowable', true)
+                eq('isChecklist', false)
+
+                ge('createdOn', startDate)
+
+
+                //filter by usergroup
+                if(userGroupInstance){
+                    userGroups{
+                        eq('id', userGroupInstance.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'total', 'desc'
+        }
+        return result
+    }
 }

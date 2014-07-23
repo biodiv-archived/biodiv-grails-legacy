@@ -1903,6 +1903,9 @@ class ObservationService extends AbstractObjectService {
                 break
             
             case DIGEST_MAIL:
+                templateMap["serverURL"] =  grailsApplication.config.grails.serverURL
+                templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName
+                templateMap["resourcesServerURL"] = grailsApplication.config.speciesPortal.resources.serverURL
                 mailSubject = "Activity digest on " + otherParams["userGroup"].name
                 bodyView = "/emailtemplates/digest"
                 templateMap["digestContent"] = otherParams["digestContent"]

@@ -13,7 +13,7 @@
     <body>
         <table style="width:621px; border:1px solid #a1a376;">
             <tr>
-                <td id="header" class="w640" align="left" bgcolor="#ffffff"><a href="${grailsApplication.config.grails.serverURL}/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="${grailsApplication.config.speciesPortal.app.siteName}" style="border: 0px solid ;width: 627px; height: 53px;"></a></td>
+                <td id="header" class="w640" align="left" bgcolor="#ffffff"><a href="${serverURL}/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="${siteName}" style="border: 0px solid ;width: 627px; height: 53px;"></a></td>
             </tr>
             <tr>
                 <td class="w580" style="height: 10px; background-color: white;"></td>
@@ -36,7 +36,7 @@
                             def controller = observationInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = observationInstance.id
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 120px;"><p>${observationInstance.title()}</p></a></td>
                             </g:each>
                         </tr>
                     </table>
@@ -54,13 +54,49 @@
                             def controller = uniObvInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = uniObvInstance.id
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${uniObvInstance.title()}</p></a></td>
                             </g:each>
                         </tr>
                     </table>
                 
-                <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true, params:['speciesName':'Unknown'])}" style="color:#2ba6cb;">View More</a></p>
-                </g:if>
+                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true, params:['speciesName':'Unknown'])}" style="color:#2ba6cb;">View More</a></p>
+                    </g:if>
+
+                    <g:if test = "${digestContent.recentTopContributors}">
+                    <g:set var="recentTopContributors" value="${digestContent.recentTopContributors}"></g:set>
+                    <h3>Top Contributors</h3>
+                    <table>
+                        <tr align="left">
+                            <g:each in="${recentTopContributors.size() < 5 ? recentTopContributors : recentTopContributors.subList(0, 5)}" var="rtc">
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:rtc[0].id, 'userGroup':userGroup)}">
+                                    <img src="${rtc[0].profilePicture()}" title="${rtc[0].name}" style="border: 0px solid ; max-height: 120px; width:120px;" />
+                                    <span>${rtc[0].name} </span></a><span> (${rtc[1]})</span>
+                            </td>
+                            </g:each>
+                        </tr>
+                    </table> 
+                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;">&nbsp; &nbsp;</p>
+
+                    </g:if>
+
+                    <g:if test = "${digestContent.topIDProviders}">
+                    <g:set var="topIDProviders" value="${digestContent.topIDProviders}"></g:set>
+                    <h3>Top ID Providers</h3>
+                    <table>
+                        <tr align="left">
+                            <g:each in="${topIDProviders.size() < 5 ? topIDProviders : topIDProviders.subList(0, 5)}" var="tip">
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:tip.user.id, 'userGroup':userGroup)}">
+                                    <img src="${tip.user.profilePicture()}" title="${tip.user.name}" style="border: 0px solid ; max-height: 120px; width:120px;" />
+                                    <span>${tip.user.name} </span></a><span>(${tip.recoCount})</span>
+                            </td>
+                            </g:each>
+                        </tr>
+                    </table> 
+                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;">&nbsp; &nbsp;</p>
+                    </g:if>
+
+
+
                 </div>
             </div>
             </g:if>
@@ -79,13 +115,13 @@
                             def imagePath = '';
                             def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
                             if(mainImage?.fileName == speciesGroupIcon.fileName) 
-                            imagePath = mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL, '.png');
+                            imagePath = mainImage.thumbnailUrl("${resourcesServerURL}", '.png');
                             else
-                            imagePath = mainImage?mainImage.thumbnailUrl(grailsApplication.config.speciesPortal.resources.serverURL):null;
+                            imagePath = mainImage?mainImage.thumbnailUrl("${resourcesServerURL}"):null;
                             def spId = speciesInstance.id
-                            imagePath = imagePath.replaceAll(' ','%20')
+                            imagePath = imagePath.replaceAll(' ','%20');
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 101px;"></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${speciesInstance.title}</p></a></td>
                             </g:each>
                         </tr>
                     </table>
@@ -103,9 +139,9 @@
                     <table>
                         <tr align="left">
                             <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: center;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
-                                    <img src="${userInstance.profilePicture()}" title="${userInstance.name}" style="border: 0px solid ; max-height: 120px; width:auto;" />
-                            </a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
+                                    <img src="${userInstance.profilePicture()}" title="${userInstance.name}" style="border: 0px solid ; max-height: 120px; width:120px;" />
+                                    <p>${userInstance.name}</p> </a></td>
                             </g:each>
                         </tr>
                     </table>
