@@ -942,21 +942,20 @@ $(document).ready(function() {
         });
 
         if($('#deleteSpecies').length > 0) {
-            $('#deleteSpecies').click (funtion() {
+            $('#deleteSpecies').click (function() {
                 if(confirm('This species will be deleted. Are you sure ?')) {
                     $.ajax({
-                        url:d.url?d.url:window.params.species.updateUrl,
+                        url:window.params.species.deleteUrl,
                         type:'POST',
-                        data:params,
                         success : function( data, textStatus, jqXHR) {
-                           alert(data); 
+                           //alert(data); 
                         },error: function(xhr, status, error) {
-                            var msg = $.parseJSON(xhr.responseText);
-                            alert(msg);
+                            //alert(msg);
                             return false;
                         }
                     });
                 }
+                return false;
             });
         }
 
