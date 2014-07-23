@@ -10,6 +10,11 @@
 <g:set var="title" value="Observations"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_create"/>
+<style>
+    .latlng{
+        margin-left: 285px !important;
+    }
+</style>
 </head>
 <body>
 

@@ -265,7 +265,8 @@ $(".applyAll").click(function(){
         $(value).find(".latitude_field").val(latVal);
         $(value).find(".longitude_field").val(longVal);
         if(wkt) $(value).find("input.areas").val(wkt.write());
-        $(value).find(".placeName").val(placeName);    
+        $(value).find(".placeName").val(placeName);
+        $(value).find(".placeName").trigger("click");
     });
 });
 

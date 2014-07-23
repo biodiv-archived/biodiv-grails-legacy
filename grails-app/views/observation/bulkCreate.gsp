@@ -30,11 +30,12 @@
             }
             .map_canvas {
                 border-color: rgba(82,168,236,0.8) !important;
-                position: absolute !important;
-                width: 99% !important;
+                //position: absolute !important;
+                width: 103% !important;
                 display: block;
                 left: 0px;
                 z-index:10 !important;
+                height:360px !important;
             }
             .selected_habitat, .selected_group{
                 position:relative;
@@ -90,7 +91,7 @@
                 background-color: #a6dfc8;
             }
             .placeName{
-                width:90% !important;
+                width:89% !important;
             }
             .map_search .latlng {
                 z-index:2;
@@ -174,6 +175,9 @@
             }
             .propagateLicense .license_options {
                 width:220px;
+            }
+            .propagateLocation .map_canvas{
+                width:99% !important;
             }
         </style>
     </head>

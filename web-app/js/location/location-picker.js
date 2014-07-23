@@ -11,7 +11,6 @@ function loadMapInput(geotaggedImages) {
     var map_class = $(this).closest(".map_class");
     $(map_class).find(".map_canvas").show();
     if(window.params.actionForBulkCreate == 'bulkCreate' ){
-        console.log("=====================BILK CREATE=====================");
         $(map_class).find(".latlng").css("display", "none");
     } else {
         $(map_class).find(".latlng").css("display", "block");
@@ -566,7 +565,7 @@ function useTitle(obj){
             if(latlng || imageDate){
                 //func += "$(this).addClass('active_location_picker_button');";
                 //func += "setInfoFromImage($(this));";
-                html = '<div  class="' + $(image).attr("id") +' leaflet-control location_picker_button " style="display:inline-block;">' + inputHtml + '<div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
+                html = '<div  class="' + $(image).attr("id") +' leaflet-control location_picker_button tagged_image " style="display:inline-block;">' + inputHtml + '<div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
                 
                 
                 $closestAddObservation.find(".geotagged_images>.title").show();
@@ -577,8 +576,8 @@ function useTitle(obj){
                     $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left").append(html);
                     //    this.addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: window.params.defaultMarkerIcon+"marker-icon.png", shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
                 }
-                var appendedImage = $closestAddObservation.find(".leaflet-control-container .leaflet-top.leaflet-left")
-                $closestAddObservation.find(".geotagged_images").find(".location_picker_button").click(me.setInfoFromImage(appendedImage)).trigger('update_map');
+                var appendedImage = $closestAddObservation.find(".leaflet-control-container .tagged_image");
+                $closestAddObservation.find(".geotagged_images").find(".location_picker_button.tagged_image").click(me.setInfoFromImage(appendedImage)).trigger('update_map');
                 
             }    		
             });
