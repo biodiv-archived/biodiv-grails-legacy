@@ -9,7 +9,7 @@
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
         <div class="tab-content" id="speciesImage-tab-content">
             <g:if test="${isSpeciesContributor}">
-            <div class="tab-pane active" id="speciesImage-tab0" style="max-height:392px;overflow-y:scroll;">
+            <div class="tab-pane active" id="speciesImage-tab0" style="max-height:410px;overflow-y:scroll;">
                 
                 <form id="pullObvImagesForm" action="${uGroup.createLink(action:'pullObvImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
@@ -19,7 +19,7 @@
                 </form>
                    
             </div>
-            <div class="tab-pane" id="speciesImage-tab1" style="max-height:392px;overflow-y:scroll;">
+            <div class="tab-pane" id="speciesImage-tab1" style="max-height:410px;overflow-y:scroll;">
                 <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
@@ -44,7 +44,7 @@
                 </form>
 
             </div>
-            <div class="tab-pane" id="speciesImage-tab2" style="max-height:392px;overflow-y:scroll;">
+            <div class="tab-pane" id="speciesImage-tab2" style="max-height:410px;overflow-y:scroll;">
                 <form id="pullSpeciesFieldImagesForm" action="${uGroup.createLink(action:'pullSpeciesFieldImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromSpeciesField']"></obv:addPhotoWrapper>

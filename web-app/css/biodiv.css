@@ -2724,3 +2724,13 @@ small {
 .rank a {
     color: #16509E;
 }
+.ui-widget-header{
+	background: #6ac9a2;
+	background: rgba(106, 201, 162, 0.2);
+	-ms-filter:
+		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
+	/* IE8 */
+	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' );
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+
+}

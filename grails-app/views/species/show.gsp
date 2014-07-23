@@ -86,6 +86,9 @@
             height: 315px !important;
             max-height:315px !important;
             }
+            .add_file_container {
+                padding: 55px 10px !important;
+            }    
             
         </style>
 
