@@ -399,6 +399,8 @@ class ObvUtilService {
 		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
 		
 		obvParams['geoPrivacy'] = m["geoprivacy"]
+
+        obvParams['resourceListType'] = "ofObv"
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(obvParams.latitude && obvParams.longitude) {
