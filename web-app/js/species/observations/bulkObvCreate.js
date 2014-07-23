@@ -266,7 +266,7 @@ $(".applyAll").click(function(){
         $(value).find(".longitude_field").val(longVal);
         if(wkt) $(value).find("input.areas").val(wkt.write());
         $(value).find(".placeName").val(placeName);
-        $(value).find(".placeName").trigger("click");
+        //$(value).find(".placeName").trigger("click");
     });
 });
 
@@ -337,6 +337,19 @@ function initializers(){
             $grpDD.hide();
             $habDD.hide();
         }
+    });
+    */
+    /*
+    $(document).unbind("click").click(function(){
+        $(".group_options").hide();
+        $(".habitat_options").hide();
+    });
+
+    $(".group_options").unbind("click").click(function(e){
+        e.stopPropagation();
+    });
+    $(".habitat_options").unbind("click").click(function(e){
+        e.stopPropagation();
     });
     */
     if($("input[name='applyToAll']").val() == "true"){
