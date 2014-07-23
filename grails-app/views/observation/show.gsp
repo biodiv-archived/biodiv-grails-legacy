@@ -328,6 +328,10 @@ $(document).ready(function(){
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
+                                var galleriaInfo = $(".galleria-info");
+                                galleriaInfo.css('cssText', 'top : 350px !important');
+                                var galleriaSlideUp = $(".galleria-info .slideUp");
+                                galleriaSlideUp.trigger('click');
                             });
 
                             this.bind('lightbox_image', function(e){

@@ -147,7 +147,6 @@ function submitForms(counter, size, allForms, showListPage){
 }
 
 function dropAction(event, ui, ele) {
-    console.log('dropAction');
     var clone = $(ui.draggable).clone()
     $(ele).append(clone);
     var draggedImages = $(ele).find(".addedResource");

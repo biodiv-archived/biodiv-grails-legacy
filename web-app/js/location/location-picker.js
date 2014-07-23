@@ -1,5 +1,4 @@
 function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
-    console.log(geotaggedImages);
     var imgs = geotaggedImages ? geotaggedImages : $(ele).closest(".addObservation").find('.geotagged_image')
     $.each(imgs, function(index, value){
         $(ele).data('locationpicker').mapLocationPicker.update_geotagged_images_list($(value));		
@@ -11,13 +10,18 @@ function loadMapInput(geotaggedImages) {
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
     $(map_class).find(".map_canvas").show();
-    $(map_class).find(".latlng").show();
+    if(window.params.actionForBulkCreate == 'bulkCreate' ){
+        console.log("=====================BILK CREATE=====================");
+        $(map_class).find(".latlng").css("display", "none");
+    } else {
+        $(map_class).find(".latlng").css("display", "block");
+    
+    }
     var me = $(map_class).find(".address .add-on");
     if($(map_class).find(".map_canvas").is(':visible')) {
         $(me).find("i").addClass("icon-remove").removeClass("icon-chevron-down");
         $(me).css("border","2px solid rgba(82,168,236,0.8)");
     }
-    console.log("calling TOP==================================================");
     var locationPicker
     if($(map_class).data('locationpicker') == undefined) {
         locationPicker = new $.fn.components.LocationPicker(map_class);
@@ -25,9 +29,7 @@ function loadMapInput(geotaggedImages) {
     } else {
         locationPicker =  $(map_class).data('locationpicker');
     }
-    console.log("calling===============================sfsaefsdfsdfsd=================== " + locationPicker.isInitialised);
     if(locationPicker.isInitialised == false || locationPicker.isInitialised == undefined) {
-        console.log("calling================================================== " + locationPicker.isInitialised);
         loadGoogleMapsAPI(function() {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
@@ -443,7 +445,11 @@ function useTitle(obj){
                 }
             });
             me.setLatLngFields(marker.getLatLng().lat, marker.getLatLng().lng);
-            $(this.$ele).closest(".map_class").find('.latlng').show();
+            if(window.params.actionForBulkCreate == 'bulkCreate' ){
+                $(this.$ele).closest(".map_class").find('.latlng').hide();
+            } else {
+                $(this.$ele).closest(".map_class").find('.latlng').show();
+            }
         },
 
         setLatLngFields : function(lat, lng) {

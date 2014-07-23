@@ -251,7 +251,8 @@ function initGalleryTabs() {
 
                 this.bind('loadfinish', function(e){
                     var galleriaInfo = $(".galleria-info");
-                    galleriaInfo.css({'top': '350px'});
+                    galleriaInfo.css('cssText', 'top : 350px !important');
+                    //galleriaInfo.css({'top': '350px'});
                     galleryImageLoadFinish();
                     var galleriaSlideUp = $(".galleria-info .slideUp");
                     galleriaSlideUp.addClass('icon-chevron-down').removeClass('icon-chevron-up');
