@@ -18,9 +18,11 @@
         </g:if>
 
         <sUser:isAdmin>
-        <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-            href="${uGroup.createLink(controller:'species', action:'delete', id:speciesInstance.id)}"
-            ><i class="icon-trash"></i>Delete</a>
+            <g:if test="${speciesInstance}">
+            <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                href="${uGroup.createLink(controller:'species', action:'delete', id:speciesInstance.id)}"
+                ><i class="icon-trash"></i>Delete</a>
+            </g:if>
         </sUser:isAdmin>
 
     </div>
