@@ -770,7 +770,7 @@ environments {
 
 
 	pamba {
-		servername = 'indiabiodiversity.pamba.org'
+		servername = 'pamba.strandls.com'
 		grails.serverURL = "http://${servername}/${appName}"
 		
         speciesPortal {

@@ -142,7 +142,7 @@ grails.project.dependency.resolution = {
         compile (':cache:1.1.6') {
                 excludes "servlet-api" 
         }
-        runtime ":database-migration:1.4.0"
+//        runtime ":database-migration:1.4.0"
 
         compile ':hibernate:3.6.10.15'
         compile ':hibernate-spatial:0.0.4'
@@ -190,7 +190,7 @@ grails.project.dependency.resolution = {
     } 
 
     grails.war.resources = { stagingDir ->
-        for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j', 'servlet-api-2.3']) {
+        for (name in ['servlet-api-2.3', 'jsp-api-2.1']) {
           delete {
           fileset dir: "$stagingDir/WEB-INF/lib/",
           includes: "$name*.jar"

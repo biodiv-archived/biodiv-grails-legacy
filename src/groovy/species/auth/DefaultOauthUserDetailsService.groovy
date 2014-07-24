@@ -27,8 +27,8 @@ class  DefaultOauthUserDetailsService extends DefaultOauthUserDetailsService {
         } catch (UsernameNotFoundException unfe) {
             log.debug "User not found. Creating a new one with default roles: ${defaultRoles}"
 	
-    		def user = SUserService.create([username:profile.getUsername(), name:profile.getDisplayName(), password:'openIdPassword', email:profile.getEmail(), profilePic:profile.getPictureUrl(),location:profile.getLocation(),  accountLocked:false, enabled:true]);
-		
+	def user = SUserService.create([username:userProfile.getUsername(), name:userProfiler.getDisplayName(), password:'openIdPassword', email:userProfile.getEmail(), profilePic:userProfile.getPictureUrl(),location:userProfile.getLocation(),  accountLocked:false, enabled:true]);
+			
 			SUserService.save(user);
 		
 			SUserService.assignRoles(user);

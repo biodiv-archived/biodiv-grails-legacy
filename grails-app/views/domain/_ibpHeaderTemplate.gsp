@@ -43,7 +43,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                                     controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="Add an Observation"> <i class="icon-plus"></i>Add an Observation</a>
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Upload multiple images of species and create multiple observations in a batch mode" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="Add Multiple Observations"> <i class="icon-plus"></i>Add Multiple Observations</a>
+                                    controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="Add Multiple Observations"> <i class="icon-plus"></i>Add Multiple Observations (β*)</a>
 
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="A list is a collection of sightings recorded from an area over a time period submitted with or without supporting media." data-trigger="hover"
                                     href="${uGroup.createLink(
