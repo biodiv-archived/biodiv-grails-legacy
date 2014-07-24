@@ -61,7 +61,7 @@
 					<div class="tab-pane">
 						<div class="super-section userGroup-section">
 							<div class="description notes_view">
-								${userGroupInstance.description}
+								${raw(userGroupInstance.description)}
 							</div>
 							<div class="section">
 								<div class="prop">
