@@ -792,7 +792,7 @@ function refreshMapBounds(mapLocationPicker) {
     if(bounds) {
         bounds = bounds.split(',');
         if(bounds.length == 4) {
-            map.fitBounds([
+            mapLocationPicker.map.fitBounds([
                     [bounds[0], bounds[1]],
                     [bounds[2], bounds[3]]
                     ]);
