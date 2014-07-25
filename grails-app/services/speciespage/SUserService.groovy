@@ -39,7 +39,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	/**
 	 * 
 	 */
-	SUser create(Map propsMap) {
+	SUser create(propsMap) {
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
 

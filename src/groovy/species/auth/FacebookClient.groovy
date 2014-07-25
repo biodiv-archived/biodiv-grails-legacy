@@ -38,10 +38,12 @@ class FacebookClient extends org.pac4j.oauth.client.FacebookClient {
 
     public FacebookClient() {
         super()
+        connectTimeout = 2000;
     }
 
     public FacebookClient(final String key, final String secret) {
         super(key,secret);
+        connectTimeout = 2000;
     }
 
     @Override

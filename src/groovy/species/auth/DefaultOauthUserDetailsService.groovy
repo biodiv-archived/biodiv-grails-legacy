@@ -11,8 +11,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUser;
 import org.springframework.security.core.userdetails .UserDetails;
 import speciespage.SUserService;
+import species.auth.SUser;
+
 
 class  DefaultOauthUserDetailsService extends DefaultOauthUserDetailsService {
+    SUserService userService;
+
     UserDetails loadUserDetailsByUserProfile(CommonProfile userProfile, Collection<GrantedAuthority> defaultRoles)
         throws UsernameNotFoundException {
         UserDetails userDetails
@@ -26,14 +30,23 @@ class  DefaultOauthUserDetailsService extends DefaultOauthUserDetailsService {
             return userDetails;
         } catch (UsernameNotFoundException unfe) {
             log.debug "User not found. Creating a new one with default roles: ${defaultRoles}"
-	
-	def user = SUserService.create([username:userProfile.getUsername(), name:userProfile.getDisplayName(), password:'openIdPassword', email:userProfile.getEmail(), profilePic:userProfile.getPictureUrl(),location:userProfile.getLocation(),  accountLocked:false, enabled:true]);
-			
-			SUserService.save(user);
+            def userProp = new HashMap();
+            userProp['username'] = userProfile.getUsername();
+            userProp['name']=userProfile.getDisplayName();
+            userProp['password']='openIdPassword';
+            userProp['email']=userProfile.getEmail();
+            userProp['profilePic']=userProfile.getPictureUrl();
+            userProp['location']=userProfile.getLocation();
+            userProp['accountLocked']=false;
+            userProp['enabled']=true;
+            def user = userService.create(userProp);
+            userService.save(user);
 		
-			SUserService.assignRoles(user);
-            return user;
+			userService.assignRoles(user);
+            userDetails = userDetailsService.loadUserByUsername userProfile.email
+            return userDetails;
         }
     }
+
 }
 
