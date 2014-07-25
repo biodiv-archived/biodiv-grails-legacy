@@ -859,7 +859,7 @@ class SpeciesUploadService {
 			tr.delete(flush:true)
 		}
 		
-		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty();
+		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).isEmpty() ;
 		if(canDelete){
 			log.debug "Deleting species ${s} "
 			deleteSpecies(s, user)
