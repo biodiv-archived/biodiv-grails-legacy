@@ -55,6 +55,7 @@ import species.Synonyms
 import species.TaxonomyRegistry
 import species.SpeciesPermission
 import species.groups.SpeciesGroupMapping
+import species.groups.UserGroup
 
 class SpeciesUploadService {
 
@@ -782,7 +783,7 @@ class SpeciesUploadService {
 				between("lastUpdated", start, end)
 			}
 		}
-		log.debug "sFields " + sFields
+		log.debug "Affected sFields " + sFields
 		
 		if(!sFields){
 			log.debug "Nothing to rollback"
@@ -791,24 +792,23 @@ class SpeciesUploadService {
 		}
 		
 		Collection<Species> sList = getAffectedSpecies(sFields)
-		log.debug "species list " + sList
+		log.debug "Affected species list " + sList
 		
-		SpeciesField.withTransaction{   
-			sFields.each { sf ->
-					log.info "Deleting ${sf}"
-					sf.delete()
-			}
+		List speciesToBeDeleted = []
+		Species.withTransaction{   
 			sList.each { s->
-				rollBackSpeciesUpdate(s, sFields, user)
+				rollBackSpeciesUpdate(s, sFields, user, speciesToBeDeleted)
 			}
-			
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 		}
+
 		
 		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			log.debug "Successfully Rolled back."
 			return "Successfully Rolled back."
 		}else{
 			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
+			log.debug "Rollback failed..."
 			return "Rollback failed..."
 		}
 	}
@@ -819,20 +819,12 @@ class SpeciesUploadService {
 	}
  
 	
-	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user) throws Exception {
-		List sFieldIds = SpeciesField.findAllBySpecies(s).collect{ it.id}
+	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user, List speciesToBeDeleted) throws Exception {
+		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+		List sFieldToDelete = specificSFields.intersect(sFields)
 		
-		//All species field deleted before this function call
-		boolean canDelete = sFieldIds.isEmpty();
-		
-		if(canDelete){
-			log.debug "Deleting species ${s} "
-			deleteSpecies(s, user)
-			return
-		}
-		
-		log.debug "Removing species field from species ${s}"
-		sFields.each { sf ->
+		log.debug "Removing species field from species ${s} following sFields  ${sFieldToDelete}"
+		sFieldToDelete.each { sf ->
 			s.removeFromFields(sf)
 			def ge = GeographicEntity.read(sf.id) 
 			if(ge){
@@ -843,21 +835,42 @@ class SpeciesUploadService {
 			}
 		}
 		
-		if(!s.save()){
+		sFieldToDelete.each { sf ->
+			sf.refresh()
+			log.info "Deleting ${sf}"
+			sf.delete(flush:true)
+		}
+		
+		sFields.removeAll(sFieldToDelete)
+		
+		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty();
+		if(canDelete){
+			log.debug "Deleting species ${s} "
+			deleteSpecies(s, user)
+			return
+		}
+
+		if(!s.save(flush:true)){
 			s.errors.allErrors.each { log.error it }
 		}
+				
 	}
 	
 	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
 		try{
 			Featured.deleteFeatureOnObv(s, user)
-			s.userGroups.each { ug ->
-				ug.removeFromSpecies(s)
-				ug.save()
+			if(s.userGroups){
+				List ugIds = s.userGroups.collect {it.id}
+				ugIds.each { ugId ->
+					def ug = UserGroup.get(ugId) 
+					log.debug "Removing species $s from userGroup  " + ug
+					ug.removeFromSpecies(s)
+					ug.save(flush:true, failOnError:true)
+				}
 			}
 			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
 				reco.taxonConcept = null
-				reco.save()
+				reco.save(flush:true)
 			}
 //			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
 //				cn.delete()
@@ -872,15 +885,23 @@ class SpeciesUploadService {
 //				sgm.delete()
 //			}
 			SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
-				sp.delete()
+				sp.delete(flush:true)
 			}
 			
-			s.resources?.clear()
-			s.delete()
+			if(s.resources){
+				def ids = s.resources.collect { it.id}
+				ids.each { 
+					def r = Resource.get(it)
+					s.removeFromResources(r)
+				}
+			}
+			log.debug "Reverting changes of species before delete $s ===="
+			s = s.merge()
+			s.delete(flush:true)
 			log.debug "Deleted ${s}"
 			return true
 		}catch (Exception e) {
-			log.error "Error in Deleting ${s}"
+			log.error "Error in Delete/Reverting ${s}"
 			e.printStackTrace()
 			throw e
 		}
