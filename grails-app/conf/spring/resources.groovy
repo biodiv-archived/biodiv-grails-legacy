@@ -329,6 +329,7 @@ beans = {
     /* oauthUserDetailsService */
     oauthUserDetailsService(DefaultOauthUserDetailsService) {
         userDetailsService = ref('userDetailsService')
+        userService = ref('SUserService')
     }
     
     oauthService(MyOauthService) {
