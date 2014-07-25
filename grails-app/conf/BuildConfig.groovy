@@ -179,7 +179,7 @@ grails.project.dependency.resolution = {
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
         compile (":mail:1.0.5")
-        compile ":quartz:1.0.1"
+        compile ":quartz:1.0.2"
         compile ":rateable:0.7.1"
         //      compile ":recaptcha:0.5.2"
         compile ":rest:0.8"
