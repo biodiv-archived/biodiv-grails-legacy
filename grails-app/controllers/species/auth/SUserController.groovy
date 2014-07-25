@@ -48,7 +48,7 @@ class SUserController extends UserController {
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
 
-	def index = {
+	def index () {
 		redirect(action: "list", params: params)
 	}
 
@@ -299,8 +299,7 @@ class SUserController extends UserController {
 		}
 	}
 
-	def search = {
-		log.debug params
+	def search () {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 		//def model = getUsersList(params);
@@ -484,8 +483,7 @@ class SUserController extends UserController {
 	/**
 	 *
 	 */
-	def advSearch = {
-		log.debug params;
+	def advSearch () {
 		String query  = "";
 		def newParams = [:]
 		for(field in params) {
@@ -509,9 +507,7 @@ class SUserController extends UserController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def nameTerms = {
-		log.debug params
-
+	def nameTerms () {
 		setIfMissing 'max', 5, 10
 
 		def jsonData = []
@@ -526,8 +522,7 @@ class SUserController extends UserController {
 	/**
 	 *
 	 */
-	def terms = {
-		log.debug params;
+	def terms () {
 		setIfMissing 'max', 5, 10
 		render SUserService.getUserSuggestions(params) as JSON;
 	}
@@ -558,9 +553,12 @@ class SUserController extends UserController {
 		return result;
 	}
 
-	def login = { render template:"/common/suser/userLoginBoxTemplate"  }
+	def loginTemplate() { 
+        String s = g.render template:"/common/suser/userLoginBoxTemplate"  
+        render s
+    }
 
-	def header = {
+	def headerTemplate () {
 		//TODO:HACK FOR NOW
 		String domainUrl = Utils.getDomainServerUrl(request);
 
@@ -571,12 +569,19 @@ class SUserController extends UserController {
 				return
 			}
 		}
-		render template:"/domain/ibpHeaderTemplate"
+		String s = g.render (template:"/domain/ibpHeaderTemplate")
+        render s;
 	}
 
-	def sidebar = { render template:"/common/userGroup/sidebarTemplate" }
+	def sidebarTemplate() { 
+        String s = g.render template:"/common/userGroup/sidebarTemplate" 
+        render s;
+    }
 
-	def footer = { render template:"/domain/ibpFooterTemplate" }
+	def footerTemplate() { 
+        String s = g.render template:"/domain/ibpFooterTemplate" 
+        render s;
+    }
 
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
@@ -652,8 +657,7 @@ class SUserController extends UserController {
 	/**
 	 *
 	 */
-	def getRecommendationVotes = {
-		log.debug params;
+	def getRecommendationVotes () {
 		params.max = params.limit ? params.int('limit') : 10
 		params.offset = params.offset ? params.long('offset'): 0
 
@@ -688,7 +692,7 @@ class SUserController extends UserController {
         return
 	}
 
-    def getRecommendationCount(userInstance){
+    def getRecommendationCount(SUser userInstance){
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.author_id = :userId", [userId:userInstance?.id])
 		return result[0]["count"]
