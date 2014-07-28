@@ -13,7 +13,9 @@ class DigestJob {
     }
 
     def execute() {
+        println "============SENDING DIGEST MAIL STARTED==================="
         digestService.sendDigestAction();
+        println "============SENDING DIGEST MAIL FINISHED=================="
     } 
 
 }
