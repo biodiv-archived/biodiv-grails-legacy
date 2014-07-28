@@ -380,7 +380,7 @@ class ImageUtils {
 				break;
 			case ImageType.ORIGINAL :
 			default:
-				name = name + defaultFileType;
+				name = name;
 
 		}
 		return name;

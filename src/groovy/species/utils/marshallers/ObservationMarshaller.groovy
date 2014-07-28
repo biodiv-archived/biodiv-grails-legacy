@@ -6,7 +6,7 @@ import grails.converters.JSON
 class ObservationMarshaller {
     
     void register() {
-        JSON.registerObjectMarshaller( Observation) { Observation obv ->
+       JSON.registerObjectMarshaller( Observation) { Observation obv ->
             Map result = [
                 id : obv.id,
                 placeName : obv.placeName,
@@ -30,7 +30,6 @@ class ObservationMarshaller {
 
                 rating : obv.rating,
 
-                maxVotedReco : obv.maxVotedReco,
 
                 resource : obv.listResourcesByRating(),
                 recommendationVote : obv.recommendationVote,
@@ -49,6 +48,20 @@ class ObservationMarshaller {
             if(obv.isChecklist && obv.isShowable) {
                 result['checklistAnnotations'] = obv.checklistAnnotations;
             }
+
+            Map maxVotedReco = new HashMap();
+            if(obv.maxVotedReco) {
+                if(obv.maxVotedReco.isScientificName) {
+                    maxVotedReco['sciNameReco'] = obv.maxVotedReco
+                }
+                
+                def commonNamesRecoList = obv.suggestedCommonNames(obv.maxVotedReco.id);
+                if(commonNamesRecoList)
+                    maxVotedReco['commonNamesRecoList'] = commonNamesRecoList
+ 
+            }
+            result['maxVotedReco'] = maxVotedReco;
+ 
             return result;
         }
     }
