@@ -127,9 +127,7 @@ $(document).ready(function() {
     });
     
     $("#refreshListForBounds").click(function() {
-        var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
-        if(mapLocationPicker){
-        }
+        var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker');
         refreshList(mapLocationPicker.getSelectedBounds());
     });
 
