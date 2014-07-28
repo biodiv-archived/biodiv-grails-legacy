@@ -788,13 +788,22 @@ class SpeciesUploadService {
 		}
 		log.debug "Affected sFields " + sFields
 		
-		if(!sFields){
+		//XXX: Assuming no parallel upload by same user.
+		List tRegistries = TaxonomyRegistry.withCriteria(){
+			and{
+				eq('uploader', user)
+				between("uploadTime", start, end)
+			}
+		}
+		log.debug "Affected taxonomy registries " + tRegistries
+		
+		if(!sFields || !tRegistries){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback."
 		}
 		
-		Collection<Species> sList = getAffectedSpecies(sFields)
+		Collection<Species> sList = getAffectedSpecies(sFields, tRegistries)
 		log.debug "Affected species list " + sList
 		
 		Species.withTransaction{   
@@ -815,8 +824,14 @@ class SpeciesUploadService {
 		}
 	}
 	
-	private Collection<Species> getAffectedSpecies(List sFields){
+	private Collection<Species> getAffectedSpecies(List sFields, List tRegs){
 		def sList = sFields.collect{it.species}
+		tRegs.each { TaxonomyRegistry tr ->
+			def s = Species.findByTaxonConcept(tr.taxonDefinition)
+			if(s)
+				sList << s
+		}
+		
 		return sList.unique() 
 	}
  

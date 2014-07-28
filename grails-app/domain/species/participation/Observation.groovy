@@ -172,12 +172,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 		if(!maxVotedReco){
 			return "";
 		}else{
-			return suggestedCommonNames(maxVotedReco.id, false);
+			def langToCommonName =  suggestedCommonNames(maxVotedReco.id);
+            return  getFormattedCommonNames(langToCommonName, false)
 		}
 	}
 
-
-	private String suggestedCommonNames(recoId, boolean addLanguage){
+	private Map suggestedCommonNames(recoId) {
 		def englistId = Language.getLanguage(null).id
 		Map langToCommonName = new HashMap()
 		this.recommendationVote.each{ rv ->
@@ -190,13 +190,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 						nameList = new HashSet()
 						langToCommonName[cnLangId] = nameList
 					}
-					nameList.add(cnReco.name)
+					nameList.add(cnReco)
 				}
 			}
 		}
-
-		return getFormattedCommonNames(langToCommonName, addLanguage)
-	}
+        return langToCommonName;
+    }
 
 	private String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
 		if(langToCommonName.isEmpty()){
@@ -209,7 +208,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		def cnList = []
 
 		langToCommonName.keySet().each{ key ->
-			def lanSuffix = langToCommonName.get(key).join(", ")
+			def lanSuffix = langToCommonName.get(key).name.join(", ")
 			if(addLanguage){
 				lanSuffix = Language.read(key).name + ": " + lanSuffix
 			}
@@ -257,7 +256,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
             map.put("isLocked", this.isLocked);
-			String cNames = suggestedCommonNames(reco.id, true)
+			def langToCommonName =  suggestedCommonNames(reco.id);
+            String cNames = getFormattedCommonNames(langToCommonName, true)
+
+			//String cNames = suggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			map.put("disAgree", (currentUser in map.authors));
             if(this.isLocked == false){

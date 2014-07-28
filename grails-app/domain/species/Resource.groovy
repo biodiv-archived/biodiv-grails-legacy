@@ -116,10 +116,16 @@ class Resource extends Sourcedata implements Rateable {
 				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
 				break;
 			case ResourceType.VIDEO :				
+                if( imageType == ImageType.ORIGINAL) {
+                    return this.url
+                }
 				String videoId = Utils.getYouTubeVideoId(this.url);
 				thumbnailUrl = "http://img.youtube.com/vi/${videoId}/default.jpg"
 				break;
 			case ResourceType.AUDIO :								
+                if( imageType == ImageType.ORIGINAL) {
+                    return grailsApplication.config.grails.serverURL+this.fileName
+                }
 				thumbnailUrl = grailsApplication.config.grails.serverURL+"/images/audioicon.png"
 				break;	
 			default :

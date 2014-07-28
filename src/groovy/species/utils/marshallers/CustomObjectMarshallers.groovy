@@ -28,6 +28,8 @@ import species.TaxonomyRegistry;
 import species.Classification;
 import species.Resource;
 import species.participation.Comment;
+import species.utils.ImageType;
+import species.Language;
 
 import grails.converters.JSON
 import species.participation.Observation
@@ -113,6 +115,10 @@ class CustomObjectMarshallers {
             if(speciesId) {
                 r['speciesId'] = speciesId;
             }
+            if(it.languageId) {
+                r['language'] = Language.read(it.languageId);
+            }
+
             return r;
         }
 
@@ -143,7 +149,7 @@ class CustomObjectMarshallers {
 
             def imagePath = it.thumbnailUrl(basePath);
 
-            return ['id':it.id, url:it.url, 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating];
+            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating];
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
