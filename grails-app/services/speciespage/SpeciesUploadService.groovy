@@ -797,7 +797,7 @@ class SpeciesUploadService {
 		}
 		log.debug "Affected taxonomy registries " + tRegistries
 		
-		if(!sFields || !tRegistries){
+		if(!sFields && !tRegistries){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback."
