@@ -498,7 +498,12 @@ environments {
                     'grails.app.tagLib.org.grails.plugin.resource',
                     'org.hibernate',
                     'grails.util'
-
+            error "grails.plugin" 
+            error 'grails.app.services.org.grails.plugin.resource'
+            error 'grails.app.taglib.org.grails.plugin.resource'
+            error 'grails.app.resourceMappers.org.grails.plugin.resource'
+            //debug "org.grails.plugin.resource"
+ 
             warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.app'
@@ -517,12 +522,7 @@ environments {
                     'org.pac4j'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            error "grails.plugin" 
-            error 'grails.app.services.org.grails.plugin.resource'
-            error 'grails.app.taglib.org.grails.plugin.resource'
-            error 'grails.app.resourceMappers.org.grails.plugin.resource'
-            //debug "org.grails.plugin.resource"
-        }
+       }
     }
 	test {
         log4jConsoleLogLevel = Priority.DEBUG
@@ -921,14 +921,33 @@ environments {
 			appenders {
 				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
 			}
+            error   'net.sf.ehcache.hibernate'
+            error    'org.codehaus.groovy.grails.web.pages', //  GSP
+                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
+                    'org.codehaus.groovy.grails.commons', // core / classloading
+                    'org.codehaus.groovy.grails.plugins', // plugins
+                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+                    'grails.app.tagLib.org.grails.plugin.resource',
+                    'org.hibernate',
+                    'grails.util'
+            error "grails.plugin" 
+            error 'grails.app.services.org.grails.plugin.resource'
+            error 'grails.app.taglib.org.grails.plugin.resource'
+            error 'grails.app.resourceMappers.org.grails.plugin.resource'
+            //debug "org.grails.plugin.resource"
+ 
+            warn    'org.springframework.security',
+                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
+                    'grails.app'
+            warn   'org.springframework.security'
+            warn   'org.springframework.security.web'
+            warn   'org.springframework.security.authentication'
+
+
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
-			warn 	'grails.app',
-					'org.springframework.security.web'
-            debug   'grails.app.filters.species.SecurityFilters'
-
-
 		}
 	}
 }
@@ -1446,6 +1465,7 @@ remove this line */
 //grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
 //TODO remove this client side fb authentication ... as this is legacy code in plugin
 grails.plugin.springsecurity.facebook.filter.type='cookie,transparent'
+grails.plugin.springsecurity.facebook.autoCreate.roles = ['ROLE_USER']
 //TODO:In Spring Security 3.0 and earlier, the username was stored in the HTTP session under the key "SPRING_SECURITY_LAST_USERNAME". This no longer done, but the plugin will use the old behavior if the grails.plugin.springsecurity.apf.storeLastUsername setting is set to true (the default is false ). Further, the name is no longer escaped before storing, it is stored exactly as entered by the user, so you must escape it when redisplaying to avoid XSS attacks.
 grails.plugin.springsecurity.apf.storeLastUsername=true
 grails.plugin.springsecurity.useSessionFixationPrevention = false
