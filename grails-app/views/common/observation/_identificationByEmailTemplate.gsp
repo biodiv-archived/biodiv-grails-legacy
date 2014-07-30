@@ -26,7 +26,7 @@
 				<i class="icon-pencil"></i><span class="keyname" style="clear: both">
 					Message</span>
 				<h5>
-					<label> ${staticMessage} </label>
+					<label>${staticMessage.encodeAsRaw()} </label>
 				</h5>
 				<div class="section-item">
 					<div id="cke_message">

@@ -2188,8 +2188,8 @@ line-height: 11px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item-horizontal {
-	height:75px;
-        width:75px;
+	height:75px !important;
+    width:75px !important;
 }
 
 .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
