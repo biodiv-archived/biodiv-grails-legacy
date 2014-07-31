@@ -574,7 +574,7 @@ class ObservationController extends AbstractObjectController {
 				
 						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
 
-                        if(f instanceof String) {
+                        if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
 						    download(f.url, file );						
                         } else {
 						    f.transferTo( file );
