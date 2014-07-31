@@ -836,19 +836,53 @@ environments {
             }
         }
 		log4jConsoleLogLevel = Priority.DEBUG
-		log4j = {
-			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-			}
-			info	'species',
-					'speciespage',
-					'com.mchange.v2.resourcepool.BasicResourcePool' 
-			warn 	'grails.app',
-					'org.springframework.security.web'
-            debug   'grails.app.filters.species.SecurityFilters'
 
+        log4j = {
 
-		}
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+                 //console name:'stacktrace'
+                 //'null' name:'stacktrace'//to disable stacktraces on stdout
+             }
+            root {
+                error 'stdout'
+            }
+            error stdout:"StackTrace"
+            error   'net.sf.ehcache.hibernate'
+            error    'org.codehaus.groovy.grails.web.pages', //  GSP
+                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
+                    'org.codehaus.groovy.grails.commons', // core / classloading
+                    'org.codehaus.groovy.grails.plugins', // plugins
+                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+                    'grails.app.tagLib.org.grails.plugin.resource',
+                    'org.hibernate',
+                    'grails.util'
+            error "grails.plugin" 
+            error 'grails.app.services.org.grails.plugin.resource'
+            error 'grails.app.taglib.org.grails.plugin.resource'
+            error 'grails.app.resourceMappers.org.grails.plugin.resource'
+            //debug "org.grails.plugin.resource"
+ 
+            warn    'org.springframework.security',
+                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
+                    'grails.app'
+            info   'org.springframework.security'
+            info   'org.springframework.security.web'
+            info   'org.springframework.security.authentication'
+
+            debug   'speciespage',
+                    'species'
+            debug   'com.the6hours', 
+                    'grails.app.taglib.com.the6hours'
+            debug   'species.auth'
+            debug   'com.odobo',
+                    'grails.app.controllers.com.odobo',
+                    'grails.app.services.com.odobo',
+                    'org.pac4j'
+//            debug 'org.hibernate.SQL'
+//            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+       }
 	}
 	kk {
 		servername = 'indiabiodiversity.org'
