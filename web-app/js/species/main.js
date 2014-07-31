@@ -52,7 +52,7 @@ var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction, ajaxLoginC
 
 var reloadLoginInfo = function() {
     $.ajax({
-        url : window.appContext+"/SUser/login",
+        url : window.appContext+"/SUser/loginTemplate",
         success : function(data) {
             $('.header_userInfo').replaceWith(data);
         }, error: function (xhr, ajaxOptions, thrownError){
