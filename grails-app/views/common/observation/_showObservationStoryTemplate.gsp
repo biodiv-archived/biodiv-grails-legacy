@@ -179,7 +179,7 @@
                 <div class="prop">
                     <span class="name"><i class="icon-info-sign"></i>References</span>
                     <div class="value linktext">
-                        ${checklistInstance.refText}
+                        ${raw(checklistInstance.refText)}
                     </div>		
                 </div>
                 </g:if>
