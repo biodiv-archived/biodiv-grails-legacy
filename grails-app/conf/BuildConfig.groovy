@@ -83,7 +83,7 @@ grails.project.dependency.resolution = {
         compile 'org.restlet.jee:org.restlet.ext.servlet:2.1.1'
 
         compile ('org.quartz-scheduler:quartz:2.1.7') {
-            excludes 'slf4j-api', 'jcl-over-slf4j'
+            excludes 'slf4j-api', 'jcl-over-slf4j', 'c3p0'
         }
 //        compile 'org.apache.lucene:lucene-analyzers:3.4.0'
 //        compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
