@@ -621,16 +621,25 @@ class ObservationController extends AbstractObjectController {
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
-					render(contentType:"text/xml") {
-						observations {							
-							dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
-							resources {
-								for(r in resourcesInfo) {
-									res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
-								}
-							}
-						}
-					}
+                    if(request.getHeader('X-Auth-Token')) {
+                        def resourcesList = [];
+                        for(r in resourcesInfo) {
+                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type]
+                            resourcesList << res
+                        }
+                        render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
+                    } else {
+                        render(contentType:"text/xml") {
+                            observations {							
+                                dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
+                                resources {
+                                    for(r in resourcesInfo) {
+                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
+                                    }
+                                }
+                            }
+                        }
+                    }
 				} else {
 					response.setStatus(500)
 					message = [success:false, error:message]
