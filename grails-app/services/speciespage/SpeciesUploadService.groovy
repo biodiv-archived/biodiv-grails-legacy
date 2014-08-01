@@ -805,6 +805,14 @@ class SpeciesUploadService {
 		
 		Collection<Species> sList = getAffectedSpecies(sFields, tRegistries)
 		log.debug "Affected species list " + sList
+
+		//XXX:remvoing species which going to be delted from usergroup first. 
+		//This is done to avaoid cascade resaving of object. better way requried.
+		Species.withTransaction{   
+			sList.each { s->
+				unpostFromUsergroup(s, sFields, user, sbu)
+			}
+		}
 		
 		Species.withTransaction{   
 			sList.each { s->
@@ -835,6 +843,37 @@ class SpeciesUploadService {
 		return sList.unique() 
 	}
  
+ 	private void unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+ 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+		List sFieldToDelete = specificSFields.intersect(sFields)
+		
+		List taxonReg = TaxonomyRegistry.withCriteria(){
+			and{
+				eq('taxonDefinition', s.taxonConcept)
+				eq('uploader', user)
+				between("uploadTime", sbu.startDate, sbu.endDate)
+			}
+		}
+
+		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
+		if(canDelete){
+			try{
+				Featured.deleteFeatureOnObv(s, user)
+				if(s.userGroups){
+					List ugIds = s.userGroups.collect {it.id}
+					ugIds.each { ugId ->
+						def ug = UserGroup.get(ugId) 
+						log.debug "Removing species $s from userGroup  " + ug
+						ug.removeFromSpecies(s)
+						ug.save(flush:true, failOnError:true)
+					}
+				}
+				if(!s.save(flush:true)){
+					s.errors.allErrors.each { log.error it }
+				}
+			}
+		}
+ 	}
 	
 	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
@@ -874,7 +913,7 @@ class SpeciesUploadService {
 			tr.delete(flush:true)
 		}
 		
-		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).isEmpty() ;
+		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			log.debug "Deleting species ${s} "
 			deleteSpecies(s, user)
@@ -889,16 +928,6 @@ class SpeciesUploadService {
 	
 	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
 		try{
-			Featured.deleteFeatureOnObv(s, user)
-			if(s.userGroups){
-				List ugIds = s.userGroups.collect {it.id}
-				ugIds.each { ugId ->
-					def ug = UserGroup.get(ugId) 
-					log.debug "Removing species $s from userGroup  " + ug
-					ug.removeFromSpecies(s)
-					ug.save(flush:true, failOnError:true)
-				}
-			}
 			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
 				reco.taxonConcept = null
 				reco.save(flush:true)
