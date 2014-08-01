@@ -96,9 +96,11 @@ class LoginController {
             params.remove('controller');
             if(!params.token) {
                 params.remove('token');
+            } 
+            
+            if(params.id) {
+                params.id = Long.parseLong(params.id);
             }
-            println "+++++++++++++++++++++++++++++"
-            println params;
             render params as JSON
         }
 	}
