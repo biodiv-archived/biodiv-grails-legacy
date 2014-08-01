@@ -872,6 +872,11 @@ class SpeciesUploadService {
 					s.errors.allErrors.each { log.error it }
 				}
 			}
+			catch (Exception e) {
+				log.error "Error in unposting from usergroup"
+				e.printStackTrace()
+				throw e
+			}
 		}
  	}
 	
