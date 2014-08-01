@@ -35,7 +35,9 @@ class SpeciesGroup {
 	Resource icon(ImageType type) {
 		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 		name = ImageUtils.getFileName(name, type, '.png');
-
+        if(type == ImageType.ORIGINAL) {
+            name = name + ".png"
+        }
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/../group_icons/speciesGroups/${name}")).exists()
 
 		if(!iconPresent) {

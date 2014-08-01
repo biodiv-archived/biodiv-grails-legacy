@@ -6,7 +6,6 @@
     def imagePath = '';
     def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
     if(mainImage?.fileName == speciesGroupIcon.fileName) { 
-        mainImage.fileName = mainImage.fileName+".png"
         imagePath = mainImage.thumbnailUrl(null, '.png');
     } else
         imagePath = mainImage?mainImage.thumbnailUrl():null;
