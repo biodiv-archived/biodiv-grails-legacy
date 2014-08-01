@@ -37,6 +37,8 @@ import species.auth.DefaultOauthUserDetailsService;
 import species.auth.MyOauthService;
 import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
+import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
+import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
 
 // Place your Spring DSL code here
 beans = {
@@ -226,10 +228,22 @@ beans = {
         appUserConnectionPropertyName = dbConf.facebook.domain.appUserConnectionPropertyName
         userDomainClassName = dbConf.userLookup.userDomainClassName
         rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
+        //coreUserDetailsService = ref('userDetailsService')
+        //defaultRoleNames = ['ROLE_USER']
+
     }
     //   }
 
-    facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
+    facebookAuthUtils(FacebookAuthUtils) { 
+        grailsApplication = ref('grailsApplication') 
+    }
+     /*   apiKey = conf.facebook.apiKey
+        secret = conf.facebook.secret
+        applicationId = conf.facebook.appId
+        filterTypes = ['cookie', 'transparent']
+        requiredPermissions = ['email']
+
+    }*/
 
     facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
     SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
@@ -351,9 +365,13 @@ beans = {
         ]
     }
 
-
     restAuthenticationFailureHandler(species.auth.RestAuthenticationFailureHandler) {
         statusCode = conf.rest.login.failureStatusCode?:HttpServletResponse.SC_FORBIDDEN
+    }
+
+    restAuthenticationTokenJsonRenderer(BiodivRestAuthenticationTokenJsonRenderer)
+    restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler) { 
+        renderer = ref('restAuthenticationTokenJsonRenderer')
     }
 
     /* restAuthenticationFilter */
@@ -367,5 +385,6 @@ beans = {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
+
 
 }
