@@ -55,7 +55,7 @@ class MyOauthService extends OauthService {
             Authentication authenticationResult = new RestAuthenticationToken(userDetails, userDetails.password, userDetails.authorities, tokenValue)
             SecurityContextHolder.context.setAuthentication(authenticationResult)
 
-            return tokenValue
+            return tokenValue+"&id="+userDetails.id;
         } catch(e) {
             e.printStackTrace();
             throw e;
