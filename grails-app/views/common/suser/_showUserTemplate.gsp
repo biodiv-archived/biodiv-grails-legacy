@@ -19,7 +19,7 @@
 			<div class="story-footer" style="position:static;">
 				<div class="footer-item" title="Observations">
 					<i class="icon-screenshot"></i>
-					<obv:showNoOfObservationsOfUser model="['user':userInstance]"/>
+					<obv:showNoOfObservationsOfUser model="['user':userInstance , 'userGroup':userGroupInstance]"/>
 				</div>
 
 <%--				<div class="footer-item" title="Tags">--%>
@@ -29,7 +29,7 @@
 				
 				<div class="footer-item" title="Identifications">
 					<i class="icon-check"></i>
-					<obv:showNoOfRecommendationsOfUser model="['user':userInstance]" />
+					<obv:showNoOfRecommendationsOfUser model="['user':userInstance , 'userGroup':userGroupInstance]" />
 				</div>
 				<div class="footer-item" title="Comments">
 					<i class="icon-comment"></i>

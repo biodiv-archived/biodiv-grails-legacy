@@ -182,7 +182,7 @@
                                     <h6>
                                         <span class="name" style="color: #b1b1b1;"> 
                                             <obv:showNoOfObservationsOfUser
-                                            model="['user':user]" /> </span> Observations
+                                            model="['user':user, 'userGroup':userGroupInstance]" /> </span> Observations
                  			<sUser:ifOwns model="['user':user]">
 						<a class="btn btn-link"
 							href="${uGroup.createLink(action:'create', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Add Observation</a>
@@ -196,7 +196,7 @@
                                 <div id="identifications" class="section" style="clear:both;">
                                     <h6>
                                         <span class="name" style="color: #b1b1b1;"> 
-                                            <obv:showNoOfRecommendationsOfUser model="['user':user]" /> </span>
+                                            <obv:showNoOfRecommendationsOfUser model="['user':user, 'userGroup':userGroupInstance]" /> </span>
                                         Identifications
                  			<sUser:ifOwns model="['user':user]">
 						<a class="btn btn-link"
@@ -247,7 +247,7 @@
 					<span class="name" style="color: #b1b1b1;"> <i
                                                 class="icon-tasks"></i> </span>Activity
                                         </h5>
-                                        <feed:showAllActivityFeeds model="['user':user?.id, feedType:ActivityFeedService.USER, 'feedPermission':false, 'feedOrder':ActivityFeedService.LATEST_FIRST]" />
+                                        <feed:showAllActivityFeeds model="['user':user?.id,'userGroup':userGroupInstance, feedType:ActivityFeedService.USER, 'feedPermission':false, 'feedOrder':ActivityFeedService.LATEST_FIRST]" />
                         </div>
 
                         </div>
