@@ -77,9 +77,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
 <%--	</div>--%>
 										
-	<div class="alertMsg alert alert-info" style="background-color: #2d2d2d; color: yellow; text-shadow: none; clear: both; margin: 0px; text-align: center;padding:4px;border:none;">
-        The National Moth week will be held between 19th-27th July. Join in! Observe moths, photograph and upload them to <a style="color:orange;" href="http://indiabiodiversity.org/group/indianmoths/show">IndianMoths@IBP</a>
-	</div>
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
