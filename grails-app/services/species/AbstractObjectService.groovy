@@ -233,7 +233,7 @@ class AbstractObjectService {
         if( params.resourceListType == "ofSpecies" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
         }
-        else if(params.resourceListType == "ofObv"){
+        else if(params.resourceListType == "ofObv" || params.resourceListType == null){
             uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
         }
         else{
@@ -344,7 +344,6 @@ class AbstractObjectService {
             break;
         }
         converter.setResourcesRootDir(rootDir);
-        
 
         def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
 
@@ -352,8 +351,7 @@ class AbstractObjectService {
             relImagesContext = resourcesXML.audios.audio?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
         }
         relImagesContext = new File(relImagesContext).getParent();
-       
-       return converter.createMedia(resourcesXML, relImagesContext);
+        return converter.createMedia(resourcesXML, relImagesContext);
     }
 
 
