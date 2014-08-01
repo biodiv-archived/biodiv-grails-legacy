@@ -56,8 +56,13 @@ class ObservationMarshaller {
                 }
                 
                 def commonNamesRecoList = obv.suggestedCommonNames(obv.maxVotedReco.id);
-                if(commonNamesRecoList)
-                    maxVotedReco['commonNamesRecoList'] = commonNamesRecoList.values()
+                if(commonNamesRecoList) {
+                    def cNRList = [];
+                    commonNamesRecoList.values().each {
+                        cNRList += it
+                    }
+                    maxVotedReco['commonNamesRecoList'] = cNRList
+                }
  
             }
             result['maxVotedReco'] = maxVotedReco;
