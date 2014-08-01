@@ -482,13 +482,9 @@ class ObservationController extends AbstractObjectController {
                     break;
                 }
                 File obvDir 
-
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
-
-
-
 				
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
@@ -512,7 +508,7 @@ class ObservationController extends AbstractObjectController {
 					// List of OK mime-types
 					//TODO Move to config
 
-					def resourcetype = f.mimetype.substring(0, f.mimetype.indexOf('/')).toLowerCase()
+					def resourcetype = mimetype.substring(0, mimetype.indexOf('/')).toLowerCase()
 					def resourceTypeAudio = ResourceType.AUDIO.value().toLowerCase()					
 					def resourceTypeImage = ResourceType.IMAGE.value().toLowerCase()		
 					
@@ -528,7 +524,7 @@ class ObservationController extends AbstractObjectController {
 										]
 						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
 
-					}else if(resourcetype == resourceTypeAudio){						
+					} else if(resourcetype == resourceTypeAudio){						
 						okcontents = [
 										'audio/mp4','audio/m4a',
 										'audio/mpeg','audio/mp1','audio/mp2','audio/mp3','audio/mpg',
@@ -541,7 +537,7 @@ class ObservationController extends AbstractObjectController {
 
 					}
 					
-					if (!okcontents.contains(f.mimetype)) {
+					if (!okcontents.contains(mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
 							filename
@@ -576,8 +572,13 @@ class ObservationController extends AbstractObjectController {
 						}
 
 				
-						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
-						download(f.url, file );						
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
+
+                        if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
+						    download(f.url, file );						
+                        } else {
+						    f.transferTo( file );
+                        }
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def thumbnail
 						def type
@@ -620,16 +621,25 @@ class ObservationController extends AbstractObjectController {
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
-					render(contentType:"text/xml") {
-						observations {							
-							dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
-							resources {
-								for(r in resourcesInfo) {
-									res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
-								}
-							}
-						}
-					}
+                    if(request.getHeader('X-Auth-Token')) {
+                        def resourcesList = [];
+                        for(r in resourcesInfo) {
+                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type]
+                            resourcesList << res
+                        }
+                        render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
+                    } else {
+                        render(contentType:"text/xml") {
+                            observations {							
+                                dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
+                                resources {
+                                    for(r in resourcesInfo) {
+                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
+                                    }
+                                }
+                            }
+                        }
+                    }
 				} else {
 					response.setStatus(500)
 					message = [success:false, error:message]

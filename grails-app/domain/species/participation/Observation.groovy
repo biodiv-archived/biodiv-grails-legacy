@@ -208,7 +208,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		def cnList = []
 
 		langToCommonName.keySet().each{ key ->
-			def lanSuffix = langToCommonName.get(key).name.join(", ")
+			def lanSuffix = langToCommonName.get(key)*.name.join(", ")
 			if(addLanguage){
 				lanSuffix = Language.read(key).name + ": " + lanSuffix
 			}
@@ -218,7 +218,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		//adding english names in front if its availabel
 		def engNamesString = null
 		if(englishNames){
-			engNamesString = englishNames.join(", ")
+			engNamesString = englishNames*.name.join(", ")
 			if(addLanguage){
 				engNamesString = Language.read(englishId).name + ": " + engNamesString
 			}

@@ -10,9 +10,9 @@
             <div class="form-row" style="${hideTo?'display:none;':''}">
 				<span class="keyname">To</span>
 				<ul class="userOrEmail-list">
-					<li id="userOrEmail-new"><input id="userAndEmailList_${autofillUsersId}"
+					<input id="userAndEmailList_${autofillUsersId}"
 						placeholder='Type user name or email id' style="float: left"
-						type="text" /></li>
+						type="text" />
 				</ul>
             </div>
             
@@ -26,7 +26,7 @@
 				<i class="icon-pencil"></i><span class="keyname" style="clear: both">
 					Message</span>
 				<h5>
-					<label> ${staticMessage} </label>
+					<label>${staticMessage.encodeAsRaw()} </label>
 				</h5>
 				<div class="section-item">
 					<div id="cke_message">

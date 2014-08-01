@@ -149,7 +149,7 @@
 						<div>
 							<h4>Summary</h4>
 							<p>
-								${projectInstance?.summary}
+								${raw(projectInstance?.summary)}
 							</p>
 						</div>
 					</g:if>
@@ -215,7 +215,7 @@
 								<tr>
 									<td class="prop"><span class=" name">Organization</td>
 									<td>
-										${projectInstance?.granteeOrganization}
+										${raw(projectInstance?.granteeOrganization)}
 									</td>
 								</tr>
 							</table>
@@ -259,7 +259,7 @@
 
 						<g:if test="${projectInstance?.projectProposal}">
 							<div class="notes_view linktext">
-								${projectInstance?.projectProposal}
+								${raw(projectInstance?.projectProposal)}
 							</div>
 						</g:if>
 
@@ -286,7 +286,7 @@
 
 						<g:if test="${projectInstance?.projectReport}">
 							<div class="notes_view linktext">
-								${projectInstance?.projectReport}
+								${raw(projectInstance?.projectReport)}
 							</div>
 						</g:if>
 
@@ -316,7 +316,7 @@
 								<tr>
 									<td class="prop" style="vertical-align:top;"><span class="name">Description</span></td>
 									<td>
-										${dataLink.description}
+										${raw(dataLink.description)}
 									</td>
 								</tr>
 								<tr>
@@ -341,7 +341,7 @@
 					<div id="misc" class="speciesField collapse in">
 						<g:if test="${projectInstance?.misc}">
 							<div class="notes_view linktext">
-								${projectInstance?.misc}
+								${raw(projectInstance?.misc)}
 							</div>
 						</g:if>
 

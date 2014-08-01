@@ -68,7 +68,7 @@
 				</div>
 				
 				<obv:identificationByEmail
-					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers']" />
+					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:'Share']" />
 				
 				<obv:download
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />

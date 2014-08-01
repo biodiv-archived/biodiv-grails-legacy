@@ -517,7 +517,7 @@ class SpeciesController extends AbstractObjectController {
                 }
                 break;
                 case 'commonname':
-                long cid = params.cid?params.long('cid'):null;
+                Long cid = params.cid?params.long('cid'):null;
                 String language = params.language?:null;
 
                 if(params.act == 'delete') {
