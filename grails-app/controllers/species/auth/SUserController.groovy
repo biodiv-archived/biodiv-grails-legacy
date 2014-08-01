@@ -124,10 +124,13 @@ class SUserController extends UserController {
 	def show() {
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
-		}
+        }
+        def userGroupInstance = null
+        if(params.webaddress) {
+            userGroupInstance = userGroupService.get(params['webaddress'])
+        }
+        def SUserInstance = SUser.get(params.long("id"))
 
-		def SUserInstance = SUser.get(params.long("id"))
-        
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
                 render (['success':false, 'msg':"Id is required"] as JSON)
@@ -147,7 +150,7 @@ class SUserController extends UserController {
                             result.roles << role.authority
                         }                    
                     }
-                    result['stat'] = chartService.getUserStats(SUserInstance);
+                    result['stat'] = chartService.getUserStats(SUserInstance, userGroupInstance);
                     render result as JSON
                     return;
                 }
@@ -160,7 +163,7 @@ class SUserController extends UserController {
             else {
                 def result = buildUserModel(SUserInstance)
                 result.put('userGroupWebaddress', params.webaddress)
-                result.put('obvData', chartService.getUserStats(SUserInstance));
+                result.put('obvData', chartService.getUserStats(SUserInstance, userGroupInstance));
     //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
     //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
                 result['currentUser'] = springSecurityService.currentUser;
@@ -658,19 +661,22 @@ class SUserController extends UserController {
 	 *
 	 */
 	def getRecommendationVotes () {
-		params.max = params.limit ? params.int('limit') : 10
+        params.max = params.limit ? params.int('limit') : 10
 		params.offset = params.offset ? params.long('offset'): 0
 
 		def userInstance = SUser.get(params.filterPropertyValue)
-		if (userInstance) {
-			def recommendationVoteList
-			if(params.obvId){
-				recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
-			}else{
-				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
-			} 
-            
-            def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance);
+        if (userInstance) {
+            def userGroupInstance
+            if(params.webaddress) {
+                userGroupInstance = userGroupService.get(params['webaddress'])
+            }
+            def recommendationVoteList
+            if(params.obvId){
+                recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
+            }else{
+				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset, userGroupInstance);
+			}
+            def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance, userGroupInstance);
 
             def observations = recommendationVoteList.collect{it.observation};	
             def result = []

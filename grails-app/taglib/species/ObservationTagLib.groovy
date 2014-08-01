@@ -62,7 +62,7 @@ class ObservationTagLib {
 	}
 
 	def showRelatedStory = {attrs, body->
-			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
+        out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
 	}
 	
 	def showGroupFilter = {attrs, body->
@@ -181,12 +181,12 @@ class ObservationTagLib {
 	}
 	
 	def showNoOfObservationsOfUser = {attrs, body->
-		def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user);
+        def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user, attrs.model.userGroup);
 		out << noOfObvs
 	}
 	
 	def showNoOfRecommendationsOfUser = {attrs, body->
-		def noOfObvs = observationService.getAllRecommendationsOfUser(attrs.model.user);
+        def noOfObvs = observationService.getAllRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
 		out << noOfObvs
 	}
 	
@@ -295,8 +295,8 @@ class ObservationTagLib {
 
     def getStats = { attrs, body ->
         def noOfTags = observationService.getAllTagsOfUser(attrs.model.user.id.toLong()).size()	
-        def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user);
-		def noOfUserRecos = observationService.getAllRecommendationsOfUser(attrs.model.user);
+        def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user, attrs.model.userGroup);
+		def noOfUserRecos = observationService.getAllRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
         def noOfComments = attrs.model.user.fetchCommentCount()
         int totalActivity = chartService.getUserActivityCount(attrs.model.user);
         out << """

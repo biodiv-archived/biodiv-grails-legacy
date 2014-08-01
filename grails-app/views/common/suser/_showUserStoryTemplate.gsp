@@ -92,7 +92,7 @@
 		</g:if>
 	</div>
         <g:if test="${!showDetails }">
-            <obv:getStats model="['user':userInstance]"/>
+            <obv:getStats model="['user':userInstance, 'userGroup':userGroupInstance]"/>
         </g:if>
 </div>
 
