@@ -668,10 +668,18 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getRecommendation(params){
-        def recoName = params.recoName;
-        def canName = params.canName;
-        def commonName = params.commonName;
-        def languageId = Language.getLanguage(params.languageName).id;
+        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
+    }
+
+    /**
+    * recoName
+    * canName
+    * commonName
+    * languageName
+    * 
+    **/
+    Map getRecommendations(String recoName, String canName, String commonName, String languageName) {
+        def languageId = Language.getLanguage(languageName).id;
         //		def refObject = params.observation?:Observation.get(params.obvId);
 
         //if source of recommendation is other that observation (i.e Checklist)
