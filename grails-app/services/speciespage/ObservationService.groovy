@@ -898,7 +898,7 @@ class ObservationService extends AbstractObjectService {
     Query q = session.createQuery(< your hql > ); 
     Geometry geom = < your parameter value> 
     //now first create a custom type 
-    Type geometryType = new CustomType(GeometryUserType.class, null); 
+    Type geometryType = new CustomType(new GeometryUserType()); 
     q.setParameter(:geoExp0, geom, geometryType); 
      */
     Map getFilteredObservations(def params, max, offset, isMapView = false) {
@@ -930,11 +930,11 @@ class ObservationService extends AbstractObjectService {
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
-            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
+            //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
 
         if(max > -1){
@@ -2364,8 +2364,8 @@ class ObservationService extends AbstractObjectService {
         def distinctRecoCountQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoCountQuery)
 
         if(params.bounds && boundGeometry) {
-            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
 
         if(max > -1){
@@ -2460,7 +2460,7 @@ class ObservationService extends AbstractObjectService {
         def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
 
         if(params.bounds && boundGeometry) {
-            speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
@@ -2538,7 +2538,7 @@ class ObservationService extends AbstractObjectService {
         if(!Environment.getCurrent().getName().equalsIgnoreCase("development")) {
         try {
             def sql =  Sql.newInstance(dataSource);
-            //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
+            //sql.in(new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()), obv.topology)
 
             sql.rows(query).each {
                 switch (it.getProperty("type")) {
@@ -2573,7 +2573,7 @@ class ObservationService extends AbstractObjectService {
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
-            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
 
         hqlQuery.setProperties(queryParts.queryParams);
