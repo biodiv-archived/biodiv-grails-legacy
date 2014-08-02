@@ -35,7 +35,7 @@
 
 					<li
 						class="${((params.controller == 'userGroup' && params.action == 'species')||(params.controller == 'species'))?' active':''}"><a
-						href="${uGroup.createLink('mapping':'userGroup', 'action':'species', 'userGroup':userGroupInstance)}"
+						href="${uGroup.createLink('controller':'species', 'action':'list', 'userGroup':userGroupInstance)}"
 						title="Species">Species</a>
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
