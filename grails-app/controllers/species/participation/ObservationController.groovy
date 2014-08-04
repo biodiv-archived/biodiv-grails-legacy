@@ -279,7 +279,7 @@ class ObservationController extends AbstractObjectController {
 		if(result.success){
             if(request.getHeader('X-Auth-Token')) 
                 params.isMobileApp = true;
-			chain(action: 'addRecommendationVote', model:['chainedParams':params]);
+			forward (action: 'addRecommendationVote', params:params);
 		} else{
             if(request.getHeader('X-Auth-Token')) {
                 result.remove('observationInstance');
@@ -679,13 +679,18 @@ class ObservationController extends AbstractObjectController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote() {
-		if(chainModel?.chainedParams) {
+		/*if(chainModel?.chainedParams) {
 			//need to change... dont pass on params
 			chainModel.chainedParams.each {
 				params[it.key] = it.value;
 			}
 			params.action = 'addRecommendationVote'
-		}
+		}*/
+        println "*************************************"
+        println request.getHeaderNames();
+        println request.getHeader('X-Auth-Token')
+        println params
+        println "*************************************"
 		params.author = springSecurityService.currentUser;
         boolean isMobileApp = request.getHeader('X-Auth-Token') || params.isMobileApp; 
         
@@ -1597,7 +1602,7 @@ class ObservationController extends AbstractObjectController {
             //TODO:edit also calls here...handle that wrt other domain objects
             def result = observationService.saveObservation(params, false)
             if(result.success){
-                chain(action: 'addRecommendationVote', model:['chainedParams':params]);
+                forward(action: 'addRecommendationVote', params:params);
             } else {
                 def output = [:]
                 def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: result.observationInstance]);
