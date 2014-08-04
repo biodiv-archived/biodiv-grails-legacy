@@ -686,11 +686,6 @@ class ObservationController extends AbstractObjectController {
 			}
 			params.action = 'addRecommendationVote'
 		}*/
-        println "*************************************"
-        println request.getHeaderNames();
-        println request.getHeader('X-Auth-Token')
-        println params
-        println "*************************************"
 		params.author = springSecurityService.currentUser;
         boolean isMobileApp = request.getHeader('X-Auth-Token') || params.isMobileApp; 
         
@@ -769,7 +764,7 @@ class ObservationController extends AbstractObjectController {
                         if(params.oldAction != "bulkSave"){
                             if(isMobileApp){
                                 println "2______________________________________________"
-                                render (['status':'success', 'success' : true, observationInstance:observationInstance] as JSON);
+                                render (['status':'success', 'success' : true, observationInstance:observationInstance.refresh()] as JSON);
                             } else {
     						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
                             }
