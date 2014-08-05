@@ -1568,8 +1568,12 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
         }
+        println "========SPECIES RESOURCES===== " + speciesResources
+        println "======RESOURCES CREATED========== " + resources
 
         resources.each { resource ->
+            //resource.saveResourceContext(species)
+            //species.addToResources(resource);
             if(params.resourceListType == "ofSpecies") {
                 resource.saveResourceContext(species)
                 if(!speciesResources.contains(resource)){

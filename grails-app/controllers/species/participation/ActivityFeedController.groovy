@@ -16,7 +16,6 @@ class ActivityFeedController {
 	def getFeeds(){
 		//log.debug params;
 		params.author = springSecurityService.currentUser;
-		
 		def feeds = activityFeedService.getActivityFeeds(params);
 		if(!feeds.isEmpty()){
 			if(params.checkFeed){

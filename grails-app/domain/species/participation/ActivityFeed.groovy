@@ -123,7 +123,21 @@ class ActivityFeed {
 							}
 							break
 						case ActivityFeedService.USER:
-							eq('author', SUser.read(params.user.toLong()))
+                            and{
+                                eq('author', SUser.read(params.user.toLong()))
+                                or{
+                                    params.typeToIdFilterMap.each{key, value ->
+                                        if(!value.isEmpty()){ 
+                                            or{
+                                                and{
+                                                    eq('rootHolderType', key)
+                                                    'in'('rootHolderId', value)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             break
 						default:
 							break
@@ -173,8 +187,20 @@ class ActivityFeed {
 							eq('rootHolderId', params.rootHolderId.toLong())
 							break
                         case ActivityFeedService.USER:
-							eq('author', SUser.read(params.user.toLong()))
-							break
+                            eq('author', SUser.read(params.user.toLong()))
+                            or{
+                                params.typeToIdFilterMap.each{key, value ->
+                                    if(!value.isEmpty()){ 
+                                        or{
+                                            and{
+                                                eq('rootHolderType', key)
+                                                'in'('rootHolderId', value)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+						break
 
 						default:
 							break
@@ -229,6 +255,10 @@ class ActivityFeed {
 				params.typeToIdFilterMap = getGroupAndObsevations(groups)
 				break
             case ActivityFeedService.USER:
+                if(params.userGroupFromUserProfile){
+                    def groups = [UserGroup.read(params.userGroupFromUserProfile.toLong())]
+                    params.typeToIdFilterMap = getGroupAndObsevations(groups)
+                }
                 if(!params.user){
 					return false
 				}
