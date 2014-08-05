@@ -473,10 +473,10 @@ $(document).ready(function() {
 	});
 	
 	<g:if test="${userGroupInstance.isAttached() }">
-			<g:each in="${userGroupInstance.getFounders(userGroupInstance.getFoundersCount()+1, 0)}" var="user">
+			<g:each in="${userGroupInstance.getFounders((userGroupInstance.getFoundersCount()+1) as int, 0L)}" var="user">
 				founders_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
 			</g:each>
-			<g:each in="${userGroupInstance.getExperts(userGroupInstance.getExpertsCount()+1, 0)}" var="user">
+			<g:each in="${userGroupInstance.getExperts((userGroupInstance.getExpertsCount()+1) as int, 0L)}" var="user">
 				experts_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
 			</g:each>
 	</g:if>
