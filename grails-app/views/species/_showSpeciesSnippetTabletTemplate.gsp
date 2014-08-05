@@ -4,10 +4,10 @@
 <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 <%
     def imagePath = '';
-    def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.NORMAL)
-    if(mainImage?.fileName == speciesGroupIcon.fileName) 
+    def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+    if(mainImage?.fileName == speciesGroupIcon.fileName) { 
         imagePath = mainImage.thumbnailUrl(null, '.png');
-    else
+    } else
         imagePath = mainImage?mainImage.thumbnailUrl():null;
 
     def obvId = speciesInstance.id

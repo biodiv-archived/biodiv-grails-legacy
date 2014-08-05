@@ -773,7 +773,6 @@ class XMLConverter extends SourceConverter {
         File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
-        
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {

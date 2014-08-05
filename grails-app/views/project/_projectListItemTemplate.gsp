@@ -13,7 +13,7 @@
 	<div class="summary">
 		<g:if test="${projectInstance.summary}">
 			<div class="proj-summary">
-				${projectInstance.summary}
+				${raw(projectInstance.summary)}
 			</div>
 		</g:if>
 
@@ -22,7 +22,7 @@
 	<g:if test="${projectInstance.granteeOrganization}">
 		<div class="proj-grantee" style="padding-top: 10px;">
 			<b> Grantee :</b>
-			${projectInstance.granteeOrganization}
+			${raw(projectInstance.granteeOrganization)}
 		</div>
 
 	</g:if>
