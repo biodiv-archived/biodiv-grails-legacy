@@ -37,4 +37,4 @@ cadb () {
 
 export GRAILS_OPTS="-XX:MaxPermSize=256m -Xmx1024M"
 
-
+export BIODIV_CONFIG_LOCATION=~/.grails/additional-config.groovy
