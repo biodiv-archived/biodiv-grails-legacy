@@ -15,6 +15,7 @@ import species.License.LicenseType;
 import species.Contributor;
 import species.Field
 import species.Resource;
+import species.Resource.ResourceType;
 import species.participation.Observation;
 import species.Species;
 import species.License;
@@ -1531,7 +1532,15 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         if(params.resourceListType == "ofSpecies"){
             def resourcesXML = createResourcesXML(params);
             resources = saveResources(species, resourcesXML);
-            //species.resources?.clear();
+            params.each { key, val ->
+                if(key.startsWith('file_')) {
+                    def res = Resource.findByFileNameAndType(params.get(key), ResourceType.IMAGE);
+                    if(res && !resources.contains(res)){
+                        resources.add(res)
+                    }
+                }
+            }
+            species.resources?.clear();
         }
         else if(params.resourceListType == "fromRelatedObv" || params.resourceListType == "fromSpeciesField"){
             def resId = []
@@ -1568,20 +1577,16 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
         }
-        println "========SPECIES RESOURCES===== " + speciesResources
-        println "======RESOURCES CREATED========== " + resources
-
         resources.each { resource ->
-            //resource.saveResourceContext(species)
-            //species.addToResources(resource);
             if(params.resourceListType == "ofSpecies") {
-                resource.saveResourceContext(species)
-                if(!speciesResources.contains(resource)){
-                    species.addToResources(resource);
+                if(!resource.save(flush:true)){
+                    resource.errors.allErrors.each { log.error it }
                 }
-            }else{
-                species.addToResources(resource);
+                if(!resource.context){
+                    resource.saveResourceContext(species)
+                }
             }
+            species.addToResources(resource);
         }
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
