@@ -110,11 +110,10 @@ class ActivityFeedService {
 	
 	
 	static transactional = false
-	
+
+    def utilsService
 	def grailsApplication
 	def springSecurityService
-	def observationService
-	def userGroupService
 	
 	def getActivityFeeds(params){
 //		log.debug params;
@@ -390,7 +389,7 @@ class ActivityFeedService {
 		def speciesId = reco?.taxonConcept?.findSpeciesId();
 		String sb = ""
 		if(speciesId != null){
-			sb =  '<a href="' + observationService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
+			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
             //sb = sb.replaceAll('"|\'','\\\\"')
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
@@ -401,7 +400,7 @@ class ActivityFeedService {
 	}
 	
 	def getUserHyperLink(user, userGroup){
-		String sb = '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
+		String sb = '<a href="' +  utilsService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
         return sb;
         //return sb.replaceAll('"|\'','\\\\"')
 	}
@@ -410,7 +409,7 @@ class ActivityFeedService {
         if(!userGroup){
             return ""
         }
-		String sb = '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+		String sb = '<a href="' + utilsService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
         return sb;
         //return sb.replaceAll('"|\'','\\\\"')
 	}
@@ -439,14 +438,14 @@ class ActivityFeedService {
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(!isBulkPull && sendMail){
-				observationService.sendNotificationMail(activityType, r, null, null, af)
+				utilsService.sendNotificationMail(activityType, r, null, null, af)
 			}
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
 			af = addActivityFeed(ug, ug, author, activityType, description, true)
             if(sendMail)
-			    observationService.sendNotificationMail(activityType, ug, null, null, af)
+			    utilsService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
 		return af
 	}

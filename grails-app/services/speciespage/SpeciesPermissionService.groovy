@@ -21,9 +21,8 @@ class SpeciesPermissionService {
 
     static transactional = true
 
-    def springSecurityService;
     def emailConfirmationService;
-    def observationService;
+    def utilsService;
 
 
     List<SUser> getCurators(Species speciesInstance) {
@@ -315,7 +314,7 @@ println res;
 
                 List<SUser> speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
                 speciesAdmins.each {
-                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:observationService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
+                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:utilsService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
                 }
 
                 msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        

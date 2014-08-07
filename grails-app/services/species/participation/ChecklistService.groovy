@@ -67,7 +67,7 @@ class ChecklistService {
 	def activityFeedService;
 	def observationsSearchService;
 	def dataSource;
-	def checklistUtilService
+	def utilsService
 	
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Create ///////////////////////////////
@@ -663,7 +663,7 @@ class ChecklistService {
 					
 				}
 				
-				checklistUtilService.cleanUpGorm(true)
+				utilsService.cleanUpGorm(true)
 				
 				Checklists.withTransaction(){ 
 					cl = Checklists.get(id)

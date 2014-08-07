@@ -52,8 +52,7 @@ class DocumentService {
 	def userGroupService
 	def dataSource
     def sessionFactory
-    def observationService
-	def checklistUtilService
+    def utilsService
 	def activityFeedService
 	
 	Document createDocument(params) {
@@ -399,7 +398,7 @@ class DocumentService {
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
-        def userGroup = observationService.getUserGroup(params);
+        def userGroup = utilsService.getUserGroup(params);
  
         if(params.featureBy == "true"){
 			query = "select document from Document document "
@@ -412,7 +411,7 @@ class DocumentService {
                 queryParams["userGroupId"] = userGroup?.id
 
             }
-            //params.userGroup = observationService.getUserGroup(params);
+            //params.userGroup = utilsService.getUserGroup(params);
             // if(params.userGroup == null) {
                 //filterQuery += "and feat.userGroup is null"
             //}
@@ -522,7 +521,7 @@ class DocumentService {
 				uploadDoc(fileDir, m, resultObv)
 				i++
 				if(i > BATCH_SIZE){
-					checklistUtilService.cleanUpGorm(true)
+					utilsService.cleanUpGorm(true)
 					def obvs = resultObv.collect { Document.read(it) }
 					try{
 						documentSearchService.publishSearchIndex(obvs, true);
@@ -544,7 +543,7 @@ class DocumentService {
 		if(sourceFile.exists()){
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			String contentRootDir = config.speciesPortal.content.rootDir
-			File destinationFile = observationService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+			File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
 			try{
 				Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
 				UFile f = new UFile()

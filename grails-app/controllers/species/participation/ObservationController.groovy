@@ -42,6 +42,7 @@ class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
+    def utilsService;
 	def observationService;
 	def springSecurityService;
 	def mailService;
@@ -53,6 +54,7 @@ class ObservationController extends AbstractObjectController {
 	def obvUtilService;
     def chartService;
     def messageSource;
+    def commentService;
 
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -579,7 +581,7 @@ class ObservationController extends AbstractObjectController {
 						}
 
 				
-						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
+						File file = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
 
                         if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
 						    download(f.url, file );						
@@ -752,7 +754,7 @@ class ObservationController extends AbstractObjectController {
 						mailType = observationService.SPECIES_RECOMMENDED;
 					}
 					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
-					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+					commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
                     if(!params["createNew"] && !isMobileApp){
 						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
@@ -1209,7 +1211,7 @@ class ObservationController extends AbstractObjectController {
 						if(!existingRecVote.save(flush:true)){
 							existingRecVote.errors.allErrors.each { log.error it }
 						}
-						observationService.addRecoComment(existingRecVote.recommendation, observation, params.recoComment);
+						commentService.addRecoComment(existingRecVote.recommendation, observation, params.recoComment);
 						*/
 					}
 					return [recVote:null, msg:msg]
@@ -1272,7 +1274,7 @@ class ObservationController extends AbstractObjectController {
 				SUser user = SUser.get(candidateEmail.toLong());
 				candidateEmail = user.email.trim();
 				if(user.allowIdentifactionMail){
-					result[candidateEmail] = observationService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+					result[candidateEmail] = utilsService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
 				}else{
 					log.debug "User $user.id has unsubscribed for identification mail."
 				}
@@ -1280,7 +1282,7 @@ class ObservationController extends AbstractObjectController {
 				if(BlockedMails.findByEmail(candidateEmail)){
 					log.debug "Email $candidateEmail is unsubscribed for identification mail."
 				}else{
-					result[candidateEmail] = observationService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+					result[candidateEmail] = utilsService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
 				}
 			}
 		}

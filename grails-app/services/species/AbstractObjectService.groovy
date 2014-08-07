@@ -14,6 +14,7 @@ import species.participation.Checklists;
 import species.sourcehandler.XMLConverter;
 import species.participation.Observation;
 import species.Species;
+import species.groups.SpeciesGroup;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -352,6 +353,21 @@ class AbstractObjectService {
         }
         relImagesContext = new File(relImagesContext).getParent();
         return converter.createMedia(resourcesXML, relImagesContext);
+    }
+
+
+    /**
+     * 
+     * @param groupId
+     * @return
+     */
+    Object getSpeciesGroupIds(groupId){
+        def groupName = SpeciesGroup.read(groupId)?.name
+        //if filter group is all
+        if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
+            return null
+        }
+        return groupId
     }
 
 

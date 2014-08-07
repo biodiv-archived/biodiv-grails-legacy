@@ -10,8 +10,8 @@ import groovy.sql.Sql;
 
 class DigestService {
 
+    def utilsService;
     def activityFeedService;
-    def observationService;
     def chartService;
     def dataSource;
 
@@ -36,7 +36,7 @@ class DigestService {
         }
         def emailFlag = true
         while(emailFlag){
-            def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+            def usersEmailList = utilsService.getParticipantsForDigest(digest.userGroup, max, offset)
             if(usersEmailList.size() != 0){
                 sendDigest(digest, usersEmailList, false)
                 offset = offset + max
@@ -71,7 +71,7 @@ class DigestService {
             otherParams['usersEmailList'] = usersEmailList  
             println "============================== Sending email" 
             println usersEmailList
-            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+            utilsService.sendNotificationMail(utilsService.DIGEST_MAIL,sp,null,null,null,otherParams)
             
             if(setTime) {
                 if(!digest.save(flush:true))
@@ -268,7 +268,7 @@ class DigestService {
         def emailFlag = true
         def userGroup = UserGroup.read(18L)
         while(emailFlag){
-            def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+            def usersEmailList = utilsService.getParticipantsForDigest(userGroup, max, offset)
             if(usersEmailList.size() != 0){
                 def otherParams = [:]
                 otherParams['userGroup'] = userGroup
@@ -276,7 +276,7 @@ class DigestService {
                 def sp = new Species() 
                 println "============================== Sending DIGEST PRIZE Email" 
                 println usersEmailList
-                observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+                utilsService.sendNotificationMail(utilsService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
                 offset = offset + max
                 Thread.sleep(300000L);
             }
@@ -293,7 +293,7 @@ class DigestService {
         def emailFlag = true
         def userGroup = UserGroup.read(18L)
         //while(emailFlag){
-        //def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+        //def usersEmailList = utilsService.getParticipantsForDigest(userGroup, max, offset)
         //if(usersEmailList.size() != 0){
         def otherParams = [:]
         otherParams['userGroup'] = userGroup
@@ -301,7 +301,7 @@ class DigestService {
         def sp = new Species() 
         println "============================== Sending DIGEST PRIZE Email" 
         println usersEmailList
-        observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+        utilsService.sendNotificationMail(utilsService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
         offset = offset + max
         //Thread.sleep(300000L);
         //}

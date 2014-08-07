@@ -5,8 +5,9 @@ class CommentService {
 	static transactional = false
 	
 	def grailsApplication
+    def springSecurityService
 	def activityFeedService
-	def observationService
+    def utilsService
 	def userGroupService
 	
 	def addComment(params){
@@ -35,7 +36,7 @@ class CommentService {
 		}else{
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 			def feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
-			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
+			utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
 			return ['success': true, 'commentObj' :c]
 		}
 	}
@@ -133,5 +134,14 @@ class CommentService {
 		params.max = params.max ? params.max.toInteger() : 3
 		params.offset = params.offset ? params.offset.toLong() : 0
 	}
+
+    def addRecoComment(commentHolder, rootHolder, recoComment){
+        recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
+        if(recoComment){
+            def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
+                commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName()]
+                addComment(m);
+        }
+    }
 
 }
