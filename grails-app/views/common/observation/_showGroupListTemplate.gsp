@@ -2,7 +2,7 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 
 <div class="view_tags grid_4">
-	<h5>Groups</h5>
+	<h5><g:message code="msg.Groups" /></h5>
 	<ul class="tagit">
 		<g:each in="${SpeciesGroup.list()}">
 			<g:if test="${it.name.equals('All')}">

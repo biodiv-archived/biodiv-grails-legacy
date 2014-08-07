@@ -5,10 +5,10 @@
 				style="margin-left: 0px; clear: both;">
 				<thead>
 					<tr>
-						<th>Title</th>
-						<th>Species Group</th>
-						<th>No. of Species</th>
-						<th>Place Name</th>
+						<th><g:message code="msg.Title" /></th>
+						<th><g:message code="msg.Species.Group" /></th>
+						<th><g:message code="msg.Species.Number" /></th>
+						<th><g:message code="msg.Place.Name" /></th>
 					</tr>
 				</thead>
 				<tbody class="mainContentList" name="p${params?.offset}">
@@ -38,8 +38,8 @@
 		<g:if test="${instanceTotal > (queryParams.max?:0)}">
 			<div class="centered">
 				<div class="btn loadMore">
-					<span class="progress" style="display: none;">Loading ... </span> <span
-						class="buttonTitle">Load more</span>
+					<span class="progress" style="display: none;"><g:message code="msg.Loading" /> ... </span> <span
+						class="buttonTitle"><g:message code="msg.Load more" /></span>
 				</div>
 			</div>
 		</g:if>
