@@ -430,7 +430,7 @@ class SpeciesService extends AbstractObjectService  {
 
         //audienceType
         speciesField.audienceTypes.clear();
-        params.audienceType.split("\\r?\\n|,").each { l ->
+        params.audienceType?.split("\\r?\\n|,").each { l ->
             l = l.trim();
             if(l) {
                 AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);

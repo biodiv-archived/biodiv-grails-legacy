@@ -10,7 +10,7 @@
 
     </g:if>
     <g:if test="${resourceListType == 'usersResource'}"
-    <i class="icon-picture"></i><span style="font-weight:bold">My Uploads</span> <span> (Uploaded media will be stored for a period of 20 days.)</span>
+    <i class="icon-picture"></i><span style="font-weight:bold">My Uploads</span> <span> (Uploaded media will be stored for a period of 20 days. Media with red border will be deleted in 1 day.)</span>
     </g:if>
 
     <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
