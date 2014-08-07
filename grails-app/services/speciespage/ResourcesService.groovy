@@ -234,4 +234,9 @@ class ResourcesService extends AbstractObjectService {
             observationService.sendNotificationMail(ObservationService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
         }
     }
+
+    def deleteUsersResourceById(id){
+        def result = UsersResource.findByRes(Resource.read(id.toLong()))
+        result.delete(flush:true, failOnError:true)
+    }
 }	

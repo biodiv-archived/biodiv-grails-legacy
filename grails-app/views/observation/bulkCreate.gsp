@@ -145,7 +145,7 @@
                 margin-bottom:90px !important;
             }
             .imagesListWrapper ul {
-                width:20000px;
+                width:100000px;
                 white-space:nowrap !important;
             }
             .imagesListWrapper ul li {

@@ -162,5 +162,10 @@ class ResourceController {
         def res = [status:true]
         render res as JSON
     }
-
+    
+    def deleteUsersResourceById(){
+        resourcesService.deleteUsersResourceById(params.resId);
+        def res = [status:true]
+        render res as JSON
+    }
 }

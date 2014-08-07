@@ -17,6 +17,7 @@
 	<input type="hidden" name='feedUrl' value="${uGroup.createLink(controller:'activityFeed', action: 'getFeeds')}"/>
 	<input type="hidden" name='webaddress' value="${(rootHolder instanceof UserGroup) ? rootHolder.webaddress: null}"/>
 	<input type="hidden" name='user' value="${user}"/>
+	<input type="hidden" name='userGroupFromUserProfile' value="${userGroup?.id}"/>
 	
 	<input type="hidden" name='isCommentThread' value="${isCommentThread}"/>
 	<input type="hidden" name='subRootHolderId' value="${subRootHolderId}"/>
@@ -31,12 +32,12 @@
 				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
 			</g:if>
 			<ul>
-				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
+				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder, 'userGroup':userGroup]" />
 			</ul>
 		</g:if>
 		<g:else>
 			<ul>
-				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
+				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder , 'userGroup':userGroup]" />
 			</ul>
 			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
 				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>

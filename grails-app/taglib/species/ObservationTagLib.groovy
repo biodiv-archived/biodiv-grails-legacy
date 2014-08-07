@@ -18,6 +18,7 @@ class ObservationTagLib {
 	def grailsApplication
     def springSecurityService;
     def chartService;
+    def SUserService;
 
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
@@ -371,7 +372,12 @@ class ObservationTagLib {
             break
 
             case "usersResource" :
-                def usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
+                def usersResList
+                if(SUserService.isAdmin(userInstance?.id)){
+                    usersResList = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString())
+                } else {
+                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
+                }
                 usersResList.each{
                     resList.add(it.res)
                 }

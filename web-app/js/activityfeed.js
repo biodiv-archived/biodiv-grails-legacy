@@ -176,7 +176,8 @@ function getFeedParams(timeLine, targetComp){
 	feedParams["feedHomeObjectId"] = $(targetComp).children('input[name="feedHomeObjectId"]').val();
 	feedParams["feedHomeObjectType"] = $(targetComp).children('input[name="feedHomeObjectType"]').val();
 	feedParams["webaddress"] = $(targetComp).children('input[name="webaddress"]').val();
-	
+	feedParams["userGroupFromUserProfile"] = $(targetComp).children('input[name="userGroupFromUserProfile"]').val();
+	    
 	feedParams["refreshType"] = $(targetComp).children('input[name="refreshType"]').val();
 	feedParams["timeLine"] = timeLine;
 	if(timeLine === "newer"){

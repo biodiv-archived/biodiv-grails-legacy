@@ -23,7 +23,7 @@
                 width:870px;
             }
             .imagesListWrapper ul {
-                width:20000px;
+                width:100000px;
                 white-space:nowrap !important;
             }
             .imagesListWrapper ul li {

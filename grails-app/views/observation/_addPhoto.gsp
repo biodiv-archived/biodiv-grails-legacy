@@ -97,11 +97,11 @@
                             }
                         %>
                         <input name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -170px;float: right;margin-left: -81px;" ${isChecked} >
-                        <input name="resId_${i}" type="hidden" value='${r.id}'/>
                     </g:if>
                 </div>
             </div>
             </g:if>
+            <input class="resId" name="resId_${i}" type="hidden" value='${r.id}'/>
             </div> 
             <div class="close_button"
                 onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
