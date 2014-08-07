@@ -1,9 +1,9 @@
 <div id="dataLink${i}" class="dataLink-div block"
 	<g:if test="${hidden}">style="display:none;"</g:if>>
 	
-	<g:hiddenField name='dataLinksList[${i}].id' value='${dataLink?.id}' />
-	<g:hiddenField name='dataLinksList[${i}].deleted' value='false' />
-	<g:hiddenField name='dataLinksList[${i}].new'
+	<g:hiddenField name='dataLinks[${i}].id' value='${dataLink?.id}' />
+	<g:hiddenField name='dataLinks[${i}].deleted' value='false' />
+	<g:hiddenField name='dataLinks[${i}].new'
 		value="${dataLink?.id == null?'true':'false'}" />
 
 	<div class="control-group span5">
@@ -11,7 +11,7 @@
 				code="project.dataLink.description.label" default="Description" /> </label>
 
 		<div class="controls">
-                    <textArea rows="4" name='dataLinksList[${i}].description' class="description input-xlarge" 
+                    <textArea rows="4" name='dataLinks[${i}].description' class="description input-xlarge" 
                         placeholder="Enter a brief description about datalink" >${dataLink?.description}</textArea>
 		</div>
 	</div>
@@ -20,7 +20,7 @@
 				code="project.dataLink.url.label" default="Url" /> </label>
 
 		<div class="controls">
-			<input type="url" name='dataLinksList[${i}].url' id='dataLinksList[${i}].url' class="input-xlarge"
+			<input type="url" name='dataLinks[${i}].url' id='dataLinks[${i}].url' class="input-xlarge"
 				placeholder="Enter url for the datalink" value='${dataLink?.url}' />
 		</div>
 	</div>

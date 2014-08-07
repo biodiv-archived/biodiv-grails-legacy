@@ -349,7 +349,6 @@ class ProjectService {
 		def projInUserGroups = projectInstance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  projInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
-			println 'removing project from usergroups'
 			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
 
 		} else {

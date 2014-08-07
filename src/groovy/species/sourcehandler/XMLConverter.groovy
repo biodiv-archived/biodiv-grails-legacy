@@ -719,7 +719,6 @@ class XMLConverter extends SourceConverter {
      * @param resourceType type of the resource
      */
     private List<Resource> createResourceByType(Node resourceNode, ResourceType resourceType, String relResFolder) {
-
         List<Resource> resources = [];
         if(resourceNode) {
             switch(resourceType) {
@@ -773,8 +772,8 @@ class XMLConverter extends SourceConverter {
         File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
+        
         log.debug "Creating image resource : "+tempFile;
-
         if(tempFile && tempFile.exists()) {
             //copying file
             relImagesFolder = relImagesFolder.trim();
@@ -784,7 +783,7 @@ class XMLConverter extends SourceConverter {
                 addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
             }
             log.debug "in dir : "+root.absolutePath;
-
+            
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
 			if(!imageFile.exists()) {
                 try {
@@ -797,9 +796,7 @@ class XMLConverter extends SourceConverter {
                     addToSummary("File not found : "+tempFile.absolutePath)
                 }
             }
-
             String path = imageFile.absolutePath.replace(resourcesRootDir, "");
-
             def res = Resource.findByFileNameAndType(path, resourceType);
 
             if(!res) {
