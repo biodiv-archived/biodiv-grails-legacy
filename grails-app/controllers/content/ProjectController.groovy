@@ -116,7 +116,6 @@ class ProjectController {
 					return
 				}
 			}
-
 			projectService.updateProject(params, projectInstance)
 			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			if (!projectInstance.hasErrors() && projectInstance.save(flush: true)) {

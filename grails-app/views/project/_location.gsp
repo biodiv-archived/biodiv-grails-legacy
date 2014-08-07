@@ -1,9 +1,9 @@
 <div id="location${i}" class="location-div block"
-	<g:if test="${hidden}">style="display:none;"</g:if>>
+	<g:if test="${hidden}">style="display:none;"</g:if>
 	
-	<g:hiddenField name='locationsList[${i}].id' value='${location?.id}' />
-	<g:hiddenField name='locationsList[${i}].deleted' value='false' />
-	<g:hiddenField name='locationsList[${i}].new'
+	<g:hiddenField name='locations[${i}].id' value='${location?.id}' />
+	<g:hiddenField name='locations[${i}].deleted' value='false' />
+	<g:hiddenField name='locations[${i}].new'
 		value="${location?.id == null?'true':'false'}" />
 
 	<div class="control-group span5" style="margin-left:0px;">
@@ -11,7 +11,7 @@
 				code="project.location.siteName.label" default="Site Name" /> </label>
 
 		<div class="controls">
-			<g:textField name='locationsList[${i}].siteName' class="site-name input-xlarge" placeholder="Enter the siteName"
+			<g:textField name='locations[${i}].siteName' class="site-name input-xlarge" placeholder="Enter the siteName"
 				value='${location?.siteName}' />
 		</div>
 	</div>
@@ -21,7 +21,7 @@
 				code="project.location.corridor.label" default="Corridor" /> </label>
 
 		<div class="controls">
-			<g:textField name='locationsList[${i}].corridor' class="corridor input-xlarge" placeholder="Enter the corridor"
+			<g:textField name='locations[${i}].corridor' class="corridor input-xlarge" placeholder="Enter the corridor"
 				value='${location?.corridor}' />
 		</div>
 	</div>
