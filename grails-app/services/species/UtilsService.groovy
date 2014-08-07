@@ -16,7 +16,6 @@ class UtilsService {
 	def sessionFactory
     def mailService;
     def springSecurityService
-    def activityFeedService
 
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
     static final String SPECIES_CURATORS = "speciesCurators"
@@ -289,7 +288,7 @@ class UtilsService {
                 break
 
                 case OBSERVATION_FLAGGED :
-                mailSubject = activityFeedService.getResType(obv).capitalize() + " flagged"
+                mailSubject = getResType(obv).capitalize() + " flagged"
                 bodyView = "/emailtemplates/addObservation"
                 toUsers.add(getOwner(obv))
                 if(obv?.getClass() == Observation) {
@@ -298,7 +297,7 @@ class UtilsService {
                 else {
                     templateMap["actionObject"] = 'usergroup'
                 }
-                templateMap["message"] = " flagged your " + activityFeedService.getResType(obv)
+                templateMap["message"] = " flagged your " + getResType(obv)
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 break
 
@@ -346,7 +345,7 @@ class UtilsService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
                 //templateMap['message'] = ActivityFeedService.getContextInfo(feedInstance, [:])
-                templateMap["groupNameWithlink"] = ActivityFeedService.getUserGroupHyperLink(ActivityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId));
+                templateMap["groupNameWithlink"] = ActivityFeedService.getUserGroupHyperLink(getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId));
                 toUsers.addAll(getParticipants(obv))
                 break
 
@@ -394,16 +393,16 @@ class UtilsService {
                 mailSubject = ActivityFeedService.getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                def ug = activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+                def ug = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
                 def groupName
                 if(obv == ug){
                     groupName = grailsApplication.config.speciesPortal.app.siteName 
                 }
                 else{
-                    groupName = activityFeedService.getUserGroupHyperLink(ug)
+                    groupName = getUserGroupHyperLink(ug)
                 }
                 //templateMap["groupNameWithlink"] = groupName
-                templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + (a ? " in : " : " from : ") + groupName
+                templateMap["message"] = getDescriptionForFeature(obv, null, a) + (a ? " in : " : " from : ") + groupName
 
                 if(obv?.getClass() == Observation) {
                     templateMap["actionObject"] = 'obvSnippet'
@@ -434,7 +433,7 @@ class UtilsService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(otherParams["usersEmailList"]);
                 break
-            //below case also had activityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
+            //below case also had ActivityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
             case [ActivityFeedService.SPECIES_CREATED]:
                 mailSubject = ActivityFeedService.SPECIES_CREATED
                 bodyView = "/emailtemplates/addObservation"
@@ -560,15 +559,15 @@ class UtilsService {
             templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
             templateMap["actorIconUrl"] = feed.author.profilePicture(ImageType.SMALL)
             templateMap["actorName"] = feed.author.name
-            templateMap["activity"] = activityFeedService.getContextInfo(feed, [webaddress:userGroupWebaddress])
-            def domainObject = activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId);
+            templateMap["activity"] = feed.contextInfo([webaddress:userGroupWebaddress])
+            def domainObject = getDomainObject(feed.rootHolderType, feed.rootHolderId);
             templateMap['domainObjectTitle'] = getTitle(domainObject);
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
             def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
             if(isCommentThread) {
                 templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
                 templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
-                templateMap['commentInstance'] = activityFeedService.getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
+                templateMap['commentInstance'] = getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
                 templateMap['group'] = domainObject;
             }
         }
@@ -644,6 +643,59 @@ class UtilsService {
             return null
     }
 
+    def getResType(r) {
+        def desc = ""
+        switch(r.class.canonicalName){
+            case Checklists.class.canonicalName:
+            desc += "checklist"
+            break
+            default:
+            desc += r.class.simpleName.toLowerCase()
+            break
+        }
+        return desc
+    }
+
+    
+	def getDomainObject(className, id){
+		def retObj = null
+		if(!className || className.trim() == ""){
+			return retObj
+		}
+		
+		id = id.toLong()
+		switch (className) {
+			case [ActivityFeedService.SPECIES_SYNONYMS, ActivityFeedService.SPECIES_COMMON_NAMES, ActivityFeedService.SPECIES_MAPS, ActivityFeedService.SPECIES_TAXON_RECORD_NAME]:
+				retObj = [objectType:className, id:id]
+				break
+			default:
+				retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+				break
+		}
+		return retObj
+	}
+	
+    def getUserGroupHyperLink(userGroup){
+        if(!userGroup){
+            return ""
+        }
+		String sb = '<a href="' + userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+        return sb;
+        //return sb.replaceAll('"|\'','\\\\"')
+	}
+	
+    def getDescriptionForFeature(r, ug, isFeature)  {
+        def desc = isFeature ? "Featured " : "Removed featured "
+        String temp = getResType(r)
+        desc+= temp
+        if(ug == null) {
+            return desc
+        }
+        desc +=  isFeature ? " to group" : " from group"
+        return desc
+
+
+    }
 
 }
 

@@ -165,21 +165,7 @@ class ActivityFeedService {
 	}
 	
 	def getDomainObject(className, id){
-		def retObj = null
-		if(!className || className.trim() == ""){
-			return retObj
-		}
-		
-		id = id.toLong()
-		switch (className) {
-			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
-				retObj = [objectType:className, id:id]
-				break
-			default:
-				retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-				break
-		}
-		return retObj
+        return utilsService.getDomainObject(className, id);
 	}
 	
 	// this will return class of object in general used in comment framework
@@ -288,11 +274,11 @@ class ActivityFeedService {
 				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
-				activityTitle = getResType(activityRootObj).capitalize() + " flagged"
+				activityTitle = utilsService.getResType(activityRootObj).capitalize() + " flagged"
 				text = feedInstance.activityDescrption
 				break
             case REMOVED_FLAG:
-				activityTitle = getResType(activityRootObj).capitalize() + " flag removed" 
+				activityTitle = utilsService.getResType(activityRootObj).capitalize() + " flag removed" 
 				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
@@ -406,12 +392,7 @@ class ActivityFeedService {
 	}
 	
 	def getUserGroupHyperLink(userGroup){
-        if(!userGroup){
-            return ""
-        }
-		String sb = '<a href="' + utilsService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
-        return sb;
-        //return sb.replaceAll('"|\'','\\\\"')
+        return utilsService.getUserGroupHyperLink(userGroup);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,36 +470,14 @@ class ActivityFeedService {
         return res 
     }	
 
-
-    def getResType(r) {
-        def desc = ""
-        switch(r.class.canonicalName){
-            case Checklists.class.canonicalName:
-            desc += "checklist"
-            break
-            default:
-            desc += r.class.simpleName.toLowerCase()
-            break
-        }
-        return desc
-    }
     def getDescriptionForFeature(r, ug, isFeature)  {
-        def desc = isFeature ? "Featured " : "Removed featured "
-        String temp = getResType(r)
-        desc+= temp
-        if(ug == null) {
-            return desc
-        }
-        desc +=  isFeature ? " to group" : " from group"
-        return desc
-
-
+        return utilsService.getDescriptionForFeature(r, ug, isFeature);
     }
 /*
     def getMailSubject(r, isFeature) {
         def desc = ""
         desc += isFeature ? "Featured " : "Removed featured "
-        String temp = getResType(r)
+        String temp = utilsService.getResType(r)
         desc+= temp
         return desc
      }*/
