@@ -4,6 +4,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.utils.ImageType"%>
+<%@page import= "org.codehaus.groovy.runtime.DateGroovyMethods"%>
 
             <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
@@ -35,27 +36,39 @@
             </li>
             </g:if>
             <g:each in="${res}" var="r">
-            <li class="addedResource thumbnail">
+            <%
+                def flag19 = false
+                if(resourceListType == "usersResource"){
+                    def d = new Date()
+                    DateGroovyMethods.clearTime(d)
+                    def d1 = d - 20
+                    def d2 = d - 19
+                    if(d2 >= r.uploadTime && r.uploadTime >= d1){
+                        flag19 = true
+                    }
+                }
+            %>
+            <li class="addedResource thumbnail" style="${flag19?'border:1px red solid' :''}">
             <%
             def imagePath = '';
-            if(r) {
-            if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString() || r.context.value() == Resource.ResourceContext.CHECKLIST.toString()){
-                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations', null, ImageType.LARGE )?:null;
-            } else if(r.context.value() == Resource.ResourceContext.USER.toString()){
-                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/usersRes', null, ImageType.LARGE)?:null;    
-            } else{
-                def spFolder = grailsApplication.config.speciesPortal.resources.rootDir
-                def finalFolder = spFolder.substring(spFolder.lastIndexOf("/"), spFolder.size())
-                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + finalFolder, null, ImageType.LARGE)?:null;   
-            }
-            }
-            def resSource = r.url
-            if(obvLinkList.size()!= 0){
-                if(!r.url){
-                    resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList.get(counter.toInteger()), 'absolute': true);
-                    counter++
+                if(r) {
+                if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString() || r.context.value() == Resource.ResourceContext.CHECKLIST.toString()){
+                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations', null, ImageType.LARGE )?:null;
+                } else if(r.context.value() == Resource.ResourceContext.USER.toString()){
+                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/usersRes', null, ImageType.LARGE)?:null;    
+                } else{
+                    def spFolder = grailsApplication.config.speciesPortal.resources.rootDir
+                    def finalFolder = spFolder.substring(spFolder.lastIndexOf("/"), spFolder.size())
+                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + finalFolder, null, ImageType.LARGE)?:null;   
                 }
-            }
+                }
+                def resSource = r.url
+                if(obvLinkList.size()!= 0){
+                    if(!r.url){
+                        resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList.get(counter.toInteger()), 'absolute': true);
+                        counter++
+                    }
+                }
             %>
             <div class='figure' style="height: 200px; overflow: hidden;">
                 <span> <img class="image_${i} geotagged_image" style="width: auto; height: auto;"
@@ -68,6 +81,7 @@
                 <input name="file_${i}" type="hidden" value='${r.fileName}' />
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
+                <input name="date_${i}" type="hidden" value='${flag19}'/>
                 <!--input name="resContext_${i}" type="hidden" value='${r.context.value()}'/-->
                 
                 <g:if test="${r.type != ResourceType.AUDIO}">  
