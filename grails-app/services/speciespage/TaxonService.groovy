@@ -1009,4 +1009,60 @@ class TaxonService {
         }
         return true;
     }
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////Navigator query related ///////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////
+	
+	List getNodeChildren(params){
+		
+		int level = params.level?.toInteger()
+		int limit = params.limit?(params.limit.toInteger()):10
+		long offset = params.offset?(params.offset.toLong):0
+		
+		TaxonomyRegistry tr = getTaxonReg(params)
+		if(!tr){
+			log.error "No taxon registry found for params " + params
+			return
+		}
+		
+		String searchablePrefix = tr.path + "_" +"%" 
+		
+		return TaxonomyRegistry.createCriteria().list(max:limit, offset:offset){
+			projections {
+				property("taxonDefinition")
+			}
+			and{
+				like('path', searchablePrefix)
+				if(level){
+					eq('level', level)
+				}
+			}
+			order 'id', 'asc'
+		}
+	}
+	
+	TaxonomyRegistry getTaxonRegParent(params){
+		return getTaxonReg(params)?.parentTaxon.taxonDefinition
+	}
+	
+	private TaxonomyRegistry getTaxonReg(params){
+		long taxonId = params.taxonId.toLong()
+		long classificationId = params.classificationId.toLong()
+		return TaxonomyRegistry.findByTaxonDefinitionAndClassification(TaxonomyDefinition.read(taxonId), Classification.read(classificationId))
+	}
+	
+	def addLevelToTaxonReg(){
+		int i = 0
+		TaxonomyRegistry.withTransaction { status ->
+			TaxonomyRegistry.list().each { tr ->
+				tr.level = tr.path.split("_").size()
+				tr.save()
+				i++
+				if(i%100 == 0)
+					println i
+			}
+		}
+	}
 }
