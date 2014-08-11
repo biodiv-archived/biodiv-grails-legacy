@@ -7,10 +7,10 @@
 
 		<%
 		// passing the strings directly is not working. Hack. 
-		def tmplDocId = "{{>docId}}"
-		def tmplPath = "{{>filePath}}"
-		def tmplName = "{{>docName}}"
-		def tmplSize = "{{>fileSize}}"
+		def tmplDocId = "{{>docId}}".encodeAsRaw()
+		def tmplPath = "{{>filePath}}".encodeAsRaw()
+		def tmplName = "{{>docName}}".encodeAsRaw()
+		def tmplSize = "{{>fileSize}}".encodeAsRaw()
 		%>
 
         <g:render template='/document/projectDoc' model="['name':name,  'docId':tmplDocId,'filePath':tmplPath, 'docName':tmplName, 'fileSize':tmplSize]" ></g:render>
@@ -32,21 +32,21 @@
 %>
 			<g:render template='/document/projectDoc'
 				model="[name:name,  'docId':doc.id,'filePath':doc.uFile.path, 'docName':doc.title, 'fileSize':doc.uFile.size, 'documentInstance':doc]" />
-<r:script>
+	<script type="text/javascript">
 	$(document).ready(function(){
-	$('#${doc.id}-tags').tagit({
-        			select:true, 
-        			allowSpaces:true, 
-        			fieldName: ${doc.id} + '.tags',
-        			placeholderText:'Add some tags',
-        			autocomplete:{
-        				source: '/document/tags'
-        			}, 
-        			triggerKeys:['enter', 'comma', 'tab'], 
-        			maxLength:30
-        		});	
-        		});
-</r:script>
+	    $('#${doc.id}-tags').tagit({
+            select:true, 
+            allowSpaces:true, 
+            fieldName: ${doc.id} + '.tags',
+            placeholderText:'Add some tags',
+            autocomplete:{
+                source: '/document/tags'
+            }, 
+            triggerKeys:['enter', 'comma', 'tab'], 
+            maxLength:30
+        });	
+    });
+</script>
 		</g:each>
 
 	</g:if>

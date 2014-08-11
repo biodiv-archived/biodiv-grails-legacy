@@ -75,7 +75,6 @@
         </g:if>
 </g:each>
 </g:if>
-<br>
 <g:if test="${audioCount >= 1}"> 
 <script type="text/javascript">
 
