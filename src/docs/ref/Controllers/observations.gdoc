@@ -514,11 +514,11 @@ h4. Upload Resource
 * *Parameters* : 
 ** resources : file attachment (MAX_IMAGE_SIZE = 104857600)
 ** obvDir : directory into which the resource should be put into. If null, a new folder is created.
-** resType : species.participation.observation | species.participation.checklists | species.Species
+** resType : species.participation.Observation | species.participation.Checklists | species.Species
 * *REST method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=species.participation.observation
+http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=species.participation.Observation
 {code}
 * *Response* : 
 ** Successfull response

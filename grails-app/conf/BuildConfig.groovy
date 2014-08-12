@@ -83,7 +83,7 @@ grails.project.dependency.resolution = {
         compile 'org.restlet.jee:org.restlet.ext.servlet:2.1.1'
 
         compile ('org.quartz-scheduler:quartz:2.1.7') {
-            excludes 'slf4j-api', 'jcl-over-slf4j'
+            excludes 'slf4j-api', 'jcl-over-slf4j', 'c3p0'
         }
 //        compile 'org.apache.lucene:lucene-analyzers:3.4.0'
 //        compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
@@ -142,7 +142,7 @@ grails.project.dependency.resolution = {
         compile (':cache:1.1.6') {
                 excludes "servlet-api" 
         }
-        runtime ":database-migration:1.4.0"
+//        runtime ":database-migration:1.4.0"
 
         compile ':hibernate:3.6.10.15'
         compile ':hibernate-spatial:0.0.4'
@@ -179,7 +179,7 @@ grails.project.dependency.resolution = {
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
         compile (":mail:1.0.5")
-        compile ":quartz:1.0.1"
+        compile ":quartz:1.0.2"
         compile ":rateable:0.7.1"
         //      compile ":recaptcha:0.5.2"
         compile ":rest:0.8"
@@ -190,7 +190,7 @@ grails.project.dependency.resolution = {
     } 
 
     grails.war.resources = { stagingDir ->
-        for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j', 'servlet-api-2.3']) {
+        for (name in ['servlet-api-2.3', 'jsp-api-2.1']) {
           delete {
           fileset dir: "$stagingDir/WEB-INF/lib/",
           includes: "$name*.jar"

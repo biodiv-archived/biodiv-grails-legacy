@@ -38,8 +38,8 @@ class NamesIndexerService {
 	 * Existing lookup is present 
 	 */
 	void rebuild() {
-
 		
+	/*	
 		log.info "Publishing names to autocomplete index";
 		Lookup lookup1 = new TSTLookup();
 
@@ -76,7 +76,7 @@ class NamesIndexerService {
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		store(indexStoreDir);
 
-		
+	*/	
 	}
 
 	/**

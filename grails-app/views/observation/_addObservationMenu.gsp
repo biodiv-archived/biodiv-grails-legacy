@@ -15,7 +15,7 @@
                     <li class="${(params.controller == 'observation' && params.action == 'bulkCreate')?'active':''}"><a
                         href="${uGroup.createLink(
                         controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                        > Add Multiple Observations</a>
+                        > Add Multiple Observations (β*)</a>
                     </li>
                     <li class="divider-vertical"></li>
                     <li class="${params.controller == 'checklist'?'active':''}"><a

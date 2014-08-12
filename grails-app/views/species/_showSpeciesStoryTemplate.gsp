@@ -69,10 +69,10 @@
             <g:if test="${summary}">
             <div class="ellipsis multiline clearfix notes_view">
                         <g:if test="${summary != null && summary.length() > 300}">
-                        ${summary[0..300] + ' ...'}
+                        ${raw(summary[0..300] + ' ...')}
                         </g:if>
                         <g:else>
-                        ${summary?:''}
+                        ${raw(summary?:'')}
                         </g:else>
             </div>
             </g:if>

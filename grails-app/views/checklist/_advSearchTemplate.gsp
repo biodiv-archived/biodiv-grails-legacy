@@ -4,26 +4,26 @@
 	<form id="advSearchForm" method="get"  title="Advanced Search"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'checklist', action:'search', userGroup:userGroupInstance) }"
 		class="searchbox">
-		<label class="control-label" for="name">Species</label> <input id="aq.name"
+		<label class="control-label" for="name"><g:message code="msg.Species" /></label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${queryParams['aq.name']?.encodeAsHTML() }"
 			placeholder="Search by species name" />
 		
-		<label class="control-label" for="title">Title</label> <input id="aq.title"
+		<label class="control-label" for="title"><g:message code="msg.Title" /></label> <input id="aq.title"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.title" value="${queryParams['aq.title']?.encodeAsHTML() }"
 			placeholder="Search by title" />
 
-		<label class="control-label" for="attribution">Attribution</label> <input id="aq.attribution"
+		<label class="control-label" for="attribution"><g:message code="msg.Attribution" /></label> <input id="aq.attribution"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.attribution" value="${queryParams['aq.attribution']?.encodeAsHTML() }"
 			placeholder="Search by attribution" />
 
-		<label class="control-label" for="location">Location</label> <input id="aq.location"
+		<label class="control-label" for="location"><g:message code="msg.Location" /></label> <input id="aq.location"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.location" value="${queryParams['aq.location']?.encodeAsHTML()}" placeholder="Search by location name" />
 			
-		<label class="control-label" for="text">Content</label> <input id="aq.text"
+		<label class="control-label" for="text"><g:message code="msg.Content" /></label> <input id="aq.text"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="Search all text content" /> 
 			
@@ -31,9 +31,9 @@
 		
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
-			value="ALL"> Search in all groups </label> <label
+			value="ALL"> <g:message code="msg.Search.in.all.groups" /> </label> <label
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-			value="THIS_GROUP"> Search within this group </label>
+			value="THIS_GROUP"> <g:message code="msg.Search within this group" /> </label>
 		</div>
 
 		<g:hiddenField name="offset" value="0" />
@@ -43,7 +43,7 @@
 	</form>
 	<div class="form-action">
 		<button type="submit" id="advSearch"
-			class="btn btn-primary pull-right" style="margin-top:10px;">Search</button>
+			class="btn btn-primary pull-right" style="margin-top:10px;"><g:message code="msg.Search " /></button>
 	</div>
 
 	<div class="clearfix"></div>

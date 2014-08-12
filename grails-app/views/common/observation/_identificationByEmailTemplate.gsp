@@ -8,25 +8,25 @@
 		<form id="email-form" name="email-form" class="popup-form"
 			style="display: none; background-color: #F2F2F2;">
             <div class="form-row" style="${hideTo?'display:none;':''}">
-				<span class="keyname">To</span>
+				<span class="keyname"><g:message code="msg.To" /></span>
 				<ul class="userOrEmail-list">
-					<li id="userOrEmail-new"><input id="userAndEmailList_${autofillUsersId}"
+					<input id="userAndEmailList_${autofillUsersId}"
 						placeholder='Type user name or email id' style="float: left"
-						type="text" /></li>
+						type="text" />
 				</ul>
             </div>
             
 			<div class="form-row">
-				<span class="keyname" style="clear: both">Subject</span><input
+				<span class="keyname" style="clear: both"><g:message code="msg.Subject" /></span><input
 					type="text" style="width: 97%" name="mailSubject"
 					value="${mailSubject}"/>
 			</div>
 
 			<div class="form-row">
 				<i class="icon-pencil"></i><span class="keyname" style="clear: both">
-					Message</span>
+					<g:message code="msg.Message" /></span>
 				<h5>
-					<label> ${staticMessage} </label>
+					<label>${staticMessage.encodeAsRaw()} </label>
 				</h5>
 				<div class="section-item">
 					<div id="cke_message">

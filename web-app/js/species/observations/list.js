@@ -1,3 +1,10 @@
+    var handlePaginateButtons = function() {
+    	$('.paginateButtons a.active').removeClass('active');
+    	$(this).addClass('active');
+        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
+        return false;
+    };
+ 
 $(document).ready(function(){
     $('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
@@ -178,13 +185,8 @@ $(document).ready(function(){
 	    return true;   
     });
 
-    $(".paginateButtons a").on('click', function() {
-    	$('.paginateButtons a.active').removeClass('active');
-    	$(this).addClass('active');
-        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
-        return false;
-    });
-    
+    $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
+   
 //    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
     $(".observation_story li.tagit-choice").on('click', function(){
         setActiveTag($(this).contents().first().text());
@@ -690,6 +692,7 @@ function updateListPage(activeTag) {
         updateRelativeTime();
         last_actions();
         eatCookies();			
+        $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
     console.log('updated gallery trigger');
         $('.list').trigger('updatedGallery');
     }
@@ -792,7 +795,7 @@ function refreshMapBounds(mapLocationPicker) {
     if(bounds) {
         bounds = bounds.split(',');
         if(bounds.length == 4) {
-            map.fitBounds([
+            mapLocationPicker.map.fitBounds([
                     [bounds[0], bounds[1]],
                     [bounds[2], bounds[3]]
                     ]);

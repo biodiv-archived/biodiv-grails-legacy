@@ -270,17 +270,24 @@ class ObservationController extends AbstractObjectController {
 	
 	private saveAndRender(params, sendMail=true){
 		def result = observationService.saveObservation(params, sendMail)
-        if(request.getHeader('X-Auth-Token')) {
+        /*if(request.getHeader('X-Auth-Token')) {
             if(!result.success) result.remove('observationInstance');
             render result as JSON;
             return
 
-        }
+        }*/
 		if(result.success){
-			chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-		}else{
-			//flash.message = "${message(code: 'error')}";
-			render(view: "create", model: [observationInstance: result.observationInstance, lastCreatedObv:null])
+            if(request.getHeader('X-Auth-Token')) 
+                params.isMobileApp = true;
+			forward (action: 'addRecommendationVote', params:params);
+		} else{
+            if(request.getHeader('X-Auth-Token')) {
+                result.remove('observationInstance');
+                render result as JSON
+            } else {
+			    //flash.message = "${message(code: 'error')}";
+			    render(view: "create", model: [observationInstance: result.observationInstance, lastCreatedObv:null])
+            }
 		}
 	}
 
@@ -482,13 +489,9 @@ class ObservationController extends AbstractObjectController {
                     break;
                 }
                 File obvDir 
-
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
-
-
-
 				
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
@@ -512,7 +515,7 @@ class ObservationController extends AbstractObjectController {
 					// List of OK mime-types
 					//TODO Move to config
 
-					def resourcetype = f.mimetype.substring(0, f.mimetype.indexOf('/')).toLowerCase()
+					def resourcetype = mimetype.substring(0, mimetype.indexOf('/')).toLowerCase()
 					def resourceTypeAudio = ResourceType.AUDIO.value().toLowerCase()					
 					def resourceTypeImage = ResourceType.IMAGE.value().toLowerCase()		
 					
@@ -528,7 +531,7 @@ class ObservationController extends AbstractObjectController {
 										]
 						maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
 
-					}else if(resourcetype == resourceTypeAudio){						
+					} else if(resourcetype == resourceTypeAudio){						
 						okcontents = [
 										'audio/mp4','audio/m4a',
 										'audio/mpeg','audio/mp1','audio/mp2','audio/mp3','audio/mpg',
@@ -541,7 +544,7 @@ class ObservationController extends AbstractObjectController {
 
 					}
 					
-					if (!okcontents.contains(f.mimetype)) {
+					if (!okcontents.contains(mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
 							filename
@@ -576,8 +579,13 @@ class ObservationController extends AbstractObjectController {
 						}
 
 				
-						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
-						download(f.url, file );						
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
+
+                        if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
+						    download(f.url, file );						
+                        } else {
+						    f.transferTo( file );
+                        }
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def thumbnail
 						def type
@@ -620,16 +628,25 @@ class ObservationController extends AbstractObjectController {
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
-					render(contentType:"text/xml") {
-						observations {							
-							dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
-							resources {
-								for(r in resourcesInfo) {
-									res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
-								}
-							}
-						}
-					}
+                    if(request.getHeader('X-Auth-Token')) {
+                        def resourcesList = [];
+                        for(r in resourcesInfo) {
+                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type]
+                            resourcesList << res
+                        }
+                        render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
+                    } else {
+                        render(contentType:"text/xml") {
+                            observations {							
+                                dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
+                                resources {
+                                    for(r in resourcesInfo) {
+                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
+                                    }
+                                }
+                            }
+                        }
+                    }
 				} else {
 					response.setStatus(500)
 					message = [success:false, error:message]
@@ -662,14 +679,15 @@ class ObservationController extends AbstractObjectController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote() {
-		if(chainModel?.chainedParams) {
+		/*if(chainModel?.chainedParams) {
 			//need to change... dont pass on params
 			chainModel.chainedParams.each {
 				params[it.key] = it.value;
 			}
 			params.action = 'addRecommendationVote'
-		}
+		}*/
 		params.author = springSecurityService.currentUser;
+        boolean isMobileApp = request.getHeader('X-Auth-Token') || params.isMobileApp; 
         
         try {
             params.obvId = params.obvId?.toLong();
@@ -678,13 +696,12 @@ class ObservationController extends AbstractObjectController {
             params.obvId = null;
         }
 
-    
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params)
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -693,6 +710,7 @@ class ObservationController extends AbstractObjectController {
 			def mailType
 			try {
 				if(!recommendationVoteInstance) {
+					log.debug "No reco instance"
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
@@ -701,13 +719,17 @@ class ObservationController extends AbstractObjectController {
 						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
-					if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
+					if(!params["createNew"] && !isMobileApp){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					} else if(request.getHeader('X-Auth-Token')){
+					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'error', 'success':'false', 'msg':msg] as JSON);
 					}else{
                         if(params.oldAction != "bulkSave"){
-						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                            if(isMobileApp){
+                                render (['status':'error', 'success' : true, observationInstance:observationInstance, 'msg':msg] as JSON);
+                            } else {
+						        redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                            }
                         } else {
                             def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
@@ -732,14 +754,20 @@ class ObservationController extends AbstractObjectController {
 					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
-                    if(!params["createNew"] && !request.getHeader('X-Auth-Token')){
+                    if(!params["createNew"] && !isMobileApp){
 						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					} else if(request.getHeader('X-Auth-Token')){
+					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
 					} else {
+                                println "1______________________________________________"
                         if(params.oldAction != "bulkSave"){
-						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                            if(isMobileApp){
+                                println "2______________________________________________"
+                                render (['status':'success', 'success' : true, observationInstance:observationInstance.refresh()] as JSON);
+                            } else {
+    						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                            }
                         } else {
                             def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
@@ -750,10 +778,11 @@ class ObservationController extends AbstractObjectController {
 					}
 					return
 				} else {
+                    log.debug "Error in reco instance"
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
 
-                    if(request.getHeader('X-Auth-Token')) {
+                    if(!params["createNew"] && isMobileApp) {
                         def errors = [];
                         recommendationVoteInstance.errors.allErrors .each {
                             def formattedMessage = messageSource.getMessage(it, null);
@@ -762,7 +791,11 @@ class ObservationController extends AbstractObjectController {
                         render (['status':'error', 'success' : 'false', 'msg':'Failed to save recommendation vote', 'errors':errors] as JSON)
                     }
                     if(params.oldAction != "bulkSave"){
-                        render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                        if(isMobileApp){
+                            render (['status':'error', 'success' : true, observationInstance:observationInstance, errors:errors] as JSON);
+                        } else {
+                            render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                        }
                     } else {
                         def output = [:]
                         def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
@@ -773,11 +806,15 @@ class ObservationController extends AbstractObjectController {
 				}
 			} catch(e) {
 				e.printStackTrace()
-				if(request.getHeader('X-Auth-Token')){
+				if(!params["createNew"] && isMobileApp){
 					render (['status':'error', 'success':'false', 'msg':e.getMessage()] as JSON);
 				}else{
                     if(params.oldAction != "bulkSave"){
-					    render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                        if(isMobileApp){
+                            render (['status':'error', 'success' : true, observationInstance:observationInstance, 'msg':e.getMessage()] as JSON);
+                        } else {
+    					    render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                        }
                     } else {
                         def output = [:]
                         def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
@@ -789,7 +826,7 @@ class ObservationController extends AbstractObjectController {
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
 			log.error flash.message;
-            if(request.getHeader('X-Auth-Token')){
+            if(!params["createNew"] && isMobileApp){
                 render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
             } else{
                 redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -820,7 +857,7 @@ class ObservationController extends AbstractObjectController {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params)
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -1115,23 +1152,30 @@ class ObservationController extends AbstractObjectController {
 
 	/*
 	 * @param params
+     * obvId
+     * author
+     * confidence
+     * recoId
+     * recoName
+    * canName
+    * commonName
+    * languageName
 	 * @return
 	 */
-	private Map getRecommendationVote(params) {
-		def observation = params.observation?:Observation.get(params.obvId);
-		def author = params.author;
+	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String canName, String commonName, String languageName) {
+		def observation = params.observation?:Observation.get(obvId);
 		
-		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
+		ConfidenceType confidence = observationService.getConfidenceType(conf?:ConfidenceType.CERTAIN.name());
 		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
 		
 		def reco, commonNameReco, isAgreeRecommendation = false;
-		if(params.recoId) {
+		if(recoId) {
 			//user presses on agree button so getting reco from id and creating new recoVote without additional common name
-			reco = Recommendation.get(params.long('recoId'));
+			reco = Recommendation.get(recoId);
 			isAgreeRecommendation = true
 		} else{
 			//add recommendation used so taking both reco and common name reco if available
-			def recoResultMap = observationService.getRecommendation(params);
+			def recoResultMap = observationService.getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
 			reco = recoResultMap.mainReco;
 			commonNameReco =  recoResultMap.commonNameReco;
 		}
@@ -1408,13 +1452,6 @@ class ObservationController extends AbstractObjectController {
 		render r as JSON
 	}
 	
-
-
-
-
-
-
-	
 	@Secured(['ROLE_USER'])
 	def downloadFile() {
 		log.debug(params)
@@ -1560,7 +1597,7 @@ class ObservationController extends AbstractObjectController {
             //TODO:edit also calls here...handle that wrt other domain objects
             def result = observationService.saveObservation(params, false)
             if(result.success){
-                chain(action: 'addRecommendationVote', model:['chainedParams':params]);
+                forward(action: 'addRecommendationVote', params:params);
             } else {
                 def output = [:]
                 def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: result.observationInstance]);

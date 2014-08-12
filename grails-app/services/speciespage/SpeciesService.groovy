@@ -1527,10 +1527,11 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     
     def updateSpecies(params, species){
         def resources = []
+        def speciesResources = species.resources;
         if(params.resourceListType == "ofSpecies"){
             def resourcesXML = createResourcesXML(params);
             resources = saveResources(species, resourcesXML);
-            species.resources?.clear();
+            //species.resources?.clear();
         }
         else if(params.resourceListType == "fromRelatedObv" || params.resourceListType == "fromSpeciesField"){
             def resId = []
@@ -1569,8 +1570,14 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         }
 
         resources.each { resource ->
-            resource.saveResourceContext(species)
-            species.addToResources(resource);
+            if(params.resourceListType == "ofSpecies") {
+                resource.saveResourceContext(species)
+                if(!speciesResources.contains(resource)){
+                    species.addToResources(resource);
+                }
+            }else{
+                species.addToResources(resource);
+            }
         }
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }

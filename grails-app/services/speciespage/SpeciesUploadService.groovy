@@ -7,6 +7,7 @@ import java.util.List
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
+
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.common.util.NamedList;
 
@@ -15,9 +16,8 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
+
 import grails.converters.JSON
-
-
 import species.Contributor;
 import species.Field
 import species.Resource;
@@ -34,19 +34,22 @@ import species.sourcehandler.SourceConverter;
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
+
 import java.text.DateFormat
 import java.text.SimpleDateFormat;
+
 import species.sourcehandler.exporter.DwCAExporter
+
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.Level;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
+
 import species.auth.SUser
 import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
-
 import species.participation.Featured
 import species.participation.Recommendation
 import species.participation.SpeciesBulkUpload
@@ -55,6 +58,7 @@ import species.Synonyms
 import species.TaxonomyRegistry
 import species.SpeciesPermission
 import species.groups.SpeciesGroupMapping
+import species.groups.UserGroup
 
 class SpeciesUploadService {
 
@@ -782,57 +786,106 @@ class SpeciesUploadService {
 				between("lastUpdated", start, end)
 			}
 		}
-		log.debug "sFields " + sFields
+		log.debug "Affected sFields " + sFields
 		
-		if(!sFields){
+		//XXX: Assuming no parallel upload by same user.
+		List tRegistries = TaxonomyRegistry.withCriteria(){
+			and{
+				eq('uploader', user)
+				between("uploadTime", start, end)
+			}
+		}
+		log.debug "Affected taxonomy registries " + tRegistries
+		
+		if(!sFields && !tRegistries){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback."
 		}
 		
-		Collection<Species> sList = getAffectedSpecies(sFields)
-		log.debug "species list " + sList
-		
-		SpeciesField.withTransaction{   
-			sFields.each { sf ->
-					log.info "Deleting ${sf}"
-					sf.delete()
-			}
+		Collection<Species> sList = getAffectedSpecies(sFields, tRegistries)
+		log.debug "Affected species list " + sList
+
+		//XXX:remvoing species which going to be delted from usergroup first. 
+		//This is done to avaoid cascade resaving of object. better way requried.
+		Species.withTransaction{   
 			sList.each { s->
-				rollBackSpeciesUpdate(s, sFields, user)
+				unpostFromUsergroup(s, sFields, user, sbu)
 			}
-			
-			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 		}
 		
+		Species.withTransaction{   
+			sList.each { s->
+				rollBackSpeciesUpdate(s, sFields, user, sbu)
+			}
+			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+		}
+
+		
 		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+			log.debug "Successfully Rolled back."
 			return "Successfully Rolled back."
 		}else{
 			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
+			log.debug "Rollback failed..."
 			return "Rollback failed..."
 		}
 	}
 	
-	private Collection<Species> getAffectedSpecies(List sFields){
+	private Collection<Species> getAffectedSpecies(List sFields, List tRegs){
 		def sList = sFields.collect{it.species}
+		tRegs.each { TaxonomyRegistry tr ->
+			def s = Species.findByTaxonConcept(tr.taxonDefinition)
+			if(s)
+				sList << s
+		}
+		
 		return sList.unique() 
 	}
  
-	
-	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user) throws Exception {
-		List sFieldIds = SpeciesField.findAllBySpecies(s).collect{ it.id}
+ 	private void unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+ 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+		List sFieldToDelete = specificSFields.intersect(sFields)
 		
-		//All species field deleted before this function call
-		boolean canDelete = sFieldIds.isEmpty();
-		
-		if(canDelete){
-			log.debug "Deleting species ${s} "
-			deleteSpecies(s, user)
-			return
+		List taxonReg = TaxonomyRegistry.withCriteria(){
+			and{
+				eq('taxonDefinition', s.taxonConcept)
+				eq('uploader', user)
+				between("uploadTime", sbu.startDate, sbu.endDate)
+			}
 		}
+
+		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
+		if(canDelete){
+			try{
+				Featured.deleteFeatureOnObv(s, user)
+				if(s.userGroups){
+					List ugIds = s.userGroups.collect {it.id}
+					ugIds.each { ugId ->
+						def ug = UserGroup.get(ugId) 
+						log.debug "Removing species $s from userGroup  " + ug
+						ug.removeFromSpecies(s)
+						ug.save(flush:true, failOnError:true)
+					}
+				}
+				if(!s.save(flush:true)){
+					s.errors.allErrors.each { log.error it }
+				}
+			}
+			catch (Exception e) {
+				log.error "Error in unposting from usergroup"
+				e.printStackTrace()
+				throw e
+			}
+		}
+ 	}
+	
+	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+		List sFieldToDelete = specificSFields.intersect(sFields)
 		
-		log.debug "Removing species field from species ${s}"
-		sFields.each { sf ->
+		log.debug "Removing species field from species ${s} following sFields  ${sFieldToDelete}"
+		sFieldToDelete.each { sf ->
 			s.removeFromFields(sf)
 			def ge = GeographicEntity.read(sf.id) 
 			if(ge){
@@ -843,21 +896,46 @@ class SpeciesUploadService {
 			}
 		}
 		
-		if(!s.save()){
+		sFieldToDelete.each { sf ->
+			sf.refresh()
+			log.info "Deleting ${sf}"
+			sf.delete(flush:true)
+		}
+		
+		sFields.removeAll(sFieldToDelete)
+		
+		//removing taxonomy hirarchy if added due to this upload
+		List taxonReg = TaxonomyRegistry.withCriteria(){
+			and{
+				eq('taxonDefinition', s.taxonConcept)
+				eq('uploader', user)
+				between("uploadTime", sbu.startDate, sbu.endDate)
+			}
+		}
+		log.debug "Taxonomy registry to be deleted as  " + taxonReg
+		taxonReg.each { tr ->
+			log.debug "Deleting  $tr"
+			tr.delete(flush:true)
+		}
+		
+		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
+		if(canDelete){
+			log.debug "Deleting species ${s} "
+			deleteSpecies(s, user)
+			return
+		}
+
+		if(!s.save(flush:true)){
 			s.errors.allErrors.each { log.error it }
 		}
+				
 	}
 	
 	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
 		try{
-			Featured.deleteFeatureOnObv(s, user)
-			s.userGroups.each { ug ->
-				ug.removeFromSpecies(s)
-				ug.save()
-			}
 			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
 				reco.taxonConcept = null
-				reco.save()
+				reco.save(flush:true)
 			}
 //			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
 //				cn.delete()
@@ -866,21 +944,29 @@ class SpeciesUploadService {
 //				sn.delete()
 //			}
 //			TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).each { tr ->
-//				tr.delete()
+//				tr.delete(flush:true)
 //			}
 //			SpeciesGroupMapping.findAllByTaxonConcept(s.taxonConcept).each { sgm ->
 //				sgm.delete()
 //			}
 			SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
-				sp.delete()
+				sp.delete(flush:true)
 			}
 			
-			s.resources?.clear()
-			s.delete()
+			if(s.resources){
+				def ids = s.resources.collect { it.id}
+				ids.each { 
+					def r = Resource.get(it)
+					s.removeFromResources(r)
+				}
+			}
+			log.debug "Reverting changes of species before delete $s ===="
+			s = s.merge()
+			s.delete(flush:true)
 			log.debug "Deleted ${s}"
 			return true
 		}catch (Exception e) {
-			log.error "Error in Deleting ${s}"
+			log.error "Error in Delete/Reverting ${s}"
 			e.printStackTrace()
 			throw e
 		}

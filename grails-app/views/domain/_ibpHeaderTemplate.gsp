@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@ page contentType="text/html"%>
 <div id="ibp-header" class="gradient-bg">
 	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;border-bottom:0px;">
 		<div class="navbar-inner"
@@ -43,7 +44,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                                     controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="Add an Observation"> <i class="icon-plus"></i>Add an Observation</a>
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Upload multiple images of species and create multiple observations in a batch mode" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="Add Multiple Observations"> <i class="icon-plus"></i>Add Multiple Observations</a>
+                                    controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="Add Multiple Observations"> <i class="icon-plus"></i>Add Multiple Observations (β*)</a>
 
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="A list is a collection of sightings recorded from an area over a time period submitted with or without supporting media." data-trigger="hover"
                                     href="${uGroup.createLink(
@@ -76,9 +77,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
 <%--	</div>--%>
 										
-	<!--div class="alertMsg alert alert-info" style="background-color: #2d2d2d; color: yellow; text-shadow: none; clear: both; margin: 0px; text-align: center;padding:4px;border:none;">
-		The <a style="color:orange;" href="http://treesindia.indiabiodiversity.org">TreesIndia@IBP</a> is organizing a "Neighbourhood Trees Campaign" from Earth day 22nd-27th April. Participate in the campaign and upload <a style="color:orange;" href="http://treesindia.indiabiodiversity.org/observation/create">tree observations</a>.
-	</div-->
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">

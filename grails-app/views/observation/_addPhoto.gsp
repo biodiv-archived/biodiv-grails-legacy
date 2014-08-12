@@ -96,7 +96,7 @@
                                 isChecked = "checked"
                             }
                         %>
-                        <input name="pullImage_${i}" type="checkbox" value="true" style="float:right; margin-right:-48px; margin-top:-23px;" ${isChecked} >
+                        <input name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -170px;float: right;margin-left: -81px;" ${isChecked} >
                         <input name="resId_${i}" type="hidden" value='${r.id}'/>
                     </g:if>
                 </div>

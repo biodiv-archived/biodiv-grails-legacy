@@ -223,27 +223,37 @@ class ObservationService extends AbstractObjectService {
 
                 params["createNew"] = true
                 params["oldAction"] = params.action
+                println "============PARAMS ACTION=============== " + params.action
+                println "============FOR OBSERVATION ============ " + observationInstance
                 String uuidRand =  UUID.randomUUID().toString()
+                println "==================UUID GENERATED======== " + uuidRand
                 observationInstance.resource.each { resource ->
+                    println "=============FOR RESOURCE=========== " + resource + " =======ITS CONTEXT ======== " + resource.context?.value() + " =====ITS FILE NAME===== " +  resource.fileName
                     if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
+                        println "========CONTEXT IS USER========= " 
                         def usersResFolder = resource.fileName.tokenize('/')[0]
+                        println "======USERS RES FOLDER========== " + usersResFolder
                         def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
+                        println "======OBV DIR FROM CONFIG======= " + obvDir
                         if(!obvDir.exists()) {
                             obvDir.mkdir();
                         }
                         /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
                         obvDir = new File(obvDir, uuidRand);
+                        println "=====NEW OBV DIR CREATED======== " + obvDir
                         obvDir.mkdir();                
                         /////change filename of resource to this uuid and inside that check for clash of filename
                         File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
                         def a = newUniq.getAbsolutePath().tokenize('/')[-1]
                         def newFileName = a.tokenize('.')[0]
-
+                        println "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
                         //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
                         String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
                         def usersResDir = new File(userRootDir, usersResFolder)
                         def finalSuffix = ""
+                        println "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
                         usersResDir.eachFileRecurse (FileType.FILES) { file ->
+                            println "=========PICKED UP THIS FILE==================== " + file
                             def fName = file.getName();
                             def tokens = fName.tokenize("_");
                             def nameSuffix = ""
@@ -258,30 +268,39 @@ class ObservationService extends AbstractObjectService {
                                     }
                                 }
                             }
+                            println "========NAME SUFFIX======== " + nameSuffix
                             Path source = Paths.get(file.getAbsolutePath());
                             Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
-
+                            println "=======SOURCE============= " + source 
+                            println "====DESTINATION=========== " + destination
                             try {
                                 //Files moved but empty folder there
+                                println "===================MOVING FILE================================"
                                 Files.move(source, destination);
                             } catch (IOException e) {
+                                println "======EXCEPTION IN MOVING FILE==============="
                                 e.printStackTrace();
                             }
                         }
                         try{
+                            println "=========DELETING DIRECTORY=========="
                             FileUtils.deleteDirectory(usersResDir);
 
                         }catch(IOException e){
+                            println "========ERROR IN DELETION=========="
                             e.printStackTrace();
-                        }
+                        }                        
                         //// UPDATING FILE NAME OF RES IN DB
                         ////check format of filename---- slash kaise hai
+                        println "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
                         resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+                        println "=======UPDATING RESOURCE CONTEXT======"
                         resource.saveResourceContext(observationInstance)
 
                         def usersRes = UsersResource.findByRes(resource)
                         ////////////////////
                         ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
+                        println "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
                         usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
                         if(!usersRes.save(flush:true)){
                             usersRes.errors.allErrors.each { log.error it }
@@ -350,7 +369,7 @@ class ObservationService extends AbstractObjectService {
             Long ugId = getUserGroup(params)?.id;
             relatedObv = getFeaturedObject(ugId, max, offset, params.controller)
         } else if(params.filterProperty == "user"){
-            relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
+            relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort, params.webaddress)
         } else if(params.filterProperty == "nearByRelated"){
             relatedObv = getNearbyObservationsRelated(params.id, max, offset)
         } else if(params.filterProperty == "nearBy"){
@@ -417,16 +436,28 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Map getRelatedObservationByUser(long userId, int limit, long offset, String sort){
+    Map getRelatedObservationByUser(long userId, int limit, long offset, String sort, String webaddress = null){
+        def sql =  Sql.newInstance(dataSource);
+        def userGroupInstance = null
+        if(webaddress){
+            userGroupInstance = userGroupService.get(webaddress) 
+        }
         //getting count
+        def count
+        if(userGroupInstance) {
+            count = sql.rows("select count(*) from observation obv , user_group_observations ugo where obv.author_id = :userId and ugo.observation_id = obv.id and ugo.user_group_id =:ugId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true , ugId:userGroupInstance.id]);
+        } else {
+            count = sql.rows("select count(*) from observation obv where obv.author_id = :userId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true]);
+                 
+        }
+        
         def queryParams = [isDeleted:false]
         def countQuery = "select count(*) from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted and obv.isShowable = :isShowable "
         queryParams["userId"] = userId
         queryParams["isDeleted"] = false;
         queryParams["isShowable"] = true;
-        def count = Observation.executeQuery(countQuery, queryParams)
-
-
+        //def count = Observation.executeQuery(countQuery, queryParams)
+        
         //getting observations
         def query = "from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted and obv.isShowable = :isShowable "
         def orderByClause = "order by obv." + (sort ? sort : "createdOn") +  " desc"
@@ -434,14 +465,23 @@ class ObservationService extends AbstractObjectService {
 
         queryParams["max"] = limit
         queryParams["offset"] = offset
-
-        def observations = Observation.findAll(query, queryParams);
+        def observationsRows
+        if(userGroupInstance) {
+            observationsRows = sql.rows("select obv.id from observation obv , user_group_observations ugo where obv.author_id = :userId and ugo.observation_id = obv.id and ugo.user_group_id =:ugId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable " + "order by obv." + (sort ? sort : "created_on") +  " desc limit :max offset :offset", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true , ugId:userGroupInstance.id , max:limit, offse:offset]);
+        } else {
+            observationsRows = sql.rows("select obv.id from observation obv where obv.author_id = :userId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable " + "order by obv." + (sort ? sort : "created_on") +  " desc limit :max offset :offset", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true, max:limit, offset:offset]);
+                 
+        }
+        //def observations = Observation.findAll(query, queryParams);
         def result = [];
+        def observations = []
+        observationsRows.each {
+            observations.add(Observation.read(it.getProperty("id")))
+        }
         observations.each {
             result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
         }
-
-        return ["observations":result, "count":count[0]]
+        return ["observations":result, "count":count[0]["count"]]
     }
 
     /**
@@ -628,10 +668,18 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getRecommendation(params){
-        def recoName = params.recoName;
-        def canName = params.canName;
-        def commonName = params.commonName;
-        def languageId = Language.getLanguage(params.languageName).id;
+        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
+    }
+
+    /**
+    * recoName
+    * canName
+    * commonName
+    * languageName
+    * 
+    **/
+    Map getRecommendations(String recoName, String canName, String commonName, String languageName) {
+        def languageId = Language.getLanguage(languageName).id;
         //		def refObject = params.observation?:Observation.get(params.obvId);
 
         //if source of recommendation is other that observation (i.e Checklist)
@@ -850,7 +898,7 @@ class ObservationService extends AbstractObjectService {
     Query q = session.createQuery(< your hql > ); 
     Geometry geom = < your parameter value> 
     //now first create a custom type 
-    Type geometryType = new CustomType(GeometryUserType.class, null); 
+    Type geometryType = new CustomType(new GeometryUserType()); 
     q.setParameter(:geoExp0, geom, geometryType); 
      */
     Map getFilteredObservations(def params, max, offset, isMapView = false) {
@@ -882,11 +930,11 @@ class ObservationService extends AbstractObjectService {
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
-            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
+            //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
 
         if(max > -1){
@@ -1160,36 +1208,78 @@ class ObservationService extends AbstractObjectService {
     }
 
     /**
-     * Gets all obvs from all groups
+     * Gets users observations depending on user group
      **/
-    long getAllObservationsOfUser(SUser user) {
-        //TODO: filter on usergroup if required
+    long getAllObservationsOfUser(SUser user , UserGroup userGroupInstance = null) {
         return (long) Observation.createCriteria().count {
             and {
                 eq("author", user)
                 eq("isDeleted", false)
                 eq("isShowable", true)
             }
+            if(userGroupInstance){
+                userGroups{
+                    eq('id', userGroupInstance.id)
+                }
+            }
         }
         //return (long)Observation.countByAuthorAndIsDeleted(user, false);
     }
 
     /**
-     * Gets all recommendations of user made in all groups
+     * Gets recommendations of user made in a user group
      **/
-    long getAllRecommendationsOfUser(SUser user) {
+    long getAllRecommendationsOfUser(SUser user , UserGroup userGroupInstance = null) {
         //TODO: filter on usergroup if required
-        def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
-        return (long)result[0];
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        if(userGroupInstance){
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o, user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable and ugo.observation_id = o.id and ugo.user_group_id =:ugId", [userId:user.id, isDeleted:false, isShowable:true, ugId:userGroupInstance.id]);
+        } else {
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
+        }
+  //      def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
+        return (long)result[0]["count"];
     }
 
-    List getRecommendationsOfUser(SUser user, int max, long offset) {
+    List getRecommendationsOfUser(SUser user, int max, long offset , UserGroup userGroupInstance = null) {
+        def sql =  Sql.newInstance(dataSource);
         if(max == -1) {
-            def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true]);
+            def recommendationVotesList
+            if(userGroupInstance){
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o , user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable and ugo.observation_id = o.id and ugo.user_group_id =:ugId order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true , ugId:userGroupInstance.id]);
+            } else {
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true]);
+            }
+            //def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
+            def finalResult = []
+            
+            for (row in recommendationVotesList) {
+                finalResult.add(RecommendationVote.findById(row.getProperty("id")))
+            }
+            //return recommendationVotesList;
+            return finalResult;
+
+            /*
+            def recommendationVotesList = sql.rows("select recoVote from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true])
+            //def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true]);
             return recommendationVotesList;
+            */
         } else {
-            def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
-            return recommendationVotesList;
+            def recommendationVotesList
+            if(userGroupInstance){
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o , user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable and ugo.observation_id = o.id and ugo.user_group_id =:ugId order by recoVote.voted_on desc limit :max offset :offset", [userId:user.id, isDeleted:false, isShowable:true ,max:max, offset:offset, ugId:userGroupInstance.id]);
+            } else {
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc limit :max offset :offset", [userId:user.id, isDeleted:false, isShowable:true ,max:max, offset:offset]);
+            }
+            //def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
+            def finalResult = []
+            
+            for (row in recommendationVotesList) {
+                finalResult.add(RecommendationVote.findById(row.getProperty("id")))
+            }
+            //return recommendationVotesList;
+            return finalResult;
         }
     }
 
@@ -2274,8 +2364,8 @@ class ObservationService extends AbstractObjectService {
         def distinctRecoCountQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoCountQuery)
 
         if(params.bounds && boundGeometry) {
-            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
 
         if(max > -1){
@@ -2370,7 +2460,7 @@ class ObservationService extends AbstractObjectService {
         def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
 
         if(params.bounds && boundGeometry) {
-            speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
@@ -2448,7 +2538,7 @@ class ObservationService extends AbstractObjectService {
         if(!Environment.getCurrent().getName().equalsIgnoreCase("development")) {
         try {
             def sql =  Sql.newInstance(dataSource);
-            //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
+            //sql.in(new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()), obv.topology)
 
             sql.rows(query).each {
                 switch (it.getProperty("type")) {
@@ -2483,7 +2573,7 @@ class ObservationService extends AbstractObjectService {
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
-            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
 
         hqlQuery.setProperties(queryParts.queryParams);

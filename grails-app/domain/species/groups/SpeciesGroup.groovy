@@ -35,11 +35,17 @@ class SpeciesGroup {
 	Resource icon(ImageType type) {
 		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 		name = ImageUtils.getFileName(name, type, '.png');
+        if(type == ImageType.ORIGINAL) {
+            name = name + ".png"
+        }
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/../group_icons/speciesGroups/${name}")).exists()
+
 		if(!iconPresent) {
+            log.debug "icon not present. ${name}"
 			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
+
 		def r = new Resource('fileName':"group_icons/speciesGroups/${name}", 'type':ResourceType.IMAGE, 'title':"You can contribute!!!");
         r['baseUrl'] = grailsApplication.config.grails.serverURL
         return r;

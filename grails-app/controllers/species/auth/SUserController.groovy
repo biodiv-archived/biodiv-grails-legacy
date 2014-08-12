@@ -48,7 +48,7 @@ class SUserController extends UserController {
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
 
-	def index = {
+	def index () {
 		redirect(action: "list", params: params)
 	}
 
@@ -124,10 +124,13 @@ class SUserController extends UserController {
 	def show() {
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
-		}
+        }
+        def userGroupInstance = null
+        if(params.webaddress) {
+            userGroupInstance = userGroupService.get(params['webaddress'])
+        }
+        def SUserInstance = SUser.get(params.long("id"))
 
-		def SUserInstance = SUser.get(params.long("id"))
-        
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
                 render (['success':false, 'msg':"Id is required"] as JSON)
@@ -147,7 +150,7 @@ class SUserController extends UserController {
                             result.roles << role.authority
                         }                    
                     }
-                    result['stat'] = chartService.getUserStats(SUserInstance);
+                    result['stat'] = chartService.getUserStats(SUserInstance, userGroupInstance);
                     render result as JSON
                     return;
                 }
@@ -160,7 +163,7 @@ class SUserController extends UserController {
             else {
                 def result = buildUserModel(SUserInstance)
                 result.put('userGroupWebaddress', params.webaddress)
-                result.put('obvData', chartService.getUserStats(SUserInstance));
+                result.put('obvData', chartService.getUserStats(SUserInstance, userGroupInstance));
     //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
     //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
                 result['currentUser'] = springSecurityService.currentUser;
@@ -289,7 +292,7 @@ class SUserController extends UserController {
 			}
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), user.name])}"
-			redirect action: list
+			redirect action:'list'
 		}
 		catch (DataIntegrityViolationException e) {
 			e.printStackTrace();
@@ -299,8 +302,7 @@ class SUserController extends UserController {
 		}
 	}
 
-	def search = {
-		log.debug params
+	def search () {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 		//def model = getUsersList(params);
@@ -484,8 +486,7 @@ class SUserController extends UserController {
 	/**
 	 *
 	 */
-	def advSearch = {
-		log.debug params;
+	def advSearch () {
 		String query  = "";
 		def newParams = [:]
 		for(field in params) {
@@ -509,9 +510,7 @@ class SUserController extends UserController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def nameTerms = {
-		log.debug params
-
+	def nameTerms () {
 		setIfMissing 'max', 5, 10
 
 		def jsonData = []
@@ -526,8 +525,7 @@ class SUserController extends UserController {
 	/**
 	 *
 	 */
-	def terms = {
-		log.debug params;
+	def terms () {
 		setIfMissing 'max', 5, 10
 		render SUserService.getUserSuggestions(params) as JSON;
 	}
@@ -558,9 +556,12 @@ class SUserController extends UserController {
 		return result;
 	}
 
-	def login = { render template:"/common/suser/userLoginBoxTemplate"  }
+	def loginTemplate() { 
+        String s = g.render template:"/common/suser/userLoginBoxTemplate"  
+        render s
+    }
 
-	def header = {
+	def headerTemplate () {
 		//TODO:HACK FOR NOW
 		String domainUrl = Utils.getDomainServerUrl(request);
 
@@ -571,12 +572,19 @@ class SUserController extends UserController {
 				return
 			}
 		}
-		render template:"/domain/ibpHeaderTemplate"
+		String s = g.render (template:"/domain/ibpHeaderTemplate")
+        render s;
 	}
 
-	def sidebar = { render template:"/common/userGroup/sidebarTemplate" }
+	def sidebarTemplate() { 
+        String s = g.render template:"/common/userGroup/sidebarTemplate" 
+        render s;
+    }
 
-	def footer = { render template:"/domain/ibpFooterTemplate" }
+	def footerTemplate() { 
+        String s = g.render template:"/domain/ibpFooterTemplate" 
+        render s;
+    }
 
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
@@ -652,21 +660,23 @@ class SUserController extends UserController {
 	/**
 	 *
 	 */
-	def getRecommendationVotes = {
-		log.debug params;
-		params.max = params.limit ? params.int('limit') : 10
+	def getRecommendationVotes () {
+        params.max = params.limit ? params.int('limit') : 10
 		params.offset = params.offset ? params.long('offset'): 0
 
 		def userInstance = SUser.get(params.filterPropertyValue)
-		if (userInstance) {
-			def recommendationVoteList
-			if(params.obvId){
-				recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
-			}else{
-				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
-			} 
-            
-            def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance);
+        if (userInstance) {
+            def userGroupInstance
+            if(params.webaddress) {
+                userGroupInstance = userGroupService.get(params['webaddress'])
+            }
+            def recommendationVoteList
+            if(params.obvId){
+                recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
+            }else{
+				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset, userGroupInstance);
+			}
+            def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance, userGroupInstance);
 
             def observations = recommendationVoteList.collect{it.observation};	
             def result = []
@@ -688,7 +698,7 @@ class SUserController extends UserController {
         return
 	}
 
-    def getRecommendationCount(userInstance){
+    def getRecommendationCount(SUser userInstance){
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.author_id = :userId", [userId:userInstance?.id])
 		return result[0]["count"]

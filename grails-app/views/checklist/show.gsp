@@ -33,11 +33,11 @@
                             <sUser:ifOwns model="['user':checklistInstance.author]">
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'checklist', action:'edit', id:checklistInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                <i class="icon-edit"></i>Edit</a>
+                                <i class="icon-edit"></i><g:message code="msg.Edit" /></a>
 
                             <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:checklistInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+                                onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="msg.Delete" /></a>
 
                             </sUser:ifOwns>
 
@@ -84,7 +84,7 @@
 <%--                    %>--%>
 <%--                    <g:if test="${annotations?.size() > 0}">--%>
 <%--                    <div class="sidebar_section">--%>
-<%--                        <h5>Annotations</h5>--%>
+<%--                        <h5><g:message code="msg.Annotations" /></h5>--%>
 <%--                        <div class="tile" style="clear: both">--%>
 <%--                            <obv:showAnnotation model="[annotations:annotations]" />--%>
 <%--                        </div>--%>

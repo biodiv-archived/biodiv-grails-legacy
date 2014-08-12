@@ -23,14 +23,11 @@ class ChecklistController {
 	}
 
 	def list() {
-		log.debug params
 		params.isChecklistOnly = "" + true
-		redirect(controller:'observation', action:list, params: params)
+		redirect(controller:'observation', action:'list', params: params)
 	}
 
-
 	def show() {
-		log.debug params
 		if(params.id) {
 			def checklistInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!checklistInstance) {
@@ -71,7 +68,6 @@ class ChecklistController {
 	}
 
 	def snippet = {
-		log.debug params
 		def checklistInstance = Checklists.read(params.id)
 		render (template:"/common/checklist/showChecklistSnippetTabletTemplate", model:[checklistInstance:checklistInstance, 'userGroupWebaddress':params.webaddress]);
 	}
@@ -95,14 +91,12 @@ class ChecklistController {
 		}[0]
 	}
 	
-	def count = {
-		log.debug params
+	def count() {
 		render chartService.getChecklistCount(params)
 	}
 	
 	@Secured(['ROLE_USER'])
 	def create() {
-		log.debug params
 		def checklistInstance = new Checklists(license:License.findByName(License.LicenseType.CC_BY))
 		checklistInstance.properties = params;
 		return [observationInstance: checklistInstance]
@@ -110,7 +104,6 @@ class ChecklistController {
 	
 	@Secured(['ROLE_USER'])
 	def save() {
-		log.debug params;
 		if(request.method == 'POST') {
 			def result = saveAndRender(params)
             if(result.success){
@@ -189,7 +182,6 @@ class ChecklistController {
 	
 	@Secured(['ROLE_USER'])
 	def edit() {
-        log.debug params;
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id?.toLong(), false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -205,7 +197,6 @@ class ChecklistController {
 	
 	@Secured(['ROLE_USER'])
 	def update() {
-		log.debug params;
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id?.toLong(), false)
 		if(observationInstance)	{
 			def result = saveAndRender(params, false)
@@ -283,7 +274,6 @@ class ChecklistController {
 	
 	
 	def observationData = {
-		log.debug params
 		def observations = checklistService.getObservationData(params.id, params)
 		def model =[observations:observations, checklistInstance:Checklists.read(params.id.toLong())]
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
@@ -295,8 +285,7 @@ class ChecklistController {
 	/**
 	 *
 	 */
-	def search = {
-		log.debug params;
+	def search() {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 		def model = checklistService.search(params);
@@ -327,8 +316,7 @@ class ChecklistController {
 	/**
 	 *
 	 */
-	def terms = {
-		log.debug params;
+	def terms() {
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
 		
 		List result = checklistService.nameTerms(params)

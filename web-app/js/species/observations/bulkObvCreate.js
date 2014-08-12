@@ -258,7 +258,9 @@ $(".applyAll").click(function(){
         });
         $.each(groups, function(index, grpVal){
             var sel = ".userGroupsClass .checkbox button[value='"+grpVal+"']"
-            $(value).find(sel).trigger("click");
+            if(!($(value).find(sel).hasClass("btn-success"))){
+                $(value).find(sel).trigger("click");
+            }
         });
         $(value).find(".group_options li[value='"+spGrpVal+"']").trigger("click");
         $(value).find(".habitat_options li[value='"+habVal+"']").trigger("click");

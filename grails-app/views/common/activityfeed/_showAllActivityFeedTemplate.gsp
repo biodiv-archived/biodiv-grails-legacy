@@ -25,10 +25,10 @@
 	<input type="hidden" name='feedHomeObjectType' value="${rootHolder?.class?.getCanonicalName()}"/>
 
     <g:if test="${!hideList}">
-		<a class="activiyfeednewermsg yj-thread-replies-container yj-show-older-replies" style="display:none;" href="#" title="load new feeds" onclick='loadNewerFeedsInAjax($(this).closest(".activityfeed${feedType}"), false);return false;'>Click to see new feeds</a>
+		<a class="activiyfeednewermsg yj-thread-replies-container yj-show-older-replies" style="display:none;" href="#" title="load new feeds" onclick='loadNewerFeedsInAjax($(this).closest(".activityfeed${feedType}"), false);return false;'><g:message code="msg.new.feeds" /></a>
 		<g:if test="${feedOrder == 'oldestFirst'}">	
 			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
+				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'><g:message code="msg.Show" /> ${(feedType != 'GroupSpecific')?remainingFeedCount:''}<g:message code="msg.older.feeds" /> </a>
 			</g:if>
 			<ul>
 				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
@@ -39,11 +39,11 @@
 				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
 			</ul>
 			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
+				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'><g:message code="msg.Show" /> ${(feedType != 'GroupSpecific')?remainingFeedCount:''} <g:message code="msg.older.feeds" /> </a>
 			</g:if>
 	    </g:else>
 	    <g:if test="${refreshType == 'auto'}">
-	    	<span class="activiyfeedNoMoreFeedmsg yj-thread-replies-container yj-show-older-replies" style="display:none;">No more feeds</span>
+	    	<span class="activiyfeedNoMoreFeedmsg yj-thread-replies-container yj-show-older-replies" style="display:none;"><g:message code="msg.No.feeds" /></span>
 	    </g:if>
 	    
     </g:if>

@@ -9,11 +9,11 @@
 				<i class="icon-flag icon-red"></i>
 			</g:if> <g:else>
 				<i class="icon-flag"></i>
-			</g:else> Flag
+			</g:else> <g:message code="msg.Flag" />
 		</button>
 
                		<div id="flag-options" class="popup-form" style="display: none">
-			<h5>Why?</h5>
+			<h5><g:message code="msg.Why" />?</h5>
 			<form id="flag-form"
                             action="javascript:flag('${observationInstance.id}', '${observationInstance.class.getCanonicalName()}','${uGroup.createLink(controller:'action', action:'flagIt', id:observationInstance.id)}')">
 				<g:each in="${FlagType.list() }" var="flag" status="i">
@@ -39,7 +39,7 @@
 
 			<div id="flagged">
 				<g:if test="${observationInstance.flagCount> -1}">
-					<span id="flagHeadings" style="font-weight: bold">Who flagged and why:</span>
+					<span id="flagHeadings" style="font-weight: bold"><g:message code="msg.Who.Why" />:</span>
                                         </g:if>
                                         <div class = "flag-list-users">
                                             <g:render template="/common/observation/flagListUsersTemplate" model="['observationInstance':observationInstance]"/>

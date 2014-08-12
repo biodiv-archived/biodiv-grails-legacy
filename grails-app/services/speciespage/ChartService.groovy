@@ -18,6 +18,7 @@ import species.participation.Observation;
 import species.participation.Checklists;
 import content.eml.Document;
 import species.participation.RecommendationVote;
+import groovy.sql.Sql;
 
 class ChartService {
 
@@ -33,6 +34,7 @@ class ChartService {
 	
 	def userGroupService
 	def observationService
+    def dataSource
 	
 	def getObservationStats(params, SUser author, request){
 		UserGroup userGroupInstance
@@ -57,12 +59,12 @@ class ChartService {
 		return allResult
 	}
 
-    def getUserStats(SUser user) {
+    def getUserStats(SUser user, UserGroup userGroupInstance = null) {
     	//getting all observation
-		def allObvResult = getFilteredObservationStats(null, user, null)
+		def allObvResult = getFilteredObservationStats(userGroupInstance, user, null)
 
         //getting ireco
-		def allRecoResult = getFilteredRecommendationStats(user)
+		def allRecoResult = getFilteredRecommendationStats(user , userGroupInstance)
 		
         mergeResult(allObvResult, allRecoResult)
     	allObvResult.columns = [
@@ -125,12 +127,25 @@ class ChartService {
 	 * @param identifactionFlag if null then returning all obs, if true then returning only identified if false then returning unidentified
 	 * @return
 	 */
-	private getFilteredRecommendationStats(SUser author){
-        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author and o.isDeleted = false and o.isShowable = true and o.isChecklist = false group by g.id", [author:author]);
-		result.each {it->
-            it[0] = SpeciesGroup.read(it[0]);
+	private getFilteredRecommendationStats(SUser author , UserGroup userGroupInstance = null){
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        if(userGroupInstance){
+            result = sql.rows("select g.id, count(*) from recommendation_vote r, observation o, user_group_observations ugo, species_group g where r.observation_id = o.id and ugo.observation_id = o.id and ugo.user_group_id =:ugID and o.group_id = g.id and r.author_id=:authorId and o.is_deleted = false and o.is_showable = true and o.is_checklist = false group by g.id", [authorId:author.id, ugID : userGroupInstance.id]);
+        } else {
+            result = sql.rows("select g.id, count(*) from recommendation_vote r, observation o, species_group g where r.observation_id = o.id and o.group_id = g.id and r.author_id=:authorId and o.is_deleted = false and o.is_showable = true and o.is_checklist = false group by g.id", [authorId:author.id]);
         }
-		return getFormattedResult(result)
+        //def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author and o.isDeleted = false and o.isShowable = true and o.isChecklist = false group by g.id", [author:author]);
+        def resultFinal = []
+        for (row in result){
+            resultFinal.add([SpeciesGroup.findById(row.getProperty("id")),row.getProperty("count")])
+        }
+
+        /*
+        result.each {it->
+            it[0] = SpeciesGroup.read(it[0]);
+        }*/
+		return getFormattedResult(resultFinal)
 	}
 
 
@@ -454,10 +469,10 @@ class ChartService {
 	}
 	
 	def activeUserStatsBySpeciesGroup(speciesGroupId, params=null){
-//		UserGroup userGroupInstance
-//		if(params.webaddress) {
-//			userGroupInstance = userGroupService.get(params.webaddress);
-//		}
+		UserGroup userGroupInstance
+        if(params.webaddress) {
+			userGroupInstance = userGroupService.get(params.webaddress);
+		}
 		int max = 5
 		def sGroup =  SpeciesGroup.get(speciesGroupId)
 		def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
@@ -475,11 +490,11 @@ class ChartService {
 				eq('group', sGroup)
 				
 //				//filter by usergroup
-//				if(userGroupInstance){
-//					userGroups{
-//						eq('id', userGroupInstance.id)
-//					}
-//				}
+				if(userGroupInstance){
+					userGroups{
+						eq('id', userGroupInstance.id)
+					}
+				}
 			}
 			maxResults max
 			order 'total', 'desc'
@@ -511,7 +526,7 @@ class ChartService {
 			return
 		}
 		def params = model.params
-		switch (model.statsType) {
+        switch (model.statsType) {
 			case USER_OBSERVATION_BY_SPECIESGROUP:
 				model.putAll(activeUserStatsBySpeciesGroup(model.speciesGroupId, params))
 				break

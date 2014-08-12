@@ -23,7 +23,7 @@
 <%--            </g:if>--%>
 
             <g:if test="${resource.description}">
-                <div class="span5 ellipsis multiline" style="margin-left:0px">${resource.description}</div>
+                <div class="span5 ellipsis multiline" style="margin-left:0px">${raw(resource.description)}</div>
 
                 <div style="clear:both;"></div>
             </g:if>
