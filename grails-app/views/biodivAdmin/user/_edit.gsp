@@ -72,7 +72,7 @@ if (isOpenId) {
 		</ul>
 	</g:if>
 	<g:else>
-	No OpenIDs registered
+	<g:message code="msg.No.OpenIDs.registered" />
 	</g:else>
 	</s2ui:tab>
 	</g:if>

@@ -522,6 +522,7 @@ environments {
                     'org.pac4j'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+		debug  'org.springframework.beans'
        }
     }
 	test {
