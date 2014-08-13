@@ -26,8 +26,8 @@ import species.TaxonomyRegistry
 import species.License.LicenseType
 import species.Resource.ResourceType
 import species.SpeciesField.AudienceType
-import species.Synonyms.RelationShip
-import species.TaxonomyDefinition.TaxonomyRank
+import species.ScientificName.RelationShip
+import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
 import species.utils.HttpUtils
 import species.utils.ImageUtils

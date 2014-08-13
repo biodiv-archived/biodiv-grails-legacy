@@ -2,7 +2,7 @@ package species
 
 import org.apache.commons.logging.LogFactory;
 
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.utils.Utils;
 
 import grails.converters.JSON;

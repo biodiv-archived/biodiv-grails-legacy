@@ -4,7 +4,6 @@ import species.Field;
 import species.UserGroupTagLib;
 import species.Synonyms;
 import species.CommonNames;
-import species.TaxonomyDefinition;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
@@ -21,8 +20,6 @@ import com.vividsolutions.jts.geom.Geometry
 import com.vividsolutions.jts.io.WKTWriter;
 import grails.converters.JSON;
 import species.participation.Featured;
-import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
 import species.TaxonomyRegistry;
 import species.Classification;
 

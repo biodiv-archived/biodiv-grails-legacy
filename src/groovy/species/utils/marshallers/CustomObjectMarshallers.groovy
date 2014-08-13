@@ -23,7 +23,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 import grails.converters.JSON;
 import species.participation.Featured;
 import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.TaxonomyRegistry;
 import species.Classification;
 import species.Resource;

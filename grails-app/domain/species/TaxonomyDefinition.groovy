@@ -5,54 +5,11 @@ import java.util.List;
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
 
-class TaxonomyDefinition extends NamesSorucedata {
-
-	public enum TaxonomyRank {
-		KINGDOM("Kingdom"),
-		PHYLUM("Phylum"),
-		CLASS("Class"),
-		ORDER("Order"),
-		FAMILY("Family"),
-		SUB_FAMILY("Sub-Family"),
-		GENUS("Genus"),
-		SUB_GENUS("Sub-Genus"),
-		SPECIES("Species");
-
-		private String value;
-
-		TaxonomyRank(String value) {
-			this.value = value;
-		}
-
-		static list() {
-			[
-				KINGDOM,
-				PHYLUM,
-				CLASS,
-				ORDER,
-				FAMILY,
-				SUB_FAMILY,
-				GENUS,
-				SUB_GENUS,
-				SPECIES
-			]
-		}
-
-		String value() {
-			return this.value;
-		}
-
-		String toString() {
-			return this.value();
-		}
-	}
+class TaxonomyDefinition extends ScientificName {
 
 	int rank;
 	String name;
-	String canonicalForm;
-	String normalizedForm;
-	String italicisedForm;
-	String binomialForm;
+
 	SpeciesGroup group;
 	String threatenedStatus;
 	ExternalLinks externalLinks;
@@ -62,10 +19,7 @@ class TaxonomyDefinition extends NamesSorucedata {
 
 	static constraints = {
 		name(blank:false)
-		canonicalForm (nullable:true, unique:['rank']);
-		normalizedForm nullable:true;
-		italicisedForm nullable:true;
-		binomialForm nullable:true;
+		canonicalForm (nullable:false, unique:['rank']);
 		group nullable:true;
 		threatenedStatus nullable:true;
 		externalLinks nullable:true;

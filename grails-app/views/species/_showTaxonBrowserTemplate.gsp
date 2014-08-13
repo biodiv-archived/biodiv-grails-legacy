@@ -1,9 +1,8 @@
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.TaxonomyDefinition"%>
-<%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 
 <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
     <h5>Classifications</h5>	

@@ -2,7 +2,7 @@ package species
 
 import java.sql.ResultSet;
 
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;

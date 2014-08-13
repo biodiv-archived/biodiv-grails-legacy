@@ -1,14 +1,18 @@
 package species
 
-class CommonNames extends NamesSorucedata {
+class CommonNames extends NameMetadata {
 
 	String name;
 	Language language;
 	TaxonomyDefinition taxonConcept;
 
+	//i.e. aam
+	String transliteration;
+	
     static constraints = {
 		name(blank:false, nullable:false, unique:['language','taxonConcept']);
 		language(nullable:true);
+		transliteration(nullable:true);
     }
 
 	static mapping = {

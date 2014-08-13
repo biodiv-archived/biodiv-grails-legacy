@@ -1,6 +1,6 @@
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="species.Reference"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@page import="species.ScientificName.TaxonomyRank"%>
 
 <div class="sidebar_section  <%=sparse?'':'menubutton'%>  ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
     <g:set var="fieldCounter" value="${1}" />

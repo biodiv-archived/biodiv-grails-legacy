@@ -1,4 +1,4 @@
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 <html>
 <%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder"%>
 

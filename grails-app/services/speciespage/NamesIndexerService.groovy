@@ -15,7 +15,7 @@ import org.apache.lucene.util.Version
 import species.Species
 import species.Language
 import species.TaxonomyDefinition
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.participation.Recommendation
 import species.search.Lookup
 import species.search.Record

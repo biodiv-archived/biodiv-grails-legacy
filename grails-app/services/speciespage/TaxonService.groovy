@@ -7,7 +7,7 @@ import org.hibernate.exception.ConstraintViolationException
 import species.Classification
 import species.Species;
 import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.TaxonomyRegistry
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.XMLConverter

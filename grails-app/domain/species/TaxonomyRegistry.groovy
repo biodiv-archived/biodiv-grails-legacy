@@ -3,8 +3,6 @@ package species
 import java.util.List;
 
 class TaxonomyRegistry extends NamesSorucedata {
-	//to store level of the node requried for bread first search
-	//int level
 	TaxonomyDefinition taxonDefinition;
 	TaxonomyRegistry parentTaxon;
 	String path;

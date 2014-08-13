@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%@page import="species.utils.ImageType"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
-<%@ page import="species.Synonyms"%>
+<%@ page import="species.ScientificName"%>
 <%@ page import="species.CommonNames"%>
 <%@ page import="species.Language"%>
 <%@page import="species.utils.Utils"%>
@@ -317,7 +317,7 @@
             </g:each>
 
             var synRelSelectorOptions = [], langSelectorOptions = [];
-            <g:each in="${Synonyms.RelationShip.toList()}" var="rel">
+            <g:each in="${ScientificName.RelationShip.toList()}" var="rel">
             synRelSelectorOptions.push({value:"${rel.value()}", text:"${rel.value()}"});
             </g:each>
             var langSelectorOptions = [];

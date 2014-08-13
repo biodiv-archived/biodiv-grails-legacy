@@ -1,5 +1,5 @@
 <%@page import="species.utils.ImageType"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>

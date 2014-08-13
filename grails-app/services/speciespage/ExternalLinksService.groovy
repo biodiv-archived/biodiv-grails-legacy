@@ -4,7 +4,7 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import species.ExternalLinks;
 import species.Species;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import grails.converters.JSON;
 import grails.util.Environment;
 import groovyx.net.http.HTTPBuilder;

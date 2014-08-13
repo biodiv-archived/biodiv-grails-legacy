@@ -9,7 +9,7 @@ import species.License.LicenseType;
 import species.formatReader.SpreadsheetWriter;
 import species.auth.SUser;
 import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 
 class SourceConverter {
     protected Map licenseUrlMap;

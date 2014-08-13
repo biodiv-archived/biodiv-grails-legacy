@@ -1,6 +1,6 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.TaxonomyDefinition"%>
-<%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 
 <div id="taxonHierarchyInputForm" class="control-group hide">
     <label
