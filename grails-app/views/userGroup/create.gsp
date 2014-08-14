@@ -318,29 +318,29 @@ max-width: 100%;
 												name="allowUsersToJoin" checked="${userGroupInstance.allowUsersToJoin}"/>
 								 <g:message code="userGroup.permissions.members.joining" default="Can users join the Group without invitation?" /> </label>
 						</div>
-						<div class="row control-group left-indent">
-							
-								<label class="checkbox" style="text-align: left;"> 
-								 <g:checkBox style="margin-left:0px;"
-												name="allowObvCrossPosting" checked="${userGroupInstance.allowObvCrossPosting}"/>
-								 <g:message code="userGroup.permissions.observations.crossposting" default="Can members cross post Observations to other Groups as well?" /> </label>
-						</div>
-						<div class="row control-group left-indent">
-							
-								<label class="checkbox" style="text-align: left;"> 
-								 <g:checkBox style="margin-left:0px;"
-												name="allowMembersToMakeSpeciesCall" checked="${userGroupInstance.allowMembersToMakeSpeciesCall}"/>
-								 <g:message code="userGroup.permissions.observations.allowMembersToMakeSpeciesCall" default="Can members make species call on Observations?" /> </label>
-						</div>
-						<sUser:isAdmin>
-						<div class="row control-group left-indent">
-							
-								<label class="checkbox" style="text-align: left;"> 
-								 <g:checkBox style="margin-left:0px;"
-												name="allowNonMembersToComment" checked="${userGroupInstance.allowNonMembersToComment}"/>
-								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Can non-members comment on Observations of the Group? " /> </label>
-						</div>
-						</sUser:isAdmin>
+<%--						<div class="row control-group left-indent">--%>
+<%--							--%>
+<%--								<label class="checkbox" style="text-align: left;"> --%>
+<%--								 <g:checkBox style="margin-left:0px;"--%>
+<%--												name="allowObvCrossPosting" checked="${userGroupInstance.allowObvCrossPosting}"/>--%>
+<%--								 <g:message code="userGroup.permissions.observations.crossposting" default="Can members cross post Observations to other Groups as well?" /> </label>--%>
+<%--						</div>--%>
+<%--						<div class="row control-group left-indent">--%>
+<%--							--%>
+<%--								<label class="checkbox" style="text-align: left;"> --%>
+<%--								 <g:checkBox style="margin-left:0px;"--%>
+<%--												name="allowMembersToMakeSpeciesCall" checked="${userGroupInstance.allowMembersToMakeSpeciesCall}"/>--%>
+<%--								 <g:message code="userGroup.permissions.observations.allowMembersToMakeSpeciesCall" default="Can members make species call on Observations?" /> </label>--%>
+<%--						</div>--%>
+<%--						<sUser:isAdmin>--%>
+<%--						<div class="row control-group left-indent">--%>
+<%--							--%>
+<%--								<label class="checkbox" style="text-align: left;"> --%>
+<%--								 <g:checkBox style="margin-left:0px;"--%>
+<%--												name="allowNonMembersToComment" checked="${userGroupInstance.allowNonMembersToComment}"/>--%>
+<%--								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Can non-members comment on Observations of the Group? " /> </label>--%>
+<%--						</div>--%>
+<%--						</sUser:isAdmin>--%>
 						
 					</div>
 				</div>
