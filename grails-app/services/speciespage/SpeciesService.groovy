@@ -52,6 +52,7 @@ import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.TaxonomyRegistry;
 import org.hibernate.FetchMode;
+import grails.converters.JSON;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -309,6 +310,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
+                //addMediaInSpField(params, speciesFieldInstance);
                 return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:activityFeedService.SPECIES_FIELD_CREATED]
             }
         } catch(Exception e) {
@@ -329,7 +331,7 @@ class SpeciesService extends AbstractObjectService  {
      * Update Species Field
      */
     def updateSpeciesField(SpeciesField speciesField, params) {
-
+        println "========dsdvsdfvfsdvdfvdfvd========= " + params
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
             return [success:false, msg:"You don't have permission to update"]
         }
@@ -338,10 +340,11 @@ class SpeciesService extends AbstractObjectService  {
             def result;
             SpeciesField.withTransaction { status ->
                 result = updateSpeciesFieldInstance(speciesField, params); 
-                if(!speciesField.save()) {
+                if(!speciesField.save(flush:true)) {
                     speciesField.errors.each { result.errors << it }
                     return [success:false, msg:"Error while updating species field", errors:result.errors]
-                } 
+                }
+                //addMediaInSpField(params, speciesField);
             }
             log.debug "Successfully updated species field";
             return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_UPDATED]
@@ -352,6 +355,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
+        println "============PARAMS=========== " + params.paramsForObvSpField +"=================== "+ params.paramsForUploadSpField
         if(!params.description) {
             return [success:false, msg:"Description cant be empty. Please delete the field if you dont want to have any description"]
         }
@@ -444,7 +448,8 @@ class SpeciesService extends AbstractObjectService  {
 
         //description
         speciesField.description = params.description;
-
+        
+        
         log.warn errors
         return [errors:errors]
     }
@@ -1527,9 +1532,9 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 	}
     
     def updateSpecies(params, species){
+        println "=========PARAMS IN UPDATE SPECIES======== " + params + "========================= "+params.class
         def resources = []
-        def speciesResources = species.resources;
-        if(params.resourceListType == "ofSpecies"){
+        if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField"){
             def resourcesXML = createResourcesXML(params);
             resources = saveResources(species, resourcesXML);
             params.each { key, val ->
@@ -1539,6 +1544,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                         resources.add(res)
                     }
                 }
+
             }
             species.resources?.clear();
         }
@@ -1547,6 +1553,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             params.each { key, val ->
                 int index = -1;
                 if(key.startsWith('pullImage_')) {
+                    println "========PULL IMAGE TRUE======= " + val
                     index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
                 }
                 if(index != -1) {
@@ -1577,8 +1584,9 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
         }
+        println "=======RESOURCVES ==========  " + resources
         resources.each { resource ->
-            if(params.resourceListType == "ofSpecies") {
+            if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
                 if(!resource.save(flush:true)){
                     resource.errors.allErrors.each { log.error it }
                 }
@@ -1586,8 +1594,11 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                     resource.saveResourceContext(species)
                 }
             }
+            species.refresh();
+            println "==========ADDING THIS RES============= " + resource
             species.addToResources(resource);
         }
+        println "======SAVING SAVING========"
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
@@ -1607,5 +1618,36 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             res.add(["observation":it, 'title':it.title])
         }
         return ['observations':res]
+    }
+
+    def getSpeciesFieldMedia(spFieldId){
+        def spF = SpeciesField.read(spFieldId.toLong())
+        return spF?spF.resources:[]
+    }
+
+    def addMediaInSpField(params, speciesField){
+        if(params.runForImages == "true"){
+            def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
+            def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
+            Map<String, String> p1 = new HashMap<String, String>();
+            Iterator<String> keysItr1 = paramsForObvSpField.keys();
+            while(keysItr1.hasNext())
+            {
+                String key = keysItr1.next();
+                String value = paramsForObvSpField.get(key);
+                p1.put(key, value);
+            }
+                
+            Map<String, String> p2 = new HashMap<String, String>();
+            Iterator<String> keysItr2 = paramsForUploadSpField.keys();
+            while(keysItr2.hasNext())
+            {
+                String key = keysItr2.next();
+                String value = paramsForUploadSpField.get(key);
+                p2.put(key, value);
+            }
+            def out2 = updateSpecies(p2, speciesField)
+            def out1 = updateSpecies(p1, speciesField)
+        }
     }
 }

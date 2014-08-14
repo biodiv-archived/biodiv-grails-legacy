@@ -30,6 +30,7 @@
             e.preventDefault();
             var $conEntry = $(e.currentTarget).parent();
             var $container = $conEntry.parent();
+            console.log("======================ON EDIT=============");
             this.initEditableForm($container, $conEntry, $container.data());
         },
 
@@ -67,6 +68,19 @@
 
 
         initEditableForm : function($container, $conEntry, options) {
+            console.log("==========EDITABLE FORM==============")
+            console.log($container);
+            //var addMediaHtml = '<a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn" onclick="getSpeciesFieldMedia("'+$container.data("speciesid")+'","'$container.data("pk")+'","fromSingleSpeciesField","'+window.params.getSpeciesFieldMedia+'")>Add Media</a>';
+            var addMediaHtml = '<a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn">Add Media</a>';
+
+            //$container.prepend(addMediaHtml);
+            $(".speciesFieldMedia").unbind("click").click(function(){
+                console.log("called this function");
+                var me = this;
+                var $container = $(me).closest(".speciesField");
+                getSpeciesFieldMedia($container.data("speciesid"), $container.data("pk"), "fromSingleSpeciesField", window.params.getSpeciesFieldMedia)
+            });
+
             var $sf = this;
             if(!options) options = {};
 
@@ -227,7 +241,24 @@
             delete params['editor'];
             delete params['contriEditor'];
             delete params['$form'];
+            if($("#addSpFieldResourcesModal").data("spfieldid") == $(e.target).closest(".speciesField").data("pk")){
+                params['runForImages'] = true;
+                var paramsForObvSpField = {} //new Object();
+                var paramsForUploadSpField = {} //new Object();
 
+                var allInputs = $("#pullObvImagesSpFieldForm :input");
+                allInputs.each(function() {
+                    paramsForObvSpField[this.name] = $(this).val();
+                });
+                var allInputs1 = $("#uploadSpeciesFieldImagesForm :input");
+                allInputs1.each(function() {
+                    paramsForUploadSpField[this.name] = $(this).val();
+                });
+                params['paramsForObvSpField'] = JSON.stringify(paramsForObvSpField);
+                params['paramsForUploadSpField'] = JSON.stringify(paramsForUploadSpField);
+            } else {
+                params['runForImages'] = false;
+            }
             $form.ajaxSubmit({
                 url : window.params.species.updateUrl,
                 type : 'POST',

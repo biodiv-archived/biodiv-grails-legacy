@@ -15,7 +15,7 @@ class ClearUserResourcesJob {
 
     def execute() {
         println "========JOB SCHEDULER OF RESOURCE CLEARING======"
-        //resourcesService.deleteUsersResources();
+        resourcesService.deleteUsersResources();
     } 
 
 }

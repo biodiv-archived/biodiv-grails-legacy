@@ -8,10 +8,10 @@
 
             <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
-                <g:set var="i" value="${1+offset}"/>
+                <g:set var="i" value="${offset-1}"/>
             </g:if>
             <g:else>
-                <g:set var="i" value="${res?.size()?:1}"/>
+                <g:set var="i" value="${res?(res.size()-1):0}"/>
             </g:else>
             <%
                 def counter = 0 
@@ -63,9 +63,9 @@
                 }
                 }
                 def resSource = r.url
-                if(obvLinkList.size()!= 0){
+                if(obvLinkList?.size()!= 0){
                     if(!r.url){
-                        resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList.get(counter.toInteger()), 'absolute': true);
+                        resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList?.get(counter.toInteger()), 'absolute': true);
                         counter++
                     }
                 }
@@ -110,7 +110,7 @@
                                 isChecked = "checked"
                             }
                         %>
-                        <input name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -170px;float: right;margin-left: -81px;" ${isChecked} >
+                        <input name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -140px;float: right;margin-left: -81px;" ${isChecked} >
                     </g:if>
                 </div>
             </div>

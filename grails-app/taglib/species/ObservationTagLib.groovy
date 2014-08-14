@@ -18,7 +18,7 @@ class ObservationTagLib {
 	def grailsApplication
     def springSecurityService;
     def chartService;
-    def SUserService;
+    //def SUserService;
 
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
@@ -336,6 +336,7 @@ class ObservationTagLib {
     }
 
     def addPhotoWrapper = { attrs, body ->
+        println "===============RES LIST TYPE================ " + attrs.model
         def resList = []
         def obvLinkList = []
         def resCount = 0
@@ -358,26 +359,33 @@ class ObservationTagLib {
                 resList = relObvMap.resList
                 resCount = relObvMap.count
                 obvLinkList = relObvMap.obvLinkList
+                offset = resCount
             break
 
             case "fromSpeciesField" :
-                def allSpField = resInstance?.fields
-                allSpField.each{
-                    def r = it.resources
-                    r.each{
-                        resList.add(it)
+                if(attrs.model.spFieldId == ""){
+                } else {
+                    def allSpField = resInstance?.fields
+                    allSpField.each{
+                        def r = it.resources
+                        r.each{
+                            resList.add(it)
+                        }
                     }
                 }
                 resCount = resList.size()
             break
+            case "fromSingleSpeciesField" :
+                
+            break
 
             case "usersResource" :
                 def usersResList
-                if(SUserService.isAdmin(userInstance?.id)){
+                /*if(SUserService.isAdmin(userInstance?.id)){
                     usersResList = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString())
-                } else {
+                } else {*/
                     usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
-                }
+                //}
                 usersResList.each{
                     resList.add(it.res)
                 }
@@ -385,6 +393,7 @@ class ObservationTagLib {
             break
     
         }
+        println "=============RES LIST========= " + resList
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount

@@ -228,6 +228,8 @@
                 <div class="span12" style="margin-left:0px">
 
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
+                    
+                    <!--g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/-->
 
                     <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
 
@@ -333,7 +335,7 @@
             </script>	
             <r:script>
             $(document).ready(function() {
-                var uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
+                var uploadResource 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
             });

@@ -32,11 +32,9 @@
                 def obvTmpFileName = (speciesInstance) ? (speciesInstance.fetchSpeciesImageDir().getAbsolutePath()) : false 
                 def obvDir = obvTmpFileName ?  obvTmpFileName.substring(obvTmpFileName.lastIndexOf("/"), obvTmpFileName.size()) : ""
                 %>
-                <form id="upload_resource" 
+                <form class="upload_resource ${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}" 
                     title="Add a photo for this observation"
-                    method="post"
-                    class="${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}">
-
+                    method="post">
                     <span class="msg" style="float: right"></span>
                     <input class="videoUrl" type="hidden" name='videoUrl'value="" />
                     <input type="hidden" name='obvDir' value="${obvDir}" />

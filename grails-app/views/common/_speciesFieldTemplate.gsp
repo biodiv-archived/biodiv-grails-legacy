@@ -1,11 +1,15 @@
+<%@page import="species.Resource"%>
+<%@page import="species.Resource.ResourceType"%>
 <s:isSpeciesFieldContributor model="['speciesFieldInstance':speciesFieldInstance]">
     <g:if test="${isSpeciesContributor}">
         <g:set var="isSpeciesFieldContributor" value="${Boolean.TRUE}"/>
     </g:if>
 </s:isSpeciesFieldContributor>
 
-
 <div class="speciesField ${speciesFieldInstance.description?'':'dummy hide'}" data-name="speciesField" data-act ="${speciesFieldInstance.description?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
+    <g:if test="${isSpeciesContributor}">
+    <!--a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn" onclick='getSpeciesFieldMedia("${speciesInstance?.id}","${speciesFieldInstance.id?:speciesFieldInstance.field.id}", "fromSingleSpeciesField","${createLink(controller:'species',  action:'getSpeciesFieldMedia')}" )'>Add Media</a-->
+    </g:if>
     <div class="contributor_entry">
         <!-- buttons -->
         <div class="pull-right">
@@ -53,11 +57,20 @@
                 </div>
                 <div>
                     <%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+                    <%  def basePath 
+                        if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString()){
+                            basePath = grailsApplication.config.speciesPortal.observations.serverURL
+                        }
+                        else if(r.context.value() == Resource.ResourceContext.SPECIES.toString() || r.context.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+                            basePath = grailsApplication.config.speciesPortal.resources.serverURL
+                        }
+                    %>
+
                     <a target="_blank"
-                        href="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}">
+                        href="${createLinkTo(file: r.fileName.trim(), base:basePath)}">
                         <span class="wrimg"> <span></span> <img
                             class="galleryImage"
-                            src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+                            src="${createLinkTo(file: imagePath, base:basePath)}"
                             title="${r?.description}" /> </span> </a> <span class="caption">
                         ${r?.description} </span>
                 </div>
