@@ -102,7 +102,8 @@ class ObservationService extends AbstractObjectService {
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
     static final String REMOVE_USERS_RESOURCE = "deleteUsersResource";
-    static final String NEW_SPECIES_PERMISSION = "New permission on species"
+    static final String NEW_SPECIES_PERMISSION = "New permission on species";
+    static final String COMMENT_ADD_USER_TAG = "Comment_add_user_tag";
     /**
      * 
      * @param params
@@ -1936,6 +1937,16 @@ class ObservationService extends AbstractObjectService {
                 templateMap['message'] = " added a comment to the page listed below."
                 templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
                 toUsers.addAll(getParticipants(obv))
+                break;
+
+                case "COMMENT_ADD_USER_TAG":
+                bodyView = "/emailtemplates/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["userGroupWebaddress"] = userGroupWebaddress
+                mailSubject = "Tagged in ${templateMap['domainObjectType']} comment"
+                templateMap['message'] = "has tagged you in a comment on the page listed below."
+                templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
+                toUsers.addAll(otherParams["taggedUsers"])
                 break;
 
                 case SPECIES_REMOVE_COMMENT:

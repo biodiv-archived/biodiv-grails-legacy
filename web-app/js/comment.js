@@ -35,7 +35,7 @@ function postComment(postComp, url, newCommentUrl) {
 		$(textComp).next('span').show();
 		return false;
 	}
-	
+	computeUserTag(postComp);
 	postAsAjax(postComp, url, newCommentUrl, true);
 	
 	$(textComp).removeClass('comment-textEmpty');
@@ -83,6 +83,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     				updateUnionComment(postComp, newCommentUrl);
     			}
     			if(data.clearForm){
+    				$(postComp).find('.contentbox').html("");
     				$(postComp).children('textarea[name=commentBody]').val("");
     				$(postComp).children('textarea[name=commentSubject]').val("");
     			}
@@ -141,6 +142,9 @@ function replyOnComment(comp, parentId, url){
 		return false;
 	}
 	
+	computeUserTag($(comp).parent());
+	params["tagUserId"] = $(comp).siblings(".tagUserId").val();
+
 	var options = {
  		url: url,
 		dataType: "json",
@@ -166,4 +170,110 @@ function replyOnComment(comp, parentId, url){
 	$.ajax(options);
 }
  
+
+function computeUserTag(postComp){
+	var tagUserId = [];	
+	if($(postComp).find('.tagUsers').size() > 0){
+		$(postComp).find('.tagUsers').each(function(){
+			tagUserId.push($(this).attr('rel'));
+			$(this).removeClass('tagUsers');
+		});	
+		$(postComp).find('.tagUserId').val(tagUserId);
+	}
+}
+
+
+
+function stripTags(source,destination){  
+  destination.html(source.html().replace(/<\/?([b-z]+)[^>]*>/gi, function(match, tag) {
+    if(tag === "br"){
+        return match;
+    }else if(tag === "a"){ 
+        return match;
+    }else{
+        return "";
+    }
+    
+}));
+  
+}  
+
+$(document).ready(function()
+{
+    $('.comment-textbox').hide();
+    $('.comment-textbox').after('<div class="commentContainer"><div class="contentbox" contenteditable="true"></div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />');
+    var start=/@/ig;
+    var word=/@(\w+)/ig;
+
+    $(".contentbox").live("keyup",function() 
+{
+    //stripTags($(this));
+    var content=$(this).text();
+    var go= content.match(start);
+    var name= content.match(word);
+    var dataString = 'searchword='+ name;
+    var dataString = content.substring(content.indexOf('@') +1);
+    var contentbox = $(this);
+    if(go != null)
+    {
+        if(go.length>0){
+       // contentbox.parent().find(".msgbox").slideDown('show');
+       // $(this).parent().find(".display").slideUp('show');
+       // $(this).parent().find(".msgbox").html("Type the name of someone or something...");
+        if(name.length>0)
+        {
+            $.ajax({
+            type: "POST",
+            url: "/user/terms?term="+dataString,
+            cache: false,
+            success: function(html)
+            {
+                contentbox.parent().find(".msgbox").hide();
+                var output = '';
+                $.each(html, function(index,value){
+                    
+                    output += '<div class="display_box" align="left">';
+                    output += '<img src="/images/no-image.jpg" class="image"/>';
+                    output += '<a href="javascript:void(0);" class="addname" id="'+value.userId+'" title="'+value.label+'">';
+                    output += value.label+'</a><br/>';
+                    output +='</div>';
+                });
+               // console.log(output);    
+                contentbox.parent().find(".display").html(output).show();
+            }
+            });
+        }
+        }
+    }else{       
+       //contentbox.parent().parent().find('.comment-textbox').html($(this).html());
+       stripTags($(this),contentbox.parent().parent().find('.comment-textbox'))
+    }
+
+   // console.log(contentbox.parent().parent().val());
+    return false;
+});
+
+$(".addname").live("click",function() 
+{
+    var username   = $(this).attr('title');
+    var userId     = $(this).attr('id');
+    var contentbox = $(this).parent().parent().parent().find(".contentbox");
+    var comment_textbox = contentbox.parent().parent().find('.comment-textbox');
+    stripTags(contentbox,comment_textbox);    
+    var old = contentbox.html();
+    var content=old.replace(word,""); 
+    contentbox.html(content);
+    var E="<a class='red tagUsers' contenteditable='false' style='color: #cc0000;font-weight: bold;' href='"+window.location.origin+"/user/show/"+userId+"' rel="+userId+" target='_blank' >"+username+"</a>&nbsp;";
+    contentbox.append(E);
+    //console.log(contentbox.html());
+    //contentbox.parent().find('.comment-textbox').html(contentbox.html());
+    stripTags(contentbox,comment_textbox);
+    //console.log(comment_textbox.html());
+
+    contentbox.parent().find(".display").hide();
+    contentbox.parent().find(".msgbox").hide();
+    //console.log(contentbox);
+    contentbox.focus();
+});
+});
 
