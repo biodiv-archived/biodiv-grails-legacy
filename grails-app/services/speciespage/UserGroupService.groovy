@@ -5,24 +5,29 @@ import java.util.List;
 import java.util.Map;
 
 import content.eml.Document
+
 import grails.plugin.springsecurity.annotation.Secured;
 import groovy.sql.Sql;
 import groovy.util.Eval;
 
 import org.apache.solr.common.SolrException;
+
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.plugin.springsecurity.acl.AclEntry
 import grails.plugin.springsecurity.acl.AclSid
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission;
+
 import org.springframework.security.acls.domain.GrantedAuthoritySid
 import org.springframework.security.acls.domain.PrincipalSid
 import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid
 import org.springframework.security.core.Authentication
+
 import grails.plugin.springsecurity.acl.AclSid;
+
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission;
@@ -33,7 +38,9 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.Assert
+
 import grails.plugin.springsecurity.acl.AclObjectIdentity
+
 import org.apache.commons.logging.LogFactory;
 
 import species.Habitat;
@@ -43,6 +50,7 @@ import species.Resource.ResourceType;
 import species.Species;
 import species.auth.Role;
 import species.auth.SUser;
+import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupController;
@@ -1509,6 +1517,31 @@ class UserGroupService {
 				}
 			}
 			return newObvs
+		}
+	}
+	
+	///////////////////////////////// Remove user in bulk ////////////////////////////////
+	def removeMemberInBulk(params){
+		try{
+			List userIds = []
+			List<Map> content = SpreadsheetReader.readSpreadSheet(params.file, 0, 0);
+			for (Map row : content) {
+				userIds << row.get("userid").toLong();
+			}
+			
+			UserGroup ug = UserGroup.get(params.groupId.toLong())
+			println "user gropu name " + ug.name + " and userIds " + userIds 
+
+			
+			UserGroup.withTransaction { 
+				userIds.each { uid ->
+					SUser u = SUser.get(uid)
+					println  "Deleting user " + uid + " from group " + ug
+					ug.deleteMember(u)
+				}
+			}
+		}catch(Exception e){
+			log.error e.printStackTrace()
 		}
 	}
 

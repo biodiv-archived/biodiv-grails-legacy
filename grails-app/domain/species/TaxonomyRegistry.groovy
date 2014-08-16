@@ -11,8 +11,6 @@ class TaxonomyRegistry extends NamesSorucedata {
 	static constraints = {
 		parentTaxon(nullable:true);
 		taxonDefinition(unique:['classification', 'path'])
-		//XXX:remove this once all migration is done remove constrain from db as well and make it nullable false
-		//level(nullable:true);
 	}
 
     static mapping = {
