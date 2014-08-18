@@ -205,7 +205,7 @@ $(document).ready(function()
     var start=/@/ig;
     var word=/@(\w+)/ig;
 
-    $(".contentbox").live("keyup",function() 
+$(".contentbox").live("keyup",function() 
 {
     //stripTags($(this));
     var content=$(this).text();
@@ -233,7 +233,7 @@ $(document).ready(function()
                 $.each(html, function(index,value){
                     
                     output += '<div class="display_box" align="left">';
-                    output += '<img src="/images/no-image.jpg" class="image"/>';
+                    output += '<img src="'+value.user_pic+'" class="image"/>';
                     output += '<a href="javascript:void(0);" class="addname" id="'+value.userId+'" title="'+value.label+'">';
                     output += value.label+'</a><br/>';
                     output +='</div>';
@@ -251,6 +251,12 @@ $(document).ready(function()
 
    // console.log(contentbox.parent().parent().val());
     return false;
+});
+
+$(".contentbox").live("focusout",function() {
+
+	$(this).parent().find('.display').hide();
+
 });
 
 $(".addname").live("click",function() 
