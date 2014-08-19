@@ -1518,6 +1518,14 @@ span.cke_skin_kama {
 	right: -2px;
 }
 
+.reco-comment-edit {
+	position: absolute;
+	top: -12px;
+	right: 10px;
+}
+
+
+
 .thumbnail {
 	border: 0px;
         padding:0px;

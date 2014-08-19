@@ -1,3 +1,53 @@
+function editCommentActivity(targetComp, commentId){
+	var that = $(targetComp);
+	console.log("dfssdfds");
+	var message_body = that.parent().find('.yj-message-body');
+	var commentVal   = that.parent().find('.yj-message-body').html();
+	that.hide();
+
+	var output  = '<div class="editCommentWrapper" id='+commentId+'><textarea name="commentBody" class="comment-textbox" placeholder="Write comment" style="display: none;"></textarea>';
+		output += '<div class="commentContainer"><div class="contentbox" contenteditable="true">'+commentVal+'</div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />';
+		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right cancelComment" title="Cancel" >Cancel</a>';
+		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right updateComment" title="Update comment" >Update</a>';
+		output += '</div>';
+	message_body.hide().after(output);
+
+}
+
+$('.cancelComment').live('click',function(){	
+	showComment($(this));	
+});
+
+$('.updateComment').live('click',function(){
+	var that = $(this);
+	var editCommentWrapper = that.parent();
+	var message_body = that.parent().parent().find('.yj-message-body');
+	var params = {}
+	params['commentBody'] = editCommentWrapper.find('.comment-textbox').val();
+	params['commentId']   = editCommentWrapper.attr('id');
+	computeUserTag(editCommentWrapper);
+	params['tagUserId']   = editCommentWrapper.find('.tagUserId').val();
+	if(params['commentBody'] != ''){
+		var message_body_cache = message_body.html();
+		message_body.html(params['commentBody']);
+		showComment(that);
+		$.post('/comment/addComment',params,function(result){			
+				if(!result.success){
+					console.log(result);
+					message_body.html(message_body_cache);
+				}
+		});
+	}else{
+		showComment(that);
+	}
+});	
+
+function showComment(that){
+	that.parent().parent().find('.yj-message-body').show();
+	that.parent().parent().find('.reco-comment-edit, .yj-attributes').show();	
+	that.parent().remove();
+}
+
 function deleteCommentActivity(targetComp, commentId, url){
 	if(confirm('This comment will be deleted. Are you sure ?')){
 		deleteComment(commentId, url);
@@ -198,10 +248,17 @@ function stripTags(source,destination){
   
 }  
 
+function appendCommentWrapper(that){
+	that.after('<div class="commentContainer"><div class="contentbox" contenteditable="true"></div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />');
+	that.hide();
+}
+
+$(document).on('focus','.comment-textbox',function(){
+	appendCommentWrapper($(this));
+})
 $(document).ready(function()
 {
-    $('.comment-textbox').hide();
-    $('.comment-textbox').after('<div class="commentContainer"><div class="contentbox" contenteditable="true"></div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />');
+    appendCommentWrapper($('.comment-textbox'));    
     var start=/@/ig;
     var word=/@(\w+)/ig;
 
@@ -252,12 +309,13 @@ $(".contentbox").live("keyup",function()
    // console.log(contentbox.parent().parent().val());
     return false;
 });
-
+/*
 $(".contentbox").live("focusout",function() {
 
 	$(this).parent().find('.display').hide();
 
 });
+*/
 
 $(".addname").live("click",function() 
 {
