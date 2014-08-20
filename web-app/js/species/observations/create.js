@@ -871,7 +871,7 @@ function openDetails(row, cell) {
     var media = data.Media;
     if(media) {
         var obvDir = data.obvDir;
-        var obvDirInput = $('#upload_resource input[name="obvDir"]');
+        var obvDirInput = $('.upload_resource input[name="obvDir"]');
         if(!obvDirInput.val()){
             $(obvDirInput).val(obvDir);
         }

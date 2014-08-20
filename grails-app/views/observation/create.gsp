@@ -111,10 +111,9 @@
             int index = obvTmpFileName.lastIndexOf("/");
             def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, index>0?index:obvTmpFileName.length()) : ""
             %>
-            <form id="upload_resource" 
+            <form class="upload_resource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" 
                 title="Add a photo for this observation"
-                method="post"
-                class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+                method="post">
 
                 <span class="msg" style="float: right"></span>
                 <input class="videoUrl" type="hidden" name='videoUrl' value="" />

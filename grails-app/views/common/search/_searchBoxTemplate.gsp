@@ -41,6 +41,7 @@ $(document).ready(function() {
                 'offset':"${params.offset}",
                 'isGalleryUpdate':'true',
                 'resDeleteUrl' : "${uGroup.createLink(controller:'resource', action: 'deleteUsersResourceById')}",
+                'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
 		"queryParamsMax":"${queryParams?.max}",
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",

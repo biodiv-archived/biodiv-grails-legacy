@@ -375,10 +375,8 @@ max-width: 100%;
 
 
 			</form>
-			<form id="upload_resource" enctype="multipart/form-data"
-				title="Add a logo for this group" method="post"
-				class="${hasErrors(bean: userGroupInstance, field: 'icon', 'errors')}">
-
+			<form class="upload_resource ${hasErrors(bean: userGroupInstance, field: 'icon', 'errors')}" enctype="multipart/form-data"
+				title="Add a logo for this group" method="post">
 				<input type="file" id="attachFile" name="resources" accept="image/*"/> 
 				<span class="msg" style="float: right"></span> 
 				<input type="hidden" name='dir' value="${userGroupDir}" />
@@ -392,10 +390,10 @@ $(document).ready(function() {
 
     	//hack: for fixing ie image upload
         if (navigator.appName.indexOf('Microsoft') != -1) {
-            $('#upload_resource').css({'visibility':'visible'});
+            $('.upload_resource').css({'visibility':'visible'});
             //$('#change_picture').hide();
         } else {
-            $('#upload_resource').css({'visibility':'hidden'});
+            $('.upload_resource').css({'visibility':'hidden'});
             //$('#change_picture').show();
         }
 
@@ -405,10 +403,10 @@ $(document).ready(function() {
         });
         
         $('#attachFile').change(function(e){
-                $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+                $('.upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
         });
 
-     	$('#upload_resource').ajaxForm({ 
+     	$('.upload_resource').ajaxForm({ 
 			url:'${g.createLink(controller:'userGroup', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
@@ -428,7 +426,7 @@ $(document).ready(function() {
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.userGroups.serverURL}'
 				var dir = $(responseXML).find('dir').text();
-				var dirInput = $('#upload_resource input[name="dir"]');
+				var dirInput = $('.upload_resource input[name="dir"]');
 				if(!dirInput.val()){
 					$(dirInput).val(dir);
 				}
@@ -455,7 +453,7 @@ $(document).ready(function() {
 
                                 var messageNode = $(".message .resources");
                                 if(messageNode.length == 0 ) {
-                                    $("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+                                    $(".upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
                                 } else {
                                     messageNode.append(response?response.error:"Error");
                                 }

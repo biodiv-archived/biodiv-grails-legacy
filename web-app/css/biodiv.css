@@ -682,7 +682,7 @@ ul#recoSummary {
 	background-color: #ffffff;
 }
 
-.addObservation .imagesList, #addResourcesModal .imagesList {
+.addObservation .imagesList, #addResourcesModal .imagesList, #addSpFieldResourcesModal .imagesList {
 	background-color: #fefad5;
 	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
@@ -2456,6 +2456,10 @@ div.noOfRatings {
 #addResourcesModal {
     width:725px;
     left:40%;
+}
+#addSpFieldResourcesModal {
+    width:925px;
+    left:35%;
 }
 .table-striped tbody>tr:nth-child(odd)>td.nameColumn, .nameColumn {
     background-color : lightyellow;
