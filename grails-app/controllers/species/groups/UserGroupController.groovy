@@ -1347,7 +1347,16 @@ class UserGroupController {
         println "==========ALL DIGEST EMAILS SENT============"
     }
 
+    @Secured(['ROLE_USER'])
+    def removeMemberInBulk(){
+       userGroupService.removeMemberInBulk(params)
+       render "== done"
+    }
+
+
 }
+
+
 
 class UserGroupCommand {
 	String name
