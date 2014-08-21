@@ -6,139 +6,157 @@ import org.codehaus.groovy.grails.web.util.WebUtils;
 import species.groups.UserGroup;
 import species.auth.SUser;
 import species.participation.ActivityFeed;
+import species.participation.Comment;
 import speciespage.ObvUtilService
 import species.participation.ActivityFeedService
+import grails.plugin.springsecurity.SpringSecurityUtils;
+import species.participation.Checklists;
+import species.participation.Observation;
+import grails.util.Environment;
+import species.utils.ImageType;
 
 class UtilsService {
 
     def grailsApplication;
     def grailsLinkGenerator;
-	def sessionFactory
+    def sessionFactory
     def mailService;
     def springSecurityService
+
+    static final String OBSERVATION_ADDED = "observationAdded";
+    static final String SPECIES_RECOMMENDED = "speciesRecommended";
+    static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+    static final String SPECIES_NEW_COMMENT = "speciesNewComment";
+    static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
+    static final String OBSERVATION_FLAGGED = "observationFlagged";
+    static final String OBSERVATION_DELETED = "observationDeleted";
+    static final String CHECKLIST_DELETED= "checklistDeleted";
+    static final String DOWNLOAD_REQUEST = "downloadRequest";
+    //static final int MAX_EXPORT_SIZE = -1;
+    static final String REMOVE_USERS_RESOURCE = "deleteUsersResource";
+    static final String NEW_SPECIES_PERMISSION = "New permission on species"
 
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
     static final String SPECIES_CURATORS = "speciesCurators"
 
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
- 
-	private void cleanUpGorm() {
-		cleanUpGorm(true)
-	}
-	
-	private void cleanUpGorm(boolean clearSession) {
-		
-	def hibSession = sessionFactory?.getCurrentSession();
 
-	if(hibSession) {
-		log.debug "Flushing and clearing session"
-		try {
-			hibSession.flush()
-		} catch(Exception e) {
-			e.printStackTrace()
-		}
-		if(clearSession){
-			hibSession.clear()
-		}
-	}
-}
+    private void cleanUpGorm() {
+        cleanUpGorm(true)
+    }
 
+    private void cleanUpGorm(boolean clearSession) {
+
+        def hibSession = sessionFactory?.getCurrentSession();
+
+        if(hibSession) {
+            log.debug "Flushing and clearing session"
+            try {
+                hibSession.flush()
+            } catch(Exception e) {
+                e.printStackTrace()
+            }
+            if(clearSession){
+                hibSession.clear()
+            }
+        }
+    }
 
     public String generateLink( String controller, String action, linkParams, request=null) {
-	request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-	return userGroupBasedLink(base: Utils.getDomainServerUrl(request),
-        controller:controller, action: action,
-        params: linkParams)
+        request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+        return userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+            controller:controller, action: action,
+            params: linkParams)
     }
-	
-	public createHardLink(controller, action, id){
-		return "" + Utils.getIBPServerDomain() + "/" + controller + "/" + action + "/" + id 
-	}
 
-	def userGroupBasedLink(attrs) {
-		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
-		String url = "";
+    public createHardLink(controller, action, id){
+        return "" + Utils.getIBPServerDomain() + "/" + controller + "/" + action + "/" + id 
+    }
+
+    def userGroupBasedLink(attrs) {
+        def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
+        String url = "";
 
         if(attrs.userGroupInstance) attrs.userGroup = attrs.userGroupInstance
-		if(attrs.userGroup && attrs.userGroup.id) {
-			attrs.webaddress = attrs.userGroup.webaddress
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');
-			String mappingName = attrs.remove('mapping')?:'userGroupModule';
-			def userGroup = attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
-			boolean absolute = attrs.remove('absolute');
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
-				String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-				url = url.replace(onlyGroupUrl, "");
-			} else {
+            if(attrs.userGroup && attrs.userGroup.id) {
+                attrs.webaddress = attrs.userGroup.webaddress
+                String base = attrs.remove('base')
+                String controller = attrs.remove('controller')
+                String action = attrs.remove('action');
+                String mappingName = attrs.remove('mapping')?:'userGroupModule';
+                def userGroup = attrs.remove('userGroup');
+                attrs.remove('userGroupWebaddress');
+                boolean absolute = attrs.remove('absolute');
+                if(attrs.params) {
+                    attrs.putAll(attrs.params);
+                    attrs.remove('params');
+                }
+                if(base) {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
+                    String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                    url = url.replace(onlyGroupUrl, "");
+                } else {
 
-				if((userGroup?.domainName)) { 
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
-					String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-					url = url.replace(onlyGroupUrl, "");
-				} else {
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
-				}
-			}
+                    if((userGroup?.domainName)) { 
+                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
+                        String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                        url = url.replace(onlyGroupUrl, "");
+                    } else {
+                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
+                    }
+                }
 
-		} else if(attrs.userGroupWebaddress) {
-			attrs.webaddress = attrs.userGroupWebaddress
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');
-			String mappingName = attrs.remove('mapping')?:'userGroupModule';
-			def userGroup = attrs.remove('userGroup');
-			String userGroupWebaddress = attrs.remove('userGroupWebaddress');
-			boolean absolute = attrs.remove('absolute');
-			def userGroupController = new UserGroupController();
-			userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
-				String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-				url = url.replace(onlyGroupUrl, "");
-			} else {
+            } else if(attrs.userGroupWebaddress) {
+                attrs.webaddress = attrs.userGroupWebaddress
+                String base = attrs.remove('base')
+                String controller = attrs.remove('controller')
+                String action = attrs.remove('action');
+                String mappingName = attrs.remove('mapping')?:'userGroupModule';
+                def userGroup = attrs.remove('userGroup');
+                String userGroupWebaddress = attrs.remove('userGroupWebaddress');
+                boolean absolute = attrs.remove('absolute');
+                def userGroupController = new UserGroupController();
+                userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
+                if(attrs.params) {
+                    attrs.putAll(attrs.params);
+                    attrs.remove('params');
+                }
+                if(base) {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
+                    String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                    url = url.replace(onlyGroupUrl, "");
+                } else {
 
-				if((userGroup?.domainName)) { 
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
-					String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
-					url = url.replace(onlyGroupUrl, "");
-				} else {
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
-				}
-			}
+                    if((userGroup?.domainName)) { 
+                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
+                        String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
+                        url = url.replace(onlyGroupUrl, "");
+                    } else {
+                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
+                    }
+                }
 
-		} else {
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');
-			attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
-			String mappingName = attrs.remove('mapping');
-			boolean absolute = attrs.remove('absolute');
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-			} else {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-			}
-		}
-		return url;
-	}
+            } else {
+                String base = attrs.remove('base')
+                String controller = attrs.remove('controller')
+                String action = attrs.remove('action');
+                attrs.remove('userGroup');
+                attrs.remove('userGroupWebaddress');
+                String mappingName = attrs.remove('mapping');
+                boolean absolute = attrs.remove('absolute');
+                if(attrs.params) {
+                    attrs.putAll(attrs.params);
+                    attrs.remove('params');
+                }
+                if(base) {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                } else {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                }
+            }
+        return url;
+    }
 
 
     File getUniqueFile(File root, String fileName){
@@ -224,7 +242,7 @@ class UtilsService {
             def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
             templateMap["currentUser"] = springSecurityService.currentUser
             templateMap["action"] = notificationType;
-			templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
+            templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
             def mailSubject = ""
             def bodyContent = ""
             String htmlContent = ""
@@ -240,7 +258,7 @@ class UtilsService {
                     mailSubject = conf.ui.addObservation.emailSubject
                     templateMap["message"] = " added the following observation:"
                 } else {
-                mailSubject = conf.ui.addObservation.emailSubject
+                    mailSubject = conf.ui.addObservation.emailSubject
                     mailSubject = "Observation updated"
                     templateMap["message"] = " updated the following observation:"
                 }
@@ -261,7 +279,7 @@ class UtilsService {
                 templateMap["actionObject"] = "checklist"
                 toUsers.add(getOwner(obv))
                 break
-                
+
                 case SPECIES_CURATORS:
                 mailSubject = "Request to curate species"
                 bodyView = "/emailtemplates/speciesCurators"
@@ -272,7 +290,7 @@ class UtilsService {
                 populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
                 toUsers = otherParams["usersMailList"]
                 break
-                
+
                 case SPECIES_CONTRIBUTOR:
                 mailSubject = "Species uploaded"
                 bodyView = "/emailtemplates/speciesContributor"
@@ -280,10 +298,10 @@ class UtilsService {
                 def user = springSecurityService.currentUser;                
                 templateMap["contributor"] = user.name
                 templateMap["speciesCreated"] = otherParams["speciesCreated"]
-				templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
-				templateMap["stubsCreated"] = otherParams["stubsCreated"]
-				templateMap["uploadCount"] = otherParams["uploadCount"]
-				populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
+                templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
+                templateMap["stubsCreated"] = otherParams["stubsCreated"]
+                templateMap["uploadCount"] = otherParams["uploadCount"]
+                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
                 toUsers.add(user)
                 break
 
@@ -412,8 +430,8 @@ class UtilsService {
                 }
                 toUsers.addAll(getParticipants(obv))
                 break
-            
-            case DIGEST_MAIL:
+
+                case DIGEST_MAIL:
                 templateMap["serverURL"] =  grailsApplication.config.grails.serverURL
                 templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName
                 templateMap["resourcesServerURL"] = grailsApplication.config.speciesPortal.resources.serverURL
@@ -425,16 +443,16 @@ class UtilsService {
                 toUsers.addAll(otherParams["usersEmailList"]);
                 //toUsers.addAll(SUser.get(4136L));
                 break
-            
-            case DIGEST_PRIZE_MAIL:
+
+                case DIGEST_PRIZE_MAIL:
                 mailSubject = "Neighborhood Trees Campaign extended till tonight"
                 bodyView = "/emailtemplates/digestPrizeEmail"
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(otherParams["usersEmailList"]);
                 break
-            //below case also had ActivityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
-            case [ActivityFeedService.SPECIES_CREATED]:
+                //below case also had ActivityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
+                case [ActivityFeedService.SPECIES_CREATED]:
                 mailSubject = ActivityFeedService.SPECIES_CREATED
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = " added the following species:"
@@ -442,7 +460,7 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-            case REMOVE_USERS_RESOURCE:
+                case REMOVE_USERS_RESOURCE:
                 mailSubject = "Attn: Your image uploads are due for deletion"
                 bodyView = "/emailtemplates/deleteUsersResource"
                 templateMap["uploadedDate"] = otherParams["uploadedDate"]
@@ -451,8 +469,8 @@ class UtilsService {
                 toUsers.addAll(otherParams["usersList"])
                 break
 
-                
-            case [ActivityFeedService.SPECIES_FIELD_CREATED, ActivityFeedService.SPECIES_SYNONYM_CREATED, ActivityFeedService.SPECIES_COMMONNAME_CREATED, ActivityFeedService.SPECIES_HIERARCHY_CREATED] :
+
+                case [ActivityFeedService.SPECIES_FIELD_CREATED, ActivityFeedService.SPECIES_SYNONYM_CREATED, ActivityFeedService.SPECIES_COMMONNAME_CREATED, ActivityFeedService.SPECIES_HIERARCHY_CREATED] :
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
@@ -461,7 +479,7 @@ class UtilsService {
                 break
 
 
-            case [ActivityFeedService.SPECIES_FIELD_UPDATED, ActivityFeedService.SPECIES_SYNONYM_UPDATED, ActivityFeedService.SPECIES_COMMONNAME_UPDATED, ActivityFeedService.SPECIES_HIERARCHY_UPDATED] :
+                case [ActivityFeedService.SPECIES_FIELD_UPDATED, ActivityFeedService.SPECIES_SYNONYM_UPDATED, ActivityFeedService.SPECIES_COMMONNAME_UPDATED, ActivityFeedService.SPECIES_HIERARCHY_UPDATED] :
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
@@ -469,24 +487,24 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-            case [ActivityFeedService.SPECIES_FIELD_DELETED, ActivityFeedService.SPECIES_SYNONYM_DELETED, ActivityFeedService.SPECIES_COMMONNAME_DELETED, ActivityFeedService.SPECIES_HIERARCHY_DELETED] :
+                case [ActivityFeedService.SPECIES_FIELD_DELETED, ActivityFeedService.SPECIES_SYNONYM_DELETED, ActivityFeedService.SPECIES_COMMONNAME_DELETED, ActivityFeedService.SPECIES_HIERARCHY_DELETED] :
                 mailsubject = notificationType;
                 bodyview = "/emailtemplates/addobservation"
                 templatemap["message"] = introspector.decapitalize(otherparams['info']);
                 populatetemplate(obv, templatemap, usergroupwebaddress, feedinstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
-            
-            case NEW_SPECIES_PERMISSION : 
+
+                case NEW_SPECIES_PERMISSION : 
                 mailSubject = notificationType
-                bodyView = "/emailtemplates/grantedPermission"
-                def user = otherParams['user'];
+                    bodyView = "/emailtemplates/grantedPermission"
+                    def user = otherParams['user'];
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
- 
 
-            default:
+
+                default:
                 log.debug "invalid notification type"
             }
 
@@ -504,7 +522,7 @@ class UtilsService {
                     if(notificationType == DIGEST_MAIL){
                         templateMap['userID'] = toUser.id
                     }
-                    
+
                     log.debug "Sending email to ${toUser}"
                     try{
                         mailService.sendMail {
@@ -535,10 +553,10 @@ class UtilsService {
                 }
             }
 
-            } catch (e) {
-                log.error "Error sending email $e.message"
-                e.printStackTrace();
-            }
+        } catch (e) {
+            log.error "Error sending email $e.message"
+            e.printStackTrace();
+        }
     }
 
     private  void  populateTemplate(def obv, def templateMap, String userGroupWebaddress="", def feed=null, def request=null)  {
@@ -585,42 +603,26 @@ class UtilsService {
         } else {
             participants << springSecurityService.currentUser;
         }
-		return participants;
-	}
+        return participants;
+    }
 
-    def List getParticipantsForDigest(userGroup, max, offset) {
-        List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
-            result.each { user ->
-                if(user.sendDigest && !participants.contains(user)){
-                    participants << user
-                }
+    private List getUserForEmail(observation){
+        if(!observation.instanceOf(UserGroup)){
+            return Follow.getFollowers(observation)
+        }else{
+            //XXX for user only sending founders and current user as list members list is too large have to decide on this
+            List userList = observation.getFounders(100, 0)
+            userList.addAll(observation.getExperts(100, 0)) 
+            def currUser = springSecurityService.currentUser
+            if(!userList.contains(currUser)){
+                userList << currUser
             }
-        } else {
-            participants << springSecurityService.currentUser;
+            return userList
         }
-		return participants;
-	}
+    }
 
-	
-	private List getUserForEmail(observation){
-		if(!observation.instanceOf(UserGroup)){
-			return Follow.getFollowers(observation)
-		}else{
-			//XXX for user only sending founders and current user as list members list is too large have to decide on this
-			List userList = observation.getFounders(100, 0)
-			userList.addAll(observation.getExperts(100, 0)) 
-			def currUser = springSecurityService.currentUser
-			if(!userList.contains(currUser)){
-				userList << currUser
-			}
-			return userList
-		}
-	}
-	
-	private SUser getOwner(observation) {
-		def author = null;
+    private SUser getOwner(observation) {
+        def author = null;
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk") ) {
             if(observation.metaClass.hasProperty(observation, 'author') || observation.metaClass.hasProperty(observation, 'contributors')) {
                 author = observation.author;
@@ -656,34 +658,33 @@ class UtilsService {
         return desc
     }
 
-    
-	def getDomainObject(className, id){
-		def retObj = null
-		if(!className || className.trim() == ""){
-			return retObj
-		}
-		
-		id = id.toLong()
-		switch (className) {
-			case [ActivityFeedService.SPECIES_SYNONYMS, ActivityFeedService.SPECIES_COMMON_NAMES, ActivityFeedService.SPECIES_MAPS, ActivityFeedService.SPECIES_TAXON_RECORD_NAME]:
-				retObj = [objectType:className, id:id]
-				break
-			default:
-				retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-				break
-		}
-		return retObj
-	}
-	
+    def getDomainObject(className, id){
+        def retObj = null
+        if(!className || className.trim() == ""){
+            return retObj
+        }
+
+        id = id.toLong()
+        switch (className) {
+            case [ActivityFeedService.SPECIES_SYNONYMS, ActivityFeedService.SPECIES_COMMON_NAMES, ActivityFeedService.SPECIES_MAPS, ActivityFeedService.SPECIES_TAXON_RECORD_NAME]:
+            retObj = [objectType:className, id:id]
+            break
+            default:
+            retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+            break
+        }
+        return retObj
+    }
+
     def getUserGroupHyperLink(userGroup){
         if(!userGroup){
             return ""
         }
-		String sb = '<a href="' + userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+        String sb = '<a href="' + userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
         return sb;
         //return sb.replaceAll('"|\'','\\\\"')
-	}
-	
+    }
+
     def getDescriptionForFeature(r, ug, isFeature)  {
         def desc = isFeature ? "Featured " : "Removed featured "
         String temp = getResType(r)
@@ -695,6 +696,18 @@ class UtilsService {
         return desc
 
 
+    }
+
+    //XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
+    // to resolve controller name
+    static getTargetController(domainObj){
+        if(domainObj.instanceOf(Checklists)){
+            return "checklist"
+        }else if(domainObj.instanceOf(SUser)){
+            return "user"
+        }else{
+            return domainObj.class.getSimpleName().toLowerCase()
+        }
     }
 
 }

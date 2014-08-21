@@ -73,7 +73,6 @@ class ObservationService extends AbstractObjectService {
 
     static transactional = false
 
-    def utilsService;
     def recommendationService;
     def observationsSearchService;
     //def curationService;
@@ -83,20 +82,6 @@ class ObservationService extends AbstractObjectService {
     //def speciesService;
     def messageSource;
 
-    static final String OBSERVATION_ADDED = "observationAdded";
-    static final String SPECIES_RECOMMENDED = "speciesRecommended";
-    static final String SPECIES_AGREED_ON = "speciesAgreedOn";
-    static final String SPECIES_NEW_COMMENT = "speciesNewComment";
-    static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
-    static final String OBSERVATION_FLAGGED = "observationFlagged";
-    static final String OBSERVATION_DELETED = "observationDeleted";
-    static final String CHECKLIST_DELETED= "checklistDeleted";
-    static final String DOWNLOAD_REQUEST = "downloadRequest";
-    static final int MAX_EXPORT_SIZE = -1;
-    static final String FEATURED = "Featured";
-    static final String UNFEATURED = "UnFeatured";
-   static final String REMOVE_USERS_RESOURCE = "deleteUsersResource";
-    static final String NEW_SPECIES_PERMISSION = "New permission on species"
     /**
      * 
      * @param params
@@ -192,7 +177,7 @@ class ObservationService extends AbstractObjectService {
                 observationInstance = createObservation(params);
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
-                mailType = OBSERVATION_ADDED
+                mailType = utilsService.OBSERVATION_ADDED
             }else{
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
@@ -1671,7 +1656,7 @@ class ObservationService extends AbstractObjectService {
                     observationInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
                     if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
-                        def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
+                        def mailType = observationInstance.instanceOf(Checklists) ? utilsService.CHECKLIST_DELETED : utilsService.OBSERVATION_DELETED
                         try {
                             observationInstance.isDeleted = true;
                             if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
@@ -2111,6 +2096,6 @@ class ObservationService extends AbstractObjectService {
     }
 
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
-    return sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
+    return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 }

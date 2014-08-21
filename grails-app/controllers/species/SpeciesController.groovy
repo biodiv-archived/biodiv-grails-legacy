@@ -40,12 +40,11 @@ class SpeciesController extends AbstractObjectController {
     def speciesUploadService;
 	def speciesService;
 	def speciesPermissionService;
-	def observationService;
 	def userGroupService;
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-
+    
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -155,7 +154,7 @@ class SpeciesController extends AbstractObjectController {
                         
                         def feedInstance = activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
 
-                        observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
+                        utilsService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
 
 
                         redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
@@ -561,7 +560,7 @@ class SpeciesController extends AbstractObjectController {
                 if(result.activityType)
                     feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
                 if(result.mailType) 
-                    observationService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
+                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
@@ -816,7 +815,7 @@ class SpeciesController extends AbstractObjectController {
             }
 
             if(success) {
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
+                utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
                 if(conf) {
                     log.debug "Deleting confirmation code and usertoken params";
@@ -875,7 +874,7 @@ class SpeciesController extends AbstractObjectController {
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
 
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
+                utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
             } else{
                 flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            

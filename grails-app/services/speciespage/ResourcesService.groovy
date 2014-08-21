@@ -34,13 +34,13 @@ import species.participation.UsersResource.UsersResourceStatus;
 import species.participation.Observation;
 import species.Species;
 import speciespage.ObservationService;
+import species.UtilsService;
 
 class ResourcesService extends AbstractObjectService {
 
 	static transactional = false
 
     def observationService;
-    def utilsService;
 
     /**
 	 * Filter resources by group, habitat, tag, user, species
@@ -232,7 +232,7 @@ class ResourcesService extends AbstractObjectService {
         if(usersList.size() > 0) {
             otherParams['usersList'] = usersList
             def sp = new Species();
-            utilsService.sendNotificationMail(ObservationService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
+            utilsService.sendNotificationMail(UtilsService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
         }
     }
 
