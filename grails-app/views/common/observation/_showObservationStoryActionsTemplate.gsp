@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@ page import="species.groups.UserGroup"%>
 <div class="story-actions clearfix" style="width: 100%;">
     <div class="span8" style="margin-left:0px;position:relative">
         <div class="footer-item pull-left">
@@ -53,7 +54,8 @@
                 def curr_id = instance.id
                 def prevId, nextId;
                 def clazz = instance.class
-				def obj = instance
+                def obj = instance
+                def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
                 if(pos>=0 && (prevObservationId || nextObservationId)) {
                     prevId = prevObservationId;
                     nextId = nextObservationId
@@ -69,7 +71,12 @@
 									 }
 									 if(obj.hasProperty('isShowable')){
 										 eq('isShowable', true)
-									 }
+                                    }
+                                    if(userGroupInstance){
+                                        userGroups{
+                                            eq('id', userGroupInstance.id)
+                                        }
+                                    }
 			 					}
 								maxResults 1
 								order 'id', 'desc'
@@ -85,7 +92,12 @@
 								 }
 								 if(obj.hasProperty('isShowable')){
 									 eq('isShowable', true)
-								 }
+                                     }
+                                     if(userGroupInstance){
+                                        userGroups{
+                                            eq('id', userGroupInstance.id)
+                                        }
+                                    }
 							 }
 							maxResults 1
 							order 'id', 'asc'

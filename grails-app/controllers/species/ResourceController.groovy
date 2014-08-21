@@ -17,15 +17,19 @@ class ResourceController {
 
 	def list() {
 		log.debug params
-		
+		println "======PARAMS LIST========== " + params
 		def model = getResourceList(params);
+        println "=======MODEL========== " + model
 		if(params.loadMore?.toBoolean()){
+            println "====IN THIS CASE 1====="
 			render(template:"/resource/showResourceListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            println "====IN THIS CASE 2====="
 			render (view:"list", model:model)
 			return;
 		} else{
+            println "====IN THIS CASE 3====="
 			def obvListHtml =  g.render(template:"/resource/showResourceListTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, instanceTotal:model.instanceTotal]
@@ -167,5 +171,19 @@ class ResourceController {
         resourcesService.deleteUsersResourceById(params.resId);
         def res = [status:true]
         render res as JSON
+    } 
+
+    def bulkUploadResources() {
+        println "======PARAMS LIST========== " + params
+		def model = getBulkUploadResourcesList(params);
+        println "=======MODEL========== " + model
+        render (view:"list", model:model)
+		return;
+    }
+
+    def getBulkUploadResourcesList(params) {
+        def result = resourcesService.getBulkUploadResourcesList(params);
+        println "========RESULT============= " + result
+        return [resourceInstanceList: result.resourceInstanceList, userCountList: result.userCountList ]
     }
 }

@@ -336,7 +336,6 @@ class ObservationTagLib {
     }
 
     def addPhotoWrapper = { attrs, body ->
-        println "===============RES LIST TYPE================ " + attrs.model
         def resList = []
         def obvLinkList = []
         def resCount = 0
@@ -384,7 +383,7 @@ class ObservationTagLib {
                 /*if(SUserService.isAdmin(userInstance?.id)){
                     usersResList = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString())
                 } else {*/
-                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
+                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
                 //}
                 usersResList.each{
                     resList.add(it.res)
@@ -393,7 +392,6 @@ class ObservationTagLib {
             break
     
         }
-        println "=============RES LIST========= " + resList
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount

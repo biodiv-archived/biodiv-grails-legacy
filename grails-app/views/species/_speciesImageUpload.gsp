@@ -1,9 +1,9 @@
 <div class="tabbable speciesImage-wrapper " style="display:none;">
     <ul class="nav nav-tabs" id="speciesImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
-            <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab">Add Observation Images</a></li>
-            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload/Edit Images</a></li>
-            <li id="speciesImage-li2"><a href="#speciesImage-tab2" class="btn" data-toggle="tab">Add Species Field Images</a></li>   
+            <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab">Add Observation Media</a></li>
+            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload/Edit Media</a></li>
+            <li id="speciesImage-li2"><a href="#speciesImage-tab2" class="btn" data-toggle="tab">Add Species Field Media</a></li>   
         </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">

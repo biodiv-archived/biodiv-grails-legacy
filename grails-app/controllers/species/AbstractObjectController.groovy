@@ -42,7 +42,8 @@ class AbstractObjectController {
     def observsationService;
    
     def related() {
-		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+		println "===========PARAMS=========== " + params 
+        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 
 		if(relatedObv) {
 			if(relatedObv.observations)

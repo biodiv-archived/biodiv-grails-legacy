@@ -34,6 +34,7 @@ import species.participation.UsersResource.UsersResourceStatus;
 import species.participation.Observation;
 import species.Species;
 import speciespage.ObservationService;
+import species.participation.UsersResource;
 
 class ResourcesService extends AbstractObjectService {
 
@@ -241,5 +242,21 @@ class ResourcesService extends AbstractObjectService {
     def deleteUsersResourceById(id){
         def result = UsersResource.findByRes(Resource.read(id.toLong()))
         result.delete(flush:true, failOnError:true)
+    }
+
+    def getBulkUploadResourcesList(params) {
+        def list = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:"id", order:"desc"])
+        def result = list.collect(){it.res}
+        def userCountList = [:]
+        list.collect(){
+            if(userCountList[it.user]){
+                userCountList[it.user] = userCountList[it.user] + 1 
+            } else {
+                userCountList[it.user] = 1
+            }
+        }
+        userCountList = userCountList.sort {a, b -> b.value <=> a.value}
+        println "======USERS======== " + userCountList
+		return [resourceInstanceList:result, userCountList:userCountList]
     }
 }	

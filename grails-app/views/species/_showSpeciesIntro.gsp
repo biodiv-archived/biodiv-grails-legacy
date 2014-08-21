@@ -26,7 +26,7 @@ ${resourceInstanceList}
         <div id="resourceTabs" style="visibility:hidden;">
             <g:if test="${isSpeciesContributor}">
             <a id="addSpeciesImagesBtn" class="btn btn-success"
-                        style="float: right; margin-right: 5px; margin-top: 5px;"> Add Images </a>
+                        style="float: right; margin-right: 5px; margin-top: 5px;"> Add Media </a>
 
             </g:if>
             <ul>

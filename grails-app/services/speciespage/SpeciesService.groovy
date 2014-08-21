@@ -310,7 +310,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                //addMediaInSpField(params, speciesFieldInstance);
+                addMediaInSpField(params, speciesFieldInstance);
                 return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:activityFeedService.SPECIES_FIELD_CREATED]
             }
         } catch(Exception e) {
@@ -331,7 +331,6 @@ class SpeciesService extends AbstractObjectService  {
      * Update Species Field
      */
     def updateSpeciesField(SpeciesField speciesField, params) {
-        println "========dsdvsdfvfsdvdfvdfvd========= " + params
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
             return [success:false, msg:"You don't have permission to update"]
         }
@@ -344,7 +343,7 @@ class SpeciesService extends AbstractObjectService  {
                     speciesField.errors.each { result.errors << it }
                     return [success:false, msg:"Error while updating species field", errors:result.errors]
                 }
-                //addMediaInSpField(params, speciesField);
+                addMediaInSpField(params, speciesField);
             }
             log.debug "Successfully updated species field";
             return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_UPDATED]
@@ -355,7 +354,6 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
-        println "============PARAMS=========== " + params.paramsForObvSpField +"=================== "+ params.paramsForUploadSpField
         if(!params.description) {
             return [success:false, msg:"Description cant be empty. Please delete the field if you dont want to have any description"]
         }
@@ -1532,19 +1530,32 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 	}
     
     def updateSpecies(params, species){
-        println "=========PARAMS IN UPDATE SPECIES======== " + params + "========================= "+params.class
         def resources = []
+        def speciesRes = species.resources
         if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField"){
             def resourcesXML = createResourcesXML(params);
             resources = saveResources(species, resourcesXML);
+            resources.each{
+                //if(it){
+                  //  it.refresh()
+                //}
+                /*
+                if(!it.save(flush:true)){
+                    it.errors.allErrors.each { log.error it }
+                    return false
+                }*/
+            }
+            def resourcesFileName = resources.collect{it.fileName}
             params.each { key, val ->
                 if(key.startsWith('file_')) {
-                    def res = Resource.findByFileNameAndType(params.get(key), ResourceType.IMAGE);
-                    if(res && !resources.contains(res)){
-                        resources.add(res)
+                    if(!resourcesFileName.contains(params.get(key))){
+                        def res = Resource.findByFileNameAndType(params.get(key), ResourceType.IMAGE);
+                        res.refresh()
+                        if(res && !resources.contains(res)){
+                            resources.add(res)
+                        }
                     }
                 }
-
             }
             species.resources?.clear();
         }
@@ -1553,7 +1564,6 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             params.each { key, val ->
                 int index = -1;
                 if(key.startsWith('pullImage_')) {
-                    println "========PULL IMAGE TRUE======= " + val
                     index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
                 }
                 if(index != -1) {
@@ -1561,7 +1571,12 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
             resId.each{
-                resources.add(Resource.get(it.toLong()))
+                def r = Resource.get(it.toLong())
+                if(speciesRes && !speciesRes.contains(r)){    
+                    resources.add(r)
+                } else if (!speciesRes){
+                    resources.add(r)
+                }
             }
 
             if(params.resourceListType == "fromRelatedObv"){
@@ -1584,7 +1599,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
         }
-        println "=======RESOURCVES ==========  " + resources
+        species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
                 if(!resource.save(flush:true)){
@@ -1594,11 +1609,10 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                     resource.saveResourceContext(species)
                 }
             }
-            species.refresh();
-            println "==========ADDING THIS RES============= " + resource
             species.addToResources(resource);
+
         }
-        println "======SAVING SAVING========"
+        species.merge();
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
@@ -1621,7 +1635,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     }
 
     def getSpeciesFieldMedia(spFieldId){
-        def spF = SpeciesField.read(spFieldId.toLong())
+        def spF = SpeciesField.get(spFieldId.toLong())
         return spF?spF.resources:[]
     }
 

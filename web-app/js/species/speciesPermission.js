@@ -224,3 +224,9 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
     });
 }
 
+$("#addSpFieldResourcesModalSubmit").click(function(){
+    var spfid = $("#addSpFieldResourcesModal").data("spfieldid");
+    $("#addSpFieldResourcesModal").modal("toggle");
+    $(".speciesField[data-pk='"+spfid+"']").find(".editable-submit").trigger("click");
+    return;
+});

@@ -811,8 +811,13 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
+                    println "=====LICENSE ON NEW RES======== " + l
                     res.addToLicenses(l);
                 }
+                if(!res.save(flush:true)){
+                    res.errors.allErrors.each { log.error it }
+                }
+                
             } else {
                 log.debug "Updating resource metadata"
                 res.url = sourceUrl
@@ -828,10 +833,16 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
+                    println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
                     res.addToLicenses(l);
                 }
+                res.merge();
+                res.refresh();
+                if(!res.save(flush:true)){
+                    res.errors.allErrors.each { log.error it }
+                }
+                res.refresh();
             }
-
             //s.addToResources(res);
             imageNode.appendNode("resource", res);
             log.debug "Successfully created resource " + res;

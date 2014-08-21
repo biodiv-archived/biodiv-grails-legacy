@@ -441,10 +441,8 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
     def update() {
-        println "===========UPDATE STARTED========= "
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
-        println "==========PARAMS FROM CLIENT======= " + paramsForObvSpField + "==== " + paramsForUploadSpField
         if(!(params.name && params.pk)) {
             render ([success:false, msg:'Either field name or field id is missing'] as JSON)
             return;
@@ -936,7 +934,6 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def getRelatedObvForSpecies() {
-        println "====================PARAMS============ " + params
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
@@ -950,7 +947,7 @@ class SpeciesController extends AbstractObjectController {
     def pullObvImage() {
         log.debug params  
         //pass that same species
-        def species = Species.read(params.speciesId.toLong())
+        def species = Species.get(params.speciesId.toLong())
         def out = speciesService.updateSpecies(params, species)
         def result
         if(out){
@@ -1054,7 +1051,6 @@ class SpeciesController extends AbstractObjectController {
         def offset = 0 
         def spInstance = Species.read(params.speciesId.toLong())
         resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
-        println "========RES LIST========== " + resList
         def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
         def result = [addPhotoHtml: addPhotoHtml]
         render result as JSON
@@ -1064,8 +1060,7 @@ class SpeciesController extends AbstractObjectController {
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
-        println "==============OBV SP FIELD================"
-        def speciesField = SpeciesField.read(params.speciesFieldId.toLong())
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
         if(out){
@@ -1077,8 +1072,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def uploadMediaInSpField(){
-         println "==============UPLOADING IN SP FIELD================"
-        def speciesField = SpeciesField.read(params.speciesFieldId.toLong())
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
         if(out){
