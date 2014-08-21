@@ -172,13 +172,12 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 		//def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
 
-		def templateMap = [username: user.name.capitalize(), email:user.email, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
+		def templateMap = [username: user.name.capitalize(), email:user.email, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request), grailsApplication:grailsApplication]
 
 		def mailSubject = ""
 		def bodyContent = ""
 
 		def replyTo = conf.ui.notification.emailReplyTo;
-
 		switch ( notificationType ) {
 			case NEW_USER:
 				mailSubject = conf.ui.newuser.emailSubject
