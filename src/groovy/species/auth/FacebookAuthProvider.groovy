@@ -20,20 +20,17 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
-public class FacebookAuthProvider implements AuthenticationProvider {
+public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.facebook.FacebookAuthProvider {
 
 	private static def log = Logger.getLogger(this)
 
-	FacebookAuthDao facebookAuthDao
-	FacebookAuthUtils facebookAuthUtils
 	UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
 	UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
 
-	boolean createNew = true
-
 	public Authentication authenticate(Authentication authentication) {
+       
 		FacebookAuthToken token = authentication
-
+/*
 		def user = facebookAuthDao.findUser(token.uid as Long)
 		if (user == null) {
 			//log.debug "New person $token.uid"
@@ -72,8 +69,20 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 			postAuthenticationChecks.check(userDetails);
 		} else {
 			token.authenticated = false
-		}
+		}*/
 
+        super.authenticate(authentication);
+        token.details = token.principal
+
+        if(token.details) {
+			try {
+				preAuthenticationChecks.check(token.details);
+			} catch (AuthenticationException exception) {
+				throw exception;
+			}
+
+			postAuthenticationChecks.check(token.details);
+        }
 
 		log.debug "returning fb token : $token"
 		return token
