@@ -216,6 +216,7 @@
         },
 
         onFormSubmit :  function(e) {
+            $("body").css("cursor", "progress");
             e.stopPropagation();
             e.preventDefault();
             var $sf = this;
@@ -325,6 +326,7 @@
                 $errorBlock.removeClass('alert-info').addClass('alert-error').html(data.msg);
                 $container.addClass('errors');
             }
+            $("body").css("cursor", "default");
         },
 
         onUpdateError : function(response, status, error) {
@@ -340,6 +342,7 @@
                     return response.responseText;
                 }
             });
+            $("body").css("cursor", "default");
         }
     });
 
