@@ -2,7 +2,14 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 import species.TaxonomyRegistry
 
+import species.namelist.Utils
 
+def startDate = new Date()
+println "======== started " 
+species.namelist.Utils.generateColStats("/home/sandeept/col")
+println "======== finish date " + new Date() + "    start date "  + startDate  
+
+/*
 def testNav(){
 	def tSer = ctx.getBean("taxonService")
 	GrailsParameterMap m = new GrailsParameterMap([:], null)
@@ -64,3 +71,4 @@ ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
 update  synonyms set status = 'SYNONYM';
 update  synonyms set position = 'DIRTY';
 
+*/
