@@ -17,6 +17,7 @@ import org.apache.solr.common.util.NamedList
 import species.auth.SUser;
 import species.participation.Observation;
 import species.utils.Utils;
+import species.utils.ImageType
 import speciespage.search.SUserSearchService;
 import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
@@ -262,7 +263,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				[max: params.max])
 
 		for (result in results) {
-			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members"]
+			def profile_pic = SUser.read(result[1]).profilePicture(ImageType.SMALL);
+			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members", "user_pic" : profile_pic]
 		}
         }
 		return jsonData;

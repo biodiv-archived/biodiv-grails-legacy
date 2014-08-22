@@ -161,7 +161,7 @@
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i>Notes</span>
-                    <div class="value notes_view linktext">
+                    <div class="value notes_view linktext">                        
                         ${raw(Utils.linkifyYoutubeLink(observationInstance.notes))}
                     </div>
                     </g:if>
