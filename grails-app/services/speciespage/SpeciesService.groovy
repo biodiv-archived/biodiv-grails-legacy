@@ -1561,17 +1561,22 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         }
         else if(params.resourceListType == "fromRelatedObv" || params.resourceListType == "fromSpeciesField"){
             def resId = []
+            def captions = []
             params.each { key, val ->
                 int index = -1;
                 if(key.startsWith('pullImage_')) {
                     index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
                 }
                 if(index != -1) {
-                    resId.add(params.get('resId_'+index));    
+                    resId.add(params.get('resId_'+index));
+                    captions.add(params.get('title_'+index))
                 }
             }
+            int index = 0;
             resId.each{
                 def r = Resource.get(it.toLong())
+                r.description = captions[index]
+                index++;
                 if(speciesRes && !speciesRes.contains(r)){    
                     resources.add(r)
                 } else if (!speciesRes){

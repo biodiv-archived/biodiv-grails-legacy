@@ -109,6 +109,9 @@
                             if(resAlreadyPres.contains(r.id)){
                                 isChecked = "checked"
                             }
+                            if(checkFlag){
+                               isChecked = "" 
+                            }
                         %>
                         <input class="pullImage" name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -140px;float: right;margin-left: -81px;" ${isChecked} >
                     </g:if>

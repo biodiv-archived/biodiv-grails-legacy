@@ -13,7 +13,7 @@
                 <form id="pullObvImagesSpFieldForm" action="${uGroup.createLink(action:'pullObvMediaInSpField', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesFieldId' value="" />
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
-                    <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'fromRelatedObv']"></obv:addPhotoWrapper>
+                    <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'fromRelatedObv' , 'checkFlag':true]"></obv:addPhotoWrapper>
                     <!--a id="pullObvImagesSpFieldBtn" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> Pull Images </a-->
                 </form>

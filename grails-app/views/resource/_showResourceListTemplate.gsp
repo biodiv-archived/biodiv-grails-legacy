@@ -7,13 +7,14 @@
 <%@page import="species.Resource"%>
 
 
-<div class="observations_list observation" style="clear: both;${(params.action == 'bulkUploadResources')?'top:0px;':''}">
-    <div class="mainContentList">
+<div class="observations_list ${(params.action == 'bulkUploadResources')?'span8':''} observation" style="clear: both;${(params.action == 'bulkUploadResources')?'top:0px;':''}">
+        <div class="mainContentList">
         <div class="mainContent" name="p${params?.offset}">
 
             <%
             def observationPos = (queryParams?.offset != null) ? queryParams.offset : params?.offset
             %>
+            
             <ul class="grid_view thumbnails">
 
                 <g:each in="${resourceInstanceList}" status="i"
@@ -100,10 +101,11 @@
     </div>
 
     </div>
+
+
 <g:if test="${params.action == 'bulkUploadResources'}">
     <div class="pull-right hello">
         <g:render template="/resource/usersResTableTemplate" model="['userCountList':userCountList]"/>
     </div>
     </g:if>
-
 
