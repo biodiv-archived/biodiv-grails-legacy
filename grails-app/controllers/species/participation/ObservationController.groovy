@@ -1608,4 +1608,15 @@ class ObservationController extends AbstractObjectController {
             redirect (url:uGroup.createLink(action:'bulkCreate', controller:"observation", 'userGroupWebaddress':params.webaddress))
         }
     }
+
+    def checktest(){
+
+    	def url = "asdfs"
+    	//def msg = g.message(code: "email.verified.resend.url", arg: [url]);
+    	//def msg = "test"
+    	def msg =messageSource.getMessage("userGroup.joined.to.contribution", [url] as Object[], request.locale);
+    	//def msg = g.message(code: "email.verified.resend.url")
+   		render msg+" "+request.locale ; 	
+   		//render "<pre>"+session+"</pre>"+request.locale ;
+    }
 }

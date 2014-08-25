@@ -496,64 +496,74 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def joinUs() {
+		def msg
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
-			render (['success':true,'statusComplete':false, 'msg':'No userGroup is selected.'] as JSON);
+			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+			render (['success':true,'statusComplete':false, 'msg':msg] as JSON);
 			return;
 		}
 
 		def user = springSecurityService.currentUser;
 		if(user) {
 			if(userGroupInstance.isMember(user)) {
-				flash.message = 'Already a member.';
-				render ([success:true, 'statusComplete':false, 'shortMsg':'Already a member', 'msg':'Already a member.']as JSON);
+				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], request.locale)
+				flash.message = msg;
+				render ([success:true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg]as JSON);
 			} else {
 				if(userGroupInstance.addMember(user)) {
-					flash.message = "You have joined ${userGroupInstance.name} group. We look forward for your contribution.";
-					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':"You have joined ${userGroupInstance.name} group. We look forward for your contribution."]as JSON);
+					msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], request.locale)
+					flash.message = msg;
+					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':msg]as JSON);
 					return;
 				}
 			}
 		}
-		flash.error = 'We are extremely sorry as we are not able to process your request now. Please try again.';
-		render ([success:true, 'statusComplete':false, 'shortMsg':'Cannot process now', 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
+		msg = messageSource.getMessage("default.not.able.process", null, request.locale)
+		flash.error = msg;
+		render ([success:true, 'statusComplete':false, 'shortMsg':'Cannot process now', 'msg':msg]as JSON);
 	} 
 
 	@Secured(['ROLE_USER'])
 	def inviteMembers() {
+		def msg
 		List members = Utils.getUsersList(params.memberUserIds);
 		log.debug members;
 
 		if(members) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup is selected.'] as JSON);
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 
 			int membersCount = members.size();
 			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request), params.message);
-			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
+			msg = messageSource.getMessage("default.usergroup.send.invite.success", [members.size()] as Object[], request.locale)
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
 
-				msg += " as other "+alreadyMembersCount+" member(s) were already found to be already part of this group."
+				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], request.locale)	
 			}
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 			return
 		}
-		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
+		msg = messageSource.getMessage("default.provide.details.invite", null, request.locale)
+		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':msg] as JSON)
 	}
 	
 	@Secured(['ROLE_USER'])
 	def inviteExperts() {
 		List members = Utils.getUsersList(params.expertUserIds);
 		log.debug members;
+		def msg
 
 		if(members) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup is selected.'] as JSON);
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 			
@@ -567,16 +577,17 @@ class UserGroupController {
 			members.removeAll(groupExperts);
 			
 			userGroupService.sendExpertInvitation(userGroupInstance, members, params.message, Utils.getDomainName(request));
-			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
+			msg = messageSource.getMessage("default.usergroup.send.invite.success", [members.size()] as Object[], request.locale)			
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
 
-				msg += " as other "+alreadyMembersCount+" member(s) were already found to be already part of this group."
+				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], request.locale)
 			}
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 			return
 		}
-		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
+		msg = messageSource.getMessage("default.provide.details.invite", null, request.locale)
+		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':msg] as JSON)
 	}
 
 
@@ -584,32 +595,38 @@ class UserGroupController {
 	def requestMembership() {
 		log.debug params;
 		def user = springSecurityService.currentUser;
+		def msg;
 		if(user) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup selected.'] as JSON);
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 
 			if(userGroupInstance.isMember(user)) {
-				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a member', 'msg':'Already a member.'] as JSON);
+				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], request.locale)
+				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
             founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
+            msg = messageSource.getMessage("default.confirm.membership", null, request.locale)
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
-						"Please confirm membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
+						msg ,  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':'Sent request to admins for confirmation.'] as JSON);
+			msg = messageSource.getMessage("default.sent.request.admin", null, request.locale)
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
 			return;
 		}
-		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to confirm request.'] as JSON);
+		msg = messageSource.getMessage("default.login.confirm", null, request.locale)
+		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':msg] as JSON);
 
 	}
 	
@@ -617,32 +634,38 @@ class UserGroupController {
 	def requestModeratorship() {
 		log.debug params;
 		def user = springSecurityService.currentUser;
+		def msg;
 		if(user) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup selected.'] as JSON);
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 
 			if(userGroupInstance.isExpert(user)) {
-				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a moderator', 'msg':'Already a moderator.'] as JSON);
+				msg = messageSource.getMessage("default.already.user", ['moderator'] as Object[], request.locale)
+				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a moderator', 'msg':msg] as JSON);
 				return;
 			}
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
 			founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
+			msg = messageSource.getMessage("default.confirm.membership", ['moderator'] as Object[], request.locale)
 			founders.each { founder ->
 				log.debug "Sending email to  founder or expert ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
-						"Please confirm moderator",  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestModeratorship'], userToken.token);
+						msg,  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestModeratorship'], userToken.token);
 			}
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':'Sent request to admins for confirmation.'] as JSON);
+			msg = messageSource.getMessage("default.sent.request.admin", null, request.locale)
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
 			return;
 		}
-		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to confirm request.'] as JSON);
+		msg = messageSource.getMessage("default.login.confirm", null, request.locale)
+		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':msg] as JSON);
 
 	}
 	
@@ -661,18 +684,19 @@ class UserGroupController {
 //	}
 
     private boolean findDesignation (user, ug, role) {
+    	def msg
         switch(role) {
             case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
                 if(ug.isFounder(user)) {
-                    flash.message="${user} is already founder of this group"
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], request.locale)
                     return true
                 }
                 else if (ug.isExpert(user)) {
-                    flash.message="${user} is already moderator of this group"
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'moderator'] as Object[], request.locale)
                     return true
                 }
                 else if( ug.isMember(user)) {
-                    flash.message="${user} is already member of this group"
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'member'] as Object[], request.locale)
                     return true
                 }
                 else {
@@ -681,11 +705,11 @@ class UserGroupController {
                 break;
             case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
                 if(ug.isFounder(user)) {
-                    flash.message="${user} is already founder of this group"
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], request.locale)
                     return true
                 }
                 else if (ug.isExpert(user)) {
-                    flash.message="${user} is already moderator of this group"
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'moderator'] as Object[], request.locale)
                     return true
                 }
                 else {
@@ -694,7 +718,7 @@ class UserGroupController {
                 break;
             case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
                 if(ug.isFounder(user)) {
-                    flash.message="${user} is already founder of this group"
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], request.locale)
                     return true
                 }
                 else {
