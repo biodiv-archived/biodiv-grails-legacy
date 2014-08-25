@@ -99,7 +99,6 @@ class SpeciesPermissionService {
                     return false
                 }
 
-                log.error "done"
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();

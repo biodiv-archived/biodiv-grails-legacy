@@ -1,5 +1,8 @@
 package species.participation
 
+import species.auth.SUser;
+import species.participation.Follow;
+import species.participation.ActivityFeed;
 class CommentService {
 
 	static transactional = false
@@ -18,25 +21,49 @@ class CommentService {
 			return ['success': false, 'msgCode': 'default.comment.not.permitted.message']
 		}
 		
-		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
-						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
-						parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim());
-
-		if(params.dateCreated) {
-			c.dateCreated = params.dateCreated
+		// String UserIds with comma seperation to make it as list
+		List<String> tagUserIds;
+		if(params.tagUserId){
+			tagUserIds = Arrays.asList(params.tagUserId.split("\\s*,\\s*"));
+		}
+		Comment c;
+		if(params.commentId){
+			c 	= Comment.findById(params.commentId?.toLong());			
+			c.body 	= params.commentBody.trim();
 			c.lastUpdated = new Date();
-		}
-		if(params.lastUpdated) {
-			c.lastUpdated = params.lastUpdated;
-		}
+			
+		}else{
+			
+			c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
+							commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
+							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim());
+			
 
+			if(params.dateCreated) {
+				c.dateCreated = params.dateCreated
+				c.lastUpdated = new Date();
+			}
+			if(params.lastUpdated) {
+				c.lastUpdated = params.lastUpdated;
+			}
+
+		}
+		
 		if(!c.save(flush:true)){
 			c.errors.allErrors.each { log.error it }
 			return ['success': false]
 		}else{
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
-			def feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
-			utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
+			def feedInstance;
+			if(!params.commentId){				
+				feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
+				utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
+			}else{
+				feedInstance = ActivityFeed.findByActivityHolderIdAndActivityHolderType(c.id,c.class.getCanonicalName());
+			}
+			if(tagUserIds){
+				userTagNofity(tagUserIds,domainObject,feedInstance,params.webaddress);
+			}
 			return ['success': true, 'commentObj' :c]
 		}
 	}
@@ -143,5 +170,17 @@ class CommentService {
                 addComment(m);
         }
     }
+
+	private userTagNofity(tagUserIds,domainObject,feedInstance,webaddress){
+		def tu =[];			
+		tagUserIds.each(){
+			def tagUser = SUser.read(it);
+			tu.add(tagUser);				
+			Follow.addFollower(domainObject, tagUser);
+		}			
+		def otherParams = ['taggedUsers' : tu];
+		observationService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
+
+	}
 
 }

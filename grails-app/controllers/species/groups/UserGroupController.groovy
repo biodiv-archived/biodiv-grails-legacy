@@ -105,7 +105,7 @@ class UserGroupController {
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		if(params.append) {
+		if(params.append && session["uGroup_ids_list"]) {
 			session["uGroup_ids_list"].addAll(userGroupInstanceList.collect {it.id});
 		} else {
 			session["uGroup_ids_list_params"] = params.clone();
@@ -766,7 +766,7 @@ class UserGroupController {
 				}
 			}
 			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", 'userGroup':userGroupInstance);
-			return;
+			return
 		}
 		flash.error="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
 		redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:"list");
@@ -1348,7 +1348,16 @@ class UserGroupController {
         println "==========ALL DIGEST EMAILS SENT============"
     }
 
+    @Secured(['ROLE_USER'])
+    def removeMemberInBulk(){
+       userGroupService.removeMemberInBulk(params)
+       render "== done"
+    }
+
+
 }
+
+
 
 class UserGroupCommand {
 	String name

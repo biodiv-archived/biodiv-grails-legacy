@@ -440,6 +440,8 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
     def update() {
+        def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
+        def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         if(!(params.name && params.pk)) {
             render ([success:false, msg:'Either field name or field id is missing'] as JSON)
             return;
@@ -931,13 +933,12 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def getRelatedObvForSpecies() {
-        log.debug params
-        def spInstance = Species.get(params.speciesId.toLong())
+        def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
         def relatedObvCount = relatedObvMap.count
         def obvLinkList = relatedObvMap.obvLinkList
-        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:params.offset.toInteger() ]);
+        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:(params.offset.toInteger() + relatedObvCount)]);
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON
     }
@@ -1068,4 +1069,43 @@ class SpeciesController extends AbstractObjectController {
     }
 
 
+    def getSpeciesFieldMedia() {
+        def resList = []
+        def obvLinkList = []
+        def resCount = 0
+        def offset = 0 
+        def spInstance = Species.read(params.speciesId.toLong())
+        resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
+        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
+        def result = [addPhotoHtml: addPhotoHtml]
+        render result as JSON
+
+    }
+
+    def pullObvMediaInSpField(){
+        log.debug params  
+        //pass that same species
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
+        def out = speciesService.updateSpecies(params, speciesField)
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }    
+    }
+
+    def uploadMediaInSpField(){
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
+        def out = speciesService.updateSpecies(params, speciesField)
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }    
+
+    }
 }

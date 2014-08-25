@@ -35,6 +35,7 @@ import species.participation.Observation;
 import species.Species;
 import speciespage.ObservationService;
 import species.UtilsService;
+import species.participation.UsersResource;
 
 class ResourcesService extends AbstractObjectService {
 
@@ -220,15 +221,18 @@ class ResourcesService extends AbstractObjectService {
         res.each{ r->
             if((r.uploadTime >= (d - storingDays)) && (r.uploadTime <= (d - (storingDays - 1)))) {
                 //   prepare users list & send mail that resource deleting tomo
+                println "=========MAILING FOR THIS RES=========== " + r
                 if(!usersList.contains(r.uploader)){
                     usersList << r.uploader 
                 }
             }
             else if(r.uploadTime <= (d - storingDays)) {
+                println "==========DELETEING THIS RES======= " + r
                 def toDelete = UsersResource.findByRes(r)
                 toDelete.delete(flush:true, failOnError:true)
             }
         }
+        println "=========USERS MAIL LIST 19 DAYS=========== " + usersList
         if(usersList.size() > 0) {
             otherParams['usersList'] = usersList
             def sp = new Species();
@@ -239,5 +243,21 @@ class ResourcesService extends AbstractObjectService {
     def deleteUsersResourceById(id){
         def result = UsersResource.findByRes(Resource.read(id.toLong()))
         result.delete(flush:true, failOnError:true)
+    }
+
+    def getBulkUploadResourcesList(params) {
+        def list = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:"id", order:"desc"])
+        def result = list.collect(){it.res}
+        def userCountList = [:]
+        list.collect(){
+            if(userCountList[it.user]){
+                userCountList[it.user] = userCountList[it.user] + 1 
+            } else {
+                userCountList[it.user] = 1
+            }
+        }
+        userCountList = userCountList.sort {a, b -> b.value <=> a.value}
+        println "======USERS======== " + userCountList
+		return [resourceInstanceList:result, userCountList:userCountList]
     }
 }	

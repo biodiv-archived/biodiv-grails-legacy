@@ -4,27 +4,29 @@ var contributors_autofillUsersComp;
 function onSpeciesImageUploadSuccess(type){
     var msgText
     if(type == "imageUpload"){
-        msgText = "Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!"
+        msgText = "Images uploaded/edited succesfully, Page will reload to reflect the changes in gallery!!"
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab1") );
     }
     else if(type == "pulledSpeciesFieldImage"){
-        msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
+        msgText = "Images succesfully pulled, Page will reload to reflect the changes in gallery!!"
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab2") );
     }
     else{
-        msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
+        msgText = "Images succesfully pulled, Page will reload to reflect the changes in gallery!!"
         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(msgText);
         $('html, body').animate({
-            scrollTop: $(".alertMsg").offset().top
-        }, 1000);
+            scrollTop: 0
+    }, 'slow');
 
     }
+    setTimeout(function(){location.reload(true);}, 1000);
     return true;
 }
 
 
-function getNextRelatedObvImages(speciesId, url, resourceListType){
-    var offset = $("#relatedImagesOffset").val();
+function getNextRelatedObvImages(speciesId, url, resourceListType, context){
+    var imagesListWrapper = $(context).closest(".imagesListWrapper");
+    var offset = imagesListWrapper.find(".relatedImagesOffset").val();
     $.ajax({
         url: url,
         dataType: "json",
@@ -32,11 +34,13 @@ function getNextRelatedObvImages(speciesId, url, resourceListType){
         success: function(data) {
             var addPhotoHtmlData = $(data.addPhotoHtml);
             if(data.relatedObvCount == 0){
-                $("#relatedObvLoadMore").replaceWith('<a class="btn disabled" style="margin-right: 5px;">No More</a>');
+                $(context).replaceWith('<a class="btn disabled" style="margin-right: 5px;">No More</a>');
+                $(context).remove();
+                return;
             } 
-            $("#speciesImage-tab0 .imagesList" ).append(addPhotoHtmlData);
-            $("#relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));
-            $("#relatedObvLoadMore").insertBefore($("#pullObvImagesBtn"));
+            imagesListWrapper.find(".imagesList" ).append(addPhotoHtmlData);
+            imagesListWrapper.find(".relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));
+            imagesListWrapper.append($(context));
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         }
@@ -167,6 +171,7 @@ $(document).ready(function() {
 
 
     $("#addSpeciesImagesBtn").click(function(){
+        uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
         $(".speciesImage-wrapper").toggle();
         $('html, body').animate({
             scrollTop: $(".speciesImage-wrapper").offset().top
@@ -187,7 +192,42 @@ $(document).ready(function() {
         $("#pullSpeciesFieldImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("pulledSpeciesFieldImage")});
         return false;
     });
+    
+    $("#pullObvImagesSpFieldBtn").click(function(){
+        $("#pullObvImagesSpFieldForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("pulledImageInSpField")});
+    });
 
+    $("#uploadSpeciesFieldImagesBtn").click(function(){
+        $("#uploadSpeciesFieldImagesForm").ajaxSubmit({success:onSpeciesImageUploadSuccess("imageUploadInSpField")});
+        return false;
+    });
 
 });
 
+
+
+function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
+    $.ajax({
+        url: url,
+        dataType: "json",
+        data: {speciesId:spId, spFieldId: spFieldId,resourceListType: resourceListType},	
+        success: function(data) {
+            var addPhotoHtmlData = $(data.addPhotoHtml);
+            $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
+            $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
+            $("#addSpFieldResourcesModal").modal("toggle");
+            $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
+            uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
+            $("input[name='speciesFieldId']").val(spFieldId);
+        }, error: function(xhr, status, error) {
+            alert(xhr.responseText);
+        }
+    });
+}
+
+$("#addSpFieldResourcesModalSubmit").click(function(){
+    var spfid = $("#addSpFieldResourcesModal").data("spfieldid");
+    $("#addSpFieldResourcesModal").modal("toggle");
+    $(".speciesField[data-pk='"+spfid+"']").find(".editable-submit").trigger("click");
+    return;
+});

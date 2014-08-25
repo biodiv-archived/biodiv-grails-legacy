@@ -220,7 +220,7 @@ class AbstractObjectService {
         
 
         String uploadDir = ""
-        if( params.resourceListType == "ofSpecies" ){
+        if( params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
         }
         else if(params.resourceListType == "ofObv" || params.resourceListType == null){
@@ -325,7 +325,7 @@ class AbstractObjectService {
             rootDir = grailsApplication.config.speciesPortal.observations.rootDir
             break;
             
-            case Species.class.name:
+            case [Species.class.name, SpeciesField.class.name]:
             rootDir = grailsApplication.config.speciesPortal.resources.rootDir
             break;
 

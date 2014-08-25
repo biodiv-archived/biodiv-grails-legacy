@@ -698,7 +698,7 @@ class ObservationController extends AbstractObjectController {
         }
 
 		if(params.obvId) {
-			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
+			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
@@ -855,7 +855,7 @@ class ObservationController extends AbstractObjectController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
+			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
 				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
