@@ -11,11 +11,11 @@
 			</g:link>
 		</div>
 		<b> ${commentInstance.author.name} :
-		</b>
+it		</b>
 		<comment:showCommentContext
 			model="['commentInstance' : commentInstance]" />
 		<div class="yj-message-body">
-			${Utils.linkifyYoutubeLink(raw(commentInstance.body?.replaceAll("\\n",'<br/>')))}
+			${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",it'<br/>'))}
 		</div>
 		<div class="yj-attributes">
 			<time class="timeago" datetime="${commentInstance.lastUpdated.getTime()}"></time>
