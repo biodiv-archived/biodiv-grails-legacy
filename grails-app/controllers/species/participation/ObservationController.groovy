@@ -330,7 +330,7 @@ class ObservationController extends AbstractObjectController {
 			}
 			else {
 				if(observationInstance.instanceOf(Checklists)){
-					redirect(controller:'checklist', action:show, params: params)
+					redirect(controller:'checklist', action:'show', params: params)
 					return
 				}
 				observationInstance.incrementPageVisit()
