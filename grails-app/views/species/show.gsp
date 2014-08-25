@@ -126,7 +126,6 @@
 
         <!-- 
         <ckeditor:resources />
-        <script type="text/javascript" src="${resource(dir:'plugins',file:'ckeditor-3.6.0.0/js/ckeditor/_source/adapters/jquery.js')}"></script>
         <script type="text/javascript" src="ckEditorConfig.js" />
 
         <script type="text/javascript"
