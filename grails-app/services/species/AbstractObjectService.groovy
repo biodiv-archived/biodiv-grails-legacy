@@ -210,7 +210,7 @@ class AbstractObjectService {
      /**
      * 
      */
-    private def createResourcesXML(params) {
+    protected def createResourcesXML(params) {
         NodeBuilder builder = NodeBuilder.newInstance();
         XMLConverter converter = new XMLConverter();
         def resources = builder.createNode("resources");
@@ -317,7 +317,7 @@ class AbstractObjectService {
         return resources;
     }
 
-    private List<Resource> saveResources(instance, resourcesXML) {
+    protected List<Resource> saveResources(instance, resourcesXML) {
         XMLConverter converter = new XMLConverter();
         def rootDir
         switch(instance.class.name) {
