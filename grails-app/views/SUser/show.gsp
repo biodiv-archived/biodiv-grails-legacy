@@ -209,6 +209,19 @@
 
                                 </div>
                                 
+                                <obv:showBulkUploadRes model="['user':user]">
+                                 <div id="bulkUploadResources" class="section" style="clear:both;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"> 
+                                            <obv:showNoOfBulkUploadResOfUser model="['user':user]" /> </span>
+                                        Bulk Upload Resources 
+                                    </h6>
+                                    <obv:showRelatedStory
+                                    model="['controller':'observation', 'action':'related', 'filterProperty': 'bulkUploadResources', 'filterPropertyValue':user.id, 'id':'bulkUploadResources', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
+
+                                </div>
+                                </obv:showBulkUploadRes>
+
                                 <g:if test="${!downloadLogList.isEmpty()}">
                                 <div id="downloads" class="section" style="clear: both;overflow:auto;">
                                     <h6>

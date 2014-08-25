@@ -398,5 +398,17 @@ class ObservationTagLib {
         attrs.model['obvLinkList'] = obvLinkList
         out << render(template:"/observation/addPhotoWrapper", model:attrs.model);
     }
+
+    def showNoOfBulkUploadResOfUser = { attrs, body ->
+        def res = UsersResource.findAllByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+        out << res.size()
+    }
+
+    def showBulkUploadRes = { attrs, body ->
+        def res = UsersResource.findAllByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+        if(res.size() > 0){
+            out << body()
+        }
+    }
 }
 

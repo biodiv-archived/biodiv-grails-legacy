@@ -84,6 +84,7 @@ class ObservationService extends AbstractObjectService {
     def speciesPermissionService;
     def speciesService;
     def messageSource;
+    def resourcesService;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
@@ -383,6 +384,8 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
         } else if(params.filterProperty == "latestUpdatedSpecies") {
             relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
+        } else if(params.filterProperty == 'bulkUploadResources') {
+            relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
         
         else{

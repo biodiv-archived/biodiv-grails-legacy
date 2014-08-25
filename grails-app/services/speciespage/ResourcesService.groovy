@@ -256,7 +256,15 @@ class ResourcesService extends AbstractObjectService {
             }
         }
         userCountList = userCountList.sort {a, b -> b.value <=> a.value}
-        println "======USERS======== " + userCountList
 		return [resourceInstanceList:result, userCountList:userCountList]
+    }
+
+    def getBulkUploadResourcesOfUser(user, max, offset){
+        def result = UsersResource.findAllByUserAndStatus(user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc', max:max, offset:offset])
+        def res = []
+        result.each{
+            res.add(["observation":it.res, 'title':''])
+        }
+        return ['observations':res]
     }
 }	
