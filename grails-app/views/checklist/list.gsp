@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="Checklists"/>
+<g:set var="title" value="${g.message(code:'title.checklists')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="checklist_list"/>
 </head>
@@ -20,7 +20,7 @@
 					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 						href="#"
 						onclick="$(this).parent().css('background-color', '#9acc57'); showChecklistMapView(); return false;">
-						<g:message code="msg.Map.view" /> <span class="caret"></span> </a>
+						<g:message code="button.map.view" /> <span class="caret"></span> </a>
 				</div>
 			</g:if>
 			

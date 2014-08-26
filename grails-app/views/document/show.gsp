@@ -26,18 +26,18 @@
                                                         href="${uGroup.createLink(
                                                                 controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                                         class="btn btn-info" title="Add Document">
-                                                        <i class="icon-plus"></i> Add Document
+                                                        <i class="icon-plus"></i><g:message code="link.add.document" />  
                                                 </a>
 
 						<a class="btn btn-primary pull-right" title="Edit Document" style="margin-right: 5px;"
 							href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-							<i class="icon-edit"></i> Edit
+							<i class="icon-edit"></i><g:message code="button.edit" /> 
 						</a>
 						
 						<a class="btn btn-danger pull-right"  href="#" title="Delete Document" style="margin-right: 5px;"
 
 							onclick="deleteDocument(); return false;">
-							<i class="icon-trash"></i> Delete
+							<i class="icon-trash"></i> <g:message code="button.delete" />
 						</a>
 							
 						<form action="${uGroup.createLink(controller:'document', action:'delete')}" method='POST' name='deleteForm'>
@@ -76,7 +76,7 @@
 
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" href="#coverageInfo"
-						data-toggle="collapse"><h5>Coverage Information</h5></a>
+						data-toggle="collapse"><h5><g:message code="link.coverage.information" /></h5></a>
 					<div id="coverageInfo" class="speciesField collapse in">
 						<table>
 
@@ -84,7 +84,7 @@
 
 
 								<tr>
-									<td class="prop"><span class="grid_3 name">Species Groups</span></td>
+									<td class="prop"><span class="grid_3 name"><g:message code="default.species.groups.label" /></span></td>
 									<td class="linktext"><g:each
 											in="${documentInstance.speciesGroups}"
 											var="speciesGroup">
@@ -100,7 +100,7 @@
 
 							<g:if test="${documentInstance?.habitats}">
 								<tr>
-									<td class="prop"><span class="grid_3 name">Habitats</span></td>
+									<td class="prop"><span class="grid_3 name"><g:message code="default.habitats.label" /></span></td>
 
 									<td class="linktext"><g:each
 											in="${documentInstance.habitats}" var="habitat">
@@ -118,7 +118,7 @@
 								<tr>
 
                                                                     <td class="prop"><span class="grid_3 name">
-                                                                            Place</span></td>
+                                                                           <g:message code="default.place.label" /> </span></td>
                                                                     <td>
                                                                         
                                                                         <g:if test="${documentInstance?.placeName}">

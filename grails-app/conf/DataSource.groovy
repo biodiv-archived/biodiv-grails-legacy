@@ -34,7 +34,7 @@ environments {
     development {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
-            url = "jdbc:postgresql://10.0.0.9:5432/${appName}"
+            url = "jdbc:postgresql://saturn.strandls.com:5432/${appName}"
         }
     }
     test {

@@ -203,11 +203,11 @@
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
                     </div>
                     <div class="section clearfix">
-                        <a class="btn btn-primary togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
+                        <a class="btn btn-primary togglePropagateDiv"> <g:message code="button.show.bulk" /> <b class="caret"></b></a>
                         <div class= "propagateBlock hide clearfix">
                             <div >
                                 <div class="column propagateLicense">
-                                    <label>License</label>
+                                    <label><g:message code="default.licenses.label" /></label>
                                     <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
@@ -230,7 +230,7 @@
                                     </div>
                                 </div>
                                 <div class="column span6 propagateTags block_row">
-                                    <label>Tags</label>
+                                    <label><g:message code="default.tags.label" /></label>
                                     <div class="create_tags" style="clear: both;">
                                         <ul class="obvCreateTags">
                                             <g:each in="${obvTags}" var="tag">
@@ -243,26 +243,26 @@
                             </div>
                             <div>
                                 <div class="column propagateGroups small_block_row">
-                                    <label>User Groups</label>
+                                    <label><g:message code="button.user.groups" /></label>
                                     <div style="clear:both">
-                                        <button type="button" class="btn toggleGrpsDiv"> User Groups</button> 
+                                        <button type="button" class="btn toggleGrpsDiv"> <g:message code="button.user.groups" /></button> 
                                         <div class="postToGrpsToggle" style="display:none;">
                                             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="column propagateHelpID small_block_row">
-                                    <label>Help Identify</label>
+                                    <label><g:message code="link.help.identify" /></label>
                                     <div style="margin-left:40px;clear:both">
                                         <input class="helpID" type="checkbox">
                                     </div>
                                 </div>
                                 <div class="column small_block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply Below
+                                        style=" margin-right: 5px; margin-top:17px;"> <g:message code="button.apply.below" />
                                     </a>
                                     <a class="applyAll applyToAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply to All
+                                        style=" margin-right: 5px; margin-top:17px;"> <g:message code="button.apply.all" />
                                     </a>
                                      <input type="hidden" name='applyToAll' value="" />
                                 </div>
@@ -294,7 +294,7 @@
                         <label class="checkbox" style="text-align: left;"> 
                             <g:checkBox style="margin-left:0px;"
                             name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
-                            <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
+                            <span class="policy-text"> <g:message code="checklist.create.submit.form" /> </span></label>
                     </div>
                 <%
 

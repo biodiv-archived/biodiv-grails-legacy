@@ -15,7 +15,7 @@
     </a>
 
     <ul id="license_options_${i}" class="dropdown-menu license_options">
-        <span>Choose a license</span>
+        <span><g:message code="default.choose.license.label" /></span>
         <g:each in="${species.License.list()}" var="l">
         <li class="license_option"
         onclick="selectLicense($(this), ${i});" title="${l.name.getTooltip()}">

@@ -40,7 +40,7 @@
             <form class="${form_class} form-horizontal" action="${form_action}" method="POST">
                 <div class="span12 super-section">
                     <div class="section">
-                        <h3>What did you observe?</h3>
+                        <h3><g:message code="checklist.create.what.observe" /> </h3>
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'ofObv']"></obv:addPhotoWrapper>
                          <div class="section" style="margin:0px;">
                             <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
@@ -52,7 +52,7 @@
                             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
                             <div class="help-identify" class="control-label">
                                 <label class="checkbox" style="text-align: left;"> <input
-                                    type="checkbox" name="help_identify" /> Help identify </label>
+                                    type="checkbox" name="help_identify" /> <g:message code="link.help.identify" /> </label>
                             </div>
                             </g:if>
                             <reco:create />
@@ -77,11 +77,11 @@
 
                     <g:if test="${observationInstance?.id}">
                     <a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
-                        style="float: right; margin-right: 30px;"> Cancel </a>
+                        style="float: right; margin-right: 30px;"><g:message code="button.cancel" /></a>
                     </g:if>
                     <g:else>
                     <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
-                        style="float: right; margin-right: 30px;"> Cancel </a>
+                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>
                     </g:else>
 
                     <g:if test="${observationInstance?.id}">
@@ -89,8 +89,7 @@
                         style="float: right; margin-right: 5px;">
                         <a
                             href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-                            onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
-                            Observation </a>
+                            onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><g:message code="button.delete.observation" />   </a>
                     </div>
                     </g:if>
                     <a id="addObservationSubmit" class="btn btn-primary"
@@ -100,7 +99,7 @@
                         <label class="checkbox" style="text-align: left;"> 
                             <g:checkBox style="margin-left:0px;"
                             name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
-                            <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
+                            <span class="policy-text"><g:message code="checklist.create.submit.form" />  </span></label>
                     </div>
 
                 </div>

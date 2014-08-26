@@ -17,7 +17,7 @@
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
 				<div class="span8 main_heading" style="margin-left: 0px;">
-					<h1>Observations</h1>
+					<h1><g:message code="default.observation.label" /></h1>
 				</div>
 
 				<div style="float: right; margin: 10px 0;">
@@ -28,8 +28,7 @@
 							href="${uGroup.createLink(mapping:'userGroupModule',
 						controller:'observation', action:'create', 'userGroupWebaddress':userGroupInstance.webaddress,
 						'userGroupId':userGroupInstance.id)}"
-							class="btn btn-info"> <i class="icon-plus"></i>Add
-							an Observation</a>
+							class="btn btn-info"> <i class="icon-plus"></i><g:message code="link.add.observation" /></a>
 					</sec:permitted>
 				</div>
 			</div>

@@ -45,16 +45,14 @@
 
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-							class="btn  btn-success"> <i class="icon-plus"></i>Add
-							a Page</a>
+							class="btn  btn-success"> <i class="icon-plus"></i><g:message code="default.add.page.label" /></a>
 					</sec:permitted>
 				</g:if>
 				<g:else>
 					<sUser:isAdmin>
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
-							class="btn btn-success"> <i class="icon-plus"></i>Add
-							a Page</a>
+							class="btn btn-success"> <i class="icon-plus"></i><g:message code="default.add.page.label" /></a>
 					</sUser:isAdmin>
 				</g:else>
 			</div>
@@ -62,7 +60,7 @@
 				<div id="contentMenu" class="tabbable tabs-right" style="">
 
             					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
-                                                <li><h5>Pages</h5></li>
+                                                <li><h5><g:message code="default.pages.label" /></h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
                                                 <li id="newsletter_${newsletterInstance.id}"><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}"><p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                     ${fieldValue(bean: newsletterInstance, field: "title")}</p>
@@ -71,8 +69,8 @@
                                                         </a></li>
 						</g:each>
                         <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
-							<li><a href="/project/list">Western Ghats CEPF
-									Projects</a></li>
+							<li><a href="/project/list"><g:message code="link.cepf.projects" />  
+									</a></li>
 						</g:if>
 
                                             </ul>

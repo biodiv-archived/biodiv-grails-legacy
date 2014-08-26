@@ -72,7 +72,7 @@ if (isOpenId) {
 		</ul>
 	</g:if>
 	<g:else>
-	<g:message code="msg.No.OpenIDs.registered" />
+	<g:message code="biodivadmin.user.no.open.registered" />
 	</g:else>
 	</s2ui:tab>
 	</g:if>

@@ -175,7 +175,7 @@ speciesPortal {
     app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
 	app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
 
-	app.rootDir = "${userHome}/git/biodiv/app-conf"
+	app.rootDir = "${userHome}/github/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  
@@ -445,7 +445,7 @@ environments {
     development {
         grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
         speciesPortal {
-	        app.rootDir = "${userHome}/git/biodiv/app-conf"
+	        app.rootDir = "${userHome}/github/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "127.0.0.1"
         }

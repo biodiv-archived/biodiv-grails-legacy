@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="layout" content="main" />
-<title>Species Edit</title>
+<title><g:message code="species.edit" /></title>
 <r:require modules="species"/>
 
 <r:script>
@@ -90,7 +90,7 @@ $(document).ready(function(){
 											title=" ${speciesInstance.taxonConcept.name}" />
 
 										<p class="caption">
-											Change
+											<g:message code="text.change" />
 										</p>
 									</g:link></td>
 

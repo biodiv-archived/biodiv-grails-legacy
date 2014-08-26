@@ -16,7 +16,7 @@ class UtilsService {
 	def sessionFactory
     def mailService;
     def springSecurityService
-    def activityFeedService
+ //   def activityFeedService
 
     static final String SPECIES_CONTRIBUTOR = "speciesContributor";
     static final String SPECIES_CURATORS = "speciesCurators"

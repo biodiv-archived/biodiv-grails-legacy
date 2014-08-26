@@ -6,5 +6,5 @@
 	</g:each>
 </g:if>
 <li style="float:right;overflow-x:hidden; overflow-y:auto;">
-    <g:link mapping="userGroupGeneric" action="list" absolute='true'>More ...</g:link>
+    <g:link mapping="userGroupGeneric" action="list" absolute='true'><g:message code="link.more" /></g:link>
 </li>	

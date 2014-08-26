@@ -1,14 +1,14 @@
 <%@ page import="species.utils.Utils"%>
 
 <div class="sidebar_section">
-    <h5><g:message code="msg.Species.Distribution" />Species Distribution</h5>
+    <h5><g:message code="default.species.distribution.label" />Species Distribution</h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
-    <h5><g:message code="msg.Location.Info" /></h5>
+    <h5><g:message code="default.location.info.label" /></h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
             <g:if test="${observationInstance.geoPrivacy}">
-            	<g:message code="msg.Geoprivacy.enabled" />
+            	<g:message code="default.geoprivacy.enabled.label" />
             </g:if>
             <g:else>
                 <g:if test="${observationInstance.placeName != ''}">
@@ -61,22 +61,22 @@
 
 <g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
     <div class="sidebar_section tile temporalDist">
-        <h5><g:message code="msg.Temporal.Distribution" /></h5>
+        <h5><g:message code="default.temporal.distribution.label" /></h5>
         <div id="temporalDist" style="height:108px;">
         </div>
         <ul>
-            <li><g:message code="msg.Jan" />Jan</li>
-            <li><g:message code="msg.Feb" />Feb</li>
-            <li><g:message code="msg.Mar" />Mar</li>
-            <li><g:message code="msg.Apr" />Apr</li>
-            <li><g:message code="msg.May" />May</li>
-            <li><g:message code="msg.Jun" />Jun</li>
-            <li><g:message code="msg.Jul" />Jul</li>
-            <li><g:message code="msg.Aug" />Aug</li>
-            <li><g:message code="msg.Sep" />Sep</li>
-            <li><g:message code="msg.Oct" />Oct</li>
-            <li><g:message code="msg.Nov" />Nov</li>
-            <li><g:message code="msg.Dec" />Dec</li>
+            <li><g:message code="default.month.jan" /></li>
+            <li><g:message code="default.month.feb" /></li>
+            <li><g:message code="default.month.mar" /></li>
+            <li><g:message code="default.month.apr" /></li>
+            <li><g:message code="default.month.may" /></li>
+            <li><g:message code="default.month.jun" /></li>
+            <li><g:message code="default.month.jul" /></li>
+            <li><g:message code="default.month.aug" /></li>
+            <li><g:message code="default.month.sep" /></li>
+            <li><g:message code="default.month.oct" /></li>
+            <li><g:message code="default.month.nov" /></li>
+            <li><g:message code="default.month.dec" /></li>
         </ul>
     </div>
 </g:if>

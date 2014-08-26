@@ -28,17 +28,17 @@ $(document).ready(function() {
 		<div class="observation_links">
 			<g:if test="${observationId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="msg.Show.all" />
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
 					</a>
 			</g:if>
 			<g:elseif test="${speciesId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="msg.Show.all" />
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
 					</a>
 			</g:elseif>
                         <g:else>
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}"><g:message code="msg.Show.all" />
+					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
 					</a>
 			</g:else>
 		</div>
@@ -46,12 +46,12 @@ $(document).ready(function() {
 <%--	<div id="carouselItemDesc"></div>--%>
 </div>
 <div id="relatedObservationAddButton_${id}" class="alert alert-info" style="display:none;">
-	<g:message code="msg.No.observations" />
+	<g:message code="msg.no.observations" />
     </div>
 
 <g:if test="${filterProperty != 'featureBy'}">
     <div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
-        <g:message code="msg.No.data" />!!
+        <g:message code="msg.no.data" />!!
     </div>
 </g:if>
 

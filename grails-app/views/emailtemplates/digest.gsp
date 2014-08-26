@@ -2,7 +2,7 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
 
-<html><head><title>Digest</title>
+<html><head><title><g:message code="msg.Digest" />Digest</title>
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <style type="text/css">
@@ -18,15 +18,15 @@
             <tr>
                 <td class="w580" style="height: 10px; background-color: white;"></td>
             </tr>
-            <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
-            <p>Here is the activity digest for the <a href="${uGroup.createLink(controller:'userGroup', action:'show','userGroup':userGroup, absolute:true)}">${userGroup.name}</a> group on the India Biodiversity Portal</p>
+            <big style="font-weight: bold;"> <small><g:message code="msg.Dear" /></small> <small>&nbsp;${username},</small></big>
+            <p><g:message code="msg.activity.digest" /> <a href="${uGroup.createLink(controller:'userGroup', action:'show','userGroup':userGroup, absolute:true)}">${userGroup.name}</a><g:message code="msg.group.portal" /> </p>
             <g:if test = "${digestContent.observations || digestContent.unidObvs}">
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Observations (${digestContent.obvListCount})</h2>
+                <h2><g:message code="msg.Observations" /> (${digestContent.obvListCount})</h2>
                 <div style="background-color: #d4ece3;">
                     <g:if test = "${digestContent.observations }">
                     <g:set var="obvIns" value="${digestContent.observations}"></g:set>
-                    <h3>Recent</h3>
+                    <h3><g:message code="msg.Recent" /></h3>
                     <table>
                         <tr align="left" style="background-color: #d4ece3">
                             <g:each in="${obvIns.size() < 5 ? obvIns : obvIns.subList(0, 5)}" var="observationInstance">
@@ -40,11 +40,11 @@
                             </g:each>
                         </tr>
                     </table>
-                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
+                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;"><g:message code="msg.View.More" /></a></p>
                     </g:if>
                     <g:if test = "${digestContent.unidObvs}">
                     <g:set var="uniObvIns" value="${digestContent.unidObvs}"></g:set>
-                    <h3>Unidentified</h3>
+                    <h3><g:message code="msg.Unidentified" /></h3>
                     <table>
                         <tr align="left" style="background-color: #d4ece3">
                             <g:each in="${uniObvIns.size() < 5 ? uniObvIns : uniObvIns.subList(0, 5)}" var="uniObvInstance">
@@ -59,12 +59,12 @@
                         </tr>
                     </table>
                 
-                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true, params:['speciesName':'Unknown'])}" style="color:#2ba6cb;">View More</a></p>
+                    <p style="text-align:right;padding-right:5px;font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true, params:['speciesName':'Unknown'])}" style="color:#2ba6cb;"><g:message code="msg.View.More" /></a></p>
                     </g:if>
 
                     <g:if test = "${digestContent.recentTopContributors}">
                     <g:set var="recentTopContributors" value="${digestContent.recentTopContributors}"></g:set>
-                    <h3>Top Contributors</h3>
+                    <h3><g:message code="msg.Top.Contributors" /></h3>
                     <table>
                         <tr align="left">
                             <g:each in="${recentTopContributors.size() < 5 ? recentTopContributors : recentTopContributors.subList(0, 5)}" var="rtc">
@@ -81,7 +81,7 @@
 
                     <g:if test = "${digestContent.topIDProviders}">
                     <g:set var="topIDProviders" value="${digestContent.topIDProviders}"></g:set>
-                    <h3>Top ID Providers</h3>
+                    <h3><g:message code="msg.Top.ID.Providers" /></h3>
                     <table>
                         <tr align="left">
                             <g:each in="${topIDProviders.size() < 5 ? topIDProviders : topIDProviders.subList(0, 5)}" var="tip">
@@ -104,9 +104,9 @@
             <g:if test = "${digestContent.species}">
             <g:set var="spIns" value="${digestContent.species}"></g:set>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Species (${digestContent.spListCount})</h2>
+                <h2><g:message code="msg.Species" /> (${digestContent.spListCount})</h2>
                 <div style="background-color: #d4ece3;">
-                    <h3>Recent</h3>
+                    <h3><g:message code="msg.Recent" /></h3>
                     <table>
                         <tr align="left">
                             <g:each in="${spIns.size() < 5 ? spIns : spIns.subList(0, 5)}" var="speciesInstance">
@@ -126,7 +126,7 @@
                         </tr>
                     </table>
                 </div>
-                <p style="text-align:right; padding-right:5px; font-weight:bold;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'species', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right; padding-right:5px; font-weight:bold;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'species', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;"><g:message code="msg.View.More" /></a></p>
             </div>
             </g:if>
             
@@ -135,7 +135,7 @@
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
                 <h2>Users (${digestContent.userListCount})</h2>
                 <div style="background-color: #d4ece3;">
-                    <h3>New</h3>
+                    <h3><g:message code="msg.New" /></h3>
                     <table>
                         <tr align="left">
                             <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
@@ -146,7 +146,7 @@
                         </tr>
                     </table>
                 </div>
-                <p style="text-align:right; padding-right:5px; font-weight:bold; color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'SUser', action:'list','userGroup':userGroup, absolute:true, params:['sort':'dateCreated'])}" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right; padding-right:5px; font-weight:bold; color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'SUser', action:'list','userGroup':userGroup, absolute:true, params:['sort':'dateCreated'])}" style="color:#2ba6cb;"><g:message code="msg.View.More" /></a></p>
             </div>
             </g:if>
 
@@ -156,9 +156,9 @@
             def counter = 1
             %>
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
-                <h2>Documents (${digestContent.docListCount})</h2>
+                <h2><g:message code="msg.Documents" /> (${digestContent.docListCount})</h2>
                 <div style="background-color: #d4ece3;">
-                    <h3>Recent</h3>
+                    <h3><g:message code="msg.Recent" /></h3>
                     <table>
                         <tr align="left">
                             <g:each in="${docIns.size() < 5 ? docIns : docIns.subList(0, 5)}" var="documentInstance">
@@ -187,10 +187,10 @@
                         </tr>
                     </table>
                 </div>
-                <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'document', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
+                <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'document', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;"><g:message code="msg.View.More" /></a></p>
             </div>
             </g:if>
-            <p>If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${uGroup.createLink(controller:'SUser', action:'show','id':userID,'userGroup':userGroup, absolute:true)}"> your profile</a></p>
+            <p><g:message code="msg.unsubscribe" /> <a href="${uGroup.createLink(controller:'SUser', action:'show','id':userID,'userGroup':userGroup, absolute:true)}"> <g:message code="msg.your.profile" /> </a></p>
         </table>
     </body>
 	</html>

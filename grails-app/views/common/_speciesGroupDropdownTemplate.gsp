@@ -30,7 +30,7 @@
                         class="group_icon species_groups_sprites active ${SpeciesGroup.findByName('All').iconClass()}"
                     title="${SpeciesGroup.findByName('All').name}"></span>
             <!--img src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/-->
-            <span class="display_value">Select group</span>
+            <span class="display_value"><g:message code="default.select.group.label" /> </span>
             <b class="caret"></b>
         </div>
             <ul class="group_options dropdown-menu">

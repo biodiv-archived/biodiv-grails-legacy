@@ -5,20 +5,20 @@
 	<form id="advSearchForm" method="get"  title="Advanced Search"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'observation', action:'search', userGroup:userGroupInstance) }"
 		class="searchbox">
-		<label class="control-label" for="name">Species</label> <input id="aq.name"
+		<label class="control-label" for="name"><g:message code="default.species.label" /></label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${queryParams['aq.name']?.encodeAsHTML() }"
-			placeholder="Search by species name" />
+			placeholder="<g:message code='placeholder.search.species.name' />" />
 			
-		<label class="control-label" for="title">Title</label> <input id="aq.title"
+		<label class="control-label" for="title"><g:message code="default.title.label" /></label> <input id="aq.title"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.title" value="${queryParams['aq.title']?.encodeAsHTML() }"
-			placeholder="Search by title" />
+			placeholder="<g:message code='placeholder.search.title' />" />
 			
-		<label class="control-label" for="contributor">Contributor</label> <input id="aq.contributor"
+		<label class="control-label" for="contributor"><g:message code="default.contributors.label" /></label> <input id="aq.contributor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.contributor" value="${queryParams['aq.contributor']?.encodeAsHTML() }"
-			placeholder="Field to search all contributors" />
+			placeholder="<g:message code='placeholder.search.all.contributors' />" />
 
 		<!-- label
 			class="control-label" for="maxvotedspeciesname">Species Name</label> <input data-provide="typeahead"
@@ -29,13 +29,13 @@
 			type="text" class="input-block-level" name="aq.common_name"
 			placeholder="Search using common name" /-->
 
-		<label class="control-label" for="location">Location</label> <input id="aq.location"
+		<label class="control-label" for="location"><g:message code="default.location.label" /></label> <input id="aq.location"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.location" value="${queryParams['aq.location']?.encodeAsHTML()}" placeholder="Search by location name" />
-		<label class="control-label" for="text">Content</label> <input id="aq.text"
+			name="aq.location" value="${queryParams['aq.location']?.encodeAsHTML()}" placeholder="<g:message code='placeholder.search.location.name' />" />
+		<label class="control-label" for="text"><g:message code="default.content.label" /></label> <input id="aq.text"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="Search all text content" /> <label
-			class="control-label" for="uploadedOn">Uploaded during</label>
+			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="<g:message code='placeholder.search.all.content' />" /> <label
+			class="control-label" for="uploadedOn"><g:message code="default.uploaded.during.label" /></label>
 			
 		<div id="uploadedOnDatePicker" style="position: relative;overflow:visible">
 			<div id="uploadedOn" class="btn pull-left" style="text-align:left;padding:5px;" >
@@ -45,9 +45,9 @@
 		
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
-			value="ALL"> Search in all groups </label> <label
+			value="ALL"> <g:message code="default.search.in.all.groups" /> </label> <label
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-			value="THIS_GROUP"> Search within this group </label>
+			value="THIS_GROUP"><g:message code="default.search.within.this.group" />  </label>
 		</div>
 
 		<g:hiddenField name="offset" value="0" />
@@ -57,7 +57,7 @@
 	</form>
 	<div class="form-action">
 		<button type="submit" id="advSearch"
-			class="btn btn-primary pull-right" style="margin-top:10px;">Search</button>
+			class="btn btn-primary pull-right" style="margin-top:10px;"><g:message code="default.search" /></button>
 	</div>
 
 	<div class="clearfix"></div>

@@ -45,7 +45,7 @@
 				<g:else>
 
 					<div class="control-group"
-						style="clear: both; float: left; line-height: 40px;">Using:</div>
+						style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
 					<div class="control_group">
 						<auth:externalAuthProviders
 							model='["openidIdentifier":openidIdentifier]' />
@@ -54,8 +54,8 @@
 						action="${uGroup.createLink(controller:'register', action:'register', userGroupWebaddress:params.webaddress)}"
 						name='registerForm' method="POST" class="form-horizontal">
 						<div class="control-group"
-							style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
-							register here:</div>
+							style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="loginformtemplate.or" />,
+							<g:message code="default.register.here.label" /> </div>
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'email', 'error')}">
 							<label class="control-label" for="email"><g:message
@@ -171,8 +171,8 @@
 						</div>
 
 						<div class="control-group">
-							<span class="policy-text"> By registering you agree to our
-								<a href="/terms">Terms and Conditions</a> on the use of our site
+							<span class="policy-text"> <g:message code="register.index.policy" />
+								<a href="/terms"><g:message code="link.terms.conditions" /></a><g:message code="register.index.use.of.site" /> 
 							</span>
 							<s2ui:submitButton elementId='createButton' form='registerForm'
 								messageCode='spring.security.ui.login.register'

@@ -1,14 +1,14 @@
 <%@ page contentType="text/html"%>
 
-Hi ${curator.name.capitalize()},
+<g:message code="msg.Hi" /> ${curator.name.capitalize()},
 <br/><br/> 
-You have been invited as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
+<g:message code="msg.invited.as" /> ${invitetype} for ${rankLevel} : ${taxon.name} <g:message code="msg.on.the" /> ${domain}.<br/>
 <g:if test="${message}">
 <br/>
-Message : ${message}
+<g:message code="msg.Message" /> : ${message}
 <br/>
 </g:if>
-Please <a href="${uri}" title="Confirmation code">click here</a> to accept being a ${invitetype}.<br/>
+<g:message code="msg.Please" /> <a href="${uri}" title="Confirmation code"><g:message code="msg.click.here" /></a><g:message code="msg.to.accept" />  ${invitetype}.<br/>
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+<g:message code="msg.msg.Thank.you" /><br/>
+<g:message code="msg.msg.-The.portal.team" />

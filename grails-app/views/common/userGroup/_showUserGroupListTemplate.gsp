@@ -15,12 +15,12 @@
 			<table class="table table-hover span8" style="margin-left: 0px;">
 				<thead>
 					<tr>
-						<th style="width:20%">Group</th>
-						<th style="width:20%">Name</th>
-						<th>Species Groups</th>
-						<th>Habitats</th>
-						<th>Members</th>
-						<th style="width:20%">Join</th>
+						<th style="width:20%"><g:message code="default.groups.label" /></th>
+						<th style="width:20%"><g:message code="default.name.label" /></th>
+						<th><g:message code="default.species.groups.label" /> </th>
+						<th><g:message code="default.habitats.label" /></th>
+						<th><g:message code="default.members.label" /></th>
+						<th style="width:20%"><g:message code="default.join.label" /></th>
 					</tr>
 				</thead>
 				<tbody class="mainContentList">
@@ -39,8 +39,8 @@
 	<g:if test="${instanceTotal > (queryParams?.max?:0)}">
 		<div class="centered" style="clear: both;">
 			<div class="btn loadMore">
-				<span class="progress" style="display: none;">Loading ... </span> <span
-					class="buttonTitle">Load more</span>
+				<span class="progress" style="display: none;"><g:message code="msg.loading" /> </span> <span
+					class="buttonTitle"><g:message code="msg.load.more" /></span>
 			</div>
 		</div>
 	</g:if>
@@ -55,17 +55,14 @@
 	<div class="modal hide" id="leaveUsModalDialog" tabindex='-1'>
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">×</button>
-					<h3>Do you want to leave this group???</h3>
+					<h3><g:message code="actionheadertemplate.want.to.leave" /> </h3>
 				</div>
 				<div class="modal-body">
-					<p>We would like to know your feedback and any ideas on making
-						this group a more interesting and a happening place. We are thankful
-						for your wonderful contribution to this group and would like to hear
-						from you soon.</p>
+					<p><g:message code="text.feedback" /></p>
 				</div>
 				<div class="modal-footer">
-					<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
-						id="leave" class="btn btn-primary" data-group-id="">Leave</a>
+					<a href="#" class="btn" data-dismiss="modal"><g:message code="button.close" /></a> <a href="#"
+						id="leave" class="btn btn-primary" data-group-id=""><g:message code="button.leave" /></a>
 				</div>
 			</div>
 </div>

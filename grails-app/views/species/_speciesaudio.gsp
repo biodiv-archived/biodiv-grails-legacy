@@ -60,7 +60,7 @@
             
                 <audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;">                                              
                   <source src="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" type="audio/mpeg">
-                    Your browser does not support the audio element.
+                   <g:message code="error.doesnot.support.audio" /> 
                 </audio>            	             
         </g:if>
     		<% audioResource += 1; %>

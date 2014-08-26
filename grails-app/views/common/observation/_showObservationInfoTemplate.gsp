@@ -58,21 +58,21 @@
                     </div>
             </div-->
 	<%--		<div class="prop tablet">--%>
-	<%--			<span class="name tablet"><g:message code="msg.Recommendations" /></span>--%>
+	<%--			<span class="name tablet"><g:message code="link.recommendations" /></span>--%>
 	<%--			<div class="value tablet">--%>
 	<%--				${observationInstance.getRecommendationCount()}--%>
 	<%--			</div>--%>
 	<%--		</div>--%>
 
 	<div class="prop tablet">
-		<span class="name tablet"><i class="icon-time"></i><g:message code="msg.Submitted" /></span>
+		<span class="name tablet"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
 		<obv:showDate
 			model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
 	</div>
 
 
 	<div class="prop tablet">
-		<span class="name tablet"><i class="icon-time"></i><g:message code="msg.Updated" /></span>
+		<span class="name tablet"><i class="icon-time"></i><g:message code="default.updated.label" /></span>
 		<obv:showDate
 			model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
 	</div>
@@ -91,7 +91,7 @@
 
 	<div class="btn btn-primary view-button">
 		<a href="${uGroup.createLink(action:"show", controller:"observation",
-			id:observationInstance.id)}"><g:message code="msg.View" /></a>
+			id:observationInstance.id)}"><g:message code="button.view" /></a>
 	</div>
 
 

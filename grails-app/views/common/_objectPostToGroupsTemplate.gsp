@@ -3,8 +3,8 @@
         <div>
             <g:if test="${isBulkPull}">
             <div>
-                <a class="select-all" href="#" title="Select all" onclick='updateListSelection($(this));return false;'>Select all</a> <b>|</b>
-                <a class="reset" href="#" title="Reset" onclick='updateListSelection($(this));return false;'>Reset</a>
+                <a class="select-all" href="#" title="Select all" onclick='updateListSelection($(this));return false;'><g:message code="button.select.all" /> </a> <b>|</b>
+                <a class="reset" href="#" title="Reset" onclick='updateListSelection($(this));return false;'><g:message code="button.reset" /></a>
             </div>
             </g:if>
             <div id="userGroups" class="userGroups">
@@ -12,8 +12,8 @@
             </div>
         </div>
         <a onclick="submitToGroups('post', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroupWebaddress:params.webaddress, userGroup:params.userGroup)}', ${isBulkPull} ,'${observationInstance?.id}');return false;" class="btn btn-primary"
-            style="float: right; margin-right: 5px;"> Post </a>
+            style="float: right; margin-right: 5px;"> <g:message code="button.post" /> </a>
         <a onclick="submitToGroups('unpost', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroupWebaddress:params.webaddress, userGroup:params.userGroup)}', ${isBulkPull}, '${observationInstance?.id}');return false;" class="btn btn-danger"
-            style="float: right; margin-right: 5px;"> Unpost </a>
+            style="float: right; margin-right: 5px;"> <g:message code="button.unpost" /> </a>
     </div>
 </div>
