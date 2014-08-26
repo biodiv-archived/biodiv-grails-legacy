@@ -18,7 +18,7 @@ class ObservationTagLib {
 	def grailsApplication
     def springSecurityService;
     def chartService;
-    def SUserService;
+    //def SUserService;
 
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
@@ -358,26 +358,33 @@ class ObservationTagLib {
                 resList = relObvMap.resList
                 resCount = relObvMap.count
                 obvLinkList = relObvMap.obvLinkList
+                offset = resCount
             break
 
             case "fromSpeciesField" :
-                def allSpField = resInstance?.fields
-                allSpField.each{
-                    def r = it.resources
-                    r.each{
-                        resList.add(it)
+                if(attrs.model.spFieldId == ""){
+                } else {
+                    def allSpField = resInstance?.fields
+                    allSpField.each{
+                        def r = it.resources
+                        r.each{
+                            resList.add(it)
+                        }
                     }
                 }
                 resCount = resList.size()
             break
+            case "fromSingleSpeciesField" :
+                
+            break
 
             case "usersResource" :
                 def usersResList
-                if(SUserService.isAdmin(userInstance?.id)){
+                /*if(SUserService.isAdmin(userInstance?.id)){
                     usersResList = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString())
-                } else {
-                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
-                }
+                } else {*/
+                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+                //}
                 usersResList.each{
                     resList.add(it.res)
                 }

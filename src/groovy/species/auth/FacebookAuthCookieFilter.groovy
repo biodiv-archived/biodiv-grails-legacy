@@ -28,7 +28,6 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean
-
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
 
 import species.auth.Role
@@ -37,7 +36,6 @@ import species.auth.SUserRole
 import species.utils.Utils;
 
 
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 import org.springframework.social.facebook.api.FacebookProfile;
 
 
@@ -68,6 +66,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 		HttpServletResponse response = servletResponse
 		String url = request.requestURI.substring(request.contextPath.length())
 		logger.debug("Processing url: $url with params : ${request.getParameterMap()}")
+        logger.debug("SecurityContext authentication : ${SecurityContextHolder.context.authentication }");
 		if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
 			logger.debug("Applying facebook auth filter")
 			assert facebookAuthUtils != null
@@ -77,10 +76,10 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 				logger.debug("Found fb cookie");
 
 				try {
-					FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
+					FacebookAuthToken token = facebookAuthUtils.build(cookie.value)
 					if (token != null) {
 						logger.debug("Got fbAuthToken $token");
-                        token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
+                        //def user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
 						Authentication authentication = authenticationManager.authenticate(token);
 						// Store to SecurityContextHolder
 						SecurityContextHolder.context.authentication = authentication;
@@ -111,7 +110,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 							return;
 						} else {
 							logger.error "Unsuccessful authentication:  $e.message";
-							request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
+							//request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
 							logger.debug "Redirecting to $createAccountUrl"
 							(new DefaultRedirectStrategy()).sendRedirect(request, response, createAccountUrl);
 							return;

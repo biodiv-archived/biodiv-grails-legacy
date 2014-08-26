@@ -7,6 +7,8 @@ import java.lang.*;
 import java.text.SimpleDateFormat;
 import org.codehaus.groovy.runtime.DateGroovyMethods;
 import groovy.sql.Sql;
+import grails.util.Environment;
+import species.groups.UserGroupMemberRole;
 
 class DigestService {
 
@@ -36,7 +38,7 @@ class DigestService {
         }
         def emailFlag = true
         while(emailFlag){
-            def usersEmailList = utilsService.getParticipantsForDigest(digest.userGroup, max, offset)
+            def usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
             if(usersEmailList.size() != 0){
                 sendDigest(digest, usersEmailList, false)
                 offset = offset + max
@@ -268,7 +270,7 @@ class DigestService {
         def emailFlag = true
         def userGroup = UserGroup.read(18L)
         while(emailFlag){
-            def usersEmailList = utilsService.getParticipantsForDigest(userGroup, max, offset)
+            def usersEmailList = getParticipantsForDigest(userGroup, max, offset)
             if(usersEmailList.size() != 0){
                 def otherParams = [:]
                 otherParams['userGroup'] = userGroup
@@ -293,7 +295,7 @@ class DigestService {
         def emailFlag = true
         def userGroup = UserGroup.read(18L)
         //while(emailFlag){
-        //def usersEmailList = utilsService.getParticipantsForDigest(userGroup, max, offset)
+        //def usersEmailList = getParticipantsForDigest(userGroup, max, offset)
         //if(usersEmailList.size() != 0){
         def otherParams = [:]
         otherParams['userGroup'] = userGroup
@@ -310,6 +312,21 @@ class DigestService {
         //}
         //}
         log.debug " DIGEST PRIZE EMAIL SENT "
+    }
+
+    def List getParticipantsForDigest(userGroup, max, offset) {
+        List participants = [];
+        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
+            result.each { user ->
+                if(user.sendDigest && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
+            participants << springSecurityService.currentUser;
+        }
+        return participants;
     }
 
 }

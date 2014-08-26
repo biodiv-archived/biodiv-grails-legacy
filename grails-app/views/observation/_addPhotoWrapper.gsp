@@ -10,7 +10,7 @@
 
     </g:if>
     <g:if test="${resourceListType == 'usersResource'}"
-    <i class="icon-picture"></i><span style="font-weight:bold">My Uploads</span> <span> (Uploaded media will be stored for a period of 20 days.)</span>
+    <i class="icon-picture"></i><span style="font-weight:bold">My Uploads</span> <span> (Uploaded media will be stored for a period of 20 days. Media with red border will be deleted in 1 day.)</span>
     </g:if>
 
     <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
@@ -28,11 +28,11 @@
             style='list-style: none; margin-left: 0px;'>
             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
-                <input type="hidden" id='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
+                <input type="hidden" class='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
             </g:if>
             <input class="resourceListTypeFilled" type="hidden" name='resourceListType' value="${resourceListType}" /> 
             <g:if test="${resourceListType == 'fromRelatedObv'}" >
-            <a class="btn" style="margin-right: 5px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" )'>Load More</a>
+            <a style="margin-right: 5px;" class="relatedObvLoadMore btn" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" , this )'>Load More</a>
             </g:if>
         </ul>
         <div class="image-resources-msg help-inline">
@@ -51,8 +51,13 @@
                 $('#speciesImage-li0').hide();
                 $('#speciesImage-tab0').hide();
                 $('#speciesImage-li1 a').tab('show');
+                $('#speciesFieldImage-li0').removeClass('active');
+                $('#speciesFieldImage-li0').hide();
+                $('#speciesFieldImage-tab0').hide();
+                $('#speciesFieldImage-li1 a').tab('show');
+
             }
-            $("#relatedImagesOffset").val(${resCount});
+            $(".relatedImagesOffset").val(${resCount});
         }
         if("${resourceListType}" == "fromSpeciesField"){
             if(${resCount} == 0){

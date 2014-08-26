@@ -16,7 +16,7 @@
 				commentPlaceHolder = "Message"
 		%>
 		<g:if test="${isGroupDisccusionThread}">
-			<textarea name="commentSubject" class="comment-subjectbox comment-textbox" placeholder="Subject"></textarea>
+			<textarea name="commentSubject" class="comment-subjectbox" placeholder="Subject"></textarea>
 		</g:if>
 		<textarea name="commentBody" class="comment-textbox" placeholder="${commentPlaceHolder}" ></textarea>
 		<span  style="color:#B84A48; display:none;"><g:message code="msg.write.comment" /></span>

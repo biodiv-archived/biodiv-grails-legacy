@@ -22,6 +22,11 @@
 	</div>
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">
+			<div class="reco-comment-edit" value="edit" title="edit comment"
+				onclick="editCommentActivity(this, ${commentInstance.id}); return false;">
+				<i class="icon-edit"></i>
+			</div>
+		
 			<div class="reco-comment-close" value="close" title="delete comment"
 				onclick="deleteCommentActivity(this, ${commentInstance.id}, '${uGroup.createLink(controller:'comment', action:'removeComment',  userGroup:feedInstance.fetchUserGroup(), 'userGroupWebaddress':feedInstance.fetchUserGroup()?.webaddress)}'); return false;">
 				<i class="icon-remove"></i>
