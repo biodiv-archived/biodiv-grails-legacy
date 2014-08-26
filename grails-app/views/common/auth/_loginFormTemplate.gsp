@@ -1,12 +1,12 @@
 <div>
 	<fieldset>
 		<legend>
-			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a> | 
-			<g:link controller='register'>Register</g:link>
+			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><g:message code="msg.Login" /></a> | 
+			<g:link controller='register'><g:message code="msg.Register" /></g:link>
 			 
 		</legend>
 		<div class="control-group"
-			style="clear: both; float: left; line-height: 40px;">Using:</div>
+			style="clear: both; float: left; line-height: 40px;"><g:message code="msg.Using" />:</div>
 		<div class="control_group">
 			<auth:externalAuthProviders
 				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax]' />
@@ -14,8 +14,8 @@
 		<form action='${daoPostUrl}' method='POST' class="form-horizontal"
 			name='loginForm'>
 			<div class="control-group"
-				style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
-				log in with your user account:</div>
+				style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="msg.Or" />,
+				<g:message code="msg.Login.user account" />:</div>
 			<div class="control-group">
 				<label class="control-label" for="username"><g:message
 						code='spring.security.ui.login.username' /> </label>

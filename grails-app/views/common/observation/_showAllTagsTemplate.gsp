@@ -39,8 +39,8 @@
 	</h5></a>
 	<div id="tags">
 		<div class="tag-tools">
-			View as <span id="as_list" class="btn">List</span> <span id="as_cloud"
-				class="btn active">Cloud</span>
+			<g:message code="msg.View as" /> <span id="as_list" class="btn"><g:message code="msg.List" /></span> <span id="as_cloud"
+				class="btn active"><g:message code="msg.Cloud" /></span>
 		</div>
 		<div id="tagCloud" class="tagsView">
 			<obv:showTagsCloud model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />

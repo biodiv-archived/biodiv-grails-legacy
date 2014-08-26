@@ -1,14 +1,14 @@
 <%@ page import="species.utils.Utils"%>
 
 <div class="sidebar_section">
-    <h5>Species Distribution</h5>
+    <h5><g:message code="msg.Species.Distribution" />Species Distribution</h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
-    <h5>Location Information</h5>
+    <h5><g:message code="msg.Location.Info" /></h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
             <g:if test="${observationInstance.geoPrivacy}">
-            	Geoprivacy enabled
+            	<g:message code="msg.Geoprivacy.enabled" />
             </g:if>
             <g:else>
                 <g:if test="${observationInstance.placeName != ''}">
@@ -61,22 +61,22 @@
 
 <g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
     <div class="sidebar_section tile temporalDist">
-        <h5>Temporal Distribution</h5>
+        <h5><g:message code="msg.Temporal.Distribution" /></h5>
         <div id="temporalDist" style="height:108px;">
         </div>
         <ul>
-            <li>Jan</li>
-            <li>Feb</li>
-            <li>Mar</li>
-            <li>Apr</li>
-            <li>May</li>
-            <li>Jun</li>
-            <li>Jul</li>
-            <li>Aug</li>
-            <li>Sep</li>
-            <li>Oct</li>
-            <li>Nov</li>
-            <li>Dec</li>
+            <li><g:message code="msg.Jan" />Jan</li>
+            <li><g:message code="msg.Feb" />Feb</li>
+            <li><g:message code="msg.Mar" />Mar</li>
+            <li><g:message code="msg.Apr" />Apr</li>
+            <li><g:message code="msg.May" />May</li>
+            <li><g:message code="msg.Jun" />Jun</li>
+            <li><g:message code="msg.Jul" />Jul</li>
+            <li><g:message code="msg.Aug" />Aug</li>
+            <li><g:message code="msg.Sep" />Sep</li>
+            <li><g:message code="msg.Oct" />Oct</li>
+            <li><g:message code="msg.Nov" />Nov</li>
+            <li><g:message code="msg.Dec" />Dec</li>
         </ul>
     </div>
 </g:if>

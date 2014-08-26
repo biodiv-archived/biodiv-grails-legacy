@@ -20,7 +20,7 @@
 					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 						href="#"
 						onclick="$(this).parent().css('background-color', '#9acc57'); showChecklistMapView(); return false;">
-						Map view <span class="caret"></span> </a>
+						<g:message code="msg.Map.view" /> <span class="caret"></span> </a>
 				</div>
 			</g:if>
 			
