@@ -693,6 +693,7 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
+        println "=========REL RES FOLER CM========= " + relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -725,8 +726,11 @@ class XMLConverter extends SourceConverter {
                 case ResourceType.IMAGE:
                 resourceNode?.image.each {
                     if(!it?.id) {
-                        def relFolder = it.fileName?.getAt(0)?.text()?.replace(resourcesRootDir.toString(), "")?:""
-                        relResFolder = new File(relFolder).getParent(); 
+                        //TODO done because each image in bulk upload goes to separate folder.
+                        if(resourcesRootDir == config.speciesPortal.usersResource.rootDir){
+                            def relFolder = it.fileName?.getAt(0)?.text()?.replace(resourcesRootDir.toString(), "")?:""
+                            relResFolder = new File(relFolder).getParent();
+                        }
                         def resource = createImage(it, relResFolder, ResourceType.IMAGE);
                         if(resource) {
                             resources.add(resource);
@@ -783,12 +787,13 @@ class XMLConverter extends SourceConverter {
                 addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
             }
             log.debug "in dir : "+root.absolutePath;
-            
             File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
 			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-                    if( resourceType == "IMAGE"){
+                    println "==========RESOURCE TYPE======== " + resourceType
+                    if( resourceType.toString() == "IMAGE"){
+                        println "=========CALLOING CREATE SCALED IMAGE=============="
                         ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                       }  
                 } catch(FileNotFoundException e) {
@@ -811,8 +816,13 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
+                    println "=====LICENSE ON NEW RES======== " + l
                     res.addToLicenses(l);
                 }
+                if(!res.save(flush:true)){
+                    res.errors.allErrors.each { log.error it }
+                }
+                
             } else {
                 log.debug "Updating resource metadata"
                 res.url = sourceUrl
@@ -828,10 +838,16 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
+                    println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
                     res.addToLicenses(l);
                 }
+                res.merge();
+                res.refresh();
+                if(!res.save(flush:true)){
+                    res.errors.allErrors.each { log.error it }
+                }
+                res.refresh();
             }
-
             //s.addToResources(res);
             imageNode.appendNode("resource", res);
             log.debug "Successfully created resource " + res;

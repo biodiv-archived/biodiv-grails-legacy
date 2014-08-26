@@ -56,6 +56,7 @@ import content.eml.Document
 import content.Project
 import species.participation.Checklists
 import species.participation.Featured
+import species.formatReader.SpreadsheetReader
 
 class UserGroupService {
 
@@ -1415,5 +1416,36 @@ class UserGroupService {
 			return newObvs
 		}
 	}
+
+       ///////////////////////////////// Remove user in bulk ////////////////////////////////
+       def removeMemberInBulk(params){
+               try{
+                       List userIds = []
+                       List<Map> content = SpreadsheetReader.readSpreadSheet(params.file, 0, 0);
+                       for (Map row : content) {
+                               userIds << row.get("userid").toLong();
+                       }
+                       
+                       UserGroup ug = UserGroup.get(params.groupId.toLong())
+                       println "user group name " + ug.name + " and userIds " + userIds 
+
+                       
+                       UserGroup.withTransaction { 
+                               userIds.each { uid ->
+                               		SUser u = SUser.get(uid)
+                               		if(ug.isMember(u)){
+										println  "Deleting user " + uid + " from group " + ug
+                                       ug.deleteMember(u)
+                               		}else{
+                               			println " >>>>>>>>>>>>> Not a member ==== " + uid
+                               		}
+                                       
+                                       
+                               }
+                       }
+               }catch(Exception e){
+                       log.error e.printStackTrace()
+               }
+       }
 
 }

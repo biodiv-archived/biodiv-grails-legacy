@@ -67,6 +67,15 @@
 
 
         initEditableForm : function($container, $conEntry, options) {
+            var addMediaHtml = '<a title="Add Media" style="position: relative;top: 54px;margin-right: 5px;right: 233px;" class="pull-right speciesFieldMedia"><i class="icon-picture"></i></a>';
+
+            $container.prepend(addMediaHtml);
+            $(".speciesFieldMedia").unbind("click").click(function(){
+                var me = this;
+                var $container = $(me).closest(".speciesField");
+                getSpeciesFieldMedia($container.data("speciesid"), $container.data("pk"), "fromSingleSpeciesField", window.params.getSpeciesFieldMedia)
+            });
+
             var $sf = this;
             if(!options) options = {};
 
@@ -189,8 +198,7 @@
             //changing id while adding it to the form
             var id = $textarea.attr('id');
             id = id+"_e"
-                $textarea.attr('id', id);
-
+            $textarea.attr('id', id);
             $textarea = $textarea.prependTo($editableInput);
             var editor = CKEDITOR.instances[id];
             if(editor) {
@@ -208,6 +216,7 @@
         },
 
         onFormSubmit :  function(e) {
+            $("body").css("cursor", "progress");
             e.stopPropagation();
             e.preventDefault();
             var $sf = this;
@@ -227,7 +236,29 @@
             delete params['editor'];
             delete params['contriEditor'];
             delete params['$form'];
+            if($("#addSpFieldResourcesModal").data("spfieldid") == $(e.target).closest(".speciesField").data("pk")){
+                params['runForImages'] = true;
+                var paramsForObvSpField = {} //new Object();
+                var paramsForUploadSpField = {} //new Object();
 
+                var allInputs = $("#pullObvImagesSpFieldForm :input");
+                allInputs.each(function() {
+                    if($(this).hasClass("pullImage") && $(this).is(':checked')){
+                        paramsForObvSpField[this.name] = $(this).val();
+                    } else if(!$(this).hasClass("pullImage")){
+                        paramsForObvSpField[this.name] = $(this).val();
+                    }
+
+                });
+                var allInputs1 = $("#uploadSpeciesFieldImagesForm :input");
+                allInputs1.each(function() {
+                    paramsForUploadSpField[this.name] = $(this).val();
+                });
+                params['paramsForObvSpField'] = JSON.stringify(paramsForObvSpField);
+                params['paramsForUploadSpField'] = JSON.stringify(paramsForUploadSpField);
+            } else {
+                params['runForImages'] = false;
+            }
             $form.ajaxSubmit({
                 url : window.params.species.updateUrl,
                 type : 'POST',
@@ -295,6 +326,7 @@
                 $errorBlock.removeClass('alert-info').addClass('alert-error').html(data.msg);
                 $container.addClass('errors');
             }
+            $("body").css("cursor", "default");
         },
 
         onUpdateError : function(response, status, error) {
@@ -310,6 +342,7 @@
                     return response.responseText;
                 }
             });
+            $("body").css("cursor", "default");
         }
     });
 

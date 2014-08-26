@@ -27,7 +27,7 @@
             style='list-style: none; margin-left: 0px;'>
             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
-                <input type="hidden" id='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
+                <input type="hidden" class='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
             </g:if>
             <input class="resourceListTypeFilled" type="hidden" name='resourceListType' value="${resourceListType}" /> 
             <g:if test="${resourceListType == 'fromRelatedObv'}" >
@@ -50,8 +50,13 @@
                 $('#speciesImage-li0').hide();
                 $('#speciesImage-tab0').hide();
                 $('#speciesImage-li1 a').tab('show');
+                $('#speciesFieldImage-li0').removeClass('active');
+                $('#speciesFieldImage-li0').hide();
+                $('#speciesFieldImage-tab0').hide();
+                $('#speciesFieldImage-li1 a').tab('show');
+
             }
-            $("#relatedImagesOffset").val(${resCount});
+            $(".relatedImagesOffset").val(${resCount});
         }
         if("${resourceListType}" == "fromSpeciesField"){
             if(${resCount} == 0){

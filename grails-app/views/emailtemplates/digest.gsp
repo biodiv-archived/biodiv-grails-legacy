@@ -36,7 +36,7 @@
                             def controller = observationInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = observationInstance.id
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 120px;"><p>${observationInstance.title()}</p></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><div style="height:165px;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="${observationInstance.isChecklist? 'opacity:0.7;' :''} border: 0px solid ; width: 120px; height: 120px;"><p>${observationInstance.title()}</p></a></div></td>
                             </g:each>
                         </tr>
                     </table>
@@ -54,7 +54,7 @@
                             def controller = uniObvInstance.isChecklist ? 'checklist' :'observation'
                             def obvId = uniObvInstance.id
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${uniObvInstance.title()}</p></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><div style="height:165px;"><a href="${uGroup.createLink(controller:controller, action:'show','id': obvId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${uniObvInstance.title()}</p></a></div></td>
                             </g:each>
                         </tr>
                     </table>
@@ -68,9 +68,9 @@
                     <table>
                         <tr align="left">
                             <g:each in="${recentTopContributors.size() < 5 ? recentTopContributors : recentTopContributors.subList(0, 5)}" var="rtc">
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:rtc[0].id, 'userGroup':userGroup)}">
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><div style="height:165px;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:rtc[0].id, 'userGroup':userGroup)}">
                                     <img src="${rtc[0].profilePicture()}" title="${rtc[0].name}" style="border: 0px solid ; max-height: 120px; width:120px;" />
-                                    <span>${rtc[0].name} </span></a><span> (${rtc[1]})</span>
+                                    <span>${rtc[0].name} </span></div></a><span> (${rtc[1]})</span>
                             </td>
                             </g:each>
                         </tr>
@@ -85,9 +85,9 @@
                     <table>
                         <tr align="left">
                             <g:each in="${topIDProviders.size() < 5 ? topIDProviders : topIDProviders.subList(0, 5)}" var="tip">
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:tip.user.id, 'userGroup':userGroup)}">
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><div style="height:165px;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:tip.user.id, 'userGroup':userGroup)}">
                                     <img src="${tip.user.profilePicture()}" title="${tip.user.name}" style="border: 0px solid ; max-height: 120px; width:120px;" />
-                                    <span>${tip.user.name} </span></a><span>(${tip.recoCount})</span>
+                                    <span>${tip.user.name} </span></a></div><span>(${tip.recoCount})</span>
                             </td>
                             </g:each>
                         </tr>
@@ -121,7 +121,7 @@
                             def spId = speciesInstance.id
                             imagePath = imagePath.replaceAll(' ','%20');
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${speciesInstance.title}</p></a></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><div style="height:165px;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${speciesInstance.title}</p></a></div></td>
                             </g:each>
                         </tr>
                     </table>
@@ -139,9 +139,9 @@
                     <table>
                         <tr align="left">
                             <g:each in="${userIns.size() < 5 ? userIns : userIns.subList(0, 5)}" var="userInstance">
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue; text-align: left;"><div style="height:165px;"><a href="${uGroup.createLink(action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroup)}">
                                     <img src="${userInstance.profilePicture()}" title="${userInstance.name}" style="border: 0px solid ; max-height: 120px; width:120px;" />
-                                    <p>${userInstance.name}</p> </a></td>
+                                    <p>${userInstance.name}</p> </a></div></td>
                             </g:each>
                         </tr>
                     </table>

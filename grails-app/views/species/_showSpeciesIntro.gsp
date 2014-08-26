@@ -14,7 +14,7 @@ ${resourceInstanceList}
 <!-- media gallery -->
 <div class="span8 right-shadow-box" style="margin:0px;">
 
-    <div style="padding-bottom:10px;height: 520px">
+    <div style="padding-bottom:10px">
                 <center>
             <div id="gallerySpinner" class="spinner">
                 <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"

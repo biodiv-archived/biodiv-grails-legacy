@@ -37,7 +37,7 @@ function removeResource(event, imageId) {
 
     var UploadResource = function (ele, options) {
         this.$ele = $(ele);
-        this.$form = $(ele).find('form#upload_resource');
+        this.$form = $(ele).find('form.upload_resource');
         this.initForm(options);
     }
 

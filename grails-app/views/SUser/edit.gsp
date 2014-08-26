@@ -412,9 +412,8 @@
 				</g:if>
 				
 				
-				<form id="upload_resource" enctype="multipart/form-data"
-					title="Upload profile picture" method="post"
-					class="${hasErrors(bean: user, field: 'profilePic', 'errors')}">
+				<form class="upload_resource ${hasErrors(bean: user, field: 'profilePic', 'errors')}" enctype="multipart/form-data"
+					title="Upload profile picture" method="post">
 					<input type="file" id="attachFile" name="resources" accept="image/*"/> 
 					<span class="msg" style="float: right"></span> 
 					<input type="hidden" name='dir' value="${userGroupDir}" />
@@ -486,16 +485,16 @@
 			
 		//hack: for fixing ie image upload
         if (navigator.appName.indexOf('Microsoft') != -1) {
-            $('#upload_resource').css({'visibility':'visible'});
+            $('.upload_resource').css({'visibility':'visible'});
         } else {
-            $('#upload_resource').css({'visibility':'hidden'});
+            $('.upload_resource').css({'visibility':'hidden'});
         }
 		
 		$('#attachFile').change(function(e){
-  			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+  			$('.upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		});
 
-     	$('#upload_resource').ajaxForm({ 
+     	$('.upload_resource').ajaxForm({ 
 			url:'${g.createLink(controller:'SUser', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
@@ -513,7 +512,7 @@
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
 				var dir = $(responseXML).find('dir').text();
-				var dirInput = $('#upload_resource input[name="dir"]');
+				var dirInput = $('.upload_resource input[name="dir"]');
 				if(!dirInput.val()){
 					$(dirInput).val(dir);
 				}
@@ -538,7 +537,7 @@
 						
 						var messageNode = $(".message .resources");
 						if(messageNode.length == 0 ) {
-							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+							$(".upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
 						} else {
 							messageNode.append(response?response.error:"Error");
 						}

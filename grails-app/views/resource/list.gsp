@@ -25,7 +25,8 @@
 	<div class="list" style="margin-left:0px;clear:both">
 		<div class="observations thumbwrap">
 			<div class="observation">
-				<div class="btn-group pull-left" style="z-index: 10">
+                <div class="btn-group pull-left" style="z-index: 10">
+                    <g:if test="${params.action != 'bulkUploadResources'}">
 					<button id="selected_sort" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="Sort by">
@@ -43,7 +44,8 @@
                                                 <g:message code="msg.Last.Updated" />
                                             </g:else>
 						<span class="caret"></span>
-					</button>
+                    </button>
+                    </g:if>
 					<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" sort_filter_label"
 							value="createdOn"> <g:message code="msg.Latest" /> </a></li>

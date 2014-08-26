@@ -24,6 +24,7 @@ class AbstractObjectService {
 	def dataSource;
 	def springSecurityService;
 	def sessionFactory;
+    def utilsService;
 
 	protected static final log = LogFactory.getLog(this);
 
@@ -46,7 +47,7 @@ class AbstractObjectService {
 
 			def item = asJSON(obv, iconBasePath) 
             
-            def controller = getTargetController(obv);
+            def controller = UtilsService.getTargetController(obv);
 			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
             item.type = controller
@@ -106,18 +107,6 @@ class AbstractObjectService {
 			}
             return item;
     }
-
-    //XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
-	// to resolve controller name
-	protected static getTargetController(domainObj){
-		if(domainObj.instanceOf(Checklists)){
-			return "checklist"
-		}else if(domainObj.instanceOf(SUser)){
-			return "user"
-		}else{
-			return domainObj.class.getSimpleName().toLowerCase()
-		}
-	}
 	
     /**
     */
@@ -210,7 +199,7 @@ class AbstractObjectService {
         def result = []
         def i = 0;
         observations.each {key,value ->
-            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':getTargetController(key)]);
+            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':utilsService.getTargetController(key)]);
         }
 		
         return['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
@@ -221,7 +210,7 @@ class AbstractObjectService {
      /**
      * 
      */
-    private def createResourcesXML(params) {
+    protected def createResourcesXML(params) {
         NodeBuilder builder = NodeBuilder.newInstance();
         XMLConverter converter = new XMLConverter();
         def resources = builder.createNode("resources");
@@ -231,7 +220,7 @@ class AbstractObjectService {
         
 
         String uploadDir = ""
-        if( params.resourceListType == "ofSpecies" ){
+        if( params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField" ){
             uploadDir = grailsApplication.config.speciesPortal.resources.rootDir
         }
         else if(params.resourceListType == "ofObv" || params.resourceListType == null){
@@ -328,7 +317,7 @@ class AbstractObjectService {
         return resources;
     }
 
-    private List<Resource> saveResources(instance, resourcesXML) {
+    protected List<Resource> saveResources(instance, resourcesXML) {
         XMLConverter converter = new XMLConverter();
         def rootDir
         switch(instance.class.name) {
@@ -336,7 +325,7 @@ class AbstractObjectService {
             rootDir = grailsApplication.config.speciesPortal.observations.rootDir
             break;
             
-            case Species.class.name:
+            case [Species.class.name, SpeciesField.class.name]:
             rootDir = grailsApplication.config.speciesPortal.resources.rootDir
             break;
 

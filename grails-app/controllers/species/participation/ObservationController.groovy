@@ -42,7 +42,6 @@ class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
-    def utilsService;
 	def observationService;
 	def springSecurityService;
 	def mailService;
@@ -332,7 +331,7 @@ class ObservationController extends AbstractObjectController {
 			}
 			else {
 				if(observationInstance.instanceOf(Checklists)){
-					redirect(controller:'checklist', action:show, params: params)
+					redirect(controller:'checklist', action:'show', params: params)
 					return
 				}
 				observationInstance.incrementPageVisit()
@@ -699,7 +698,7 @@ class ObservationController extends AbstractObjectController {
         }
 
 		if(params.obvId) {
-			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
+			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
@@ -717,7 +716,7 @@ class ObservationController extends AbstractObjectController {
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
-						mailType = observationService.OBSERVATION_ADDED;
+						mailType = utilsService.OBSERVATION_ADDED;
 						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
@@ -749,15 +748,15 @@ class ObservationController extends AbstractObjectController {
 					
 					//sending email
 					if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
-						mailType = observationService.OBSERVATION_ADDED;
+						mailType = utilsService.OBSERVATION_ADDED;
 					} else {
-						mailType = observationService.SPECIES_RECOMMENDED;
+						mailType = utilsService.SPECIES_RECOMMENDED;
 					}
 					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
                     if(!params["createNew"] && !isMobileApp){
-						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
+						//observationService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
@@ -856,7 +855,7 @@ class ObservationController extends AbstractObjectController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
+			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
 				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
@@ -879,11 +878,11 @@ class ObservationController extends AbstractObjectController {
 				} else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, utilsService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+					observationService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
