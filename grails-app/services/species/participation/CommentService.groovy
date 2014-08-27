@@ -179,7 +179,7 @@ class CommentService {
 			Follow.addFollower(domainObject, tagUser);
 		}			
 		def otherParams = ['taggedUsers' : tu];
-		observationService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
+		utilsService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
 
 	}
 

@@ -16,7 +16,7 @@ import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
 class FacebookAuthService {
 
 	def grailsApplication;
-
+    def facebookAuthDao;
 	String userDomainClassName
 
 	def createAppUser(user, token) {
