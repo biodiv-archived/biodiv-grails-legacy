@@ -8,11 +8,11 @@ $(document).ready(function() {
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
     <g:if test="${controller.toLowerCase().equals('featured')}">
-        <h4>Featured Content</h4>
+        <h4><g.message code="heading.feature.content" /></h4>
     </g:if>
     <g:else>
         <h4>Featured ${controller.toLowerCase().capitalize()}</h4>
-    </g:else>
+            </g:else>
     </g:if>
 	<ul style="list-style:none; width:100%; margin-left:0px;">
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->

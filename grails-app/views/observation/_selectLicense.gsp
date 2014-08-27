@@ -9,7 +9,7 @@
 
         <img
         src="${resource(dir:'images/license',file:selectedLicense?.name?.getIconFilename()+'.png', absolute:true)}"
-        title="Set a license for this image" />
+        title="${g.message(code:'title.set.license')}" />
 
         <b class="caret"></b>
     </a>

@@ -175,7 +175,7 @@ speciesPortal {
     app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
 	app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
 
-	app.rootDir = "${userHome}/github/biodiv/app-conf"
+	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  
@@ -445,7 +445,7 @@ environments {
     development {
         grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
         speciesPortal {
-	        app.rootDir = "${userHome}/github/biodiv/app-conf"
+	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "127.0.0.1"
         }
@@ -511,18 +511,18 @@ environments {
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
 
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+            //debug   'speciespage',
+                 //   'species'
+           // debug   'com.the6hours', 
+                  //  'grails.app.taglib.com.the6hours'
+           // debug   'species.auth'
+           // debug   'com.odobo',
+                   // 'grails.app.controllers.com.odobo',
+                   // 'grails.app.services.com.odobo',
+                  //  'org.pac4j'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-		debug  'org.springframework.beans'
+		//debug  'org.springframework.beans'
        }
     }
 	test {
@@ -546,10 +546,10 @@ environments {
             'grails.plugin',
             'org.springframework.security.web',
             'grails.app.tagLib.org.grails.plugin.resource'
-            debug   'speciespage',
-            'grails.app',
-            'species'
-            debug   'grails.app.filters.species.SecurityFilters'
+            //debug   'speciespage',
+           // 'grails.app',
+           // 'species'
+           // debug   'grails.app.filters.species.SecurityFilters'
             info    'species.auth',
             'com.mchange.v2.resourcepool.BasicResourcePool'
         }
@@ -651,7 +651,7 @@ environments {
 			debug	'species',
 					'speciespage'
 			info 'com.mchange.v2.resourcepool.BasicResourcePool' 
-            debug   'grails.app.filters.species.SecurityFilters'
+           // debug   'grails.app.filters.species.SecurityFilters'
 		}
 	}
 	pambaTest {
@@ -752,18 +752,18 @@ environments {
                     'grails.plugin',
                     'grails.app'
             info   'org.springframework.security'
-            debug   'org.springframework.security.web'
-            debug   'org.springframework.security.authentication'
+           // debug   'org.springframework.security.web'
+           // debug   'org.springframework.security.authentication'
 
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+           // debug   'speciespage',
+                   // 'species'
+          //  debug   'com.the6hours', 
+                  //  'grails.app.taglib.com.the6hours'
+           // debug   'species.auth'
+           // debug   'com.odobo',
+                 //   'grails.app.controllers.com.odobo',
+                   // 'grails.app.services.com.odobo',
+                  //  'org.pac4j'
  
         }
 
@@ -872,15 +872,15 @@ environments {
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
 
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+           // debug   'speciespage',
+                   // 'species'
+           // debug   'com.the6hours', 
+                  //  'grails.app.taglib.com.the6hours'
+           // debug   'species.auth'
+           // debug   'com.odobo',
+                  //  'grails.app.controllers.com.odobo',
+                  //  'grails.app.services.com.odobo',
+                  //  'org.pac4j'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
        }

@@ -2,15 +2,15 @@
 <div class="block-tagadelic">
 	<form id="advSearchForm" method="get"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'newsletter', action:'search', userGroup:userGroupInstance) }"
-		title="Advanced Search" class="searchbox">
+		title="${g.message(code:'title.advanced.search')}" class="searchbox">
 
 		<label class="control-label" for="aq.name"><g:message code="msg.Title" /> </label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${params['aq.name']?.encodeAsHTML() }"
-			placeholder="Search all titles" /> <label class="control-label"
+			placeholder="${g.message(code:'placeholder.search.titles')}" /> <label class="control-label"
 			for="aq.text"><g:message code="msg.Content" /> </label> <input data-provide="typeahead" id="aq.text"
 			type="text" class="input-block-level" name="aq.text"
-			value="${params['aq.text']?.encodeAsHTML() }" placeholder="Search all text content" />
+			value="${params['aq.text']?.encodeAsHTML() }" placeholder="${g.message(code:'placeholder.search.content')}" />
 	
 		<div id="uGroupFilter" style="${params.webaddress?:'display:none;'}">	
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 

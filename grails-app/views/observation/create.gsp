@@ -111,7 +111,7 @@
             def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, index>0?index:obvTmpFileName.length()) : ""
             %>
             <form class="upload_resource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" 
-                title="Add a photo for this observation"
+                title="${g.message(code:'title.checklist.create')}"
                 method="post">
 
                 <span class="msg" style="float: right"></span>

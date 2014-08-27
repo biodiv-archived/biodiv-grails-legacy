@@ -2,23 +2,23 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <div  class="block-tagadelic ">
 
-	<form id="advSearchForm" method="get"  title="Advanced Search"
+	<form id="advSearchForm" method="get"  title="${g.message(code:'title.advanced.search')}"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'observation', action:'search', userGroup:userGroupInstance) }"
 		class="searchbox">
 		<label class="control-label" for="name"><g:message code="default.species.label" /></label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${queryParams['aq.name']?.encodeAsHTML() }"
-			placeholder="<g:message code='placeholder.search.species.name' />" />
+			placeholder="${g.message(code:'placeholder.search.species.name')}" />
 			
 		<label class="control-label" for="title"><g:message code="default.title.label" /></label> <input id="aq.title"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.title" value="${queryParams['aq.title']?.encodeAsHTML() }"
-			placeholder="<g:message code='placeholder.search.title' />" />
+			placeholder="${g.message(code:'placeholder.search.title')}" />
 			
 		<label class="control-label" for="contributor"><g:message code="default.contributors.label" /></label> <input id="aq.contributor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.contributor" value="${queryParams['aq.contributor']?.encodeAsHTML() }"
-			placeholder="<g:message code='placeholder.search.all.contributors' />" />
+			placeholder="${g.message(code:'placeholder.search.all.contributors')}" />
 
 		<!-- label
 			class="control-label" for="maxvotedspeciesname">Species Name</label> <input data-provide="typeahead"
@@ -31,10 +31,10 @@
 
 		<label class="control-label" for="location"><g:message code="default.location.label" /></label> <input id="aq.location"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.location" value="${queryParams['aq.location']?.encodeAsHTML()}" placeholder="<g:message code='placeholder.search.location.name' />" />
+			name="aq.location" value="${queryParams['aq.location']?.encodeAsHTML()}" placeholder="${g.message(code:'placeholder.search.location.name')} " />
 		<label class="control-label" for="text"><g:message code="default.content.label" /></label> <input id="aq.text"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="<g:message code='placeholder.search.all.content' />" /> <label
+			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="${g.message(code:'placeholder.search.all.content')}" /> <label
 			class="control-label" for="uploadedOn"><g:message code="default.uploaded.during.label" /></label>
 			
 		<div id="uploadedOnDatePicker" style="position: relative;overflow:visible">

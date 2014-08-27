@@ -10,7 +10,7 @@
         </div>
         <form>
             <small id='remainingC'><g:message code="featureusergroup.remaining.characters" /></small>
-            <textarea style="height:100px;" placeholder="Why Featuring??" name="featureNotes" id="featureNotes" maxlength="400"></textarea>
+            <textarea style="height:100px;" placeholder="${g.message(code:'featureusergroup.placeholder.why')}" name="featureNotes" id="featureNotes" maxlength="400"></textarea>
         </form>  
 
         <div id="featureMsg" class="alert alert-success" style="display:none;"></div>

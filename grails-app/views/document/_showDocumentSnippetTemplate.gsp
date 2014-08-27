@@ -24,7 +24,7 @@ def obvId = documentInstance.id
             <g:else>
             <img class="galleryImage img-polaroid"
             src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-            title="You can contribute!!!" />
+            title="${g.message(code:'showobservationsnippet.title.contribute')}" />
             </g:else>
         </div>
 

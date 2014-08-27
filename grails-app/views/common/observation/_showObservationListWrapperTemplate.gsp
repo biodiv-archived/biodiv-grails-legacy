@@ -75,7 +75,7 @@
 
 			</div>
                         <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
-                            <obv:showObservationsList/>
+                            <obv:showObservationsList />
                         </div>
                         <div class="span4" style="position:relative;top:20px">
                  

@@ -7,7 +7,7 @@
 			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i><g:message code='button.see.species' />" + "</a>"
 		} 
 		if(observationInstance.id != observationInstance.sourceId && !isHeading){
-			speciesLink += '<a class="species-page-link" title="${g.message(code:'showspeciesnametemp.title.source')}" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i><g:message code='button.see.checklist' />" + "</a>"
+			speciesLink += '<a class="species-page-link" title="${g.message(code:"showspeciesnametemp.title.source")}" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i><g:message code='button.see.checklist' />" + "</a>"
 		}
 	%>
 	<g:set var="speciesLinkHtml" value="${speciesLink.replaceAll('"','\\\\"').encodeAsRaw()}" />

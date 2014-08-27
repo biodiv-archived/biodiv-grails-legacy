@@ -25,7 +25,7 @@ def obvId = observationInstance?.id
 			<g:else>
 				<img class="img-polaroid"
 					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-					title="${g.message(code:'shovobservationsnippet.title.contribute')}" />
+					title="${g.message(code:'showobservationsnippet.title.contribute')}" />
 			</g:else>
                         <g:if test="${observationInstance?.isChecklist}">
                         <div class="checklistCount">${observationInstance?.speciesCount}</div>

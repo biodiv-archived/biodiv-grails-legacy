@@ -335,7 +335,7 @@ $(document).ready(function(){
                             });
 
                             this.bind('lightbox_image', function(e){
-                                //$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
+                                //$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'"><g:message code="show.view.full.image" /> </a>');
                             })
 
                         }

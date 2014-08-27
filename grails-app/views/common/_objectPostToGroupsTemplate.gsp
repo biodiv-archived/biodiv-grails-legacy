@@ -3,8 +3,8 @@
         <div>
             <g:if test="${isBulkPull}">
             <div>
-                <a class="select-all" href="#" title="Select all" onclick='updateListSelection($(this));return false;'><g:message code="button.select.all" /> </a> <b>|</b>
-                <a class="reset" href="#" title="Reset" onclick='updateListSelection($(this));return false;'><g:message code="button.reset" /></a>
+                <a class="select-all" href="#" title="${g.message(code:'objectposttogroups.title.select')}" onclick='updateListSelection($(this));return false;'><g:message code="button.select.all" /> </a> <b>|</b>
+                <a class="reset" href="#" title="${g.message(code:'objectposttogroups.title.reset')}" onclick='updateListSelection($(this));return false;'><g:message code="button.reset" /></a>
             </div>
             </g:if>
             <div id="userGroups" class="userGroups">

@@ -18,7 +18,7 @@
     </g:if>
     <div class="footer-item">
         <g:if test="${!observationInstance.isChecklist}">
-        <i class="icon-check" title="${g.message(code.showobservationstoryfooter.title.species.calls)}"></i>
+        <i class="icon-check" title="${g.message(code:'showobservationstoryfooter.title.species.calls')}"></i>
         <span class="">${observationInstance.fetchRecoVoteOwnerCount()}</span>
         </g:if>
     </div>
@@ -30,7 +30,7 @@
         </div>
         <g:if test="${observationInstance.isChecklist}">
             <div class="footer-item"> 
-                <i class="icon-screenshot" title="${g.message(code:'showobservationstoryfooter.title.species)}"></i>
+                <i class="icon-screenshot" title="${g.message(code:'showobservationstoryfooter.title.species')}"></i>
                 <span class="">${observationInstance.speciesCount}</span>
             </div>
 

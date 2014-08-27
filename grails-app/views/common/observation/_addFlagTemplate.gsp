@@ -31,8 +31,8 @@
 				<br/>
 				<textarea id ="flagNotes" class="comment-textbox" placeholder="${g.message(code:'addflagtemp.tell.why')}" name="notes"></textarea>
 <%--				<input type="text" name="notes" placeholder="${g.message(code:'addflagtemp.any.reason')}"></input><br />--%>
-				<input class="btn btn-danger pull-right" type="submit" value="Flag"/>
-				<div id="flag-close" class="popup-form-close" value="close">
+				<input class="btn btn-danger pull-right" type="submit" value="${g.message(code:'button.flag')}"/>
+				<div id="flag-close" class="popup-form-close" value="${g.message(code:'button.close')}">
 					<i class="icon-remove"></i>
 				</div>
 			</form>

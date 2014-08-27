@@ -128,7 +128,7 @@
         if(pos)
                 lastListParams.put('fragment', pos);	 
         %>
-        <a class="btn btn-mini" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
+    <a class="btn btn-mini" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;"><g:message code="default.list.label" /></a>
     </div>
 
 
