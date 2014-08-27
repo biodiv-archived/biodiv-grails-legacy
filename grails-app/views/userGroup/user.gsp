@@ -33,19 +33,18 @@
 				<ul class="nav nav-tabs">
 					<li
 						class="${(!params.action || params.action == 'about')?'active':'' }"><a
-						href="${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance)}"> About Us</a></li>
+						href="${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance)}"> <g:message code="button.about.us" /></a></li>
 					<li
 						class="${(!params.action || params.action == 'user')?'active':'' }"><a
-						href="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}"> All
-							Members (${membersTotalCount})</a></li>
+						href="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}"><g:message code="button.all.members" /> (${membersTotalCount})</a></li>
 
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
-							Founders (${foundersTotalCount})</a></li>
+							<g:message code="tabs.founder" /> (${foundersTotalCount})</a></li>
 							
 					<li class="${(params.action == 'experts')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'moderators', 'userGroup':userGroupInstance)}">
-							Moderators (${expertsTotalCount})</a></li>
+							<g:message code="tabs.moderators" /> (${expertsTotalCount})</a></li>
 				</ul>
 
 

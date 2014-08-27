@@ -1,12 +1,12 @@
 <div>
 	<fieldset>
 		<legend>
-			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a> | 
-			<g:link controller='register'>Register</g:link>
+			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><g:message code="button.login" /></a> | 
+			<g:link controller='register'><g:message code="button.register" /></g:link>
 			 
 		</legend>
 		<div class="control-group"
-			style="clear: both; float: left; line-height: 40px;">Using:</div>
+			style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
 		<div class="control_group">
 			<auth:externalAuthProviders
 				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax]' />
@@ -14,14 +14,14 @@
 		<form action='${daoPostUrl}' method='POST' class="form-horizontal"
 			name='loginForm'>
 			<div class="control-group"
-				style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
-				log in with your user account:</div>
+				style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="loginformtemplate.or" />,
+				<g:message code="loginformtemplate.login.user.account" />:</div>
 			<div class="control-group">
 				<label class="control-label" for="username"><g:message
 						code='spring.security.ui.login.username' /> </label>
 				<div class="controls">
 					<input class="input-xlarge focused" type="text" name="j_username"
-						placeholder="Enter your email id...">
+						placeholder="${g.message(code:'placeholder.enter.emailid')}">
 				</div>
 			</div>
 			<div class="control-group" style="clear: both;">
@@ -29,7 +29,7 @@
 						code='spring.security.ui.login.password' /> </label>
 				<div class="controls">
 					<input class="input-xlarge" type="password" name="j_password"
-						placeholder="Enter your password...">
+						placeholder="${g.message(code:'placeholder.enter.password')}">
 				</div>
 			</div>
 			

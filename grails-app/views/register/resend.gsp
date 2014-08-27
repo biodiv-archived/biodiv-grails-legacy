@@ -11,7 +11,7 @@ form {
 </style>
 <body>
 <div class="alert alert-success">
-<i>The Email Verification email has been resent. Please check your mail. </i>
+<i><g:message code="register.resend.verifications.email" /> </i>
 </div>
 
 </body>

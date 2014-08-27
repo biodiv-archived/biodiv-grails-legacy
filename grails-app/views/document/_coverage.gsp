@@ -3,11 +3,11 @@
 	<div class="section"
 		style="position: relative; overflow: visible; clear: both;">
 
-		<h3>Taxonomic Coverage</h3>
+		<h3><g:message code="document.cov.taxonomic.coverage" /> </h3>
 
 
 
-		<label class="control-label">Species Groups & Habitats </label>
+		<label class="control-label"><g:message code="default.species.habitats.label" /> </label>
 
 		<div class="filters controls textbox" style="position: relative;">
 			<obv:showGroupFilter

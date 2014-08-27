@@ -8,10 +8,10 @@
         aria-hidden="true">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="requestPermissionModalLabel">Request Permission</h3>
+            <h3 id="requestPermissionModalLabel"><g:message code="link.request" /></h3>
         </div>
         <div class="modal-body">
-            <p>Send a request for permission</p>
+            <p><g:message code="inviteforcontribut.send.request" /></p>
             <div>
                 <div class="inviteMsg_status"></div>
                 <form method="post"
@@ -22,8 +22,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-            <a href="#" class="requestButton btn btn-primary">Request</a>
+            <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="button.close" /></a>
+            <a href="#" class="requestButton btn btn-primary"><g:message code="inviteforcontribut.req" /></a>
         </div>
     </div>
 </div>
@@ -41,10 +41,10 @@
             aria-hidden="true">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="inviteCuratorsModalLabel">Invite curators</h3>
+                <h3 id="inviteCuratorsModalLabel"><g:message code="inviteforcontribut.invite.curators" /></h3>
             </div>
             <div class="modal-body">
-                <p>Send an invitation to add curator</p>
+                <p><g:message code="inviteforcontribut.send.invitation.curator" /></p>
                 <div>
                     <div class="inviteMsg_status"></div>
                     <form method="post"
@@ -57,8 +57,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-                <a href="#" class="inviteButton btn btn-primary">Invite</a>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="button.close" /></a>
+                <a href="#" class="inviteButton btn btn-primary"><g:message code="button.invite" /></a>
             </div>
         </div>
 
@@ -68,10 +68,10 @@
             aria-hidden="true">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="inviteContributorsModalLabel">Invite contributors</h3>
+                <h3 id="inviteContributorsModalLabel"><g:message code="inviteforcontribut.invite.contributors" /></h3>
             </div>
             <div class="modal-body">
-                <p>Send an invitation to add contributors</p>
+                <p><g:message code="inviteforcontribut.send.invitation.contributors" /></p>
                 <div>
                     <div class="inviteMsg_status"></div>
                     <form method="post"
@@ -84,8 +84,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-                <a href="#" class="inviteButton btn btn-primary">Invite</a>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="msg.Close" /></a>
+                <a href="#" class="inviteButton btn btn-primary"><g:message code="msg.Invite" /></a>
             </div>
         </div>
 

@@ -5,43 +5,43 @@
 		class="searchbox">
 
 
-		<label class="control-label" for="title">Title</label> <input
+		<label class="control-label" for="title"><g:message code="default.title.label" /></label> <input
 			id="aq.title" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.title"
 			placeholder="Search by Document title" value="${(queryParams?.get('aq.title'))?.encodeAsHTML() }" />
 		
 		<label
-			class="control-label" for="grantee">Type</label> <input
+			class="control-label" for="grantee"><g:message code="default.type.label" /></label> <input
 			id="aq.type" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.type"
 			placeholder="Search by Description" value="${(queryParams?.get('aq.type'))?.encodeAsHTML()}" />
 			
 		<label
-			class="control-label" for="grantee">Description</label> <input
+			class="control-label" for="grantee"><g:message code="default.description.label" /></label> <input
 			id="aq.description" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.description"
 			placeholder="Search by Description" value="${(queryParams?.get('aq.description'))?.encodeAsHTML()}" />
 
 		<label
-			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead" id="aq.contributor"
+			class="control-label" for="aq.contributor"><g:message code="default.contributors.label" /></label> <input data-provide="typeahead" id="aq.contributor"
 			type="text" class="input-block-level" name="aq.contributor" value="${(queryParams?.get('aq.contributor'))?.encodeAsHTML()}" 
 			placeholder="Field to search all contributors" />
 		
 		<label
-			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead" id="aq.attribution"
+			class="control-label" for="aq.attribution"><g:message code="default.attributions.label" /></label> <input data-provide="typeahead" id="aq.attribution"
 			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
 			placeholder="Field to search all attributions" />
 
-		<label class="control-label" for="tags">Tags</label> <input
+		<label class="control-label" for="tags"><g:message code="default.tags.label" /></label> <input
 			id="aq.tag" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.tag"
 			placeholder="Search by Tags" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
 			
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
-			value="ALL"> Search in all groups </label> <label
+			value="ALL"> <g:message code="default.search.in.all.groups" /> </label> <label
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-			value="THIS_GROUP"> Search within this group </label>
+			value="THIS_GROUP"> <g:message code="default.search.within.this.group" /> </label>
 		</div>
 
 <%--		<g:hiddenField name="offset" value="0" />--%>
@@ -51,7 +51,7 @@
 
 		<div class="form-action">
 			<button type="submit" id="search-btn"
-				class="btn btn-primary pull-right" style="margin-top: 10px;">Search</button>
+				class="btn btn-primary pull-right" style="margin-top: 10px;"><g:message code="default.search" /></button>
 		</div>
 	</form>
 	<div class="clearfix"></div>

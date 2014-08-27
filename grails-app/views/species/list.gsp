@@ -26,15 +26,15 @@
                     <uGroup:rightSidebar/>
                     <obv:featured
             model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
-            <h4>Browse Species</h4>
+            <h4><g:message code="species.list.browse.species" /></h4>
 
 		<div class="tabbable" style="margin-left:0px;clear:both;">
 			<ul class="nav nav-tabs" style="margin-bottom: 0px">
-				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
+				<li class="active"><a href="#list" data-toggle="tab"><g:message code="button.gallery" /></a>
 				</li>
-				<li><a href="#taxonBrowser" data-toggle="tab">Taxon Browser</a>
+				<li><a href="#taxonBrowser" data-toggle="tab"><g:message code="button.taxon.browser" /></a>
 				</li>
-				<li><a href="#contribute" data-toggle="tab">Contribute</a>
+				<li><a href="#contribute" data-toggle="tab"><g:message code="button.contribute" /></a>
 				</li>
 
 			</ul>
@@ -52,11 +52,11 @@
 				</div>
                 <div id="taxonBrowser" class="tab-pane" style="position:relative">
                     <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
-                        <h5>Classifications</h5>	
+                        <h5><g:message code="button.classifications" /></h5>	
                 <div class="section help-block"> 
                     <ul>
                         <li>
-                        Species page content is sourced from researchers and experts who have been authenticated by curators. If you are a researcher and would like to contribute, please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. Please also follow up by sending an email to  <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> with a brief curriculum vitae (CV) or summary of your expertise so that curators can evaluate your application. You will be able to contribute once you have been allotted create/edit rights for the taxa.
+                        <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
                         </li>
                     </ul>
                 </div>

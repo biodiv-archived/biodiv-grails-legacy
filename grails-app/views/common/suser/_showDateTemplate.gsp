@@ -11,7 +11,7 @@
 		<g:formatDate date="${serverDate}" type="datetime" style="LONG" timeStyle="SHORT"/>
 	</g:if>
 	<g:elseif test="${propertyName == 'lastLoginDate' && (!(serverDate - SUserInstance.dateCreated))}">
-		None	
+		<g:message code="tect.none" />	
 	</g:elseif>
 	<g:else>
 	<%

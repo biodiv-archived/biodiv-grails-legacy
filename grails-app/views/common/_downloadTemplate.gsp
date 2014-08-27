@@ -1,12 +1,12 @@
 <div id="download-box" class="btn-group"  style="z-index: 10; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
     <a id="download-action" class="btn ${(params.action=='show')?'btn-link':''} dropdown-toggle" data-toggle="dropdown"
 			href="#"> <i class=" icon-download-alt"></i>
-			Download
+			<g:message code="button.download" />
 		</a>
 
 		<div id="download-options" class="popup-form" style="display: none">
 			<form id="download-form">
-				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;">The download link will be available on your user profile page</span></div>
+				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;"><g:message code="msg.link.available" /></span></div>
 				<g:each in="${downloadTypes}" var="downloadType" status="i">
 					<g:if test="${i > 0}">
 						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
@@ -20,7 +20,7 @@
 					</g:else>
 				</g:each>
 				<br />
-				<textarea class="comment-textbox" placeholder="Please let us know how you intend to use this data" name="notes"></textarea>
+				<textarea class="comment-textbox" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
 				<input class="btn pull-right" type="submit" value="OK"></input>
 				<div id="download-close" class="popup-form-close" value="close">

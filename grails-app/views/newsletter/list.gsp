@@ -17,8 +17,8 @@
     </head>
     <body>
         <div class="span12">
-            <div style="float: right;"><g:link action="create"><h3>Create newsletter</h3></g:link></div>
-            <h1>Newsletters Archive</h1>
+            <div style="float: right;"><g:link action="create"><h3><g:message code="link.create.newsletter" /></h3></g:link></div>
+            <h1><g:message code="link.newsleters.archive" /></h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>

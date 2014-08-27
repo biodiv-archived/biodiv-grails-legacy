@@ -26,8 +26,7 @@
 
 							<a
 								href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-								class="btn btn-info"> <i class="icon-plus"></i>Add
-								a Page</a>
+								class="btn btn-info"> <i class="icon-plus"></i><g:message code="default.add.page.label" /></a>
 						</sec:permitted>
 					</g:if>
 					<g:else>
@@ -35,7 +34,7 @@
 							<g:link
 								url="${uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'pageCreate')}"
 								class="btn  btn-info">
-								<i class="icon-plus"></i>Add a Page</g:link>
+								<i class="icon-plus"></i><g:message code="default.add.page.label" /></g:link>
 						</sUser:isAdmin>
 					</g:else>
 				</div>

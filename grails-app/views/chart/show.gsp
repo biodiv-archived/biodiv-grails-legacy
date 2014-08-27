@@ -3,7 +3,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="Dashboard"/>
+<g:set var="title" value="${g.message(code:'button.dashboard')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="chart" />
 <gvisualization:apiImport />

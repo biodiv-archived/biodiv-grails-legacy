@@ -6,9 +6,9 @@
 		action="${uGroup.createLink(controller:controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 		<select id="userGroupSelectFilter" class="btn" name="uGroup" style="display:none;">	
-			<option value="ALL"> Search in all groups </option>
+			<option value="ALL"><g:message code="default.search.in.all.groups" /> </option>
 			<g:if test="${params.webaddress }">
-				<option value="THIS_GROUP"> Search within this group </option>
+				<option value="THIS_GROUP"> <g:message code="default.search.within.this.group" /> </option>
 			</g:if>
 		</select>
 		

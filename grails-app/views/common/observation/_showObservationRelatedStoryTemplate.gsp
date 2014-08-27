@@ -8,11 +8,11 @@ $(document).ready(function() {
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
     <g:if test="${controller.toLowerCase().equals('featured')}">
-        <h4>Featured Content</h4>
+        <h4><g.message code="heading.feature.content" /></h4>
     </g:if>
     <g:else>
         <h4>Featured ${controller.toLowerCase().capitalize()}</h4>
-    </g:else>
+            </g:else>
     </g:if>
 	<ul style="list-style:none; width:100%; margin-left:0px;">
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
@@ -28,30 +28,30 @@ $(document).ready(function() {
 		<div class="observation_links">
 			<g:if test="${observationId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
-					all</a>
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
+					</a>
 			</g:if>
 			<g:elseif test="${speciesId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}">Show
-					all</a>
+					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
+					</a>
 			</g:elseif>
                         <g:else>
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}">Show
-					all</a>
+					href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
+					</a>
 			</g:else>
 		</div>
 	</g:if>
 <%--	<div id="carouselItemDesc"></div>--%>
 </div>
 <div id="relatedObservationAddButton_${id}" class="alert alert-info" style="display:none;">
-	No observations
+	<g:message code="msg.no.observations" />
     </div>
 
 <g:if test="${filterProperty != 'featureBy'}">
     <div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
-        No data!!
+        <g:message code="msg.no.data" />!!
     </div>
 </g:if>
 
