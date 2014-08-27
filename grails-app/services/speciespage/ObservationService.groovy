@@ -76,7 +76,7 @@ class ObservationService extends AbstractObjectService {
     def recommendationService;
     def observationsSearchService;
     //def curationService;
-    //def userGroupService;
+    def userGroupService;
     def activityFeedService;
     def SUserService;
     //def speciesService;
@@ -1173,6 +1173,15 @@ class ObservationService extends AbstractObjectService {
     }
 
     /**
+    * getUserGroupObservations
+    */
+    def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
+		if(!userGroupInstance) return;
+        params['userGroup'] = userGroupInstance;
+        return getFilteredObservations(params, max, offset, isMapView); 
+	}
+
+    /**
      * Gets users observations depending on user group
      **/
     long getAllObservationsOfUser(SUser user , UserGroup userGroupInstance = null) {
@@ -2083,7 +2092,7 @@ class ObservationService extends AbstractObjectService {
                 log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
                 return []
             }
-            return userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
+            return getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
         }
         else{
             return getFilteredObservations(params, max, offset, false).observationInstanceList
@@ -2091,10 +2100,18 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
+    /**
+    * Plz use utilsService.getUserGroup
+    **/
+    @Deprecated
     def getUserGroup(params) {
         return utilsService.getUserGroup(params);
     }
 
+    /**
+    * Plz use utilsService.sendNotificationMail
+    **/
+    @Deprecated
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }

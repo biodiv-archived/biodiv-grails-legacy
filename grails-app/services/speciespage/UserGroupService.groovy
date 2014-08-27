@@ -68,12 +68,10 @@ class UserGroupService {
 	def aclUtilService
 	def springSecurityService
 	def dataSource;
-	def observationService;
 	def grailsApplication;
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	def speciesService;
 	def SUserService;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
@@ -382,7 +380,7 @@ class UserGroupService {
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
-			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			def groupId = utilsService.getSpeciesGroupIds(params.sGroup)
 			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			}else{
@@ -450,7 +448,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
-			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
+			//utilsService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
@@ -476,7 +474,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false, sendMail);
-			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
+			//utilsService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}
@@ -537,53 +535,7 @@ class UserGroupService {
         return count;
 	}
 	
-	def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
 
-		if(!userGroupInstance) return;
-        log.debug params
-        params['userGroup'] = userGroupInstance;
-        log.debug params.getClass()
-        return observationService.getFilteredObservations(params, max, offset, isMapView); 
-/*
-		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
-		queryParts.queryParams['userGroup'] = userGroupInstance
-		queryParts.queryParams['isDeleted'] = false;
-
-		String query = queryParts.query;
-		String userGroupQuery = " join obv.userGroups userGroup "
-		queryParts.filterQuery += " and userGroup=:userGroup "
-		if(isMapView) {
-			query = queryParts.mapViewQuery + userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
-		} else {
-			query += userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
-			if(max != -1)
-				queryParts.queryParams["max"] = max
-			if(offset != -1)
-				queryParts.queryParams["offset"] = offset
-		}
-
-		//		String countQuery = "select count(*) from Observation observation " +
-		//			"join observation.userGroups userGroup " +
-		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
-		//
-		//		def countParams = queryParts.queryParams.clone();
-		//		countParams.remove("max");
-		//		println countParams;
-		//		println queryParts.mapViewQuery
-		//		def totalObservationInstanceList = Observation.executeQuery(queryParts.mapViewQuery, countParams)
-		//		def count = totalObservationInstanceList.size()
-
-		//		String query = "select observation from Observation observation " +
-		//			"join observation.userGroups userGroup " +
-		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
-		log.debug query;
-        log.debug queryParts.queryParams;
-
-		def result=['userGroupInstance':userGroupInstance, 'observationInstanceList': Observation.executeQuery(query, queryParts.queryParams), 'queryParams':queryParts.queryParams, 'activeFilters':queryParts.activeFilters, 'showTags':false];
-
-		return result;
-        */
-	}
 
 
 	////////////////////MEMBERS RELATED/////////////////////////

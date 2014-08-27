@@ -437,15 +437,13 @@ class UserGroupController {
 	}
 	
 	def getUserGroupObservationsList(params) {
-        log.debug "+++++++++++++++++"+params
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 		
-		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
-		//def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
+		def model = observationService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
         def checklistCount =  model.checklistCount
 		def allObservationCount =  model.allObservationCount
 		model['checklistCount'] = checklistCount
@@ -953,7 +951,7 @@ class UserGroupController {
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 		params.sort = "visitCount";
-		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset);
+		def model = observationService.getUserGroupObservations(userGroupInstance, params, max, offset);
 
 		def result = [];
 		model.observationInstanceList.each {
