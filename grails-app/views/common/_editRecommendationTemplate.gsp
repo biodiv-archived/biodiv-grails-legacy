@@ -40,7 +40,7 @@
                 <div class="nameContainer textbox" style="position:relative;">
 
                     <input type="text" name="commonName" class="commonName input-block-level" style="width:87%"
-                        value="${species_cn_name}" placeholder='Suggest a common name'
+                        value="${species_cn_name}" placeholder='${g.message(code:"editrecomendation.placeholder.suggest")}'
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                     <input type="hidden" class="mappedRecoNameForcanName" />
 
@@ -64,7 +64,7 @@
 
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
                         <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}"
-                            placeholder='Suggest a scientific name'
+                            placeholder='${g.message(code:"editrecomendation.placeholder.scientific")}'
                             class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                         <div class='nameSuggestions' style='display: block;'></div>
                         <input type="hidden" name="canName" class="canName" value="${species_canonical_name }"/>
@@ -83,7 +83,7 @@
                     <div class="nameContainer textbox">
                         <input type="text" name="recoComment" id="recoComment" value="${species_call_comment}"
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
-                        placeholder="Write comment on species call"/>
+                        placeholder="${g.message(code:'editrecomendation.placeholder.comment')}"/>
                     </div>
                 </div>
             </div>

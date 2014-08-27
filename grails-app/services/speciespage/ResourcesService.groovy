@@ -34,6 +34,8 @@ import species.participation.UsersResource.UsersResourceStatus;
 import species.participation.Observation;
 import species.Species;
 import speciespage.ObservationService;
+import species.UtilsService;
+import species.participation.UsersResource;
 
 class ResourcesService extends AbstractObjectService {
 
@@ -87,7 +89,7 @@ class ResourcesService extends AbstractObjectService {
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
-			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			def groupId = getSpeciesGroupIds(params.sGroup)
 			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			}else{
@@ -234,12 +236,28 @@ class ResourcesService extends AbstractObjectService {
         if(usersList.size() > 0) {
             otherParams['usersList'] = usersList
             def sp = new Species();
-            observationService.sendNotificationMail(ObservationService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
+            utilsService.sendNotificationMail(UtilsService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
         }
     }
 
     def deleteUsersResourceById(id){
         def result = UsersResource.findByRes(Resource.read(id.toLong()))
         result.delete(flush:true, failOnError:true)
+    }
+
+    def getBulkUploadResourcesList(params) {
+        def list = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:"id", order:"desc"])
+        def result = list.collect(){it.res}
+        def userCountList = [:]
+        list.collect(){
+            if(userCountList[it.user]){
+                userCountList[it.user] = userCountList[it.user] + 1 
+            } else {
+                userCountList[it.user] = 1
+            }
+        }
+        userCountList = userCountList.sort {a, b -> b.value <=> a.value}
+        println "======USERS======== " + userCountList
+		return [resourceInstanceList:result, userCountList:userCountList]
     }
 }	

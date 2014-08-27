@@ -20,11 +20,11 @@
 		
 			<div class="super-section"><a 
 				href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}"> <i
-				class="icon-edit"></i>Edit Group </a></div>
+				class="icon-edit"></i><g:message code="button.edit.group" /> </a></div>
 			<div class="super-section" style="clear: both;">
 			
 				<div class="section" style="position: relative; overflow: visible;">
-					<h3>Display Settings</h3>
+					<h3><g:message code="usergroup.display.settings" /></h3>
 					<form class="form-horizontal"
 						action="${uGroup.createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"
 						id='groupSettingForm' name='groupSettingForm' method="POST">

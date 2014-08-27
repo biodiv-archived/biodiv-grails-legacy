@@ -3,7 +3,7 @@
 <div>
     <g:if test="${!params.webaddress}">
     <div class="prop">
-        <span class="name"  style="padding-right: 20px;">Group</span>
+        <span class="name"  style="padding-right: 20px;"><g:message code="default.group.label" /></span>
         <div class="value">
             <uGroup:showUserGroupSignature model="['userGroup':userGroupInstance]" />
         </div>
@@ -11,14 +11,14 @@
     </g:if>
     <g:if test="${commentInstance.subject}">
     <div class="prop">
-        <span class="name"  style="padding-right: 20px;">Subject</span>
+        <span class="name"  style="padding-right: 20px;"><g:message code="default.subject.label" /></span>
         <div class="value">
             ${commentInstance.subject?:"No Subject"}
         </div>
     </div>
     </g:if>
     <div class="prop">
-        <span class="name" style="padding-right: 15px;">Message</span>
+        <span class="name" style="padding-right: 15px;"><g:message code="default.message.label" /></span>
         <div class="value">
             ${commentInstance.body}
         </div>

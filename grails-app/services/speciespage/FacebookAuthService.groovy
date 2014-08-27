@@ -24,8 +24,9 @@ class FacebookAuthService {
 		def appUser;
 
 		if(token.accessToken) {
-			FacebookTemplate facebook = new FacebookTemplate(token.accessToken);
-			facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken, facebook.getOAuth2Version()));
+            String accessToken = token.accessToken.accessToken;
+			FacebookTemplate facebook = new FacebookTemplate(accessToken);
+			facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), accessToken, facebook.getOAuth2Version()));
 			FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
 
 			def securityConf = SpringSecurityUtils.securityConfig
@@ -55,7 +56,7 @@ class FacebookAuthService {
 			}
 
 			if(!appUser[securityConf.userLookup.passwordPropertyName])
-				appUser[securityConf.userLookup.passwordPropertyName] = token.accessToken
+				appUser[securityConf.userLookup.passwordPropertyName] = accessToken
 
 			appUser[securityConf.userLookup.enabledPropertyName] = true
 			appUser[securityConf.userLookup.accountExpiredPropertyName] = false
@@ -98,9 +99,10 @@ class FacebookAuthService {
 	 */
 	void registerFacebookUser(FacebookAuthToken token, SUser appUser) {
 		log.debug "Saving facebook user domain class"
-		def conf =  grailsApplication.config.grails.plugin.springsecurity;
+        facebookAuthDao.create(token);	
+/*		def conf =  grailsApplication.config.grails.plugin.springsecurity;
 		String domainClassName = conf.facebook.domain.classname;
-		String connectionPropertyName = conf.facebook.domain.connectionPropertyName
+		String appUserConnectionPropertyName = conf.facebook.domain.appUserConnectionPropertyName
 		Class<?> UserClass = grailsApplication.getDomainClass(domainClassName)?.clazz
 
 		if (!UserClass) {
@@ -116,12 +118,12 @@ class FacebookAuthService {
 			user.accessToken = token.accessToken
 		}
 
-		user[connectionPropertyName] = appUser
+		user[appUserConnectionPropertyName] = appUser
 
 		user.save(flush: true, failOnError: true)
 
 		log.debug "Saving facebook user domain class done $user"
-	}
+*/	}
 
 	/**
 	 *

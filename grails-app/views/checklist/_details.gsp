@@ -4,7 +4,7 @@
     <label for="title" class="control-label"><g:message
         code="checklist.title.label" default="Title" /> <span class="req">*</span></label>
     <div class="controls textbox">
-        <g:textField name="title" value="${observationInstance?.title}" class="input-block-level" placeholder="Enter a name for the checklist..." />
+        <g:textField name="title" value="${observationInstance?.title}" class="input-block-level" placeholder="${g.message(code:'checklist.details.enter.name')}" />
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="title">
             <g:eachError bean="${observationInstance}" field="title">
@@ -43,7 +43,7 @@
 
         <input name="publicationDate" type="text" class="date input-block-level"
         value="${observationInstance?.publicationDate?.format('dd/MM/yyyy')}"
-        placeholder="Select publication date (dd/MM/yyyy)" />
+        placeholder="${g.message(code:'checklist.details.select.date')}" />
 
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="publicationDate">
@@ -64,7 +64,7 @@
     <label for="title" class="control-label"><g:message
         code="checklist.attribution.label" default="Attribution" /> </label>
     <div class="controls textbox">
-        <g:textField name="attributions" value="${params.attributions ?: (observationInstance?.attributions?.collect{ it.name}?.join(', ')) }" class="input-block-level" placeholder="Enter attribution for this checklist..." />
+        <g:textField name="attributions" value="${params.attributions ?: (observationInstance?.attributions?.collect{ it.name}?.join(', ')) }" class="input-block-level" placeholder="${g.message(code:'checklist.details.enter.attribution')}" />
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="attributions">
             <g:eachError bean="${observationInstance}" field="attributions">

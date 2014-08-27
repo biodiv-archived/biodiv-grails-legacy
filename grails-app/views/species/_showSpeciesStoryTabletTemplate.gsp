@@ -1,5 +1,4 @@
-<div class="poor_species_content" style="display: none;">No
-    information yet</div>
+<div class="poor_species_content" style="display: none;"><g:message code="showspeciesstorytablet.no.information" /></div>
 <a
     href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup])}" style="display:inline-block;width:125px;">
     <span class="species_story ellipsis multiline sci_name"

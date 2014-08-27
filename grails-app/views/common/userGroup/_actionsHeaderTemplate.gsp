@@ -10,10 +10,10 @@
 			aria-hidden="true">
 			<div class="modal-header">
 			    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-				<h3 id="inviteMembersModalLabel">Invite friends</h3>
+				<h3 id="inviteMembersModalLabel"><g:message code="actionheadertemplate.invite.friends" /> </h3>
 			</div>
 			<div class="modal-body">
-				<p>Send an invitation to your friends to join and contribute in this group</p>
+				<p><g:message code="text.send.invitation" /></p>
 				<div>
 					<div id="invite_memberMsg"></div>
 					<form id="inviteMembersForm" method="post"
@@ -25,8 +25,8 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-				<a href="#" id="inviteMemberButton" class="btn btn-primary">Invite</a>
+				<a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="button.close" /></a>
+				<a href="#" id="inviteMemberButton" class="btn btn-primary"><g:message code="button.invite" /></a>
 			</div>
 		</div>
 		
@@ -36,18 +36,15 @@
 	<div class="modal hide fade in" id="leaveUsModalDialog" tabindex="-1" role="dialog" aria-labelledby="leaveUsModalDialogLabel" >
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-			<h3 id="leaveUsModalDialogLabel">Do you want to leave this group???</h3>
+			<h3 id="leaveUsModalDialogLabel"><g:message code="actionheadertemplate.want.to.leave" /></h3>
 		</div>
 		<div class="modal-body">
-			<p>We would like to know your feedback and any ideas on making
-				this group a more interesting and a happening place. We are thankful
-				for your wonderful contribution to this group and would like to hear
-				from you soon.</p>
+			<p><g:message code="text.feedback" /></p>
 		</div>
 		<div class="modal-footer">
-			<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
+			<a href="#" class="btn" data-dismiss="modal"><g:message code="button.close" /></a> <a href="#"
 				id="leave" class="btn btn-primary"
-				data-group-id="${userGroupInstance.id}">Leave</a>
+				data-group-id="${userGroupInstance.id}"><g:message code="button.leave" /></a>
 		</div>
 	</div>
 </div>

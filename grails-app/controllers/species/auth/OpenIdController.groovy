@@ -206,8 +206,8 @@ class OpenIdController {
 		}
 
 		log.debug "Processing facebook registration in createAccount"
-		FacebookTemplate facebook = new FacebookTemplate(token.accessToken);
-		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken, facebook.getOAuth2Version()));
+		FacebookTemplate facebook = new FacebookTemplate(token.accessToken.accessToken);
+		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
 		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
 
 		//TODO: if there are multiple email accounts available choose among them

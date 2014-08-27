@@ -4,8 +4,9 @@
          <h4>Add/Edit Media</h4>
      </div>
      <div class="modal-body">
-        <g:render template="/species/speciesFieldImageUpload" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+        <g:render template="/species/speciesFieldImageUpload" model="['observationInstance':speciesInstance, 'speciesFieldFlag' :true, 'isSpeciesContributor':isSpeciesContributor]"/>
     </div>
-     <div class="modal-footer">
+    <div class="modal-footer">
+         <a id="addSpFieldResourcesModalSubmit" class="btn btn-primary">Add Resources</a>
      </div>
 </div>

@@ -40,9 +40,11 @@ import species.participation.Featured
 class AbstractObjectController {
     
     def observsationService;
-   
+    def utilsService;
+
     def related() {
-		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+		println "===========PARAMS=========== " + params 
+        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 
 		if(relatedObv) {
 			if(relatedObv.observations)

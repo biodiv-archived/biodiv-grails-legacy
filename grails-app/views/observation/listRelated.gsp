@@ -47,10 +47,10 @@
 					</div>
 					<h5 style="position: relative; top: 40px; clear: both">
 						<g:if test="${filterProperty == 'nearByRelated'}">
-										Observations nearby
+										<g:message code="text.observations.nearby" />
 									</g:if>
 						<g:elseif test="${filterProperty == 'speciesName'}">
-										Observations of same species
+										<g:message code="text.observations.same" />
 									</g:elseif>
 					</h5>
 					<div>

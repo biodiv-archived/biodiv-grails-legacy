@@ -31,9 +31,9 @@ class ChartService {
 	static final String SPECIES_STATS = "Species stats"
 	static final String USER_OBSERVATION_BY_SPECIESGROUP = "User observation by species group"
 	
-	
+
+    def utilsService
 	def userGroupService
-	def observationService
     def dataSource
 	
 	def getObservationStats(params, SUser author, request){
@@ -211,7 +211,7 @@ class ChartService {
 			}
 		}
 		filterParamsForHyperLink.sGroup = SpeciesGroup.findByName(speciesGroup).id
-		def link = observationService.generateLink((isObv)?"observation":"species", "list", filterParamsForHyperLink, null)
+		def link = utilsService.generateLink((isObv)?"observation":"species", "list", filterParamsForHyperLink, null)
 		return "" + '<a href="' +  link +'">' + count + "</a>"
 	}
 	
@@ -226,7 +226,7 @@ class ChartService {
 			fitlerParams.sGroup = speciesGroup.id
 		}
 		fitlerParams.user = userId
-		def link = observationService.generateLink("observation", "list", fitlerParams, request)
+		def link = utilsService.generateLink("observation", "list", fitlerParams, request)
 		return "" + '<a  href="' +  link +'">' + count + "</a>"
 	}
 	
@@ -322,7 +322,7 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			def link = utilsService.generateLink("SUser", "show", ["id": r[0].id], request)
 			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
 			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, startDate, r[1], request)])
 			r[0] = r[0].name
@@ -502,7 +502,7 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			def link = utilsService.generateLink("SUser", "show", ["id": r[0].id], request)
 			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
 			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, null, r[1], request, sGroup)])
 			r[0] = r[0].name

@@ -6,9 +6,9 @@
 		action="${uGroup.createLink(controller:controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 		<select id="userGroupSelectFilter" class="btn" name="uGroup" style="display:none;">	
-			<option value="ALL"> Search in all groups </option>
+			<option value="ALL"><g:message code="default.search.in.all.groups" /> </option>
 			<g:if test="${params.webaddress }">
-				<option value="THIS_GROUP"> Search within this group </option>
+				<option value="THIS_GROUP"> <g:message code="default.search.within.this.group" /> </option>
 			</g:if>
 		</select>
 		
@@ -66,7 +66,7 @@ $(document).ready(function() {
                 'userTermsUrl' : "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}",
                 'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
                 'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
-                'saveModifiedSpecies' : "${uGroup.createLink(controller:'UFile', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
+                'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
                 'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
                 'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
                 'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",

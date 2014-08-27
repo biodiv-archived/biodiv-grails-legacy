@@ -19,7 +19,7 @@
             </g:each>
 
 <%--            <g:if test="${resource.type == ResourceType.IMAGE}">--%>
-<%--                <a href="${createLinkTo(file: resource.fileName.trim(), base:base)}" target="_blank">View original image</a> --%>
+<%--                <a href="${createLinkTo(file: resource.fileName.trim(), base:base)}" target="_blank"><g:message code="link.original.image" /></a> --%>
 <%--            </g:if>--%>
 
             <g:if test="${resource.description}">
@@ -31,7 +31,7 @@
 
         </div>
         <g:if test="${resource.contributors?.size() > 0}">
-        <b>Contributors:</b>
+        <b><g:message code="default.contributors.label" /></b>
         <ol>
             <g:each in="${resource.contributors}" var="a">
             <li>
@@ -41,7 +41,7 @@
         </ol>
         </g:if>
         <g:if test="${resource.attributors?.size() > 0}">
-        <b>Attributions:</b>
+        <b><g:message code="default.attributions.label" /></b>
         <ol>
             <g:each in="${resource.attributors}" var="a">
             <li>
@@ -51,8 +51,7 @@
         </ol>
         </g:if>
         <g:if test="${resource.url}">
-        <a href="${resource.url}" target="_blank"><b>View image
-                source</b> </a>
+        <a href="${resource.url}" target="_blank"><b><g:message code="link.image.source" /></b> </a>
         </g:if>
 
     </div>

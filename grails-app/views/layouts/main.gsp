@@ -36,7 +36,7 @@
 </head>
 <body>
 	<div id="loading" class="loading" style="display: none;">
-		<span>Loading ...</span>
+		<span><g:message code="msg.loading" /> </span>
 	</div>
 	<div id="postToUGroup" class="overlay" style="display: none;">
         <i class="icon-plus"></i>

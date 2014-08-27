@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@ page import="species.groups.UserGroup"%>
 <div class="story-actions clearfix" style="width: 100%;">
     <div class="span8" style="margin-left:0px;position:relative">
         <div class="footer-item pull-left">
@@ -53,7 +54,8 @@
                 def curr_id = instance.id
                 def prevId, nextId;
                 def clazz = instance.class
-				def obj = instance
+                def obj = instance
+                def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
                 if(pos>=0 && (prevObservationId || nextObservationId)) {
                     prevId = prevObservationId;
                     nextId = nextObservationId
@@ -69,7 +71,12 @@
 									 }
 									 if(obj.hasProperty('isShowable')){
 										 eq('isShowable', true)
-									 }
+                                    }
+                                    if(userGroupInstance){
+                                        userGroups{
+                                            eq('id', userGroupInstance.id)
+                                        }
+                                    }
 			 					}
 								maxResults 1
 								order 'id', 'desc'
@@ -85,7 +92,12 @@
 								 }
 								 if(obj.hasProperty('isShowable')){
 									 eq('isShowable', true)
-								 }
+                                     }
+                                     if(userGroupInstance){
+                                        userGroups{
+                                            eq('id', userGroupInstance.id)
+                                        }
+                                    }
 							 }
 							maxResults 1
 							order 'id', 'asc'
@@ -104,19 +116,19 @@
         if(pos>=0 && (prevObservationId || nextObservationId)) 
             navParams['pos'] = pos-1; 
         %>
-        <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink(navParams.clone())}"><i class="icon-backward"></i>Prev</a>
+        <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink(navParams.clone())}"><i class="icon-backward"></i><g:message code="button.prev" /></a>
 
         <% navParams['id'] = nextId; 
         if(pos>=0 && (prevObservationId || nextObservationId))
             navParams['pos'] = pos+1; 
         %>
-        <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink(navParams.clone())}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
+        <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink(navParams.clone())}"><g:message code="button.next" /><i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
 
         <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
         if(pos)
                 lastListParams.put('fragment', pos);	 
         %>
-        <a class="btn btn-mini" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
+    <a class="btn btn-mini" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;"><g:message code="default.list.label" /></a>
     </div>
 
 

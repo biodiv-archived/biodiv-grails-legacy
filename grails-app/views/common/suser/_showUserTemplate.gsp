@@ -17,7 +17,7 @@
 			 </a>
 
 			<div class="story-footer" style="position:static;">
-				<div class="footer-item" title="Observations">
+				<div class="footer-item" title="${g.message(code:'showusergroupsig.title.observations')}">
 					<i class="icon-screenshot"></i>
 					<obv:showNoOfObservationsOfUser model="['user':userInstance , 'userGroup':userGroupInstance]"/>
 				</div>
@@ -27,11 +27,11 @@
 <%--					<obv:showNoOfTagsOfUser model="['userId':userInstance.id]" />--%>
 <%--				</div>--%>
 				
-				<div class="footer-item" title="Identifications">
+				<div class="footer-item" title="${g.message(code:'showuser.title.identifications')}">
 					<i class="icon-check"></i>
 					<obv:showNoOfRecommendationsOfUser model="['user':userInstance , 'userGroup':userGroupInstance]" />
 				</div>
-				<div class="footer-item" title="Comments">
+				<div class="footer-item" title="${g.message(code:'showobservationstoryfooter.title.comments')}">
 					<i class="icon-comment"></i>
 					${userInstance.fetchCommentCount()}
 				</div>

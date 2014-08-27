@@ -32,6 +32,7 @@ import species.participation.Follow;
 
 class SUserController extends UserController {
 
+    def utilsService;
 	def springSecurityService
 	def namesIndexerService;
 	def observationService;
@@ -170,7 +171,7 @@ class SUserController extends UserController {
     //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
     //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
                 result['currentUser'] = springSecurityService.currentUser;
-                result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                result['currentUserProfile'] = result['currentUser']?utilsService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
                 return result
             }
         }
@@ -543,14 +544,14 @@ class SUserController extends UserController {
 				if(BlockedMails.findByEmail(candidateEmail)){
 					log.debug "Email $candidateEmail is unsubscribed for identification mail."
 				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+					result[candidateEmail] = utilsService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
 				}
 			}else{
 				//its user id
 				SUser user = SUser.get(candidateEmail.toLong());
 				candidateEmail = user.email.trim();
 				if(user.allowIdentifactionMail){
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+					result[candidateEmail] = utilsService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
 				}else{
 					log.debug "User $user.id has unsubscribed for identification mail."
 				}
@@ -767,7 +768,7 @@ class SUserController extends UserController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
+						File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, usersDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);

@@ -45,7 +45,7 @@
 		</g:if>
 		<g:if test="${userInstance.location}">
 			<div class="prop">
-				<span class="name"><i class="icon-map-marker"></i>Location</span>
+				<span class="name"><i class="icon-map-marker"></i><g:message code="msg.Location" /></span>
 				<div class="value">
 					${userInstance.location}
 				</div>
@@ -54,7 +54,7 @@
 
 		<g:if test="${userInstance.website}">
 			<div class="prop">
-				<span class="name"><i class="icon-road"></i>Website</span>
+				<span class="name"><i class="icon-road"></i><g:message code="text.website" /></span>
 				<div class="value">
 					<div class="linktext pull-left">
 						${fieldValue(bean: userInstance, field: 'website')}
@@ -64,8 +64,7 @@
 					<g:if test="${facebookUrl}">
 						<div class="facebookButton pull-left"
 							style="background-repeat: no-repeat; height: 33px;">
-							<a class="fbJustConnect" target="_blank" href="${facebookUrl}">Facebook
-								Profile</a>
+							<a class="fbJustConnect" target="_blank" href="${facebookUrl}"><g:message code="link.facebook.profile" /></a>
 						</div>
 					</g:if>
 				</div>
@@ -74,7 +73,7 @@
 
 		<g:if test="${!showDetails }">
 			<div class="prop">
-				<span class="name"><i class="icon-time"></i>Member since </span>
+				<span class="name"><i class="icon-time"></i><g:message code="default.member.since.label" /> </span>
 				<div class="value">
 					<time class="timeago"
 						datetime="${userInstance.dateCreated.getTime()}"></time>
@@ -82,7 +81,7 @@
 			</div>
 			<g:if test="${userInstance.lastLoginDate}">
 				<div class="prop">
-					<span class="name"><i class="icon-time"></i>Last visited </span>
+					<span class="name"><i class="icon-time"></i><g:message code="default.last.visited.label" /> </span>
 					<div class="value">
 						<time class="timeago"
 							datetime="${userInstance.lastLoginDate.getTime()}"></time>

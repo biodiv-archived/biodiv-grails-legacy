@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="layout" content="main" />
-<title>Error</title>
+<title><g:message code="views.error" /></title>
 <r:require modules="core" />
 </head>
 
@@ -19,12 +19,11 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 			<div class="observation  span12">
 				<p class="message">
-					Oops!!! There seems to be some problem. <br /> Please send the
-                                        following message and other required information to reproduce this error on our side to <span class="mailme">${supportEmail }</span>.<br/> One of us will work on it asap.<br />
+					<g:message code="views.problem" /> <br /><g:message code="views.send.message" />  <span class="mailme">${supportEmail }</span>.<br/><g:message code="views.will.work" /> <br />
 					<br />
 				</p>
 				<div class="errors">
-					<strong>Error ${request.'javax.servlet.error.status_code'}:</strong>
+					<strong><g:message code="views.error" /> ${request.'javax.servlet.error.status_code'}:</strong>
 					${request.'javax.servlet.error.message'.encodeAsHTML()}<br />
 				</div>
 

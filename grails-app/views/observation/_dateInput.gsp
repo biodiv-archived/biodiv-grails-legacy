@@ -13,7 +13,7 @@
 
         <input name="fromDate" type="text" class="date" class="input-block-level"
         value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"
-        placeholder="Select from date (dd/MM/yyyy)" />
+        placeholder="${g.message(code:'placeholder.dateinput.select.fromdate')}" />
 
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="fromDate">
@@ -30,7 +30,7 @@
 
         <input name="toDate" type="text" class="date" class="input-block-level"
         value="${observationInstance?.toDate?.format('dd/MM/yyyy')}"
-        placeholder="Select to date (dd/MM/yyyy)" />
+        placeholder="${g.message(code:'placeholder.dateinput.select.todate')}" />
 
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="toDate">
@@ -52,7 +52,7 @@
 
         <input name="fromDate" type="text" class = "fromDate date input-block-level"
         value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"
-        placeholder="Select date (dd/MM/yyyy)" />
+        placeholder="${g.message(code:'placeholder.dateinput.select.date')}" />
 
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="fromOn">

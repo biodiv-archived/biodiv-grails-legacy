@@ -5,6 +5,6 @@
 			id="${"habitat_" + habitat.id}" value="${habitat.id}"
 			title="${habitat.name}"
 			data-content="${message(code: 'habitat.definition.' + habitat.name)}"
-			rel="tooltip" data-original-title="A Title"></button>
+			rel="tooltip" data-original-title="${g.message(code:'speciesgroupfilter.title.a')}"></button>
 	</g:link>
 </g:each>

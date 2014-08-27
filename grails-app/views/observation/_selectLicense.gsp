@@ -9,13 +9,13 @@
 
         <img
         src="${resource(dir:'images/license',file:selectedLicense?.name?.getIconFilename()+'.png', absolute:true)}"
-        title="Set a license for this image" />
+        title="${g.message(code:'title.set.license')}" />
 
         <b class="caret"></b>
     </a>
 
     <ul id="license_options_${i}" class="dropdown-menu license_options">
-        <span>Choose a license</span>
+        <span><g:message code="default.choose.license.label" /></span>
         <g:each in="${species.License.list()}" var="l">
         <li class="license_option"
         onclick="selectLicense($(this), ${i});" title="${l.name.getTooltip()}">

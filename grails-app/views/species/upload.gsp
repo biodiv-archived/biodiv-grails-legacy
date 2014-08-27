@@ -23,7 +23,7 @@
                             </div-->
                             <div
                                 class="control-group">
-                                <label class="control-label span2" for="speciesFile"> Species File <span
+                                <label class="control-label span2" for="speciesFile"><g:message code="upload.species.file" />  <span
                                         class="req">*</span></label>
                                 <div class="controls span9" style="">
                                     <% def allowedExtensions = '[ "xls", "xlsx"]'  %>
@@ -47,7 +47,7 @@
 
                             <div
                                 class="control-group">
-                                <label class="control-label span2" for="imagesDir"> Images Url</label>
+                                <label class="control-label span2" for="imagesDir"><g:message code="upload.images.url" /> </label>
 
                                 <div class="controls span9">
                                     <input id="imagesDir" type="text" class="input-block-level" name="imagesDir"
@@ -73,13 +73,13 @@
                     
 
                 <div id="speciesGridSection" style="clear:both;" class="section checklist-slickgrid ${params.action=='upload'?'hide':''}">
-                    %{--<span id="addNewColumn" class="btn-link">+ Add New Column</span>--}%
+                    %{--<span id="addNewColumn" class="btn-link"><g:message code="checklist.create.add.new.column" /></span>--}%
                     <!--span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span-->
 
                     <div id="myGrid" class="" style="width:100%;height:350px;clear:both;"></div>
                     <div id="nameSuggestions" style="display: block;"></div>
                     <div id="legend" class="hide">
-                        <span class="incorrectName badge">Incorrect Names</span>
+                        <span class="incorrectName badge"><g:message code="error.incorrect.names" /> </span>
                     </div>
 
                     <div class="section" style="clear:both;margin:0;">
@@ -101,45 +101,43 @@
                         </div>	
                     </div> 
                     <a id="parseNames" class="btn btn-primary"
-                        style="float: right; margin: 5px;display:none;">Validate Names</a>
+                        style="float: right; margin: 5px;display:none;"><g:message code="button.validate.names" /> </a>
 
                 </div>
                 
                 </table>            
                 <div id="tagHeaders" class="section checklist-slickgrid" style="clear:both;display:none;">
                     <table id="tableHeader" border="1">
-                        <th class="columnName">Column_Name</th>
-                        <th>Data_Columns</th>
-                        <th>Header</th>
-                        <th>Append</th>
+                        <th class="columnName"><g:message code="upload.column.name" /></th>
+                        <th><g:message code="upload.data.columns" /></th>
+                        <th><g:message code="upload.header" /></th>
+                        <th><g:message code="upload.append" /></th>
                         <!--th>Group</th-->
-                        <th>Delimiter</th>
-                        <th>Images</th>
-                        <th class="contributorCell">Contributor  &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
-                        <th class ="attributionsCell">Attributions &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
-                        <th>Refrences</th>
-                        <th class="licenseCell">License &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div> </th>
-                        <th class="audienceCell">Audience &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary">Propagate</button></div></th>
+                        <th><g:message code="upload.delimiter" /></th>
+                        <th><g:message code="button.images" /></th>
+                        <th class="contributorCell"><g:message code="default.contributors.label" />  &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary"><g:message code="button.propogate" /></button></div> </th>
+                        <th class ="attributionsCell"><g:message code="default.attributions.label" /> &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary"><g:message code="button.propogate" /></button></div> </th>
+                        <th><g:message code="default.references.label" /></th>
+                        <th class="licenseCell"><g:message code="default.licenses.label" /> &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary"><g:message code="button.propogate" /></button></div> </th>
+                        <th class="audienceCell"><g:message code="default.audiences.label" /> &nbsp; &nbsp; <i class="icon-edit initPropagation"></i><div style="display:none;"><ul class="propagateDown"></ul><button class="propagateButton btn btn-primary"><g:message code="button.propogate" /></button></div></th>
 
                     </table>
 
 
-                    %{-- <button id="tagHeadersButton">Mark this Header</button> --}%
-                    <button class="btn btn-primary" id="downloadModifiedSpecies" style="margin-top: 8px">Download</button>
+                    %{-- <button id="tagHeadersButton"><g:message code="button.mark.header" /></button> --}%
+                    <button class="btn btn-primary" id="downloadModifiedSpecies" style="margin-top: 8px"><g:message code="button.download" /></button>
                 </div>
                 
                 <div class="section" style="margin-top: 0px; margin-bottom: 40px;clear:both;">
 
                     <a id="speciesUploadCancel" href="${uGroup.createLink(controller:'species', action:'list')}" class="btn"
-                        style="float: right; margin-right: 5px;"> Cancel </a>
+                        style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
 
                     <a id="uploadSpecies"
                         class="btn btn-primary" style="float: right; margin-right: 5px;">
-                        Upload Species</a>
+                        <g:message code="button.upload.species" /></a>
                     <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img class="uploadingSpecies" src="../images/rotate.gif"></div>
-                    <span class="policy-text"> By submitting this form for
-                        uploading species data you agree to our <a href="/terms">Terms
-                            and Conditions</a> on the use of our site </span>
+                    <span class="policy-text"> <g:message code="upload.submit.upload" /> <a href="/terms"><g:message code="link.terms.conditions" />          </a> <g:message code="button.propogate" /><g:message code="register.index.use.of.site" /></span>
                 </div>
                 </div>
                 <div id="xlsxFileUrl" style="display:none;">
@@ -158,14 +156,14 @@
 
                 <form id="downloadSpeciesFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
                     <input type="text" name="downloadFile" value="" style="visibility:hidden;">
-                    Download the uploaded sheet here <input class="btn btn-primary" type="submit" value="Download">
+                    <g:message code="upload.download.upload" /> <input class="btn btn-primary" type="submit" value="Download">
                 </form>
                 
                 <form id="downloadErrorFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">
                     <input type="text" name="downloadFile" value="" style="visibility:hidden;">
-                    Download the error file here <input class="btn btn-primary" type="submit" value="Download">
+                   <g:message code="upload.download.error.file" />  <input class="btn btn-primary" type="submit" value="Download">
                 </form>
-                <span id="filterLinkSpan" style="display:none;">You may view your contribution <a href="" id="filterLink"> here </a>.</span>
+                <span id="filterLinkSpan" style="display:none;"><g:message code="text.view.contribution" />  <a href="" id="filterLink"> <g:message code="msg.here" /> </a>.</span>
                 <div id="uploadConsole">
 
                 </div>

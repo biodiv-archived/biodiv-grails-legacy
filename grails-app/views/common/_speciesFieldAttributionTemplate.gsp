@@ -5,7 +5,7 @@
     <!-- attributions -->
     <g:if test="${speciesFieldInstance.attributors?.size() > 0}">
     <div class="prop span11">
-        <div class="name" style="float:none;">Attributions</div>
+        <div class="name" style="float:none;"><g:message code="msg.Attributions" /></div>
             <ul>
                 <g:each in="${speciesFieldInstance.attributors}" var="r">
                 <g:if test="${r}">
@@ -25,7 +25,7 @@
     </g:if>
     <g:elseif test="${isSpeciesFieldContributor}">
     <div class="prop span11">
-        <div class="name" style="float:none;">Attributions</div>
+        <div class="name" style="float:none;"><g:message code="default.attributions.label" /></div>
             <ul>
                 <li class="hidePoint">
                 <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-name="attribution" data-original-title="Add attribution" data-placeholder="Add attribution"></span>
@@ -36,7 +36,7 @@
 
     <g:if test="${speciesFieldInstance?.contributors}">
     <div class="prop span11">
-        <div class="name" style="float:none;">Contributors</div>
+        <div class="name" style="float:none;"><g:message code="default.contributors.label" /></div>
             <ul><g:each
                 in="${ speciesFieldInstance?.contributors}" var="contributor">
                 <g:if test="${contributor}">
@@ -57,7 +57,7 @@
 
     <g:if test="${speciesFieldInstance?.status}">
     <div class="prop span11">
-        <div class="name span2" style="margin-left:0px;">Status</div>
+        <div class="name span2" style="margin-left:0px;"><g:message code="default.status.label" /></div>
         <div class="value pull-left">
             
             <!--a href="#" class="status ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status"  data-value="${speciesFieldInstance?.status?.value()}" data-original-title="Edit status">
@@ -69,7 +69,7 @@
     </g:if>
     <g:if test="${speciesFieldInstance?.audienceTypes}">
     <div class="prop span11">
-        <div class="span2 name" style="margin-left:0px;">Audiences</div>
+        <div class="span2 name" style="margin-left:0px;"><g:message code="default.audiences.label" /></div>
         <div class="value pull-left"><g:each
             in="${ speciesFieldInstance?.audienceTypes}"
             var="audienceType">
@@ -81,7 +81,7 @@
     </g:if>
     <g:if test="${speciesFieldInstance?.licenses?.size() > 0}">
     <div class="prop span11">
-        <div class="span2 name" style="margin-left:0px;">Licenses</div>
+        <div class="span2 name" style="margin-left:0px;"><g:message code="default.licenses.label" /></div>
         <div class="value pull-left"><g:each status="i"
             in="${speciesFieldInstance?.licenses}" var="license">
             <span class="license ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-name="license" data-value="${license.name}" data-original-title="Edit license">${license.name}</span>
@@ -94,7 +94,7 @@
     <!-- references -->
     <g:if test="${speciesFieldInstance.references?.size() > 0}">
     <div class="prop span11">
-        <div class="name" style="float:none;">References</div>
+        <div class="name" style="float:none;"><g:message code="default.references.label=References" /></div>
         <div>
             <ul>
                 <g:each in="${speciesFieldInstance.references}" var="r">
@@ -123,7 +123,7 @@
     </g:if>
     <g:elseif test="${isSpeciesFieldContributor}">
     <div class="prop span11">
-        <div class="name" style="float:none;">References</div>
+        <div class="name" style="float:none;"><g:message code="msg.References" /></div>
             <ul>
                 <li class="hidePoint">
                 <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></span>

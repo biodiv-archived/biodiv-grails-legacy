@@ -113,7 +113,7 @@ max-width: 100%;
 				<div class="super-section">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Groups</h3>
+						<h3><g:message code="default.groups.label" /></h3>
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'name', 'error')}">
 
@@ -144,7 +144,7 @@ max-width: 100%;
 							>
 							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
 							
-								<label for="description" class="control-label">Description</label>
+								<label for="description" class="control-label"><g:message code="default.description.label" /></label>
 							<div class="controls  textbox">
 								
 								<textarea id="description" name="description" placeholder="Write a small description about your activities in this Group. This will appear on the Group's home page...">${userGroupInstance?.description}</textarea>
@@ -202,7 +202,7 @@ max-width: 100%;
 												<a id="change_picture">
 													<img id="thumbnail"
 													src='${createLink(url: userGroupInstance.mainImage().fileName)}' class='logo '/>
-                                                                                                        <div><i class="icon-picture"></i>Upload group icon preferably of dimensions 200px X 200px and size < ${grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024}KB</div>
+                                                                                                        <div><i class="icon-picture"></i><g:message code="usergroup.upload.icon.size" /> ${grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024}KB</div>
 												</a>
 												
 											</div>
@@ -230,7 +230,7 @@ max-width: 100%;
 				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Administration</h3>
+						<h3><g:message code="usergroup.administration" /></h3>
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'founders', 'error')}">
 							<label for="founders" class="control-label"><g:message
@@ -238,7 +238,7 @@ max-width: 100%;
 							<div class="controls  textbox">
 								<sUser:selectUsers model="['id':founders_autofillUsersId]" />
 								<input type="hidden" name="founderUserIds" id="founderUserIds" />
-								<textarea name="founderMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" >You are invited to be a founder for the group. Please click on the link to accept</textarea>
+								<textarea name="founderMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" ><g:message code="usergroup.invited.accept" /></textarea>
 								
 							</div>
 						</div>
@@ -250,7 +250,7 @@ max-width: 100%;
 							<div class="controls  textbox">
 									<sUser:selectUsers model="['id':experts_autofillUsersId]"/>
 									<input type="hidden" name="expertUserIds" id="expertUserIds" />
-									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" >You are invited to be a moderator for the group. Please click on the link to accept</textarea>
+									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" ><g:message code="usergroup.invited.moderator" /></textarea>
 							</div>
 						</div>
 					</div>
@@ -267,7 +267,7 @@ max-width: 100%;
                                 <div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Location</h3>
+						<h3><g:message code="default.location.label" /></h3>
                                                 <uGroup:locationSelector model="['userGroupInstance':userGroupInstance]"/>
                                         </div>
                                 </div>
@@ -275,11 +275,11 @@ max-width: 100%;
 				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Interests</h3>
+						<h3><g:message code="suser.edit.intrests" /></h3>
 						
 						<div class="row control-group left-indent">
 							
-								<label class="control-label">Species Groups & Habitats
+								<label class="control-label"><g:message code="default.species.habitats.label" />
 								</label>
 							
 							<div class="filters controls textbox" style="position: relative;">
@@ -290,7 +290,7 @@ max-width: 100%;
 						
 						<div class="row control-group left-indent">
 							
-								<label class="control-label">Tags <small><g:message
+								<label class="control-label"><g:message code="default.tags.label" /> <small><g:message
 											code="observation.tags.message" default="" />
 								</small>
 								</label>
@@ -310,7 +310,7 @@ max-width: 100%;
 				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Permissions</h3>
+						<h3><g:message code="usergroup.create.permissions" /></h3>
 						<div class="row control-group left-indent">
 							
 								<label class="checkbox" style="text-align: left;"> 
@@ -349,11 +349,11 @@ max-width: 100%;
 				
 					<g:if test="${userGroupInstance?.id}">
 						<a href="${createLink(mapping:'userGroup', action:'show', params:['webaddress':userGroupInstance.webaddress])}" class="btn"
-							style="float: right; margin-right: 5px;"> Cancel </a>
+							style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
 					</g:if>
 					<g:else>
 					<a href="${createLink(mapping:'userGroupgeneric', action:'list')}" class="btn"
-							style="float: right; margin-right: 5px;"> Cancel </a>
+							style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
 					</g:else>
 					
 					<g:if test="${userGroupInstance?.id}">
@@ -361,16 +361,13 @@ max-width: 100%;
 							style="float: right; margin-right: 5px;">
 							<a
 								href="${createLink(mapping:'userGroup', action:'delete', params:['webaddress':userGroupInstance.webaddress])}"
-								onclick="return confirm('${message(code: 'default.userGroup.delete.confirm.message', default: 'This group and its content will be deleted. Are you sure ?')}');">Delete
-								Group </a>
+								onclick="return confirm('${message(code: 'default.userGroup.delete.confirm.message', default: 'This group and its content will be deleted. Are you sure ?')}');"><g:message code="button.delete.group" /></a>
 						</div>
 					</g:if>
 					 <a id="createGroupSubmit"
 						class="btn btn-primary" style="float: right; margin-right: 5px;">
 						${form_button_val} </a>
-					<span class="policy-text"> By submitting this form for
-						creating a new group you agree to our <a href="/terms">Terms
-							and Conditions</a> on the use of our site </span>
+					<span class="policy-text"> <g:message code="usergroup.create.submitting.for.new" /> <a href="/terms"><g:message code="link.terms.conditions" /></a> <g:message code="register.index.use.of.site" /> </span>
 				</div>
 
 

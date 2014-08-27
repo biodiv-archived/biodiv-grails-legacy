@@ -26,7 +26,7 @@
                 <div style="width:100%;">
                     <div class="main_heading" style="margin-left:0px;">
 
-                        <h1>Observations</h1>
+                        <h1><g:message code="default.observation.label" /></h1>
 
                     </div>
                 </div>
@@ -39,7 +39,7 @@
             <obv:featured 
             model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 
-            <h4>Browse Observations</h4>
+            <h4><g:message code="heading.browse.observations" /></h4>
             <obv:showObservationsListWrapper />
 	</div>
 

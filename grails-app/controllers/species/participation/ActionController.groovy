@@ -41,6 +41,7 @@ import species.participation.ActivityFeedService
 class ActionController {
     
     def grailsApplication;
+    def utilsService;
 	def observationService;
 	def springSecurityService;
 	def mailService;
@@ -80,7 +81,7 @@ class ActionController {
         //NOTE: Putting rootHolder & activity holder Same for IBP group case
         def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
         searchIndex(params.type,obv)
-        observationService.sendNotificationMail(act.activityType, obv, null, null, act)
+        utilsService.sendNotificationMail(act.activityType, obv, null, null, act)
         return true
     }
 
@@ -277,7 +278,7 @@ class ActionController {
 
                     def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, params.author, activityFeedService.UNFEATURED, featuredInstance.notes);
                     searchIndex(params.type,obv)
-                    observationService.sendNotificationMail(act.activityType, obv, null, null, act)
+                    utilsService.sendNotificationMail(act.activityType, obv, null, null, act)
                     status = true
                     if(status) {
                         msg = messageSource.getMessage("default.remove.featured", [obv.class.simpleName] as Object[], request.locale)
@@ -323,7 +324,7 @@ class ActionController {
                     obv.save(flush:true)
                     def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
                     searchIndex(params.type,obv)				
-                    observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
+                    utilsService.sendNotificationMail(utilsService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
                     flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
                     msg = "Flagged..."
                 }

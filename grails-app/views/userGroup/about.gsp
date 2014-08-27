@@ -15,7 +15,7 @@
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
 				<div class="span8 main_heading" style="margin-left: 0px;">
-					<h1>About Us</h1>
+					<h1><g:message code="button.about.us" /></h1>
 				</div>
 				<sec:permitted className='species.groups.UserGroup'
 					id='${userGroupInstance.id}'
@@ -23,7 +23,7 @@
 
 					<a class="btn btn-info pull-right"
 						href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}">
-						<i class="icon-edit"></i>Edit Group </a>
+						<i class="icon-edit"></i><g:message code="button.edit.group" /> </a>
 					<!-- a class="btn btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
 				</sec:permitted>
 
@@ -42,18 +42,18 @@
 					<li
 						class="${(!params.action || params.action == 'about')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance)}">
-							About Us</a></li>
+							<g:message code="button.about.us" /></a></li>
 					<li
 						class="${(!params.action || params.action == 'user')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}">
-							All Members (${membersTotalCount})</a></li>
+							<g:message code="button.all.members" />  (${membersTotalCount})</a></li>
 
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
-							Founders (${foundersTotalCount})</a></li>
+							<g:message code="tabs.founders" /> (${foundersTotalCount})</a></li>
 					<li class="${(params.action == 'experts')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'moderators', 'userGroup':userGroupInstance)}">
-							Moderators (${expertsTotalCount})</a></li>
+							<g:message code="tabs.moderators" /> (${expertsTotalCount})</a></li>
 				</ul>
 
 
@@ -65,7 +65,7 @@
 							</div>
 							<div class="section">
 								<div class="prop">
-									<span class="name"><i class="icon-time"></i>Founded</span>
+									<span class="name"><i class="icon-time"></i><g:message code="default.founded.label" /></span>
 									<obv:showDate
 										model="['userGroupInstance':userGroupInstance, 'propertyName':'foundedOn']" />
 								</div>
@@ -95,21 +95,21 @@
 		</div-->
 
 						<div class="super-section">
-							<h3>Interests</h3>
+							<h3><g:message code="suser.edit.intrests" /></h3>
 							<div class="section">
-								<h5>Species Groups</h5>
+								<h5><g:message code="default.species.groups.label" /></h5>
 								<uGroup:interestedSpeciesGroups
 									model="['userGroupInstance':userGroupInstance]" />
 							</div>
 
 							<div class="section">
-								<h5>Habitat</h5>
+								<h5><g:message code="default.habitats.label" /></h5>
 								<uGroup:interestedHabitats
 									model="['userGroupInstance':userGroupInstance]" />
 
 							</div>
 							<div class="section">
-								<h5>Location</h5>
+								<h5><g:message code="default.location.label" /></h5>
 								<uGroup:showLocation
 									model="['userGroupInstance':userGroupInstance]" />
 							</div>

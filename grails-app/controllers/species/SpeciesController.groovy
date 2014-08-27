@@ -40,12 +40,11 @@ class SpeciesController extends AbstractObjectController {
     def speciesUploadService;
 	def speciesService;
 	def speciesPermissionService;
-	def observationService;
 	def userGroupService;
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-
+    
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -156,7 +155,7 @@ class SpeciesController extends AbstractObjectController {
                         
                         def feedInstance = activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
 
-                        observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
+                        utilsService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
 
 
                         redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
@@ -447,7 +446,6 @@ class SpeciesController extends AbstractObjectController {
         println "===========UPDATE STARTED========= "
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
-        println "==========PARAMS FROM CLIENT======= " + paramsForObvSpField + "==== " + paramsForUploadSpField
         if(!(params.name && params.pk)) {
         	msg=messageSource.getMessage("default.species.error.fieldOrname", null, request.locale)
             render ([success:false, msg:msg] as JSON)
@@ -570,7 +568,7 @@ class SpeciesController extends AbstractObjectController {
                 if(result.activityType)
                     feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
                 if(result.mailType) 
-                    observationService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
+                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
@@ -832,7 +830,7 @@ class SpeciesController extends AbstractObjectController {
             }
 
             if(success) {
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
+                utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
                 if(conf) {
                     log.debug "Deleting confirmation code and usertoken params";
@@ -894,6 +892,7 @@ class SpeciesController extends AbstractObjectController {
 
                 observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)
+                utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
             } else{
                 flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)            
             }
@@ -949,7 +948,6 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def getRelatedObvForSpecies() {
-        println "====================PARAMS============ " + params
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
@@ -963,7 +961,7 @@ class SpeciesController extends AbstractObjectController {
     def pullObvImage() {
         log.debug params  
         //pass that same species
-        def species = Species.read(params.speciesId.toLong())
+        def species = Species.get(params.speciesId.toLong())
         def out = speciesService.updateSpecies(params, species)
         def result
         if(out){
@@ -1067,6 +1065,32 @@ class SpeciesController extends AbstractObjectController {
         return result;
     }
 
+    def saveModifiedSpeciesFile = {
+        //log.debug params
+        File file = speciesUploadService.saveModifiedSpeciesFile(params);
+        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+        /*
+        if (f.exists()) {
+            println "here here===================="
+            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+            response.outputStream << f.readBytes()
+            response.outputStream.flush()
+            println "==YAHAN HUN == " 
+            return render(text: [success:true] as JSON, contentType:'text/html')
+        } else {
+            println "in else================"
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            log.error msg
+            flash.message = msg
+            redirect controller: params.errorController, action: params.errorAction
+            return
+        }
+        */
+    }
+
+
     def getSpeciesFieldMedia() {
         def resList = []
         def obvLinkList = []
@@ -1074,7 +1098,6 @@ class SpeciesController extends AbstractObjectController {
         def offset = 0 
         def spInstance = Species.read(params.speciesId.toLong())
         resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
-        println "========RES LIST========== " + resList
         def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
         def result = [addPhotoHtml: addPhotoHtml]
         render result as JSON
@@ -1084,8 +1107,7 @@ class SpeciesController extends AbstractObjectController {
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
-        println "==============OBV SP FIELD================"
-        def speciesField = SpeciesField.read(params.speciesFieldId.toLong())
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
         if(out){
@@ -1097,8 +1119,7 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def uploadMediaInSpField(){
-         println "==============UPLOADING IN SP FIELD================"
-        def speciesField = SpeciesField.read(params.speciesFieldId.toLong())
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
         if(out){

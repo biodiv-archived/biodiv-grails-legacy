@@ -1,7 +1,7 @@
 	<div class="prop">
 		<div class="row control-group left-indent">
 
-			<label class="control-label">Home Page </label>
+			<label class="control-label"><g:message code="default.home.page.label" /> </label>
 			<g:hiddenField name="homePage" />
 			<div class="controls">
 				<div class="btn-group" style="margin-top: 10px;">
@@ -42,7 +42,7 @@
 	<div class="prop">
 		<div class="row control-group left-indent">
 
-			<label class="control-label">Theme</label>
+			<label class="control-label"><g:message code="default.theme.label" /></label>
 			<g:hiddenField name="theme" />
 			<div class="controls">
 				<div class="btn-group" style="margin-top: 10px;">

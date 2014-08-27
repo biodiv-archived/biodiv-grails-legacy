@@ -30,7 +30,6 @@
             e.preventDefault();
             var $conEntry = $(e.currentTarget).parent();
             var $container = $conEntry.parent();
-            console.log("======================ON EDIT=============");
             this.initEditableForm($container, $conEntry, $container.data());
         },
 
@@ -68,14 +67,10 @@
 
 
         initEditableForm : function($container, $conEntry, options) {
-            console.log("==========EDITABLE FORM==============")
-            console.log($container);
-            //var addMediaHtml = '<a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn" onclick="getSpeciesFieldMedia("'+$container.data("speciesid")+'","'$container.data("pk")+'","fromSingleSpeciesField","'+window.params.getSpeciesFieldMedia+'")>Add Media</a>';
-            var addMediaHtml = '<a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn">Add Media</a>';
+            var addMediaHtml = '<a title="Add Media" style="position: relative;top: 54px;margin-right: 5px;right: 233px;" class="pull-right speciesFieldMedia"><i class="icon-picture"></i></a>';
 
-            //$container.prepend(addMediaHtml);
+            $container.prepend(addMediaHtml);
             $(".speciesFieldMedia").unbind("click").click(function(){
-                console.log("called this function");
                 var me = this;
                 var $container = $(me).closest(".speciesField");
                 getSpeciesFieldMedia($container.data("speciesid"), $container.data("pk"), "fromSingleSpeciesField", window.params.getSpeciesFieldMedia)
@@ -203,8 +198,7 @@
             //changing id while adding it to the form
             var id = $textarea.attr('id');
             id = id+"_e"
-                $textarea.attr('id', id);
-
+            $textarea.attr('id', id);
             $textarea = $textarea.prependTo($editableInput);
             var editor = CKEDITOR.instances[id];
             if(editor) {
@@ -222,6 +216,7 @@
         },
 
         onFormSubmit :  function(e) {
+            $("body").css("cursor", "progress");
             e.stopPropagation();
             e.preventDefault();
             var $sf = this;
@@ -248,7 +243,12 @@
 
                 var allInputs = $("#pullObvImagesSpFieldForm :input");
                 allInputs.each(function() {
-                    paramsForObvSpField[this.name] = $(this).val();
+                    if($(this).hasClass("pullImage") && $(this).is(':checked')){
+                        paramsForObvSpField[this.name] = $(this).val();
+                    } else if(!$(this).hasClass("pullImage")){
+                        paramsForObvSpField[this.name] = $(this).val();
+                    }
+
                 });
                 var allInputs1 = $("#uploadSpeciesFieldImagesForm :input");
                 allInputs1.each(function() {
@@ -326,6 +326,7 @@
                 $errorBlock.removeClass('alert-info').addClass('alert-error').html(data.msg);
                 $container.addClass('errors');
             }
+            $("body").css("cursor", "default");
         },
 
         onUpdateError : function(response, status, error) {
@@ -341,6 +342,7 @@
                     return response.responseText;
                 }
             });
+            $("body").css("cursor", "default");
         }
     });
 

@@ -4,21 +4,22 @@ var contributors_autofillUsersComp;
 function onSpeciesImageUploadSuccess(type){
     var msgText
     if(type == "imageUpload"){
-        msgText = "Images uploaded/edited succesfully, Please refresh the page to see the changes in gallery!!"
+        msgText = "Images uploaded/edited succesfully, Page will reload to reflect the changes in gallery!!"
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab1") );
     }
     else if(type == "pulledSpeciesFieldImage"){
-        msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
+        msgText = "Images succesfully pulled, Page will reload to reflect the changes in gallery!!"
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab2") );
     }
     else{
-        msgText = "Images succesfully pulled, Please refresh the page to see the changes in gallery!!"
+        msgText = "Images succesfully pulled, Page will reload to reflect the changes in gallery!!"
         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(msgText);
         $('html, body').animate({
-            scrollTop: $(".alertMsg").offset().top
-        }, 1000);
+            scrollTop: 0
+    }, 'slow');
 
     }
+    setTimeout(function(){location.reload(true);}, 1000);
     return true;
 }
 
@@ -224,3 +225,9 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
     });
 }
 
+$("#addSpFieldResourcesModalSubmit").click(function(){
+    var spfid = $("#addSpFieldResourcesModal").data("spfieldid");
+    $("#addSpFieldResourcesModal").modal("toggle");
+    $(".speciesField[data-pk='"+spfid+"']").find(".editable-submit").trigger("click");
+    return;
+});

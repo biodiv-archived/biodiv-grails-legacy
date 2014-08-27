@@ -31,6 +31,7 @@ class UserGroupController {
 
 	def mailService;
 	def aclUtilService;
+	def utilsService;
 	def observationService;
 	def emailConfirmationService;
 	def namesIndexerService;
@@ -106,7 +107,7 @@ class UserGroupController {
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		if(params.append) {
+		if(params.append && session["uGroup_ids_list"]) {
 			session["uGroup_ids_list"].addAll(userGroupInstanceList.collect {it.id});
 		} else {
 			session["uGroup_ids_list_params"] = params.clone();
@@ -791,7 +792,7 @@ class UserGroupController {
 				}
 			}
 			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", 'userGroup':userGroupInstance);
-			return;
+			return
 		}
 		flash.error=messageSource.getMessage("default.userPermission.to.confirmation", null, request.locale)
 		redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:"list");
@@ -937,7 +938,7 @@ class UserGroupController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(userGroupDir, Utils.generateSafeFileName(f.originalFilename));
+						File file = utilsService.getUniqueFile(userGroupDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, userGroupDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);

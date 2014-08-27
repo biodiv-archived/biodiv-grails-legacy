@@ -276,13 +276,13 @@ class ObservationTagLib {
             """
 
             if(!hideForm) {
-                out << """<form class="ratingForm" method="get" title="Rate it">
+                out << """<form class="ratingForm" method="get" title="${g.message(code:'observationtaglib.title.rate')}">
                     """
             }
             out << """
                 <span class="like_${divClass} 
                     title="${(userRating>0)?'Unlike':'Like'}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
-                    <span class="noOfRatings" title='No of likes'>${resource.totalRatings ?: 0}</span>
+                    <span class="noOfRatings" title='${g.message(code:"observationtaglib.title.likes")}'>${resource.totalRatings ?: 0}</span>
                 """
             if(!hideForm) {
                 out << "</form>"
@@ -336,7 +336,6 @@ class ObservationTagLib {
     }
 
     def addPhotoWrapper = { attrs, body ->
-        println "===============RES LIST TYPE================ " + attrs.model
         def resList = []
         def obvLinkList = []
         def resCount = 0
@@ -384,7 +383,7 @@ class ObservationTagLib {
                 /*if(SUserService.isAdmin(userInstance?.id)){
                     usersResList = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString())
                 } else {*/
-                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
+                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
                 //}
                 usersResList.each{
                     resList.add(it.res)
@@ -393,7 +392,6 @@ class ObservationTagLib {
             break
     
         }
-        println "=============RES LIST========= " + resList
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount

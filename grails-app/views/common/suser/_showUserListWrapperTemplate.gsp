@@ -22,16 +22,16 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 							data-toggle="dropdown" href="#" rel="tooltip"
 							data-original-title="Sort by">
 							<g:if test="${params.sort == 'lastLoginDate'}">
-                                                Last Login
+                                               <g:message code="button.last.login" /> 
                                             </g:if>
 							<g:elseif test="${params.sort == 'name'}">
-                                                Name
+                                                <g:message code="default.name.label" />
                                             </g:elseif>
                                             <g:elseif test="${params.sort == 'score'}">
-                                                Relevancy
+                                               <g:message code="button.relevancy" /> 
                                             </g:elseif>
 				            <g:else>
-                                                Activity
+                                               <g:message code="button.activity" /> 
                                             </g:else>
 							<span class="caret"></span>
 						</button>
@@ -40,16 +40,16 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 
 						<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 							<li class="group_option"><a class="sort_filter_label"
-								value="activity">Activity </a></li>
+								value="activity"><g:message code="button.activity" />  </a></li>
 							<li class="group_option"><a
 								class=" sort_filter_label ${params.sort == 'lastLoginDate'?'active':'' }"
-								value="lastLoginDate"> Last Login </a></li>
+								value="lastLoginDate"> <g:message code="button.last.login" />  </a></li>
 							<li class="group_option"><a
 								class=" sort_filter_label  ${params.sort == 'name'?'active':'' }"
-								value="name"> Name </a></li>
+								value="name"> <g:message code="default.name.label" /> </a></li>
 							<g:if test="${isSearch}">
 								<li class="group_option"><a class=" sort_filter_label"
-									value="score"> Relevancy </a></li>
+									value="score"> <g:message code="button.relevancy" /> </a></li>
 							</g:if>
 						
 						</ul>

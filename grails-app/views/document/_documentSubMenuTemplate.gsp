@@ -7,7 +7,7 @@
                                 <a class="btn btn-success pull-right"
                                         href="${uGroup.createLink(
                                                         controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" title="Add Document"
-                                        > <i class="icon-plus"></i>Add Document</a>
+                                        > <i class="icon-plus"></i><g:message code="link.add.document" /></a>
 
                             </div>
 			    <s:showHeadingAndSubHeading

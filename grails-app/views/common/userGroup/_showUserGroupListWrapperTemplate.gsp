@@ -22,27 +22,27 @@
 
 
 							<g:if test="${params.sort == 'foundedOn'}">
-                                                Latest
+                                               <g:message code="button.latest" /> 
                                             </g:if>
 							<g:elseif test="${params.sort == 'score'}">
-                                                Relevancy
+                                                <g:message code="button.relevancy" />
                                             </g:elseif>
 							<g:else>
-                                                Most Viewed
+                                               <g:message code="button.most.viewed" /> 
                                             </g:else>
 							<span class="caret"></span>
 						</button>
 						<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 							<li class="group_option"><a class=" sort_filter_label"
-								value="foundedOn"> Latest </a></li>
+								value="foundedOn"> <g:message code="button.latest" />  </a></li>
 
 							<g:if test="${isSearch}">
 								<li class="group_option"><a class=" sort_filter_label"
-									value="score"> Relevancy </a></li>
+									value="score"> <g:message code="button.relevancy" />  </a></li>
 							</g:if>
 							<g:else>
 								<li class="group_option"><a class=" sort_filter_label"
-									value="visitCount"> Most Viewed </a></li>
+									value="visitCount">  <g:message code="button.most.viewed" />  </a></li>
 							</g:else>
 						</ul>
 					</div>
