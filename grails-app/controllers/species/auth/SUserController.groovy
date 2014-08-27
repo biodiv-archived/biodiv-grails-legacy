@@ -134,12 +134,12 @@ class SUserController extends UserController {
 
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
-            	msg = messageSource.getMessage("id.required", null, request.locale)
+            	msg = messageSource.getMessage("id.required", ['Id'] as Object[], request.locale)
                 render (['success':false, 'msg':msg] as JSON)
                 return
             } else {
                 if (!SUserInstance) {
-                	msg = messageSource.getMessage("user.not.find.by.id", [params.id] as Object[], request.locale)
+                	msg = messageSource.getMessage("default.not.find.by.id", ['user',params.id] as Object[], request.locale)
                     render (['success':false, 'msg':msg] as JSON)
                     return
                 } else {

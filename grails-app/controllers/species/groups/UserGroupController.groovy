@@ -36,6 +36,8 @@ class UserGroupController {
 	def namesIndexerService;
 	def activityFeedService;
     def digestService;
+
+    def messageSource;
 	
 	static allowedMethods = [save: "POST", update: "POST"]
 
@@ -732,6 +734,7 @@ class UserGroupController {
     @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest() {
 		log.debug params;
+		def msg;
 		if(params.userId && params.userGroupInstanceId) {
 			def user;
 			if(params.userId == 'register') {
@@ -752,7 +755,7 @@ class UserGroupController {
                             break;
                         }
                         if(userGroupInstance.addMember(user)) {
-                            flash.message="Successfully added ${user} to this group as member"
+                            flash.message=messageSource.getMessage("default.addresource.success", [user,'member'] as Object[], request.locale)
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
@@ -761,7 +764,7 @@ class UserGroupController {
                             break;
                         }
                         if(userGroupInstance.addFounder(user)) {
-							flash.message="Successfully added ${user} to this group as founder"
+							flash.message=messageSource.getMessage("default.addresource.success", [user,'founder'] as Object[], request.locale)
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
@@ -770,7 +773,7 @@ class UserGroupController {
                             break;
                         }
                         if(userGroupInstance.addExpert(user)) {
-							flash.message="Successfully added ${user} to this group as a moderator"
+							flash.message=messageSource.getMessage("default.addresource.success", [user,'moderator'] as Object[], request.locale)
 						}
 						break;
 					default: log.error "No proper role type is specified."
@@ -783,36 +786,39 @@ class UserGroupController {
 				}
 			} else {
 				if(user && userGroupInstance) {
-					flash.error="Couldn't add user to the group as the currently logged in user doesn't have required permissions."
-				} else {
-					flash.error="Couldn't add user to the group because of missing information."
+					flash.error=messageSource.getMessage("default.userCouldntaddedToGroup.permission", null, request.locale)				} else {
+					flash.error=messageSource.getMessage("default.userCouldntaddedToGroup.permission", null, request.locale)
 				}
 			}
 			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", 'userGroup':userGroupInstance);
 			return;
 		}
-		flash.error="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
+		flash.error=messageSource.getMessage("default.userPermission.to.confirmation", null, request.locale)
 		redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:"list");
 	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def leaveUs() {
+		def msg;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
-			flash.error = 'No userGroup selected.'
-			render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup selected.'] as JSON);
+			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+			flash.error = msg
+			render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 			return;
 		}
 
 		def user = springSecurityService.currentUser;
 		if(user && userGroupInstance.deleteMember(user)) {
 			activityFeedService.addActivityFeed(userGroupInstance, user, user, activityFeedService.MEMBER_LEFT);
-			flash.message = 'Thank you for being with us.'
-			render (['msg':'Thank you for being with us.', 'shortMsg':'Thank you', 'success':true, 'statusComplete':true] as JSON);
+			msg = messageSource.getMessage("default.thankYouForBeingWithUS", null, request.locale)
+			flash.message = msg
+			render (['msg':msg, 'shortMsg':'Thank you', 'success':true, 'statusComplete':true] as JSON);
 			return;
 		}
-		flash.error = 'Your presence is important to us. Cannot let you leave at present.'
-		render (['msg':'Your presence is important to us. Cannot let you leave at present.', 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
+		msg = messageSource.getMessage("default.YourPresenceImportant", null, request.locale)
+		flash.error = msg
+		render (['msg':msg, 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
 	}
    
 
@@ -832,7 +838,7 @@ class UserGroupController {
 
 		def observationInstance = Observation.get(params.long('id'))
 		if (!observationInstance) {
-			flash.message = "Observation not found with id $params.id"
+			flash.message = messageSource.getMessage("default.Not.Founded", ['Observation',params.id] as Object[], request.locale)
 			return;
 		}
 
@@ -1023,7 +1029,7 @@ class UserGroupController {
 
 		def userInstance = SUser.get(params.long('id'))
 		if (!userInstance) {
-			flash.message = "SUser not found with id $params.id"
+			flash.message = messageSource.getMessage("default.Not.Founded", ['SUser',params.id] as Object[], request.locale)
 			return;
 		}
 
