@@ -1,7 +1,7 @@
 <%@ page import="species.utils.Utils"%>
 
 <div class="sidebar_section">
-    <h5><g:message code="default.species.distribution.label" />Species Distribution</h5>
+    <h5><g:message code="default.species.distribution.label" /></h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
     <h5><g:message code="default.location.info.label" /></h5>
     <table class="table table-bordered table-condensed table-striped">

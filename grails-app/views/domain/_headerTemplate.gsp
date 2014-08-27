@@ -98,7 +98,7 @@
 					
 
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"> <g:message code="link.more" /> <b class="caret"></b> </a>
+						data-toggle="dropdown"> <g:message code="link.more.button" /> <b class="caret"></b> </a>
 						<ul class="dropdown-menu" style="text-align: left;">
                                                     <li
                                                     class="${((params.controller == 'user' && params.action == 'list') ||(params.controller == 'user'))?' active':''}"><a
