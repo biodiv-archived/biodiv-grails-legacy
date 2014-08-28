@@ -1615,12 +1615,32 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
             species.addToResources(resource);
-
         }
         species.merge();
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
+        }
+        if(species.instanceOf(Species)) {
+            def otherParams = [:]
+            def resURLs = []
+            resources.each {
+                def basePath = '';
+                if(it?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
+                    basePath = grailsApplication.config.speciesPortal.observations.serverURL
+                }
+                else if(it?.context?.value() == Resource.ResourceContext.SPECIES.toString() || it?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+                    basePath = grailsApplication.config.speciesPortal.resources.serverURL
+                }
+                def imagePath = '';
+                imagePath = it.thumbnailUrl(basePath);
+                resURLs.add(imagePath);
+            }
+            otherParams['resURLs'] = resURLs
+            otherParams['spId'] = species.id
+            //ADD FEED AND SEND
+            def feedInstance = activityFeedService.addActivityFeed(species, species, springSecurityService.currentUser, activityFeedService.SPECIES_UPDATED);
+            observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, species, null, "", feedInstance, otherParams);
         }
         return true
     }

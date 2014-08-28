@@ -53,8 +53,25 @@
 							<a href="${actorProfileUrl}"> ${currentUser?.name} </a>
 					</g:else>
 				</g:else>
-				${raw(message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1))}
-
+                ${raw(message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1))}
+                <g:if test="${spFDes}">
+                    <p style="margin-left:35px;">
+                        ${spFDes}
+                    </p>
+                </g:if>
+                <g:if test="${resURLs}">
+                    <table>
+                        <tr align="left">
+                            <g:each in="${resURLs.size() < 8 ? resURLs : resURLs.subList(0, 5)}" var="ru">
+                            <td height="50" width="50" style=" border: 1px solid lightblue; text-align: left;">
+                                <a href="${uGroup.createLink(action:'show', controller:'species', 'id': obvId , absolute:true)}">
+                                    <img src="${ru}" title="" style="border: 0px solid ; max-height: 50px; width:50px;" />
+                                </a>
+                            </td>
+                            </g:each>
+                        </tr>
+                    </table>
+                </g:if>
 
 				<g:if test="${activity?.text }">
 
@@ -75,7 +92,7 @@
 				</table>
 			</div>
 			
-				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'species' || domainObjectType == 'usergroup' || domainObjectType == 'newsletter')}">
+				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'usergroup' || domainObjectType == 'newsletter')}">
 				 		<div class="clear" class="content" style="margin: 0 auto;padding: 10px 0px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; background-color:#D4ECE3; align:left; clear: both;">
 							<!-- Callout Panel -->
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
@@ -172,9 +189,10 @@
 								<g:else>
 									<b>Common Name:</b> Help Identify <br />
 								</g:else>
-
+                                
+								<g:if test="${obvPlace || obvDate}"> 
 								<b>Location: </b> ${obvPlace}<br /><b>Observed On:</b>  ${obvDate}<br />
-
+                                </g:if>
 								</p>
 
 		
@@ -196,8 +214,8 @@
 			</div><!-- /COLUMN WRAP -->	
 </g:else>
 				<g:if test="${groups}">
-				<div class="clear" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; clear: both; background-color: #D4ECE3;">
-					<a style="padding:0 2px">The above observation is a member of the following groups: <a/><br />
+                <div class="clear" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; clear: both; background-color: #D4ECE3;">
+                    <span style="padding:0 2px">The above ${domainObjectType} is a member of the following groups: <span/><br />
 						<g:each in="${groups}">
 							<div style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
 							    <a href="${baseUrl}/group/${it.webaddress}" style="text-decoration: none; color: #222222;"> 

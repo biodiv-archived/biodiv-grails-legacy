@@ -2,6 +2,7 @@ var curators_autofillUsersComp;
 var contributors_autofillUsersComp;
 
 function onSpeciesImageUploadSuccess(type){
+    $("body").css("cursor", "progress");
     var msgText
     if(type == "imageUpload"){
         msgText = "Images uploaded/edited succesfully, Page will reload to reflect the changes in gallery!!"
@@ -19,7 +20,8 @@ function onSpeciesImageUploadSuccess(type){
     }, 'slow');
 
     }
-    setTimeout(function(){location.reload(true);}, 1000);
+    setTimeout(function(){location.reload();}, 2000);
+    $("body").css("cursor", "default");
     return true;
 }
 
