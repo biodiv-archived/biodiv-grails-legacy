@@ -18,7 +18,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import species.auth.FacebookAuthToken;
 
 public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.facebook.FacebookAuthProvider {
 
@@ -30,6 +30,14 @@ public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.fa
 	public Authentication authenticate(Authentication authentication) {
        
 		FacebookAuthToken token = authentication
+        //HACK to accomodate registering new user from facebookCreateAccount
+        if(token.uid > 0) {
+            def user = facebookAuthDao.findUser(token.uid as Long)
+            if (user == null && token.user != null && token.user.accessToken != null) {
+                throw new AuthenticationServiceException("Registering from Facebook ${token.user}");
+            }
+        }
+
 /*
 		def user = facebookAuthDao.findUser(token.uid as Long)
 		if (user == null) {

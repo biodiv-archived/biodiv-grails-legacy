@@ -68,12 +68,7 @@ class LoginController {
 	}
 
 	def authSuccess = {
-        println "***********++++++++++++++++++++++++++++++++++"
-        println springSecurityService.currentUser
-        log.debug params
-        println "***********++++++++++++++++++++++++++++++++++"
 		if(params.uid) {
-            println "dklsfjlsdfj"
 			def targetUrl = request.getParameter(SpringSecurityUtils.DEFAULT_TARGET_PARAMETER);
 			if (StringUtils.hasText(targetUrl)) {
 				try {
