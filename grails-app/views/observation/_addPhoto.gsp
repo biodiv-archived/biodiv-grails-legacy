@@ -78,7 +78,7 @@
 
             <div class='metadata prop'
                 style="position: relative; top: -30px;">
-                <input name="file_${i}" type="hidden" value='${r.fileName}' />
+                <input class="fileName" name="file_${i}" type="hidden" value='${r.fileName}' />
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
                 <input name="date_${i}" type="hidden" value='${flag19}'/>
@@ -137,7 +137,7 @@
     </div>
 
     <div class='metadata prop' style="position:relative; top:-30px;">
-        <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
+        <input class="fileName" name="file_{{>i}}" type="hidden" value='{{>file}}'/>
         <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
         <input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
         

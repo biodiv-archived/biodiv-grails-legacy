@@ -214,13 +214,15 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
         dataType: "json",
         data: {speciesId:spId, spFieldId: spFieldId,resourceListType: resourceListType},	
         success: function(data) {
-            var addPhotoHtmlData = $(data.addPhotoHtml);
-            $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
-            $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
-            $("#addSpFieldResourcesModal").modal("toggle");
-            $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
-            uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
-            $("input[name='speciesFieldId']").val(spFieldId);
+            if(data.statusComplete){
+                var addPhotoHtmlData = $(data.addPhotoHtml);
+                $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
+                $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
+                $("#addSpFieldResourcesModal").modal("toggle");
+                $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
+                uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
+                $("input[name='speciesFieldId']").val(spFieldId);
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         }

@@ -1057,17 +1057,23 @@ class SpeciesController extends AbstractObjectController {
         return result;
     }
 
+    @Secured(['ROLE_USER'])
     def getSpeciesFieldMedia() {
         def resList = []
         def obvLinkList = []
         def resCount = 0
-        def offset = 0 
-        def spInstance = Species.read(params.speciesId.toLong())
-        resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
-        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
-        def result = [addPhotoHtml: addPhotoHtml]
+        def offset = 0
+        def result
+        if(params.speciesId){
+            def spInstance = Species.read(params.speciesId?.toLong())
+            resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
+            def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
+            result = [statusComplete:true, addPhotoHtml: addPhotoHtml]
+        } else {
+            log.debug params  
+            result = [statusComplete:false]
+        }
         render result as JSON
-
     }
 
     def pullObvMediaInSpField(){

@@ -5,15 +5,18 @@ function removeResource(event, imageId) {
     else if (event.srcElement) targ = event.srcElement; //for IE
     else {}
     if(($(targ).closest(".imagesList").size() == 1) && ($( "input[name='resType']" ).val() == "species.auth.SUser")){
-        var resId =  $(targ).parent('.addedResource').find(".resId").val()
-        var resDeleteUrl = window.params.resDeleteUrl
+        var resId =  $(targ).parent('.addedResource').find(".resId").val();
+        var fileName = $(targ).parent('.addedResource').find(".fileName").val();
+        var resDeleteUrl = window.params.resDeleteUrl;
         $.ajax({
             url: resDeleteUrl,
             dataType: "json",
-            data: {resId:resId},	
+            data: {resId:resId , fileName:fileName},	
             success: function(data) {
                 if(data.status){
                     alert("Media deleted!")
+                } else {
+                    alert("Deletion failed - Uploaded media has no ID, refresh and try!!")
                 } 
             }, error: function(xhr, status, error) {
                 alert(xhr.responseText);
