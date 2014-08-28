@@ -108,9 +108,7 @@ class Project implements Taggable{
 		
 		author nullable:false
 	}
-
-
-
+	
 	def getLocationsList() {
 		return LazyList.decorate(
 		locations,
@@ -152,6 +150,26 @@ class Project implements Taggable{
 						
 		}
 
-	}	
+	}
+	
+	def fetchProposalFiles(){
+		return sortedDocs(proposalFiles)
+	}
 
+	def fetchReportFiles(){
+		return sortedDocs(reportFiles)
+	}
+	
+	def fetchMiscFiles(){
+		return sortedDocs(miscFiles)
+	}
+	
+	private List sortedDocs(docs){
+		if(!docs){
+			return []
+		}
+		def res = docs.collect {it}
+		Collections.sort(res)
+		return res
+	}
 }

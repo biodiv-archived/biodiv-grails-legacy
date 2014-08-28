@@ -12,8 +12,7 @@
 		def tmplName = "{{>docName}}".encodeAsRaw()
 		def tmplSize = "{{>fileSize}}".encodeAsRaw()
 		%>
-
-        <g:render template='/document/projectDoc' model="['name':name,  'docId':tmplDocId,'filePath':tmplPath, 'docName':tmplName, 'fileSize':tmplSize]" ></g:render>
+		<g:render template='/document/projectDoc' model="['name':name,  'docId':tmplDocId,'filePath':tmplPath, 'docName':tmplName, 'fileSize':tmplSize]" ></g:render>
 
 	</script>
 
