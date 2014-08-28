@@ -421,7 +421,7 @@ class SpeciesController extends AbstractObjectController {
         return false;
     }
 
-	@Secured(['ROLE_USER'])
+	/*@Secured(['ROLE_USER'])
 	def edit() {
 		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
@@ -437,7 +437,7 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-	}
+	}*/
 
 	@Secured(['ROLE_USER'])
     def update() {
