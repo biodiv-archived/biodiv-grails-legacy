@@ -14,6 +14,7 @@ import species.participation.Checklists;
 import species.participation.Observation;
 import grails.util.Environment;
 import species.utils.ImageType;
+import species.groups.SpeciesGroup;
 
 class UtilsService {
 
@@ -709,6 +710,22 @@ class UtilsService {
             return domainObj.class.getSimpleName().toLowerCase()
         }
     }
+
+
+    /**
+     * 
+     * @param groupId
+     * @return
+     */
+    Object getSpeciesGroupIds(groupId){
+        def groupName = SpeciesGroup.read(groupId)?.name
+        //if filter group is all
+        if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
+            return null
+        }
+        return groupId
+    }
+
 
 }
 

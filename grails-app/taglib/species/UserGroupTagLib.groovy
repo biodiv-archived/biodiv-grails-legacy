@@ -18,6 +18,7 @@ class UserGroupTagLib {
 	static namespace = "uGroup";
 
 	def springSecurityService
+	def observationService;
 	def userGroupService;
     def activityFeedService;
 
@@ -364,7 +365,7 @@ class UserGroupTagLib {
 
 	def showActivityOnMap = {attrs, body ->
 		def userGroupInstance = attrs.model?.userGroupInstance;
-		def result = userGroupService.getUserGroupObservations(userGroupInstance, [:], -1, -1, true)
+		def result = observationService.getUserGroupObservations(userGroupInstance, [:], -1, -1, true)
 		def model = ['observationInstanceList':result?.observationInstanceList]
 		out<<render(template:"/common/observation/showObservationMultipleLocationTemplate", model:model);
 	}
