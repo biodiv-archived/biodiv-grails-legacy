@@ -43,6 +43,10 @@ import species.utils.Utils;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import java.beans.Introspector;
+import species.CommonNames;
+import species.Language;
+import species.Species;
+
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
@@ -1823,7 +1827,6 @@ class ObservationService extends AbstractObjectService {
                     mailSubject = conf.ui.addObservation.emailSubject
                     templateMap["message"] = " added the following observation:"
                 } else {
-                mailSubject = conf.ui.addObservation.emailSubject
                     mailSubject = "Observation updated"
                     templateMap["message"] = " updated the following observation:"
                 }
@@ -2027,10 +2030,20 @@ class ObservationService extends AbstractObjectService {
                 toUsers.addAll(otherParams["usersEmailList"]);
                 break
             //below case also had activityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
-            case [activityFeedService.SPECIES_CREATED]:
-                mailSubject = activityFeedService.SPECIES_CREATED
+            case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
+                mailSubject = notificationType
+                if(otherParams['resURLs']){
+                    templateMap['resURLs'] = otherParams['resURLs']
+                }
                 bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = " added the following species:"
+                if(notificationType == activityFeedService.SPECIES_CREATED){
+                    templateMap["message"] = " added the following species:"
+                } else {
+                    //templateMap['domainObjectType'] = 'species'
+                    templateMap['obvUrl'] = generateLink("species", "show", ["id": otherParams['spId']], request)
+                    templateMap['obvId'] = otherParams['spId']
+                    templateMap["message"] = " updated the following species with these media:"
+                }
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -2049,6 +2062,7 @@ class ObservationService extends AbstractObjectService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes']
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -2058,6 +2072,7 @@ class ObservationService extends AbstractObjectService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes']
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -2147,6 +2162,21 @@ class ObservationService extends AbstractObjectService {
             //get All the UserGroups an observation is part of
             templateMap["groups"] = obv.userGroups
         }
+        if(obv.instanceOf(Species) && obv.id) {
+            templateMap["obvSName"] = obv.taxonConcept.name  
+            templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name   
+            def imagePath = '';
+            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            def mainImage = obv.mainImage();
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
+
+            templateMap["obvImage"] = imagePath.replaceAll(' ','%20');
+            //get All the UserGroups a species is part of
+            templateMap["groups"] = obv.userGroups
+        }
         if(feed) {
             templateMap['actor'] = feed.author;
             templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
@@ -2193,7 +2223,7 @@ class ObservationService extends AbstractObjectService {
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
             result.each { user ->
-                if(user.sendDigest && !participants.contains(user)){
+                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
                     participants << user
                 }
             }

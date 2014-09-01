@@ -262,7 +262,12 @@ class UFileController {
     def saveModifiedSpeciesFile = {
         //log.debug params
         File file = speciesUploadService.saveModifiedSpeciesFile(params);
-        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+        if(file) {
+            return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html') 
+        } else {
+            println "======SAVE MODIFIED SPECIES FILE CALLED BUT NO FILE ======= " + params
+            return
+        }
         /*
         if (f.exists()) {
             println "here here===================="

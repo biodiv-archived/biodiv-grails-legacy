@@ -168,22 +168,27 @@ class ResourceController {
     }
     
     def deleteUsersResourceById(){
-        resourcesService.deleteUsersResourceById(params.resId);
-        def res = [status:true]
+        def res
+        if(!params.resId) {
+            params.resId = Resource.findByFileName(params.fileName).id;
+        }
+        if(params.resId) {
+            resourcesService.deleteUsersResourceById(params.resId);
+            res = [status:true]
+        } else { 
+            res = [status:false]
+        }
         render res as JSON
     } 
 
     def bulkUploadResources() {
-        println "======PARAMS LIST========== " + params
 		def model = getBulkUploadResourcesList(params);
-        println "=======MODEL========== " + model
         render (view:"list", model:model)
 		return;
     }
 
     def getBulkUploadResourcesList(params) {
         def result = resourcesService.getBulkUploadResourcesList(params);
-        println "========RESULT============= " + result
         return [resourceInstanceList: result.resourceInstanceList, userCountList: result.userCountList ]
     }
 }

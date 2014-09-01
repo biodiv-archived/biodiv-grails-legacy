@@ -1066,7 +1066,7 @@ class ObservationController extends AbstractObjectController {
 	def listRelated = {
     	log.debug params;
 
-        long parentId = params.id?params.long('id'):null;
+        Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 
         def activeFilters = new HashMap(params);
