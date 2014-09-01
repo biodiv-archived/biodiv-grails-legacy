@@ -37,20 +37,16 @@
 					</div>
 
 				</div>
-
 				<div class="control-group">
-					<label class="control-label" for="notes"> Description
+					<label class="control-label" for="description"> Description
 					</label>
 					<div class="controls">
-						<textarea rows='4' name='${docId}.notes' width="100%" class="input-block-level"
-							value='${documentInstance?.notes}'
-							placeholder="Describe the file"> </textarea>
+						<textarea rows='4' name='${docId}.description' width="100%" class="input-block-level"
+							placeholder="Describe the file"> ${documentInstance?.notes}</textarea>
 					</div>
 
 
 				</div>
-
-                            
 				<div
 					class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
 					<label class="control-label" for="contributors">Contributor(s)</label>

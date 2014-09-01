@@ -2162,7 +2162,7 @@ class ObservationService extends AbstractObjectService {
             //get All the UserGroups an observation is part of
             templateMap["groups"] = obv.userGroups
         }
-        if(obv.instanceOf(Species)) {
+        if(obv.instanceOf(Species) && obv.id) {
             templateMap["obvSName"] = obv.taxonConcept.name  
             templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name   
             def imagePath = '';
