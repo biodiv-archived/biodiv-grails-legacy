@@ -32,6 +32,41 @@ function removeResource(event, imageId) {
 
 }
 
+function createResources(start, end, w, count) {
+    if(count < end) {
+        end = count;
+    }
+    var metadataForForm = $(".metadata.prop").slice(start, end).clone();
+    $(metadataForForm).css("display","none");
+    $("form.createResource").find(".metadata.prop").remove();
+    $(metadataForForm).appendTo($("form.createResource"));
+
+    $("form.createResource").ajaxSubmit({
+        url : $(this).attr("action"),
+        dataType : 'json', 
+        type : 'POST',
+        success : function(data, statusText, xhr, form) {
+            if(end >= count) {
+                $(".addedResource.thumbnail").draggable({helper:'clone'});  
+
+                $(".imageHolder").droppable({
+                    accept: ".addedResource.thumbnail",
+                    drop: function(event,ui){
+                        dropAction(event, ui, this);    
+                    }
+                });
+                return;
+            } else {
+                createResources(end, end + w, w, count);
+            }
+        }, error : function (xhr, ajaxOptions, thrownError){
+            console.log("THROWN ERROR");
+            console.log(thrownError);
+            createResources(end, end + w, w, count);
+        }  
+    });
+}
+
 /**
   @class uploadResource
  **/
@@ -279,28 +314,10 @@ function removeResource(event, imageId) {
                 }
                 */
                 var count = $("input[name='lastUploaded']").val();
-                var metadataForForm = $(".metadata.prop:lt("+count+")").clone();
-                $(metadataForForm).css("display","none");
-                $("form.createResource").find(".metadata.prop").remove();
-                $(metadataForForm).appendTo($("form.createResource"));
-
-                $("form.createResource").ajaxSubmit({
-                url : $(this).attr("action"),
-                dataType : 'json', 
-                type : 'POST',
-                success : function(data, statusText, xhr, form) {
-                    $(".addedResource.thumbnail").draggable({helper:'clone'});  
-
-                    $(".imageHolder").droppable({
-                        accept: ".addedResource.thumbnail",
-                        drop: function(event,ui){
-                            dropAction(event, ui, this);    
-                        }
-                    });
-                }, error : function (xhr, ajaxOptions, thrownError){
-
-                }  
-                });
+                var start = 0;
+                var w = 3; 
+                var end = start + w; 
+                createResources(start, end, w, count);
                 $("input[name='obvDir']").val('');
             }
 
