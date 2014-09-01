@@ -17,7 +17,7 @@
 					style="background-color: #F2F2F2;">
 					<sUser:selectUsers model="['id':experts_autofillUsersId]" />
 					<input type="hidden" name="expertUserIds" id="expertUserIds" />
-					<textarea id="inviteModeratorMsg" class="comment-textbox" placeholder="Please write a note to invite moderator."></textarea>
+					<textarea id="inviteModeratorMsg" class="comment-textbox" placeholder="${g.message(code:'ugroup.note.invite')}"></textarea>
 				</form>
 			</div>
 		</div>
@@ -45,7 +45,7 @@
 				<div id="requset_moderatorMsg"></div>
 				<form id="requestModeratorForm" method="post"
 					style="background-color: #F2F2F2;">
-					<textarea id="requestModeratorMsg" class="comment-textbox" placeholder="Please mention why you will be a suitable moderator for this group."></textarea>
+					<textarea id="requestModeratorMsg" class="comment-textbox" placeholder="${g.message(code:'ugroup.note.suitable')}"></textarea>
 				</form>
 			</div>
 		</div>

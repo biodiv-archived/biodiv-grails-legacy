@@ -3,20 +3,20 @@
 	<form id="advSearchForm" method="get" 		
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search', userGroup:userGroupInstance) }"
 		title="${g.message(code:'title.advanced.search')}" class="searchbox">
-		<label class="control-label" for="name"><title><g:message code="default.species.label" /></label> <input id="aq.name"
+		<label class="control-label" for="name"> <g:message code="default.species.label" /></label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${(queryParams?.get('aq.name'))?.encodeAsHTML() }"
 			placeholder="${g.message(code:'placeholder.species.name')}" />
 	 <label
-			class="control-label" for="aq.taxon"><title><g:message code="default.taxon.hierarchy.label" /></label> <input data-provide="typeahead" id="aq.taxon"
+			class="control-label" for="aq.taxon"> <g:message code="default.taxon.hierarchy.label" /></label> <input data-provide="typeahead" id="aq.taxon"
 			type="text" class="input-block-level" name="aq.taxon" value="${(queryParams?.get('aq.taxon'))?.encodeAsHTML()}"
 			placeholder="${g.message(code:'placeholder.species.taxon.hierarchy')}" />
 			
 			<label
-			class="control-label" for="aq.contributor"><title><g:message code="default.contributors.label" /></label> <input data-provide="typeahead" id="aq.contributor"
+			class="control-label" for="aq.contributor"> <g:message code="default.contributors.label" /></label> <input data-provide="typeahead" id="aq.contributor"
 			type="text" class="input-block-level" name="aq.contributor" value="${(queryParams?.get('aq.contributor'))?.encodeAsHTML()}" 
 			placeholder="${g.message(code:'placeholder.species.field.search')}" /> <label
-			class="control-label" for="aq.attribution"><title><g:message code="default.attributions.label" /></label> <input data-provide="typeahead" id="aq.attribution"
+			class="control-label" for="aq.attribution"> <g:message code="default.attributions.label" /></label> <input data-provide="typeahead" id="aq.attribution"
 			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
 			placeholder="${g.message(code:'placeholder.species.search.attributions')}" />
 			
@@ -43,9 +43,9 @@
 		
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
-			value="ALL"> <title><g:message code="default.search.in.all.groups" /> </label> <label
+			value="ALL">  <g:message code="default.search.in.all.groups" /> </label> <label
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-			value="THIS_GROUP"> <title><g:message code="default.search.within.this.group" /> </label>
+			value="THIS_GROUP">  <g:message code="default.search.within.this.group" /> </label>
 		</div>
 
 <%--		<g:hiddenField name="start" value="0" />--%>
@@ -58,7 +58,7 @@
 	</form>
 	<div class="form-action">
 		<button type="submit" id="advSearch"
-			class="btn btn-primary pull-right"><title><g:message code="default.search" /></button>
+			class="btn btn-primary pull-right"> <g:message code="default.search" /></button>
 	</div>
 
 

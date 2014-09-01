@@ -3,7 +3,7 @@
 <%@ page import="species.Habitat"%>
 <html>
 <head>
-<g:set var="title" value="User groups"/>
+<g:set var="title" value="${g.message(code:'group.value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_create" />
 <style>
@@ -122,10 +122,10 @@ max-width: 100%;
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
 									<g:if test="${userGroupInstance?.domainName }">
-										<g:textField name="name" value="${userGroupInstance?.name}" placeholder="Enter a group name..." readonly="true"/>
+										<g:textField name="name" value="${userGroupInstance?.name}" placeholder="${g.message(code:'ugroup.enter.group.name')}" readonly="true"/>
 									</g:if>
 									<g:else>
-										<g:textField name="name" value="${userGroupInstance?.name}" placeholder="Enter a group name..." />
+										<g:textField name="name" value="${userGroupInstance?.name}" placeholder="${g.message(code:'ugroup.enter.group.name')}" />
 									</g:else>
 									<div class="help-inline">
 										<g:hasErrors bean="${userGroupInstance}" field="name">
@@ -147,7 +147,7 @@ max-width: 100%;
 								<label for="description" class="control-label"><g:message code="default.description.label" /></label>
 							<div class="controls  textbox">
 								
-								<textarea id="description" name="description" placeholder="Write a small description about your activities in this Group. This will appear on the Group's home page...">${userGroupInstance?.description}</textarea>
+								<textarea id="description" name="description" placeholder="${g.message(code:'ugroup.small.description')}">${userGroupInstance?.description}</textarea>
 								
 								<script type='text/javascript'>
 									CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
@@ -238,7 +238,7 @@ max-width: 100%;
 							<div class="controls  textbox">
 								<sUser:selectUsers model="['id':founders_autofillUsersId]" />
 								<input type="hidden" name="founderUserIds" id="founderUserIds" />
-								<textarea name="founderMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" ><g:message code="usergroup.invited.accept" /></textarea>
+								<textarea name="founderMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="${g.message(code:'ugroup.place.message')}" ><g:message code="usergroup.invited.accept" /></textarea>
 								
 							</div>
 						</div>
@@ -250,7 +250,7 @@ max-width: 100%;
 							<div class="controls  textbox">
 									<sUser:selectUsers model="['id':experts_autofillUsersId]"/>
 									<input type="hidden" name="expertUserIds" id="expertUserIds" />
-									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" ><g:message code="usergroup.invited.moderator" /></textarea>
+									<textarea name="expertMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="${g.message(code:'ugroup.place.message')}" ><g:message code="usergroup.invited.moderator" /></textarea>
 							</div>
 						</div>
 					</div>
@@ -373,7 +373,7 @@ max-width: 100%;
 
 			</form>
 			<form class="upload_resource ${hasErrors(bean: userGroupInstance, field: 'icon', 'errors')}" enctype="multipart/form-data"
-				title="Add a logo for this group" method="post">
+				title="${g.message(code:'ugroup.title.addlogo')}" method="post">
 				<input type="file" id="attachFile" name="resources" accept="image/*"/> 
 				<span class="msg" style="float: right"></span> 
 				<input type="hidden" name='dir' value="${userGroupDir}" />

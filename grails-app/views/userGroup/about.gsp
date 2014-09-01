@@ -4,7 +4,7 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<g:set var="title" value="AboutUs"/>
+<g:set var="title" value="${g.message(code:'ugroup.value.aboutus')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 
@@ -50,7 +50,7 @@
 
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
-							<g:message code="tabs.founders" /> (${foundersTotalCount})</a></li>
+							<g:message code="tabs.founder" /> (${foundersTotalCount})</a></li>
 					<li class="${(params.action == 'experts')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'moderators', 'userGroup':userGroupInstance)}">
 							<g:message code="tabs.moderators" /> (${expertsTotalCount})</a></li>

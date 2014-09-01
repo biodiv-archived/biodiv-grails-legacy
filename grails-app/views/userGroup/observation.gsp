@@ -5,7 +5,7 @@
 <html>
 <head>
 
-<g:set var="title" value="Observations"/>
+<g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="userGroups_show, observations_list" />

@@ -64,7 +64,7 @@
 								<input
 									class="input-large focused ${(command.openId)?'readonly':''} "
 									id="email" type="text" value="${command.email}" name="email"
-									placeholder="Enter your email id..."
+									placeholder="${g.message(code:'placeholder.enter.emailid')}"
 									${(command.openId)?'readonly':''}>
 
 								<g:hasErrors bean="${command}" field="email">
@@ -84,7 +84,7 @@
 								<div class="controls">
 									<input class="input-large" id="password" type="password"
 										value="${command.password}" name="password"
-										placeholder="Enter your password...">
+										placeholder="${g.message(code:'placeholder.enter.password')}">
 
 									<g:hasErrors bean="${command}" field="password">
 										<div class="help-inline">
@@ -100,7 +100,7 @@
 								<div class="controls">
 									<input class="input-large" id="password2" type="password"
 										value="${command.password2}" name="password2"
-										placeholder="Enter your password again...">
+										placeholder="${g.message(code:'register.placeholder.enter.pwdagain')}">
 
 									<g:hasErrors bean="${command}" field="password2">
 										<div class="help-inline">
@@ -120,7 +120,7 @@
 							<div class="controls">
 								<input class="input-large" id="name" type="text"
 									value="${command.name}" name="name"
-									placeholder="Enter your name...">
+									placeholder="${g.message(code:'register.placeholder.enter.name')}">
 
 								<g:hasErrors bean="${command}" field="name">
 									<div class="help-inline">
@@ -138,7 +138,7 @@
 							<div class="controls">
 								<input class="input-large" id="location" type="text"
 									value="${command.location}" name="location"
-									placeholder="Enter your location...">
+									placeholder="${g.message(code:'register.placeholder.enter.location')}">
 
 								<g:hasErrors bean="${command}" field="location">
 									<div class="help-inline">
@@ -159,7 +159,7 @@
 
 								<input class="input-large" id="captcha_response" type="text"
 									value="" name="captcha_response"
-									placeholder="Enter words as shown in box...">
+									placeholder="${g.message(code:'register.placeholder.enter.wordshown')}">
 
 								<g:hasErrors bean="${command}" field="captcha_response">
 									<div class="help-inline">

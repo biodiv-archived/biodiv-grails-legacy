@@ -10,7 +10,7 @@
 <g:set var="entityName"
 	value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
 
-<g:set var="title" value="Pages"/>
+<g:set var="title" value="${g.message(code:'ugroup.value.pages')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show" />
 <style>

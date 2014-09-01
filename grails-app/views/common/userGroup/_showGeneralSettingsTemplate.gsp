@@ -7,7 +7,7 @@
 				<div class="btn-group" style="margin-top: 10px;">
 					<button id="homePageSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
-						data-original-title="Home page">
+						data-original-title="${g.message(code:'ugroup.title.homepage')}">
                                                 ${userGroupInstance?.fetchHomePageTitle() ?: 'Select home page '}<span
 							class="caret"></span>
 					</button>
@@ -48,7 +48,7 @@
 				<div class="btn-group" style="margin-top: 10px;">
 					<button id="themeSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
-						data-original-title="Theme">
+						data-original-title="${g.message(code:'ugroup.title.theme')}">
 						${userGroupInstance?.theme ?: 'Select theme '}<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">

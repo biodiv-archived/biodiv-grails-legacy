@@ -171,7 +171,7 @@
 						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
 						href="/theportal" title="<g:message code='button.about.us' />"><g:message code="button.about.us" /> </a></li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"> <g:message code="link.more" /> <b class="caret"></b> </a>
+						data-toggle="dropdown"> <g:message code="link.moree" /> <b class="caret"></b> </a>
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li
