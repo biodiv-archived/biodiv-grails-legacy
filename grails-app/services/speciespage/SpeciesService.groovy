@@ -1634,6 +1634,8 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
                 def imagePath = '';
                 imagePath = it.thumbnailUrl(basePath);
+                //URL encoding required
+                imagePath = imagePath.replaceAll(' ','%20');
                 resURLs.add(imagePath);
             }
             otherParams['resURLs'] = resURLs

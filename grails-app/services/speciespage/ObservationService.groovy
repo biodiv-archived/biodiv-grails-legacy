@@ -2165,8 +2165,16 @@ class ObservationService extends AbstractObjectService {
         if(obv.instanceOf(Species)) {
             templateMap["obvSName"] = obv.taxonConcept.name  
             templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name   
-            templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
-            //get All the UserGroups an observation is part of
+            def imagePath = '';
+            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            def mainImage = obv.mainImage();
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
+
+            templateMap["obvImage"] = imagePath.replaceAll(' ','%20');
+            //get All the UserGroups a species is part of
             templateMap["groups"] = obv.userGroups
         }
         if(feed) {
