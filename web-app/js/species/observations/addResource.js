@@ -144,7 +144,6 @@ function createResources(start, end, w, count) {
 
 
 
-
             me.$form.ajaxForm({ 
                 url:window.params.observation.uploadUrl,
                 dataType: 'xml',//could not parse json wih this form plugin 
@@ -172,7 +171,14 @@ function createResources(start, end, w, count) {
             var me = this;
             var onSuccess = function(FPFiles){
                 var count = 0;
-                $.each(FPFiles, function(){
+                me.uploadedFiles = FPFiles;
+                me.uploadedFilesSize = FPFiles.length;
+                me.start = 0;
+                me.w = 2;
+                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+                me.start = me.start + me.w;
+                me.$form.find("input[name='resources']").remove();
+                $.each(FPF, function(){
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'resources',
@@ -219,13 +225,30 @@ function createResources(start, end, w, count) {
          filePickAudio : function(e) {
             var me = this;
             var onSuccess = function(FPFiles){
-                $.each(FPFiles, function(){
+                var count = 0;
+                me.uploadedFiles = FPFiles;
+                me.uploadedFilesSize = FPFiles.length;
+                me.start = 0;
+                me.w = 2;
+                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+                me.start = me.start + me.w;
+                me.$form.find("input[name='resources']").remove();
+                $.each(FPF, function(){
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'resources',
                         value:JSON.stringify(this)
                     }).appendTo(me.$form);
+                    count = count + 1;
                 });
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    $("input[name='obvDir']").val('');
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'lastUploaded',
+                        value: count
+                    }).appendTo(me.$form);
+                }
                 me.submitRes();
             };
 
@@ -315,16 +338,34 @@ function createResources(start, end, w, count) {
                 */
                 var count = $("input[name='lastUploaded']").val();
                 var start = 0;
-                var w = 3; 
+                var w = 2; 
                 var end = start + w; 
                 createResources(start, end, w, count);
                 $("input[name='obvDir']").val('');
             }
+            /////call here submitRes and before that modify contains of upload res form
+            if(me.start < me. uploadedFilesSize) {
+                var count = 0;
+                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+                me.start = me.start + me.w;
+                $.each(FPF, function(){
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'resources',
+                        value:JSON.stringify(this)
+                    }).appendTo(me.$form);
+                    count = count + 1;
+                });
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    $("input[name='obvDir']").val('');
+                    $("input[name='lastUploaded']").val(count);
+                }    
+                me.submitRes();
+            }
+        },
 
-            },
-
-                onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
-                    var successHandler = this.success, errorHandler;
+        onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
+            var successHandler = this.success, errorHandler;
             var me = this;
             handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
                 if(data && data.status == 401) {
