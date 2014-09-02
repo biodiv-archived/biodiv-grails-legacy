@@ -11,6 +11,7 @@
     </g:if>
     <g:if test="${resourceListType == 'usersResource'}"
     <i class="icon-picture"></i><span style="font-weight:bold">My Uploads</span> <span> (Uploaded media will be stored for a period of 20 days. Media with red border will be deleted in 1 day.)</span>
+    <a style="margin-bottom: 5px;" class="pull-right sortMediaOnExif btn" onclick='sortMediaOnExif()'>Sort by EXIF date</a>
     </g:if>
 
     <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
@@ -66,6 +67,5 @@
             }
         }
         $(".resourceListType").val($(".resourceListTypeFilled").val());
-
     });
 </r:script>

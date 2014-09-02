@@ -170,6 +170,7 @@ function createResources(start, end, w, count) {
         filePick : function(e) {
             var me = this;
             var onSuccess = function(FPFiles){
+                $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
                 me.uploadedFiles = FPFiles;
                 me.uploadedFilesSize = FPFiles.length;
@@ -361,6 +362,8 @@ function createResources(start, end, w, count) {
                     $("input[name='lastUploaded']").val(count);
                 }    
                 me.submitRes();
+            } else {
+               $(".sortMediaOnExif").removeClass("disabled"); 
             }
         },
 
