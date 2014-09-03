@@ -5,7 +5,7 @@
     <!-- attributions -->
     <g:if test="${speciesFieldInstance.attributors?.size() > 0}">
     <div class="prop span11">
-        <div class="name" style="float:none;"><g:message code="msg.Attributions" /></div>
+        <div class="name" style="float:none;"><g:message code="default.attributions.label" /></div>
             <ul>
                 <g:each in="${speciesFieldInstance.attributors}" var="r">
                 <g:if test="${r}">
@@ -123,7 +123,7 @@
     </g:if>
     <g:elseif test="${isSpeciesFieldContributor}">
     <div class="prop span11">
-        <div class="name" style="float:none;"><g:message code="msg.References" /></div>
+        <div class="name" style="float:none;"><g:message code="default.references.label" /></div>
             <ul>
                 <li class="hidePoint">
                 <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></span>

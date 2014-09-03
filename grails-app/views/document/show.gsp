@@ -25,16 +25,16 @@
                                                 <a class="btn btn-success pull-right"
                                                         href="${uGroup.createLink(
                                                                 controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                                        class="btn btn-info" title="Add Document">
+                                                        class="btn btn-info" title="${g.message(code:'title.document.add')}">
                                                         <i class="icon-plus"></i><g:message code="link.add.document" />  
                                                 </a>
 
-						<a class="btn btn-primary pull-right" title="Edit Document" style="margin-right: 5px;"
+						<a class="btn btn-primary pull-right" title="${g.message(code:'title.document.edit')}" style="margin-right: 5px;"
 							href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 							<i class="icon-edit"></i><g:message code="button.edit" /> 
 						</a>
 						
-						<a class="btn btn-danger pull-right"  href="#" title="Delete Document" style="margin-right: 5px;"
+						<a class="btn btn-danger pull-right"  href="#" title="${g.message(code:'title.document.delete')}" style="margin-right: 5px;"
 
 							onclick="deleteDocument(); return false;">
 							<i class="icon-trash"></i> <g:message code="button.delete" />

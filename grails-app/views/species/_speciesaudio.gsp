@@ -46,7 +46,7 @@
                 <g:if test="${r.type == ResourceType.AUDIO}"> 
                     <% audioTextNum += 1 %>               	                                     
                     <li class="active" style="display: inline;">
-                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${audioTextNum}</a>
+                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  ><g:message code="species.audio.arg" args= "${ [audioTextNum] }" /></a>
                     </li>
                 </g:if>
             </g:each>

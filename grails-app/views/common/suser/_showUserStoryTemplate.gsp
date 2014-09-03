@@ -45,7 +45,7 @@
 		</g:if>
 		<g:if test="${userInstance.location}">
 			<div class="prop">
-				<span class="name"><i class="icon-map-marker"></i><g:message code="msg.Location" /></span>
+				<span class="name"><i class="icon-map-marker"></i><g:message code="default.location.label" /></span>
 				<div class="value">
 					${userInstance.location}
 				</div>

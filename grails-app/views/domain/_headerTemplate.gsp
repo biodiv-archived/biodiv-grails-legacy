@@ -40,7 +40,7 @@
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('controller':'observation', 'action':'list', 'userGroup':userGroupInstance)}"
-                                                title="Observations"><g:message code="default.observation.label" /></a> 
+                                                title="Observationis"><g:message code="default.observation.label" /></a> 
                                             <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
 					<li
@@ -169,7 +169,7 @@
 					
 					<li
 						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
-						href="/theportal" title="<g:message code='button.about.us' />"><g:message code="button.about.us" /> </a></li>
+						href="/theportal" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> <g:message code="link.moree" /> <b class="caret"></b> </a>
 

@@ -4,7 +4,7 @@ $(document).ready(function() {
 });
 </r:script>
 
-<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;" data-url="${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}" data-contextFreeUrl=${uGroup.createLink(controller:resultController?:controller, action:'show')}"">
+<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;" data-url="${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}" data-contextFreeUrl=${uGroup.createLink(controller:resultController?:controller, action:'show')}>
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
     <g:if test="${controller.toLowerCase().equals('featured')}">
@@ -18,8 +18,10 @@ $(document).ready(function() {
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
             <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
                 <li style="float: left; list-style: none;">
+		
 
-                <g:render template="/${relatedInstanceDetails.controller.equalsIgnoreCase('checklist')?'observation':relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller]"/>
+<g:render template="/${relatedInstanceDetails.controller.equalsIgnoreCase('checklist')?'observation':relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller]"/>
+                
                 </li>
             </g:each>
         </ul>
@@ -51,7 +53,7 @@ $(document).ready(function() {
 
 <g:if test="${filterProperty != 'featureBy'}">
     <div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
-        <g:message code="msg.no.data" />!!
+        <g:message code="msg.no.data" />
     </div>
 </g:if>
 

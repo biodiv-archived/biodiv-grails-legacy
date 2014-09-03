@@ -28,7 +28,7 @@
                 <g:else>
                 <img class="img-polaroid"
                 src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-                title="You can contribute!!!" />
+                title="${g.message(code:'showobservationsnippet.title.contribute')}" />
                 </g:else>
 		</g:link>
 	</div>

@@ -12,7 +12,7 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'list', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="Species"/>
+<g:set var="title" value="${g.message(code:'showobservationstoryfooter.title.species')}"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
 
 <r:require modules="species"/>
@@ -20,6 +20,7 @@
 
 </head>
 <body>
+
 
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
@@ -67,7 +68,7 @@
                             Classification.list().each {
                             classifications.add([it.id, it, null]);
                             }
-                            classifications = classifications.sort {return it[1].name};
+                            classifications = classifications.sort {return it[1].name}; 
                             %>
 
                             <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>

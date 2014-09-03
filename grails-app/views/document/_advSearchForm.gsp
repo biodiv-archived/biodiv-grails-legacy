@@ -1,6 +1,6 @@
 
 <div class="block-tagadelic ">
-	<form id="advSearchForm" method="get" title="Search"
+	<form id="advSearchForm" method="get" title="${g.message(code:'default.search')}"
 		action="${uGroup.createLink(controller:params.controller, action:params.action, userGroup:userGroupInstance)}"
 		class="searchbox">
 
@@ -8,34 +8,34 @@
 		<label class="control-label" for="title"><g:message code="default.title.label" /></label> <input
 			id="aq.title" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.title"
-			placeholder="Search by Document title" value="${(queryParams?.get('aq.title'))?.encodeAsHTML() }" />
+			placeholder="${g.message(code:'placeholder.search.document')}" value="${(queryParams?.get('aq.title'))?.encodeAsHTML() }" />
 		
 		<label
 			class="control-label" for="grantee"><g:message code="default.type.label" /></label> <input
 			id="aq.type" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.type"
-			placeholder="Search by Description" value="${(queryParams?.get('aq.type'))?.encodeAsHTML()}" />
+			placeholder="${g.message(code:'placeholder.search.description')}" value="${(queryParams?.get('aq.type'))?.encodeAsHTML()}" />
 			
 		<label
 			class="control-label" for="grantee"><g:message code="default.description.label" /></label> <input
 			id="aq.description" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.description"
-			placeholder="Search by Description" value="${(queryParams?.get('aq.description'))?.encodeAsHTML()}" />
+			placeholder="${g.message(code:'placeholder.search.description')}" value="${(queryParams?.get('aq.description'))?.encodeAsHTML()}" />
 
 		<label
 			class="control-label" for="aq.contributor"><g:message code="default.contributors.label" /></label> <input data-provide="typeahead" id="aq.contributor"
 			type="text" class="input-block-level" name="aq.contributor" value="${(queryParams?.get('aq.contributor'))?.encodeAsHTML()}" 
-			placeholder="Field to search all contributors" />
+			placeholder="${g.message(code:'placeholder.species.field.search')}" />
 		
 		<label
 			class="control-label" for="aq.attribution"><g:message code="default.attributions.label" /></label> <input data-provide="typeahead" id="aq.attribution"
 			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
-			placeholder="Field to search all attributions" />
+			placeholder="${g.message(code:'placeholder.species.search.attributions')}" />
 
 		<label class="control-label" for="tags"><g:message code="default.tags.label" /></label> <input
 			id="aq.tag" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.tag"
-			placeholder="Search by Tags" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
+			placeholder="${g.message(code:'placeholder.search.tags')}" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
 			
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 

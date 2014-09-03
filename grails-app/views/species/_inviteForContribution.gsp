@@ -1,7 +1,7 @@
 <div class="request">
     <a id="requestPermission" class="btn btn-primary ${hide?'hide':''}" href="#requestPermissionDialog" role="button" data-toggle="modal" data-invitetype='requestPermission'><i
             class="icon-envelope"></i> <g:message code="userGroup.members.label"
-        default="Request Permission" /> </a>
+        default="${g.message(code:'link.request')}" /> </a>
 
     <div class="modal hide fade" id="requestPermissionDialog" tabindex='-1'
         role="dialog" aria-labelledby="requestPermissionModalLabel"
@@ -17,7 +17,7 @@
                 <form method="post"
                     style="background-color: #F2F2F2;">
                     <input type="hidden" name="invitetype" value="contributor"></input>
-                    <textarea class="inviteMsg comment-textbox" placeholder="Please briefly tell us about your expertise in this taxa and what content you intend contribute to enrich the species pages."></textarea>
+                    <textarea class="inviteMsg comment-textbox" placeholder="${g.message(code:'placeholder.species.about.you')}"></textarea>
                 </form>
             </div>
         </div>
@@ -52,7 +52,7 @@
                         <sUser:selectUsers model="['id':'curator']" />
                         <input type="hidden" name="userIds" />
                         <input type="hidden" name="invitetype" value="curator" />
-                        <textarea class="inviteMsg comment-textbox" placeholder="Please write a note to invite curator."></textarea>
+                        <textarea class="inviteMsg comment-textbox" placeholder="${g.message(code:'placeholder.invite.curator')}"></textarea>
                     </form>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                         <sUser:selectUsers model="['id':'contributor']" />
                         <input type="hidden" name="userIds" />
                         <input type="hidden" name="invitetype" value="contributor" />
-                        <textarea class="inviteMsg comment-textbox" placeholder="Please write a note to invite contributor."></textarea>
+                        <textarea class="inviteMsg comment-textbox" placeholder="${g.message(code:'placeholder.invite.contributor')}"></textarea>
                     </form>
                 </div>
             </div>

@@ -3,14 +3,14 @@
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
-<g:set var="title" value="Newsletter"/>
+<g:set var="title" value="${g.message(code:'title.value.newsletter')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="core" />
 </head>
 <body>
 	<div class="span9">
 		<div class="page-header">
-			<h1><g:message code="button.eEdit" /></h1>
+			<h1><g:message code="button.edit" /></h1>
 		</div>
 		
 		<div class="tabbable">

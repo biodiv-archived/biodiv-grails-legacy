@@ -3,7 +3,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="Documents"/>
+<g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="add_file" />
@@ -68,7 +68,7 @@ input.dms_field {
                             code="document.type.label" default="Type" /><span class="req">*</span></label>
                         <div class="controls">
                             <g:select name="type" class="input-block-level"
-                            placeholder="Select document type"
+                            placeholder="${g.message(code:'placeholder.document.select')}"
                             from="${content.eml.Document$DocumentType?.values()}"
                             keys="${content.eml.Document$DocumentType?.values()*.value()}"
                             value="${documentInstance?.type?.value()}" />
@@ -83,7 +83,7 @@ input.dms_field {
                         <div class="controls">
 
                             <input type="text" class="input-block-level" name="title"
-                            placeholder="Enter the title for the document"
+                            placeholder="${g.message(code:'placeholder.document.enter.title')}"
                             value="${documentInstance?.title}" required />
 
                             <div class="help-inline">
@@ -113,7 +113,7 @@ input.dms_field {
                                 <label class="control-label" for="uri" style="width: 40px;"><g:message code="default.url.label" /></label>
                                 <div class="controls" style="margin-left: 55px;">
                                     <input type="text" class="input-block-level" name="uri"
-                                    placeholder="Enter URL for the resource"
+                                    placeholder="${g.message(code:'placeholder.document.enter.url')}"
                                     value="${documentInstance?.uri}" />
                                 </div>
                             </div>
@@ -132,7 +132,7 @@ input.dms_field {
                         <div class="controls">
                             <g:textField name="contributors" class="input-block-level"
                             value="${documentInstance?.contributors }"
-                            placeholder="Enter the contirbutors for the document" />
+                            placeholder="${g.message(code:'placeholder.document.enter.contributors')}" />
                         </div>
                     </div>
 
@@ -143,7 +143,7 @@ input.dms_field {
                         <label class="control-label" for="attribution"><g:message code="default.attribution.label" /></label>
                         <div class="controls">
                             <g:textField name="attribution" class="input-block-level"
-                            placeholder="Enter the attribution to be given for this document"
+                            placeholder="${g.message(code:'placeholder.document.enter.attribution')}"
                             value="${documentInstance?.attribution}" />
                         </div>
                     </div>
@@ -159,7 +159,7 @@ input.dms_field {
                                 <a id="selected_license" class="btn dropdown-toggle btn-mini"
                                     data-toggle="dropdown"> <img
                                     src="${documentInstance.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
-                                    title="Set a license for this file" /> <b class="caret"></b>
+                                    title="${g.message(code:'title.set.license')}" /> <b class="caret"></b>
                                 </a>
 
                                 <ul id="license_options" class="dropdown-menu license_options">
@@ -191,7 +191,7 @@ input.dms_field {
                         <div class="controls">
 
                             <textarea id="description" name="description"
-                                placeholder="Write a small description about the document.">
+                                placeholder="${g.message(code:'placeholder.document.write.description')}">
                                 ${documentInstance?.notes}
                             </textarea>
 
@@ -412,7 +412,7 @@ CKEDITOR.replace('description', config);
              $("#tags").tagit({
         	select:true, 
         	allowSpaces:true, 
-        	placeholderText:'Add some tags',
+        	placeholderText:'${g.message(code:"placeholder.add.tags")}',
         	fieldName: 'tags', 
         	autocomplete:{
         		source: '/document/tags'

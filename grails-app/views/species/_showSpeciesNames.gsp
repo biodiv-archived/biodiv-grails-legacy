@@ -58,7 +58,7 @@
                     ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
-                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
+                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="${g.message(code:'title.click.edit')}">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
             </div>    
             </li>
             </g:each>

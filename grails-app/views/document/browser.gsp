@@ -5,7 +5,7 @@
 <%@ page import="species.participation.ActivityFeedService"%>
 <html>
     <head>
-        <g:set var="title" value="Documents"/>
+        <g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="add_file, content_view, activityfeed" />
         <uploader:head />

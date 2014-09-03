@@ -1,8 +1,8 @@
 <div class="tabbable speciesFieldImage-wrapper " style="">
     <ul class="nav nav-tabs" id="speciesFieldImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
-            <li id="speciesFieldImage-li0" class="active"><a href="#speciesFieldImage-tab0" class="btn" data-toggle="tab">Add Observation Images</a></li>
-            <li id="speciesFieldImage-li1"><a href="#speciesFieldImage-tab1" class="btn" data-toggle="tab">Upload/Edit Images</a></li>
+            <li id="speciesFieldImage-li0" class="active"><a href="#speciesFieldImage-tab0" class="btn" data-toggle="tab"><g:message code="speciesimageupload.add.observation.images" /></a></li>
+            <li id="speciesFieldImage-li1"><a href="#speciesFieldImage-tab1" class="btn" data-toggle="tab"><g:message code="speciesimageupload.upload.edit.images" /> </a></li>
         </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
@@ -34,7 +34,7 @@
                 def obvDir = obvTmpFileName ?  obvTmpFileName.substring(obvTmpFileName.lastIndexOf("/"), obvTmpFileName.size()) : ""
                 %>
                 <form class="upload_resource ${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}" 
-                    title="Add a photo for this observation"
+                    title="${g.message(code:'title.checklist.create')}"
                     method="post">
                     <span class="msg" style="float: right"></span>
                     <input class="videoUrl" type="hidden" name='videoUrl'value="" />

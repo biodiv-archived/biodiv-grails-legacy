@@ -44,7 +44,7 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    
+    def observationService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

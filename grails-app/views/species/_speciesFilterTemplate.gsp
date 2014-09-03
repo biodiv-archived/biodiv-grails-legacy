@@ -11,7 +11,7 @@
 	<div class="btn-group pull-right" style="z-index: 10">
 		<button id="selected_sort" class="btn dropdown-toggle"
 			data-toggle="dropdown" href="#" rel="tooltip"
-			data-original-title="Sort by">
+			data-original-title="${g.message(code:'showobservationlistwrapertemp.sort')}">
 
 			<g:if test="${params.sort == 'title'}">
             	<g:message code="default.name.label" />

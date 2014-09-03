@@ -51,7 +51,7 @@
 
                                 <div class="controls span9">
                                     <input id="imagesDir" type="text" class="input-block-level" name="imagesDir"
-                                    placeholder="Enter URL for the images"
+                                    placeholder="${g.message(code:'placeholder.species.enter.url')}"
                                     value="${imagesDir}" />
                                 </div>
                             </div>

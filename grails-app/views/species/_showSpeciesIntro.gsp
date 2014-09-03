@@ -50,7 +50,7 @@ ${resourceInstanceList}
                     <% def fileName = speciesInstance.fetchSpeciesGroup().icon(ImageType.LARGE).fileName%>
                     <img class="group_icon galleryImage" 
                              src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
-                             title="Contribute!!!"/>
+                             title="${g.message(code:'title.show.contribute')}"/>
                     </g:else>
 
                 </div>

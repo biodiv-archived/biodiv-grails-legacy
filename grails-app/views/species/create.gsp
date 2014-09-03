@@ -64,7 +64,7 @@
                             <input id="page" 
                             data-provide="typeahead" type="text" class="taxonRank" style=""
                             name="page" value="${requestParams?requestParams.speciesName:''}" data-rank="${requestParams?requestParams.rank:TaxonomyRank.SPECIES.ordinal()}"
-                            placeholder="Add Page" />
+                            placeholder="${g.message(code:'placeholder.create.add')}" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
 

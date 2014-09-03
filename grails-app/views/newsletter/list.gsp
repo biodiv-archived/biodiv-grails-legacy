@@ -2,7 +2,7 @@
 <%@ page import="utils.Newsletter" %>
 <html>
     <head>
-<g:set var="title" value="Newsletters"/>
+<g:set var="title" value="${g.message(code:'title.value.newsletters')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
         .body {

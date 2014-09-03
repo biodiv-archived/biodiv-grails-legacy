@@ -33,7 +33,7 @@
                 def obvDir = obvTmpFileName ?  obvTmpFileName.substring(obvTmpFileName.lastIndexOf("/"), obvTmpFileName.size()) : ""
                 %>
                 <form class="upload_resource ${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}" 
-                    title="Add a photo for this observation"
+                    title="${g.message(code:'title.checklist.create')}"
                     method="post">
                     <span class="msg" style="float: right"></span>
                     <input class="videoUrl" type="hidden" name='videoUrl'value="" />
