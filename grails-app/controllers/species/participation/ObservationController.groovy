@@ -92,7 +92,7 @@ class ObservationController extends AbstractObjectController {
 
 	def list() {
 		
-		def model = getObservationList(params);
+		def model = runLastListQuery(params);
 		
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
@@ -341,7 +341,6 @@ class ObservationController extends AbstractObjectController {
 				if(params.pos) {
 					int pos = params.int('pos');
 					def prevNext = getPrevNextObservations(pos, params.webaddress);
-					
 					if(prevNext) {
 						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 					} else {
@@ -372,6 +371,7 @@ class ObservationController extends AbstractObjectController {
 			listParamsKey = userGroupWebaddress + listParamsKey;
 		}
 		def lastListParams = session[listParamsKey]?.clone();
+        
 		if(lastListParams) {
 			if(!session[listKey]) {
 				log.debug "Fetching observations list as its not present in session "
@@ -401,14 +401,14 @@ class ObservationController extends AbstractObjectController {
 		}
 	}
 	
-	private void runLastListQuery(Map params) {
+	private def runLastListQuery(Map params) {
 		if(params.webaddress) {
 			def userGroupController = new UserGroupController();
-			userGroupController.getUserGroupObservationsList(params)
+			return userGroupController.getUserGroupObservationsList(params)
 		} else if(params.action == 'search') {
-			observationService.getObservationsFromSearch(params);
+			return observationService.getObservationsFromSearch(params);
 		} else {
-			getObservationList(params);
+			return getObservationList(params);
 		}
 	}
 	
