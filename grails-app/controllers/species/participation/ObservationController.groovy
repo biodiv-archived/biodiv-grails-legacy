@@ -93,7 +93,7 @@ class ObservationController extends AbstractObjectController {
 	def list() {
 		
 		def model = runLastListQuery(params);
-		
+		model.resultType = 'observation'
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
@@ -103,7 +103,6 @@ class ObservationController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else {
-
 			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
