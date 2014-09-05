@@ -46,7 +46,7 @@
 							code='spring.security.ui.login.rememberme' /> | 
 							<a href="${uGroup.createLink(controller:'register', action:'forgotPassword','userGroupWebaddress':params.webaddress)}">
 							<g:message code='spring.security.ui.login.forgotPassword' />
-						</a> </label> <input class="btn btn-primary" type="submit" value="Login"
+						</a> </label> <input class="btn btn-primary" type="submit" value="${g.message(code:'button.login')}"
 						style="float: right;margin: 3px;">
 				</div>
 			</div>

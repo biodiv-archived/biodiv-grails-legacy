@@ -1,7 +1,7 @@
 <g:if test="${isExpertOrFounder}">
 	<a id="inviteExperts" class="btn btn-primary" href="#inviteExpertsDialog" role="button" data-toggle="modal"><i
 		class="icon-envelope"></i> <g:message code="userGroup.moderators.label"
-			default="Invite Moderators" /> </a>
+			default="${g.message(code:'title.default.invite.moderators')}" /> </a>
 	<div class="modal hide fade" id="inviteExpertsDialog" tabindex='-1'
 		role="dialog" aria-labelledby="inviteExpertsModalLabel"
 		aria-hidden="true">
