@@ -186,7 +186,7 @@ input.dms_field {
 
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'notes', 'error')}">
-                        <label class="control-label" for="description"><g:message code="default.description.label" /><g:message code="default.description.label" />
+                        <label class="control-label" for="description"><g:message code="default.description.label" />
                         </label>
                         <div class="controls">
 

@@ -373,7 +373,7 @@ max-width: 100%;
 
 			</form>
 			<form class="upload_resource ${hasErrors(bean: userGroupInstance, field: 'icon', 'errors')}" enctype="multipart/form-data"
-				title="${g.message(code:'ugroup.title.addlogo')}" method="post">
+				title="${g.message(code:'ugroup.place.message')}" method="post">
 				<input type="file" id="attachFile" name="resources" accept="image/*"/> 
 				<span class="msg" style="float: right"></span> 
 				<input type="hidden" name='dir' value="${userGroupDir}" />

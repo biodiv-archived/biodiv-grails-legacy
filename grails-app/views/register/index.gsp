@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<g:set var="title" value="Register"/>
+<g:set var="title" value="${g.message(code:'title.value.register')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 </title>
 
@@ -80,7 +80,7 @@
 							<div
 								class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 								<label class="control-label" for="password"><g:message
-										code='user.password.label' default='Password *' /> </label>
+										code='user.password.label' default='password *' /> </label>
 								<div class="controls">
 									<input class="input-large" id="password" type="password"
 										value="${command.password}" name="password"
@@ -116,7 +116,7 @@
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'name', 'error')}">
 							<label class="control-label" for="name"><g:message
-									code='user.name.label' default='Name' /> </label>
+									code='user.name.label' default='${g.message(code:"default.name.label")}' /> </label>
 							<div class="controls">
 								<input class="input-large" id="name" type="text"
 									value="${command.name}" name="name"
@@ -134,7 +134,7 @@
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'location', 'error')}">
 							<label class="control-label" for="location"><g:message
-									code='user.location.label' default='Location' /> </label>
+									code='user.location.label' default='${g.message(code:"default.location.label")}' /> </label>
 							<div class="controls">
 								<input class="input-large" id="location" type="text"
 									value="${command.location}" name="location"

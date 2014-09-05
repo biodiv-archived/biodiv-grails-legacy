@@ -4,7 +4,7 @@
 					
 		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
-				default="Invite Friends" /> </a>
+				default="${g.message(code:'title.default.invite.friends')}" /> </a>
 		<div class="modal hide fade" id="inviteMembersDialog" tabindex='-1'
 			role="dialog" aria-labelledby="inviteMembersModalLabel"
 			aria-hidden="true">

@@ -28,7 +28,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	
 				</ol>
 
-                <g:message code="species.contributetemp.provide" /> <span class="mailme">${supportEmail}</span>
+                <g:message code="species.contributetemp.provide.question.provide" /> <span class="mailme">${supportEmail}</span>
 				</div>
 	
 			</div>

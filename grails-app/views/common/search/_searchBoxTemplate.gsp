@@ -14,7 +14,7 @@
 		
 		<input type="text" name="query" id="searchTextField"
 			value="${((queryParams?.query)?:((queryParams?.q)?:params.query))?.encodeAsHTML()}"
-			class="search-query span3" placeholder="Search" />
+			class="search-query span3" placeholder="${g.message(code:'default.search')}" />
 		
 		<button id="search" class="btn btn-link" type="button"><i class="icon-search icon-gray"></i></button>
 		<input type="hidden" name="fl" value="id" />
