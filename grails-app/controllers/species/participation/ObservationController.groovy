@@ -339,21 +339,14 @@ class ObservationController extends AbstractObjectController {
 					return
 				}
 				observationInstance.incrementPageVisit()
-				def userGroupInstance;
-				if(params.webaddress) {
-					userGroupInstance = userGroupService.get(params.webaddress);
-				}
-				if(params.pos) {
-					int pos = params.int('pos');
-					def prevNext = getPrevNextObservations(pos, params.webaddress);
+				
+                int pos = params.pos?params.int('pos'):0;
+				def prevNext = getPrevNextObservations(pos, params.webaddress);
 					
-					if(prevNext) {
-						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
-					} else {
-						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
-					}
+				if(prevNext) {
+						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 				} else {
-					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
+					[observationInstance: observationInstance]
 				}
 			}
 		} else {
