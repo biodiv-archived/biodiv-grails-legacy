@@ -11,7 +11,7 @@ $(document).ready(function() {
         <h4><g.message code="heading.feature.content" /></h4>
     </g:if>
     <g:else>
-        <h4>Featured ${controller.toLowerCase().capitalize()}</h4>
+        <h4><g:message code="heading.featured" args="${ [controller.toLowerCase().capitalize()] }" /> </h4>
             </g:else>
     </g:if>
 	<ul style="list-style:none; width:100%; margin-left:0px;">

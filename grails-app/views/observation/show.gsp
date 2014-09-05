@@ -12,7 +12,7 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
+<g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():g.message(code:'link.help.identify')}"/>
 
 <%
 def r = observationInstance.mainImage();
@@ -205,7 +205,7 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
                                 </div>
                                 
                             </form>

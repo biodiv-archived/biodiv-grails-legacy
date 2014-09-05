@@ -34,7 +34,7 @@
 
         <div class="control-group commonNameDiv">
             <label for="recommendationVote" class="control-label"> <g:message
-                code="observation.recommendationVote.label" default="Common name" />
+                code="observation.recommendationVote.label" default="${g.message(code:'default.common.name.label')}" />
             </label>
             <div class="controls">
                 <div class="nameContainer textbox" style="position:relative;">
@@ -57,7 +57,7 @@
 
             <div class="control-group sciNameDiv" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
-                    code="observation.recommendationVote.label" default="Scientific name" />
+                    code="observation.recommendationVote.label" default="${g.message(code:'default.scientific.name.label')}" />
                 </label>
                 <div class="controls">
                     <div class="textbox nameContainer">
@@ -77,7 +77,7 @@
 
             <div class="control-group recoCommentDiv"  style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
-                    code="observation.recommendationVote.label" default="Comment" />
+                    code="observation.recommendationVote.label" default="${g.message(code:'default.comment.label')}" />
                 </label>
                 <div class="controls">
                     <div class="nameContainer textbox">

@@ -6,7 +6,7 @@
 <%@ page import="species.Species"%>
 <html>
 <head>
-<g:set var="title" value="Observations"/>
+<g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_list" />
 <style>
@@ -22,7 +22,7 @@
 </head>
 <body>
 	<div class="span12">
-		<obv:showSubmenuTemplate model="['entityName':'Related Observations']" />
+		<obv:showSubmenuTemplate model="['entityName':g.message(code:'observation.show.related.observations')]" />
 
 		<div>
 			<%--			<div class="tags_section span3" style="float: right;">--%>

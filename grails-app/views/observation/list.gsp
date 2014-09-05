@@ -19,6 +19,8 @@
 </head>
 <body>
 
+
+"${g.message(code:'placeholder.share.email')}"
 	<div class="span12">
            <obv:showSubmenuTemplate/>
 

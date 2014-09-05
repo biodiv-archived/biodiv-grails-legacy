@@ -3,8 +3,8 @@
 		style="z-index: 10; float: left; margin-left: 5px;">
 		<button id="identification-email"
 			class="${(params.action == 'show')?'btn btn-link' : 'btn'} dropdown-toggle"
-            title="${titleTooltip?:'Share this page link through email.'}"
-            data-toggle="dropdown" href="#"><i class="icon-envelope"></i>${title?:'Share'}</button>
+            title="${titleTooltip?:g.message(code:'placeholder.share.email') }"
+            data-toggle="dropdown" href="#"><i class="icon-envelope"></i>${title?:g.message(code:'button.share')}</button>
 		<form id="email-form" name="email-form" class="popup-form"
 			style="display: none; background-color: #F2F2F2;">
             <div class="form-row" style="${hideTo?'display:none;':''}">
