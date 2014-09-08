@@ -44,7 +44,7 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    
+	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -216,11 +216,11 @@ class SpeciesController extends AbstractObjectController {
 
 			Map map = getTreeMap(speciesInstance, fields);
 			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
-			def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
-			def observationInstanceList = relatedObservations?.observations?.observation
-			def instanceTotal = relatedObservations?relatedObservations.count:0
+			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
+			//def observationInstanceList = relatedObservations?.observations?.observation
+			//def instanceTotal = relatedObservations?relatedObservations.count:0
 
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], observationInstanceList:observationInstanceList, instanceTotal:instanceTotal, queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
+			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
 
             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');

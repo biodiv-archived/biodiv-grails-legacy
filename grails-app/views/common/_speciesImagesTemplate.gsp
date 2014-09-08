@@ -8,11 +8,13 @@
 
  <g:if test="${r.type == ResourceType.IMAGE}">
         <%  def basePath 
-            if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString()){
+            if(r.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
                 basePath = grailsApplication.config.speciesPortal.observations.serverURL
             }
-            else if(r.context.value() == Resource.ResourceContext.SPECIES.toString() || r.context.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+            else if(r.context?.value() == Resource.ResourceContext.SPECIES.toString() || r.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
                 basePath = grailsApplication.config.speciesPortal.resources.serverURL
+            }else{
+				basePath = grailsApplication.config.speciesPortal.resources.serverURL
             }
         %>
         <%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
