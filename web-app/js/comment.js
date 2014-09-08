@@ -289,7 +289,7 @@ $(".contentbox").live("keyup",function()
                 var output = '';
                 $.each(html, function(index,value){
                     
-                    output += '<div class="display_box addname" style="cursor:pointer;" align="left" class="addname" id="'+value.userId+'" title="'+value.label+'">';
+                    output += '<div class="display_box addname" style="cursor:pointer;" align="left" id="'+value.userId+'" title="'+value.label+'">';
                     output += '<img src="'+value.user_pic+'" class="image"/>';
                     output += '<a href="javascript:void(0);" id="'+value.userId+'" title="'+value.label+'">';
                     output += value.label+'</a><br/>';
@@ -327,7 +327,7 @@ $(".addname").live("click",function()
     var old = contentbox.html();
     var content=old.replace(word,""); 
     contentbox.html(content);
-    var E="<a class='red tagUsers' contenteditable='false' style='color: #16509E;font-weight: bold;' href='"+window.location.origin+"/user/show/"+userId+"' rel="+userId+" target='_blank' >"+username+"</a>&nbsp;";
+    var E="<a class='red tagUsers' contenteditable='false'  href='"+window.location.origin+"/user/show/"+userId+"' rel="+userId+" target='_blank' >"+username+"</a>&nbsp;";
     contentbox.append(E);
     //console.log(contentbox.html());
     //contentbox.parent().find('.comment-textbox').html(contentbox.html());
