@@ -588,8 +588,10 @@ class ObservationController extends AbstractObjectController {
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def thumbnail
 						def type
+                        def pi
 						if(resourcetype == resourceTypeImage){
-								ImageUtils.createScaledImages(file, obvDir);
+								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
+                                //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
 								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
 		                        //context specific baseUrl for location picker script to work
 								def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
@@ -602,7 +604,7 @@ class ObservationController extends AbstractObjectController {
 								
 
 						}		
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
+						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
 					}
 				}
 				
@@ -630,7 +632,7 @@ class ObservationController extends AbstractObjectController {
                     if(request.getHeader('X-Auth-Token')) {
                         def resourcesList = [];
                         for(r in resourcesInfo) {
-                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type]
+                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
                             resourcesList << res
                         }
                         render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
@@ -640,7 +642,7 @@ class ObservationController extends AbstractObjectController {
                                 dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
                                 resources {
                                     for(r in resourcesInfo) {
-                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
+                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
                                     }
                                 }
                             }
@@ -1607,5 +1609,13 @@ class ObservationController extends AbstractObjectController {
         } else {
             redirect (url:uGroup.createLink(action:'bulkCreate', controller:"observation", 'userGroupWebaddress':params.webaddress))
         }
+    }
+
+    def getProcessedImageStatus = {
+        def pi = ProcessImage.get(params.jobId.toLong());
+        def output = [:];
+        output = ['imageStatus':pi.status];
+        render output as JSON
+        return;
     }
 }

@@ -52,10 +52,10 @@
                 background-color: rgb(106, 201, 162) !important;
             }
             .column.block_row {
-                width:444px;
+                width:443px;
             }
             .miniObvWrapper.column {
-                width:290px;
+                width:291px;
                 margin:2px;
                 height:auto;
                 background-color: #a6dfc8;
@@ -137,7 +137,8 @@
                 overflow-x:scroll;
                 overflow-y:hidden;
                 height: 250px;
-                width:890px;
+                width:884px;
+                margin-left:2px;
             }
             .imageHolder {
                 border: 1px solid grey ;
@@ -185,6 +186,13 @@
             .propagateLocation .map_canvas{
                 width:99% !important;
             }
+            .section {
+                border:1px solid gray;
+            }
+            .sortMediaOnExif {
+                margin-right:2px;
+                margin-top:2px;
+            }
         </style>
     </head>
     <body>
@@ -202,8 +210,8 @@
                     <div class="section">
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
                     </div>
-                    <div class="section clearfix">
-                        <a class="btn btn-primary togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
+                    <div class="section clearfix" style="text-align:center;">
+                        <a class="btn btn-primary togglePropagateDiv" style="width:269px;"> Show Bulk Action <b class="caret"></b></a>
                         <div class= "propagateBlock hide clearfix">
                             <div >
                                 <div class="column propagateLicense">
@@ -272,6 +280,7 @@
                     </div>
 
                         <div class="section clearfix">
+                            <div><span style="font-weight:bold;margin-left:5px;">Observation Templates</span></div>
                             <div class="miniObvWrapper column">
                                 <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>

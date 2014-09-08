@@ -31,6 +31,7 @@
                 <div class="translucent_box"></div>
                 <div class="progress_bar"></div>
                 <div class="progress_msg"></div>
+                <div class="mediaProgressBar" style ="margin-top:117px"></div>
             </div>
 
             </li>

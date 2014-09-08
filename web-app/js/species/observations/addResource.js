@@ -32,6 +32,102 @@ function removeResource(event, imageId) {
 
 }
 
+function submitNextUpload(me) {
+    var val = (me.start/me.uploadedFilesSize)*100;
+        me.$ele.find(".mediaProgressBar").progressbar({
+            value:val
+        });
+    if(me.start < me.uploadedFilesSize) {
+        var count = 0;
+        var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+        me.start = me.start + me.w;
+        $.each(FPF, function(){
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'resources',
+                value:JSON.stringify(this)
+            }).appendTo(me.$form);
+            count = count + 1;
+        });
+        if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+            $("input[name='obvDir']").val('');
+            $("input[name='lastUploaded']").val(count);
+        }
+        me.submitRes();
+    } else {
+        me.$ele.find(".progress").css('z-index',90);
+        me.$ele.find(".mediaProgressBar").progressbar("destroy");
+        me.$ele.find('.progress_msg').html('');
+        $(".sortMediaOnExif").removeClass("disabled"); 
+    }
+}
+
+function getProcessedImageStatusInAjax(jobId, images, me) {
+    $.ajax({
+        url:window.params.getProcessedImageUrl,
+        dataType: "json",
+        data:{jobId:jobId},
+        success: function(data) {
+            if(data.imageStatus == "Success") {
+                //me.$ele.find(".progress").css('z-index',90);
+                flag = false;
+                var html = $( "#metadataTmpl" ).render( images );
+                var metadataEle = $(html);
+                if($( "input[name='resType']" ).val() == "species.participation.Observation") {
+                    metadataEle.each(function() {
+                        $('.geotagged_image', this).load(function(){
+                            var me = this;
+                            $.proxy(loadMapInput, $(".addObservation").find(".map_class"), $(me))();
+                            //$(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+                        });
+                        var $ratingContainer = $(this).find('.star_obvcreate');
+                        rate($ratingContainer);
+                    });
+                }
+                me.$ele.find(".imagesList li:first" ).after (metadataEle);
+                me.$ele.find(".add_file" ).fadeIn(3000);
+                me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
+                me.$ele.find(".image-resources-msg").html("");
+                me.$form.find("input[name='resources']").remove();
+                me.$ele.find('.videoUrl').val('');
+                me.$ele.find('.audioUrl').val('');
+                me.$ele.find('.add_video').editable('setValue','', false);
+                // me.$ele.find('.add_audio').editable('setValue','', false);		
+                me.$ele.find('.add_video').editable('setValue','', false);	
+
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    var count = $("input[name='lastUploaded']").val();
+                    var start = 0;
+                    var w = 1; 
+                    var end = start + w; 
+                    createResources(start, end, w, count);
+                    $("input[name='obvDir']").val('');
+                }
+                submitNextUpload(me); 
+                return;
+
+            } else if(data.imageStatus == "Failed") {
+                me.$ele.find(".progress").css('z-index',90);
+                me.$ele.find('.progress_msg').html('');
+                flag = false;
+                submitNextUpload(me);
+                return;
+
+            } else {
+                getProcessedImageStatusInAjax(jobId, images, me);
+            }
+        }, error : function(xhr, status, error) {
+            console.log("====ERROR=======");
+            //alert(xhr.responseText);
+        }
+    });
+
+}
+
+function getProcessedImageStatus(jobId, images, me) {
+    getProcessedImageStatusInAjax(jobId, images, me);
+}
+
 function createResources(start, end, w, count) {
     if(count < end) {
         end = count;
@@ -163,8 +259,9 @@ function createResources(start, end, w, count) {
         submitRes : function() {
             this.$form.submit().find("span.msg").html("Uploading... Please wait...");
             this.$ele.find(".iemsg").html("Uploading... Please wait...");
-            this.$ele.find(".progress").css('z-index',110);
-            this.$ele.find('.progress_msg').html('Uploading ...');
+                        
+            //this.$ele.find(".progress").css('z-index',110);
+            //this.$ele.find('.progress_msg').html('Uploading ...');
         },
 
         filePick : function(e) {
@@ -175,7 +272,7 @@ function createResources(start, end, w, count) {
                 me.uploadedFiles = FPFiles;
                 me.uploadedFilesSize = FPFiles.length;
                 me.start = 0;
-                me.w = 2;
+                me.w = 1;
                 var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
                 me.start = me.start + me.w;
                 me.$form.find("input[name='resources']").remove();
@@ -194,7 +291,13 @@ function createResources(start, end, w, count) {
                         name: 'lastUploaded',
                         value: count
                     }).appendTo(me.$form);
-                }    
+                }
+                me.$ele.find(".progress").css('z-index',110);
+                me.$ele.find('.progress_msg').html('Processing <br> Images...');
+                me.$ele.find(".mediaProgressBar").progressbar({
+                    value:0
+                });
+                me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
                 me.submitRes();
             };
 
@@ -230,7 +333,7 @@ function createResources(start, end, w, count) {
                 me.uploadedFiles = FPFiles;
                 me.uploadedFilesSize = FPFiles.length;
                 me.start = 0;
-                me.w = 2;
+                me.w = 1;
                 var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
                 me.start = me.start + me.w;
                 me.$form.find("input[name='resources']").remove();
@@ -279,8 +382,8 @@ function createResources(start, end, w, count) {
             var me = this;
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
-            me.$ele.find(".progress").css('z-index',90);
-            me.$ele.find('.progress_msg').html('');
+            //me.$ele.find(".progress").css('z-index',90);
+            //me.$ele.find('.progress_msg').html('Processing Image......');
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
@@ -299,72 +402,13 @@ function createResources(start, end, w, count) {
             var $s = $(responseXML).find('resources').find('res');
             var x = $s.length;
             $s.each(function() {
+                me.jobId = $(this).attr('jobId');
                 var fileName = $(this).attr('fileName');
                 var type = $(this).attr('type');					
                 images.push({i:x+i, file:fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
                 x--;
             });
-            var html = $( "#metadataTmpl" ).render( images );
-            var metadataEle = $(html);
-            if($( "input[name='resType']" ).val() == "species.participation.Observation") {
-                metadataEle.each(function() {
-                    $('.geotagged_image', this).load(function(){
-                        var me = this;
-                        $.proxy(loadMapInput, $(".addObservation").find(".map_class"), $(me))();
-                        //$(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
-                    });
-                    var $ratingContainer = $(this).find('.star_obvcreate');
-                    rate($ratingContainer);
-                });
-            }
-            me.$ele.find(".imagesList li:first" ).after (metadataEle);
-            me.$ele.find(".add_file" ).fadeIn(3000);
-            me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
-            me.$ele.find(".image-resources-msg").html("");
-            me.$form.find("input[name='resources']").remove();
-            me.$ele.find('.videoUrl').val('');
-            me.$ele.find('.audioUrl').val('');
-            me.$ele.find('.add_video').editable('setValue','', false);
-           // me.$ele.find('.add_audio').editable('setValue','', false);		
-            me.$ele.find('.add_video').editable('setValue','', false);	
-            
-            if($( "input[name='resType']" ).val() == "species.auth.SUser") {
-                /*
-                if($(".imagesList li").size() > 4){
-                    console.log("=============INCREASING WIDTH===========");
-                    var w = $(".imagesList").css("width");
-                    var w = w + 150;
-                    $(".imagesList").css("width", w);
-                }
-                */
-                var count = $("input[name='lastUploaded']").val();
-                var start = 0;
-                var w = 2; 
-                var end = start + w; 
-                createResources(start, end, w, count);
-                $("input[name='obvDir']").val('');
-            }
-            /////call here submitRes and before that modify contains of upload res form
-            if(me.start < me. uploadedFilesSize) {
-                var count = 0;
-                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
-                me.start = me.start + me.w;
-                $.each(FPF, function(){
-                    $('<input>').attr({
-                        type: 'hidden',
-                        name: 'resources',
-                        value:JSON.stringify(this)
-                    }).appendTo(me.$form);
-                    count = count + 1;
-                });
-                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
-                    $("input[name='obvDir']").val('');
-                    $("input[name='lastUploaded']").val(count);
-                }    
-                me.submitRes();
-            } else {
-               $(".sortMediaOnExif").removeClass("disabled"); 
-            }
+            getProcessedImageStatus(me.jobId, images, me);
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
