@@ -39,6 +39,7 @@ import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
 import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
 import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
+import grails.plugin.mail.MailMessageContentRenderer
 
 // Place your Spring DSL code here
 beans = {
@@ -385,6 +386,5 @@ beans = {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
-
 
 }
