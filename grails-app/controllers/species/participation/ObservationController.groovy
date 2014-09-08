@@ -1216,6 +1216,7 @@ class ObservationController extends AbstractObjectController {
 					log.debug " Overwriting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
 					def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
 					try{
+                        observation.removeFromRecommendationVote(existingRecVote);
 						existingRecVote.delete(flush: true, failOnError:true)
 					}catch (Exception e) {
 						e.printStackTrace();
