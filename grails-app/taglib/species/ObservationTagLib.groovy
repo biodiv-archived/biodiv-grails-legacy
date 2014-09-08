@@ -251,7 +251,7 @@ class ObservationTagLib {
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
 
             out << """
-               <span class="star_${divClass} 
+               <span class="star_${divClass}" 
                     title="Rate" data-score='${averageRating}' data-input-name="${name}"  data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="like" ></span>
                     <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
                 """

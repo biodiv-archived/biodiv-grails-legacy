@@ -693,7 +693,6 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
-        println "=========REL RES FOLER CM========= " + relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -791,9 +790,7 @@ class XMLConverter extends SourceConverter {
 			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-                    println "==========RESOURCE TYPE======== " + resourceType
                     if( resourceType.toString() == "IMAGE"){
-                        println "=========CALLOING CREATE SCALED IMAGE=============="
                         ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                       }  
                 } catch(FileNotFoundException e) {

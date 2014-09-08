@@ -467,7 +467,7 @@ div.errors {
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height: 57px;
+	height: 65px;
 	cursor: pointer;
 }
 .add_audio {
@@ -518,9 +518,9 @@ div.errors {
 .progress_msg {
 	position: absolute;
 	display: inline-block;
-	bottom: 15px;
+	bottom: 96px;
 	left: 30px;
-	color: #ffffff;
+	color: blue;
 	font-size: 1.5em;
 	font-weight: bold;
 }

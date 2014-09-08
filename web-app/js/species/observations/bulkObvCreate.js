@@ -363,7 +363,7 @@ function sortMediaOnExif() {
     if($(".sortMediaOnExif").hasClass("disabled")) {
         return;
     }
-    var allMedia = $(".addedResource.thumbnail");
+    var allMedia = $(".imagesList .addedResource.thumbnail");
     var unsorted = []
     $.each(allMedia, function(index, value){
         var temp = {};
@@ -371,7 +371,6 @@ function sortMediaOnExif() {
         var img = $(value).find(".geotagged_image");
         $(img).exifLoad(function() {
             var imageDate =  $(img).exif("DateTimeOriginal")[0];
-            console.log(imageDate);
             if(imageDate) {
                 temp.value = imageDate;
             } else {
@@ -380,13 +379,12 @@ function sortMediaOnExif() {
         });
         unsorted[index] = temp;
     });
-    console.log(unsorted);
     var sorted = unsorted.slice(0).sort(function(a, b) {
         return a.value < b.value;
     });
-    console.log(sorted);
-    $(".addedResource.thumbnail").remove();
+    $(".imagesList .addedResource.thumbnail").remove();
     $.each(sorted, function(index, value){
         $(".imagesList").append(value.key);
     });
+    $(".imagesList .addedResource.thumbnail").draggable({helper:'clone'});  
 }
