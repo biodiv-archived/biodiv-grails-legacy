@@ -337,7 +337,7 @@ http://indiabiodiversity.org/observation/distinctReco?sGroup=829&habitat=267835&
 
 h4. flagDelete
 
-* *Path* : /api/observation/flagDelete
+* *Path* : /api/observation/flagDeleted
 * *Parameters* :
 ** id : observation id
 * *REST Method* : POST
