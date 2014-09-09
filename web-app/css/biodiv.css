@@ -2773,11 +2773,6 @@ small {
     border:solid 1px #dedede;padding:5px;
     display:none;background-color:#f2f2f2;
 }
-.red
-{
-    color:#cc0000;
-    font-weight:bold;
-}
 .contentbox a
 {
     text-decoration:none;
@@ -2851,9 +2846,9 @@ small {
     border:solid 1px #dedede;padding:5px;
     display:none;background-color:#f2f2f2;
 }
-.red
+.tagUsers
 {
-    color:#cc0000;
+    color:#16509E !important;
     font-weight:bold;
 }
 .contentbox a
