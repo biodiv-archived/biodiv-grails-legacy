@@ -382,6 +382,8 @@ function sortMediaOnExif() {
     var sorted = unsorted.slice(0).sort(function(a, b) {
         return a.value < b.value;
     });
+    console.log("=======SORTED======");
+    console.log(sorted);
     $(".imagesList .addedResource.thumbnail").remove();
     $.each(sorted, function(index, value){
         $(".imagesList").append(value.key);

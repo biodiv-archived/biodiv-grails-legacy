@@ -14,7 +14,6 @@ function removeResource(event, imageId) {
             data: {resId:resId , fileName:fileName},	
             success: function(data) {
                 if(data.status){
-                    alert("Media deleted!")
                 } else {
                     alert("Deletion failed - Uploaded media has no ID, refresh and try!!")
                 } 
@@ -114,7 +113,7 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
                 return;
 
             } else {
-                getProcessedImageStatusInAjax(jobId, images, me);
+                setTimeout(function(){getProcessedImageStatusInAjax(jobId, images, me)}, 500);
             }
         }, error : function(xhr, status, error) {
             console.log("====ERROR=======");

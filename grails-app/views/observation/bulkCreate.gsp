@@ -187,7 +187,8 @@
                 width:99% !important;
             }
             .section {
-                border:1px solid gray;
+                border:1px solid lightgrey;
+                border-radius:7px;
             }
             .sortMediaOnExif {
                 margin-right:2px;
