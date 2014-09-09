@@ -162,7 +162,7 @@ grails.project.dependency.resolution = {
                 excludes 'spring-security-core', 'cors'
         }
 
-        runtime ":webxml:1.4.1" 
+        compile ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
         //compile ":error-pages-fix:0.2"
         compile ":ajax-uploader:1.1"
