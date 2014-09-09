@@ -544,8 +544,8 @@ class XMLConverter extends SourceConverter {
             if(contributor) {
                 contributors.add(contributor);
             } else {
-                log.warn "NOT A VALID CONTIBUTOR : "+contributorName;
-                addToSummary("NOT A VALID CONTIBUTOR : "+contributorName)
+                log.warn "NOT A VALID CONTRIBUTOR : "+contributorName;
+                addToSummary("NOT A VALID CONTRIBUTOR : "+contributorName)
             }
         }
         return contributors;
