@@ -380,6 +380,7 @@ class UserGroupTagLib {
 
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 
 		result.each {
 			switch(it.key.id) {
@@ -389,8 +390,11 @@ class UserGroupTagLib {
 				case memberRole.id :
 					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Member of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
+				case expertRole.id :
+                    out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Expert of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+					break;
 				default :
-					log.error it
+					log.error "Invalid role id for user ${userInstance} : ${it}"
 			}
 		}
 
