@@ -712,7 +712,7 @@ function useTitle(obj){
                             response( cacheSN[ term ] );
                             return;
                         }
-                        me.mapLocationPicker.geocoder.geocode( {'address': request.term +'+india', 'region':'in'}, function(results, status) {
+                        me.mapLocationPicker.geocoder.geocode( {'address': request.term }, function(results, status) {
                             var r = [];
                             $.each(results, function(index, item) {
                                 if(r.length >= 5) return;

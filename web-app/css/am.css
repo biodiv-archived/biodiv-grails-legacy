@@ -154,7 +154,7 @@ margin-bottom:2px;
 }
 
 #panel_show_bttn {
-z-index: 2000;
+/* z-index: 2000; */
 background-image: url("../images/left_arrow.png");
 background-repeat: no-repeat;
 background-position: left center;
@@ -772,7 +772,8 @@ opacity:0.5;
 opacity:1;      
 }
 
-.layer_details_link {
+.layer_options li.layer_details_link {
+    display:none;
 background-image: url("../images/info.png");
 background-repeat: no-repeat;
 background-position: left center;
