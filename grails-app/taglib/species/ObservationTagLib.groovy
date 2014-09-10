@@ -280,8 +280,8 @@ class ObservationTagLib {
                     """
             }
             out << """
-                <span class="like_${divClass} 
-                    title="${(userRating>0)?'Unlike':'Like'}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
+                <span class="like_${divClass}" 
+                    title="${(userRating>0)?g.message(code:'default.unlike'):g.message(code:'default.like')}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
                     <span class="noOfRatings" title='${g.message(code:"observationtaglib.title.likes")}'>${resource.totalRatings ?: 0}</span>
                 """
             if(!hideForm) {

@@ -14,7 +14,7 @@
 
 <html>
     <head>
-        <g:set var="title" value="Checklist"/>
+        <g:set var="title" value="${g.message(code:'default.checklist.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="checklist_create"/>
         <uploader:head />
@@ -36,7 +36,7 @@
                 def form_id = "addObservation"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Add Checklist"
-                def form_button_val = "Add Checklist"
+                def form_button_val = "${g.message(code:'button.add.checklist')}"
                 if(params.action == 'edit' || params.action == 'update'){
                 form_action = uGroup.createLink(action:'update', controller:'checklist', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 form_button_name = "Update Checklist"

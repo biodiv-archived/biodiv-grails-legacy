@@ -382,13 +382,15 @@ class UserGroupTagLib {
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 
+
 		result.each {
 			switch(it.key.id) {
 				case founderRole.id :
-					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Founded', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+
+					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':g.message(code:'default.founded.label'), 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				case memberRole.id :
-					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Member of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':g.message(code:'suser.member.label'), 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				default :
 					log.error it

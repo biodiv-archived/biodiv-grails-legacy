@@ -7,7 +7,7 @@
 
 <html>
 <head>
-<g:set var="title" value="Observations"/>
+<g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_create"/>
 <style>
@@ -27,12 +27,12 @@
             def form_class = "addObservation"
             def form_action = uGroup.createLink(action:'save', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
             def form_button_name = "Add Observation"
-            def form_button_val = "Add Observation"
+            def form_button_val = "${g.message(code:'link.add.observation')}"
             if(params.action == 'edit' || params.action == 'update'){
             //form_class = "updateObservation"
             form_action = uGroup.createLink(action:'update', controller:'observation', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
             form_button_name = "Update Observation"
-            form_button_val = "Update Observation"
+            form_button_val = "${g.message(code:'default.update.observation')}"
             }
 
             %>

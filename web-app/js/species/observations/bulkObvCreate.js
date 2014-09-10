@@ -210,7 +210,7 @@ function dropAction(event, ui, ele) {
 $(".obvCreateTags").tagit({
     select:true, 
     allowSpaces:true, 
-    placeholderText:'Add some tags',
+    placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
     fieldName: 'tags', 
     autocomplete:{
         source: '/observation/tags'
@@ -287,7 +287,7 @@ function initializers(){
     $(".obvCreateTags").tagit({
         select:true, 
         allowSpaces:true, 
-        placeholderText:'Add some tags',
+        placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
         fieldName: 'tags', 
         autocomplete:{
             source: '/observation/tags'

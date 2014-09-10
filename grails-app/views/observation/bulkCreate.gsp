@@ -8,7 +8,7 @@
 
 <html>
     <head>
-        <g:set var="title" value="Observations"/>
+        <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
         <style>
@@ -195,8 +195,8 @@
                 def form_id = "addBulkObservations"
                 def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Submit & and more"
-                def form_button_val = "Submit & Add More"
-                def submitFinish = "Submit & Finish"
+                def form_button_val = "${g.message(code:'button.submit.add')}"
+                def submitFinish = "${g.message(code:'button.submit.finish')}"
                 %>
                 <div class="super-section">
                     <div class="section">

@@ -43,9 +43,14 @@
 						<form action="${uGroup.createLink(controller:'document', action:'delete')}" method='POST' name='deleteForm'>
 							<input type="hidden" name="id" value="${documentInstance.id}" />
 						</form>
+                        <%
+                        def y="${g.message(code:'info.document.delete')}"
+                        %>
 						<r:script>
 						function deleteDocument(){
-							if(confirm('This document will be deleted. Are you sure ?')){
+                            var test="${y}";
+                            
+							if(confirm(test)){
 								document.forms.deleteForm.submit();
 							}
 						}

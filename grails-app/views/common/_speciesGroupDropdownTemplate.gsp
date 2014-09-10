@@ -4,7 +4,7 @@
 <%@page import="species.Habitat"%>
 <div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}" style="clear:both;">
     <label for="group"><g:message
-        code="observation.group.label" default="Group" />
+        code="observation.group.label" default="${g.message(code:'default.group.label')}" />
     </label> 
 
     <div class="help-inline control-label">

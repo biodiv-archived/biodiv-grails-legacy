@@ -33,7 +33,7 @@
 						<uGroup:showGeneralSettings model="['userGroupInstance':userGroupInstance]" />
 						
 						<div class="" style="margin-top: 20px; margin-bottom: 40px;">
-							<input type="submit" value="Update"
+							<input type="submit" value="${g.message(code:'suser.edit.update')}"
 								class="btn btn-primary" 
 								style="clear: both; float:right; border-radius: 5px" />
 							</div>

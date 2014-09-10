@@ -4,7 +4,7 @@
     <label for="topology" class="control-label">
         <i class="icon-map-marker"></i>
         <g:message
-        code="observation.topology.label" default="Observed At" /> <span class="req">*</span></label>
+        code="observation.topology.label" default="${g.message(code:'default.label.at')}" /> <span class="req">*</span></label>
     <div class="controls ">
  
     <div style="margin-left:0px;">
@@ -21,7 +21,7 @@
                 <div class="wrapperParent"  style="text-align:center;width:100%">
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:2;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="${g.message(code:'showmapinput.find.place')}"  class="input-block-level" style="width:94%;"
-                        class="section-item" value="${observationInstance?.placeName}"/>
+                        class="section-item" value="${observationInstance?.placeName}" rel="${g.message(code:'default.search')}" />
 
                         <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
                         

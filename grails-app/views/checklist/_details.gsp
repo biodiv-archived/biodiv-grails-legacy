@@ -2,7 +2,7 @@
     class="row control-group ${hasErrors(bean: observationInstance, field: 'title', 'error')}">
 
     <label for="title" class="control-label"><g:message
-        code="checklist.title.label" default="Title" /> <span class="req">*</span></label>
+        code="checklist.title.label" default="${g.message(code:'default.title.label')}" /> <span class="req">*</span></label>
     <div class="controls textbox">
         <g:textField name="title" value="${observationInstance?.title}" class="input-block-level" placeholder="${g.message(code:'checklist.details.enter.name')}" />
         <div class="help-inline">
@@ -18,7 +18,7 @@
     class="row control-group ${hasErrors(bean: observationInstance, field: 'license', 'error')}">
 
     <label for="license" class="control-label"><g:message
-        code="checklist.license.label" default="License" /> <span class="req">*</span></label>
+        code="checklist.license.label" default="${g.message(code:'default.licenses.label')}" /> <span class="req">*</span></label>
     <div class="controls">
 	<g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':observationInstance?.license]"/>
         <div class="help-inline">
@@ -36,7 +36,7 @@
     <label for="publicationDate" class="control-label"><i
             class="icon-calendar"></i>
         <g:message code="observation.publicationDate.label"
-        default="Publication Date" /></label>
+        default="${g.message(code:'default.publication.date.label')}" /></label>
 
 
     <div class="controls textbox">
@@ -62,7 +62,7 @@
     class="row control-group ${hasErrors(bean: observationInstance, field: 'attribution', 'error')}">
 
     <label for="title" class="control-label"><g:message
-        code="checklist.attribution.label" default="Attribution" /> </label>
+        code="checklist.attribution.label" default="${g.message(code:'default.attribution.label')}" /> </label>
     <div class="controls textbox">
         <g:textField name="attributions" value="${params.attributions ?: (observationInstance?.attributions?.collect{ it.name}?.join(', ')) }" class="input-block-level" placeholder="${g.message(code:'checklist.details.enter.attribution')}" />
         <div class="help-inline">
@@ -78,7 +78,7 @@
     class="row control-group ${hasErrors(bean: observationInstance, field: 'refText', 'error')}">
 
     <label for="refText" class="control-label"><g:message
-        code="checklist.refText.label" default="References" /> </label>
+        code="checklist.refText.label" default="${g.message(code:'default.references.label')}" /> </label>
     <div class="controls textbox">
         <ckeditor:config var="toolbar_editorToolbar">
         [

@@ -6,7 +6,7 @@
                             <div class="pull-right">
                                 <a class="btn btn-success pull-right"
                                         href="${uGroup.createLink(
-                                                        controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" title="Add Document"
+                                                        controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" title="${g.message(code:'link.add.document')}"
                                         > <i class="icon-plus"></i><g:message code="link.add.document" /></a>
 
                             </div>

@@ -124,9 +124,11 @@
                                         if(currentUser) {
                                             staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
                                         }
-                                        %>
+def contact_me_text="${g.message(code:'button.contact.me')}"                                        
+%>
+
                             			    <obv:identificationByEmail
-                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:'Contact Me', titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:contact_me_text, titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
                                         </li>
                                     </g:if>
                                 </ul>
@@ -167,7 +169,11 @@
 				    </obv:showObservationsLocation>
                                 </div>
                                 <div id="expertice" class="section span6" style="margin:0px;margin-left:20px;width:420px;">
-                                         <chart:showStats model="['title':'Observations by Species Group', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/>
+                                <%
+                                def species_group_observations="${g.message(code:'suser.heading.species.observations')}"
+                                %>
+                                
+                                <chart:showStats model="['title':species_group_observations, columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/>
 	                        </div>
  
                             </div>

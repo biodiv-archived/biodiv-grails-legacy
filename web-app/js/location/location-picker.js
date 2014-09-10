@@ -902,8 +902,9 @@ function useTitle(obj){
 
 $(document).ready(function() { 
   
-  $('.placeName').watermark('Search');
+  $('.placeName').watermark($(".placeName").attr('rel'));
 
+//alert($(".placename").attr('rel'));
   $(".address .add-on").unbind('click').click(function(){
       var me = this;
       var map_class = $(this).closest(".map_class");

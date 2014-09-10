@@ -23,7 +23,7 @@
 
 
 	<div class="span12">
-		<s:showSubmenuTemplate model="['entityName':'Species']" />
+		<s:showSubmenuTemplate model="['entityName':'Specie']" />
                     <uGroup:rightSidebar/>
                     <obv:featured
             model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />

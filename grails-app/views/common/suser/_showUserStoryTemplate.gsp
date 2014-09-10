@@ -13,7 +13,7 @@
 		<g:if test="${showDetails}">
 			<div class="prop">
 				<span class="name"><i class="icon-user"></i> <g:message
-						code="suser.username.label" default="Username" /> </span>
+						code="suser.username.label" /> </span>
 				<div class="value">
 					${fieldValue(bean: userInstance, field: "username")}
 				</div>
@@ -21,7 +21,7 @@
 
 			<div class="prop">
 				<span class="name"><i class="icon-user"></i> <g:message
-						code="suser.name.label" default="Full Name" /> </span>
+						code="suser.name.label" /> </span>
 				<div class="value">
 					${fieldValue(bean: userInstance, field: "name")}
 				</div>
@@ -33,7 +33,7 @@
 				model="['user':userInstance, 'isPublic':!userInstance.hideEmailId]">
 				<div class="prop">
 					<span class="name"> <i class="icon-envelope"></i> <g:message
-							code="suser.email.label" default="Email" /> </span>
+							code="suser.email.label" /> </span>
 					<div class="value">
 
 						<a href="mailto:${fieldValue(bean: userInstance, field: 'email')}">

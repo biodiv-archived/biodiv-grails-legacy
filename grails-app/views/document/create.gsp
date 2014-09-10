@@ -35,8 +35,8 @@ input.dms_field {
 
     <% 
     def form_action = uGroup.createLink(action:'save', controller:'document', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-    def form_title = "Create Document"
-    def form_button_name = "Add Document"
+    def form_title = "${g.message(code:'title.create.document')}"
+    def form_button_name = "${g.message(code:'title.document.add')}"
     def form_button_val = "Add Document"
     if(params.action == 'edit' || params.action == 'update'){
     form_action = uGroup.createLink(action:'update', controller:'document', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -65,7 +65,7 @@ input.dms_field {
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'type', 'error')}">
                         <label class="control-label" for="type"><g:message
-                            code="document.type.label" default="Type" /><span class="req">*</span></label>
+                            code="document.type.label" default="${g.message(code:'default.type.label')}" /><span class="req">*</span></label>
                         <div class="controls">
                             <g:select name="type" class="input-block-level"
                             placeholder="${g.message(code:'placeholder.document.select')}"
@@ -79,7 +79,7 @@ input.dms_field {
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'title', 'error')}">
                         <label class="control-label" for="title"><g:message
-                            code="document.title.label" default="Title" /><span class="req">*</span></label>
+                            code="document.title.label" default="${g.message(code:'default.title.label')}" /><span class="req">*</span></label>
                         <div class="controls">
 
                             <input type="text" class="input-block-level" name="title"
@@ -105,6 +105,16 @@ input.dms_field {
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir]]" />
 
+<% def upload_file_text="${g.message(code:'default.upload.file.label')}"
+%>
+ <script type="text/javascript">
+
+$(document).ready(function(){
+$('.qq-upload-button').html(function(index, text) {
+return text.replace('Upload a file', '${upload_file_text}');
+}).attr("title","value");
+});
+</script>
                             </div>
                             <div class="span1"><g:message code="loginformtemplate.or" /></div>
                             <div

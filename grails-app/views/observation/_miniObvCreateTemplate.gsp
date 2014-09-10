@@ -52,7 +52,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 <i class="icon-tags"></i><g:message code="default.tags.label" /> <small><g:message code="observation.tags.message" default="" /></small></label>
         </h5>
         <div class="create_tags section-item" style="clear: both;">
-            <ul class="obvCreateTags">
+            <ul class="obvCreateTags" rel="${g.message(code:'placeholder.add.tags')}">
                 <g:each in="${obvTags}" var="tag">
                 <li>${tag}</li>
                 </g:each>
