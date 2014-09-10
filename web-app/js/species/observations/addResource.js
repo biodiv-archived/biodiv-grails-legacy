@@ -62,6 +62,10 @@ function submitNextUpload(me) {
 }
 
 function getProcessedImageStatusInAjax(jobId, images, me) {
+    if(!jobId) {
+        console.log("NO JOB ID");
+        return;
+    }
     $.ajax({
         url:window.params.getProcessedImageUrl,
         dataType: "json",
@@ -124,6 +128,10 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
 }
 
 function getProcessedImageStatus(jobId, images, me) {
+    if(!jobId) {
+        console.log("NO JOB ID");
+        return;
+    }
     getProcessedImageStatusInAjax(jobId, images, me);
 }
 

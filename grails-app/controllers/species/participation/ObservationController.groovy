@@ -1613,7 +1613,10 @@ class ObservationController extends AbstractObjectController {
 
     def getProcessedImageStatus = {
         println "======IN HERE ##########===========================%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ========="
-        def pi = ProcessImage.get(params.jobId.toLong());
+        if(!(params.jobId)) {
+            return;
+        }
+        def pi = ProcessImage.get(params.jobId?.toLong());
         def output = [:];
         output = ['imageStatus':pi.status];
         render output as JSON

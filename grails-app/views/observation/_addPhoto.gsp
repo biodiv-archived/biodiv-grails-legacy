@@ -168,7 +168,7 @@
         <g:if test="${observationInstance instanceof Species}">
             <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
+                    <input name="contributor_{{>i}}" type="text" value="${currentUser.name}" placeholder="Contributor">
                     <input name="source_{{>i}}" type="text" value="" placeholder="Source">
                     <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
                     <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->

@@ -400,7 +400,7 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.contextGroupWebaddress || params.webaddress){
+        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources') ){
             //def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
             //println group.webaddress
             relatedObv.observations.each { map ->

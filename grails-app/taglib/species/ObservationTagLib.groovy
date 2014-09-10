@@ -392,6 +392,9 @@ class ObservationTagLib {
             break
     
         }
+        if(springSecurityService.currentUser) {
+            attrs.model['currentUser'] = springSecurityService.currentUser
+        }
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount
