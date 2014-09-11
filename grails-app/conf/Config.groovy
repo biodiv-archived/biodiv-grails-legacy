@@ -165,10 +165,11 @@ else {
 
 
 speciesPortal {
-    app.siteName = "India Biodiversity Portal"
+    app.siteName = "WIKWIO Portal V.1.0"
     app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
-    app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
-    app.siteCode = 'ibp'
+    app.homepageDescription = "WIKWIO aims to strengthen science and technology orientation to achieving food security by enhancing agricultural productivity in the Southern African region. Agricultural productivity is hampered by many factors, one important among them being weeds. Wikwio aims to build and leverage a Science & Technology network which will consolidate existing scientific knowledge and facilitate sharing of new scientific knowledge on weeds of food and cash crops of the region and effective management practices. Wikwio will deploy appropriate ICT solutions to build a multi-stakeholder community of researchers, extension services, civil society and farmers around an ICT knowledge base of weeds. The action aims at enhancing the capacities of researchers, reinforce the institutional capabilities of the National Agricultural Research System (NARS) and Universities, empower extension services and improving their quality of service, through a participatory, technology facilitated platform."
+    app.siteCode = 'wikwio'
+    app.siteName2 = "Weed Identification and Knowledge in the Western Indian Ocean<br>WIKWIO"
 
     app.twitterUrl = "https://twitter.com/inbiodiversity"
     app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
@@ -179,7 +180,7 @@ speciesPortal {
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  
-    app.logo = "logo/IBP.png"
+    app.logo = "logo/wikwio.png"
     app.favicon = "logo/favicon.png"
    
     app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]

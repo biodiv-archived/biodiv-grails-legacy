@@ -128,8 +128,7 @@
         <ckeditor:resources />
         <script type="text/javascript" src="ckEditorConfig.js" />
 
-        <script type="text/javascript"
-            src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
+        
         <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
         -->
         <script type="text/javascript">
@@ -152,13 +151,9 @@
 
         $(document).ready(function(){
             if(${sparse}) {
-                if(occurrenceCount > 0) {
+                
                 showOccurence('${speciesName}');
-                //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
-                } else {
-                $("#map").next('.alert').html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.").css('height','auto');
-                $('#map').hide();
-                }
+                
             } else {
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
                 showSpeciesField($(".defaultSpeciesField").attr("id"))
