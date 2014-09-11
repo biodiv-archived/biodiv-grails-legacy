@@ -318,7 +318,7 @@ beans = {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }
 
-    /*dataSource(ComboPooledDataSource) { bean ->
+    dataSource(ComboPooledDataSource) { bean ->
         bean.destroyMethod = 'close'
         user = CH.config.dataSource.username
         password = CH.config.dataSource.password
@@ -327,7 +327,7 @@ beans = {
         unreturnedConnectionTimeout = 50 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
-      }*/ 
+     } 
 
     /*if (Environment.current == Environment.DEVELOPMENT) {
     log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {

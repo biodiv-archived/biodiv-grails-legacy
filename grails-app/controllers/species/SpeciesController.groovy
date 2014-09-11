@@ -930,7 +930,8 @@ class SpeciesController extends AbstractObjectController {
         return;
     }
 
-    def uploadImage() {
+    @Secured(['ROLE_USER'])
+    def pullImageForSpecies() {
         log.debug params
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
@@ -945,6 +946,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
@@ -955,7 +957,8 @@ class SpeciesController extends AbstractObjectController {
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON
     }
-
+/*
+    @Secured(['ROLE_USER'])
     def pullObvImage() {
         log.debug params  
         //pass that same species
@@ -971,6 +974,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def pullSpeciesFieldImage() {
         log.debug params
         def species = Species.get(params.speciesId.toLong())
@@ -984,7 +988,7 @@ class SpeciesController extends AbstractObjectController {
         }   
         render result as JSON
     }
-
+*/
     @Secured(['ROLE_USER'])
     def validate() {
 /*        List hierarchy = [];
@@ -1100,6 +1104,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
@@ -1114,6 +1119,7 @@ class SpeciesController extends AbstractObjectController {
         }    
     }
 
+    @Secured(['ROLE_USER'])
     def uploadMediaInSpField(){
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)

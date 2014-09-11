@@ -555,11 +555,10 @@ environments {
             debug   'speciespage',
             'grails.app',
             'species'
-            debug   'grails.app.filters.species.SecurityFilters'
+            info   'grails.app.filters.species.SecurityFilters'
             info    'species.auth',
             'com.mchange.v2.resourcepool.BasicResourcePool'
             info    'com.linkedin.grails'
-            info    'species.SecurityFilters'
         }
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
@@ -891,10 +890,11 @@ environments {
                     'org.pac4j'
             info    'jdbc.sqltiming'
             info    'jdbc.connection'
-            fatal   'jdbc.sqlonly'
-            fatal   'jdbc.audit'
-            fatal   'jdbc.resultset'
-            fatal   'jdbc.resultsettable'
+            off   'jdbc.sqlonly'
+            off   'jdbc.audit'
+            off   'jdbc.resultset'
+            off   'jdbc.resultsettable'
+            info   'grails.app.filters.species.SecurityFilters'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
        }
@@ -997,12 +997,13 @@ environments {
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
-            fatal   'jdbc.sqltiming'
-            fatal   'jdbc.connection'
-            fatal   'jdbc.sqlonly'
-            fatal   'jdbc.audit'
-            fatal   'jdbc.resultset'
-            fatal   'jdbc.resultsettable'
+            off   'jdbc.sqltiming'
+            off   'jdbc.connection'
+            off   'jdbc.sqlonly'
+            off   'jdbc.audit'
+            off   'jdbc.resultset'
+            off   'jdbc.resultsettable'
+            info   'grails.app.filters.species.SecurityFilters'
 		}
 	}
 }
