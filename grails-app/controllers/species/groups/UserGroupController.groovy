@@ -1353,6 +1353,18 @@ class UserGroupController {
        render "== done"
     }
 
+    @Secured(['ROLE_ADMIN'])
+    def createDigestIns(){
+        def ug = UserGroup.get(params.userGroupId.toLong())
+        println "=========UG=========== " + ug
+        def dig = new Digest(userGroup:ug, lastSent:new Date() - 14, forObv:true, forSp:true, forDoc:true, forUsers:true, startDateStats:new Date() - 14, sendTopContributors:true,sendTopIDProviders:true);
+        if(!dig.save(flush:true)) {
+            dig.errors.allErrors.each { log.error it } 
+        }
+        println "========== CREATED Digest instance ============="
+    }
+
+
 
 }
 
