@@ -43,6 +43,10 @@ import species.utils.Utils;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import java.beans.Introspector;
+import species.CommonNames;
+import species.Language;
+import species.Species;
+
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
@@ -81,6 +85,7 @@ class ObservationService extends AbstractObjectService {
     def SUserService;
     //def speciesService;
     def messageSource;
+    def resourcesService;
 
     /**
      * 
@@ -359,10 +364,11 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "latestUpdatedObservations") {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
-        } 
-        //else if(params.filterProperty == "latestUpdatedSpecies") {
-        //    relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
-        //}
+        } else if(params.filterProperty == "latestUpdatedSpecies") {
+            relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
+        } else if(params.filterProperty == 'bulkUploadResources') {
+            relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
+        }
         
         else{
             if(params.id) {
@@ -372,7 +378,7 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.contextGroupWebaddress || params.webaddress){
+        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources') ){
             //def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
             //println group.webaddress
             relatedObv.observations.each { map ->

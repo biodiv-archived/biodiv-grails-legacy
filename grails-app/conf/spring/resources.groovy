@@ -39,6 +39,7 @@ import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
 import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
 import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
+import grails.plugin.mail.MailMessageContentRenderer
 
 // Place your Spring DSL code here
 beans = {
@@ -317,16 +318,16 @@ beans = {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }
 
-    dataSource(ComboPooledDataSource) { bean ->
+    /*dataSource(ComboPooledDataSource) { bean ->
         bean.destroyMethod = 'close'
         user = CH.config.dataSource.username
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
-        //unreturnedConnectionTimeout = 5 // seconds
+        unreturnedConnectionTimeout = 50 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
-      } 
+      }*/ 
 
     /*if (Environment.current == Environment.DEVELOPMENT) {
     log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
@@ -387,6 +388,5 @@ beans = {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
-
 
 }

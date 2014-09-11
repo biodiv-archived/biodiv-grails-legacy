@@ -266,7 +266,7 @@
 						<g:if test="${projectInstance?.proposalFiles}">
 							<b>Files</b>
 
-							<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
+							<g:each in="${projectInstance?.fetchProposalFiles()}" var="proposalFile">
 
                                                             <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':proposalFile, showDetails:false]"/>
 							</g:each>
@@ -293,7 +293,7 @@
 						<g:if test="${projectInstance?.reportFiles}">
 							<b>Files</b>
 
-							<g:each in="${projectInstance?.reportFiles}" var="reportFile">
+							<g:each in="${projectInstance?.fetchReportFiles()}" var="reportFile">
 
                                                             <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':reportFile, showDetails:false]"/>
 							</g:each>
@@ -348,7 +348,7 @@
 						<g:if test="${projectInstance?.miscFiles}">
 							<b>Files</b>
 
-							<g:each in="${projectInstance?.miscFiles}" var="miscFile">
+							<g:each in="${projectInstance?.fetchMiscFiles()}" var="miscFile">
 
                                                             <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':miscFile, showDetails:false]"/>
 							</g:each>

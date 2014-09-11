@@ -81,7 +81,7 @@ class DigestService {
             }
             
         }else{
-            log.error "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
+            log.warn "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
         }
     }
 

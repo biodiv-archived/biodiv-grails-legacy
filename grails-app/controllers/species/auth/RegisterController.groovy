@@ -471,7 +471,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 		def config = SpringSecurityUtils.securityConfig
 
-		def savedRequest = session["SPRING_SECURITY_SAVED_REQUEST_KEY"]
+		def savedRequest = session['SPRING_SECURITY_SAVED_REQUEST_KEY']
 		if (savedRequest && !config.successHandler.alwaysUseDefault) {
 			flash.message = message(code: 'spring.security.ui.register.completeSimple')
 			redirect url: savedRequest.redirectUrl
