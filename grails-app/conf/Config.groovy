@@ -171,10 +171,10 @@ speciesPortal {
     app.siteCode = 'wikwio'
     app.siteName2 = "Weed Identification and Knowledge in the Western Indian Ocean<br>WIKWIO"
 
-    app.twitterUrl = "https://twitter.com/inbiodiversity"
-    app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
-    app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
-	app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
+    //app.twitterUrl = "https://twitter.com/inbiodiversity"
+    //app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
+    //app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
+	//app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
 
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
@@ -183,7 +183,7 @@ speciesPortal {
     app.logo = "logo/wikwio.png"
     app.favicon = "logo/favicon.png"
    
-    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com"]
 
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
@@ -1092,8 +1092,8 @@ grails.plugin.springsecurity.facebook.domain.classname='species.auth.FacebookUse
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="notification@indiabiodiversity.org"
-emailConfirmation.from="notification@indiabiodiversity.org"
+grails.mail.default.from="notification@wikwio.org"
+emailConfirmation.from="notification@wikwio.org"
 
 grails.plugin.springsecurity.password.algorithm = 'MD5'
 grails.plugin.springsecurity.password.hash.iterations = 1
@@ -1147,7 +1147,7 @@ If you didn't make this request then ignore the email; no changes have been made
 <br/>
 If you did make the request, then click <a href="$url">here</a> to reset your password.
 '''
-//grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@wikwio.org'
 grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugin.springsecurity.ui.addObservation.emailSubject = 'Observation added'
