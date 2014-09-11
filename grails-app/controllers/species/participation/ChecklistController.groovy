@@ -36,7 +36,7 @@ class ChecklistController {
 			}else{
 				//if this instance is not checklists instance then redirecting to observation
 				if(!checklistInstance.instanceOf(Checklists)){
-					redirect(controller:'observation', action:show, params: params)
+					redirect(controller:'observation', action:'show', params: params)
 					return
 				}
 				//refetching checklist and  all observation in one query
