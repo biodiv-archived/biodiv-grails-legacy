@@ -54,6 +54,7 @@ class ObservationController extends AbstractObjectController {
     def chartService;
     def messageSource;
     def commentService;
+    def utilsService;
 
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -712,7 +713,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
 						mailType = utilsService.OBSERVATION_ADDED;
-						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+						utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
 					if(!params["createNew"] && !isMobileApp){
@@ -747,11 +748,11 @@ class ObservationController extends AbstractObjectController {
 					} else {
 						mailType = utilsService.SPECIES_RECOMMENDED;
 					}
-					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
                     if(!params["createNew"] && !isMobileApp){
-						//observationService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
+						//utilsService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
@@ -877,7 +878,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					observationService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
@@ -953,7 +954,7 @@ class ObservationController extends AbstractObjectController {
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 			   //sending mail to user
-			   observationService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
+			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
 			   def r = [
 				   status : 'success',
 				   success : 'true',

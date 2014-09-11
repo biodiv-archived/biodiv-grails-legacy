@@ -561,10 +561,6 @@ class SpeciesController extends AbstractObjectController {
                 def feedInstance;
                 if(result.activityType)
                     feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
-<<<<<<< HEAD
-                if(result.mailType) 
-                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
-=======
                 if(result.mailType) {
                     def otherParams = ['info':result.activityType]
                     def spIns = result.speciesFieldInstance
@@ -578,9 +574,8 @@ class SpeciesController extends AbstractObjectController {
                             otherParams['spFDes'] = des
                         }
                     }
-                    observationService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParams);
+                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParams);
                 }
->>>>>>> master
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
