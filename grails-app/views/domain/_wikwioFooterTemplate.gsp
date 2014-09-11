@@ -152,18 +152,23 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                                                 $.cookie("fb_login", "true", { path: '/', domain:".${Utils.getIBPServerCookieDomain()}"});
                                                 if($(clickedObject).hasClass('ajaxForm')) {
                                                         $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
+                                                        var p = new Array();
+                                                        p['uid'] = response.authResponse.userID;
+                                                        <g:if test="${targetUrl}">
+                                                            p['spring-security-redirect'] = '${targetUrl}'
+                                                        </g:if>
                                                         $.ajax({
                                                             url: "${uGroup.createLink(controller:'login', action:'authSuccess')}",
                                                             method:"GET",
-                                                            data:{'uid':response.authResponse.userID, ${targetUrl?'"spring-security-redirect":"'+targetUrl+'"':''}},
+                                                            data:p,
                                                             success: function(data, statusText, xhr) {
                                                                 ajaxLoginSuccessHandler(data, statusText, xhr);
                                                             },  error: function(xhr, ajaxOptions, thrownError) {
-                                                $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
-                                            }
+                                                                $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
+                                                            }
                                                         });
                                                 } else{
-                                                        var redirectTarget = ${targetUrl?'"&spring-security-redirect='+targetUrl+'"':'""'};
+                                                        var redirectTarget = "${targetUrl?'spring-security-redirect='+targetUrl:''}";
                                                         window.location = "${uGroup.createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
                                                 }
                                         } else {
