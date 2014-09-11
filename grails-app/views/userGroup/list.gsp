@@ -9,7 +9,10 @@
 </head>
 <body>
 	<div class="span12">
-		<uGroup:showSubmenuTemplate   model="['entityName':'Groups']"/>
+    <%
+    def group=g.message(code:'default.groups.label')
+    %>
+		<uGroup:showSubmenuTemplate   model="['entityName':group]"/>
 		
 		
 		<div class="">

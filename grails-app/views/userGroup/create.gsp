@@ -82,13 +82,13 @@ max-width: 100%;
 				def form_id = "createGroup"
 				def form_action = uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'save')
 				def form_button_name = "Create Group"
-				def form_button_val = "Create Group"
+				def form_button_val = "${g.message(code:'button.create.group')}"
 				
 				if(params.action == 'edit' || params.action == 'update'){
 					//form_id = "updateGroup"
 					form_action = uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'update', 'userGroup':userGroupInstance)
 				 	form_button_name = "Update Group"
-					form_button_val = "Update Group"
+					form_button_val = "${g.message(code:'button.update.group')}"
 					entityName = "Edit Group"
 				}
 				%>
@@ -118,7 +118,7 @@ max-width: 100%;
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'name', 'error')}">
 
 							<label for="name" class="control-label"><g:message
-									code="userGroup.name.label" default="Group Name" /> </label>
+									code="userGroup.name.label" default="${g.message(code:'usergroup.name.label')}" /> </label>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
 									<g:if test="${userGroupInstance?.domainName }">
@@ -191,7 +191,7 @@ max-width: 100%;
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'icon', 'error')}">
 							<label for="icon" class="control-label"><g:message
-									code="userGroup.icon.label" default="Icon" /> </label>
+									code="userGroup.icon.label" default="${g.message(code:'usergroup.icon.label')}" /> </label>
 							<div class="controls">
 								<div style="z-index: 3;">
 										<div
@@ -234,7 +234,7 @@ max-width: 100%;
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'founders', 'error')}">
 							<label for="founders" class="control-label"><g:message
-									code="userGroup.founders.label" default="Invite Founders" /> </label>
+									code="userGroup.founders.label"  /> </label>
 							<div class="controls  textbox">
 								<sUser:selectUsers model="['id':founders_autofillUsersId]" />
 								<input type="hidden" name="founderUserIds" id="founderUserIds" />
@@ -246,7 +246,7 @@ max-width: 100%;
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'experts', 'error')}">
 							<label for="experts" class="control-label"><g:message
-									code="userGroup.experts.label" default="Invite Moderators" /> </label>
+									code="title.default.invite.moderators"  /> </label>
 							<div class="controls  textbox">
 									<sUser:selectUsers model="['id':experts_autofillUsersId]"/>
 									<input type="hidden" name="expertUserIds" id="expertUserIds" />
@@ -316,7 +316,7 @@ max-width: 100%;
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowUsersToJoin" checked="${userGroupInstance.allowUsersToJoin}"/>
-								 <g:message code="userGroup.permissions.members.joining" default="Can users join the Group without invitation?" /> </label>
+								 <g:message code="userGroup.permissions.members.joining" default="" /> </label>
 						</div>
 <%--						<div class="row control-group left-indent">--%>
 <%--							--%>
@@ -361,7 +361,7 @@ max-width: 100%;
 							style="float: right; margin-right: 5px;">
 							<a
 								href="${createLink(mapping:'userGroup', action:'delete', params:['webaddress':userGroupInstance.webaddress])}"
-								onclick="return confirm('${message(code: 'default.userGroup.delete.confirm.message', default: 'This group and its content will be deleted. Are you sure ?')}');"><g:message code="button.delete.group" /></a>
+								onclick="return confirm('${message(code: 'default.userGroup.delete.confirm.message')}');"><g:message code="button.delete.group" /></a>
 						</div>
 					</g:if>
 					 <a id="createGroupSubmit"
@@ -533,7 +533,7 @@ $(document).ready(function() {
 	$("#tags").tagit({
 		select:true, 
 		allowSpaces:true, 
-		placeholderText:'Add some tags',
+		placeholderText:'${g.message(code:"placeholder.add.tags")}',
 		fieldName:'tags', 
 		autocomplete:{
 			source: "${uGroup.createLink(controller:'userGroup', action: 'tags')}"

@@ -8,7 +8,7 @@
 					<button id="homePageSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="${g.message(code:'ugroup.title.homepage')}">
-                                                ${userGroupInstance?.fetchHomePageTitle() ?: 'Select home page '}<span
+                                                ${userGroupInstance?.fetchHomePageTitle() ?: g.message(code:"usergroup.select.home.page") }<span
 							class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
@@ -49,7 +49,7 @@
 					<button id="themeSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="${g.message(code:'ugroup.title.theme')}">
-						${userGroupInstance?.theme ?: 'Select theme '}<span class="caret"></span>
+						${userGroupInstance?.theme ?: g.message(code:"usergroup.select.theme") }<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
 						<g:each var="theme" in="${userGroupInstance?.getThemes()}">

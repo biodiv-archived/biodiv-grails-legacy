@@ -11,7 +11,23 @@ $(document).ready(function() {
         <h4><g.message code="heading.feature.content" /></h4>
     </g:if>
     <g:else>
-        <h4><g:message code="heading.featured" args="${ [controller.toLowerCase().capitalize()] }" /> </h4>
+   
+    <% def controller_name=""  %>
+    <g:if test="${controller=='species'}">
+        <%  controller_name=g.message(code:'default.species.label')  %>
+    </g:if>
+    <g:elseif test="${controller=='observation'}">
+        <%  controller_name=g.message(code:'default.observation.label')  %>
+    </g:elseif>
+    <g:else test="${controller=='document'}" >
+        <%  controller_name=g.message(code:'feature.part.document')   %>
+    </g:else>
+
+
+      
+
+
+    <h4><g:message code="heading.featured" args="${ [controller_name] }" /> </h4>
             </g:else>
     </g:if>
 	<ul style="list-style:none; width:100%; margin-left:0px;">

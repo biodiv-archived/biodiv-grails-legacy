@@ -10,7 +10,7 @@ def obvId = observationInstance.id
 </g:if>
 
 <div class="snippet">
-    <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'title.feature'):''}">
+    <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
             </span>
     <div class="figure pull-left observation_story_image" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>

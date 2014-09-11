@@ -23,7 +23,11 @@
 
 
 	<div class="span12">
-		<s:showSubmenuTemplate model="['entityName':'Specie']" />
+      <%
+    def species_title=g.message(code:'default.species.label')
+    %>
+
+		<s:showSubmenuTemplate model="['entityName':species_title]" />
                     <uGroup:rightSidebar/>
                     <obv:featured
             model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />

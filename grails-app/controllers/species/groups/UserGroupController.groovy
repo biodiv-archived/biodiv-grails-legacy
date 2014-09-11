@@ -161,7 +161,7 @@ class UserGroupController {
 		else {
 			log.debug "Successfully created usergroup : "+userGroupInstance
 			activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_CREATED);
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.webaddress])}"
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label'), userGroupInstance.webaddress])}"
 			redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params:['webaddress': userGroupInstance.webaddress])
 		}
 	}

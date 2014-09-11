@@ -11,8 +11,11 @@
 		<div class="observations thumbwrap">
 			<div class="observation">
 				<div>
-					<obv:showObservationFilterMessage
-						model="['observationInstanceList':userGroupInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'resultType':'user group']" />
+				<%
+                def user_group=g.message(code:'text.user.group')
+                %>
+                <obv:showObservationFilterMessage
+						model="['observationInstanceList':userGroupInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'resultType':user_group]" />
 				</div>
 				<g:if test="${instanceTotal > 0}">
 					<div class="btn-group pull-left" style="z-index: 10">
