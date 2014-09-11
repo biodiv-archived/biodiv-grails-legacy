@@ -27,7 +27,7 @@
         </g:if>
         <ul class="imagesList thumbwrap thumbnails"
             style='list-style: none; margin-left: 0px;'>
-            <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
+            <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset, 'currentUser':currentUser]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <input type="hidden" class='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
             </g:if>

@@ -400,7 +400,7 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.contextGroupWebaddress || params.webaddress){
+        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources') ){
             //def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
             //println group.webaddress
             relatedObv.observations.each { map ->
@@ -2013,6 +2013,7 @@ class ObservationService extends AbstractObjectService {
                 templateMap["serverURL"] =  grailsApplication.config.grails.serverURL
                 templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName
                 templateMap["resourcesServerURL"] = grailsApplication.config.speciesPortal.resources.serverURL
+                templateMap["grailsApplication"] = grailsApplication
                 mailSubject = "Activity digest on " + otherParams["userGroup"].name
                 bodyView = "/emailtemplates/digest"
                 templateMap["digestContent"] = otherParams["digestContent"]

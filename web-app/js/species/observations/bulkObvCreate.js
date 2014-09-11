@@ -372,7 +372,11 @@ function sortMediaOnExif() {
         $(img).exifLoad(function() {
             var imageDate =  $(img).exif("DateTimeOriginal")[0];
             if(imageDate) {
-                temp.value = imageDate;
+                var date = imageDate.split(" ")[0];
+                var time = imageDate.split(" ")[1];
+                date = date.replace(/:/g, "-");
+                var modDate = date + " " + time
+                temp.value = modDate;
             } else {
                 temp.value = '1970-01-01 00:00:00'
             }
@@ -380,10 +384,8 @@ function sortMediaOnExif() {
         unsorted[index] = temp;
     });
     var sorted = unsorted.slice(0).sort(function(a, b) {
-        return a.value < b.value;
+        return (new Date(b.value)) - (new Date(a.value));
     });
-    console.log("=======SORTED======");
-    console.log(sorted);
     $(".imagesList .addedResource.thumbnail").remove();
     $.each(sorted, function(index, value){
         $(".imagesList").append(value.key);
