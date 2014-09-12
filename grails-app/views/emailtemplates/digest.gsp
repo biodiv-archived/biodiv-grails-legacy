@@ -181,10 +181,10 @@
                                 <td class="w640" height="30" width="627" style="border-bottom:1px solid white">
                                     <g:if test="${documentInstance.notes != null}">
                                     <g:if test="${documentInstance.notes.length() > 160}">
-                                    ${documentInstance.notes[0..158] + '...'} <br />
+                                    ${raw(documentInstance.notes[0..158]) + '...'} <br />
                                     </g:if>
                                     <g:else>
-                                    ${documentInstance.notes?:''} <br />
+                                    ${raw(documentInstance.notes)?:''} <br />
                                     </g:else>
                                     </g:if>
                                 </td>
