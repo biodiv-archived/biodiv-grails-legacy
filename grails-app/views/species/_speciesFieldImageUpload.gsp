@@ -1,8 +1,8 @@
 <div class="tabbable speciesFieldImage-wrapper " style="">
     <ul class="nav nav-tabs" id="speciesFieldImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
-            <li id="speciesFieldImage-li0" class="active"><a href="#speciesFieldImage-tab0" class="btn" data-toggle="tab">Add Observation Images</a></li>
-            <li id="speciesFieldImage-li1"><a href="#speciesFieldImage-tab1" class="btn" data-toggle="tab">Upload/Edit Images</a></li>
+            <li id="speciesFieldImage-li0" class="active"><a href="#speciesFieldImage-tab0" class="btn" data-toggle="tab">Add Observation Media</a></li>
+            <li id="speciesFieldImage-li1"><a href="#speciesFieldImage-tab1" class="btn" data-toggle="tab">Upload/Edit Media</a></li>
         </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
@@ -15,7 +15,7 @@
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'fromRelatedObv' , 'checkFlag':true]"></obv:addPhotoWrapper>
                     <!--a id="pullObvImagesSpFieldBtn" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Pull Images </a-->
+                        style="float: right; margin-right: 5px;"> Pull Media </a-->
                 </form>
                    
             </div>
