@@ -176,7 +176,7 @@ grails.project.dependency.resolution = {
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
-        //        compile ":grails-melody:1.47.2"
+        compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.2.1"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
