@@ -6,7 +6,7 @@
 <div class="feedFilterDiv">
 	<div class="btn-group pull-right" style="z-index: 10; clear:both">
 		<button id="feedFilterButton" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
-			data-original-title="Filter by"> Group <span class="caret"></span>
+			data-original-title="Filter by"> All <span class="caret"></span>
 		</button>
 		
 		<ul id="feedFilter" class="dropdown-menu" style="width: auto;">
