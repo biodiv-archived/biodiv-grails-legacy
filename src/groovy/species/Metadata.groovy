@@ -49,12 +49,13 @@ abstract class Metadata {
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
-		topology nullable:true, validator : { val, obj ->
-			if(!val){
-				return true
-			}
-			return ObservationService.validateLocation(val, obj)
-		}
+		topology (nullable:true)
+//		, validator : { val, obj ->
+//			if(!val){
+//				return true
+//			}
+//			return ObservationService.validateLocation(val, obj)
+//		}
         fromDate nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
