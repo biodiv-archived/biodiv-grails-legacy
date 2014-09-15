@@ -541,7 +541,7 @@ $(document).ready(function(){
         }
 
     });
-    $(".recoName").watermark("Suggest a species name");
+    $(".recoName").watermark($(".recoName").attr('rel'));
 
     /**
      */
@@ -758,7 +758,7 @@ $(document).ready(function(){
             $(".addObservation").submit();        	
             return false;
         } else {
-            alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
+            alert("Please agree to the terms mentioned at the end of the form to submit the observation.") 
         }
     });
 

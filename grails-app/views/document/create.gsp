@@ -305,7 +305,7 @@ CKEDITOR.replace('description', config);
 
                                 </form>
                             </div>
-
+<%def alert_msg=g.message(code:'document.error.message')%>
 	<r:script>
 	
 	$(document).ready(function() {
@@ -370,7 +370,8 @@ CKEDITOR.replace('description', config);
 				        $("#documentForm").submit();
 			    	    return false;
 					} else {
-						alert("Please agree to the terms mentioned at the end of the form to submit the document.")
+                        var error_msg="${alert_msg}";
+						alert(error_msg)
 					}       	
 		       	
 	
