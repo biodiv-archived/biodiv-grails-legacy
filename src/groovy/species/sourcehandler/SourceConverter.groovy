@@ -588,9 +588,9 @@ class SourceConverter {
 	
 	
 	def myPrint(str){
-		if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
+		//if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
 			println str
-		}
+		//}
 	}
 }
 
