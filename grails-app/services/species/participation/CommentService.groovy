@@ -68,10 +68,12 @@ class CommentService {
 	}
 
 	def removeComment(params){
-		Comment comment = Comment.get(params.commentId.toLong());
+		Comment comment = Comment.get(params.commentId?.toLong());
 		try{
-			comment.deleteComment();
-			return true
+            if(comment){
+			    comment.deleteComment();
+			    return true
+            } 
 		}catch(e) {
 			e.printStackTrace()
 		}

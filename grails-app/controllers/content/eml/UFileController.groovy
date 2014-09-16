@@ -291,15 +291,17 @@ class UFileController {
 
     def downloadSpeciesFile = {
         //println "====FILE NAME =======" + params
-        File f = new File(params.downloadFile);
-        if (f.exists()) {
-            //println "here here===================="
-            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
-            response.setContentType("application/octet-stream")
-            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
-            response.outputStream << f.readBytes()
-            response.outputStream.flush()
-            //println "==YAHAN HUN == " 
+        if(params.downloadFile) {
+            File f = new File(params.downloadFile);
+            if (f.exists()) {
+                //println "here here===================="
+                //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+                response.setContentType("application/octet-stream")
+                response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+                response.outputStream << f.readBytes()
+                response.outputStream.flush()
+                //println "==YAHAN HUN == " 
+            }
         } 
     } 
 
