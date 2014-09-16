@@ -7,6 +7,7 @@ import java.lang.*;
 import java.text.SimpleDateFormat;
 import org.codehaus.groovy.runtime.DateGroovyMethods;
 import groovy.sql.Sql;
+import species.groups.UserGroupMemberRole;
 
 class DigestService {
 
@@ -34,11 +35,12 @@ class DigestService {
         if(setTime){
             lastSent = new Date()
         }
+        def digestContent = fetchDigestContent(digest)
         def emailFlag = true
         while(emailFlag){
             def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
             if(usersEmailList.size() != 0){
-                sendDigest(digest, usersEmailList, false)
+                sendDigest(digest, usersEmailList, false, digestContent)
                 offset = offset + max
                 Thread.sleep(600000L);
             }
@@ -55,8 +57,8 @@ class DigestService {
 
     }
 
-    def sendDigest(Digest digest, usersEmailList, setTime){
-        def digestContent = fetchDigestContent(digest)
+    def sendDigest(Digest digest, usersEmailList, setTime, digestContent){
+        //def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
             def otherParams = [:]
@@ -83,7 +85,7 @@ class DigestService {
         }
     }
 
-    private def fetchDigestContent(Digest digest){
+    def fetchDigestContent(Digest digest){
         def params = [:]
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
@@ -93,6 +95,7 @@ class DigestService {
         params.feedType = ActivityFeedService.GROUP_SPECIFIC
 
         def res = [:]
+        res = latestContentsByGroup(digest)
         def obvList = [], unidObvList = [], spList = [], docList = [], userList = [];
         boolean obvFlag = false, unidObvFlag = false, spFlag = false, docFlag = false, userFlag = false;
         //HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
@@ -112,6 +115,7 @@ class DigestService {
         else{
             for (def feed : feedsList){
                 switch(feed.rootHolderType){
+                    /*
                     case Observation.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS) { 
                         def obv = Observation.read(feed.rootHolderId)
@@ -148,7 +152,7 @@ class DigestService {
                     }
                     //obvIds.add(it.rootHolderId);
                     break
-
+                    */
 
                     case Species.class.getCanonicalName():
                     if(spList.size() < MAX_DIGEST_OBJECTS){
@@ -190,7 +194,7 @@ class DigestService {
                     break
                 } 
                 
-                if(obvFlag && unidObvFlag && spFlag && docFlag && userFlag){
+                if(spFlag && docFlag && userFlag){
                     break;
                 }
 
@@ -213,11 +217,14 @@ class DigestService {
                     isNotNull('maxVotedReco')
                 }
             }*/
+            /*
             res['observations'] = obvList
             res['unidObvs'] = unidObvList
             res['species'] = spList
+            */
             res['documents'] = docList
             res['users'] = userList
+
 
             def p = [webaddress:digest.userGroup.webaddress];
 
@@ -312,4 +319,78 @@ class DigestService {
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
+    def latestContentsByGroup(Digest digest) {
+		def res = [:]
+        int max = 5
+        def obvList = Observation.withCriteria(){
+            and{
+                // taking undeleted observation
+                eq('isDeleted', false)
+                eq('isShowable', true)
+                
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastRevised', 'desc'
+        }
+
+        def unidObvList = Observation.withCriteria(){
+            and{
+                // taking undeleted observation
+                eq('isDeleted', false)
+                eq('isShowable', true)
+                eq('isChecklist', false)
+                isNull('maxVotedReco')
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastRevised', 'desc'
+        }
+        /*
+        def spList = Species.withCriteria(){
+            and{
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastUpdated', 'desc'
+        }
+
+        def docList = Document.withCriteria(){
+            and{
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastRevised', 'desc'
+        }
+        //wrong suser desc
+        //def userList = UserGroupMemberRole.findAllByUserGroup(digest.userGroup, [max: max, sort: "sUser", order: "desc"]).collect {it.sUser};
+        */
+        res['observations'] = obvList
+        res['unidObvs'] = unidObvList
+        //res['species'] = spList
+        //res['documents'] = docList
+        //res['users'] = userList
+        
+        return res
+    }
 }

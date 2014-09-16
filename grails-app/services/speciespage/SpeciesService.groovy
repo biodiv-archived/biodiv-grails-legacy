@@ -1334,7 +1334,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         }
 
         queryParams.sort = params.sort?:"lastrevised"
-        if(queryParams.sort.equals('lastrevised')) {
+        if(queryParams.sort.equals('lastrevised') || queryParams.sort.equals('lastupdated')) {
             queryParams.sort = 'lastUpdated'
 
         } else if(queryParams.sort.equals('percentofinfo') || queryParams.sort.equals('score')) {
