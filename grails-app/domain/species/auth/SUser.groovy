@@ -139,7 +139,7 @@ class SUser {
 			return profilePic;
 		}
 
-		def baseUrl = grailsApplication.config.speciesPortal.resources.serverURL;
+		def baseUrl = grailsApplication.config.speciesPortal.users.serverURL;
 		switch(type) {
 			case ImageType.NORMAL :
 				case ImageType.LARGE : return baseUrl+"/user_large.png"
