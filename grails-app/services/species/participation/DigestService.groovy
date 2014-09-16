@@ -35,11 +35,12 @@ class DigestService {
         if(setTime){
             lastSent = new Date()
         }
+        def digestContent = fetchDigestContent(digest)
         def emailFlag = true
         while(emailFlag){
             def usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
             if(usersEmailList.size() != 0){
-                sendDigest(digest, usersEmailList, false)
+                sendDigest(digest, usersEmailList, false, digestContent)
                 offset = offset + max
                 Thread.sleep(600000L);
             }
@@ -56,8 +57,8 @@ class DigestService {
 
     }
 
-    def sendDigest(Digest digest, usersEmailList, setTime){
-        def digestContent = fetchDigestContent(digest)
+    def sendDigest(Digest digest, usersEmailList, setTime, digestContent){
+        //def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
             def otherParams = [:]
@@ -84,7 +85,7 @@ class DigestService {
         }
     }
 
-    private def fetchDigestContent(Digest digest){
+    def fetchDigestContent(Digest digest){
         def params = [:]
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
@@ -318,7 +319,7 @@ class DigestService {
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-    private def latestContentsByGroup(Digest digest) {
+    def latestContentsByGroup(Digest digest) {
 		def res = [:]
         int max = 5
         def obvList = Observation.withCriteria(){
