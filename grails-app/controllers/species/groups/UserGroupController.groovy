@@ -1307,11 +1307,13 @@ class UserGroupController {
     def sendSampleDigest() {
         println "=====STARTING SENDING SAMPLE EMAIL======"
         def digest = Digest.findByUserGroup(UserGroup.get(params.userGroupId.toLong()));
+        //def usersEmailList = [SUser.get(4136L)]
         def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4136L)]
         println "==USERSMAIL LIST========= "  + usersEmailList
         def setTime = params.setTime?params.setTime.toBoolean():false
         println "=====SET TIME ===== " + setTime
-        digestService.sendDigest(digest, usersEmailList, setTime);
+        def digestContent = digestService.fetchDigestContent(digest)
+        digestService.sendDigest(digest, usersEmailList, setTime, digestContent);
         println "==========SAMPLE EMAILS SENT============"
     }
     
