@@ -139,8 +139,8 @@ abstract class AbstractSearchService {
         def result;
         try{
             result = solrServer.query( q );
-        } catch(SolrException e) {
-            log.error "Error: ${e.getMessage()}"
+        } catch(Exception e) {
+            log.error "Query: ${query} - Error: ${e.getMessage()}"
         }
         return result;
     }

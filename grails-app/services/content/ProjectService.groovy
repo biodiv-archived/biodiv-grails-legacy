@@ -218,11 +218,13 @@ class ProjectService {
 		List result = new ArrayList();
 
 		def queryResponse = projectSearchService.terms(params.term, params.field, params.max);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Project Pages"]);
-		}
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Project Pages"]);
+            }
+        }
 		return result;
 	}
 
