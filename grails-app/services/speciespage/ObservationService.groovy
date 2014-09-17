@@ -1002,7 +1002,10 @@ class ObservationService extends AbstractObjectService {
 
         def query = "select "
 
-        def orderByClause = "  obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
+        if(!params.sort || params.sort == 'score') {
+            params.sort = "lastRevised"
+        }
+        def orderByClause = "  obv." + params.sort +  " desc, obv.id asc"
 
         if(params.fetchField) {
             query += " obv.id as id,"
