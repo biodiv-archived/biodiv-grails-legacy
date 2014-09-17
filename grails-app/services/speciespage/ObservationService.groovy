@@ -1801,12 +1801,13 @@ class ObservationService extends AbstractObjectService {
             def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
             def obvUrl, domain, baseUrl
 
-            try {
-                request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-            } catch(IllegalStateException e) {
-                log.error e.getMessage();
+            if(notificationType != DIGEST_MAIL) {
+                try {
+                    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+                } catch(IllegalStateException e) {
+                    log.error e.getMessage();
+                }
             }
-
             if(request) {
                 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
                 domain = Utils.getDomainName(request)
@@ -2103,7 +2104,6 @@ class ObservationService extends AbstractObjectService {
             default:
                 log.debug "invalid notification type"
             }
-
             toUsers.eachWithIndex { toUser, index ->
                 if(toUser) {
                     if(!toUser.enabled || toUser.accountLocked){
@@ -2148,7 +2148,6 @@ class ObservationService extends AbstractObjectService {
                     }
                 }
             }
-
             } catch (e) {
                 log.error "Error sending email $e.message"
                 e.printStackTrace();
