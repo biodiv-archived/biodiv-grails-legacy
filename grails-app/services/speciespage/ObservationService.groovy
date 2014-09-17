@@ -2120,7 +2120,7 @@ class ObservationService extends AbstractObjectService {
                     }
                     
                     log.debug "Sending email to ${toUser}"
-                    try{/*
+                    try{
                         mailService.sendMail {
                             to toUser.email
                             if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("kk")) ) {
@@ -2141,7 +2141,7 @@ class ObservationService extends AbstractObjectService {
                                 }
                                 html bodyContent
                             }
-                        }*/
+                        }
                     } catch(Exception e) {
                         log.error "Error sending message ${e.getMessage()} toUser : ${toUser} "
                         e.printStackTrace();
