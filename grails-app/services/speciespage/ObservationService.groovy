@@ -1706,10 +1706,12 @@ class ObservationService extends AbstractObjectService {
         List result = new ArrayList();
 
         def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
-        NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-        for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-            Map.Entry tag = (Map.Entry) iterator.next();
-            result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+            }
         }
         return result;
     } 
