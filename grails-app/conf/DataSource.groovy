@@ -35,7 +35,7 @@ environments {
     development {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
-            url = "jdbc:log4jdbc:postgresql://127.0.0.1:5432/${appName}"
+            url = "jdbc:postgresql://127.0.0.1:5432/${appName}"
         }
     }
     test {
@@ -59,7 +59,7 @@ environments {
     pamba {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
-            url = "jdbc:log4jdbc:postgresql://localhost:5432/${appName}"
+            url = "jdbc:postgresql://localhost:5432/${appName}"
         }
     }
     pambaTest {
@@ -71,14 +71,14 @@ environments {
     kk {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
-            url = "jdbc:log4jdbc:postgresql://localhost:5432/${appName}"
+            url = "jdbc:postgresql://localhost:5432/${appName}"
         }
     }
 }
 
 /* Added by the Hibernate Spatial Plugin. */
 dataSource {
-   //driverClassName = "org.postgresql.Driver"
+   driverClassName = "org.postgresql.Driver"
    //driverClassName = "net.sf.log4jdbc.DriverSpy"
-   driverClassName = "net.sf.log4jdbc.sql.jdbcapi.DriverSpy"
+   //driverClassName = "net.sf.log4jdbc.sql.jdbcapi.DriverSpy"
 }
