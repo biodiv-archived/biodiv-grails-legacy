@@ -270,6 +270,23 @@ function loaderFun(that,boolVal,msgValue,Ele){
 	}
 }	 
 
+function placeCaretAtEnd(el) {
+   el.focus();
+   if (typeof window.getSelection != "undefined"
+           && typeof document.createRange != "undefined") {
+       var range = document.createRange();
+       range.selectNodeContents(el);
+       range.collapse(false);
+       var sel = window.getSelection();
+       sel.removeAllRanges();
+       sel.addRange(range);
+   } else if (typeof document.body.createTextRange != "undefined") {
+       var textRange = document.body.createTextRange();
+       textRange.moveToElementText(el);
+       textRange.collapse(false);
+       textRange.select();
+   }
+}
 
 $(document).on('focus','.comment-textbox',function(){
 	appendCommentWrapper($(this));
@@ -327,6 +344,8 @@ $(".contentbox").live("keyup",function()
         }
     }else{       
        //contentbox.parent().parent().find('.comment-textbox').html($(this).html());
+         contentbox.parent().find(".display").hide();
+	    contentbox.parent().find(".msgbox").hide();
        stripTags($(this),contentbox.parent().parent().find('.comment-textbox'))
     }
 
@@ -367,7 +386,8 @@ $(".addname").live("click",function()
     contentbox.parent().find(".display").hide();
     contentbox.parent().find(".msgbox").hide();
     //console.log(contentbox);
-    contentbox.focus();
+   // contentbox.focus();
+   placeCaretAtEnd(contentbox.get(0));
 });
 });
 

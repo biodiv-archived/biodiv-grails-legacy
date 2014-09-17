@@ -229,37 +229,37 @@ class ObservationService extends AbstractObjectService {
 
                 params["createNew"] = true
                 params["oldAction"] = params.action
-                println "============PARAMS ACTION=============== " + params.action
-                println "============FOR OBSERVATION ============ " + observationInstance
+                log.debug "============PARAMS ACTION=============== " + params.action
+                log.debug "============FOR OBSERVATION ============ " + observationInstance
                 String uuidRand =  UUID.randomUUID().toString()
-                println "==================UUID GENERATED======== " + uuidRand
+                log.debug "==================UUID GENERATED======== " + uuidRand
                 observationInstance.resource.each { resource ->
-                    println "=============FOR RESOURCE=========== " + resource + " =======ITS CONTEXT ======== " + resource.context?.value() + " =====ITS FILE NAME===== " +  resource.fileName
+                    log.debug "=============FOR RESOURCE=========== " + resource + " =======ITS CONTEXT ======== " + resource.context?.value() + " =====ITS FILE NAME===== " +  resource.fileName
                     if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
-                        println "========CONTEXT IS USER========= " 
+                        log.debug "========CONTEXT IS USER========= " 
                         def usersResFolder = resource.fileName.tokenize('/')[0]
-                        println "======USERS RES FOLDER========== " + usersResFolder
+                        log.debug "======USERS RES FOLDER========== " + usersResFolder
                         def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
-                        println "======OBV DIR FROM CONFIG======= " + obvDir
+                        log.debug "======OBV DIR FROM CONFIG======= " + obvDir
                         if(!obvDir.exists()) {
                             obvDir.mkdir();
                         }
                         /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
                         obvDir = new File(obvDir, uuidRand);
-                        println "=====NEW OBV DIR CREATED======== " + obvDir
+                        log.debug "=====NEW OBV DIR CREATED======== " + obvDir
                         obvDir.mkdir();                
                         /////change filename of resource to this uuid and inside that check for clash of filename
                         File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
                         def a = newUniq.getAbsolutePath().tokenize('/')[-1]
                         def newFileName = a.tokenize('.')[0]
-                        println "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
+                        log.debug "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
                         //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
                         String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
                         def usersResDir = new File(userRootDir, usersResFolder)
                         def finalSuffix = ""
-                        println "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
+                        log.debug "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
                         usersResDir.eachFileRecurse (FileType.FILES) { file ->
-                            println "=========PICKED UP THIS FILE==================== " + file
+                            log.debug "=========PICKED UP THIS FILE==================== " + file
                             def fName = file.getName();
                             def tokens = fName.tokenize("_");
                             def nameSuffix = ""
@@ -274,39 +274,39 @@ class ObservationService extends AbstractObjectService {
                                     }
                                 }
                             }
-                            println "========NAME SUFFIX======== " + nameSuffix
+                            log.debug "========NAME SUFFIX======== " + nameSuffix
                             Path source = Paths.get(file.getAbsolutePath());
                             Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
-                            println "=======SOURCE============= " + source 
-                            println "====DESTINATION=========== " + destination
+                            log.debug "=======SOURCE============= " + source 
+                            log.debug "====DESTINATION=========== " + destination
                             try {
                                 //Files moved but empty folder there
-                                println "===================MOVING FILE================================"
+                                log.debug "===================MOVING FILE================================"
                                 Files.move(source, destination);
                             } catch (IOException e) {
-                                println "======EXCEPTION IN MOVING FILE==============="
+                                log.debug "======EXCEPTION IN MOVING FILE==============="
                                 e.printStackTrace();
                             }
                         }
                         try{
-                            println "=========DELETING DIRECTORY=========="
+                            log.debug "=========DELETING DIRECTORY=========="
                             FileUtils.deleteDirectory(usersResDir);
 
                         }catch(IOException e){
-                            println "========ERROR IN DELETION=========="
+                            log.debug "========ERROR IN DELETION=========="
                             e.printStackTrace();
                         }                        
                         //// UPDATING FILE NAME OF RES IN DB
                         ////check format of filename---- slash kaise hai
-                        println "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
+                        log.debug "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
                         resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
-                        println "=======UPDATING RESOURCE CONTEXT======"
+                        log.debug "=======UPDATING RESOURCE CONTEXT======"
                         resource.saveResourceContext(observationInstance)
 
                         def usersRes = UsersResource.findByRes(resource)
                         ////////////////////
                         ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
-                        println "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
+                        log.debug "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
                         usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
                         if(!usersRes.save(flush:true)){
                             usersRes.errors.allErrors.each { log.error it }
@@ -1002,7 +1002,10 @@ class ObservationService extends AbstractObjectService {
 
         def query = "select "
 
-        def orderByClause = "  obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
+        if(!params.sort || params.sort == 'score') {
+            params.sort = "lastRevised"
+        }
+        def orderByClause = "  obv." + params.sort +  " desc, obv.id asc"
 
         if(params.fetchField) {
             query += " obv.id as id,"
@@ -1706,10 +1709,12 @@ class ObservationService extends AbstractObjectService {
         List result = new ArrayList();
 
         def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
-        NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-        for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-            Map.Entry tag = (Map.Entry) iterator.next();
-            result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+            }
         }
         return result;
     } 
@@ -1796,12 +1801,13 @@ class ObservationService extends AbstractObjectService {
             def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
             def obvUrl, domain, baseUrl
 
-            try {
-                request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-            } catch(IllegalStateException e) {
-                log.error e.getMessage();
+            if(notificationType != DIGEST_MAIL) {
+                try {
+                    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+                } catch(IllegalStateException e) {
+                    log.error e.getMessage();
+                }
             }
-
             if(request) {
                 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
                 domain = Utils.getDomainName(request)
@@ -2098,7 +2104,6 @@ class ObservationService extends AbstractObjectService {
             default:
                 log.debug "invalid notification type"
             }
-
             toUsers.eachWithIndex { toUser, index ->
                 if(toUser) {
                     if(!toUser.enabled || toUser.accountLocked){
@@ -2143,7 +2148,6 @@ class ObservationService extends AbstractObjectService {
                     }
                 }
             }
-
             } catch (e) {
                 log.error "Error sending email $e.message"
                 e.printStackTrace();
@@ -2219,7 +2223,7 @@ class ObservationService extends AbstractObjectService {
 		return participants;
 	}
 
-    def List getParticipantsForDigest(userGroup, max, offset) {
+    def List getParticipantsForDigest(UserGroup userGroup, int max, long offset) {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
@@ -2231,6 +2235,7 @@ class ObservationService extends AbstractObjectService {
         } else {
             participants << springSecurityService.currentUser;
         }
+        log.debug "getParticipantsForDigest : ${participants}"
 		return participants;
 	}
 
