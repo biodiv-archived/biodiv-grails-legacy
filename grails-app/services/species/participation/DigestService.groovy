@@ -88,7 +88,7 @@ class DigestService {
             }
 
             otherParams['usersEmailList'] = usersEmailList  
-            //observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
             
             if(setTime) {
                 if(!digest.save(flush:true))
