@@ -322,7 +322,7 @@ beans = {
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
-        unreturnedConnectionTimeout = 50 // seconds
+        //unreturnedConnectionTimeout = 50 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
      } 
