@@ -164,11 +164,11 @@
                     <div class="value notes_view linktext">                        
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
-                        %>                        
-                            <g:if test="${observationInstance?.language.id == userLanguage?.id}">
+                        %> 
+                        <g:if test="${observationInstance?.language.id != userLanguage?.id}">
                                 <%  
                                     styleVar = "none"
-                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+userLanguage.name+'</a>';
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+observationInstance?.language.name+'</a>';
                                 %>
                             </g:if>
                             
