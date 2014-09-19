@@ -62,6 +62,7 @@ class ActivityFeedService {
 	//static final String SPECIES_POSTED_ON_GROUP = "Posted species to group"
 	//static final String SPECIES_REMOVED_FROM_GROUP = "Removed species from group"
 	static final String SPECIES_CREATED = "Created species"
+	static final String SPECIES_UPDATED = "Updated species gallery"  //updation mail on when media changes
 	static final String SPECIES_FIELD_UPDATED = "Updated species field"
 	static final String SPECIES_FIELD_CREATED = "Added species field"
 	static final String SPECIES_FIELD_DELETED = "Deleted species field"
@@ -326,6 +327,10 @@ class ActivityFeedService {
                 }
                 text = feedInstance.activityDescrption
                 break
+            case SPECIES_UPDATED:
+                activityTitle = SPECIES_UPDATED
+                break
+
 			default:
 				activityTitle = activityType
 				break

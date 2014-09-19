@@ -44,7 +44,7 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    
+	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -216,11 +216,11 @@ class SpeciesController extends AbstractObjectController {
 
 			Map map = getTreeMap(speciesInstance, fields);
 			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
-			def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
-			def observationInstanceList = relatedObservations?.observations?.observation
-			def instanceTotal = relatedObservations?relatedObservations.count:0
+			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
+			//def observationInstanceList = relatedObservations?.observations?.observation
+			//def instanceTotal = relatedObservations?relatedObservations.count:0
 
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], observationInstanceList:observationInstanceList, instanceTotal:instanceTotal, queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
+			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
 
             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
@@ -420,7 +420,7 @@ class SpeciesController extends AbstractObjectController {
         return false;
     }
 
-	@Secured(['ROLE_USER'])
+	/*@Secured(['ROLE_USER'])
 	def edit() {
 		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
@@ -436,7 +436,7 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-	}
+	}*/
 
 	@Secured(['ROLE_USER'])
     def update() {
@@ -561,8 +561,21 @@ class SpeciesController extends AbstractObjectController {
                 def feedInstance;
                 if(result.activityType)
                     feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
-                if(result.mailType) 
-                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
+                if(result.mailType) {
+                    def otherParams = ['info':result.activityType]
+                    def spIns = result.speciesFieldInstance
+                    if(spIns) {
+                        def des = spIns.description
+                        des = des.replaceAll("<(.|\n)*?>", '');
+                        des = des.replaceAll("&nbsp;", '');
+                        if(des.length() > 150) {
+                            otherParams['spFDes'] = des[0..147] + "...";
+                        } else {
+                            otherParams['spFDes'] = des
+                        }
+                    }
+                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParams);
+                }
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
@@ -917,7 +930,8 @@ class SpeciesController extends AbstractObjectController {
         return;
     }
 
-    def uploadImage() {
+    @Secured(['ROLE_USER'])
+    def pullImageForSpecies() {
         log.debug params
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
@@ -932,6 +946,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
@@ -942,7 +957,8 @@ class SpeciesController extends AbstractObjectController {
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON
     }
-
+/*
+    @Secured(['ROLE_USER'])
     def pullObvImage() {
         log.debug params  
         //pass that same species
@@ -958,6 +974,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def pullSpeciesFieldImage() {
         log.debug params
         def species = Species.get(params.speciesId.toLong())
@@ -971,7 +988,7 @@ class SpeciesController extends AbstractObjectController {
         }   
         render result as JSON
     }
-
+*/
     @Secured(['ROLE_USER'])
     def validate() {
 /*        List hierarchy = [];
@@ -1067,21 +1084,27 @@ class SpeciesController extends AbstractObjectController {
         }
         */
     }
-
-
+    
+    @Secured(['ROLE_USER'])
     def getSpeciesFieldMedia() {
         def resList = []
         def obvLinkList = []
         def resCount = 0
-        def offset = 0 
-        def spInstance = Species.read(params.speciesId.toLong())
-        resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
-        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
-        def result = [addPhotoHtml: addPhotoHtml]
+        def offset = 0
+        def result
+        if(params.speciesId){
+            def spInstance = Species.read(params.speciesId?.toLong())
+            resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
+            def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
+            result = [statusComplete:true, addPhotoHtml: addPhotoHtml]
+        } else {
+            log.debug params  
+            result = [statusComplete:false]
+        }
         render result as JSON
-
     }
 
+    @Secured(['ROLE_USER'])
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
@@ -1096,6 +1119,7 @@ class SpeciesController extends AbstractObjectController {
         }    
     }
 
+    @Secured(['ROLE_USER'])
     def uploadMediaInSpField(){
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)

@@ -31,6 +31,7 @@
                 <div class="translucent_box"></div>
                 <div class="progress_bar"></div>
                 <div class="progress_msg"></div>
+                <div class="mediaProgressBar" style ="margin-top:117px"></div>
             </div>
 
             </li>
@@ -78,7 +79,7 @@
 
             <div class='metadata prop'
                 style="position: relative; top: -30px;">
-                <input name="file_${i}" type="hidden" value='${r.fileName}' />
+                <input class="fileName" name="file_${i}" type="hidden" value='${r.fileName}' />
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
                 <input name="date_${i}" type="hidden" value='${flag19}'/>
@@ -137,7 +138,7 @@
     </div>
 
     <div class='metadata prop' style="position:relative; top:-30px;">
-        <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
+        <input class="fileName" name="file_{{>i}}" type="hidden" value='{{>file}}'/>
         <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
         <input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
         
@@ -167,7 +168,7 @@
         <g:if test="${observationInstance instanceof Species}">
             <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
+                    <input name="contributor_{{>i}}" type="text" value="${currentUser?.name}" placeholder="Contributor">
                     <input name="source_{{>i}}" type="text" value="" placeholder="Source">
                     <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
                     <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->

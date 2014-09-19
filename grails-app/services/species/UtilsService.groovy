@@ -15,6 +15,7 @@ import species.participation.Observation;
 import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
+import species.CommonNames;
 
 class UtilsService {
 
@@ -378,6 +379,16 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break;
 
+                case "COMMENT_ADD_USER_TAG":
+                bodyView = "/emailtemplates/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["userGroupWebaddress"] = userGroupWebaddress
+                mailSubject = "Tagged in ${templateMap['domainObjectType']} comment"
+                templateMap['message'] = "has tagged you in a comment on the page listed below."
+                templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
+                toUsers.addAll(otherParams["taggedUsers"])
+                break;
+
                 case SPECIES_REMOVE_COMMENT:
                 mailSubject = conf.ui.removeComment.emailSubject
                 //bodyView = "/emailtemplates/addObservation"
@@ -436,6 +447,7 @@ class UtilsService {
                 templateMap["serverURL"] =  grailsApplication.config.grails.serverURL
                 templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName
                 templateMap["resourcesServerURL"] = grailsApplication.config.speciesPortal.resources.serverURL
+                templateMap["grailsApplication"] = grailsApplication
                 mailSubject = "Activity digest on " + otherParams["userGroup"].name
                 bodyView = "/emailtemplates/digest"
                 templateMap["digestContent"] = otherParams["digestContent"]
@@ -452,11 +464,21 @@ class UtilsService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(otherParams["usersEmailList"]);
                 break
-                //below case also had ActivityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
-                case [ActivityFeedService.SPECIES_CREATED]:
-                mailSubject = ActivityFeedService.SPECIES_CREATED
+                
+                case [ActivityFeedService.SPECIES_CREATED, ActivityFeedService.SPECIES_UPDATED]:
+                mailSubject = notificationType;
+                    if(otherParams['resURLs']){
+                        templateMap['resURLs'] = otherParams['resURLs']
+                    }
                 bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = " added the following species:"
+                if(notificationType == ActivityFeedService.SPECIES_CREATED){
+                    templateMap["message"] = " added the following species:"
+                } else {
+                    //templateMap['domainObjectType'] = 'species'
+                    templateMap['obvUrl'] = generateLink("species", "show", ["id": otherParams['spId']], request)
+                    templateMap['obvId'] = otherParams['spId']
+                    templateMap["message"] = " updated the following species with these media:"
+                }
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -573,6 +595,22 @@ class UtilsService {
             //get All the UserGroups an observation is part of
             templateMap["groups"] = obv.userGroups
         }
+        if(obv.instanceOf(Species) && obv.id) {
+            templateMap["obvSName"] = obv.taxonConcept.name  
+            templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name    
+            def imagePath = ''; 
+            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL) 
+            def mainImage = obv.mainImage(); 
+            if(mainImage?.fileName == speciesGroupIcon.fileName) {  
+                imagePath = mainImage.thumbnailUrl(null, '.png'); 
+            } else 
+                imagePath = mainImage?mainImage.thumbnailUrl():null; 
+
+            templateMap["obvImage"] = imagePath.replaceAll(' ','%20'); 
+            //get All the UserGroups a species is part of 
+            templateMap["groups"] = obv.userGroups 
+        }   
+
         if(feed) {
             templateMap['actor'] = feed.author;
             templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
