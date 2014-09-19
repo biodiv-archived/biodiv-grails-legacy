@@ -99,21 +99,21 @@ var showOccurence = function(speciesName) {
         };
         var layersOptions = [
     {
-        title : 'Occurrence',
+        title :window.i8ln.species.specie.oc ,
     layers : 'ibp:occurrence',
     styles : '',
     cql_filter : "species_name='" + speciesName + "'",
     opacity : 0.7
     },
     {
-        title : 'Observation',
+        title :window.i8ln.species.specie.obs ,
     layers : 'ibp:observation_locations',
     styles : '',
     cql_filter : "species_name='" + speciesName + "'",
     opacity : 0.7
     },
     {
-        title : 'Checklist',
+        title :window.i8ln.species.specie.ckl,
         layers : 'ibp:checklist_species_locations',
         styles : '',
         cql_filter : "species_name='" + speciesName + "'",
@@ -404,12 +404,12 @@ function onEditableError(response, newValue) {
     var successHandler = this.success, errorHandler;
     handleError(response, undefined, undefined, function(data){
         $ele.find('.editField').editable('submit');
-        return "Please resubmit the form again";
+        return window.i8ln.species.abstracteditabletype.re;
     }, function(data) {
         if(data && data.status == 401) {
-            return "Please login and resubmit the changes"; 
+            return window.i8ln.species.abstracteditabletype.sub; 
         } else if(response.status === 500) {
-            return 'Service unavailable. Please try later.';
+            return window.i8ln.species.abstracteditabletype.un;
         } else {
             return response.responseText;
         }
@@ -482,7 +482,7 @@ function initEditables($ele) {
     });
 
     $ele.find('.deleteFieldButton').click(function(e) {
-        var c = confirm('You are about to delete some content. Are you sure?')
+        var c = confirm(window.i8ln.species.abstracteditabletype.del)
         if(c == true) {
             var $f =  $(this).nextAll('.editField.editable');
             var $textarea = $(this).nextAll('textarea');
@@ -597,12 +597,12 @@ function onAddableError(response, newValue) {
     var successHandler = this.success, errorHandler;
     handleError(response, undefined, undefined, function(data){
         $ele.find('.addField').editable('submit');
-        return "Please resubmit the form again";
+        return window.i8ln.species.abstracteditabletype.re;
     }, function(data) {
         if(data && data.status == 401) {
-            return "Please login and resubmit the changes"; 
+            return window.i8ln.species.abstracteditabletype.sub; 
         } else if(response.status === 500) {
-            return 'Service unavailable. Please try later.';
+            return window.i8ln.species.abstracteditabletype.un;
         } else {
             return response.responseText;
         }
@@ -708,12 +708,12 @@ var onSelectorError =  function(response, newValue) {
     var successHandler = this.success, errorHandler;
     handleError(response, undefined, undefined, function(data){
         $ele.find('.selector').editable('submit');
-        return "Please resubmit the form again";
+        return window.i8ln.species.abstracteditabletype.re;
     }, function(data) {
         if(data && data.status == 401) {
-            return "Please login and resubmit the changes"; 
+            return window.i8ln.species.abstracteditabletype.sub; 
         } else if(response.status === 500) {
-            return 'Service unavailable. Please try later.';
+            return window.i8ln.species.abstracteditabletype.un;
         } else {
             return response.responseText;
         }
@@ -943,7 +943,7 @@ $(document).ready(function() {
 
         if($('#deleteSpecies').length > 0) {
             $('#deleteSpecies').click (function() {
-                if(confirm('This species will be deleted. Are you sure ?')) {
+                if(confirm(window.i8ln.species.specie.sdel)) {
                     $.ajax({
                         url:window.params.species.deleteUrl,
                         type:'POST',

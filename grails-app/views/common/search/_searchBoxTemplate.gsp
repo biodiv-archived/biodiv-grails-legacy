@@ -6,15 +6,15 @@
 		action="${uGroup.createLink(controller:controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 		<select id="userGroupSelectFilter" class="btn" name="uGroup" style="display:none;">	
-			<option value="ALL"> Search in all groups </option>
+			<option value="ALL"><g:message code="default.search.in.all.groups" /> </option>
 			<g:if test="${params.webaddress }">
-				<option value="THIS_GROUP"> Search within this group </option>
+				<option value="THIS_GROUP"> <g:message code="default.search.within.this.group" /> </option>
 			</g:if>
 		</select>
 		
 		<input type="text" name="query" id="searchTextField"
 			value="${((queryParams?.query)?:((queryParams?.q)?:params.query))?.encodeAsHTML()}"
-			class="search-query span3" placeholder="Search" />
+			class="search-query span3" placeholder="${g.message(code:'default.search')}" />
 		
 		<button id="search" class="btn btn-link" type="button"><i class="icon-search icon-gray"></i></button>
 		<input type="hidden" name="fl" value="id" />
@@ -110,6 +110,107 @@ $(document).ready(function() {
                 }
                 
 	}
+
+    window.i8ln = {
+        "species" : {
+            "abstracteditabletype" : {         
+
+                "del": "${g.message(code:'delete.content')}", 
+                "re":"${g.message(code:'resubmit.form')}",
+                "sub":"${g.message(code:'resubmit.login')}",
+                "un":"${g.message(code:'service.later')}",
+                "er":"${g.message(code:'fix.errors')}"
+
+            },
+            "ajaxLogin" : {
+                "ewp": "${g.message(code:'while.processing')}"    
+            }, 
+            "parseUtil" : {
+                "csd":"${g.message(code:'loading.data')}",  
+                "eol":"${g.message(code:'line.error')}",
+                "ic":"${g.message(code:'item.count')}",
+                "mhc":"${g.message(code:'header.count.match')}",
+                "max":"${g.message(code:'maximum.of')}",
+                "head":"${g.message(code:'exclute.header')}",
+                "snm":"${g.message(code:'name.scientific')}",
+                "cnm":"${g.message(code:'name.common')}",
+                "cnu":"${g.message(code:'name.common.another')}",
+                "snu":"${g.message(code:'name.scientific.another')}",
+                "sno":"${g.message(code:'serial.number')}",
+                "med":"${g.message(code:'default.media.label')}"
+
+
+
+            },
+            "specie" : {
+                "oc":"${g.message(code:'species.occurrence')}",
+                "obs":"${g.message(code:'species.observation')}",
+                "ckl":"${g.message(code:'species.checklist')}",
+                "sdel": "${g.message(code:'species.deleted.sure')}"
+            } ,
+            "speciesPermission" : {
+                "ius":"${g.message(code:'image.edited.uploaded')}",
+                  "pul":"${g.message(code:'image.pulled.reload')}"  
+                              },  
+           
+           "util" : {
+               "sem":"${g.message(code:'send.email')}"
+            }
+        },
+        "observation" : {
+            "addResource" : {
+                "md": "${g.message(code:'info.media.deleted')}",
+                "fr":"${g.message(code:'info.field.required')}",
+                "youtube":"${g.message(code:'link.youtube.watch')}",
+                "ayoutube":"${g.message(code:'link.ayoutube.audio')}",
+                "upload":"${g.message(code:'info.upload.wait')}",   
+
+                "uploading":"${g.message(code:'info.uploading')}"
+
+            },
+
+            "bulkObvCreate" :{
+                "up":"${g.message(code:'uploading.progress.submit')}",
+                "agree":"${g.message(code:'agree.terms.submit')}",
+
+                "error":"${g.message(code:'errror.refresh')}"                   
+
+            },
+
+            "create" :{
+                "mark":"${g.message(code:'marked.verify')}",
+                "add":"${g.message(code:'add.media.info')}",
+
+                "req":"${g.message(code:'require.this.field')}",
+
+                "ld": "${g.message(code:'load.names')}",
+
+                "sn":"${g.message(code:'scientific.common.name')}",
+                "same":"${g.message(code:'mentioned.same.name')}",
+
+                "in":"${g.message(code:'name.incorrect')}",
+
+                "valid":"${g.message(code:'error.validating')}",
+
+                "nc":"${g.message(code:'new.column')}"
+
+            },
+            "show" :{
+
+                "lock":"${g.message(code:'species.locked')}" 
+            },
+            "upload" :{
+                "again":"${g.message(code:'other.try.again')}",                       
+                "statu":"${g.message(code:'upload.progres.visit')}",                       
+                "lic":"${g.message(code:'provide.license')}"
+            }      
+
+
+        }
+
+
+    }
+
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });
         

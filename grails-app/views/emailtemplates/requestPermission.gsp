@@ -1,14 +1,14 @@
 <%@ page contentType="text/html"%>
 
-Hi ${admin.name.capitalize()},
+<g:message code="msg.Hi" /> ${admin.name.capitalize()},
 <br/><br/> 
-<a href="${requesterUrl}" title="${requester.name}">${requester.name.capitalize()}</a> has requested for permission as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
+<a href="${requesterUrl}" title="${requester.name}">${requester.name.capitalize()}</a> <g:message code="msg.requested.permission" /> ${invitetype} <g:message code="msg.for" /> ${rankLevel} : ${taxon.name} <g:message code="msg.on.the" /> ${domain}.<br/>
 <g:if test="${message}">
 <br/>
-Message : ${message}
+<g:message code="msg.Message" /> : ${message}
 <br/>
 </g:if>
-Please <a href="${uri}" title="Confirmation code">click here</a> to confirm granting a ${invitetype} permission.<br/>
+<g:message code="msg.Please" /> <a href="${uri}" title="Confirmation code"><g:message code="msg.click.here" /></a> <g:message code="msg.confirm.granting" /> ${invitetype}<g:message code="msg.permission" /> <br/>
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+<g:message code="msg.msg.Thank.you" /><br/>
+<g:message code="msg.msg.-The.portal.team" />

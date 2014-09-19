@@ -4,16 +4,16 @@
  <div>
 	<div class="btn-group">
 		<button id="flag-action" class="btn btn-link" data-toggle="dropdown"
-                        title="Report an inappropriate or erroneous contribution"
+                        title="${g.message(code:'adddflagtemp.report')}"
 			href="#"> <g:if test="${observationInstance.flagCount>0}">
 				<i class="icon-flag icon-red"></i>
 			</g:if> <g:else>
 				<i class="icon-flag"></i>
-			</g:else> <g:message code="msg.Flag" />
+			</g:else> <g:message code="button.flag" />
 		</button>
 
                		<div id="flag-options" class="popup-form" style="display: none">
-			<h5><g:message code="msg.Why" />?</h5>
+			<h5><g:message code="common.observation.why" />?</h5>
 			<form id="flag-form"
                             action="javascript:flag('${observationInstance.id}', '${observationInstance.class.getCanonicalName()}','${uGroup.createLink(controller:'action', action:'flagIt', id:observationInstance.id)}')">
 				<g:each in="${FlagType.list() }" var="flag" status="i">
@@ -29,17 +29,17 @@
 					</g:else>
 				</g:each>
 				<br/>
-				<textarea id ="flagNotes" class="comment-textbox" placeholder="Tell Why??" name="notes"></textarea>
-<%--				<input type="text" name="notes" placeholder="Any other reason"></input><br />--%>
-				<input class="btn btn-danger pull-right" type="submit" value="Flag"/>
-				<div id="flag-close" class="popup-form-close" value="close">
+				<textarea id ="flagNotes" class="comment-textbox" placeholder="${g.message(code:'addflagtemp.tell.why')}" name="notes"></textarea>
+<%--				<input type="text" name="notes" placeholder="${g.message(code:'addflagtemp.any.reason')}"></input><br />--%>
+				<input class="btn btn-danger pull-right" type="submit" value="${g.message(code:'button.flag')}"/>
+				<div id="flag-close" class="popup-form-close" value="${g.message(code:'button.close')}">
 					<i class="icon-remove"></i>
 				</div>
 			</form>
 
 			<div id="flagged">
 				<g:if test="${observationInstance.flagCount> -1}">
-					<span id="flagHeadings" style="font-weight: bold"><g:message code="msg.Who.Why" />:</span>
+					<span id="flagHeadings" style="font-weight: bold"><g:message code="common.observation.who.why" />:</span>
                                         </g:if>
                                         <div class = "flag-list-users">
                                             <g:render template="/common/observation/flagListUsersTemplate" model="['observationInstance':observationInstance]"/>

@@ -22,11 +22,11 @@
 			<table class="table" style="margin-left: 0px;">
 				<thead>
 					<tr>
-						<th style="width:20%"><g:message code="msg.Group" /></th>
-						<th style="width:20%"><g:message code="msg.Name" /></th>
-						<th><g:message code="msg.Species.Groups" /> </th>
-						<th><g:message code="msg.Habitats" /></th>
-						<th><g:message code="msg.Members" /></th>
+						<th style="width:20%"><g:message code="default.group.label" /></th>
+						<th style="width:20%"><g:message code="default.name.label" /></th>
+						<th><g:message code="default.species.groups.label" /> </th>
+						<th><g:message code="default.habitats.label" /></th>
+						<th><g:message code="default.members.label" /></th>
 					</tr>
 				</thead>
 				<tbody>

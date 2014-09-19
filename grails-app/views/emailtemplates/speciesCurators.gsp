@@ -1,10 +1,10 @@
 <%@ page contentType="text/html"%>
 
-Hi ${curator},<br />
+<g:message code="msg.Hi" /> ${curator},<br />
 <br />
-New species pages have been uploaded for a taxon for which you are a curator. <br />
-Please visit the pages <a href ="${link}" >here</a> and validate the content.<br />
+<g:message code="msg.New.species.uploaded" /><br />
+<g:message code="msg.visit.pages" /> <a href ="${link}" ><g:message code="msg.here" /></a> <g:message code="msg.validate.content" /><br />
 <br />
-Thank You,<br />
-The Portal Team
+<g:message code="msg.msg.Thank.you" /><br />
+<g:message code="msg.msg.-The.portal.team" />
 

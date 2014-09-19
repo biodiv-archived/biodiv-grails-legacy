@@ -60,7 +60,7 @@
         <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
            <div class="prop">
                 <g:if test="${showDetails}">
-                <span class="name"><i class="icon-share-alt"></i><g:message code="msg.Name" /></span>
+                <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>
                 </g:if>
                 <g:else>
                 <i class="pull-left icon-share-alt"></i>
@@ -74,7 +74,7 @@
 
             <div class="prop">
                 <g:if test="${showDetails}">
-                <span class="name"><i class="icon-map-marker"></i><g:message code="msg.Place" /></span>
+                <span class="name"><i class="icon-map-marker"></i><g:message code="default.place.label" /></span>
                 </g:if>
                 <g:else>
                 <i class="pull-left icon-map-marker"></i>
@@ -98,7 +98,7 @@
 
             <div class="prop">
                 <g:if test="${showDetails}">
-                <span class="name"><i class="icon-time"></i><g:message code="msg.Observed on" /></span>
+                <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
                 </g:if>
                 <g:else>
                 <i class="pull-left icon-time"></i>
@@ -115,7 +115,7 @@
             <g:if test="${showDetails}">
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-time"></i><g:message code="msg.Submitted" /></span>
+                    <span class="name"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
                     </g:if>
                     <g:else>
                     <i class="pull-left icon-time"></i>
@@ -128,7 +128,7 @@
 
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-time"></i><g:message code="msg.Updated" /></span>
+                    <span class="name"><i class="icon-time"></i><g:message code="default.updated.label" /></span>
                     </g:if>
                     <g:else>
                     <i class="pull-left icon-time"></i>
@@ -140,7 +140,7 @@
                 </div>
                 <g:if test="${observationInstance.isChecklist && observationInstance.fetchAttributions()}">
                 <div class="prop" >
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="msg.Attribution" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
                     <div class="value linktext">
                         ${observationInstance.fetchAttributions()}
                     </div>
@@ -149,7 +149,7 @@
 
                 <g:if test="${observationInstance.isChecklist && observationInstance.sourceText}" >
                 <div class="prop">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="msg.Source" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.source.label" /></span>
                     <div class="value linktext">
                         ${observationInstance.sourceText}
                     </div>
@@ -160,7 +160,7 @@
             <g:if test="${observationInstance.notes}">
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="msg.Notes" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
                     <div class="value notes_view linktext">                        
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
@@ -188,7 +188,7 @@
             <g:if test="${showDetails}">
                 <g:if test="${observationInstance.isChecklist && observationInstance.refText}" >
                 <div class="prop">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="msg.References" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.references.label" /></span>
                     <div class="value linktext">
                         ${raw(checklistInstance.refText)}
                     </div>		

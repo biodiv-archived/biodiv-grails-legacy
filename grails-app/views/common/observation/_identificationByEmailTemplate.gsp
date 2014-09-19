@@ -3,28 +3,28 @@
 		style="z-index: 10; float: left; margin-left: 5px;">
 		<button id="identification-email"
 			class="${(params.action == 'show')?'btn btn-link' : 'btn'} dropdown-toggle"
-            title="${titleTooltip?:'Share this page link through email.'}"
+            title="${titleTooltip?:g.message(code:'placeholder.share.email') }"
             data-toggle="dropdown" href="#"><i class="icon-envelope"></i>${title?:'Share'}</button>
 		<form id="email-form" name="email-form" class="popup-form"
 			style="display: none; background-color: #F2F2F2;">
             <div class="form-row" style="${hideTo?'display:none;':''}">
-				<span class="keyname"><g:message code="msg.To" /></span>
+				<span class="keyname"><g:message code="default.to.label" /></span>
 				<ul class="userOrEmail-list">
 					<input id="userAndEmailList_${autofillUsersId}"
-						placeholder='Type user name or email id' style="float: left"
+						placeholder='${g.message(code:"placeholder.name.email")}' style="float: left"
 						type="text" />
 				</ul>
             </div>
             
 			<div class="form-row">
-				<span class="keyname" style="clear: both"><g:message code="msg.Subject" /></span><input
+				<span class="keyname" style="clear: both"><g:message code="default.subject.label" /></span><input
 					type="text" style="width: 97%" name="mailSubject"
 					value="${mailSubject}"/>
 			</div>
 
 			<div class="form-row">
 				<i class="icon-pencil"></i><span class="keyname" style="clear: both">
-					<g:message code="msg.Message" /></span>
+					<g:message code="default.message.label" /></span>
 				<h5>
 					<label>${staticMessage.encodeAsRaw()} </label>
 				</h5>

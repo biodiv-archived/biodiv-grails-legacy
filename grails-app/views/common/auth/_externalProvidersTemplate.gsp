@@ -1,14 +1,14 @@
 <div class="external_providers">
 
 	<div class="sign_in_external_bttn external_bttn facebookButton">
-		<div class="fbJustConnect ${ajax?'ajaxForm':'' }"><g:message code="msg.Login.Facebook" /></div>
+		<div class="fbJustConnect ${ajax?'ajaxForm':'' }"><g:message code="common.auth.login.facebook" /></div>
 	</div>
 	<g:if test="${ajax}">
 		<div class="sign_in_external_bttn external_bttn googleButton">
-			<div class="googleConnect"><g:message code="msg.Login.Google" /></div>
+			<div class="googleConnect"><g:message code="common.auth.login.google" /></div>
 		</div>
 		<div class="sign_in_external_bttn external_bttn yahooButton">
-			<div class="yahooConnect"><g:message code="msg.Login.Yahoo" /></div>
+			<div class="yahooConnect"><g:message code="common.auth.login.yahoo" /></div>
 		</div>
 	</g:if>
 	<g:else>

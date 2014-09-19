@@ -6,7 +6,7 @@
 <%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
 <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
-    <h5>Classifications</h5>	
+    <h5><g:message code="button.classifications" /></h5>	
 
     <div id="taxaHierarchy">
         <g:set var="classifications" value="${speciesInstance.classifications()}" />
@@ -37,8 +37,8 @@
                     <input class='classification' type="hidden" name="classification" value="${Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY).id}" readonly/>
                 </div>
                 <div class="editable-buttons editable-buttons-bottom pull-right">
-                    <button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button>
-                    <button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button>
+                    <button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i><g:message code="button.save" /></button>
+                    <button type="button" class="btn editable-cancel"><i class="icon-remove"></i><g:message code="button.cancel" /></button>
                 </div>
             </div>
         </div> 

@@ -13,8 +13,8 @@
 <g:if test="${instanceTotal > (queryParams.max?:0)}">
 	<div class="centered">
 		<div class="btn loadMore">
-			<span class="progress" style="display: none;"><g:message code="msg.Loading" />... </span>
-			<span class="buttonTitle"><g:message code="msg.Load more" /></span>
+			<span class="progress" style="display: none;"><g:message code="msg.loading" />... </span>
+			<span class="buttonTitle"><g:message code="msg.load.more" /></span>
 		</div>
 	</div>
 </g:if>

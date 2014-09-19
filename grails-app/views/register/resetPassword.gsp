@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<g:set var="title" value="Reset Password"/>
+<g:set var="title" value="${g.message(code:'register.value.reset')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="auth" />
 </head>
@@ -42,7 +42,7 @@
 						<div class="controls">
 							<input class="input-block-level" id="password" type="password"
 								value="${command.password}" name="password"
-								placeholder="Enter your password...">
+								placeholder="${g.message(code:'placeholder.enter.password')}">
 
 							<g:hasErrors bean="${command}" field="password">
 								<div class="help-inline">
@@ -58,7 +58,7 @@
 						<div class="controls">
 							<input class="input-block-level" id="password2" type="password"
 								value="${command.password2}" name="password2"
-								placeholder="Enter your password again...">
+								placeholder="${g.message(code:'register.placeholder.enter.pwdagain')}">
 
 							<g:hasErrors bean="${command}" field="password2">
 								<div class="help-inline">

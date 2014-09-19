@@ -10,10 +10,10 @@
         <g:if test="${!hideAgree}">
         <div class="iAgree ">
             <g:if test="${!r.disAgree}">
-            <button class="btn btn-primary btn-small nameAgree ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}', this); return true;"><g:message code="msg.Agree" /></button>
+            <button class="btn btn-primary btn-small nameAgree ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}', this); return true;"><g:message code="button.agree" /></button>
             </g:if>
             <g:else>
-            <button class="btn btn-primary btn-small nameRemove ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}', this); return true;"><g:message code="msg.Remove" /></button>
+            <button class="btn btn-primary btn-small nameRemove ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}', this); return true;"><g:message code="button.remove" /></button>
             </g:else>
         </div>
 
@@ -51,8 +51,8 @@
     </g:if>
 
     <span class="voteCount"><span id="votes_${r.recoId}">
-            ${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"><g:message code="msg.user.thinks" /> </g:if>
-        <g:else> <g:message code="msg.user.thinks" /></g:else> <g:message code="msg.it.is" />:</span><span class="highlight">
+            ${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
+        <g:else> <g:message code="text.user.thinks" /></g:else> <g:message code="text.it.is" />:</span><span class="highlight">
         <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
             <i> ${r.name} </i>

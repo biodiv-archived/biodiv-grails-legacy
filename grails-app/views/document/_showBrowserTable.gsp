@@ -4,11 +4,11 @@
 <table class="table table-hover tablesorter">
 	<thead>
 		<tr>
-			<th title="${message(code: 'Dcoument.title.label', default: 'Title')}">${message(code: 'Dcoument.title.label', default: 'Title')}</th>
-			<th title="${message(code: 'Dcoument.type.label', default: 'Document Type')}">${message(code: 'Dcoument.type.label', default: 'Document Type')}</th>
-			<th title="${message(code: 'Dcoument.description.label', default: 'Description')}">${message(code: 'Dcoument.description.label', default: 'Description')}</th>
+			<th title="${message(code:'Dcoument.title.label')}">${message(code: 'Dcoument.title.label')}</th>
+			<th title="${message(code: 'Dcoument.type.label')}">${message(code: 'Dcoument.type.label')}</th>
+			<th title="${message(code: 'Dcoument.description.label')}">${message(code: 'Dcoument.description.label')}</th>
 			<g:if test="${canPullResource}">		
-				<th title="${message(code: 'Dcoument.pullToGroup.label', default: 'Post on Group')}">${message(code: 'Dcoument.pullToGroup.label', default: 'Post')}</th>
+				<th title="${message(code: 'Dcoument.pullToGroup.label')}">${message(code: 'Dcoument.pullToGroup.label')}</th>
 			</g:if>
 		</tr>
 	</thead>

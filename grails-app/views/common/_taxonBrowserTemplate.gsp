@@ -14,7 +14,7 @@
     </g:each>
 </select>
 <div class="attributionBlock">
-    <span class="ui-icon-info ui-icon-control " title="Show details"
+    <span class="ui-icon-info ui-icon-control " title="${g.message(code:'title.show.details')}"
         style="position: absolute; top: 0; right: 0; margin: 10px;"></span>
     <div class="ui-corner-all toolbarIconContent attribution"
         style="display: none;">
