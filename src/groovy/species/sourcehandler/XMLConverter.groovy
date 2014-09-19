@@ -144,7 +144,8 @@ class XMLConverter extends SourceConverter {
                             log.info "Merging with already existing species information : "+existingSpecies.id;
                             //mergeSpecies(existingSpecies, s);
                             s = existingSpecies;
-                            s.resources?.clear();
+							//XXX: not removing resources so if same spreadsheet uploaded multiple times will see duplicate images
+                            //s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
                             addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
@@ -693,7 +694,6 @@ class XMLConverter extends SourceConverter {
      * @param species an xml having media nodes
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
-        println "=========REL RES FOLER CM========= " + relResFolder
         List<Resource> resources = [];
 
         if(resourcesXML) {
@@ -791,9 +791,7 @@ class XMLConverter extends SourceConverter {
 			if(!imageFile.exists()) {
                 try {
                     Utils.copy(tempFile, imageFile);
-                    println "==========RESOURCE TYPE======== " + resourceType
                     if( resourceType.toString() == "IMAGE"){
-                        println "=========CALLOING CREATE SCALED IMAGE=============="
                         ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
                       }  
                 } catch(FileNotFoundException e) {

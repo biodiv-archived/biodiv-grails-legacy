@@ -21,7 +21,7 @@ import species.participation.Featured;
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html
  *
  */
-class Document extends Metadata implements Taggable, Rateable {
+class Document extends Metadata implements Comparable, Taggable, Rateable {
 	
 	def springSecurityService;
 	def SUserService;
@@ -186,5 +186,8 @@ class Document extends Metadata implements Taggable, Rateable {
 		}
 		return null;
 	}
-
+	
+	int compareTo(obj) {
+		createdOn.compareTo(obj.createdOn)
+	}
 }

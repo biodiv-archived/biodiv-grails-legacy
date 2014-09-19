@@ -258,7 +258,7 @@ class OpenIdController {
 
 		def config = SpringSecurityUtils.securityConfig
 
-		def savedRequest = session["SPRING_SECURITY_SAVED_REQUEST_KEY"]
+		def savedRequest = session['SPRING_SECURITY_SAVED_REQUEST_KEY']
 		if (savedRequest && !config.successHandler.alwaysUseDefault) {
 			(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, savedRequest.getRedirectUrl());
 		}

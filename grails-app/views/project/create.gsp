@@ -313,7 +313,7 @@ CKEDITOR.replace('projectProposal', config);
 						<div class="controls">
 
 							<fileManager:uploader
-								model="['name':'proposalFiles', 'docs':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Proposal.value]]" />
+								model="['name':'proposalFiles', 'docs':projectInstance?.fetchProposalFiles(), 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Proposal.value]]" />
 						</div>
 					</div>
 				</div>
@@ -352,7 +352,7 @@ CKEDITOR.replace('projectReport', config);
 									%>
 
 							<fileManager:uploader
-								model="['name':'reportFiles', 'docs':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Report.value]]" />
+								model="['name':'reportFiles', 'docs':projectInstance?.fetchReportFiles(), 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Report.value]]" />
 						</div>
 					</div>
 				</div>
@@ -396,7 +396,7 @@ CKEDITOR.replace('misc', config);
 
 
 							<fileManager:uploader
-								model="['name':'miscFiles', 'docs':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Miscellaneous.value]]" />
+								model="['name':'miscFiles', 'docs':projectInstance?.fetchMiscFiles(), 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Miscellaneous.value]]" />
 						</div>
 
 

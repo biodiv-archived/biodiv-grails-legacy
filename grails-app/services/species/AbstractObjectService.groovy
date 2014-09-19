@@ -253,22 +253,23 @@ class AbstractObjectService {
 
             }
            
-            if(index != -1) {                
-                files.add(val);
-                
-                titles.add(params.get('title_'+index));
-                licenses.add(params.get('license_'+index));
-                type.add(params.get('type_'+index));
-                url.add(params.get('url_'+index));
-                source.add(params.get('source_'+index));
-                ratings.add(params.get('rating_'+index));
-                //resContext.add(params.get('resContext_'+index));
-                if( params.speciesId != null ){
-                    contributor.add(params.get('contributor_'+index));
+            if(index != -1) {
+                if(val != "") {
+                    files.add(val);
+
+                    titles.add(params.get('title_'+index));
+                    licenses.add(params.get('license_'+index));
+                    type.add(params.get('type_'+index));
+                    url.add(params.get('url_'+index));
+                    source.add(params.get('source_'+index));
+                    ratings.add(params.get('rating_'+index));
+                    //resContext.add(params.get('resContext_'+index));
+                    if( params.speciesId != null ){
+                        contributor.add(params.get('contributor_'+index));
+                    }
                 }
             }
         }
-         
         files.eachWithIndex { file, key ->
             Node image;
           

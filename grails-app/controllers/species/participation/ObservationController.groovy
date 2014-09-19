@@ -54,6 +54,7 @@ class ObservationController extends AbstractObjectController {
     def chartService;
     def messageSource;
     def commentService;
+    def utilsService;
 
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -93,8 +94,8 @@ class ObservationController extends AbstractObjectController {
 
 	def list() {
 		
-		def model = getObservationList(params);
-		
+		def model = runLastListQuery(params);
+		model.resultType = 'observation'
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
@@ -104,7 +105,6 @@ class ObservationController extends AbstractObjectController {
 			render (view:"list", model:model)
 			return;
 		} else {
-
 			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -335,21 +335,14 @@ class ObservationController extends AbstractObjectController {
 					return
 				}
 				observationInstance.incrementPageVisit()
-				def userGroupInstance;
-				if(params.webaddress) {
-					userGroupInstance = userGroupService.get(params.webaddress);
-				}
-				if(params.pos) {
-					int pos = params.int('pos');
-					def prevNext = getPrevNextObservations(pos, params.webaddress);
+				
+                int pos = params.pos?params.int('pos'):0;
+				def prevNext = getPrevNextObservations(pos, params.webaddress);
 					
-					if(prevNext) {
-						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
-					} else {
-						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
-					}
+				if(prevNext) {
+						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 				} else {
-					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
+					[observationInstance: observationInstance]
 				}
 			}
 		} else {
@@ -373,6 +366,7 @@ class ObservationController extends AbstractObjectController {
 			listParamsKey = userGroupWebaddress + listParamsKey;
 		}
 		def lastListParams = session[listParamsKey]?.clone();
+        
 		if(lastListParams) {
 			if(!session[listKey]) {
 				log.debug "Fetching observations list as its not present in session "
@@ -402,14 +396,14 @@ class ObservationController extends AbstractObjectController {
 		}
 	}
 	
-	private void runLastListQuery(Map params) {
+	private def runLastListQuery(Map params) {
 		if(params.webaddress) {
 			def userGroupController = new UserGroupController();
-			userGroupController.getUserGroupObservationsList(params)
+			return userGroupController.getUserGroupObservationsList(params)
 		} else if(params.action == 'search') {
-			observationService.getObservationsFromSearch(params);
+			return observationService.getObservationsFromSearch(params);
 		} else {
-			getObservationList(params);
+			return getObservationList(params);
 		}
 	}
 	
@@ -590,8 +584,10 @@ class ObservationController extends AbstractObjectController {
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def thumbnail
 						def type
+                        def pi
 						if(resourcetype == resourceTypeImage){
-								ImageUtils.createScaledImages(file, obvDir);
+								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
+                                //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
 								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
 		                        //context specific baseUrl for location picker script to work
 								def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
@@ -604,7 +600,7 @@ class ObservationController extends AbstractObjectController {
 								
 
 						}		
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
+						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
 					}
 				}
 				
@@ -632,7 +628,7 @@ class ObservationController extends AbstractObjectController {
                     if(request.getHeader('X-Auth-Token')) {
                         def resourcesList = [];
                         for(r in resourcesInfo) {
-                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type]
+                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
                             resourcesList << res
                         }
                         render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
@@ -642,7 +638,7 @@ class ObservationController extends AbstractObjectController {
                                 dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
                                 resources {
                                     for(r in resourcesInfo) {
-                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
+                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
                                     }
                                 }
                             }
@@ -717,7 +713,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
 						mailType = utilsService.OBSERVATION_ADDED;
-						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+						utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
 					if(!params["createNew"] && !isMobileApp){
@@ -752,11 +748,11 @@ class ObservationController extends AbstractObjectController {
 					} else {
 						mailType = utilsService.SPECIES_RECOMMENDED;
 					}
-					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
                     if(!params["createNew"] && !isMobileApp){
-						//observationService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
+						//utilsService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
@@ -882,7 +878,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					observationService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
@@ -958,7 +954,7 @@ class ObservationController extends AbstractObjectController {
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 			   //sending mail to user
-			   observationService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
+			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
 			   def r = [
 				   status : 'success',
 				   success : 'true',
@@ -1067,7 +1063,7 @@ class ObservationController extends AbstractObjectController {
 	def listRelated = {
     	log.debug params;
 
-        long parentId = params.id?params.long('id'):null;
+        Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 
         def activeFilters = new HashMap(params);
@@ -1218,6 +1214,7 @@ class ObservationController extends AbstractObjectController {
 					log.debug " Overwriting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
 					def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
 					try{
+                        observation.removeFromRecommendationVote(existingRecVote);
 						existingRecVote.delete(flush: true, failOnError:true)
 					}catch (Exception e) {
 						e.printStackTrace();
@@ -1608,5 +1605,17 @@ class ObservationController extends AbstractObjectController {
         } else {
             redirect (url:uGroup.createLink(action:'bulkCreate', controller:"observation", 'userGroupWebaddress':params.webaddress))
         }
+    }
+
+    def getProcessedImageStatus = {
+        println "======IN HERE ##########===========================%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ========="
+        if(!(params.jobId)) {
+            return;
+        }
+        def pi = ProcessImage.get(params.jobId?.toLong());
+        def output = [:];
+        output = ['imageStatus':pi.status];
+        render output as JSON
+        return;
     }
 }

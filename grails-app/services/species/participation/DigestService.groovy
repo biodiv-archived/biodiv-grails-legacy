@@ -81,7 +81,7 @@ class DigestService {
             }
             
         }else{
-            log.error "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
+            log.warn "NO DIGEST CONTENT FOR GROUP " + digest.userGroup
         }
     }
 
@@ -318,8 +318,9 @@ class DigestService {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
+
             result.each { user ->
-                if(user.sendDigest && !participants.contains(user)){
+                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
                     participants << user
                 }
             }

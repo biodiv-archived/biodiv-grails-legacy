@@ -797,7 +797,14 @@ class SpeciesUploadService {
 		}
 		log.debug "Affected taxonomy registries " + tRegistries
 		
-		if(!sFields && !tRegistries){
+		List resourceList = Resource.withCriteria(){
+			and{
+				eq('uploader', user)
+				between("uploadTime", start, end)
+			}
+		}
+		
+		if(!sFields && !tRegistries && !resourceList){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback."
@@ -816,7 +823,7 @@ class SpeciesUploadService {
 		
 		Species.withTransaction{   
 			sList.each { s->
-				rollBackSpeciesUpdate(s, sFields, user, sbu)
+				rollBackSpeciesUpdate(s, sFields, resourceList, user, sbu)
 			}
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 		}
@@ -880,7 +887,7 @@ class SpeciesUploadService {
 		}
  	}
 	
-	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+	private void rollBackSpeciesUpdate(Species s, List sFields, List resources, SUser user, SpeciesBulkUpload sbu) throws Exception {
 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
 		List sFieldToDelete = specificSFields.intersect(sFields)
 		
@@ -916,6 +923,14 @@ class SpeciesUploadService {
 		taxonReg.each { tr ->
 			log.debug "Deleting  $tr"
 			tr.delete(flush:true)
+		}
+		
+		s.resources.each { res ->
+			if(resources.contains(res)){
+				log.debug "Removing resource " + res
+				s.removeFromResources(res)
+				resources.remove(res)
+			}
 		}
 		
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;

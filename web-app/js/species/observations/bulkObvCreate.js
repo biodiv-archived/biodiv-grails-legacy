@@ -358,3 +358,37 @@ function initializers(){
         $(".applyToAll").trigger("click");
     }
 }
+
+function sortMediaOnExif() {
+    if($(".sortMediaOnExif").hasClass("disabled")) {
+        return;
+    }
+    var allMedia = $(".imagesList .addedResource.thumbnail");
+    var unsorted = []
+    $.each(allMedia, function(index, value){
+        var temp = {};
+        temp.key = value;
+        var img = $(value).find(".geotagged_image");
+        $(img).exifLoad(function() {
+            var imageDate =  $(img).exif("DateTimeOriginal")[0];
+            if(imageDate) {
+                var date = imageDate.split(" ")[0];
+                var time = imageDate.split(" ")[1];
+                date = date.replace(/:/g, "-");
+                var modDate = date + " " + time
+                temp.value = modDate;
+            } else {
+                temp.value = '1970-01-01 00:00:00'
+            }
+        });
+        unsorted[index] = temp;
+    });
+    var sorted = unsorted.slice(0).sort(function(a, b) {
+        return (new Date(b.value)) - (new Date(a.value));
+    });
+    $(".imagesList .addedResource.thumbnail").remove();
+    $.each(sorted, function(index, value){
+        $(".imagesList").append(value.key);
+    });
+    $(".imagesList .addedResource.thumbnail").draggable({helper:'clone'});  
+}
