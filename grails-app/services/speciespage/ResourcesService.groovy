@@ -41,8 +41,6 @@ class ResourcesService extends AbstractObjectService {
 
 	static transactional = false
 
-    def observationService;
-
     /**
 	 * Filter resources by group, habitat, tag, user, species
 	 * max: limit results to max: if max = -1 return all results

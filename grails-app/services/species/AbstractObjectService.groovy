@@ -14,7 +14,6 @@ import species.participation.Checklists;
 import species.sourcehandler.XMLConverter;
 import species.participation.Observation;
 import species.Species;
-import species.groups.SpeciesGroup;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -30,17 +29,14 @@ class AbstractObjectService {
 
     /**
     */
-    protected static List createUrlList2(observations){
+    protected static List createUrlList2(observations) {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
 		def urlList = createUrlList2(observations, iconBasePath)
-//		urlList.each {
-//			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-//		}
 		return urlList
 	}
 
-	protected static List createUrlList2(observations, String iconBasePath){
+	protected static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
             def obv = param['observation'];
@@ -351,12 +347,7 @@ class AbstractObjectService {
      * @return
      */
     Object getSpeciesGroupIds(groupId){
-        def groupName = SpeciesGroup.read(groupId)?.name
-        //if filter group is all
-        if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
-            return null
-        }
-        return groupId
+        return utilsService.getSpeciesGroupIds(groupId);
     }
 
 
