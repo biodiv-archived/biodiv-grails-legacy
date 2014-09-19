@@ -158,7 +158,7 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity</a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Discussions">Discussions</a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->

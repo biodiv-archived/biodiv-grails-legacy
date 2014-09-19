@@ -521,8 +521,13 @@ environments {
                     'grails.app.controllers.com.odobo',
                     'grails.app.services.com.odobo',
                     'org.pac4j'
+            debug   'grails.app.services.species.participation.DigestService'
+            debug   'species.DigestJob'
+            debug   'grails.app.services.speciespage.ObservationService'
+
+
             info    'grails.app.filters.species'
-            info    'jdbc.sqltiming'
+            fatal    'jdbc.sqltiming'
             info    'jdbc.connection'
             fatal   'jdbc.sqlonly'
             fatal   'jdbc.audit'
@@ -898,6 +903,11 @@ environments {
             info   'grails.app.filters.species.SecurityFilters'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+            
+            debug   'grails.app.services.species.participation.DigestService'
+            debug   'species.DigestJob'
+            debug   'grails.app.services.speciespage.ObservationService'
+
        }
 	}
 	kk {
@@ -1005,6 +1015,9 @@ environments {
             off   'jdbc.resultset'
             off   'jdbc.resultsettable'
             info   'grails.app.filters.species.SecurityFilters'
+            debug   'grails.app.services.species.participation.DigestService'
+            debug   'species.DigestJob'
+            debug   'grails.app.services.speciespage.ObservationService'
 		}
 	}
 }
