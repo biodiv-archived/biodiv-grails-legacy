@@ -162,7 +162,18 @@
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="msg.Notes" /></span>
                     <div class="value notes_view linktext">                        
-                        ${raw(Utils.linkifyYoutubeLink(observationInstance.notes))}
+                        <%  def styleVar = 'block';
+                            def clickcontentVar = '' 
+                        %>                        
+                            <g:if test="${observationInstance?.language.id == userLanguage?.id}">
+                                <%  
+                                    styleVar = "none"
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+userLanguage.name+'</a>';
+                                %>
+                            </g:if>
+                            
+                            ${raw(clickcontentVar)}
+                            <div style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(observationInstance.notes))}</div>
                     </div>
                     </g:if>
                     <g:else>
@@ -203,3 +214,13 @@
         </div>
         </g:else>
     </div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('.clickcontent').click(function(){
+        $(this).next().slideToggle('slow');
+    });
+});
+
+</script>

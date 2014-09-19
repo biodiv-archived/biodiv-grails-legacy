@@ -72,6 +72,7 @@ import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 
 class ObservationService extends AbstractObjectService {
 
@@ -132,6 +133,7 @@ class ObservationService extends AbstractObjectService {
         observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
+        observation.language = params.locale_language;
 
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         //        if(params.latitude && params.longitude) {
@@ -2121,4 +2123,15 @@ class ObservationService extends AbstractObjectService {
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
+
+
+     // Get Language id
+   Language getCurrentLanguage(request){
+        String langStr = RCU.getLocale(request)
+        def (langtwo, lang1) = langStr.tokenize( '_' );
+        def languageInstance = Language.findByTwoLetterCode(langtwo);
+        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);        
+   }
+
+
 }

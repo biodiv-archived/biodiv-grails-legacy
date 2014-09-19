@@ -270,6 +270,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private saveAndRender(params, sendMail=true){
+		params.locale_language = observationService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
         /*if(request.getHeader('X-Auth-Token')) {
             if(!result.success) result.remove('observationInstance');
@@ -335,14 +336,14 @@ class ObservationController extends AbstractObjectController {
 					return
 				}
 				observationInstance.incrementPageVisit()
-				
+				def userLanguage = observationService.getCurrentLanguage(request);   
                 int pos = params.pos?params.int('pos'):0;
 				def prevNext = getPrevNextObservations(pos, params.webaddress);
 					
 				if(prevNext) {
-						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage]
 				} else {
-					[observationInstance: observationInstance]
+					[observationInstance: observationInstance,'userLanguage':userLanguage]
 				}
 			}
 		} else {

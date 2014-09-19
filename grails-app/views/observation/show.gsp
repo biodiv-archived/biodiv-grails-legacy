@@ -173,7 +173,7 @@ if(r) {
 
 
                     <obv:showStory
-                        model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                        model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
                         
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
