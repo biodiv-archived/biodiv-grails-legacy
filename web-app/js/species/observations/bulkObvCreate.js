@@ -6,7 +6,7 @@ function bulkObservationSubmission(ele, showListPage){
     $("body").css("cursor", "progress");
     var me = ele;
     if($(me).hasClass('disabled')) {
-        alert("Uploading is in progress. Please submit after it is over.");
+        alert(window.i8ln.observation.bulkObvCreate.up);
         event.preventDefault();
         return false; 		 		
     }
@@ -30,7 +30,7 @@ function bulkObservationSubmission(ele, showListPage){
         submitForms(0, size, formsWithData, showListPage); 
         return false;
     } else {
-        alert("Please agree to the terms mentioned at the end of the form to submit the observation.");    
+        alert(window.i8ln.observation.bulkObvCreate.agree);    
         $("#addBulkObservationsSubmit").removeClass("disabled");
         $("#addBulkObservationsAndListPage").removeClass("disabled");
     }
@@ -133,7 +133,7 @@ function submitForms(counter, size, allForms, showListPage){
                 submitForms(counter+1, size, allForms, showListPage);
             }, error : function (xhr, ajaxOptions, thrownError){
                 //successHandler is used when ajax login succedes
-                alert("Sorry, a server error occured.Please refresh the page & try again or else report the error.");
+                alert(window.i8ln.observation.bulkObvCreate.error);
                 var successHandler = this.success;
                 handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
                     var response = $.parseJSON(xhr.responseText);

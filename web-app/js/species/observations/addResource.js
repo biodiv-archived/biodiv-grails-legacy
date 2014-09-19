@@ -13,7 +13,7 @@ function removeResource(event, imageId) {
             data: {resId:resId},	
             success: function(data) {
                 if(data.status){
-                    alert("Media deleted!")
+                    alert(window.i8ln.observation.addResource.md)
                 } 
             }, error: function(xhr, status, error) {
                 alert(xhr.responseText);
@@ -56,7 +56,7 @@ function removeResource(event, imageId) {
                 url : function(params) {
                     var d = new $.Deferred;
                     if(!params.value) {
-                        return d.reject('This field is required'); //returning error via deferred object
+                        return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
                     } else {
                         me.$form.find('.videoUrl').val(params.value);
                         me.submitRes();
@@ -66,10 +66,10 @@ function removeResource(event, imageId) {
                 }, 
                     validate :  function(value) {
                         if($.trim(value) == '') {
-                            return 'This field is required';
+                            return window.i8ln.observation.addResource.fr;
                         }
                     }, 
-                title : 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
+                title : window.i8ln.observation.addResource.youtube
             };
 
 
@@ -82,7 +82,7 @@ function removeResource(event, imageId) {
                 url : function(params) {
                     var d = new $.Deferred;
                     if(!params.value) {
-                        return d.reject('This field is required'); //returning error via deferred object
+                        return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
                     } else {
                         me.$form.find('.audioUrl').val(params.value);
                         me.submitRes();
@@ -92,10 +92,10 @@ function removeResource(event, imageId) {
                 }, 
                     validate :  function(value) {
                         if($.trim(value) == '') {
-                            return 'This field is required';
+                            return window.i8ln.observation.addResource.fr;
                         }
                     }, 
-                title : 'Enter Audio url like http://test.com/sample.mp3'
+                title : window.i8ln.observation.addResource.ayoutube
             };
 
 
@@ -124,10 +124,10 @@ function removeResource(event, imageId) {
         },
 
         submitRes : function() {
-            this.$form.submit().find("span.msg").html("Uploading... Please wait...");
-            this.$ele.find(".iemsg").html("Uploading... Please wait...");
+            this.$form.submit().find("span.msg").html(window.i8ln.observation.addResource.upload);
+            this.$ele.find(".iemsg").html(window.i8ln.observation.addResource.upload);
             this.$ele.find(".progress").css('z-index',110);
-            this.$ele.find('.progress_msg').html('Uploading ...');
+            this.$ele.find('.progress_msg').html(window.i8ln.observation.addResource.uploading);
         },
 
         filePick : function(e) {

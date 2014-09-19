@@ -4,25 +4,23 @@ var contributors_autofillUsersComp;
 function onSpeciesImageUploadSuccess(type){
     var msgText
     if(type == "imageUpload"){
-        msgText = "Images uploaded/edited succesfully, Page will reload to reflect the changes in gallery!!"
+        msgText = window.i8ln.species.speciesPermission.ius
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab1") );
     }
     else if(type == "pulledSpeciesFieldImage"){
-        msgText = "Images succesfully pulled, Page will reload to reflect the changes in gallery!!"
+        msgText = window.i8ln.species.speciesPermission.pul
         showUpdateStatus(msgText, 'success',$("#speciesImage-tab2") );
     }
     else{
-        msgText = "Images succesfully pulled, Page will reload to reflect the changes in gallery!!"
+        msgText = window.i8ln.species.speciesPermission.pul
         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(msgText);
         $('html, body').animate({
             scrollTop: 0
     }, 'slow');
-
     }
     setTimeout(function(){location.reload(true);}, 1000);
     return true;
 }
-
 
 function getNextRelatedObvImages(speciesId, url, resourceListType, context){
     var imagesListWrapper = $(context).closest(".imagesListWrapper");

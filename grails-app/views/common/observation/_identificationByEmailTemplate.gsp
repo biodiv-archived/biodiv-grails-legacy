@@ -4,7 +4,7 @@
 		<button id="identification-email"
 			class="${(params.action == 'show')?'btn btn-link' : 'btn'} dropdown-toggle"
             title="${titleTooltip?:g.message(code:'placeholder.share.email') }"
-            data-toggle="dropdown" href="#"><i class="icon-envelope"></i>${g.message(code:'button.share')}</button>
+            data-toggle="dropdown" href="#"><i class="icon-envelope"></i>${title?:'Share'}</button>
 		<form id="email-form" name="email-form" class="popup-form"
 			style="display: none; background-color: #F2F2F2;">
             <div class="form-row" style="${hideTo?'display:none;':''}">

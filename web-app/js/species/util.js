@@ -13,9 +13,9 @@ $(function() {
 	$(spt).each(function() {
 		var addr = $(this).text().replace(at, "@").replace(dot, ".");
 		$(this).after(
-				'<a href="mailto:' + addr + '" title="Send an email">' + addr
+				'<a href="mailto:' + addr + '" title=window.i8ln.species.util.sem>' + addr
 						+ '</a>').hover(function() {
-			window.status = "Send an email!";
+			window.status = window.i8ln.species.util.sem;
 		}, function() {
 			window.status = "";
 		});

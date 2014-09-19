@@ -124,11 +124,13 @@
                                         if(currentUser) {
                                             staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
                                         }
-def contact_me_text="${g.message(code:'button.contact.me')}"                                        
+def contact_me_text=g.message(code:'button.contact.me')                                     
 %>
 
                             			    <obv:identificationByEmail
                                             model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:contact_me_text, titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+
+
                                         </li>
                                     </g:if>
                                 </ul>

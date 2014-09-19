@@ -66,9 +66,10 @@
 
 
 				</div>
+
 				
 				<obv:identificationByEmail
-					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:'Share']" />
+					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:g.message(code:'button.share')]" />
 				
 				<obv:download
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
