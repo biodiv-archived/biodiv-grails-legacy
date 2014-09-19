@@ -510,16 +510,22 @@ environments {
             info   'org.springframework.security'
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
-
-            //debug   'speciespage',
-                 //   'species'
-           // debug   'com.the6hours', 
-                  //  'grails.app.taglib.com.the6hours'
-           // debug   'species.auth'
-           // debug   'com.odobo',
-                   // 'grails.app.controllers.com.odobo',
-                   // 'grails.app.services.com.odobo',
-                  //  'org.pac4j'
+            debug   'speciespage',
+                    'species'
+            debug   'com.the6hours', 
+                    'grails.app.taglib.com.the6hours'
+            debug   'species.auth'
+            debug   'com.odobo',
+                    'grails.app.controllers.com.odobo',
+                    'grails.app.services.com.odobo',
+                    'org.pac4j'
+            info    'grails.app.filters.species'
+            info    'jdbc.sqltiming'
+            info    'jdbc.connection'
+            fatal   'jdbc.sqlonly'
+            fatal   'jdbc.audit'
+            fatal   'jdbc.resultset'
+            fatal   'jdbc.resultsettable'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
 		//debug  'org.springframework.beans'
@@ -546,12 +552,13 @@ environments {
             'grails.plugin',
             'org.springframework.security.web',
             'grails.app.tagLib.org.grails.plugin.resource'
-            //debug   'speciespage',
-           // 'grails.app',
-           // 'species'
-           // debug   'grails.app.filters.species.SecurityFilters'
+            debug   'speciespage',
+            'grails.app',
+            'species'
+            info   'grails.app.filters.species.SecurityFilters'
             info    'species.auth',
             'com.mchange.v2.resourcepool.BasicResourcePool'
+            info    'com.linkedin.grails'
         }
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
@@ -872,15 +879,22 @@ environments {
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
 
-           // debug   'speciespage',
-                   // 'species'
-           // debug   'com.the6hours', 
-                  //  'grails.app.taglib.com.the6hours'
-           // debug   'species.auth'
-           // debug   'com.odobo',
-                  //  'grails.app.controllers.com.odobo',
-                  //  'grails.app.services.com.odobo',
-                  //  'org.pac4j'
+           debug   'speciespage',
+                    'species'
+            debug   'com.the6hours', 
+                    'grails.app.taglib.com.the6hours'
+            debug   'species.auth'
+            debug   'com.odobo',
+                    'grails.app.controllers.com.odobo',
+                    'grails.app.services.com.odobo',
+                    'org.pac4j'
+            info    'jdbc.sqltiming'
+            info    'jdbc.connection'
+            off   'jdbc.sqlonly'
+            off   'jdbc.audit'
+            off   'jdbc.resultset'
+            off   'jdbc.resultsettable'
+            info   'grails.app.filters.species.SecurityFilters'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
        }
@@ -983,6 +997,13 @@ environments {
 			info	'species',
 					'speciespage',
 					'com.mchange.v2.resourcepool.BasicResourcePool' 
+            off   'jdbc.sqltiming'
+            off   'jdbc.connection'
+            off   'jdbc.sqlonly'
+            off   'jdbc.audit'
+            off   'jdbc.resultset'
+            off   'jdbc.resultsettable'
+            info   'grails.app.filters.species.SecurityFilters'
 		}
 	}
 }

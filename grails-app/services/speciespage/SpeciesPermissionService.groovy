@@ -113,8 +113,8 @@ class SpeciesPermissionService {
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        println "IS SPECIES CONTRIBUTOR -----------------"
-        println speciesInstance.taxonConcept;
+        //println "IS SPECIES CONTRIBUTOR -----------------"
+        //println speciesInstance.taxonConcept;
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 

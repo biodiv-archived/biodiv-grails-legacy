@@ -9,7 +9,8 @@
 
     </g:if>
     <g:if test="${resourceListType == 'usersResource'}"
-    <i class="icon-picture"></i><span style="font-weight:bold"><g:message code="button.my.uploads" /></span> <span> <g:message code="text.stored.period" /></span>
+    <i class="icon-picture"></i><span style="font-weight:bold;margin-left:2px;"><g:message code="button.my.uploads" /></span> <span> <g:message code="text.stored.period" /></span>
+    <a style="margin-bottom:3px;" class="pull-right sortMediaOnExif btn" onclick='sortMediaOnExif()'>Sort by EXIF date</a>
     </g:if>
 
     <div class="resources control-group imagesListWrapper ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
@@ -25,7 +26,7 @@
         </g:if>
         <ul class="imagesList thumbwrap thumbnails"
             style='list-style: none; margin-left: 0px;'>
-            <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset]"/>
+            <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance, 'resList': resList, 'obvLinkList': obvLinkList , 'resourceListType': resourceListType, 'offset':offset, 'currentUser':currentUser]"/>
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <input type="hidden" class='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
             </g:if>
@@ -65,6 +66,5 @@
             }
         }
         $(".resourceListType").val($(".resourceListTypeFilled").val());
-
     });
 </r:script>

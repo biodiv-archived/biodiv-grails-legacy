@@ -3,7 +3,7 @@
 <div class="page-header clearfix">
     <div style="width: 100%;">
         <div class="main_heading navbar" style="margin: 0px;">
-            <h1>
+            <h1 style="font-size:20px;">
                 <g:if test="${(params.action=='create' || params.action == 'save' || params.action == 'bulkCreate')}">
                 <ul class="nav">
                     <li class="${(params.controller == 'observation' && (params.action == 'create' || params.action == 'save'))?'active':''}"><a

@@ -1,8 +1,8 @@
 <%@page contentType="text/html"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
-
-<html><head><title><g:message code="msg.Digest" />Digest</title>
+<%@page import="species.Resource"%>
+<html><head><title><g:message code="msg.Digest" /></title>
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <style type="text/css">
@@ -113,15 +113,24 @@
                             <g:set var="mainImage" value="${speciesInstance.mainImage()}" />
                             <%
                             def imagePath = '';
+                            def basePath;
                             def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
                             if(mainImage?.fileName == speciesGroupIcon.fileName) 
-                            imagePath = mainImage.thumbnailUrl("${resourcesServerURL}", '.png');
-                            else
-                            imagePath = mainImage?mainImage.thumbnailUrl("${resourcesServerURL}"):null;
+                                imagePath = mainImage.thumbnailUrl("${resourcesServerURL}", '.png');
+                            else {
+                                if(mainImage.context.value() == Resource.ResourceContext.OBSERVATION.toString()){
+                                    basePath = grailsApplication.config.speciesPortal.observations.serverURL
+                                } else if(mainImage.context.value() == Resource.ResourceContext.SPECIES.toString() || r.context.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
+                                    basePath = grailsApplication.config.speciesPortal.resources.serverURL
+                                } else {
+                                    basePath = grailsApplication.config.speciesPortal.resources.serverURL
+                                }
+                                imagePath = mainImage?mainImage.thumbnailUrl(basePath):null;
+                            }
                             def spId = speciesInstance.id
                             imagePath = imagePath.replaceAll(' ','%20');
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><div style="height:165px;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${speciesInstance.title}</p></a></div></td>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><div style="height:165px;"><a href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;"><p>${raw(speciesInstance.title)}</p></a></div></td>
                             </g:each>
                         </tr>
                     </table>

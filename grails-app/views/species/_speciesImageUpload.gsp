@@ -11,7 +11,7 @@
             <g:if test="${isSpeciesContributor}">
             <div class="tab-pane active" id="speciesImage-tab0" style="max-height:410px;overflow-y:scroll;">
                 
-                <form id="pullObvImagesForm" action="${uGroup.createLink(action:'pullObvImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+                <form id="pullObvImagesForm" action="${uGroup.createLink(action:'pullImageForSpecies', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromRelatedObv']"></obv:addPhotoWrapper>
                     <a id="pullObvImagesBtn" class="btn btn-primary"
@@ -20,7 +20,7 @@
                    
             </div>
             <div class="tab-pane" id="speciesImage-tab1" style="max-height:410px;overflow-y:scroll;">
-                <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'uploadImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+                <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'pullImageForSpecies', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
                     <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
@@ -43,7 +43,7 @@
 
             </div>
             <div class="tab-pane" id="speciesImage-tab2" style="max-height:410px;overflow-y:scroll;">
-                <form id="pullSpeciesFieldImagesForm" action="${uGroup.createLink(action:'pullSpeciesFieldImage', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+                <form id="pullSpeciesFieldImagesForm" action="${uGroup.createLink(action:'pullImageForSpecies', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromSpeciesField']"></obv:addPhotoWrapper>
                     <a id="pullSpeciesFieldImagesBtn" class="btn btn-primary"

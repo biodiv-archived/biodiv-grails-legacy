@@ -20,7 +20,7 @@
     <div class="prop">
         <span class="name" style="padding-right: 15px;"><g:message code="default.message.label" /></span>
         <div class="value">
-            ${commentInstance.body}
+            ${raw(commentInstance.body)}
         </div>
     </div>
 </div>

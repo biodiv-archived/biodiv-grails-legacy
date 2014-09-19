@@ -23,7 +23,7 @@ class TaxonController {
     def taxonService;
     def springSecurityService;
     def activityFeedService;
-    def observationService;
+    def utilsService;
     def grailsApplication;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -420,7 +420,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType );
-                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
 
@@ -494,7 +494,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
-                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON
@@ -534,7 +534,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
-                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON;

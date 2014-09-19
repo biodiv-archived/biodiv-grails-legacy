@@ -536,6 +536,8 @@ class ChecklistService {
 
 	
 	def List getObservationData(id, params=[:]){
+        //Done because of java melody error - junk coming with offset value
+        params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
 		params.max = params.max ? params.max.toInteger() :50
 		params.offset = params.offset ? params.offset.toInteger() :0
 		def sql =  Sql.newInstance(dataSource);

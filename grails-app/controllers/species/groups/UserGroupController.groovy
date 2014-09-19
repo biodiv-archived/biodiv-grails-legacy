@@ -612,8 +612,8 @@ class UserGroupController {
 			}
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
-            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
+			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0L);
+            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0L));
             msg = messageSource.getMessage("default.confirm.membership", null, request.locale)
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
@@ -651,8 +651,8 @@ class UserGroupController {
 			}
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
-			founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0));
+			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount().toInteger(), 0L);
+			founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount().toInteger(), 0L));
 			msg = messageSource.getMessage("default.confirm.membership", ['moderator'] as Object[], request.locale)
 			founders.each { founder ->
 				log.debug "Sending email to  founder or expert ${founder}"
@@ -1381,6 +1381,18 @@ class UserGroupController {
        userGroupService.removeMemberInBulk(params)
        render "== done"
     }
+
+    @Secured(['ROLE_ADMIN'])
+    def createDigestIns(){
+        def ug = UserGroup.get(params.userGroupId.toLong())
+        println "=========UG=========== " + ug
+        def dig = new Digest(userGroup:ug, lastSent:new Date() - 14, forObv:true, forSp:true, forDoc:true, forUsers:true, startDateStats:new Date() - 14, sendTopContributors:true,sendTopIDProviders:true);
+        if(!dig.save(flush:true)) {
+            dig.errors.allErrors.each { log.error it } 
+        }
+        println "========== CREATED Digest instance ============="
+    }
+
 
 
 }

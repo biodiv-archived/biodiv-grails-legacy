@@ -2,6 +2,7 @@ var curators_autofillUsersComp;
 var contributors_autofillUsersComp;
 
 function onSpeciesImageUploadSuccess(type){
+    $("body").css("cursor", "progress");
     var msgText
     if(type == "imageUpload"){
         msgText = window.i8ln.species.speciesPermission.ius
@@ -18,7 +19,8 @@ function onSpeciesImageUploadSuccess(type){
             scrollTop: 0
     }, 'slow');
     }
-    setTimeout(function(){location.reload(true);}, 1000);
+    setTimeout(function(){location.reload();}, 2000);
+    $("body").css("cursor", "default");
     return true;
 }
 
@@ -210,13 +212,15 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
         dataType: "json",
         data: {speciesId:spId, spFieldId: spFieldId,resourceListType: resourceListType},	
         success: function(data) {
-            var addPhotoHtmlData = $(data.addPhotoHtml);
-            $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
-            $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
-            $("#addSpFieldResourcesModal").modal("toggle");
-            $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
-            uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
-            $("input[name='speciesFieldId']").val(spFieldId);
+            if(data.statusComplete){
+                var addPhotoHtmlData = $(data.addPhotoHtml);
+                $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
+                $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
+                $("#addSpFieldResourcesModal").modal("toggle");
+                $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
+                uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
+                $("input[name='speciesFieldId']").val(spFieldId);
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         }

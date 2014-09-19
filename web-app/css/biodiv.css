@@ -467,7 +467,7 @@ div.errors {
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
-	height: 57px;
+	height: 65px;
 	cursor: pointer;
 }
 .add_audio {
@@ -518,9 +518,9 @@ div.errors {
 .progress_msg {
 	position: absolute;
 	display: inline-block;
-	bottom: 15px;
+	bottom: 96px;
 	left: 30px;
-	color: #ffffff;
+	color: blue;
 	font-size: 1.5em;
 	font-weight: bold;
 }
@@ -2773,11 +2773,6 @@ small {
     border:solid 1px #dedede;padding:5px;
     display:none;background-color:#f2f2f2;
 }
-.red
-{
-    color:#cc0000;
-    font-weight:bold;
-}
 .contentbox a
 {
     text-decoration:none;
@@ -2851,9 +2846,9 @@ small {
     border:solid 1px #dedede;padding:5px;
     display:none;background-color:#f2f2f2;
 }
-.red
+.tagUsers
 {
-    color:#cc0000;
+    color:#16509E !important;
     font-weight:bold;
 }
 .contentbox a
