@@ -154,6 +154,7 @@ class ObservationService extends AbstractObjectService {
         observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
+        observation.language = params.locale_language;
 
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         //        if(params.latitude && params.longitude) {
@@ -2688,5 +2689,13 @@ class ObservationService extends AbstractObjectService {
         log.debug "New file created : "+ uploaded.getPath()
         return uploaded
     }
+
+    // Get Language id
+   Language getCurrentLanguage(request){
+        String langStr = RCU.getLocale(request)
+        def (langtwo, lang1) = langStr.tokenize( '_' );
+        def languageInstance = Language.findByTwoLetterCode(langtwo);
+        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);        
+   }
 
 }

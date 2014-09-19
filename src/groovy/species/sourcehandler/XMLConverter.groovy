@@ -800,10 +800,9 @@ class XMLConverter extends SourceConverter {
             }
             String path = imageFile.absolutePath.replace(resourcesRootDir, "");
             def res = Resource.findByFileNameAndType(path, resourceType);
-
             if(!res) {
                 log.debug "Creating new resource"
-                res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
+                res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text(),language:imageNode.language[0]?.value());
                 res.url = sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
@@ -825,6 +824,7 @@ class XMLConverter extends SourceConverter {
                 res.url = sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 res.description = imageNode.caption?.text();
+                res.language    = imageNode.language[0]?.value();
                 res.licenses?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
@@ -975,7 +975,7 @@ class XMLConverter extends SourceConverter {
             
             def attributors = getAttributions(videoNode, true);
             String description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
-            res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:description, license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
+            res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:description, license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true),language:videoNode.language[0]?.value());
             res.url = sourceUrl;
             if(rate) res.rating = Integer.parseInt(rate);
 
@@ -993,7 +993,7 @@ class XMLConverter extends SourceConverter {
             res.url = sourceUrl
             if(rate) res.rating = Integer.parseInt(rate);
             res.description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
-
+            res.language    = videoNode.language[0]?.value()
 
             res.licenses?.clear()
             res.contributors?.clear()

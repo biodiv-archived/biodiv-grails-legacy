@@ -268,6 +268,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private saveAndRender(params, sendMail=true){
+		params.locale_language = observationService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
         /*if(request.getHeader('X-Auth-Token')) {
             if(!result.success) result.remove('observationInstance');
