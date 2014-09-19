@@ -71,6 +71,8 @@ class SecurityFilters {
                         def user = springSecurityService.getCurrentUser();
                         model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
                     }
+                    //passing locale Languages
+                    model.localeLanguages = grailsApplication.config.speciesPortal.localeLanguages
                 }
                 log.debug "after rendering"
             }

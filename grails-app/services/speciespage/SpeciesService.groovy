@@ -65,7 +65,6 @@ class SpeciesService extends AbstractObjectService  {
     def externalLinksService;
     def speciesSearchService;
     def namesIndexerService;
-    def observationService;
     def speciesPermissionService;
     def taxonService;
     def activityFeedService;
@@ -193,7 +192,7 @@ class SpeciesService extends AbstractObjectService  {
 
         if(params.sGroup) {
             params.sGroup = params.sGroup.toLong()
-            def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+            def groupId = getSpeciesGroupIds(params.sGroup)
             if(!groupId){
                 log.debug("No groups for id " + params.sGroup)
             } else{
@@ -313,7 +312,7 @@ class SpeciesService extends AbstractObjectService  {
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
                 addMediaInSpField(params, speciesFieldInstance);
-                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:activityFeedService.SPECIES_FIELD_CREATED]
+                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -348,7 +347,7 @@ class SpeciesService extends AbstractObjectService  {
                 addMediaInSpField(params, speciesField);
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_UPDATED]
+            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:ActivityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_UPDATED]
         } catch(Exception e) {
             e.printStackTrace();
             return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
@@ -474,7 +473,7 @@ class SpeciesService extends AbstractObjectService  {
                 //sortAsPerRating(sameFieldSpeciesFieldInstances);
                 //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                 def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_DELETED]
+                return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_DELETED]
             } catch(e) {
                 e.printStackTrace();
                 log.error e.getMessage();
@@ -854,11 +853,11 @@ class SpeciesService extends AbstractObjectService  {
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
                 String activityType, mailType;
                 if(oldSynonym) {
-                    activityType = activityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                    mailType = activityFeedService.SPECIES_SYNONYM_UPDATED
+                    activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
                 } else {
-                    activityType = activityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
-                    mailType = activityFeedService.SPECIES_SYNONYM_CREATED
+                    activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
 
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
@@ -918,11 +917,11 @@ class SpeciesService extends AbstractObjectService  {
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
                 String activityType, mailType;
                 if(oldCommonname) {
-                    activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
-                    mailType = activityFeedService.SPECIES_COMMONNAME_UPDATED
+                    activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
+                    mailType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
                 } else {
-                    activityType = activityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
-                    mailType = activityFeedService.SPECIES_COMMONNAME_CREATED
+                    activityType = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+                    mailType = ActivityFeedService.SPECIES_COMMONNAME_CREATED
                 }
 
 
@@ -1081,7 +1080,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 msg = 'Successfully removed synonym';
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:activityFeedService.SPECIES_SYNONYM_DELETED]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1131,7 +1130,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 msg = 'Successfully removed common name';
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:activityFeedService.SPECIES_COMMONNAME_DELETED]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1384,7 +1383,7 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         if(params.featureBy == "true" ) {
-            params.userGroup = observationService.getUserGroup(params)
+            params.userGroup = utilsService.getUserGroup(params)
             // def featureQuery = ", Featured feat "
             //query += featureQuery;
             //countQuery += featureQuery
@@ -1638,8 +1637,8 @@ class SpeciesService extends AbstractObjectService  {
             otherParams['resURLs'] = resURLs
             otherParams['spId'] = species.id
             //ADD FEED AND SEND
-            def feedInstance = activityFeedService.addActivityFeed(species, species, springSecurityService.currentUser, activityFeedService.SPECIES_UPDATED);
-            observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, species, null, "", feedInstance, otherParams);
+            def feedInstance = activityFeedService.addActivityFeed(species, species, springSecurityService.currentUser, ActivityFeedService.SPECIES_UPDATED);
+            utilsService.sendNotificationMail(ActivityFeedService.SPECIES_UPDATED, species, null, "", feedInstance, otherParams);
         }
         return true
     }

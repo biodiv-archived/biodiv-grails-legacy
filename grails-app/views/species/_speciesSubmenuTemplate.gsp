@@ -13,7 +13,7 @@
         <g:if test="${isSpeciesContributor}">
         <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"
             href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-            <i class="icon-edit"></i>Edit</a>
+            <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
         </g:if>
 
@@ -21,7 +21,7 @@
             <g:if test="${speciesInstance}">
             <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                 href="${uGroup.createLink(controller:'species', action:'delete', id:speciesInstance.id)}"
-                ><i class="icon-trash"></i>Delete</a>
+                ><i class="icon-trash"></i><g:message code="button.delete" /></a>
             </g:if>
         </sUser:isAdmin>
 

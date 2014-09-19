@@ -3,8 +3,8 @@
 <g:if test="${!recoComments.isEmpty()}">
 	<div class="btn-group" id="reco_comment_${recoId}">
 
-		<a class="reco-comment-action" data-toggle="dropdown" href="#" onclick="$(this).next('.reco-comment-table').show(); return false;"><g:if test="${recoComments.size() > 1}">View comments</g:if>
-					<g:else>View comment</g:else></a>
+		<a class="reco-comment-action" data-toggle="dropdown" href="#" onclick="$(this).next('.reco-comment-table').show(); return false;"><g:if test="${recoComments.size() > 1}"><g:message code="button.view.comment" /></g:if>
+					<g:else><g:message code="button.View.comment" /></g:else></a>
 		<div class="reco-comment-table" style="display: none">
 			<div class="reco-comment-close" value="close" onclick="$(this).parent().hide(); return false;">
 				<i class="icon-remove"></i>
@@ -18,7 +18,7 @@
 							<img class="small_profile_pic"
 								src="${recoVoteInstance.author?.profilePicture(ImageType.SMALL)}"
 								title="${recoVoteInstance.author.name}"/>
-							</g:link> on <g:formatDate date="${recoVoteInstance.votedOn}" type="datetime" style="LONG" timeStyle="SHORT"/> : ${recoVoteInstance.comment} 
+							</g:link> <g:message code="text.on" /> <g:formatDate date="${recoVoteInstance.votedOn}" type="datetime" style="LONG" timeStyle="SHORT"/> : ${recoVoteInstance.comment} 
 						</span>
 						<sUser:ifOwns model="['user':recoVoteInstance.author]">
 								<a href="#" onclick="removeRecoComment(${recoVoteInstance.recoVoteId},'#reco_comment_' + ${recoId}, '${uGroup.createLink(controller:'observation', action:'deleteRecoVoteComment')}',$(this).parent()); return false;"><span class="deleteCommentIcon" data-original-title="Remove this comment" ><i class="icon-trash icon-red"></i></span></a>

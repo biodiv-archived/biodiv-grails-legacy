@@ -415,5 +415,8 @@ class ActivityFeed {
 			}
 		}
 	}
-	
+
+    def contextInfo(params=null) {
+        return activityFeedService.getContextInfo(this,params);
+    }
 }

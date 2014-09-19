@@ -47,7 +47,8 @@ import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ChecklistService {
 
 	static transactional = false
@@ -67,8 +68,9 @@ class ChecklistService {
 	def activityFeedService;
 	def observationsSearchService;
 	def dataSource;
-	def checklistUtilService
-	
+	def utilsService
+	def messageSource;
+	//SessionLocaleResolver localeResolver;
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Create ///////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
@@ -135,7 +137,7 @@ class ChecklistService {
                 }
             }
             if(!validObvPresent) {
-				return ['success' : false, 'msg':'No valid observation present. Ignoring saving checklist', checklistInstance:checklistInstance]
+				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
 
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
@@ -667,7 +669,7 @@ class ChecklistService {
 					
 				}
 				
-				checklistUtilService.cleanUpGorm(true)
+				utilsService.cleanUpGorm(true)
 				
 				Checklists.withTransaction(){ 
 					cl = Checklists.get(id)

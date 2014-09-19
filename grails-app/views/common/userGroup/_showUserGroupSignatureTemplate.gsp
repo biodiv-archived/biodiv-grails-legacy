@@ -42,19 +42,19 @@ if(userGroup && userGroup.id) {
                     title="${userGroupName}"> ${userGroupName} </span> 
             </a>
             <g:if test="${!showDetails && userGroup && userGroup.id}">
-            <div class="footer-item" title="Members">
+            <div class="footer-item" title="${g.message(code:'showusergroupsig.title.members')}">
                 <i class="icon-user"></i>
                 ${membersCount}
             </div>
-            <div class="footer-item" title="Species">
+            <div class="footer-item" title="${g.message(code:'showobservationstoryfooter.title.species')}">
                 <i class="icon-leaf"></i>
                 ${userGroup.noOfSpecies()}
             </div>
-             <div class="footer-item" title="Observations">
+             <div class="footer-item" title="${g.message(code:'showusergroupsig.title.observations')}">
                 <i class="icon-screenshot"></i>
                 ${userGroup.noOfObservations()}
             </div>
-            <div class="footer-item" title="Documents">
+            <div class="footer-item" title="${g.message(code:'showusergroupsig.title.documents')}">
                 <i class="icon-file"></i>
                 ${userGroup.noOfDocuments()}
             </div>

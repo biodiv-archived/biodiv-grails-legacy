@@ -1,24 +1,27 @@
 <%@page import="species.utils.Utils"%>
+
+
 <div class="block-tagadelic">
 	<form id="advSearchForm" method="get" 		
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search', userGroup:userGroupInstance) }"
-		title="Advanced Search" class="searchbox">
-		<label class="control-label" for="name">Species</label> <input id="aq.name"
+		title="${g.message(code:'title.advanced.search')}" class="searchbox">
+		<label class="control-label" for="name"><g:message code="default.species.label" /></label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${(queryParams?.get('aq.name'))?.encodeAsHTML() }"
-			placeholder="Search by species name" />
-	 <label
-			class="control-label" for="aq.taxon">Taxon Hierarchy</label> <input data-provide="typeahead" id="aq.taxon"
+			placeholder="${g.message(code:'placeholder.species.name')}" />
+	 	<label
+			class="control-label" for="aq.taxon"><g:message code="default.taxon.hierarchy.label" /></label> <input data-provide="typeahead" id="aq.taxon"
 			type="text" class="input-block-level" name="aq.taxon" value="${(queryParams?.get('aq.taxon'))?.encodeAsHTML()}"
-			placeholder="Search using taxon hierarchy" />
+			placeholder="${g.message(code:'placeholder.species.taxon.hierarchy')}" />
 			
-			<label
-			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead" id="aq.contributor"
+		<label
+			class="control-label" for="aq.contributor"><g:message code="default.contributors.label" /></label> <input data-provide="typeahead" id="aq.contributor"
 			type="text" class="input-block-level" name="aq.contributor" value="${(queryParams?.get('aq.contributor'))?.encodeAsHTML()}" 
-			placeholder="Field to search all contributors" /> <label
-			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead" id="aq.attribution"
+			placeholder="${g.message(code:'placeholder.species.field.search')}" />
+		<label
+			class="control-label" for="aq.attribution"><g:message code="default.attributions.label" /></label> <input data-provide="typeahead" id="aq.attribution"
 			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
-			placeholder="Field to search all attributions" />
+			placeholder="${g.message(code:'placeholder.species.search.attributions')}" />
 			
 			<!-- label
 			class="control-label" for="aq.author">Species Author</label> <input data-provide="typeahead"
@@ -28,9 +31,11 @@
 			class="input-block-level" name="aq.year"
 			placeholder="Search using year of finding the species and basionym year" /-->
 
-		<label class="control-label" for="aq.text">Content</label> <input data-provide="typeahead" id="aq.text"
+		<label class="control-label" for="aq.text"><g:message code="default.content.label" /></label> <input data-provide="typeahead" id="aq.text"
 			type="text" class="input-block-level" name="aq.text" value="${(queryParams?.get('aq.text'))?.encodeAsHTML() }"
-			placeholder="Search all text content" />  <!-- label
+			placeholder="${g.message(code:'placeholder.search.content')}" />  
+
+		<!-- label
 			class="control-label" for="aq.reference">References</label> <input data-provide="typeahead"
 			type="text" class="input-block-level" name="aq.reference" value=""
 			placeholder="Field to search all references" /-->
@@ -43,9 +48,9 @@
 		
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
-			value="ALL"> Search in all groups </label> <label
+			value="ALL"> <g:message code="default.search.in.all.groups" />  </label> <label
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-			value="THIS_GROUP"> Search within this group </label>
+			value="THIS_GROUP"> <g:message code="default.search.within.this.group" /> </label>
 		</div>
 
 <%--		<g:hiddenField name="start" value="0" />--%>
@@ -58,12 +63,13 @@
 	</form>
 	<div class="form-action">
 		<button type="submit" id="advSearch"
-			class="btn btn-primary pull-right">Search</button>
+			class="btn btn-primary pull-right"><g:message code="default.search" /></button>
 	</div>
 
 
 <div class="clearfix"></div>
 </div>
+
 <r:script>
 
 $(document).ready(function() {

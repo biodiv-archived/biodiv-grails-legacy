@@ -25,9 +25,9 @@
         <div id="home" class="observation  span12">
 
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
-                <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;">Welcome to ${grailsApplication.config.speciesPortal.app.siteName}</h2>
+                <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;"><g:message code="index.welcome" /> ${grailsApplication.config.speciesPortal.app.siteName}</h2>
                 <p style="line-height:1.5">${grailsApplication.config.speciesPortal.app.homepageDescription}
-                
+                <a href="about"><g:message code="link.more" /></a>
                 </p>
             </div>
         
@@ -73,14 +73,19 @@
             </div>
         </div>
 
+<<<<<<< HEAD
             <!-- <div class="navblock" style="margin-top:20px;">
                 <b><big>&nbsp;<a name="latestObservations">Latest Observations</a></big></b>
+=======
+            <div class="navblock" style="margin-top:20px;">
+                <b><big>&nbsp;<a name="latestObservations"><g:message code="index.button.latest.observations" /></a></big></b>
+>>>>>>> locale
                 <div class="sidebar_section" style="margin: 5px; overflow: hidden; background-color: white;">
                     <div class="jcarousel-skin-ie7" data-contextfreeurl="/observation/show&quot;" data-url="/observation/related" id="carousel_latestUpdatedObservations" style="clear: both; width: 880px; margin-top: 23px;">
                         <ul style="list-style: none; width: 880px; margin-left: 0px;">
                         </ul>
                         <div class="observation_links" style="margin-top: 5px; margin-bottom: 3px;">
-                            <a class="btn btn-mini" href="/observation/list?sort=lastRevised">Show all</a>
+                            <a class="btn btn-mini" href="/observation/list?sort=lastRevised"><g:message code="button.show.all" /></a>
                         </div>
                     </div>
                 </div>

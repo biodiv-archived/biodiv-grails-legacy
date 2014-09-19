@@ -45,30 +45,6 @@ import static species.participation.ChecklistService.*
  *
  */
 class ChecklistUtilService {
-	
-	def sessionFactory
-	
-	private void cleanUpGorm() {
-		cleanUpGorm(true)
-	}
-	
-	private void cleanUpGorm(boolean clearSession) {
-		
-	def hibSession = sessionFactory?.getCurrentSession();
-
-	if(hibSession) {
-		log.debug "Flushing and clearing session"
-		try {
-			hibSession.flush()
-		} catch(Exception e) {
-			e.printStackTrace()
-		}
-		if(clearSession){
-			hibSession.clear()
-		}
-	}
-}
-
 //    static transactional = false
 //	
 //	def grailsApplication

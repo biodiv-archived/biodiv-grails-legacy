@@ -70,6 +70,7 @@ class SpeciesUploadService {
     //prototype - A new service is created every time it is injected into another class
     static scope = "prototype"
 
+    def utilsService;
 	def grailsApplication;
 	def groupHandlerService;
 	def namesLoaderService;
@@ -77,7 +78,6 @@ class SpeciesUploadService {
 	def externalLinksService;
 	def speciesSearchService;
 	def namesIndexerService;
-	def observationService;
 	def springSecurityService
 	def speciesPermissionService;
 	def SUserService;
@@ -207,7 +207,7 @@ class SpeciesUploadService {
 		//writing log after upload
 		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
 		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " + res.log
-		File errorFile = observationService.createFile("ErrorLog.txt" , "species", contentRootDir);
+		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		errorFile.write(mylog)
 		
 		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
@@ -227,14 +227,14 @@ class SpeciesUploadService {
 			linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
 			linkParams["sort"] = "lastUpdated"
 			linkParams["user"] = springSecurityService.currentUser?.id
-			link = observationService.generateLink("species", "list", linkParams)
+			link = utilsService.generateLink("species", "list", linkParams)
 			otherParams["link"] = link
 			usersMailList.each{ user ->
 				def uml =[]
 				uml.add(user)
 				otherParams["curator"] = user.name
 				otherParams["usersMailList"] = uml
-				observationService.sendNotificationMail(observationService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+				utilsService.sendNotificationMail(utilsService.SPECIES_CURATORS,sp,null,null,null,otherParams)
 			}
 			
 			//sending mail to species contributor
@@ -242,7 +242,7 @@ class SpeciesUploadService {
 			otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
 			otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
 			otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
-			observationService.sendNotificationMail(observationService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
+			utilsService.sendNotificationMail(utilsService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
 		}
 		
 		def msg = ""
@@ -718,7 +718,7 @@ class SpeciesUploadService {
         println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
         fileName = fileName + "."+ext;
         println "===FILE NAME CREATED ================ " + fileName
-        File file = observationService.createFile(fileName , uploadDir, contentRootDir);
+        File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
         println "=== NEW MODIFIED SPECIES FILE === " + file
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new FileInputStream(xlsxFileUrl);
@@ -797,7 +797,14 @@ class SpeciesUploadService {
 		}
 		log.debug "Affected taxonomy registries " + tRegistries
 		
-		if(!sFields && !tRegistries){
+		List resourceList = Resource.withCriteria(){
+			and{
+				eq('uploader', user)
+				between("uploadTime", start, end)
+			}
+		}
+		
+		if(!sFields && !tRegistries && !resourceList){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback."
@@ -816,7 +823,7 @@ class SpeciesUploadService {
 		
 		Species.withTransaction{   
 			sList.each { s->
-				rollBackSpeciesUpdate(s, sFields, user, sbu)
+				rollBackSpeciesUpdate(s, sFields, resourceList, user, sbu)
 			}
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 		}
@@ -880,7 +887,7 @@ class SpeciesUploadService {
 		}
  	}
 	
-	private void rollBackSpeciesUpdate(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+	private void rollBackSpeciesUpdate(Species s, List sFields, List resources, SUser user, SpeciesBulkUpload sbu) throws Exception {
 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
 		List sFieldToDelete = specificSFields.intersect(sFields)
 		
@@ -916,6 +923,14 @@ class SpeciesUploadService {
 		taxonReg.each { tr ->
 			log.debug "Deleting  $tr"
 			tr.delete(flush:true)
+		}
+		
+		s.resources.each { res ->
+			if(resources.contains(res)){
+				log.debug "Removing resource " + res
+				s.removeFromResources(res)
+				resources.remove(res)
+			}
 		}
 		
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;

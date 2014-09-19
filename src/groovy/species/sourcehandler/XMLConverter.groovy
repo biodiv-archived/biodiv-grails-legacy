@@ -144,7 +144,8 @@ class XMLConverter extends SourceConverter {
                             log.info "Merging with already existing species information : "+existingSpecies.id;
                             //mergeSpecies(existingSpecies, s);
                             s = existingSpecies;
-                            s.resources?.clear();
+							//XXX: not removing resources so if same spreadsheet uploaded multiple times will see duplicate images
+                            //s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
                             addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)

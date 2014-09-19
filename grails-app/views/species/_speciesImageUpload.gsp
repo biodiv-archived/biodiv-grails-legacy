@@ -1,9 +1,9 @@
 <div class="tabbable speciesImage-wrapper " style="display:none;">
     <ul class="nav nav-tabs" id="speciesImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
-            <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab">Add Observation Media</a></li>
-            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab">Upload/Edit Media</a></li>
-            <li id="speciesImage-li2"><a href="#speciesImage-tab2" class="btn" data-toggle="tab">Add Species Field Media</a></li>   
+            <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab"><g:message code="speciesimageupload.add.observation.images" /></a></li>
+            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab"><g:message code="speciesimageupload.upload.edit.images" /></a></li>
+            <li id="speciesImage-li2"><a href="#speciesImage-tab2" class="btn" data-toggle="tab"><g:message code="speciesimageupload.species.field.images" /></a></li>   
         </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
@@ -15,7 +15,7 @@
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromRelatedObv']"></obv:addPhotoWrapper>
                     <a id="pullObvImagesBtn" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Pull Images </a>
+                        style="float: right; margin-right: 5px;"><g:message code="speciesimageupload.pull.images" />  </a>
                 </form>
                    
             </div>
@@ -24,7 +24,7 @@
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
                     <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Save </a>
+                        style="float: right; margin-right: 5px;"> <g:message code="button.save" /> </a>
 
                 </form>
                 <%
@@ -33,7 +33,7 @@
                 def obvDir = obvTmpFileName ?  obvTmpFileName.substring(obvTmpFileName.lastIndexOf("/"), obvTmpFileName.size()) : ""
                 %>
                 <form class="upload_resource ${hasErrors(bean: speciesInstance, field: 'resources', 'errors')}" 
-                    title="Add a photo for this observation"
+                    title="${g.message(code:'title.checklist.create')}"
                     method="post">
                     <span class="msg" style="float: right"></span>
                     <input class="videoUrl" type="hidden" name='videoUrl'value="" />
@@ -47,7 +47,7 @@
                     <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
                     <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromSpeciesField']"></obv:addPhotoWrapper>
                     <a id="pullSpeciesFieldImagesBtn" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Pull Images </a>
+                        style="float: right; margin-right: 5px;"> <g:message code="speciesimageupload.pull.images" /> </a>
                 </form>
                    
             </div>

@@ -12,6 +12,7 @@ class ActivityFeedController {
 	
 	def activityFeedService;
 	def springSecurityService;
+	def messageSource;
 	
 	def getFeeds(){
 		//log.debug params;
@@ -64,13 +65,13 @@ class ActivityFeedController {
         def msg
 		if(params.follow.toBoolean()){
 			Follow.addFollower(domainObj, author)
-			msg = "Followed..."
+			msg = messageSource.getMessage("default.followed", null, request.locale)
 			if(!author.sendNotification){
-				msg += " Please turn on notification mail from your profile page."
+				msg += messageSource.getMessage("default.turn.notification", null, request.locale)
 			}
 		}else{
 			Follow.deleteFollower(domainObj, author)
-			msg = "Unfollowed..."
+			msg = messageSource.getMessage("default.unfollowed", null, request.locale)
 		}
 		def r = [status:'success']
 		r['msg']= msg 
