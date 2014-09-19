@@ -82,7 +82,7 @@ class ObservationsSearchService extends AbstractSearchService {
 
     /**
      */
-    private List<SolrInputDocument> getSolrDocument(Observation obv) {
+    public List<SolrInputDocument> getSolrDocument(Observation obv) {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         List docs = [];
         if(!obv.isDeleted) {

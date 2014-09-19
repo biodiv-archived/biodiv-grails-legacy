@@ -49,6 +49,7 @@ abstract class AbstractSearchService {
     *
     */
     protected boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
+        println "====COMMITING===== " + docs
         if(docs) {
             try {
                 solrServer.add(docs);
@@ -59,6 +60,7 @@ abstract class AbstractSearchService {
                     }
                     solrServer.commit();
                     log.info "Finished committing to ${this.getClass().getName()} solr core"
+                    println "======true====="
                     return true;
                 }
             } catch(SolrServerException e) {
@@ -67,6 +69,7 @@ abstract class AbstractSearchService {
                 e.printStackTrace();
             }
         }
+        println "=====end===="
         return false;
     }
 
@@ -118,6 +121,7 @@ abstract class AbstractSearchService {
      */
     def optimize() {
         log.info "Optimizing ${this.getClass().getName()} search index"
+        println "=========SOLR SEVER======== " + solrServer
         solrServer.optimize();
     }
 

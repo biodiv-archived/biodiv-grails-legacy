@@ -69,12 +69,12 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
-        compile ('org.apache.solr:solr-solrj:4.4.0') {
+        compile ('org.apache.solr:solr-solrj:4.10.0') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
 
         if (Environment.current == Environment.DEVELOPMENT) {
-            compile ('org.apache.solr:solr-core:4.4.0') {
+            compile ('org.apache.solr:solr-core:4.10.0') {
                 excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec', 'hadoop-hdfs', 'hadoop-auth', 'hadoop-annotations', 'hadoop-common'
             }
         }

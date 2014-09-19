@@ -92,14 +92,15 @@ beans = {
         //File f = new File( home, "solr.xml" );
         CoreContainer container = new CoreContainer("${configRoot.speciesPortal.app.rootDir}/solr");
         container.load() 
-
-        speciesSolrServer(EmbeddedSolrServer, container, "species" )
-        observationsSolrServer(EmbeddedSolrServer, container, "observations" );
-        newsletterSolrServer(EmbeddedSolrServer, container, "newsletters" );
-        projectSolrServer(EmbeddedSolrServer, container, "projects" );
+            
+        
+        speciesSolrServer(EmbeddedSolrServer, container, "biodiv" )
+        observationsSolrServer(EmbeddedSolrServer, container, "biodiv" );
+        newsletterSolrServer(EmbeddedSolrServer, container, "biodiv" );
+        projectSolrServer(EmbeddedSolrServer, container, "biodiv" );
         //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
-        documentSolrServer(EmbeddedSolrServer, container, "documents" );
-        usersSolrServer(EmbeddedSolrServer, container, "users" );
+        documentSolrServer(EmbeddedSolrServer, container, "biodiv" );
+        usersSolrServer(EmbeddedSolrServer, container, "biodiv" );
 
     } else {
         speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {

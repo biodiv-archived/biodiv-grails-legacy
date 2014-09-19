@@ -27,6 +27,7 @@ class BiodivAdminController {
     def groupHandlerService;
     def sessionFactory;
     def externalLinksService;
+    def biodivSearchService;
 
     /**
      * 
@@ -254,5 +255,17 @@ def user = {
     log.debug actionId
     render (template:"/admin/user/$actionId");
 }
+
+    def reloadBiodivSearchIndex = {
+        try {
+            biodivSearchService.publishSearchIndex();
+            biodivSearchService.optimize();
+            flash.message = "Successfully created biodiv search index"
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
 
 }
