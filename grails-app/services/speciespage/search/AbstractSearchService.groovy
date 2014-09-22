@@ -48,8 +48,7 @@ abstract class AbstractSearchService {
     /**
     *
     */
-    protected boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
-        println "====COMMITING===== " + docs
+    public boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
         if(docs) {
             try {
                 solrServer.add(docs);
@@ -60,7 +59,6 @@ abstract class AbstractSearchService {
                     }
                     solrServer.commit();
                     log.info "Finished committing to ${this.getClass().getName()} solr core"
-                    println "======true====="
                     return true;
                 }
             } catch(SolrServerException e) {
@@ -69,7 +67,6 @@ abstract class AbstractSearchService {
                 e.printStackTrace();
             }
         }
-        println "=====end===="
         return false;
     }
 
