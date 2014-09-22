@@ -47,14 +47,14 @@
    <field name="content" type="taxonText" indexed="true" multiValued="false" />
    <field name="member" type="taxonText" indexed="true" stored="true" multiValued="false" />
    <field name="license" type="string" indexed="true" multiValued="false" />
-   <field name="sp_overview" type="taxonText" indexed="true" multiValued="false" />
-   <field name="sp_nc" type="taxonText" indexed="true" multiValued="false" />
-   <field name="sp_nh" type="taxonText" indexed="true" multiValued="false" />
-   <field name="sp_hd" type="taxonText" indexed="true" multiValued="false" />
-   <field name="sp_dc" type="taxonText" indexed="true" multiValued="false" />
-   <field name="sp_um" type="taxonText" indexed="true" multiValued="false" />
-   <field name="sp_il" type="taxonText" indexed="true" multiValued="false" />
-   <field name="pages" type="taxonText" indexed="true" multiValued="false" />
+   <field name="sp_overview" type="taxonText" indexed="true" multiValued="true" />
+   <field name="sp_nc" type="taxonText" indexed="true" multiValued="true" />
+   <field name="sp_nh" type="taxonText" indexed="true" multiValued="true" />
+   <field name="sp_hd" type="taxonText" indexed="true" multiValued="true" />
+   <field name="sp_dc" type="taxonText" indexed="true" multiValued="true" />
+   <field name="sp_um" type="taxonText" indexed="true" multiValued="true" />
+   <field name="sp_il" type="taxonText" indexed="true" multiValued="true" />
+   <field name="pages" type="taxonText" indexed="true" multiValued="true" />
    <!--SHOULD this be ENUM-->
    <field name="doctype" type="string" indexed="true" multiValued="false" />
    

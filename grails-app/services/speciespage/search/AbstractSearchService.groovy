@@ -51,6 +51,7 @@ abstract class AbstractSearchService {
     public boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
         if(docs) {
             try {
+                println "=========SOLR===========" + solrServer
                 solrServer.add(docs);
                 if(commit) {
                     //commit ...server is configured to do an autocommit after 10000 docs or 1hr

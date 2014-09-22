@@ -4,6 +4,9 @@ import species.participation.Observation
 import species.Species
 import content.eml.Document
 import species.auth.SUser;
+import utils.Newsletter;
+import content.Project
+import species.groups.UserGroup;
 
 
 class BiodivSearchService extends AbstractSearchService {
@@ -12,6 +15,8 @@ class BiodivSearchService extends AbstractSearchService {
     def speciesSearchService
     def documentSearchService
     def SUserSearchService
+    def newsletterSearchService
+    def userGroupSearchService
 
     int BATCH_SIZE = 10;
 
@@ -32,6 +37,9 @@ class BiodivSearchService extends AbstractSearchService {
         modules["species"] = Species.list(max: limit);
         modules["document"] = Document.list(max:limit);
         modules["users"] = SUser.findAll("from SUser as u where u.accountLocked =:ae and u.accountExpired =:al and u.enabled=:en", [ae:false, al:false, en:true], [max:limit, offset:offset, sort: "id"]);
+        modules["projects"] = Project.list(max:limit, offset:offset);
+        modules["newsletters"] = Newsletter.list(max:limit, offset:offset);
+        modules["userGroups"] = UserGroup.list(max:limit, offset:offset);
         println "=====MODULES======== " + modules
         if(!publishSearchIndex(modules, true)) {
             log.error "FAILED to publish biodiv search index"
@@ -62,6 +70,9 @@ class BiodivSearchService extends AbstractSearchService {
         def sps = modules["species"];
         def documents = modules["document"];
         def users = modules["users"];
+        //def projects = modules["projects"];
+        def newsletters = modules["newsletters"];
+        def userGroups = modules["userGroups"];
         println "===OBV======== "
         def f1 = observationsSearchService.publishSearchIndex(obvs, commit);
         println "===SP========"
@@ -70,6 +81,12 @@ class BiodivSearchService extends AbstractSearchService {
         def f3 = documentSearchService.publishSearchIndex(documents, commit)
         println "===USER========"
         def f4 = SUserSearchService.publishSearchIndex(users, commit)
+        println "===NEWSLETTER========"
+        def f5 = newsletterSearchService.publishSearchIndex(newsletters, commit)
+        println "=====USER GROUP==== " + userGroups
+        def f6 = userGroupSearchService.publishSearchIndex(userGroups, commit)
+
+        println "===DONE========"
         /*obvs.each { obv ->
             log.debug "Reading observation : "+obv.id;
             List ds = observationsSearchService.getSolrDocument(mod);

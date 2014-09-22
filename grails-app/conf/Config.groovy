@@ -406,6 +406,14 @@ speciesPortal {
 		USERNAME = "username"
 		ABOUT_ME = "about_me"
 		LAST_LOGIN = "lastlogindate"
+        SP_OVERVIEW = "sp_overview"
+        SP_NC = "sp_nc"
+        SP_NH = "sp_nh"
+        SP_DC = "sp_dc"
+        SP_IL = "sp_il"
+        SP_HD = "sp_hd"
+        SP_UM = "sp_um"
+        PAGES = "pages"
 	}
 
 	nameSearchFields {

@@ -87,7 +87,8 @@ class ObservationsSearchService extends AbstractSearchService {
         List docs = [];
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
-            doc.addField(searchFieldsConfig.ID, obv.id.toString());
+            println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
+            doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
             addNameToDoc(obv, doc);
 
             doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);

@@ -62,7 +62,8 @@ class DocumentSearchService extends AbstractSearchService {
 			log.debug "Reading Document : "+document.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, document.id.toString());
+                println "=====ID======== " + document.class.simpleName +"_"+document.id.toString()
+				doc.addField(searchFieldsConfig.ID,document.class.simpleName +"_"+ document.id.toString());
 				doc.addField(searchFieldsConfig.TITLE, document.title);
 				doc.addField(searchFieldsConfig.DESCRIPTION, document.notes);
 				doc.addField(searchFieldsConfig.TYPE, document.type.value());

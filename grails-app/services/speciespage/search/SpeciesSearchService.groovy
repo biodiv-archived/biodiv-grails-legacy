@@ -74,7 +74,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		species.each { s ->
 			log.debug "Reading Species : "+s.id;
 			SolrInputDocument doc = new SolrInputDocument();
-			doc.addField(searchFieldsConfig.ID, s.id.toString());
+			doc.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
 			doc.addField(searchFieldsConfig.GUID, s.guid);
 			addNameToDoc(doc, s.taxonConcept);
 
@@ -129,6 +129,41 @@ class SpeciesSearchService extends AbstractSearchService {
 				if(field.description && copyDesc) {
 					message += field.description+" ";
 				}
+                
+                switch(concept) {
+                    case "Overview" :
+						doc.addField(searchFieldsConfig.SP_OVERVIEW, field.description);
+                    break
+
+                    case "Nomenclature and Classification" :
+						doc.addField(searchFieldsConfig.SP_NC, field.description);
+                    break
+
+                    case "Natural History" :
+						doc.addField(searchFieldsConfig.SP_NH, field.description);
+                    break
+
+                    case "Habitat and Distribution" :
+						doc.addField(searchFieldsConfig.SP_HD, field.description);
+                    break
+
+                    case "Demography and Conservation" :
+						doc.addField(searchFieldsConfig.SP_DC, field.description);
+                    break
+
+                    case "Uses and Management" :
+						doc.addField(searchFieldsConfig.SP_UM, field.description);
+                    break
+
+                    case "Information Listing" :
+						doc.addField(searchFieldsConfig.SP_IL, field.description);
+                    break
+
+                    default:
+                    log.info "Not indexing this concept ${concept} separately"
+
+                }
+
 			}
 
 			s.resources.each { resource ->

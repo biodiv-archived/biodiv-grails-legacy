@@ -63,7 +63,8 @@ class SUserSearchService extends AbstractSearchService {
 		susers.each { suser ->
 			log.debug "Reading User : "+suser.id;
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, suser.id.toString());
+                println "=====ID======== " + suser.class.simpleName +"_"+suser.id.toString()
+				doc.addField(searchFieldsConfig.ID, suser.class.simpleName +"_"+suser.id.toString());
 				doc.addField(searchFieldsConfig.NAME, suser.name);
 				doc.addField(searchFieldsConfig.USERNAME, suser.username);
 				doc.addField(searchFieldsConfig.EMAIL, suser.email);
