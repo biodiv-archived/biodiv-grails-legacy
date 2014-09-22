@@ -7,7 +7,7 @@
 <g:set var="entityName"
 	value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
 
-<g:set var="title" value="Pages"/>
+<g:set var="title" value="${g.message(code:'ugroup.value.pages')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show" />
 </head>
@@ -26,8 +26,7 @@
 
 							<a
 								href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-								class="btn btn-info"> <i class="icon-plus"></i>Add
-								a Page</a>
+								class="btn btn-info"> <i class="icon-plus"></i><g:message code="default.add.page.label" /></a>
 						</sec:permitted>
 					</g:if>
 					<g:else>
@@ -35,7 +34,7 @@
 							<g:link
 								url="${uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'pageCreate')}"
 								class="btn  btn-info">
-								<i class="icon-plus"></i>Add a Page</g:link>
+								<i class="icon-plus"></i><g:message code="default.add.page.label" /></g:link>
 						</sUser:isAdmin>
 					</g:else>
 				</div>
@@ -50,12 +49,12 @@
 				<g:if test="${userGroupInstance}">
 					<g:link
 						url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'pages', 'userGroup':userGroupInstance)}"
-						class="btn btn-info">< Back to Pages</g:link>
+						class="btn btn-info">< ${g.message(code:'ugroup.pages.back')} </g:link>
 				</g:if>
 				<g:else>
 					<g:link
 						url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}"
-						class="btn btn-info">< Back to Pages</g:link>
+						class="btn btn-info">< ${g.message(code:'ugroup.pages.back')}</g:link>
 				</g:else>
 
 

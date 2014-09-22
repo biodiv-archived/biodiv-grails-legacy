@@ -3,13 +3,16 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="UserGroups "/>
+<g:set var="title" value="${g.message(code:'group.value.user')} "/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_list" />
 </head>
 <body>
 	<div class="span12">
-		<uGroup:showSubmenuTemplate   model="['entityName':'Groups']"/>
+    <%
+    def group=g.message(code:'default.groups.label')
+    %>
+		<uGroup:showSubmenuTemplate   model="['entityName':group]"/>
 		
 		
 		<div class="">

@@ -27,6 +27,8 @@ class BiodivAdminController {
     def groupHandlerService;
     def sessionFactory;
     def externalLinksService;
+    def messageSource;
+    def msg;
 
     /**
      * 
@@ -40,7 +42,7 @@ class BiodivAdminController {
     def setup = {
         try {
             setupService.setupDefs();
-            flash.message = "Successfully loaded all definitions"
+            flash.message = messageSource.getMessage("default.success.loaded", null, request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -52,10 +54,10 @@ class BiodivAdminController {
         int noOfInsertions = 0;
         try {
             noOfInsertions = speciesUploadService.loadData();
-            flash.message = "Added ${noOfInsertions} records"
+            flash.message = messageSource.getMessage("default.addNo.records", [noOfInsertions] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
-            flash.message = "Inserted ${noOfInsertions} records. Error while doing so ${e.getMessage()}"
+            flash.message = messageSource.getMessage("default.insert.record.error", [noOfInsertions,e.getMessage()] as Object[], request.locale)
         }
         redirect(action: "index")
     }
@@ -63,10 +65,10 @@ class BiodivAdminController {
     def loadNames = {
         try {
             taxonService.loadTaxon(true);
-            flash.message = "Finished loading names"
+            flash.message = messageSource.getMessage("default.admin.finished.loading", null, request.locale)
         } catch(e) {
             e.printStackTrace();
-            flash.message = "Error ${e.getMessage()}"
+            flash.message = messageSource.getMessage("default.admin.error", [e.getMessage()] as Object[], request.locale)
         }
 
         redirect (action:"index");
@@ -76,7 +78,7 @@ class BiodivAdminController {
         try {
             log.debug "Syncing names into recommendations"
             namesLoaderService.syncNamesAndRecos(false);
-            flash.message = "Successfully loaded all names into recommendations"
+            flash.message = messageSource.getMessage("default.admin.success.loaded.name", null, request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -90,7 +92,7 @@ class BiodivAdminController {
             //speciesSearchService.deleteIndex();
             speciesSearchService.publishSearchIndex();
             speciesSearchService.optimize();
-            flash.message = "Successfully created species search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['species'] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -103,7 +105,7 @@ class BiodivAdminController {
             //observationsSearchService.deleteIndex();
             observationsSearchService.publishSearchIndex();
             observationsSearchService.optimize();
-            flash.message = "Successfully created observations search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['observations'] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -116,7 +118,7 @@ class BiodivAdminController {
             //SUserSearchService.deleteIndex();
             SUserSearchService.publishSearchIndex();
             SUserSearchService.optimize();
-            flash.message = "Successfully created users search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['users'] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -129,7 +131,7 @@ class BiodivAdminController {
             //documentSearchService.deleteIndex();
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
-            flash.message = "Successfully created documents search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -140,7 +142,7 @@ class BiodivAdminController {
     def reloadNamesIndex = {
         try {
             namesIndexerService.rebuild();
-            flash.message = "Successfully created names index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['names'] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -152,7 +154,7 @@ class BiodivAdminController {
         int noOfUpdations = 0;
         try {
             noOfUpdations = groupHandlerService.updateGroups();
-            flash.message = "Successfully updated group associations for taxonConcepts ${noOfUpdations}"
+            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -163,7 +165,7 @@ class BiodivAdminController {
     def updateExternalLinks = {
         try {
             int noOfUpdations = externalLinksService.updateExternalLinks();
-            flash.message = "Successfully updated externalLinks for taxonConcepts ${noOfUpdations}"
+            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['externalLinks',noOfUpdations] as Object[], request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -174,7 +176,7 @@ class BiodivAdminController {
     def recomputeInfoRichness = {
         try {
             speciesService.computeInfoRichness();
-            flash.message = "Successfully updated species information richness"
+            flash.message = messageSource.getMessage("default.admin.success.updated.richness", null, request.locale)
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()

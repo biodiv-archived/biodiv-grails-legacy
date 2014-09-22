@@ -34,7 +34,7 @@
 
 <g:elseif test="${r.type == ResourceType.VIDEO}">
 <% isaudioResource = 1 %>
-    <a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
+    <a href="${r.url }"><span class="video galleryImage"><g:message code="link.watch.in.youtube" /></span></a>
     <g:imageAttribution model="['resource':r]" />
 </g:elseif>
 <g:elseif test="${r.type == ResourceType.AUDIO}">                                                                    
@@ -69,7 +69,7 @@
                 <g:if test="${r.type == ResourceType.AUDIO}">
                     <%  tempVar = tempVar + 1 %>                                        
                     <li class="active" style="display: inline;">
-                        <a href="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.observations.serverURL)}" class="btn btn-small btn-success" >Audio ${tempVar}</a>
+                        <a href="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.observations.serverURL)}" class="btn btn-small btn-success" ><g:message code="link.audio" /> ${tempVar}</a>
                     </li>
                 </g:if>
             </g:each>
@@ -83,7 +83,7 @@
             <% audioResource = 1; %>
                 <audio controls style="float: right;padding: 8px 0px;width: 100%;">                                              
                   <source src="${createLinkTo(file: r.fileName, base:grailsApplication.config.speciesPortal.observations.serverURL)}" type="audio/mpeg">
-                    Your browser does not support the audio element.
+                    <g:message code="error.doesnot.support.audio" />
                 </audio>
             <g:if test="${isaudioResource == 0}" >
                  <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />

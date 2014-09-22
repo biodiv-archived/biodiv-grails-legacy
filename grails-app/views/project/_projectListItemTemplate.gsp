@@ -21,7 +21,7 @@
 
 	<g:if test="${projectInstance.granteeOrganization}">
 		<div class="proj-grantee" style="padding-top: 10px;">
-			<b> Grantee :</b>
+			<b> <g:message code="default.grantee.label" /> :</b>
 			${raw(projectInstance.granteeOrganization)}
 		</div>
 
@@ -29,7 +29,7 @@
 	
 	<g:if test="${projectInstance.proposalFiles}">
 		<div class="file-image">
-			Project Proposal
+			<g:message code="heading.project.proposal" />
 		</div>
 
 	</g:if>
@@ -37,13 +37,13 @@
 	<g:if test="${projectInstance.reportFiles}">
 	
 		<div class="file-image">	
-				Project Report
+				<g:message code="heading.project.report" />
 		</div>
 
 	</g:if>
 	
 	<g:if test="${projectInstance.miscFiles}">
-		<div class="file-image">Miscellaneous</div>
+		<div class="file-image"><g:message code="heading.miscellaneous" /></div>
 
 
 	</g:if>

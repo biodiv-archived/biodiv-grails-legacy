@@ -3,14 +3,14 @@
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
-<g:set var="title" value="Newsletter"/>
+<g:set var="title" value="${g.message(code:'title.value.newsletter')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="core" />
 </head>
 <body>
 	<div class="span9">
 		<div class="page-header">
-			<h1>Edit</h1>
+			<h1><g:message code="button.edit" /></h1>
 		</div>
 		
 		<div class="tabbable">
@@ -76,7 +76,7 @@
 						value="Update" /> </span> <span class="button"> <a
 						class="btn btn-danger" style="float: right; margin-right: 5px;"
 						href="${uGroup.createLink(controller:'newsletter', action:'delete', id:newsletterInstance.id)}"
-						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete
+						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><g:message code="button.delete" />
 					</a> </span>
 				</div>
 			</form>

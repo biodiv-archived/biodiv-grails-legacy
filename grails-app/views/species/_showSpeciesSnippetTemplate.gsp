@@ -27,7 +27,7 @@
     <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
 </g:if>
 <div class="snippet">
-    <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" title="${(featureCount>0) ? 'Featured':''}">
+    <span class="badge ${speciesInstance.fetchSpeciesGroup().iconClass()} ${(featureCount>0) ? 'featured':''}" title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
                 </span>
 
     <div class="figure pull-left observation_story_image"
@@ -41,7 +41,7 @@
 			<g:else>
 				<img class="img-polaroid"
 					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-					title="You can contribute!!!" />
+					title="${g.message(code:'showobservationsnippet.title.contribute')}" />
 			</g:else>
 		</g:link>
 	</div>

@@ -4,9 +4,9 @@
 
 <div id="taxonHierarchyInputForm" class="control-group hide">
     <label
-        class="control-label span3">Taxon Hierarchy</label> 
+        class="control-label span3"><g:message code="default.taxon.hierarchy.label" /></label> 
     <div id="taxonHierachyInput" class = "span8">
-        <div id="existingHierarchies" class="hide" ><div>Following hierarchies already exist for the given name.</div></div>
+        <div id="existingHierarchies" class="hide" ><div><g:message code="createtaxonregtemp.hierarchies.already.exist" /></div></div>
     </div>
 </div>
 

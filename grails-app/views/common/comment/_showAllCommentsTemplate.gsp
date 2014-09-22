@@ -8,7 +8,7 @@
    		</ul>
 		<input type="hidden" name='olderTimeRef' value="${olderTimeRef}"/>
 		<g:if test="${(totalCount - comments.size()) > 0}" >
-			<a class="yj-thread-replies-container yj-show-older-replies" href="#" title="show replies" onclick='loadOlderComment($(this).closest(".comment"), "${commentType}", "${commentHolder.id}", "${ActivityFeedService.getType(commentHolder)}", "${rootHolder.id}", "${rootHolder.class.getCanonicalName()}", "${createLink(controller:'comment',  action:'getComments')}");return false;'>Show ${totalCount - comments.size()} older comments >></a>
+			<a class="yj-thread-replies-container yj-show-older-replies" href="#" title="${g.message(code:'showallcomments.show.replies')}" onclick='loadOlderComment($(this).closest(".comment"), "${commentType}", "${commentHolder.id}", "${ActivityFeedService.getType(commentHolder)}", "${rootHolder.id}", "${rootHolder.class.getCanonicalName()}", "${createLink(controller:'comment',  action:'getComments')}");return false;'><g:message code="link.show" /> ${totalCount - comments.size()} <g:message code="showallcommentstemplate.older.comments" /> >></a>
 		</g:if>
 	</g:if>
 </div>

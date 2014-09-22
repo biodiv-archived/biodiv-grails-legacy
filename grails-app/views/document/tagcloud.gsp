@@ -2,7 +2,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="Document Tags"/>
+<g:set var="title" value="${g.message(code:'title.value.document')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="core" />
 </head>

@@ -5,12 +5,11 @@
 <%@page import="species.Species"%>
 <div>
     <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField' && resourceListType != 'usersResource'}"
-    <i class="icon-picture"></i><span>Upload photos of a
-        single observation and species and rate images inorder to order them.</span>
+    <i class="icon-picture"></i><span><g:message code="text.upload.photos" /></span>
 
     </g:if>
     <g:if test="${resourceListType == 'usersResource'}"
-    <i class="icon-picture"></i><span style="font-weight:bold;margin-left:2px;">My Uploads</span> <span> (Uploaded media will be stored for a period of 20 days. Media with red border will be deleted in 1 day.)</span>
+    <i class="icon-picture"></i><span style="font-weight:bold;margin-left:2px;"><g:message code="button.my.uploads" /></span> <span> <g:message code="text.stored.period" /></span>
     <a style="margin-bottom:3px;" class="pull-right sortMediaOnExif btn" onclick='sortMediaOnExif()'>Sort by EXIF date</a>
     </g:if>
 
@@ -33,7 +32,7 @@
             </g:if>
             <input class="resourceListTypeFilled" type="hidden" name='resourceListType' value="${resourceListType}" /> 
             <g:if test="${resourceListType == 'fromRelatedObv'}" >
-            <a style="margin-right: 5px;" class="relatedObvLoadMore btn" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" , this )'>Load More</a>
+            <a class="btn" style="margin-right: 5px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}" )'><g:message code="msg.load.more" /></a>
             </g:if>
         </ul>
         <div class="image-resources-msg help-inline">

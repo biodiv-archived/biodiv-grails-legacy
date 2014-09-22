@@ -46,7 +46,7 @@
         onDelete : function(e) {
             e.stopPropagation();
             e.preventDefault();
-            var c = confirm('You are about to delete some content. Are you sure?');
+            var c = confirm(window.i8ln.species.abstracteditabletype.del);
             if(c == true) {
 
                 var $conEntry = $(e.currentTarget).parent();
@@ -278,7 +278,7 @@
             var $errorBlock = $form? $form.find('.editable-error-block') : $('<div class="errors"></div>').appendTo($container);
 
             if(data.errors && data.errors.length > 0) {
-                data.msg += "<div class='alert-error'>Please fix following errors</div><ul class='alert-error'>";
+                data.msg += "<div class='alert-error'>window.i8ln.species.abstracteditabletype.er</div><ul class='alert-error'>";
                 $.each(data.errors, function(i, v) {
                     data.msg += "<li>"+v+"</li>"
                 });
@@ -332,12 +332,12 @@
         onUpdateError : function(response, status, error) {
             var successHandler = this.success, errorHandler;
             handleError(response, undefined, undefined, function(data){
-                return "Please resubmit the form again";
+                return window.i8ln.species.abstracteditabletype.re;
             }, function(data) {
                 if(data && data.status == 401) {
-                    return "Please login and resubmit the changes"; 
+                    return window.i8ln.species.abstracteditabletype.sub; 
                 } else if(response.status === 500) {
-                    return 'Service unavailable. Please try later.';
+                    return window.i8ln.species.abstracteditabletype.un;
                 } else {
                     return response.responseText;
                 }

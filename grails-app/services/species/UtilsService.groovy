@@ -24,6 +24,7 @@ class UtilsService {
     def sessionFactory
     def mailService;
     def springSecurityService
+ //   def activityFeedService
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_RECOMMENDED = "speciesRecommended";

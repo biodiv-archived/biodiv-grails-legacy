@@ -123,6 +123,7 @@ class SUserController extends UserController {
 	}
 
 	def show() {
+		def msg
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
         }
@@ -134,11 +135,13 @@ class SUserController extends UserController {
 
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
-                render (['success':false, 'msg':"Id is required"] as JSON)
+            	msg = messageSource.getMessage("id.required", ['Id'] as Object[], request.locale)
+                render (['success':false, 'msg':msg] as JSON)
                 return
             } else {
                 if (!SUserInstance) {
-                    render (['success':false, 'msg':"Coudn't find user with id ${params.id}"] as JSON)
+                	msg = messageSource.getMessage("default.not.find.by.id", ['user',params.id] as Object[], request.locale)
+                    render (['success':false, 'msg':msg] as JSON)
                     return
                 } else {
                     def result = [:];
@@ -819,7 +822,8 @@ class SUserController extends UserController {
                         def formattedMessage = messageSource.getMessage(it, null);
                         errors << [field: it.field, message: formattedMessage]
                     }
-                    render (['success' : false, 'msg':'Failed to reset password', 'errors':errors] as JSON); 
+                    msg = messageSource.getMessage("reset.password.fail", null, request.locale)
+                    render (['success' : false, 'msg':msg, 'errors':errors] as JSON); 
                     return
                 } else {
     				return [command: command2]
@@ -831,10 +835,10 @@ class SUserController extends UserController {
 				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
 				user.password = command2.password
 				if(!user.save()) {
-					msg = "Error saving password"
+					msg = msg = messageSource.getMessage("password.errors.save", null, request.locale)
 				} else {
                     success = true;
-					msg = "Successfully updated password"
+					msg = messageSource.getMessage("password.update.success", null, request.locale)
                 }
 			}
 

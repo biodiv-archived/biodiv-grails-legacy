@@ -64,6 +64,10 @@ ALTER TABLE document RENAME COLUMN date_created TO created_on;
 ALTER TABLE document RENAME COLUMN last_updated TO last_revised;
 ALTER TABLE document RENAME COLUMN description TO notes;
 
+/** 19th Septembaer 2014 for language */
+ALTER TABLE observation ADD language_id bigint;
+ALTER TABLE resource ADD language_id bigint;
+
 /** After updating code */
 update document set geo_privacy = false;
 update document set latitude = 0.0 where latitude is null;
