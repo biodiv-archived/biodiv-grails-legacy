@@ -65,7 +65,6 @@ class SpeciesService extends AbstractObjectService  {
     def externalLinksService;
     def speciesSearchService;
     def namesIndexerService;
-    def observationService;
     def speciesPermissionService;
     def taxonService;
     def activityFeedService;
@@ -193,7 +192,7 @@ class SpeciesService extends AbstractObjectService  {
 
         if(params.sGroup) {
             params.sGroup = params.sGroup.toLong()
-            def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+            def groupId = getSpeciesGroupIds(params.sGroup)
             if(!groupId){
                 log.debug("No groups for id " + params.sGroup)
             } else{
@@ -1384,7 +1383,7 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         if(params.featureBy == "true" ) {
-            params.userGroup = observationService.getUserGroup(params)
+            params.userGroup = utilsService.getUserGroup(params)
             // def featureQuery = ", Featured feat "
             //query += featureQuery;
             //countQuery += featureQuery

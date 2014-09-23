@@ -46,7 +46,7 @@ class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-	def observationService
+	def utilsService
     def springSecurityService;
     def grailsApplication
     def speciesUploadService;
@@ -101,7 +101,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = observationService.createFile(originalFilename, params.uploadDir,contentRootDir)
+			File uploaded = utilsService.createFile(originalFilename, params.uploadDir,contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
@@ -165,7 +165,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = observationService.createFile(originalFilename, params.uploadDir, contentRootDir)
+			File uploaded = utilsService.createFile(originalFilename, params.uploadDir, contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 
@@ -257,36 +257,6 @@ class UFileController {
             redirect controller: params.errorController, action: params.errorAction
             return
         }
-    }
-
-    def saveModifiedSpeciesFile = {
-        //log.debug params
-        File file = speciesUploadService.saveModifiedSpeciesFile(params);
-        if(file) {
-            return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html') 
-        } else {
-            println "======SAVE MODIFIED SPECIES FILE CALLED BUT NO FILE ======= " + params
-            return
-        }
-        /*
-        if (f.exists()) {
-            println "here here===================="
-            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
-            response.setContentType("application/octet-stream")
-            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
-            response.outputStream << f.readBytes()
-            response.outputStream.flush()
-            println "==YAHAN HUN == " 
-            return render(text: [success:true] as JSON, contentType:'text/html')
-        } else {
-            println "in else================"
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
-            log.error msg
-            flash.message = msg
-            redirect controller: params.errorController, action: params.errorAction
-            return
-        }
-        */
     }
 
     def downloadSpeciesFile = {
@@ -547,7 +517,7 @@ class UFileController {
     private Map convertExcelToCSV(File uploaded, params ) {
         def compContent
         def spread
-        File outCSVFile = observationService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
+        File outCSVFile = utilsService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
         boolean isSimpleSheet = detectSheetType(uploaded)
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);

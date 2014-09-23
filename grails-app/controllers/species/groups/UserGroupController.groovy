@@ -31,6 +31,7 @@ class UserGroupController {
 
 	def mailService;
 	def aclUtilService;
+	def utilsService;
 	def observationService;
 	def emailConfirmationService;
 	def namesIndexerService;
@@ -907,7 +908,7 @@ class UserGroupController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(userGroupDir, Utils.generateSafeFileName(f.originalFilename));
+						File file = utilsService.getUniqueFile(userGroupDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, userGroupDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);

@@ -20,7 +20,7 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 	private static def log = Logger.getLogger(this)
 
 	def grailsApplication;
-
+/*
 	FacebookAuthToken build(HttpServletRequest request, String signedRequest) {
 		if (!signedRequest) {
 			return null
@@ -67,9 +67,8 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 			return it.name == cookieName
 		}
 	}
-
+*/
 	public getFBLoginCookie(HttpServletRequest request) {
-		String applicationId = getFacebookAppIdForDomain(request);
 		String cookieName = "fb_login"
 		log.debug "looking for cookie named $cookieName";
 		return request.cookies.find { Cookie it ->
@@ -77,7 +76,7 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 			return it.name == cookieName
 		}
 	}
-
+/*
 	String getAccessToken(String applicationId, String secret, String code) {
 		try {
 			String authUrl = "https://graph.facebook.com/oauth/access_token?client_id=$applicationId&redirect_uri=&client_secret=$secret&code=$code"
@@ -151,9 +150,9 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 		}
 		return null;
 	}
-
+*/
 	void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-		log.info("Cleanup Facebook cookies")
+/*		log.info("Cleanup Facebook cookies")
 		Cookie cookie = this.getAuthCookie(httpServletRequest)
 		if (cookie != null) {
 			cookie.maxAge = 0
@@ -161,7 +160,7 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 			cookie.domain = "."+Utils.getIBPServerCookieDomain();
 			httpServletResponse.addCookie(cookie)
 		}
-
+*/
 		Cookie cookie2 = this.getFBLoginCookie(httpServletRequest)
 		if (cookie2 != null) {
 			cookie2.maxAge = 0

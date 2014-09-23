@@ -28,6 +28,7 @@ class Checklists extends Observation {
 	
 	def activityFeedService;
 	def obvUtilService;
+	def utilsService;
 	
 	String title;
 	int speciesCount = 0;
@@ -160,7 +161,7 @@ class Checklists extends Observation {
 		cl.userGroups.collect{ ug.add(it.name)}
 		metaDataList.add([keyPrefix + "userGroups" + SEPARATOR,  ug.join(", ")])
 		
-		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_URL + SEPARATOR, obvUtilService.createHardLink('user', 'show', cl.author.id)])
+		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_URL + SEPARATOR, utilsService.createHardLink('user', 'show', cl.author.id)])
 		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_NAME + SEPARATOR, cl.author.name])
 		
 		res[META_DATA] = metaDataList

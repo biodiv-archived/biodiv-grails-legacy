@@ -35,6 +35,7 @@ import species.participation.Observation;
 import species.Species;
 import speciespage.ObservationService;
 import species.participation.UsersResource;
+import species.UtilsService;
 
 class ResourcesService extends AbstractObjectService {
 
@@ -88,7 +89,7 @@ class ResourcesService extends AbstractObjectService {
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
-			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			def groupId = getSpeciesGroupIds(params.sGroup)
 			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			}else{
@@ -235,7 +236,7 @@ class ResourcesService extends AbstractObjectService {
         if(usersList.size() > 0) {
             otherParams['usersList'] = usersList
             def sp = new Species();
-            observationService.sendNotificationMail(ObservationService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
+            utilsService.sendNotificationMail(UtilsService.REMOVE_USERS_RESOURCE, sp, null, "", null, otherParams)
         }
     }
 

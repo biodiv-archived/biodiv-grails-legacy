@@ -8,8 +8,9 @@ class CommentService {
 	static transactional = false
 	
 	def grailsApplication
+    def springSecurityService
 	def activityFeedService
-	def observationService
+    def utilsService
 	def userGroupService
 	
 	def addComment(params){
@@ -53,6 +54,7 @@ class CommentService {
 			return ['success': false]
 		}else{
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
+<<<<<<< HEAD
 			def feedInstance;
 			if(!params.commentId){				
 				feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
@@ -63,6 +65,10 @@ class CommentService {
 			if(tagUserIds){
 				userTagNofity(tagUserIds,domainObject,feedInstance,params.webaddress);
 			}
+=======
+			def feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
+			utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
+>>>>>>> biodiv2.0
 			return ['success': true, 'commentObj' :c]
 		}
 	}
@@ -174,5 +180,13 @@ class CommentService {
 		observationService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
 
 	}
+    def addRecoComment(commentHolder, rootHolder, recoComment){
+        recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
+        if(recoComment){
+            def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
+                commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName()]
+                addComment(m);
+        }
+    }
 
 }
