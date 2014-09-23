@@ -27,7 +27,7 @@
             </div>
             <div class="featured_notes linktext">
                 <div style="clear:both;">
-                    <b> <small>Featured on <b>${featuredNotesItem.createdOn.format('MMMMM dd, yyyy')}</b> as : </small></b>
+                    <b> <small><g:message code="text.featured.on" />  <b>${featuredNotesItem.createdOn.format('MMMMM dd, yyyy')}</b> <g:message code="text.as" /> </small></b>
                     ${featuredNotesItem.notes}
                 </div>
             </div>

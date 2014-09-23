@@ -8,7 +8,7 @@ def parentGroupId = ''
 %>
 <input type="hidden" class="userGroupsList" name="userGroupsList" value="${params.userGroupsList}" />
 <g:if test="${exclusiveUsergroups}">
-	<div>Share with either of these groups</div>
+	<div><g:message code="text.share.either.of.two.groups" /></div>
 	<div class="groupsWithSharingNotAllowed btn-group userGroups"
 		data-toggle="buttons-radio">
 		
@@ -60,7 +60,7 @@ def parentGroupId = ''
 </g:if>
 
 <g:if test="${exclusiveUsergroups && otherUsergroups}">
-	<div>or with any of these groups</div>
+	<div><g:message code="text.any.of.these.groups" /></div>
 </g:if>
 <div class="groupsWithSharingAllowed btn-group userGroups"
 	data-toggle="buttons-checkbox">

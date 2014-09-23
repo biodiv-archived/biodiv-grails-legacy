@@ -37,7 +37,7 @@
 														.addClass(
 																'alter alert-error')
 														.show();
-												alert('Error while processing the request.');
+												alert(window.i8ln.species.ajaxLogin.ewp);
 											}
 											updateLoginInfo();
 										});

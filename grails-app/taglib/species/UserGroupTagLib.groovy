@@ -383,13 +383,15 @@ class UserGroupTagLib {
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 
+
 		result.each {
 			switch(it.key.id) {
 				case founderRole.id :
-					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Founded', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+
+					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':g.message(code:'default.founded.label'), 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				case memberRole.id :
-					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Member of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':g.message(code:'suser.member.label'), 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				case expertRole.id :
                     out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Expert of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);

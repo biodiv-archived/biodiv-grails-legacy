@@ -293,6 +293,7 @@ class AbstractObjectService {
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
+                new Node(image, "language", params.locale_language);
                 //new Node(image, "resContext", resContext.getAt(key));
                 if( params.resourceListType == "ofObv" || params.resourceListType == "usersResource" ){
                     if(!params.author){

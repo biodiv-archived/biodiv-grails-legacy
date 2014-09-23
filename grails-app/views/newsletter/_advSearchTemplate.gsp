@@ -2,21 +2,21 @@
 <div class="block-tagadelic">
 	<form id="advSearchForm" method="get"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'newsletter', action:'search', userGroup:userGroupInstance) }"
-		title="Advanced Search" class="searchbox">
+		title="${g.message(code:'title.advanced.search')}" class="searchbox">
 
-		<label class="control-label" for="aq.name">Title</label> <input id="aq.name"
+		<label class="control-label" for="aq.name"><g:message code="msg.Title" /> </label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${params['aq.name']?.encodeAsHTML() }"
-			placeholder="Search all titles" /> <label class="control-label"
-			for="aq.text">Content</label> <input data-provide="typeahead" id="aq.text"
+			placeholder="${g.message(code:'placeholder.search.titles')}" /> <label class="control-label"
+			for="aq.text"><g:message code="msg.Content" /> </label> <input data-provide="typeahead" id="aq.text"
 			type="text" class="input-block-level" name="aq.text"
-			value="${params['aq.text']?.encodeAsHTML() }" placeholder="Search all text content" />
+			value="${params['aq.text']?.encodeAsHTML() }" placeholder="${g.message(code:'placeholder.search.content')}" />
 	
 		<div id="uGroupFilter" style="${params.webaddress?:'display:none;'}">	
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
-			value="ALL"> Search in all groups </label> <label
+			value="ALL"> <g:message code="msg.msg.Search.in.all.groups" />  </label> <label
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-			value="THIS_GROUP"> Search within this group </label>
+			value="THIS_GROUP"> <g:message code="msg.msg.Search.within.this.group" /> </label>
 		</div>
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
@@ -28,7 +28,7 @@
 	</form>
 	<div class="form-action">
 		<button type="submit" id="advSearch"
-			class="btn btn-primary pull-right">Search</button>
+			class="btn btn-primary pull-right"><g:message code="msg.Search" /></button>
 	</div>
 	<div class="clearfix"></div>
 </div>

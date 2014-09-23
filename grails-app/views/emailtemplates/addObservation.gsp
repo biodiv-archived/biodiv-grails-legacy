@@ -34,16 +34,16 @@
 					<tr style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 						<td style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 							<p class="lead" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 10px;font-weight: normal;font-size: 14px;line-height: 1;">
-				Hi ${username},<br /><br />
+				<g:message code="msg.Hi" /> ${username},<br /><br />
 
 				<a href="${actorProfileUrl?: obvOwnUrl}"><img src="${currentUser?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
 
 				<g:set var="currentAction" value="${action}"></g:set>
 				<g:if test="${currentAction == 'downloadRequest'}">
-					Your 
+					<g:message code="msg.Your" /> 
 				</g:if>
 				<g:elseif test="${currentUser?.username == tousername}">
-					You 
+					<g:message code="msg.You" /> 
 				</g:elseif>
 				<g:else>
 					<g:if test="${currentAction == 'observationAdded' || currentAction == 'observationDeleted'}">
@@ -98,22 +98,22 @@
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
 
 								<g:if test="${domainObjectType == 'document' || currentAction == 'Document created'}">
-								 	The document can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+								 	<g:message code="msg.can.viewed " args="['document']"/> <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> <g:message code="msg.here" /> &raquo;</a> 
                                 </g:if>
 								<g:elseif  test="${currentAction == 'downloadRequest'}">
-									You can log into your profile <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a>
+									<g:message code="msg.log.into.profile" /> <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> <g:message code="msg.here" /> &raquo;</a>
                                 </g:elseif>
 								<g:elseif test="${domainObjectType == 'checklists'}">
-								 	The checklist can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+								 	<g:message code="msg.can.viewed " args="['checklist']"/> <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"><g:message code="msg.here" />  &raquo;</a> 
                                 </g:elseif>
 								<g:elseif test="${domainObjectType == 'species'}">
-								 	The species can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+								 	<g:message code="msg.can.viewed " args="['species']"/> <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> <g:message code="msg.here" /> &raquo;</a> 
 
                                 </g:elseif>
                                 <g:elseif test="${domainObjectType == 'usergroup' && action=='Added a comment'}">
-                                    <b>Subject</b> : ${commentInstance.subject?:'No Subject'}<br/>
-                                    <b>Message</b> : ${commentInstance.body} <br/>
-                                    <b>Group</b> :
+                                    <b><g:message code="msg.Subject" /></b> : ${commentInstance.subject?:'No Subject'}<br/>
+                                    <b><g:message code="msg.Message" /></b> : ${commentInstance.body} <br/>
+                                    <b><g:message code="msg.Group" /></b> :
                                     <span style="height: 30px; width: 186px; position: relative; background-color: #D4ECE3;  margin:2px 6px; " >
                                         <a href="${baseUrl}/group/${group.webaddress}"> 
                                             <img src="${group.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
@@ -131,17 +131,17 @@
                                         </a>   
                                     </span><br/>
                                     <br/>      
-                                    <b> By </b> : 
+                                    <b> <g:message code="msg.By" /> </b> : 
                                     <a href="${feedActorProfileUrl}"><img src="${feedInstance.author?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
                                     <a href="${feedActorProfileUrl}">${feedInstance.author.name}<a/><br/>
 
-                                    The discussion can be viewed <a href="${discussionUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+                                    <g:message code="msg.can.viewed " args="['discussion']"/> <a href="${discussionUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> <g:message code="msg.here" /> &raquo;</a> 
                                 </g:elseif>
 								<g:elseif test="${domainObjectType == 'newsletter'}">
-                                The page can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+                                <g:message code="msg.can.viewed " args="['page']"/> <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> <g:message code="msg.here" /> &raquo;</a> 
                                 </g:elseif>
 								<g:else>
-                                The ${domainObjectType} can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+                               <g:message code="msg.The" />  ${domainObjectType}<g:message code="msg.can.viewed " args="[' ']"/>  <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> <g:message code="msg.here" /> &raquo;</a> 
                                 </g:else>
 								</p><!-- /Callout Panel -->
 						</div>
@@ -172,22 +172,22 @@
 								<g:set var="common" value="${obvCName}"></g:set>
 
 								<g:if test="${scientific}"> 
-									<b>Scientific Name:</b> ${scientific} <br />
+									<b><g:message code="msg.Scientific.Name" /></b> ${scientific} <br />
 								</g:if>
 								<g:elseif test="${common}"> 
 								</g:elseif>
 								<g:else>
-									<b>Scientific Name:</b> Help Identify <br />
+									<b><g:message code="msg.Scientific.Name" /></b> Help Identify <br />
 								</g:else>
 
 
 								<g:if test="${common}"> 
-									<b>Common Name:</b> ${common}<br />
+									<b><g:message code="msg.Common.Name" /></b> ${common}<br />
 								</g:if>
 								<g:elseif test="${scientific}"> 
 								</g:elseif>
 								<g:else>
-									<b>Common Name:</b> Help Identify <br />
+									<b><g:message code="msg.Common.Name" /></b> <g:message code="msg.Help.Identify" /> <br />
 								</g:else>
                                 
 								<g:if test="${obvPlace || obvDate}"> 
@@ -208,14 +208,19 @@
 							<!-- Callout Panel -->
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
 
-									For more information, please visit the page <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;">here &raquo;</a>							
+									<g:message code="msg.For.more.visit" /> <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"><g:message code="msg.here" /> &raquo;</a>							
 							</p><!-- /Callout Panel -->
 				</div>
 			</div><!-- /COLUMN WRAP -->	
 </g:else>
 				<g:if test="${groups}">
+<<<<<<< HEAD
+				<div class="clear" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; clear: both; background-color: #D4ECE3;">
+					<a style="padding:0 2px"><g:message code="msg.member.following.groups" /> <a/><br />
+=======
                 <div class="clear" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; clear: both; background-color: #D4ECE3;">
                     <span style="padding:0 2px">The above ${domainObjectType} is a member of the following groups: <span/><br />
+>>>>>>> biodiv2.0
 						<g:each in="${groups}">
 							<div style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
 							    <a href="${baseUrl}/group/${it.webaddress}" style="text-decoration: none; color: #222222;"> 
@@ -272,7 +277,7 @@
 						<tr style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 							<td align="left" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 								<p style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 10px;font-weight: normal;font-size: 12px;line-height: 1;">
-									If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${userProfileUrl?:obvOwnUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;"><unsubscribe style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"> your profile</unsubscribe></a>
+									<g:message code="msg.unsubscribe" /> <a href="${userProfileUrl?:obvOwnUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;"><unsubscribe style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"> <g:message code="msg.your.profile" /></unsubscribe></a>
 								</p>
 							</td>
 						</tr>

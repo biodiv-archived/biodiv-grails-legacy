@@ -147,7 +147,7 @@ CKEDITOR.replace('summary', image_config);
 				</div>
 
 				<div class="span12 super-section">
-					<h3>Location</h3>
+					<h3><g:message code="default.location.label" /></h3>
 					<div id="locationsDiv">
 						<g:render template="locations"
 							model="['projectInstance':projectInstance]" />
@@ -158,7 +158,7 @@ CKEDITOR.replace('summary', image_config);
 
 				<div class=" span12 super-section">
 
-					<h3>Grantee Details</h3>
+					<h3><g:message code="heading.grantee.details" /></h3>
 					<div class="span5 section" style="margin-left:0px">
 
 						<div
@@ -228,7 +228,7 @@ CKEDITOR.replace('summary', image_config);
 
 				<div class="span12 super-section">
 					<div id="projectDetails" class="section span6" style="margin-left:0px;">
-					<h3>Project Details</h3>
+					<h3><g:message code="heading.project.details" /></h3>
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
 
@@ -279,7 +279,7 @@ CKEDITOR.replace('summary', image_config);
 			</div>
 
 			<div class="super-section">
-				<h3>Project Proposal</h3>
+				<h3><g:message code="heading.project.proposal" /></h3>
 
 				<div id="projectProposalSec">
 
@@ -322,7 +322,7 @@ CKEDITOR.replace('projectProposal', config);
 
 			<div class="super-section">
 
-				<h3>Project Report</h3>
+				<h3><g:message code="heading.project.report" /></h3>
 				<div id="projectReportSec" class="section">
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'projectReport', 'error')}">
@@ -360,7 +360,7 @@ CKEDITOR.replace('projectReport', config);
 
 
 			<div class="super-section">
-				<h3>Data Contribution</h3>
+				<h3><g:message code="heading.data.contribution" /> </h3>
 				<div id="data-links">
 					<g:render template="dataLinks"
 						model="['projectInstance':projectInstance]" />
@@ -371,7 +371,7 @@ CKEDITOR.replace('projectReport', config);
 
 
 			<div class="super-section">
-				<h3>Miscellaneous</h3>
+				<h3><g:message code="heading.miscellaneous" /></h3>
 				<div id="miscSec" class="section in collapse">
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'misc', 'error')}">

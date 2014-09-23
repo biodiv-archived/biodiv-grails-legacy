@@ -2,14 +2,14 @@
 
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-Hi ${user.name.capitalize()},
+<g:message code="msg.Hi" /> ${user.name.capitalize()},
 <br/><br/> 
 
 
-You have been granted permission as a ${permissionType.toLowerCase()} on species pages for the taxonomic level ${TaxonomyRank.list()[taxonConcept.rank].value()} : ${taxonConcept.name} on the ${domain}.<br/>
+<g:message code="msg.granted.permission" />${permissionType.toLowerCase()} <g:message code="msg.on.taxonomic.level" /> ${TaxonomyRank.list()[taxonConcept.rank].value()} : ${taxonConcept.name} <g:message code="msg.on.the" /> ${domain}.<br/>
 
-Please click <g:link href="${uGroup.createLink(controller:'species', action:'create', absolute:true)}">here</g:link> to begin creating content. 
+<g:message code="msg.Please.click" /> <g:link href="${uGroup.createLink(controller:'species', action:'create', absolute:true)}"><g:message code="msg.here" /></g:link> <g:message code="msg.to.begin" />  
 
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+<g:message code="msg.msg.Thank.you" /><br/>
+<g:message code="msg.msg.-The.portal.team" />
