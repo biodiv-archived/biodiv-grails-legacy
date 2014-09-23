@@ -23,7 +23,6 @@ import species.groups.UserGroup;
 
 class UserGroupSearchService extends AbstractSearchService {
 
-    def observationService;
 	/**
 	 * 
 	 */

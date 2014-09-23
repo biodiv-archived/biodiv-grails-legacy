@@ -23,7 +23,8 @@ abstract class AbstractSearchService {
     static transactional = false
 
     def grailsApplication;
-
+    def observationService;
+    
     protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     SolrServer solrServer;
 	SessionFactory sessionFactory;

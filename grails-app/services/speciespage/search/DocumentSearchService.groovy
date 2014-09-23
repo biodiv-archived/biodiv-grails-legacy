@@ -20,7 +20,6 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class DocumentSearchService extends AbstractSearchService {
     
-    def observationService;
 	
     /**
 	 *

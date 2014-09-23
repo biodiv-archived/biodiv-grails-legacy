@@ -25,7 +25,6 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class SpeciesSearchService extends AbstractSearchService {
 	
-    def observationService;
 	
     int BATCH_SIZE = 20;
 

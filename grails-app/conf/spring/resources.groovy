@@ -101,6 +101,7 @@ beans = {
         //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
         documentSolrServer(EmbeddedSolrServer, container, "biodiv" );
         usersSolrServer(EmbeddedSolrServer, container, "biodiv" );
+        biodivSolrServer(EmbeddedSolrServer, container, "biodiv" );
 
     } else {
         speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
@@ -186,15 +187,29 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             log.debug "Initialized search server to "+config.serverURL+"/users"
          }
+        
+    biodivSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/biodiv"
+         }
     }//end of initializing solr Server
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
         solrServer = ref('speciesSolrServer');
 		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
     }
     observationsSearchService(speciespage.search.ObservationsSearchService) {
         solrServer = ref('observationsSolrServer');
 		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
     }
     //checklistSearchService(speciespage.search.ChecklistSearchService) {
     //    solrServer = ref('checklistSolrServer');
@@ -202,18 +217,27 @@ beans = {
     newsletterSearchService(speciespage.search.NewsletterSearchService) {
         solrServer = ref('newsletterSolrServer');
 		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
         solrServer = ref('projectSolrServer');
 		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
         solrServer = ref('documentSolrServer');
 		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
     }
     SUserSearchService(speciespage.search.SUserSearchService) {
         solrServer = ref('usersSolrServer');
 		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
+    }
+    biodivSearchService(speciespage.search.BiodivSearchService) {
+        solrServer = ref('biodivSolrServer');
+		sessionFactory = ref("sessionFactory");
+        observationService = ref('observationService');
     }
 
     preAuthenticationChecks(DefaultPreAuthenticationChecks)

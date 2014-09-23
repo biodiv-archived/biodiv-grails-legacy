@@ -31,7 +31,6 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService extends AbstractSearchService {
 
-    def observationService;
     
     int BATCH_SIZE = 10;
 
