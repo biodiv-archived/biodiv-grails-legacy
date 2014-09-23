@@ -546,7 +546,6 @@ $(document).ready(function(){
     /**
      */
     $(".help-identify input").click(function(){
-        console.log($(this).closest('.section').find('.nameContainer input'));
         if ($(this).is(':checked')){
             $(this).closest('.addObservation').find('.nameContainer input').val('');
             $(this).closest('.addObservation').find('.nameContainer input').attr('disabled', 'disabled');

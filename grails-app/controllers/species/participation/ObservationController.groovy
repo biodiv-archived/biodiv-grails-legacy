@@ -603,8 +603,11 @@ class ObservationController extends AbstractObjectController {
 								type = ResourceType.AUDIO	
 								
 
-						}		
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
+						}
+                        if(pi)
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
+                        else 
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
 					}
 				}
 				
