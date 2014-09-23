@@ -1,19 +1,19 @@
 export JAVA_HOME=/apps/jdk1.7.0_51
 export JRE_HOME=/apps/jdk1.7.0_51/jre
-export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/apps/biodiv/solr"
-export PGDATA=/apps/biodiv/db
-export GRAILS_HOME=/apps/installers/grails-1.3.7
-export PATH=${JAVA_HOME}/bin:/apps/postgresql-9.3.2/bin:${GRAILS_HOME}/bin:/apps/apache-tomcat-7.0.52/bin:/apps/nginx-1.4.7/sbin:/apps/ruby/bin:${PATH}
-export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
+export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/apps/biodiv/solr  -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
 export CATALINA_OPTS="-Xms2048M -Xmx16384M"
-export CATALINA_OPTS="$CATALINA_OPTS \
--Dcom.sun.management.jmxremote=true \
-    -Dcom.sun.management.jmxremote.port=8086 \
-    -Dcom.sun.management.jmxremote.ssl=false \
-    -Dcom.sun.management.jmxremote.authenticate=false \
-    -Djava.rmi.server.hostname=10.0.0.11"
 
-#export CATALINA_BASE="/apps/apache-tomcat-7.0.52"
+export CATALINA_OPTS="$CATALINA_OPTS	\ 
+		  -Dcom.sun.management.jmxremote=true \
+                  -Dcom.sun.management.jmxremote.port=8086 \
+                 -Dcom.sun.management.jmxremote.ssl=false \
+                  -Dcom.sun.management.jmxremote.authenticate=false \
+                  -Djava.rmi.server.hostname=10.0.0.11"
+export PGDATA=/apps/biodiv/db
+export GRAILS_HOME=/apps/installers/grails-2.3.9
+export PATH=${JAVA_HOME}/bin:/apps/postgresql-9.3.2/bin:${GRAILS_HOME}/bin:/apps/apache-tomcat-7.0.54/bin:/apps/nginx-1.4.7/sbin:/apps/ruby/bin:${PATH}
+export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M"
+#export CATALINA_BASE="/apps/apache-tomcat-7.0.54"
 #export LOGGING_CONFIG="${CATALINA_BASE}/lib/log4j.properties"
 #export LOGGING_MANAGER=
 export GEOSERVER_DATA_DIR=/apps/biodiv/geoserver_data_dir
@@ -23,8 +23,8 @@ export BIODIV_CONFIG_LOCATION=/apps/biodiv/additional-config.groovy
 alias tstop='catalina.sh stop'
 alias tstart='catalina.sh start'
 alias gwar='cd /apps/git/biodiv;grails -Dgrails.env=kk war;cd -'
-alias cwar="cp /apps/git/biodiv/target/biodiv.war /apps/apache-tomcat-7.0.52/webapps/"
-alias tlog='tail -f /apps/apache-tomcat-7.0.52/logs/catalina.out'
+alias cwar="cp /apps/git/biodiv/target/biodiv.war /apps/apache-tomcat-7.0.54/webapps/"
+alias tlog='tail -f /apps/apache-tomcat-7.0.54/logs/catalina.out'
 
 
 
