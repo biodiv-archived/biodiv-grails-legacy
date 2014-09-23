@@ -23,6 +23,7 @@ import species.groups.UserGroup;
 
 class UserGroupSearchService extends AbstractSearchService {
 
+    def observationService;
 	/**
 	 * 
 	 */
@@ -66,6 +67,7 @@ class UserGroupSearchService extends AbstractSearchService {
 				SolrInputDocument doc = new SolrInputDocument();
                 println "=====ID======== " + ug.class.simpleName +"_"+ug.id.toString()
 				doc.addField(searchFieldsConfig.ID, ug.class.simpleName +"_"+ ug.id.toString());
+			    doc.addField(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
 				doc.addField(searchFieldsConfig.TITLE, ug.name);
 				//Location
                 //doc.addField(searchFieldsConfig.UPLOADED_ON, obv.date);
@@ -76,9 +78,14 @@ class UserGroupSearchService extends AbstractSearchService {
                 }
                 println "===ALL PAGES===== " + allPages 
                 doc.addField(searchFieldsConfig.PAGES, allPages);
-				//members
-                //doc.addField(searchFieldsConfig.TITLE, ug.name);
-				
+
+                String members = ""
+                List allMembers = observationService.getParticipants(ug)
+                allMembers.each { mem ->
+                    members += mem.name + " "
+                }
+                doc.addField(searchFieldsConfig.MEMBERS, members);
+                
                 docs.add(doc);
 			
 		}

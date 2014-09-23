@@ -31,6 +31,8 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService extends AbstractSearchService {
 
+    def observationService;
+    
     int BATCH_SIZE = 10;
 
     /**
@@ -89,6 +91,7 @@ class ObservationsSearchService extends AbstractSearchService {
             SolrInputDocument doc = new SolrInputDocument();
             println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
             doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
+			doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
             doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
@@ -125,6 +128,15 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
             doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
             doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
+
+            String members = ""
+            println "=========OBV SERVICE======== " + observationService
+            List allMembers = observationService.getParticipants(obv)
+            allMembers.each { mem ->
+                members += mem.name + " "
+            }
+            doc.addField(searchFieldsConfig.MEMBERS, members);
+
             //boolean geoPrivacy = false;
             //String locationAccuracy;
             obv.tags.each { tag ->

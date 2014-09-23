@@ -25,7 +25,9 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class SpeciesSearchService extends AbstractSearchService {
 	
-	int BATCH_SIZE = 20;
+    def observationService;
+	
+    int BATCH_SIZE = 20;
 
 	/**
 	 * 
@@ -75,6 +77,7 @@ class SpeciesSearchService extends AbstractSearchService {
 			log.debug "Reading Species : "+s.id;
 			SolrInputDocument doc = new SolrInputDocument();
 			doc.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
+			doc.addField(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
 			doc.addField(searchFieldsConfig.GUID, s.guid);
 			addNameToDoc(doc, s.taxonConcept);
 
@@ -187,7 +190,19 @@ class SpeciesSearchService extends AbstractSearchService {
 			doc.addField(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
 			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id.longValue());
 			//doc.addField(searchFieldsConfig.HABITAT, s.);
-			
+		
+            String members = ""
+            List allMembers = observationService.getParticipants(s)
+            allMembers.each { mem ->
+                members += mem.name + " "
+            }
+            doc.addField(searchFieldsConfig.MEMBERS, members);	
+
+            s.userGroups.each { userGroup ->
+                doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+                doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+            }
+
 			docs.add(doc);
 		}
 

@@ -414,6 +414,9 @@ speciesPortal {
         SP_HD = "sp_hd"
         SP_UM = "sp_um"
         PAGES = "pages"
+        OBJECT_TYPE = "object_type"
+        MEMBERS = "members"
+        DOC_TYPE = "doc_type"
 	}
 
 	nameSearchFields {
@@ -455,7 +458,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            names.parser.serverURL = "127.0.0.1"
+            names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false
         grails.resources.debug = false

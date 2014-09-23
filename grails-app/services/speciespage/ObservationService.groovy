@@ -2208,7 +2208,7 @@ class ObservationService extends AbstractObjectService {
         params: linkParams)
     }
 
-    private List getParticipants(observation) {
+    public List getParticipants(observation) {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = getUserForEmail(observation) //Follow.getFollowers(observation)
