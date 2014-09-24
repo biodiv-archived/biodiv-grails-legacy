@@ -173,8 +173,10 @@ $(document).ready(function() {
                 "up":"${g.message(code:'uploading.progress.submit')}",
                 "agree":"${g.message(code:'agree.terms.submit')}",
 
-                "error":"${g.message(code:'errror.refresh')}"                   
-
+                "error":"${g.message(code:'errror.refresh')}",   
+                 "suc":"${g.message(code:'error.message.success')}",
+                 "submit":"${g.message(code:'errors.submission')}"
+                 
             },
 
             "create" :{
