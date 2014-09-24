@@ -87,18 +87,17 @@ grails.project.dependency.resolution = {
         }
 //        compile 'org.apache.lucene:lucene-analyzers:3.4.0'
 //        compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
-		
-		compile (group:'org.apache.poi', name:'poi', version:'3.10.1'){
-			excludes 'servlet-api'
-		}
-		compile (group:'org.apache.poi', name:'poi-contrib', version:'3.6'){
-			excludes 'servlet-api'
-		}
+        compile (group:'org.apache.poi', name:'poi', version:'3.7'){
+            excludes 'servlet-api'
+        }
+        compile (group:'org.apache.poi', name:'poi-contrib', version:'3.6'){
+            excludes 'servlet-api'
+        }
 
-		compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.10.1'
-		compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.10.1') {
-			excludes 'geronimo-stax-api_1.0_spec'
-		}
+        compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.7'
+        compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7') {
+            excludes 'geronimo-stax-api_1.0_spec'
+        }
         compile ('org.springframework.social:spring-social-facebook:1.0.0.RELEASE') {
             excludes 'spring-web' 
         }
