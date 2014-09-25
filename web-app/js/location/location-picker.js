@@ -91,7 +91,7 @@ function useTitle(obj){
             var G = google.maps;
             this.M= L;
             this.M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
-            this.allowedBounds = new this.M.LatLngBounds(new this.M.LatLng('6.74678', '68.03215'), new this.M.LatLng('35.51769', '97.40238'));
+            this.allowedBounds = new this.M.LatLngBounds(new this.M.LatLng('85', '-180'), new this.M.LatLng('-85', '180'));
             //var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '59'), new this.M.LatLng('45', '105'));
             var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '69'), new this.M.LatLng('36', '98'));
             var nagpur_latlng = new this.M.LatLng('21.07', '79.27');                
