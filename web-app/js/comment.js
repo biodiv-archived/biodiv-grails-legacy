@@ -22,7 +22,7 @@ $('.updateComment').live('click',function(){
 	var editCommentWrapper = that.parent();
 	var message_body = that.parent().parent().find('.yj-message-body');
 	var params = {}
-	params['commentBody'] = editCommentWrapper.find('.comment-textbox').val();
+	params['commentBody'] = editCommentWrapper.find('.comment-textbox').text();
 	params['commentId']   = editCommentWrapper.attr('id');
 	computeUserTag(editCommentWrapper);
 	params['tagUserId']   = editCommentWrapper.find('.tagUserId').val();
@@ -85,17 +85,18 @@ function deleteComment(commentId, url){
 function postComment(postComp, url, newCommentUrl) {
 	var submitButton = $(postComp).children('input[type="submit"]');
 	var textComp = $(postComp).children('textarea[name="commentBody"]');
-	if($.trim(textComp.val()) === ""){
-		$(textComp).addClass('comment-textEmpty');
-		$(textComp).next('span').show();
+	var contentbox = $(textComp).next().find('.contentbox');
+	if($.trim(textComp.text()) === ""){
+		contentbox.addClass('comment-textEmpty');
+		//$(textComp).next('span').show();
 		return false;
 	}
 	loaderFun(submitButton,true,"Posting",'input');//submitButton.attr('disabled',true).attr('value','posting');
 	computeUserTag(postComp);
 	postAsAjax(postComp, url, newCommentUrl, true);
 	
-	$(textComp).removeClass('comment-textEmpty');
-	$(textComp).next('span').hide();
+	contentbox.removeClass('comment-textEmpty');
+	//$(textComp).next('span').hide();
 	return false;
 }
 
@@ -119,6 +120,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
 //		resetForm: true,
 		type: 'POST',
 		beforeSubmit: function(formData, jqForm, options) {
+			formData[1].value = $(postComp).children('textarea[name="commentBody"]').text();
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
@@ -192,7 +194,7 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 
 function replyOnComment(comp, parentId, url){
 	var params = {};
-	params["commentBody"] = $(comp).siblings(".comment-textbox").val();
+	params["commentBody"] = $(comp).siblings(".comment-textbox").text();
 	params["parentId"] = parentId;
 	
 	if($.trim(params["commentBody"]) === ""){
@@ -260,6 +262,7 @@ function stripTags(source,destination){
 function appendCommentWrapper(that){
 	that.after('<div class="commentContainer"><div class="contentbox" contenteditable="true"></div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />');
 	that.hide();
+	that.next().find('.contentbox').focus();
 }
 
 function loaderFun(that,boolVal,msgValue,Ele){
@@ -318,29 +321,31 @@ $(".contentbox").live("keyup",function()
        // $(this).parent().find(".display").slideUp('show');
        // $(this).parent().find(".msgbox").html("Type the name of someone or something...");
        //console.log("name ="+name);
-       // if(name.length>0)
-        //{
-            $.ajax({
-            type: "POST",
-            url: "/user/terms?term="+dataString,
-            cache: false,
-            success: function(html)
-            {
-                contentbox.parent().find(".msgbox").hide();
-                var output = '';
-                $.each(html, function(index,value){
-                    
-                    output += '<div class="display_box addname" style="cursor:pointer;" align="left" id="'+value.userId+'" title="'+value.label+'">';
-                    output += '<img src="'+value.user_pic+'" class="image"/>';
-                    output += '<a href="javascript:void(0);" id="'+value.userId+'" title="'+value.label+'">';
-                    output += value.label+'</a><br/>';
-                    output +='</div>';
-                });
-               // console.log(output);    
-                contentbox.parent().find(".display").html(output).show();
-            }
-            });
-        //}
+	       if(name){
+			        if(name.length>0)
+			        {
+			            $.ajax({
+			            type: "POST",
+			            url: "/user/terms?term="+dataString,
+			            cache: false,
+			            success: function(html)
+			            {
+			                contentbox.parent().find(".msgbox").hide();
+			                var output = '';
+			                $.each(html, function(index,value){
+			                    
+			                    output += '<div class="display_box addname" style="cursor:pointer;" align="left" id="'+value.userId+'" title="'+value.label+'">';
+			                    output += '<img src="'+value.user_pic+'" class="image"/>';
+			                    output += '<a href="javascript:void(0);" id="'+value.userId+'" title="'+value.label+'">';
+			                    output += value.label+'</a><br/>';
+			                    output +='</div>';
+			                });
+			               // console.log(output);    
+			                contentbox.parent().find(".display").html(output).show();
+			            }
+			            });
+			        }
+	    	}
         }
     }else{       
        //contentbox.parent().parent().find('.comment-textbox').html($(this).html());
