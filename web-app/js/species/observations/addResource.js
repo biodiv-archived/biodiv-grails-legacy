@@ -31,6 +31,41 @@ function removeResource(event, imageId) {
 
 }
 
+function attachThumbnailAndProcess(me , images) {
+    var html = $( "#metadataTmpl" ).render( images );
+    var metadataEle = $(html);
+    if($( "input[name='resType']" ).val() == "species.participation.Observation") {
+        metadataEle.each(function() {
+            $('.geotagged_image', this).load(function(){
+                var me = this;
+                $.proxy(loadMapInput, $(".addObservation").find(".map_class"), $(me))();
+                //$(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+            });
+            var $ratingContainer = $(this).find('.star_obvcreate');
+            rate($ratingContainer);
+        });
+    }
+    me.$ele.find(".imagesList li:first" ).after (metadataEle);
+    me.$ele.find(".add_file" ).fadeIn(3000);
+    me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
+    me.$ele.find(".image-resources-msg").html("");
+    me.$form.find("input[name='resources']").remove();
+    me.$ele.find('.videoUrl').val('');
+    me.$ele.find('.audioUrl').val('');
+    me.$ele.find('.add_video').editable('setValue','', false);
+    // me.$ele.find('.add_audio').editable('setValue','', false);		
+    me.$ele.find('.add_video').editable('setValue','', false);	
+
+    if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+        var count = $("input[name='lastUploaded']").val();
+        var start = 0;
+        var w = 1; 
+        var end = start + w; 
+        createResources(start, end, w, count);
+        $("input[name='obvDir']").val('');
+    }
+}
+
 function submitNextUpload(me) {
     var val = (me.start/me.uploadedFilesSize)*100;
         me.$ele.find(".mediaProgressBar").progressbar({
@@ -74,6 +109,8 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
             if(data.imageStatus == "Success") {
                 //me.$ele.find(".progress").css('z-index',90);
                 flag = false;
+                attachThumbnailAndProcess(me, images);
+                /*
                 var html = $( "#metadataTmpl" ).render( images );
                 var metadataEle = $(html);
                 if($( "input[name='resType']" ).val() == "species.participation.Observation") {
@@ -105,7 +142,7 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
                     var end = start + w; 
                     createResources(start, end, w, count);
                     $("input[name='obvDir']").val('');
-                }
+                }*/
                 submitNextUpload(me); 
                 return;
 
@@ -408,14 +445,21 @@ function createResources(start, end, w, count) {
             }
             var $s = $(responseXML).find('resources').find('res');
             var x = $s.length;
+            var uploadedObjType
             $s.each(function() {
                 me.jobId = $(this).attr('jobId');
                 var fileName = $(this).attr('fileName');
                 var type = $(this).attr('type');					
+                uploadedObjType = type;
                 images.push({i:x+i, file:fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
                 x--;
             });
-            getProcessedImageStatus(me.jobId, images, me);
+            console.log(uploadedObjType);
+            if(uploadedObjType == "IMAGE"){
+                getProcessedImageStatus(me.jobId, images, me); 
+            } else {
+                attachThumbnailAndProcess(me, images); 
+            }
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
