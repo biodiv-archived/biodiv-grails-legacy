@@ -64,7 +64,6 @@ class UserGroupSearchService extends AbstractSearchService {
 			log.debug "Reading usergroup : "+ug.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
-                println "=====ID======== " + ug.class.simpleName +"_"+ug.id.toString()
 				doc.addField(searchFieldsConfig.ID, ug.class.simpleName +"_"+ ug.id.toString());
 			    doc.addField(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
 				doc.addField(searchFieldsConfig.TITLE, ug.name);
@@ -75,16 +74,15 @@ class UserGroupSearchService extends AbstractSearchService {
                 ug.newsletters.each {
                     allPages += it.title + " "
                 }
-                println "===ALL PAGES===== " + allPages 
                 doc.addField(searchFieldsConfig.PAGES, allPages);
-
-                String members = ""
-                List allMembers = observationService.getParticipants(ug)
-                allMembers.each { mem ->
-                    members += mem.name + " "
-                }
-                doc.addField(searchFieldsConfig.MEMBERS, members);
                 
+                String memberInfo = ""
+                List allMembers = utilsServiceBean.getParticipants(ug)
+                allMembers.each { mem ->
+                    memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                    doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+                }
+
                 docs.add(doc);
 			
 		}

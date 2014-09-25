@@ -64,7 +64,6 @@ class DocumentSearchService extends AbstractSearchService {
             log.debug "Reading Document : "+document.id;
 
             SolrInputDocument doc = new SolrInputDocument();
-            println "=====ID======== " + document.class.simpleName +"_"+document.id.toString()
             doc.addField(searchFieldsConfig.ID,document.class.simpleName +"_"+ document.id.toString());
             doc.addField(searchFieldsConfig.OBJECT_TYPE, document.class.simpleName);
             doc.addField(searchFieldsConfig.TITLE, document.title);
@@ -76,7 +75,13 @@ class DocumentSearchService extends AbstractSearchService {
             }
 
             if(document.contributors){
-                doc.addField(searchFieldsConfig.CONTRIBUTOR, document.contributors);
+                document.contributors.each { contributor -> 
+                    /*String userInfo = ""
+                    if(contributor.user) {
+                        userInfo = " ### "+contributor.user.email+" "+contributor.user.username+" "+contributor.user.id.toString()
+                    }*/
+                    doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor);
+                }
             }
 
             document.tags.each { tag ->
@@ -88,13 +93,12 @@ class DocumentSearchService extends AbstractSearchService {
                 doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
             }
 
-
-            String members = ""
-            List allMembers = observationService.getParticipants(document)
+            String memberInfo = ""
+            List allMembers = utilsServiceBean.getParticipants(document)
             allMembers.each { mem ->
-                members += mem.name + " "
+                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
             }
-            doc.addField(searchFieldsConfig.MEMBERS, members);
 
             doc.addField(searchFieldsConfig.DOC_TYPE, document.type);
 

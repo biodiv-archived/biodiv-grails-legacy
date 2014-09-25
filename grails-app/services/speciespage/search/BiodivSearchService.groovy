@@ -7,19 +7,71 @@ import species.auth.SUser;
 import utils.Newsletter;
 import content.Project
 import species.groups.UserGroup;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
+import org.springframework.context.ApplicationContext
 
 
 class BiodivSearchService extends AbstractSearchService {
     
-    def observationsSearchService
-    def speciesSearchService
-    def documentSearchService
-    def SUserSearchService
-    def newsletterSearchService
-    def userGroupSearchService
+    def observationsSearchServiceBean
+    def speciesSearchServiceBean
+    def documentSearchServiceBean
+    def SUserSearchServiceBean
+    //def newsletterSearchServiceBean
+    def userGroupSearchServiceBean
+    //ApplicationContext applicationContext
 
     int BATCH_SIZE = 10;
 
+
+/*
+    def getObservationsSearchServiceBean() {
+        println "=======HELLO==========="
+        if(!observationsSearchServiceBean) { 
+            println "=================="
+            observationsSearchServiceBean = applicationContext.getBean("observationsSearchService");
+        }
+        return observationsSearchServiceBean;
+    }
+    
+    def getSpeciesSearchServiceBean() {
+        if(!speciesSearchServiceBean) { 
+            speciesSearchServiceBean = applicationContext.getBean("speciesSearchService");
+        }
+        return speciesSearchServiceBean;
+    
+    }
+    
+    def getDocumetSearchServiceBean() {
+        if(!documentSearchServiceBean) { 
+            documentSearchServiceBean = applicationContext.getBean("documentSearchService");
+        }
+        return documentSearchServiceBean;
+    
+    }
+    
+    def getSUserSearchServiceBean() {
+        if(!SUserSearchServiceBean) { 
+            SUserSearchServiceBean = applicationContext.getBean("SUserSearchService");
+        }
+        return SuserSearchServiceBean;
+    
+    }
+    
+    def getNewsletterSearchServiceBean() {
+        if(!newsletterSearchServiceBean) { 
+            newsletterSearchServiceBean = applicationContext.getBean("newsletterSearchService");
+        }
+        return newsletterSearchServiceBean;
+    }
+    
+    def getUserGroupSearchServiceBean() {
+        if(!userGroupSearchServiceBean) { 
+            userGroupSearchServiceBean = applicationContext.getBean("userGroupSearchService");
+        }
+        return userGroupSearchServiceBean;
+    }
+  */
     /**
      * 
      */
@@ -40,7 +92,6 @@ class BiodivSearchService extends AbstractSearchService {
         modules["projects"] = Project.list(max:limit, offset:offset);
         modules["newsletters"] = Newsletter.list(max:limit, offset:offset);
         modules["userGroups"] = UserGroup.list(max:limit, offset:offset);
-        println "=====MODULES======== " + modules
         if(!publishSearchIndex(modules, true)) {
             log.error "FAILED to publish biodiv search index"
             return
@@ -73,18 +124,19 @@ class BiodivSearchService extends AbstractSearchService {
         //def projects = modules["projects"];
         def newsletters = modules["newsletters"];
         def userGroups = modules["userGroups"];
-        println "===OBV======== "
-        def f1 = observationsSearchService.publishSearchIndex(obvs, commit);
-        println "===SP========"
-        def f2 = speciesSearchService.publishSearchIndex(sps, commit);
-        println "===DOC========"
-        def f3 = documentSearchService.publishSearchIndex(documents, commit)
-        println "===USER========"
-        def f4 = SUserSearchService.publishSearchIndex(users, commit)
-        println "===NEWSLETTER========"
-        def f5 = newsletterSearchService.publishSearchIndex(newsletters, commit)
-        println "=====USER GROUP==== " + userGroups
-        def f6 = userGroupSearchService.publishSearchIndex(userGroups, commit)
+        //getObservationsSearchServiceBean()
+        println "===INDEXING OBV======== "
+        def f1 = observationsSearchServiceBean.publishSearchIndex(obvs, commit);
+        println "===INDEXING SP========"
+        def f2 = speciesSearchServiceBean.publishSearchIndex(sps, commit);
+        println "===INDEXING DOC========"
+        def f3 = documentSearchServiceBean.publishSearchIndex(documents, commit)
+        println "===INDEXING USER========"
+        def f4 = SUserSearchServiceBean.publishSearchIndex(users, commit)
+        //println "===NEWSLETTER========"
+        //def f5 = newsletterSearchServiceBean.publishSearchIndex(newsletters, commit)
+        println "=====INDEXING USER GROUP==== "
+        def f6 = userGroupSearchServiceBean.publishSearchIndex(userGroups, commit)
 
         println "===DONE========"
         /*obvs.each { obv ->
@@ -102,8 +154,10 @@ class BiodivSearchService extends AbstractSearchService {
             List ds = documentSearchService.getSolrDocument(mod);
             docs.addAll(ds);
         }*/
-        println "=======RES===== " + f1.booleanValue() +"==== "+ f2.booleanValue() + "======= "+ f3.booleanValue() + "========== " + f4.booleanValue()
-        return (f1 && f2 && f3 && f4);
+        println "=======RES===== " + f1.booleanValue() +"==== "+ f2.booleanValue() + "======= "+ f3.booleanValue() + "========== " + f4.booleanValue() + "========== " + f6.booleanValue()
+        return (f1 && f2 && f3 && f4 && f6);
+
+        return (f1 && f2 && f3 && f4 && f6);
     }
 
 

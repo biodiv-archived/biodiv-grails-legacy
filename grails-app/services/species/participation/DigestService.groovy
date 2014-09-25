@@ -50,10 +50,9 @@ class DigestService {
         def emailFlag = true
 
         while(emailFlag){
-<<<<<<< HEAD
             List<SUser> usersEmailList = [];
             Digest.withTransaction { status ->
-                usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+                usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
 
                 if(usersEmailList.size() != 0){
                     sendDigest(digest, usersEmailList, false, digestContent)
@@ -62,16 +61,6 @@ class DigestService {
                 else{
                     emailFlag = false
                 }
-=======
-            def usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-            if(usersEmailList.size() != 0){
-                sendDigest(digest, usersEmailList, false)
-                offset = offset + max
-                Thread.sleep(600000L);
-            }
-            else{
-                emailFlag = false
->>>>>>> biodiv2.0
             }
             if(emailFlag) 
                 Thread.sleep(600000L);
@@ -100,13 +89,9 @@ class DigestService {
             }
 
             otherParams['usersEmailList'] = usersEmailList  
-<<<<<<< HEAD
-            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
-=======
             println "============================== Sending email" 
             println usersEmailList
             utilsService.sendNotificationMail(utilsService.DIGEST_MAIL,sp,null,null,null,otherParams)
->>>>>>> biodiv2.0
             
             if(setTime) {
                 if(!digest.save(flush:true))
@@ -359,7 +344,6 @@ log.debug resultSet
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-<<<<<<< HEAD
     def latestContentsByGroup(Digest digest) {
         log.debug "latestContentsByGroup ${digest}"
 		def res = [:]
@@ -438,7 +422,6 @@ log.debug resultSet
         
         return res
     }
-=======
     def List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
@@ -454,5 +437,4 @@ log.debug resultSet
         return participants;
     }
 
->>>>>>> biodiv2.0
 }

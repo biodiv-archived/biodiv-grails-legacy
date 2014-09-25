@@ -54,21 +54,16 @@ class CommentService {
 			return ['success': false]
 		}else{
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
-<<<<<<< HEAD
 			def feedInstance;
 			if(!params.commentId){				
 				feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
-				observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
+				utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
 			}else{
 				feedInstance = ActivityFeed.findByActivityHolderIdAndActivityHolderType(c.id,c.class.getCanonicalName());
 			}
 			if(tagUserIds){
 				userTagNofity(tagUserIds,domainObject,feedInstance,params.webaddress);
 			}
-=======
-			def feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
-			utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
->>>>>>> biodiv2.0
 			return ['success': true, 'commentObj' :c]
 		}
 	}

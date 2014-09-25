@@ -17,19 +17,30 @@ import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
+import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class AbstractSearchService {
 
     static transactional = false
 
     def grailsApplication;
-    def observationService;
+    def utilsServiceBean;
+    
+    @Autowired
+    private ApplicationContext applicationContext
     
     protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     SolrServer solrServer;
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 50;
-
+    
+    def getUtilsServiceBean() {
+        if(!utilsServiceBean) {
+            utilsServiceBean = applicationContext.getBean("utilsService");
+        }
+        return utilsServiceBean;
+    }
     /**
      * 
      */
@@ -52,7 +63,6 @@ abstract class AbstractSearchService {
     public boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
         if(docs) {
             try {
-                println "=========SOLR===========" + solrServer
                 solrServer.add(docs);
                 if(commit) {
                     //commit ...server is configured to do an autocommit after 10000 docs or 1hr
@@ -120,7 +130,6 @@ abstract class AbstractSearchService {
      */
     def optimize() {
         log.info "Optimizing ${this.getClass().getName()} search index"
-        println "=========SOLR SEVER======== " + solrServer
         solrServer.optimize();
     }
 

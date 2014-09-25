@@ -88,14 +88,13 @@ class ObservationsSearchService extends AbstractSearchService {
         List docs = [];
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
-            println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
             doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
 			doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
             doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
             doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name +" ### "+obv.author.email +" "+obv.author.username+" "+obv.author.id.toString());
 
             doc.addField(searchFieldsConfig.FROM_DATE, obv.fromDate);
             doc.addField(searchFieldsConfig.TO_DATE, obv.toDate);
@@ -128,13 +127,12 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
             doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
 
-            String members = ""
-            println "=========OBV SERVICE======== " + observationService
-            List allMembers = observationService.getParticipants(obv)
+            String memberInfo = ""
+            List allMembers = utilsServiceBean.getParticipants(obv)
             allMembers.each { mem ->
-                members += mem.name + " "
+                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
             }
-            doc.addField(searchFieldsConfig.MEMBERS, members);
 
             //boolean geoPrivacy = false;
             //String locationAccuracy;
@@ -166,7 +164,7 @@ class ObservationsSearchService extends AbstractSearchService {
         def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
         distRecoVotes.each { vote ->
             doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name);
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
             if(vote.recommendation.taxonConcept)
                 doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
         }
@@ -187,7 +185,11 @@ class ObservationsSearchService extends AbstractSearchService {
         doc.addField(searchFieldsConfig.SOURCE_TEXT, chk.sourceText);
 
         chk.contributors.each { s ->
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, s.name);
+            String userInfo = ""
+            if(s.user) {
+                userInfo = " ### "+s.user.email+" "+s.user.username+" "+s.user.id.toString()
+            }
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, s.name + userInfo);
         }
         chk.attributions.each { s ->
             doc.addField(searchFieldsConfig.ATTRIBUTION, s.name);

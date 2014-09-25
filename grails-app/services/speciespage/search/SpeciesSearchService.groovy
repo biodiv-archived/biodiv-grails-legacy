@@ -22,6 +22,7 @@ import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
+import species.auth.SUser;
 
 class SpeciesSearchService extends AbstractSearchService {
 	
@@ -116,8 +117,12 @@ class SpeciesSearchService extends AbstractSearchService {
 				String subcategory = field.field.subCategory;
 
 				field.contributors.each { contributor ->
+                    String userInfo = ""
+                    if(contributor.id) {
+                        userInfo = " ### "+contributor.email+" "+contributor.username+" "+contributor.id.toString()
+                    }
 					if(contributor.name)
-						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
+						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
 				field.attributors.each { attribution ->
 					if(attribution.name)
@@ -172,9 +177,13 @@ class SpeciesSearchService extends AbstractSearchService {
 
 				doc.addField(resource.type.value().toLowerCase(), resource.description);
 
-				resource.contributors.each { contributor ->
+                resource.contributors.each { contributor ->
+                    String userInfo = ""
+                    if(contributor.user) {
+                        userInfo = " ### "+contributor.user.email+" "+contributor.user.username+" "+contributor.user.id.toString()
+                    }
 					if(contributor.name)
-						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
+						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
 				resource.attributors.each { attributor ->
 					if(attributor.name)
@@ -189,14 +198,14 @@ class SpeciesSearchService extends AbstractSearchService {
 			doc.addField(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
 			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id.longValue());
 			//doc.addField(searchFieldsConfig.HABITAT, s.);
-		
-            String members = ""
-            List allMembers = observationService.getParticipants(s)
+		    
+            String memberInfo = ""
+            List allMembers = utilsServiceBean.getParticipants(s)
             allMembers.each { mem ->
-                members += mem.name + " "
+                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
             }
-            doc.addField(searchFieldsConfig.MEMBERS, members);	
-
+            
             s.userGroups.each { userGroup ->
                 doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
                 doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
