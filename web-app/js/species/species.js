@@ -100,7 +100,7 @@ var showOccurence = function(speciesName) {
         var layersOptions = [
     {
         title : 'Observation',
-        layers : 'wikwio:observation_locations',
+        layers : 'ibp:observation_locations',
         styles : '',
         cql_filter : "species_name='" + speciesName + "'",
         opacity : 0.7
