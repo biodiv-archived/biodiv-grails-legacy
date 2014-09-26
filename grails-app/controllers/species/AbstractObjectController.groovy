@@ -39,7 +39,7 @@ import species.participation.Featured
 
 class AbstractObjectController {
     
-    def observsationService;
+    def observationService;
     def utilsService;
 
     def related() {
