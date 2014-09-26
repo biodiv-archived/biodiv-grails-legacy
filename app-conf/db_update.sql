@@ -66,7 +66,14 @@ ALTER TABLE document RENAME COLUMN description TO notes;
 
 /** 19th Septembaer 2014 for language */
 ALTER TABLE observation ADD language_id bigint;
+alter table observation add constraint language_id foreign key (id) references language(id) match full;
+update observation set language_id = 205;
+alter table observation alter column language_id set not null;
+
 ALTER TABLE resource ADD language_id bigint;
+alter table resource add constraint language_id foreign key (id) references language(id) match full;
+update resource set language_id = 205;
+alter table resource alter column language_id set not null;
 
 /** After updating code */
 update document set geo_privacy = false;

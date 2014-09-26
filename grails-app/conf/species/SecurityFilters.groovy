@@ -73,6 +73,7 @@ class SecurityFilters {
                     }
                     //passing locale Languages
                     model.localeLanguages = grailsApplication.config.speciesPortal.localeLanguages
+                    model.hideLanguages = grailsApplication.config.speciesPortal.hideLanguages
                 }
                 log.debug "after rendering"
             }
@@ -104,6 +105,7 @@ class SecurityFilters {
                     "'$request.forwardURI', " +
                     " 'at ${new Date()}', 'Ajax: $request.xhr', 'controller: $controllerName', " +
                     "'action: $actionName', 'params: ${params}', " +
+                    "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"'"
                     "'${end - start}ms'"
 
                     if (log.traceEnabled) {

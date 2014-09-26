@@ -37,5 +37,4 @@ cadb () {
 }
 
 export GRAILS_OPTS="-XX:MaxPermSize=256m -Xmx1024M -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
-
-
+export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/home/sravanthi/git/biodiv/app-conf/solr -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator "
