@@ -241,7 +241,7 @@
                                 <div class="column span6 propagateTags block_row">
                                     <label><g:message code="default.tags.label" /></label>
                                     <div class="create_tags" style="clear: both;">
-                                        <ul class="obvCreateTags">
+                                        <ul class="obvCreateTags" rel="${g.message(code:'placeholder.add.tags')}">
                                             <g:each in="${obvTags}" var="tag">
                                                 <li>${tag}</li>
                                             </g:each>
