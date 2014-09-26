@@ -252,7 +252,8 @@ class SpeciesService extends AbstractObjectService  {
             Iterator iter = queryResponse.getResults().listIterator();
             while(iter.hasNext()) {
                 def doc = iter.next();
-                def speciesInstance = Species.get(doc.getFieldValue("id"));
+                Long id = (doc.getFieldValue("id").tokenize("_")[1]).toLong()
+                def speciesInstance = Species.get(id);
                 if(speciesInstance)
                     speciesInstanceList.add(speciesInstance);
             }

@@ -301,7 +301,8 @@ class DocumentService {
                 Iterator iter = queryResponse.getResults().listIterator();
                 while(iter.hasNext()) {
                     def doc = iter.next();
-                    def documentInstance = Document.get(doc.getFieldValue("id"));
+                    Long id = (doc.getFieldValue("id").tokenize("_")[1]).toLong()
+                    def documentInstance = Document.get(id);
                     if(documentInstance)
                         documentInstanceList.add(documentInstance);
                 }
