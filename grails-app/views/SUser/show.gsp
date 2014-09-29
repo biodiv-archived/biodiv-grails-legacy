@@ -149,8 +149,23 @@ def contact_me_text=g.message(code:'button.contact.me')
                                 </h5>
                                 <div class="section" style="clear:both;margin-left:20px;">
                                     <g:if test="${user.aboutMe}">
+
+                                    <%  def styleVar = 'block';
+                                        def clickcontentVar = '' 
+                                    %> 
+                                    <g:if test="${user?.language?.id != userLanguage?.id}">
+                                        <%  
+                                          styleVar = "none"
+                                          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.twoLetterCode.toUpperCase()+'</a>';
+                                        %>
+                                    </g:if>
+
+                                    ${raw(clickcontentVar)}
+                                    <div style="display:${styleVar}">
                                         ${user.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
-                                        </g:if>
+                                    </div>
+                                        
+                                    </g:if>
                                 </div>
 
                                 <div class="section" style="clear:both;margin-left:20px;">

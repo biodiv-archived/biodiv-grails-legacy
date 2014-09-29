@@ -1601,6 +1601,7 @@ class ObservationController extends AbstractObjectController {
         log.debug params;
         if(request.method == 'POST') {
             //TODO:edit also calls here...handle that wrt other domain objects
+            params.locale_language = observationService.getCurrentLanguage(request);
             def result = observationService.saveObservation(params, false)
             if(result.success){
                 forward(action: 'addRecommendationVote', params:params);
