@@ -120,7 +120,12 @@ function postAsAjax(postComp, url, newCommentUrl, update){
 //		resetForm: true,
 		type: 'POST',
 		beforeSubmit: function(formData, jqForm, options) {
-			formData[1].value = $(postComp).children('textarea[name="commentBody"]').text();
+			$.each(formData, function( index, value ) {			  
+			  	if(value.name == "commentBody"){
+			  		value.value = $(postComp).children('textarea[name="commentBody"]').text();			  		
+			  	}
+			});
+			console.log(formData);			
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
