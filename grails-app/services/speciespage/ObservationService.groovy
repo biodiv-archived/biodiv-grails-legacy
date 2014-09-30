@@ -2123,7 +2123,7 @@ class ObservationService extends AbstractObjectService {
                     try{
                         mailService.sendMail {
                             to toUser.email
-                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("kk")) ) {
+                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) ) {
                                 bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                             }
                             from grailsApplication.config.grails.mail.default.from
