@@ -817,7 +817,7 @@ class SpeciesUploadService {
 		//This is done to avaoid cascade resaving of object. better way requried.
 		Species.withTransaction{   
 			sList.each { s->
-				unpostFromUsergroup(s, sFields, user, sbu)
+				unpostFromUserGroup(s, sFields, user, sbu)
 			}
 		}
 		
