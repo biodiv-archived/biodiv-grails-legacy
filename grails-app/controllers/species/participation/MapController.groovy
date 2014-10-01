@@ -287,4 +287,42 @@ function GetTableColsOfType($tablename, $table_type, $col_type, $layer_id=NULL) 
     return $table_info;
 }
 */
+
+
+public def getLayerColumns(){
+    render amdbService.getLayerColumns(params, response);
+}
+
+
+public def getSummaryColumns(){
+    render amdbService.getSummaryColumns(params, response);
+}
+
+public def getLayersAccessStatus(){
+    render amdbService.getLayersAccessStatus(params, response);    
+}
+
+
+public def getLayerLinkTables(){
+    render amdbService.getLayerLinkTables(params, response);    
+}
+
+
+public def getLayersByTheme(){
+    render amdbService.getLayersByTheme(params, response);    
+}
+
+public def getLayerSummary(){
+    render amdbService.getLayerSummary(params, response);    
+}
+
+public def getLayerDetails(){
+    render amdbService.getLayerDetails(params, response);    
+}
+
+public def getLayerAttribution(){
+    render amdbService.getLayerAttribution(params, response);
+}
+
+
 }
