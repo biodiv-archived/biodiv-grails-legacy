@@ -6,7 +6,7 @@
 <br/><br/> 
 
 
-<g:message code="msg.granted.permission" />${permissionType.toLowerCase()} <g:message code="msg.on.taxonomic.level" /> ${TaxonomyRank.list()[taxonConcept.rank].value()} : ${taxonConcept.name} <g:message code="msg.on.the" /> ${domain}.<br/>
+<g:message code="msg.granted.permission" />${permissionType.toLowerCase()} <g:message code="msg.on.taxonomic.level" /> ${g.message(error:TaxonomyRank.list()[taxonConcept.rank])} : ${taxonConcept.name} <g:message code="msg.on.the" /> ${domain}.<br/>
 
 <g:message code="msg.Please.click" /> <g:link href="${uGroup.createLink(controller:'species', action:'create', absolute:true)}"><g:message code="msg.here" /></g:link> <g:message code="msg.to.begin" />  
 
