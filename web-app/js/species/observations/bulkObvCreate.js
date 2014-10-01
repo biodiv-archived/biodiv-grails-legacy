@@ -205,7 +205,7 @@ function dropAction(event, ui, ele) {
 
 
 
-
+//alert($(".obvCreateTags").attr('rel'));
 
 $(".obvCreateTags").tagit({
     select:true, 

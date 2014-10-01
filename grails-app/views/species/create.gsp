@@ -57,7 +57,7 @@
                             <div class="input-prepend">
                                 <select id="rank" name="rank" class="add-on">
                                 <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
-                                    <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}>${rank.value()}</option>
+                                    <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}><g:message error="${rank}"/></option>
                                 </g:each>
                             </select>
 
@@ -121,12 +121,13 @@
         });
 
         var taxonRanks = [];
+
         <g:each in="${TaxonomyRank.list()}" var="t">
         <g:if test="${t == TaxonomyRank.SUB_GENUS || t == TaxonomyRank.SUB_FAMILY}">
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
         </g:if>
         <g:else>
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
         </g:else>
         </g:each>
 
