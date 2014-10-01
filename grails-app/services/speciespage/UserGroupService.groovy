@@ -96,6 +96,7 @@ class UserGroupService {
 		userGroup.properties = params;
 		userGroup.name = userGroup.name?.capitalize();
 		userGroup.webaddress = URLEncoder.encode(userGroup.name.toLowerCase().replaceAll(" ", "_"), "UTF-8");
+		userGroup.language = params.locale_language;
 
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)

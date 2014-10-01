@@ -153,6 +153,7 @@ class UserGroupController {
 	def save() {
 		log.debug params;
 		params.domain = Utils.getDomainName(request)
+		params.locale_language = observationService.getCurrentLanguage(request);
 		def userGroupInstance = userGroupService.create(params);
 		if (userGroupInstance.hasErrors()) {
 			userGroupInstance.errors.allErrors.each { log.error it }
@@ -170,16 +171,17 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
+			def userLanguage = observationService.getCurrentLanguage(request);
 			if(params.pos) {
 				int pos = params.int('pos');
 				def prevNext = getPrevNextUserGroups(pos);
 				if(prevNext) {
-					return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams]
+					return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams,userLanguage:userLanguage]
 				} else {
-					return [userGroupInstance: userGroupInstance]
+					return [userGroupInstance: userGroupInstance,userLanguage:userLanguage]
 				}
 			} else {
-				return [userGroupInstance: userGroupInstance]
+				return [userGroupInstance: userGroupInstance,userLanguage:userLanguage]
 			}
 		}
 	}
@@ -241,7 +243,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def update() {
 		log.debug params;
-		
+		params.locale_language = observationService.getCurrentLanguage(request);
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (userGroupInstance) {
 			if (params.version) {
@@ -612,8 +614,8 @@ class UserGroupController {
 			}
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0L);
-            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0L));
+			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount() as int, 0L);
+            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount() as int, 0L));
             msg = messageSource.getMessage("default.confirm.membership", null, request.locale)
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
@@ -824,8 +826,8 @@ class UserGroupController {
 	def about() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
-
-		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount()]
+		def userLanguage = observationService.getCurrentLanguage(request);
+		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(),userLanguage:userLanguage]
 	}
 
 	def getRelatedUserGroups() {
@@ -1336,11 +1338,13 @@ class UserGroupController {
     def sendSampleDigest() {
         println "=====STARTING SENDING SAMPLE EMAIL======"
         def digest = Digest.findByUserGroup(UserGroup.get(params.userGroupId.toLong()));
+        //def usersEmailList = [SUser.get(4136L)]
         def usersEmailList = [SUser.get(1426L), SUser.get(1117L), SUser.get(4136L)]
         println "==USERSMAIL LIST========= "  + usersEmailList
         def setTime = params.setTime?params.setTime.toBoolean():false
         println "=====SET TIME ===== " + setTime
-        digestService.sendDigest(digest, usersEmailList, setTime);
+        def digestContent = digestService.fetchDigestContent(digest)
+        digestService.sendDigest(digest, usersEmailList, setTime, digestContent);
         println "==========SAMPLE EMAILS SENT============"
     }
     

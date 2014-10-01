@@ -14,7 +14,7 @@ grails.project.fork = [
 // configure settings for the test-app JVM, uses the daemon by default
 test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 // configure settings for the run-app JVM
-//run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
+run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the run-war JVM
 war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the Console UI JVM
@@ -176,7 +176,7 @@ grails.project.dependency.resolution = {
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
-        //        compile ":grails-melody:1.47.2"
+        compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.2.1"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"

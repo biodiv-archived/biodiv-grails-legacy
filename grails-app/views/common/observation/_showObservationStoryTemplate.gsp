@@ -216,12 +216,3 @@
         </g:else>
     </div>
 
-<script type="text/javascript">
-$(document).ready(function(){
-
-    $(document).on('click','.clickcontent',function(){
-        $(this).next().slideToggle('slow');
-    });
-});
-
-</script>

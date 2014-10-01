@@ -215,5 +215,11 @@ $(document).ready(function() {
 
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });
-        
+       
+$(document).ready(function(){
+    $(document).on('click','.clickcontent',function(){
+        $(this).next().slideToggle('slow');
+   });
+});
+
 </script>

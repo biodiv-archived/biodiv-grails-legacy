@@ -61,7 +61,7 @@
 					<div class="tab-pane">
 						<div class="super-section userGroup-section">
 							<div class="description notes_view">
-								${raw(userGroupInstance.description)}
+								<g:render template="/common/languagewrap" model="['domainInstance': userGroupInstance , 'userLanguage' : userLanguage, 'contentValue' : userGroupInstance.description]"/>
 							</div>
 							<div class="section">
 								<div class="prop">

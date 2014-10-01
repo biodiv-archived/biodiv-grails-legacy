@@ -2,8 +2,8 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <div class="post-comment">
-
-	<form class="form-horizontal" onSubmit='return postComment(this, "${uGroup.createLink(controller:'comment', action:'addComment')}")'>
+    <g:set var="postCommentUrl" value="${uGroup.createLink(controller:'comment', action:'addComment')}"/>
+    <form class="form-horizontal" onSubmit="return postComment(this, '${postCommentUrl}')">
 		<%
 			boolean isGroupDisccusionThread = params.webaddress && (params.controller == 'activityFeed' || params.action == 'activity')
 			def commentPlaceHolder = "Write comment"

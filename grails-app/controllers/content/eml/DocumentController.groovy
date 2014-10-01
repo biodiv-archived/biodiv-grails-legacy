@@ -18,6 +18,7 @@ class DocumentController extends AbstractObjectController {
 	def activityFeedService
 	def utilsService
 	def documentSearchService
+	def observationService
 	def index = {
 		redirect(action: "browser", params: params)
 	}
@@ -37,6 +38,7 @@ class DocumentController extends AbstractObjectController {
 		log.debug "params in document save "+ params
 
 		params.author = springSecurityService.currentUser;
+		params.locale_language = observationService.getCurrentLanguage(request);
 		def documentInstance = documentService.createDocument(params)
 
 		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
@@ -76,7 +78,8 @@ class DocumentController extends AbstractObjectController {
 			redirect(action: "browser")
 		}
 		else {
-			[documentInstance: documentInstance]
+			def userLanguage = observationService.getCurrentLanguage(request);
+			[documentInstance: documentInstance,userLanguage: userLanguage]
 		}
 	}
 
@@ -109,6 +112,7 @@ class DocumentController extends AbstractObjectController {
 					return
 				}
 			}
+			params.locale_language = observationService.getCurrentLanguage(request);
 			//documentInstance.properties = params
 			documentService.updateDocument(documentInstance, params)
 			if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
