@@ -1,26 +1,43 @@
 package speciespage
 
+
+import java.io.IOException;
+import javax.sql.DataSource;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import groovy.sql.Sql
+import java.sql.Driver
+
 class MapService {
 	def grailsApplication;
-    def serviceMethod() {
-
-    }
-
+   
     public static String FIELD_SEP = "///";
 
-    private Sql getConnection() throws SQLException {
+     private Sql getConnection() throws SQLException {
        // return dataSourceibp.getConnection();
-       	def db = [url:grailsApplication.config.speciesPortal.ibpmapdatabase.url, user:grailsApplication.config.speciesPortal.ibpmapdatabase.username, password:grailsApplication.config.speciesPortal.ibpmapdatabase.password, driver:grailsApplication.config.speciesPortal.ibpmapdatabase.driver];
-       	def driver = Class.forName(db.driver).newInstance() as Driver;
-       	
-       	def props = new Properties()
-		props.setProperty("user", db.user)
-		props.setProperty("password", db.password)
-		def conn = driver.connect(db.url, props)
-		def sql = new Sql(conn);
- 		
+        def db = [url:grailsApplication.config.speciesPortal.ibpmapdatabase.url, user:grailsApplication.config.speciesPortal.ibpmapdatabase.username, password:grailsApplication.config.speciesPortal.ibpmapdatabase.password, driver:grailsApplication.config.speciesPortal.ibpmapdatabase.driver];
+        def driver = Class.forName(db.driver).newInstance() as Driver;
+        
+        def props = new Properties()
+        props.setProperty("user", db.user)
+        props.setProperty("password", db.password)
+        def conn = driver.connect(db.url, props)
+        def sql = new Sql(conn);
+        
       return sql;
-    }
+    }    
 
     /**
      *  get column description (the display title for column) for 
