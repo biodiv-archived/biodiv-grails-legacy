@@ -533,7 +533,8 @@ environments {
                     'org.pac4j'
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
-            debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 
 
             info    'grails.app.filters.species'
@@ -917,6 +918,8 @@ environments {
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 
        }
 	}
@@ -1028,6 +1031,8 @@ environments {
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 		}
 	}
 }

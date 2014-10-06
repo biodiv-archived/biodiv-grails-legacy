@@ -21,17 +21,26 @@
 			name="aq.name" value="${queryParams?queryParams['aq.name']?.encodeAsHTML():'' }"
 			placeholder="Search by species name" />
 			
-			
 		<label class="control-label" for="contributor">Contributor</label> <input id="aq.contributor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.contributor" value="${queryParams?queryParams['aq.contributor']?.encodeAsHTML():'' }"
 			placeholder="Field to search all contributors" />
+            
+        <label class="control-label" for="attribution">Attribution</label> <input id="aq.attribution"
+			data-provide="typeahead" type="text" class="input-block-level"
+			name="aq.attribution" value="${queryParams?queryParams['aq.attribution']?.encodeAsHTML():'' }"
+			placeholder="Field to search all attributions" />
 
+        <label class="control-label" for="license">License</label> <input id="aq.license"
+			data-provide="typeahead" type="text" class="input-block-level"
+			name="aq.license" value="${queryParams?queryParams['aq.license']?.encodeAsHTML():'' }"
+			placeholder="Field to search licence" />
+       
 		<label class="control-label" for="location">Location</label> <input id="aq.location"
 			data-provide="typeahead" type="text" class="input-block-level"
             name="aq.location" value="${queryParams?queryParams['aq.location']?.encodeAsHTML():''}"
             placeholder="Search by location name" />
-    
+
         <label class="control-label" for="text">Content</label> <input id="aq.text"
 			data-provide="typeahead" type="text" class="input-block-level"
             name="aq.text" value="${queryParams?queryParams['aq.text']?.encodeAsHTML():''}"
@@ -48,7 +57,7 @@
             placeholder="Search all tags" /> 
 
         <g:each in="${modules}" var="module">
-            <g:if test="${!module.name.equalsIgnoreCase('All') &&!module.name.equalsIgnoreCase('SUser') && !module.name.equalsIgnoreCase('UserGroup') }">
+            <g:if test="${!module.name.equalsIgnoreCase('All') && !module.name.equalsIgnoreCase('SUser') && !module.name.equalsIgnoreCase('UserGroup') }">
 
             <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type'].equalsIgnoreCase(module.name)?'':'hide' }">
                 <g:render template="/${module.name.toLowerCase()}/advSearchTemplate"/>
@@ -150,6 +159,16 @@ $(document).ready(function(){
         var val = $(this).val();
         $('.aq_modules').hide();
         $('.aq_modules input').val('');
+
+        $('input[name*="aq."]').val('').show().prev('label').show();
+        if(val == 'Observation') {
+            $('input[name="aq.attribution"]').val('').hide().prev('label').hide();
+        } else if (val == 'SUser') {
+            $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.tag"]').val('').hide().prev('label').hide();
+        } else if (val == 'UserGroup') {
+            $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.text"],input[name="aq.tag"],input[name="aq.uGroup"]').val('').hide().prev('label').hide();
+        }
+
         $('.'+val.toLowerCase()+'_aq_filters').show()
     });
 });
