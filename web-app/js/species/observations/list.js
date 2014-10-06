@@ -522,6 +522,14 @@ function getSelectedUserGroup() {
     return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
+function getSelectedFilters($ele) {
+    var selected = [];
+    $ele.each(function() {
+        selected.push($(this).attr('name'));
+    });
+    return selected.join(' or ');
+} 
+
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
 
@@ -589,7 +597,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     if(!isRegularSearch) {
-        $("#advSearchForm :input").each(function(index, ele) {
+        $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
             var query = $( this ).val();
             if(query){
@@ -605,6 +613,10 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             delete params['daterangepicker_start'];
             delete params['daterangepicker_end'];
         }
+
+        delete params['query'];
+        $( "#searchTextField" ).val('');
+
     }
 
     if($("#limit").length != 0) {
@@ -646,11 +658,39 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     var isMapView = $("#isMapView").val()
-        if(isMapView) {
-            params['isMapView'] = isMapView
-        } else {
-            delete params['isMapView']
-        }
+    if(isMapView) {
+        params['isMapView'] = isMapView
+    } else {
+        delete params['isMapView']
+    }
+
+    var object_type = getSelectedFilters($("input.moduleFilter:checked"))
+    if(object_type) {
+        params['object_type'] = object_type
+    } else {
+        delete params['object_type']
+    }
+
+    var sGroup = getSelectedFilters($("input.sGroupFilter:checked"))
+    if(sGroup) {
+        params['sGroup'] = sGroup
+    } 
+
+    var contributor = getSelectedFilters($("input.contributorFilter:checked"))
+    if(contributor) {
+        params['contributor'] = contributor
+    } else {
+        delete params['contributor']
+    }
+
+    var tag = getSelectedFilters($("input.tagFilter:checked"))
+    if(tag) {
+        params['tag'] = tag
+    } else {
+        delete params['tag']
+    }
+
+
     return params;
 }	
 
@@ -685,6 +725,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
+        //$('#filterPanel').replaceWith(data.filterPanel);
         //$('.observation_location').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);

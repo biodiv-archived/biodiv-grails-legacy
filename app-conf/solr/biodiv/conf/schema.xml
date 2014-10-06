@@ -4,7 +4,7 @@
     <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_root_" type="string" indexed="true" stored="false"/>
-    <field name="object_type" type="string" indexed="true" stored="true" multiValued="false" />
+    <field name="object_type" type="string" indexed="true" stored="true" required="true" multiValued="false" />
 
    <field name="title" type="taxonText" indexed="true" stored="true" multiValued="false" />
     <field name="contributor" type="taxonText" indexed="true" stored="true" multiValued="true" />

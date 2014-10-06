@@ -43,12 +43,14 @@ class ObservationsSearchService extends AbstractSearchService {
         //TODO: change limit
         int limit = BATCH_SIZE//Observation.count()+1, 
         int offset = 0;
+        int noIndexed = 0;
 
         def observations;
         def startTime = System.currentTimeMillis()
-        while(true) {
+        while(noIndexed < INDEX_DOCS) {
             observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
-            if(!observations) break;
+            noIndexed += observations.size()
+            if(!observations && noIndexed > INDEX_DOCS) break;
             publishSearchIndex(observations, true);
             observations.clear();
             offset += limit;
@@ -162,6 +164,7 @@ class ObservationsSearchService extends AbstractSearchService {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
         def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
+        //distRecoVotes = obv.maxVotedReco;
         distRecoVotes.each { vote ->
             doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
             doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
@@ -209,8 +212,10 @@ class ObservationsSearchService extends AbstractSearchService {
         chk.observations.each { row ->
             //addNameToDoc(row, doc)
             def d = getSolrDocument(Observation.read(row.id));
-            d[0].addField(searchFieldsConfig.TITLE, chk.title);
-            docs.addAll(d);
+            if(d) {
+                d[0].addField(searchFieldsConfig.TITLE, chk.title);
+                docs.addAll(d);
+            }
         }
         return docs;
     }

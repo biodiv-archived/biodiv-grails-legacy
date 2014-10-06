@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import species.Resource;
 import species.Habitat;
 import species.Language;
-import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.Resource.ResourceType;
 import species.auth.SUser;

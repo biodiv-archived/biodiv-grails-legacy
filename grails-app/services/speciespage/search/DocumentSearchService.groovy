@@ -28,12 +28,13 @@ class DocumentSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
-		int limit = Document.count()+1, offset = 0;
+		int limit = Document.count()+1, offset = 0, noIndexed = 0;
 		
 		def documents;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+		while(noIndexed < INDEX_DOCS) {
 			documents = Document.list(max:limit, offset:offset);
+            noIndexed += documents.size();
 			if(!documents) break;
 			publishSearchIndex(documents, true);
 			documents.clear();

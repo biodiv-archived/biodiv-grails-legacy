@@ -258,6 +258,7 @@ def user = {
 
     def reloadBiodivSearchIndex = {
         try {
+            biodivSearchService.deleteIndex();
             biodivSearchService.publishSearchIndex();
             biodivSearchService.optimize();
             flash.message = "Successfully created biodiv search index"

@@ -27,12 +27,13 @@ class SUserSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
-		int limit = BATCH_SIZE, offset = 0;
+		int limit = BATCH_SIZE, offset = 0, noIndexed = 0;
 		
 		def susers;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+		while(noIndexed < INDEX_DOCS) { 
 			susers = SUser.findAll("from SUser as u where u.accountLocked =:ae and u.accountExpired =:al and u.enabled=:en", [ae:false, al:false, en:true], [max:limit, offset:offset, sort: "id"]);
+            noIndexed += susers.size();
 			if(!susers) break;
 			if(susers)  {
 				publishSearchIndex(susers, true);
@@ -61,16 +62,19 @@ class SUserSearchService extends AbstractSearchService {
 		Map names = [:];
 		Map docsMap = [:]
 		susers.each { suser ->
-			log.debug "Reading User : "+suser.id;
-				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, suser.class.simpleName +"_"+suser.id.toString());
-				doc.addField(searchFieldsConfig.NAME, suser.name);
-				doc.addField(searchFieldsConfig.USERNAME, suser.username);
-				doc.addField(searchFieldsConfig.EMAIL, suser.email);
-				doc.addField(searchFieldsConfig.ABOUT_ME, suser.aboutMe);
-				doc.addField(searchFieldsConfig.LAST_LOGIN, suser.lastLoginDate);
-				
-				docs.add(doc);
+            suser = SUser.read(suser.id);
+            log.debug "Reading User : "+suser.id;
+            SolrInputDocument doc = new SolrInputDocument();
+            String className = org.hibernate.Hibernate.getClass(suser).getSimpleName()  
+            doc.addField(searchFieldsConfig.ID, className +"_"+suser.id.toString());
+            doc.addField(searchFieldsConfig.OBJECT_TYPE, className);
+            doc.addField(searchFieldsConfig.NAME, suser.name);
+            doc.addField(searchFieldsConfig.USERNAME, suser.username);
+            doc.addField(searchFieldsConfig.EMAIL, suser.email);
+            doc.addField(searchFieldsConfig.ABOUT_ME, suser.aboutMe);
+            doc.addField(searchFieldsConfig.LAST_LOGIN, suser.lastLoginDate);
+
+            docs.add(doc);
 		}
 
         return commitDocs(docs, commit);

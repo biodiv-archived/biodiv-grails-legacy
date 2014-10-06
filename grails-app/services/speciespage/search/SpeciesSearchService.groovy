@@ -36,12 +36,13 @@ class SpeciesSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to search index"
 		
 		//TODO: change limit
-		int limit=BATCH_SIZE, offset = 0;
+		int limit=BATCH_SIZE, offset = 0, noIndexed = 0;
 		
 		def species;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+		while(noIndexed < INDEX_DOCS) {
 			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
+            noIndexed += species.size();
 			if(!species) break;
 			publishSearchIndex(species);
 			species = null;

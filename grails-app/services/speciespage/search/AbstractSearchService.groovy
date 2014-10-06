@@ -20,6 +20,10 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.apache.solr.core.CoreContainer;
+
+
 abstract class AbstractSearchService {
 
     static transactional = false
@@ -31,16 +35,33 @@ abstract class AbstractSearchService {
     private ApplicationContext applicationContext
     
     protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    
+    @Autowired
     SolrServer solrServer;
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 50;
-    
+    int INDEX_DOCS = 20;
+
     def getUtilsServiceBean() {
         if(!utilsServiceBean) {
             utilsServiceBean = applicationContext.getBean("utilsService");
         }
         return utilsServiceBean;
     }
+
+    org.apache.solr.client.solrj.SolrServer  getSolrServer() {
+        println "++++++++++++++++++++++++++++++++++++++++++++++++++"
+        if(!solrServer) {
+            log.debug "Initializing sole contianer and biodivSolrServer"
+            solrServer = applicationContext.getBean("biodivSolrServer");
+        }
+        return solrServer;
+    }
+
+    void setSolrServer (org.apache.solr.client.solrj.SolrServer solrServer) {
+        this.solrServer = solrServer;
+    }
+
     /**
      * 
      */
@@ -90,6 +111,7 @@ abstract class AbstractSearchService {
     def search(query) {
         def params = SolrParams.toSolrParams(query);
         log.info "Running ${this.getClass().getName()} search query : "+params
+        println "Running ${this.getClass().getName()} search query : "+params
         def result;
         try {
             result = solrServer.query( params );

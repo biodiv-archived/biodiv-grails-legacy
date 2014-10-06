@@ -4,7 +4,7 @@
 
 <td
 	title='<g:if test="${userGroupTitle != null}">${userGroupTitle}</g:if>'>
-	<div class="figure pull-left" style="display: table; width:100%;height:100px;">
+	<div class="figure pull-left observation_story_image" style="height:150px;">
 		<a
 			href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroupInstance.domainName, 'userGroup':userGroupInstance, 'pos':pos)}">
 			<img

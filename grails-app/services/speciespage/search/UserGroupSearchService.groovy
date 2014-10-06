@@ -30,12 +30,13 @@ class UserGroupSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to usergroup search index"
 		
 		//TODO: change limit
-		int limit = UserGroup.count()+1, offset = 0;
+		int limit = UserGroup.count()+1, offset = 0, noIndexed = 0;
 		
 		def userGroups;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+		while(noIndexed < INDEX_DOCS) {
 			userGroups = UserGroup.list(max:limit, offset:offset);
+            noIndexed += userGroups.size();
 			if(!userGroups) break;
 			publishSearchIndex(userGroups, true);
 			userGroups.clear();

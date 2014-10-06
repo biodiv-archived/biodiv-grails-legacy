@@ -27,14 +27,15 @@ class SearchTagLib {
 	def advSearch =  {attrs, body ->
 		def model = attrs.model;
 		
-		if(params.controller == "species") {
+		out << render(template:"/search/advSearchTemplate", model:attrs.model);
+		/*if(params.controller == "species") {
 			out << render(template:"/species/advSearchTemplate", model:attrs.model);
 		} else if(params.controller == "observation" || (params.controller == 'userGroup' && params.action == 'observation')) {
 			out << render(template:"/observation/advSearchTemplate", model:attrs.model);
 		} else if(params.controller == "newsletter"  || (params.controller == 'userGroup' && params.action == 'newsletter')) {
 			out << render(template:"/newsletter/advSearchTemplate", model:attrs.model);
-		}else if(params.controller == "checklist"  || (params.controller == 'userGroup' && params.action == 'checklist')) {
+		} else if(params.controller == "checklist"  || (params.controller == 'userGroup' && params.action == 'checklist')) {
 			out << render(template:"/checklist/advSearchTemplate", model:attrs.model);
-		}
+		}*/
 	}
 }

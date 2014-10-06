@@ -14,8 +14,6 @@ $(document).ready(function(){
 	$("#habitatFilter").button();
 	$('#habitatFilter button[value="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
-	
-	
 		
 });
 
@@ -98,13 +96,3 @@ $(document).ready(function(){
 	
 </g:if>
 
-<g:if test="${!hideAdvSearchBar}">
-	<div id="advSearchContainer" class="sidebar_section" style="left: 0px; margin: 10px 0px;">
-		<a data-toggle="collapse" data-parent="#advSearchContainer" href="#advSearchBox"><h5>
-				<i class=" icon-search"></i>Advanced Search
-			</h5> </a>
-		<div id="advSearchBox" class="collapse ${params.aq?'in':'' }" style="${params.aq?'overflow:visible;height:auto;':'' }" >
-			<search:advSearch />
-		</div>
-	</div>
-</g:if>

@@ -1,4 +1,3 @@
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <%@ page import="species.Species"%>

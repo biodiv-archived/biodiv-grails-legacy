@@ -213,10 +213,9 @@ modules = {
 	}
 
 	search {
-		dependsOn 'core'
+		dependsOn 'observations_list'
 
-		resource url:'/css/960.css'
-		resource url:'/css/main.css'
+		resource url:'/js/species/search.js'
 	}
 
 	admin { dependsOn	'core' }

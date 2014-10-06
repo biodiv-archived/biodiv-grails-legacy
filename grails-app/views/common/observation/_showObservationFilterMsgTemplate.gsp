@@ -142,6 +142,17 @@
 						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="#${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>
+
+			<g:if test="${queryParam.key == 'object_type' && queryParam.value }">
+                           		in <span class="highlight"><a
+					href="${uGroup.createLink(
+					mapping:"userGroupGeneric", action:"list",
+					params:[object_type: queryParam.value])}">
+						${queryParam.value } <a href="#"
+						onclick="setDefaultModule(); return false;">[X]</a> </a> </span> modules
+            </g:if>
+
+
 		</g:each>
 
 </div>
