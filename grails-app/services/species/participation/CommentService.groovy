@@ -30,13 +30,14 @@ class CommentService {
 		if(params.commentId){
 			c 	= Comment.findById(params.commentId?.toLong());			
 			c.body 	= params.commentBody.trim();
+			c.language 	=	params.locale_language;
 			c.lastUpdated = new Date();
 			
 		}else{
 			
 			c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 							commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
-							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim());
+							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim(), language:params.locale_language);
 			
 
 			if(params.dateCreated) {

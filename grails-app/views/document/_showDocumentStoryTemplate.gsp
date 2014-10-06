@@ -60,12 +60,26 @@
             </div>
         </div>
 
+        <%  def styleVar = 'block';
+            def clickcontentVar = '' 
+        %> 
+        <g:if test="${documentInstance?.language?.id != userLanguage?.id}">
+            <%  
+              styleVar = "none"
+              clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+documentInstance?.language?.twoLetterCode.toUpperCase()+'</a>';
+            %>
+        </g:if>
+                
+
         <g:if
         test="${documentInstance?.notes && documentInstance?.notes.trim() != ''}">
         <div class="prop">
             <span class="name"><g:message code="default.description.label" /></span>
             <div class="notes_view linktext value">
-                ${raw(documentInstance?.notes)}
+                ${raw(clickcontentVar)}
+                <div style="display:${styleVar}">
+                    ${raw(documentInstance?.notes)}
+                </div>    
             </div>
         </div>
         </g:if>
@@ -81,7 +95,10 @@
         <div class="prop">
             <span class="name"><g:message code="default.attribution.label" /></span>
             <div class="value">
-                ${documentInstance?.attribution}
+                ${raw(clickcontentVar)}
+                <div style="display:${styleVar}">
+                    ${documentInstance?.attribution}
+                </div>    
             </div>
         </div>
         </g:if>

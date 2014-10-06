@@ -14,6 +14,7 @@ import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Follow;
 import species.participation.Featured;
+import species.Language;
 
 /**
  * eml-literature module
@@ -70,6 +71,9 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	
 	//Date createdOn  <=== dateCreated
 	//Date lastRevised <=== lastUpdated
+
+	// Language
+    Language language;
 	
 	boolean deleted
 	
@@ -87,6 +91,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		uri validator : {val, obj -> 
 			val || obj.uFile
 		},nullable:true
+		language nullable:false
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true

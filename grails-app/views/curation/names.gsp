@@ -15,7 +15,7 @@
 
 		<form id="namesFileForm" enctype="multipart/form-data" method="POST">
 			<label><g:message code="default.file.with.scientific.name.label" /> </label> <input type="file" name="namesFile"
-				placeholder="Names file with <5000 names">
+				placeholder="${g.message(code:'curation.names')}">
 			<button type="submit" class="btn"><g:message code="button.upload.curate" /></button>
 		</form>
 

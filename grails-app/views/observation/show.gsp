@@ -218,7 +218,7 @@ if(r) {
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
                     <div class="union-comment">
                     <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-                    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
+                    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                     </div>
                 </div>
 

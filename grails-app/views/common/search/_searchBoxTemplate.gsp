@@ -173,8 +173,10 @@ $(document).ready(function() {
                 "up":"${g.message(code:'uploading.progress.submit')}",
                 "agree":"${g.message(code:'agree.terms.submit')}",
 
-                "error":"${g.message(code:'errror.refresh')}"                   
-
+                "error":"${g.message(code:'errror.refresh')}",   
+                 "suc":"${g.message(code:'error.message.success')}",
+                 "submit":"${g.message(code:'errors.submission')}"
+                 
             },
 
             "create" :{
@@ -213,5 +215,11 @@ $(document).ready(function() {
 
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });
-        
+       
+$(document).ready(function(){
+    $(document).on('click','.clickcontent',function(){
+        $(this).next().slideToggle('slow');
+   });
+});
+
 </script>

@@ -133,6 +133,7 @@ class SUserController extends UserController {
         }
         def SUserInstance = SUser.get(params.long("id"))
 
+        def userLanguage =observationService.getCurrentLanguage(request);
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
             	msg = messageSource.getMessage("id.required", ['Id'] as Object[], request.locale)
@@ -155,6 +156,7 @@ class SUserController extends UserController {
                         }                    
                     }
                     result['stat'] = chartService.getUserStats(SUserInstance, userGroupInstance);
+                    result['userLanguage'] = userLanguage;
                     render result as JSON
                     return;
                 }
@@ -172,6 +174,7 @@ class SUserController extends UserController {
     //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
                 result['currentUser'] = springSecurityService.currentUser;
                 result['currentUserProfile'] = result['currentUser']?utilsService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                result['userLanguage'] = userLanguage;
                 return result
             }
         }
@@ -229,6 +232,8 @@ class SUserController extends UserController {
 			addInterestedHabitats(user, params.habitat)
 
 			user.website = (params.website.trim() != "") ? params.website.trim().split(",").join(", ") : null
+
+			user.language = observationService.getCurrentLanguage(request);
 
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)

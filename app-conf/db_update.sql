@@ -69,11 +69,21 @@ ALTER TABLE observation ADD language_id bigint;
 alter table observation add constraint language_id foreign key (id) references language(id) match full;
 update observation set language_id = 205;
 alter table observation alter column language_id set not null;
+ALTER TABLE document ADD language_id bigint;
+
+ALTER TABLE suser ADD language_id bigint;
+update suser set language_id = 205;
+
+ALTER TABLE user_group ADD language_id bigint;
+update user_group set language_id = 205;	
 
 ALTER TABLE resource ADD language_id bigint;
 alter table resource add constraint language_id foreign key (id) references language(id) match full;
 update resource set language_id = 205;
 alter table resource alter column language_id set not null;
+
+alter table species_field add column language_id bigint;
+update species_field set language_id = 205;
 
 /** After updating code */
 update document set geo_privacy = false;

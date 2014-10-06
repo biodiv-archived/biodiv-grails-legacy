@@ -14,8 +14,13 @@
 
 </head>
 <body>
+
+
         <div class="span12">
-        <s:showSubmenuTemplate model="['entityName':'Taxonomy Browser']"/>
+        <%
+        def taxonomy_browser="${g.message(code:'taxonbrowser.taxonomy.browser')}"
+        %>
+        <s:showSubmenuTemplate model="['entityName':taxonomy_browser]"/>
 
             <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
                 <h5><g:message code="button.classifications" /></h5>	
@@ -30,6 +35,7 @@
  
                 <div id="taxaHierarchy">
 
+
                     <%
                     def classifications = [];
                     Classification.list().each {
@@ -37,9 +43,11 @@
                     }
                     classifications = classifications.sort {return it[1].name};
                     %>
-
+                   
                     <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
-                </div>
+                
+                     
+                    </div>
             </div>
             <g:render template="/species/inviteForContribution"/>
         </div>
@@ -81,13 +89,13 @@
 
             </form>
         </div-->
-
         <script type="text/javascript">
         var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
-            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
-            </g:each>
 
+            
+            taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
+            </g:each>
             </script>	
 
         <r:script>

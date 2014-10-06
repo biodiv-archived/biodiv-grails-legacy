@@ -18,7 +18,26 @@
 	</g:else>
 	</b>
 	<div class="feedActivityHolderContext yj-message-body">
+		
+	<%  def styleVar = 'block';
+        def clickcontentVar = '' 
+    %> 
+    <g:if test="${commentInstance?.language?.id != userLanguage?.id}">
+        <%  
+          styleVar = "none"
+          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+commentInstance?.language?.twoLetterCode.toUpperCase()+'</a>';
+        %>
+    </g:if>
+        
+    ${raw(clickcontentVar)}
+    <div style="display:${styleVar}">
 		${raw(Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>')))}
+	</div>	
+	
+
+
+
+
 	</div>
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">

@@ -2,7 +2,7 @@
 
 <head>
 	<meta name='layout' content='admin'/>
-<g:set var="title" value="User"/>
+<g:set var="title" value="${g.message(code:'value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 </head>

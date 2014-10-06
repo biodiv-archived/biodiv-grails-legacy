@@ -17,6 +17,7 @@ import species.utils.ImageUtils;
 import content.eml.Document;
 import content.Project;
 import species.Species
+import species.Language;
 
 import utils.Newsletter;
 
@@ -51,6 +52,8 @@ class UserGroup implements Taggable {
 	def gormUserDetailsService;
 	def springSecurityService;
 	def userGroupService;
+	// Language
+    Language language;
 
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species]
 
@@ -71,6 +74,7 @@ class UserGroup implements Taggable {
 		homePage nullable:true
 		theme nullable:true
 		domainName nullable:true
+		language nullable:false
 	}
 
 	static mapping = {

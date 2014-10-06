@@ -4,7 +4,7 @@
 	<comment:postComment model="['commentHolder':commentHolder, 'rootHolder':rootHolder, 'commentType':commentType, 'newerTimeRef': newerTimeRef]" />
 	<g:if test="${showCommentList == true}">
 		<ul>
-			<comment:showCommentList model="['comments':comments]" />
+			<comment:showCommentList model="['comments':comments, 'userLanguage':userLanguage]" />
    		</ul>
 		<input type="hidden" name='olderTimeRef' value="${olderTimeRef}"/>
 		<g:if test="${(totalCount - comments.size()) > 0}" >
