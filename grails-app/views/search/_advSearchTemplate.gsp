@@ -59,7 +59,7 @@
         <g:each in="${modules}" var="module">
             <g:if test="${!module.name.equalsIgnoreCase('All') && !module.name.equalsIgnoreCase('SUser') && !module.name.equalsIgnoreCase('UserGroup') }">
 
-            <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type'].equalsIgnoreCase(module.name)?'':'hide' }">
+            <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.name)?'':'hide' }">
                 <g:render template="/${module.name.toLowerCase()}/advSearchTemplate"/>
             </div>
             </g:if>
