@@ -6,7 +6,7 @@
 <div  class="block-tagadelic ">
 
 	<form id="advSearchForm" method="get"  title="Advanced Search"
-		action="${uGroup.createLink(controller:'search', action:params.action?:'index') }"
+		action="${uGroup.createLink(controller:'search', action:params.action?:'select') }"
 		class="searchbox">
         
         <label class="control-label" for="module">Module</label>
