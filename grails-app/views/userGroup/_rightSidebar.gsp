@@ -2,15 +2,14 @@
     			<a class="btn btn-success"
 				href="${uGroup.createLink(
 						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" style="width:125px;margin-bottom:10px;" 
-				> <i class="icon-plus"></i>Add Observation</a>
+				> <i class="icon-plus"></i><g:message code="link.add.observation" /></a>
 
     				<a class="btn btn-success"
 					href="${uGroup.createLink(
 						controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
 					class="btn btn-info"
 					style="width:125px;margin-bottom:10px">
-					<i class="icon-plus"></i>Add Document
-                                    </a>
+					<i class="icon-plus"></i><g:message code="link.add.document" />                                    </a>
 	
                                 </div>
 -->

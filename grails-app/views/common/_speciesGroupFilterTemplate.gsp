@@ -43,7 +43,7 @@ $(document).ready(function(){
 					id="${"habitat_" + habitat.id}" value="${habitat.id}"
 					title="${habitat.name}"
 					data-content="${message(code: 'habitat.definition.' + habitat.name)}"
-					rel="tooltip" data-original-title="A Title"></button>
+					rel="tooltip" data-original-title="${g.message(code:'speciesgroupfilter.title.a')}"></button>
 			</g:if>
 		</g:each>
 		<button class="btn habitats_sprites ${othersHabitat.iconClass()}"
@@ -60,7 +60,7 @@ $(document).ready(function(){
 <%--		<input type="text" id="observationMediaFilter"--%>
 <%--			value="${params.isMediaFilter}" style="display: none" />--%>
 <%--		<button id="observationMediaAllFilterButton" class="btn"--%>
-<%--			rel="tooltip" data-original-title="Show all observations">All</button>--%>
+<%--			rel="tooltip" data-original-title="Show all observations"><g:message code="default.all.label" /></button>--%>
 <%--		<button id="observationMediaOnlyFilterButton" class="btn" rel="tooltip"--%>
 <%--			data-original-title="Show only observations with images">With Images</button>--%>
 <%--	</div>--%>
@@ -70,9 +70,9 @@ $(document).ready(function(){
 		<input type="text" id="observationAllChecklistFilter"
 			value="${params.isChecklistOnly}" style="display: none" />
 		<button id="observationAllButton" class="btn"
-			rel="tooltip" data-original-title="Show all observations">All</button>
+			rel="tooltip" data-original-title="${g.message(code:'speciesgroupfilter.title.show.all')}"><g:message code="default.all.label" /></button>
 		<button id="observationChecklistOnlyButton" class="btn" rel="tooltip"
-			data-original-title="Show only checklist">Checklist</button>
+			data-original-title="${g.message(code:'speciesgroupfilter.title.show.only')}"><g:message code="default.checklist.label" /></button>
 	</div>
 	
 	<div id="speciesNameFilter" class="btn-group"
@@ -80,18 +80,18 @@ $(document).ready(function(){
 		<input type="text" id="speciesNameFilter"
 			value="${params.speciesName}" style="display: none" />
 		<button id="speciesNameAllButton" class="btn" rel="tooltip"
-			data-original-title="Show all observations">All</button>
+			data-original-title="${g.message(code:'speciesgroupfilter.title.show.all')}"><g:message code="default.all.label" /></button>
 		<button id="speciesNameFilterButton" class="btn" rel="tooltip"
-			data-original-title="Show only unidentified observations">Unidentified</button>
+			data-original-title="${g.message(code:'speciesgroupfilter.title.show.unidentified')}"><g:message code="button.unidentified" /></button>
 	</div>
 	<div id="observationFlagFilter" class="btn-group"
 		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -30px; right: 0;">
 		<input type="text" id="observationFlagFilter"
 			value="${params.isFlagged}" style="display: none" />
 		<button id="observationWithNoFlagFilterButton" class="btn"
-			rel="tooltip" data-original-title="Show all observations">All</button>
+			rel="tooltip" data-original-title="${g.message(code:'speciesgroupfilter.title.show.all')}"><g:message code="default.all.label" /></button>
 		<button id="observationFlaggedButton" class="btn" rel="tooltip"
-			data-original-title="Show only flagged observations">Flagged</button>
+			data-original-title="${g.message(code:'speciesgroupfilter.title.show.flagged')}"><g:message code="button.flagged" /></button>
 	</div>
 	
 </g:if>

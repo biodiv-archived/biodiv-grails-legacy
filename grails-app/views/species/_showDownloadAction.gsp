@@ -3,20 +3,19 @@
 	<a id="download-action"
 		class="btn ${(params.action=='show')?'btn-link':''} dropdown-toggle"
 		data-toggle="dropdown" href="#"> <i class=" icon-download-alt"></i>
-		Download
+		<g:message code="button.download" />
 	</a>
         <a id="feature-action"
 		class="btn ${(params.action=='show')?'btn-link':''} dropdown-toggle"
 		data-toggle="dropdown" href="#"> <i class=" icon-download-alt"></i>
-		Feature
+		<g:message code="button.feature" />
 	</a>
 
 	<div id="download-options" class="popup-form" style="display: none">
 		<form id="download-form">
 			<div>
 				<span class="label label-info"
-					style="padding: 5px; margin-bottom: 10px;">The download link
-					will be available on your user profile page</span>
+					style="padding: 5px; margin-bottom: 10px;"><g:message code="msg.link.available" /></span>
 			</div>
  
 			<input type="hidden" name="downloadType" value="ZIP" /> <br />

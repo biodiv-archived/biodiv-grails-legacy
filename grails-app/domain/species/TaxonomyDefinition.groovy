@@ -4,10 +4,12 @@ import java.util.List;
 
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
-
+import org.springframework.context.MessageSourceResolvable;
 class TaxonomyDefinition extends NamesSorucedata {
 
-	public enum TaxonomyRank {
+  
+
+	public enum TaxonomyRank  implements org.springframework.context.MessageSourceResolvable {
 		KINGDOM("Kingdom"),
 		PHYLUM("Phylum"),
 		CLASS("Class"),
@@ -20,31 +22,45 @@ class TaxonomyDefinition extends NamesSorucedata {
 
 		private String value;
 
-		TaxonomyRank(String value) {
-			this.value = value;
-		}
+        TaxonomyRank(String value) {
+            this.value = value;
+        }
 
-		static list() {
-			[
-				KINGDOM,
-				PHYLUM,
-				CLASS,
-				ORDER,
-				FAMILY,
-				SUB_FAMILY,
-				GENUS,
-				SUB_GENUS,
-				SPECIES
-			]
-		}
+        TaxonomyRank(String value, int i) {
+        }
 
-		String value() {
-			return this.value;
-		}
+        static list() {
+            [
+            KINGDOM,
+            PHYLUM,
+            CLASS,
+            ORDER,
+            FAMILY,
+            SUB_FAMILY,
+            GENUS,
+            SUB_GENUS,
+            SPECIES
+            ]
+        }
 
-		String toString() {
-			return this.value();
-		}
+        String value() {
+            return this.value;
+        }
+
+        String toString() {
+            return this.value();
+        }
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            
+            println "${getClass().name}.${name()}"
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+
+        String getDefaultMessage() { value() }
+
 	}
 
 	int rank;

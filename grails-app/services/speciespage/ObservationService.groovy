@@ -71,6 +71,7 @@ import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 
 class ObservationService extends AbstractObjectService {
 
@@ -79,7 +80,7 @@ class ObservationService extends AbstractObjectService {
     def recommendationService;
     def observationsSearchService;
     //def curationService;
-    //def userGroupService;
+    def userGroupService;
     def activityFeedService;
     def SUserService;
     //def speciesService;
@@ -131,6 +132,7 @@ class ObservationService extends AbstractObjectService {
         observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
+        observation.language = params.locale_language;
 
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         //        if(params.latitude && params.longitude) {
@@ -363,10 +365,9 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "latestUpdatedObservations") {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
-        }
-        /*else if(params.filterProperty == "latestUpdatedSpecies") {
+        } else if(params.filterProperty == "latestUpdatedSpecies") {
             relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
-        }*/ 
+        } 
         else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
@@ -1181,6 +1182,15 @@ class ObservationService extends AbstractObjectService {
         }
         return null;
     }
+
+    /**
+    * getUserGroupObservations
+    */
+    def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
+		if(!userGroupInstance) return;
+        params['userGroup'] = userGroupInstance;
+        return getFilteredObservations(params, max, offset, isMapView); 
+	}
 
     /**
      * Gets users observations depending on user group
@@ -2095,7 +2105,7 @@ class ObservationService extends AbstractObjectService {
                 log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
                 return []
             }
-            return userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
+            return getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
         }
         else{
             return getFilteredObservations(params, max, offset, false).observationInstanceList
@@ -2103,11 +2113,30 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
+    /**
+    * Plz use utilsService.getUserGroup
+    **/
+    @Deprecated
     def getUserGroup(params) {
         return utilsService.getUserGroup(params);
     }
 
+    /**
+    * Plz use utilsService.sendNotificationMail
+    **/
+    @Deprecated
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
+
+
+     // Get Language id
+   Language getCurrentLanguage(request){
+        String langStr = RCU.getLocale(request)
+        def (langtwo, lang1) = langStr.tokenize( '_' );
+        def languageInstance = Language.findByTwoLetterCode(langtwo);
+        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);        
+   }
+
+
 }

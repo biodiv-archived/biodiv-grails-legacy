@@ -89,8 +89,6 @@ class DigestService {
             }
 
             otherParams['usersEmailList'] = usersEmailList  
-            println "============================== Sending email" 
-            println usersEmailList
             utilsService.sendNotificationMail(utilsService.DIGEST_MAIL,sp,null,null,null,otherParams)
             
             if(setTime) {
@@ -344,6 +342,22 @@ log.debug resultSet
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
+    def List getParticipantsForDigest(userGroup, max, offset) {
+        List participants = [];
+        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
+
+            result.each { user ->
+                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
+            participants << springSecurityService.currentUser;
+        }
+        return participants;
+    }
+
     def latestContentsByGroup(Digest digest) {
         log.debug "latestContentsByGroup ${digest}"
 		def res = [:]
@@ -422,19 +436,4 @@ log.debug resultSet
         
         return res
     }
-    def List getParticipantsForDigest(userGroup, max, offset) {
-        List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
-            result.each { user ->
-                if(user.sendDigest && !participants.contains(user)){
-                    participants << user
-                }
-            }
-        } else {
-            participants << springSecurityService.currentUser;
-        }
-        return participants;
-    }
-
 }

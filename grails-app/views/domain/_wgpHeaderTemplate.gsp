@@ -7,8 +7,7 @@
 				data-target=".nav-collapse"> <span class="icon-bar"></span> <span
 				class="icon-bar"></span> <span class="icon-bar"></span> </a> <a
 				class="brand" href="/"> <!-- img class="logo" alt="western ghats"
-						src="/sites/all/themes/wg/images/map-logo.gif"--> India
-				Biodiversity Portal</a>
+						src="/sites/all/themes/wg/images/map-logo.gif"--> <g:message code="link.india.biodiv.portal" /></a>
 			<div class="nav-collapse">
 				<ul class="nav">
 

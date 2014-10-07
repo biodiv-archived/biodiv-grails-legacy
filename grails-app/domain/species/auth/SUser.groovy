@@ -19,6 +19,7 @@ import species.groups.SpeciesGroup;
 import content.eml.Document
 import species.utils.ImageUtils;
 import species.SpeciesPermission;
+import species.Language;
 
 class SUser {
 
@@ -50,6 +51,8 @@ class SUser {
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
 
+	// Language
+    Language language;
 
 	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
 	static belongsTo = [UserGroup]
@@ -67,6 +70,7 @@ class SUser {
 		aboutMe nullable:true
 		location nullable:true
 		lastLoginDate nullable:true
+		language nullable:false
 	}
 
 	static mapping = {

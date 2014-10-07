@@ -14,12 +14,26 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 
 import species.utils.Utils;
+import groovyx.net.http.HTTPBuilder
+import static groovyx.net.http.Method.GET
+import static groovyx.net.http.ContentType.TEXT
+import java.util.concurrent.TimeUnit
+import org.codehaus.groovy.grails.web.json.JSONException
+import com.the6hours.grails.springsecurity.facebook.FacebookAccessToken
+
 
 class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils {
 
 	private static def log = Logger.getLogger(this)
 
 	def grailsApplication;
+	
+    //HACK required to populate user in facebookauthtoken... for new user registration
+    FacebookAuthToken build(String signedRequest) {
+        com.the6hours.grails.springsecurity.facebook.FacebookAuthToken t = super.build(signedRequest);
+        FacebookAuthToken token = new FacebookAuthToken(t);
+        return token;
+    }
 /*
 	FacebookAuthToken build(HttpServletRequest request, String signedRequest) {
 		if (!signedRequest) {
@@ -76,6 +90,58 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 			return it.name == cookieName
 		}
 	}
+
+    FacebookAccessToken requestAccessToken(String authUrl) {
+        try {
+            String responseStr;
+            new HTTPBuilder(authUrl).request(GET, TEXT) { req ->
+
+                response.success = { resp, reader ->
+                    log.debug "$authUrl request was successful"
+                    responseStr = reader.text;
+                }
+
+                response.failure = { resp ->
+                    log.debug "$authUrl request failed"
+                    throw new IOException(resp.getData().toString());
+                }
+            }
+
+            String response = responseStr?:'';
+            println "AccessToken response: $response"
+            Map data = [:]
+            response.split('&').each {
+                String[] kv = it.split('=')
+                if (kv.length != 2) {
+                    log.warn("Invalid response part: $it")
+                } else {
+                    data[kv[0]] = kv[1]
+                }
+            }
+            FacebookAccessToken token = new FacebookAccessToken()
+            if (data.access_token) {
+                token.accessToken = data.access_token
+            } else {
+                log.error("No access_token in response: $response")
+            }
+            if (data.expires) {
+                if (data.expires =~ /^\d+$/) {
+                    token.expireAt = new Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Long.parseLong(data.expires)))
+                } else {
+                    log.warn("Invalid 'expires' value: $data.expires")
+                }
+            } else {
+              log.error("No expires in response: $response")
+            }
+            //log.debug("Got AccessToken: $token")
+            return token
+        } catch (IOException e) {
+            log.error("Can't read data from Facebook", e)
+            return null
+        }
+    }
+
+
 /*
 	String getAccessToken(String applicationId, String secret, String code) {
 		try {

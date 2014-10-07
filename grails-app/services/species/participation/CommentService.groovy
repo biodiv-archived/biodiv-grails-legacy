@@ -30,13 +30,14 @@ class CommentService {
 		if(params.commentId){
 			c 	= Comment.findById(params.commentId?.toLong());			
 			c.body 	= params.commentBody.trim();
+			c.language 	=	params.locale_language;
 			c.lastUpdated = new Date();
 			
 		}else{
 			
 			c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 							commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
-							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim());
+							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim(), language:params.locale_language);
 			
 
 			if(params.dateCreated) {
@@ -164,17 +165,6 @@ class CommentService {
 		params.offset = params.offset ? params.offset.toLong() : 0
 	}
 
-	private userTagNofity(tagUserIds,domainObject,feedInstance,webaddress){
-		def tu =[];			
-		tagUserIds.each(){
-			def tagUser = SUser.read(it);
-			tu.add(tagUser);				
-			Follow.addFollower(domainObject, tagUser);
-		}			
-		def otherParams = ['taggedUsers' : tu];
-		observationService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
-
-	}
     def addRecoComment(commentHolder, rootHolder, recoComment){
         recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
         if(recoComment){
@@ -183,5 +173,18 @@ class CommentService {
                 addComment(m);
         }
     }
+
+	private userTagNofity(tagUserIds,domainObject,feedInstance,webaddress){
+		def tu =[];			
+		tagUserIds.each(){
+			def tagUser = SUser.read(it);
+			tu.add(tagUser);				
+			Follow.addFollower(domainObject, tagUser);
+		}			
+		def otherParams = ['taggedUsers' : tu];
+		utilsService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
+
+	}
+
 
 }

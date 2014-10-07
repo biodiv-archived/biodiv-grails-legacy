@@ -99,8 +99,6 @@ class SpeciesPermissionService {
                     return false
                 }
 
-                //observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, [speciesPermission:newCon]);
-                log.error "done"
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();

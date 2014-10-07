@@ -24,6 +24,7 @@ import species.License
 import content.Project
 
 import species.sourcehandler.XMLConverter
+import species.AbstractObjectService;
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
@@ -41,18 +42,15 @@ import species.groups.UserGroup;
 import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
 
-class DocumentService {
+class DocumentService extends AbstractObjectService {
 
 	static transactional = false
 	
 	private static final int BATCH_SIZE = 1
 	
 	def documentSearchService
-	def grailsApplication
 	def userGroupService
-	def dataSource
     def sessionFactory
-    def utilsService
 	def activityFeedService
 	
 	Document createDocument(params) {
@@ -76,7 +74,7 @@ class DocumentService {
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
 		document.locationAccuracy = params.location_accuracy
-
+		document.language = params.locale_language 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 		if(params.areas) {
 			WKTReader wkt = new WKTReader(geometryFactory);

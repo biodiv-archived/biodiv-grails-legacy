@@ -19,6 +19,8 @@ import species.participation.Checklists;
 import content.eml.Document;
 import species.participation.RecommendationVote;
 import groovy.sql.Sql;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class ChartService {
 
@@ -31,7 +33,7 @@ class ChartService {
 	static final String SPECIES_STATS = "Species stats"
 	static final String USER_OBSERVATION_BY_SPECIESGROUP = "User observation by species group"
 	
-
+def messageSource;
     def utilsService
 	def userGroupService
     def dataSource
@@ -50,9 +52,9 @@ class ChartService {
 
 		mergeResult(allResult, unidentifiedResult)
     	allResult.columns = [
-			['string', 'Species Group'],
-			['number', 'All'],
-			['number', 'UnIdentified']
+			['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
+			['number', messageSource.getMessage("default.all.label", null, LCH.getLocale())],
+			['number', messageSource.getMessage("button.unidentified", null, LCH.getLocale())]
 		]
 
 		addHtmlResultForObv(allResult, request)
@@ -69,7 +71,7 @@ class ChartService {
         mergeResult(allObvResult, allRecoResult)
     	allObvResult.columns = [
 			['string', 'Species Group'],
-			['number', 'Observations'],
+			['number', ''],
 			['number', 'Identifications']
 		]
 
@@ -258,9 +260,9 @@ class ChartService {
 		}
 
 		def res = [data : finalResult, columns : [
-				['string', 'Species Group'],
-				['number', 'Content'],
-				['number', 'Stubs']
+				['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
+				['number', messageSource.getMessage("default.content.label", null, LCH.getLocale())],
+				['number', messageSource.getMessage("table.stubs", null, LCH.getLocale())]
 			]]
 		addHtmlResultForSpecies(res, , request)
 		return res
@@ -275,9 +277,9 @@ class ChartService {
 		res.htmlData = htmlData
 		res.htmlColumns = [
 			['string', ''],
-			['string', 'Species Group'],
-			['number', 'Content'],
-			['number', 'Stubs']
+			['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
+			['number', messageSource.getMessage("default.content.label", null, LCH.getLocale())],
+			['number', messageSource.getMessage("table.stubs", null, LCH.getLocale())]
 		]
 	}
 	
@@ -329,13 +331,13 @@ class ChartService {
 		}
 		
 		return [obvCount:obvCount, data : result, htmlData:finalResult, columns : [
-					['string', 'User'],
-					['number', 'Observations']
+					['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
+					['number', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
 				],
 				htmlColumns : [
 					['string', ''],
-					['string', 'User'],
-					['string', 'Observations']
+					['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
+					['string', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
 				]
 			]
 	}

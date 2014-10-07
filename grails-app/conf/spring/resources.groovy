@@ -300,6 +300,7 @@ beans = {
     facebookAuthService(FacebookAuthService) {
         grailsApplication = ref('grailsApplication')
         userDomainClassName = conf.userLookup.userDomainClassName
+        facebookAuthDao = ref('facebookAuthDao')
     }
 
 

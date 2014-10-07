@@ -259,6 +259,36 @@ class UFileController {
         }
     }
 
+    def saveModifiedSpeciesFile = {
+        //log.debug params
+        File file = speciesUploadService.saveModifiedSpeciesFile(params);
+        if(file) {
+            return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html') 
+        } else {
+            println "======SAVE MODIFIED SPECIES FILE CALLED BUT NO FILE ======= " + params
+            return
+        }
+        /*
+        if (f.exists()) {
+            println "here here===================="
+            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+            response.outputStream << f.readBytes()
+            response.outputStream.flush()
+            println "==YAHAN HUN == " 
+            return render(text: [success:true] as JSON, contentType:'text/html')
+        } else {
+            println "in else================"
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            log.error msg
+            flash.message = msg
+            redirect controller: params.errorController, action: params.errorAction
+            return
+        }
+        */
+    }
+
     def downloadSpeciesFile = {
         //println "====FILE NAME =======" + params
         if(params.downloadFile) {

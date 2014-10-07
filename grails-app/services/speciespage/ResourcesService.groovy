@@ -34,14 +34,12 @@ import species.participation.UsersResource.UsersResourceStatus;
 import species.participation.Observation;
 import species.Species;
 import speciespage.ObservationService;
-import species.participation.UsersResource;
 import species.UtilsService;
+import species.participation.UsersResource;
 
 class ResourcesService extends AbstractObjectService {
 
 	static transactional = false
-
-    def observationService;
 
     /**
 	 * Filter resources by group, habitat, tag, user, species

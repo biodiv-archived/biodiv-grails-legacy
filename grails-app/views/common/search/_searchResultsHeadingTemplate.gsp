@@ -18,4 +18,3 @@
         model="['observationInstanceList':instanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'search result']" />
     </div>
 </div>
-

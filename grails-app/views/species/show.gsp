@@ -213,7 +213,7 @@
                 <g:if test="${!speciesInstance.percentOfInfo}">
                 <div class="poor_species_content alert">
                     <i class="icon-info"></i>
-                    No information yet.
+                   <g:message code="showspeciesstorytablet.no.information" />
 
                 </div>
                 </g:if>
@@ -264,8 +264,6 @@
                     <!--div id="tocContainer" class="sidebar_section">
                     <div id="toc" class="tile"></div>
                     </div-->
-
-
                     <!--div id="map" class="sidebar_section">
                     <h5>Occurrence Map</h5>
                     <div id="mapSpinner" class="spinner">
@@ -289,7 +287,7 @@
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
-                        <h5> Activity </h5>
+                        <h5> <g:message code="button.activity" /> </h5>
                         <div class="union-comment">
                             <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                             <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false]" />
@@ -328,7 +326,7 @@
 
             var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
-            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
 
             </script>	

@@ -37,6 +37,7 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.AbstractObjectController;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -54,6 +55,7 @@ class ObservationController extends AbstractObjectController {
     def chartService;
     def messageSource;
     def commentService;
+    def utilsService;
 
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -269,6 +271,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private saveAndRender(params, sendMail=true){
+		params.locale_language = observationService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
         /*if(request.getHeader('X-Auth-Token')) {
             if(!result.success) result.remove('observationInstance');
@@ -293,17 +296,19 @@ class ObservationController extends AbstractObjectController {
 
 	def show() {
         params.id = params.long('id');
-
+        def msg;
         if(request.getHeader('X-Auth-Token')) {
             
             if(params.id) {
     			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
 	    		if (!observationInstance) {
-                    render (['success':false, 'msg':"Coudn't find observation with id ${params.id}"] as JSON)
+	    			msg = messageSource.getMessage("default.not.find.by.id", ['Observation',params.id] as Object[], request.locale)
+                    render (['success':false, 'msg':msg] as JSON)
                     return
                 } else {
     				if(observationInstance.instanceOf(Checklists)){
-                        render (['success':false, 'msg':"Id ${params.id} is a checklist"] as JSON)
+    					msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], request.locale)
+                        render (['success':false, 'msg':msg] as JSON)
 					    return
 	    			}
 
@@ -316,7 +321,8 @@ class ObservationController extends AbstractObjectController {
                 }
 
             } else {
-                render (['success':false, 'msg':"Valid id is required"] as JSON)
+            	msg = messageSource.getMessage("id.required", ['Valid id'] as Object[], request.locale)
+                render (['success':false, 'msg':msg] as JSON)
                 return
             }
         }
@@ -334,20 +340,14 @@ class ObservationController extends AbstractObjectController {
 					return
 				}
 				observationInstance.incrementPageVisit()
-				def userGroupInstance;
-				if(params.webaddress) {
-					userGroupInstance = userGroupService.get(params.webaddress);
-				}
-				if(params.pos) {
-					int pos = params.int('pos');
-					def prevNext = getPrevNextObservations(pos, params.webaddress);
-					if(prevNext) {
-						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
-					} else {
-						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
-					}
+				def userLanguage = observationService.getCurrentLanguage(request);   
+                int pos = params.pos?params.int('pos'):0;
+				def prevNext = getPrevNextObservations(pos, params.webaddress);
+					
+				if(prevNext) {
+						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage]
 				} else {
-					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
+					[observationInstance: observationInstance,'userLanguage':userLanguage]
 				}
 			}
 		} else {
@@ -455,8 +455,10 @@ class ObservationController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
 	def upload_resource() {
 		def message;
+		def msg;
 		if(params.ajax_login_error == "1") {
-            message = [status:401, error:'Please login to continue']
+			msg = messageSource.getMessage("default.login.continue", null, request.locale)
+            message = [status:401, error:msg]
 			render message as JSON 
 			return;
 		} else if(!params.resources && !params.videoUrl) {
@@ -619,10 +621,10 @@ class ObservationController extends AbstractObjectController {
 						res.setUrl(videoUrl);				
 						resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
 						} else {
-						message = "Not a valid youtube video url"
+						message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , request.locale)
 						}
 					} else {
-						message = "Not a valid video url"
+						message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , request.locale)
 					}
 				}
 
@@ -718,7 +720,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
 						mailType = utilsService.OBSERVATION_ADDED;
-						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+						utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
 					if(!params["createNew"] && !isMobileApp){
@@ -753,11 +755,11 @@ class ObservationController extends AbstractObjectController {
 					} else {
 						mailType = utilsService.SPECIES_RECOMMENDED;
 					}
-					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
                     if(!params["createNew"] && !isMobileApp){
-						//observationService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
+						//utilsService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
@@ -788,7 +790,8 @@ class ObservationController extends AbstractObjectController {
                             def formattedMessage = messageSource.getMessage(it, null);
                             errors << [field: it.field, message: formattedMessage]
                         }
-                        render (['status':'error', 'success' : 'false', 'msg':'Failed to save recommendation vote', 'errors':errors] as JSON)
+                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, request.locale)
+                        render (['status':'error', 'success' : 'false', 'msg':msg, 'errors':errors] as JSON)
                     }
                     if(params.oldAction != "bulkSave"){
                         if(isMobileApp){
@@ -841,7 +844,7 @@ class ObservationController extends AbstractObjectController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addAgreeRecommendationVote() {
-
+		def msg;
 		params.author = springSecurityService.currentUser;
  
         try {
@@ -855,7 +858,7 @@ class ObservationController extends AbstractObjectController {
 		if(params.obvId) {
 			//Saves recommendation if its not present
 			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
-			def recVoteResult, recommendationVoteInstance, msg
+			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
 				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
 				recommendationVoteInstance = recVoteResult?.recVote;
@@ -881,7 +884,7 @@ class ObservationController extends AbstractObjectController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					observationService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
@@ -899,13 +902,15 @@ class ObservationController extends AbstractObjectController {
                             def formattedMessage = messageSource.getMessage(it, null);
                             errors << [field: it.field, message: formattedMessage]
                         }
-                        render (['status':'error', 'success' : 'false', 'msg':'Failed to save recommendation vote', 'errors':errors] as JSON)
+                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, request.locale)
+                        render (['status':'error', 'success' : 'false', 'msg':msg, 'errors':errors] as JSON)
                     }            
 				}
 			} catch(e) {
 				e.printStackTrace();
                 if(request.getHeader('X-Auth-Token')){
-                    render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
+                	msg = messageSource.getMessage("default.error.adding.vote", [e.getMessage()] as Object[], request.locale)
+                    render (['status':'error', 'success':'false', 'msg':msg] as JSON);
                 } else{
                     //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
                 }
@@ -957,7 +962,7 @@ class ObservationController extends AbstractObjectController {
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 			   //sending mail to user
-			   observationService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
+			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
 			   def r = [
 				   status : 'success',
 				   success : 'true',
@@ -1558,13 +1563,13 @@ class ObservationController extends AbstractObjectController {
             }
             obv.maxVotedReco = reco; 
             obv.isLocked = true;
-            msg = "Observation successfully locked, Please refresh to see changes"
+            msg = messageSource.getMessage("default.observation.locked", null, request.locale)
             
         }else{
             obv.removeResourcesFromSpecies()
             obv.isLocked = false;
             obv.calculateMaxVotedSpeciesName()
-            msg = "Observation successfully unlocked, Please refresh to see changes"
+            msg = messageSource.getMessage("default.observation.unlocked", null, request.locale)
         }
         if(!obv.save(flush:true)){
             obv.errors.allErrors.each { log.error it } 
@@ -1596,6 +1601,7 @@ class ObservationController extends AbstractObjectController {
         log.debug params;
         if(request.method == 'POST') {
             //TODO:edit also calls here...handle that wrt other domain objects
+            params.locale_language = observationService.getCurrentLanguage(request);
             def result = observationService.saveObservation(params, false)
             if(result.success){
                 forward(action: 'addRecommendationVote', params:params);

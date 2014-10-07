@@ -10,7 +10,7 @@ def obvId = documentInstance.id
 </g:if>
 
 <div class="snippet">
-    <span class="badge ${documentInstance.group?.iconClass()} ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? 'Featured':''}">
+    <span class="badge ${documentInstance.group?.iconClass()} ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
     </span>
     <div class="figure pull-left observation_story_image" 
         title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
@@ -24,13 +24,11 @@ def obvId = documentInstance.id
             <g:else>
             <img class="galleryImage img-polaroid"
             src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-            title="You can contribute!!!" />
+            title="${g.message(code:'showobservationsnippet.title.contribute')}" />
             </g:else>
         </div>
 
         </g:link>
-
+        <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:showDetails, showFeatured:showFeatured, showPDFViewer:showPDFViewer]"></g:render>
     </div>
-
-    <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:showDetails, showFeatured:showFeatured, showPDFViewer:showPDFViewer]"></g:render>
 </div>

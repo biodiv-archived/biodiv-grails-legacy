@@ -26,7 +26,7 @@
 		</g:if>
 		<g:hasErrors bean="${newsletterInstance}">
 			<div class="errors">
-				Please fix following error before proceeding
+				<g:message code="newsletter.create.fix.error" />
 			</div>
 		</g:hasErrors>
 		<form action="${uGroup.createLink(controller:'newsletter', action:'save', userGroupWebaddress:params.webaddress)}" method="POST">
