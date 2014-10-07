@@ -25,7 +25,7 @@
                     </g:if>
                     <g:elseif test="${taxonRank.ordinal() < speciesInstance.taxonConcept.rank}">
                     <div class="input-prepend">
-                        <span class="add-on"> ${taxonRank.value()}</span>
+                        <span class="add-on"> ${g.message(error:taxonRank)}</span>
                         <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
                         type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
                         placeholder="Add ${taxonRank.value()}" />

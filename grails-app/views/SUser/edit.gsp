@@ -11,7 +11,7 @@
 </sec:ifNotSwitched>
 
 <head>
-<g:set var="title" value="User"/>
+<g:set var="title" value="${g.message(code:'value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_show" />
 <style>
@@ -194,7 +194,7 @@
 						<div class="super-section"
 								style="position: relative; overflow: visible;">
 								<h5>
-									<i class="icon-screenshot"></i><g:message code="suser.edit.Interests" />
+									<i class="icon-screenshot"></i><g:message code="suser.edit.intrests" />
 								</h5>
 								
 								<div class="row control-group left-indent">

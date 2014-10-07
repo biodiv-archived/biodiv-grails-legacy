@@ -74,7 +74,7 @@ class DocumentService extends AbstractObjectService {
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
 		document.locationAccuracy = params.location_accuracy
-
+		document.language = params.locale_language 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 		if(params.areas) {
 			WKTReader wkt = new WKTReader(geometryFactory);

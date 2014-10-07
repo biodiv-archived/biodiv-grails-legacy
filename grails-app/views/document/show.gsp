@@ -75,7 +75,7 @@
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, showDetails:true]"/>
+                    <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, showDetails:true,'userLanguage':userLanguage]"/>
 			<g:if
 				test="${documentInstance?.speciesGroups || documentInstance?.habitats || documentInstance?.placeName }">
 

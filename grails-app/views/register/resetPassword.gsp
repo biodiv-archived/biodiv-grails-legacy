@@ -38,7 +38,7 @@
 					<div
 						class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 						<label class="control-label" for="password"><g:message
-								code='user.password.label' default='Password *' /> </label>
+								code='register.password.label'  /> </label>
 						<div class="controls">
 							<input class="input-block-level" id="password" type="password"
 								value="${command.password}" name="password"
@@ -54,7 +54,7 @@
 					<div
 						class="control-group ${hasErrors(bean: command, field: 'password2', 'error')}">
 						<label class="control-label" for="password2"><g:message
-								code='user.password2.label' default='Password (again)*' /> </label>
+								code='register.password.again.label'  /> </label>
 						<div class="controls">
 							<input class="input-block-level" id="password2" type="password"
 								value="${command.password2}" name="password2"

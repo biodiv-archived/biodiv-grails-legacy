@@ -264,8 +264,6 @@
                     <!--div id="tocContainer" class="sidebar_section">
                     <div id="toc" class="tile"></div>
                     </div-->
-
-
                     <!--div id="map" class="sidebar_section">
                     <h5>Occurrence Map</h5>
                     <div id="mapSpinner" class="spinner">
@@ -328,7 +326,7 @@
 
             var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
-            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
 
             </script>	

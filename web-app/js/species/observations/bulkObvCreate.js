@@ -64,7 +64,7 @@ function submitForms(counter, size, allForms, showListPage){
     }
     if(counter == size){
         $("body").css("cursor", "default");
-        alert("Observations created successfully = " + (counter - errorCount) + "\n Errors in observation submission = " +errorCount);
+        alert(window.i8ln.observation.bulkObvCreate.suc + (counter - errorCount) + "\n"+ window.i8ln.observation.bulkObvCreate.submit +errorCount);
         
         if(!showListPage) {
             if(!gotError){
@@ -205,7 +205,7 @@ function dropAction(event, ui, ele) {
 
 
 
-
+//alert($(".obvCreateTags").attr('rel'));
 
 $(".obvCreateTags").tagit({
     select:true, 
