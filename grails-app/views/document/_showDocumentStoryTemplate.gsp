@@ -21,7 +21,6 @@
         <g:else>
 
         <g:if test="${documentInstance.uFile}">
-
         <% def extension = documentInstance?.uFile?.path.split("\\.")[-1] %>
             <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
                 <% url = grailsApplication.config.speciesPortal.content.serverURL
