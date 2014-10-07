@@ -3,6 +3,7 @@ package species
 import org.grails.rateable.*
 import species.auth.SUser
 import species.NamesSorucedata;
+import species.Language;
 
 class SpeciesField extends NamesSorucedata implements Rateable {
 
@@ -64,7 +65,9 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	Date dateCreated
 	Date lastUpdated
     List<Contributor> attributors;
-	
+	// Language
+    Language language;
+
 	static hasMany = [licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
@@ -78,6 +81,7 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	
 	static constraints = {
         description blank:false, nullable:false
+        language nullable:false
 		contributors validator : { val, obj ->
 			if(!val) {
 				//obj.addToContributors(SUser.findByUsername('pearlsravanthi'));

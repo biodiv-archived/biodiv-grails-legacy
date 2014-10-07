@@ -104,9 +104,9 @@
     <g:each in="${speciesFieldInstance?.description?.split('\n')}"
     var="para">
     <g:if test="${para}">
-    <p>
-    ${raw(para.trim())}
-    </p>
+    <div>        
+        <g:render template="/common/languagewrap" model="['domainInstance': speciesFieldInstance , 'userLanguage' : userLanguage, 'contentValue' : para.trim(), 'isHtml' : true]"/>
+    </div>
     </g:if>
 
     </g:each>

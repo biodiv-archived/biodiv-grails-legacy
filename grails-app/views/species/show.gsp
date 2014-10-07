@@ -246,7 +246,7 @@
                         <g:else>
                         <li class="nav ui-state-default">
                         </g:else>
-                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor]" />
+                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage]" />
                         </li>
                         <%conceptCounter++%>
                         </g:else>
@@ -281,7 +281,7 @@
                         The current map showing distribution of species is only indicative.
                     </div>
 
-                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
+                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	
 
                     </div-->
                     <uGroup:objectPostToGroupsWrapper 
@@ -290,7 +290,7 @@
                         <h5> <g:message code="button.activity" /> </h5>
                         <div class="union-comment">
                             <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false]" />
+                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                         </div>
                     </div>
 
