@@ -49,8 +49,8 @@ class SearchController {
             def filterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
             listHtml = listHtml.replaceAll(/\n|\t|\s+/,' ');
-            //def filterPanel = g.render(template:"/search/sidebar", model:[modules:model.objectTypes, sGroups:model.sGroups, tags:model.tags, contributors:model.contributors]);
-            def result = [obvListHtml:listHtml, obvFilterMsgHtml:filterMsgHtml,  instanceTotal:model.instanceTotal]
+            def filterPanel = g.render(template:"/search/sidebar", model:[modules:model.objectTypes, sGroups:model.sGroups, tags:model.tags, contributors:model.contributors]);
+            def result = [obvListHtml:listHtml, obvFilterMsgHtml:filterMsgHtml, filterPanel:filterPanel,  instanceTotal:model.instanceTotal]
             render result as JSON
             return;
         }
