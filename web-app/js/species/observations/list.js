@@ -525,7 +525,12 @@ function getSelectedUserGroup() {
 function getSelectedFilters($ele) {
     var selected = [];
     $ele.each(function() {
-        selected.push($(this).attr('name'));
+        var name = $(this).attr('value');
+        if(name.toLowerCase() == 'all') {
+            selected = ['All']
+            return;
+        }
+        selected.push(name);
     });
     return selected.join(' or ');
 } 
@@ -596,6 +601,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         }
     }
 
+    console.log(isRegularSearch);
+
     if(!isRegularSearch) {
         $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
@@ -664,26 +671,26 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['isMapView']
     }
 
-    var object_type = getSelectedFilters($("input.moduleFilter:checked"))
+    var object_type = getSelectedFilters($("input.moduleFilter.active:checked"))
     if(object_type) {
         params['object_type'] = object_type
     } else {
         delete params['object_type']
     }
 
-    var sGroup = getSelectedFilters($("input.sGroupFilter:checked"))
+    var sGroup = getSelectedFilters($("input.sGroupFilter.active:checked"))
     if(sGroup) {
         params['sGroup'] = sGroup
     } 
 
-    var contributor = getSelectedFilters($("input.contributorFilter:checked"))
+    var contributor = getSelectedFilters($("input.contributorFilter.active:checked"))
     if(contributor) {
         params['contributor'] = contributor
     } else {
         delete params['contributor']
     }
 
-    var tag = getSelectedFilters($("input.tagFilter:checked"))
+    var tag = getSelectedFilters($("input.tagFilter.active:checked"))
     if(tag) {
         params['tag'] = tag
     } else {

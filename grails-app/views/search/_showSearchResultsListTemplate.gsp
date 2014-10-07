@@ -22,7 +22,7 @@
                     <obv:showSnippet model="['observationInstance':instance]"></obv:showSnippet>
                     </g:elseif>
                     <g:elseif test="${className == Document.simpleName}">
-                    <g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':instance]"/>
+                    <g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':instance, showPdfViewer:false]"/>
                     </g:elseif>
                     <g:elseif test="${className == SUser.simpleName}">
                     <g:render template="/common/suser/showUserSnippetTemplate" model="['userInstance':instance]"/>
@@ -30,7 +30,7 @@
                     <g:elseif test="${className == UserGroup.simpleName}">
                     <table class="table">
                         <tr class="mainContentList">
-                            <g:render template="/common/userGroup/showUserGroupSnippetTemplate" model="['userGroupInstance':instance]"/>
+                            <g:render template="/common/userGroup/showUserGroupSnippetTemplate" model="['userGroupInstance':instance, showJoin:false, showLeave:false]"/>
                         </tr>
                     </table>
                     </g:elseif>

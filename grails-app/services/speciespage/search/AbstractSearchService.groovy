@@ -39,7 +39,7 @@ abstract class AbstractSearchService {
     @Autowired
     SolrServer solrServer;
 	SessionFactory sessionFactory;
-    int BATCH_SIZE = 50;
+    int BATCH_SIZE = 20;
     int INDEX_DOCS = 20;
 
     def getUtilsServiceBean() {

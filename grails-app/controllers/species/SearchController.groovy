@@ -44,8 +44,11 @@ class SearchController {
         } else {
             println "333======================="
             params.remove('isGalleryUpdate');
+            model['resultType'] = 'search result'
             def listHtml =  g.render(template:"/search/showSearchResultsListTemplate", model:model);
             def filterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+            listHtml = listHtml.replaceAll(/\n|\t/,'');
             //def filterPanel = g.render(template:"/search/sidebar", model:[modules:model.objectTypes, sGroups:model.sGroups, tags:model.tags, contributors:model.contributors]);
             def result = [obvListHtml:listHtml, obvFilterMsgHtml:filterMsgHtml,  instanceTotal:model.instanceTotal]
             render result as JSON

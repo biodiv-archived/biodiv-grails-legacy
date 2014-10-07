@@ -27,8 +27,6 @@ import species.auth.SUser;
 class SpeciesSearchService extends AbstractSearchService {
 	
 	
-    int BATCH_SIZE = 20;
-
 	/**
 	 * 
 	 */

@@ -142,12 +142,14 @@ $(document).ready(function(){
 	$("#advSearch").click(function() {
 		$( "#advSearchForm" ).submit();
 	});
+
 	$( "#advSearchForm" ).submit(function() {
 		if($('#uGroup_ALL').is(':checked')) {
 			$( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
 			updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
 			return false;
 		} 
+        resetSearchFilters();
 		updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
 		return false;
 	});

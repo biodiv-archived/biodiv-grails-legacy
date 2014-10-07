@@ -98,7 +98,6 @@ $(document).ready(function() {
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 
     $('#advSearchBox.dropdown-menu input, #advSearchBox.dropdown-menu label, #advSearchBox.dropdown-menu select').click(function(e) {
-            console.log('stopping propogation of dropdown event');
             e.stopPropagation();
     });
 });
