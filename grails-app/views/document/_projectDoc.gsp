@@ -18,7 +18,7 @@
 					value="${documentInstance?'false':'true'}" />
 
 				<div class="control-group">
-					<label class="control-label" for="file"> File </label>
+					<label class="control-label" for="file"> <g:message code="default.file.label" /></label>
                                         <div class="controls">
 					<span class="qq-upload-file"><i class="icon-file"></i> ${docName}
 					</span> of size <span class="qq-upload-size"> ${fileSize}
@@ -28,7 +28,7 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="name"> Title </label>
+					<label class="control-label" for="name"> <g:message code="default.title.label" /> </label>
 
 					<div class="controls">
 						<input class="input-block-level" type='text' name='${docId}.title'
@@ -37,23 +37,19 @@
 					</div>
 
 				</div>
-
 				<div class="control-group">
-					<label class="control-label" for="notes"> Description
+					<label class="control-label" for="description"> <g:message code="default.description.label" /> 				
 					</label>
 					<div class="controls">
-						<textarea rows='4' name='${docId}.notes' width="100%" class="input-block-level"
-							value='${documentInstance?.notes}'
-							placeholder="Describe the file"> </textarea>
+						<textarea rows='4' name='${docId}.description' width="100%" class="input-block-level"
+							placeholder="Describe the file"> ${documentInstance?.notes}</textarea>
 					</div>
 
 
 				</div>
-
-                            
 				<div
 					class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
-					<label class="control-label" for="contributors">Contributor(s)</label>
+					<label class="control-label" for="contributors"><g:message code="default.contributor.label" /></label>
 					<div class="controls">
 						<input type="text" class="input-block-level" name="${docId}.contributors"
 							value="${documentInstance?.contributors }" />
@@ -64,12 +60,12 @@
 
 				<div
 					class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
-					<label class="control-label" for="attribution">Attribution</label>
+					<label class="control-label" for="attribution"><g:message code="default.attribution.label" /></label>
 					<div class="controls">
 						<input type="text" class="input-block-level" name="${docId}.attribution"
 							value="${documentInstance?.attribution}" />
 					</div>
-				</div> <label class="control-label" for="License"> License </label>
+				</div> <label class="control-label" for="License"> <g:message code="default.licenses.label" /> </label>
 
 				<div id="${docId}.license" class="licence_div dropdown controls">
 
@@ -81,7 +77,7 @@
 
 					<ul id="license_options_${docId}"
 						class="dropdown-menu license_options">
-						<span>Choose a license</span>
+						<span><g:message code="default.choose.license.label" /></span>
 						<g:each in="${License.list()}" var="l">
 							<li class="license_option"
 								onclick="$('#license_${docId}').val($.trim($(this).text()));$('#selected_license_${docId}').find('img:first').replaceWith($(this).html());">
@@ -97,7 +93,7 @@
 				</div>
                                 <div class="control-group" style="clear:both;">
                                     <label class="control-label" for='tags'> <i
-					class="icon-tags"></i>Tags
+					class="icon-tags"></i><g:message code="default.tags.label" />
 			            </label>
                                     <div class="controls">
                                             <ul class='file-tags' id="${docId}-tags" name="${docId}.tags">

@@ -5,15 +5,18 @@ function removeResource(event, imageId) {
     else if (event.srcElement) targ = event.srcElement; //for IE
     else {}
     if(($(targ).closest(".imagesList").size() == 1) && ($( "input[name='resType']" ).val() == "species.auth.SUser")){
-        var resId =  $(targ).parent('.addedResource').find(".resId").val()
-        var resDeleteUrl = window.params.resDeleteUrl
+        var resId =  $(targ).parent('.addedResource').find(".resId").val();
+        var fileName = $(targ).parent('.addedResource').find(".fileName").val();
+        var resDeleteUrl = window.params.resDeleteUrl;
         $.ajax({
             url: resDeleteUrl,
             dataType: "json",
-            data: {resId:resId},	
+            data: {resId:resId , fileName:fileName},	
             success: function(data) {
                 if(data.status){
-                    alert("Media deleted!")
+                    alert(window.i8ln.observation.addResource.md)
+                } else {
+                    alert("Deletion failed - Uploaded media has no ID, refresh and try!!")
                 } 
             }, error: function(xhr, status, error) {
                 alert(xhr.responseText);
@@ -29,6 +32,182 @@ function removeResource(event, imageId) {
 
 }
 
+function attachThumbnailAndProcess(me , images) {
+    var html = $( "#metadataTmpl" ).render( images );
+    var metadataEle = $(html);
+    if($( "input[name='resType']" ).val() == "species.participation.Observation") {
+        metadataEle.each(function() {
+            $('.geotagged_image', this).load(function(){
+                var me = this;
+                $.proxy(loadMapInput, $(".addObservation").find(".map_class"), $(me))();
+                //$(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+            });
+            var $ratingContainer = $(this).find('.star_obvcreate');
+            rate($ratingContainer);
+        });
+    }
+    me.$ele.find(".imagesList li:first" ).after (metadataEle);
+    me.$ele.find(".add_file" ).fadeIn(3000);
+    me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
+    me.$ele.find(".image-resources-msg").html("");
+    me.$form.find("input[name='resources']").remove();
+    me.$ele.find('.videoUrl').val('');
+    me.$ele.find('.audioUrl').val('');
+    me.$ele.find('.add_video').editable('setValue','', false);
+    // me.$ele.find('.add_audio').editable('setValue','', false);		
+    me.$ele.find('.add_video').editable('setValue','', false);	
+
+    if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+        var count = $("input[name='lastUploaded']").val();
+        var start = 0;
+        var w = 1; 
+        var end = start + w; 
+        createResources(start, end, w, count);
+        $("input[name='obvDir']").val('');
+    }
+}
+
+function submitNextUpload(me) {
+    var val = (me.start/me.uploadedFilesSize)*100;
+        me.$ele.find(".mediaProgressBar").progressbar({
+            value:val
+        });
+    if(me.start < me.uploadedFilesSize) {
+        var count = 0;
+        var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+        me.start = me.start + me.w;
+        $.each(FPF, function(){
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'resources',
+                value:JSON.stringify(this)
+            }).appendTo(me.$form);
+            count = count + 1;
+        });
+        if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+            $("input[name='obvDir']").val('');
+            $("input[name='lastUploaded']").val(count);
+        }
+        me.submitRes();
+    } else {
+        me.$ele.find(".progress").css('z-index',90);
+        me.$ele.find(".mediaProgressBar").progressbar("destroy");
+        me.$ele.find('.progress_msg').html('');
+        $(".sortMediaOnExif").removeClass("disabled"); 
+    }
+}
+
+function getProcessedImageStatusInAjax(jobId, images, me) {
+    if(!jobId) {
+        console.log("NO JOB ID");
+        return;
+    }
+    $.ajax({
+        url:window.params.getProcessedImageUrl,
+        dataType: "json",
+        data:{jobId:jobId},
+        success: function(data) {
+            if(data.imageStatus == "Success") {
+                //me.$ele.find(".progress").css('z-index',90);
+                flag = false;
+                attachThumbnailAndProcess(me, images);
+                /*
+                var html = $( "#metadataTmpl" ).render( images );
+                var metadataEle = $(html);
+                if($( "input[name='resType']" ).val() == "species.participation.Observation") {
+                    metadataEle.each(function() {
+                        $('.geotagged_image', this).load(function(){
+                            var me = this;
+                            $.proxy(loadMapInput, $(".addObservation").find(".map_class"), $(me))();
+                            //$(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
+                        });
+                        var $ratingContainer = $(this).find('.star_obvcreate');
+                        rate($ratingContainer);
+                    });
+                }
+                me.$ele.find(".imagesList li:first" ).after (metadataEle);
+                me.$ele.find(".add_file" ).fadeIn(3000);
+                me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
+                me.$ele.find(".image-resources-msg").html("");
+                me.$form.find("input[name='resources']").remove();
+                me.$ele.find('.videoUrl').val('');
+                me.$ele.find('.audioUrl').val('');
+                me.$ele.find('.add_video').editable('setValue','', false);
+                // me.$ele.find('.add_audio').editable('setValue','', false);		
+                me.$ele.find('.add_video').editable('setValue','', false);	
+
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    var count = $("input[name='lastUploaded']").val();
+                    var start = 0;
+                    var w = 1; 
+                    var end = start + w; 
+                    createResources(start, end, w, count);
+                    $("input[name='obvDir']").val('');
+                }*/
+                submitNextUpload(me); 
+                return;
+
+            } else if(data.imageStatus == "Failed") {
+                me.$ele.find(".progress").css('z-index',90);
+                me.$ele.find('.progress_msg').html('');
+                flag = false;
+                submitNextUpload(me);
+                return;
+
+            } else {
+                setTimeout(function(){getProcessedImageStatusInAjax(jobId, images, me)}, 500);
+            }
+        }, error : function(xhr, status, error) {
+            console.log("====ERROR=======");
+            //alert(xhr.responseText);
+        }
+    });
+
+}
+
+function getProcessedImageStatus(jobId, images, me) {
+    if(!jobId) {
+        console.log("NO JOB ID");
+        return;
+    }
+    getProcessedImageStatusInAjax(jobId, images, me);
+}
+
+function createResources(start, end, w, count) {
+    if(count < end) {
+        end = count;
+    }
+    var metadataForForm = $(".metadata.prop").slice(start, end).clone();
+    $(metadataForForm).css("display","none");
+    $("form.createResource").find(".metadata.prop").remove();
+    $(metadataForForm).appendTo($("form.createResource"));
+
+    $("form.createResource").ajaxSubmit({
+        url : $(this).attr("action"),
+        dataType : 'json', 
+        type : 'POST',
+        success : function(data, statusText, xhr, form) {
+            if(end >= count) {
+                $(".addedResource.thumbnail").draggable({helper:'clone'});  
+
+                $(".imageHolder").droppable({
+                    accept: ".addedResource.thumbnail",
+                    drop: function(event,ui){
+                        dropAction(event, ui, this);    
+                    }
+                });
+                return;
+            } else {
+                createResources(end, end + w, w, count);
+            }
+        }, error : function (xhr, ajaxOptions, thrownError){
+            console.log("THROWN ERROR");
+            console.log(thrownError);
+            createResources(end, end + w, w, count);
+        }  
+    });
+}
+
 /**
   @class uploadResource
  **/
@@ -37,7 +216,7 @@ function removeResource(event, imageId) {
 
     var UploadResource = function (ele, options) {
         this.$ele = $(ele);
-        this.$form = $(ele).find('form#upload_resource');
+        this.$form = $(ele).find('form.upload_resource');
         this.initForm(options);
     }
 
@@ -56,7 +235,7 @@ function removeResource(event, imageId) {
                 url : function(params) {
                     var d = new $.Deferred;
                     if(!params.value) {
-                        return d.reject('This field is required'); //returning error via deferred object
+                        return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
                     } else {
                         me.$form.find('.videoUrl').val(params.value);
                         me.submitRes();
@@ -66,10 +245,10 @@ function removeResource(event, imageId) {
                 }, 
                     validate :  function(value) {
                         if($.trim(value) == '') {
-                            return 'This field is required';
+                            return window.i8ln.observation.addResource.fr;
                         }
                     }, 
-                title : 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
+                title : window.i8ln.observation.addResource.youtube
             };
 
 
@@ -82,7 +261,7 @@ function removeResource(event, imageId) {
                 url : function(params) {
                     var d = new $.Deferred;
                     if(!params.value) {
-                        return d.reject('This field is required'); //returning error via deferred object
+                        return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
                     } else {
                         me.$form.find('.audioUrl').val(params.value);
                         me.submitRes();
@@ -92,17 +271,16 @@ function removeResource(event, imageId) {
                 }, 
                     validate :  function(value) {
                         if($.trim(value) == '') {
-                            return 'This field is required';
+                            return window.i8ln.observation.addResource.fr;
                         }
                     }, 
-                title : 'Enter Audio url like http://test.com/sample.mp3'
+                title : window.i8ln.observation.addResource.ayoutube
             };
 
 
             $.extend( videoOptions, options);
             me.$ele.find('.add_video').editable(videoOptions);
            // me.$ele.find('.add_audio').editable(audioOptions);
-
 
 
 
@@ -124,17 +302,25 @@ function removeResource(event, imageId) {
         },
 
         submitRes : function() {
-            this.$form.submit().find("span.msg").html("Uploading... Please wait...");
-            this.$ele.find(".iemsg").html("Uploading... Please wait...");
-            this.$ele.find(".progress").css('z-index',110);
-            this.$ele.find('.progress_msg').html('Uploading ...');
+            this.$form.submit().find("span.msg").html(window.i8ln.observation.addResource.upload);
+            this.$ele.find(".iemsg").html(window.i8ln.observation.addResource.upload);
+            //this.$ele.find(".progress").css('z-index',110);
+            //this.$ele.find('.progress_msg').html(window.i8ln.observation.addResource.uploading);
         },
 
         filePick : function(e) {
             var me = this;
             var onSuccess = function(FPFiles){
+                $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
-                $.each(FPFiles, function(){
+                me.uploadedFiles = FPFiles;
+                me.uploadedFilesSize = FPFiles.length;
+                me.start = 0;
+                me.w = 1;
+                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+                me.start = me.start + me.w;
+                me.$form.find("input[name='resources']").remove();
+                $.each(FPF, function(){
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'resources',
@@ -149,7 +335,13 @@ function removeResource(event, imageId) {
                         name: 'lastUploaded',
                         value: count
                     }).appendTo(me.$form);
-                }    
+                }
+                me.$ele.find(".progress").css('z-index',110);
+                me.$ele.find('.progress_msg').html('Processing <br> Images...');
+                me.$ele.find(".mediaProgressBar").progressbar({
+                    value:0
+                });
+                me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
                 me.submitRes();
             };
 
@@ -181,13 +373,30 @@ function removeResource(event, imageId) {
          filePickAudio : function(e) {
             var me = this;
             var onSuccess = function(FPFiles){
-                $.each(FPFiles, function(){
+                var count = 0;
+                me.uploadedFiles = FPFiles;
+                me.uploadedFilesSize = FPFiles.length;
+                me.start = 0;
+                me.w = 1;
+                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+                me.start = me.start + me.w;
+                me.$form.find("input[name='resources']").remove();
+                $.each(FPF, function(){
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'resources',
                         value:JSON.stringify(this)
                     }).appendTo(me.$form);
+                    count = count + 1;
                 });
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    $("input[name='obvDir']").val('');
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'lastUploaded',
+                        value: count
+                    }).appendTo(me.$form);
+                }
                 me.submitRes();
             };
 
@@ -217,8 +426,8 @@ function removeResource(event, imageId) {
             var me = this;
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
-            me.$ele.find(".progress").css('z-index',90);
-            me.$ele.find('.progress_msg').html('');
+            //me.$ele.find(".progress").css('z-index',90);
+            //me.$ele.find('.progress_msg').html('Processing Image......');
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
@@ -236,75 +445,25 @@ function removeResource(event, imageId) {
             }
             var $s = $(responseXML).find('resources').find('res');
             var x = $s.length;
+            var uploadedObjType
             $s.each(function() {
+                me.jobId = $(this).attr('jobId');
                 var fileName = $(this).attr('fileName');
                 var type = $(this).attr('type');					
+                uploadedObjType = type;
                 images.push({i:x+i, file:fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
                 x--;
             });
-            var html = $( "#metadataTmpl" ).render( images );
-            var metadataEle = $(html);
-            if($( "input[name='resType']" ).val() == "species.participation.Observation") {
-                metadataEle.each(function() {
-                    $('.geotagged_image', this).load(function(){
-                        var me = this;
-                        $.proxy(loadMapInput, $(".addObservation").find(".map_class"), $(me))();
-                        //$(".map_class").data('locationpicker').mapLocationPicker.update_geotagged_images_list($(this));		
-                    });
-                    var $ratingContainer = $(this).find('.star_obvcreate');
-                    rate($ratingContainer);
-                });
+            console.log(uploadedObjType);
+            if(uploadedObjType == "IMAGE"){
+                getProcessedImageStatus(me.jobId, images, me); 
+            } else {
+                attachThumbnailAndProcess(me, images); 
             }
-            me.$ele.find(".imagesList li:first" ).after (metadataEle);
-            me.$ele.find(".add_file" ).fadeIn(3000);
-            me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
-            me.$ele.find(".image-resources-msg").html("");
-            me.$form.find("input[name='resources']").remove();
-            me.$ele.find('.videoUrl').val('');
-            me.$ele.find('.audioUrl').val('');
-            me.$ele.find('.add_video').editable('setValue','', false);
-           // me.$ele.find('.add_audio').editable('setValue','', false);		
-            me.$ele.find('.add_video').editable('setValue','', false);	
-            
-            if($( "input[name='resType']" ).val() == "species.auth.SUser") {
-                /*
-                if($(".imagesList li").size() > 4){
-                    console.log("=============INCREASING WIDTH===========");
-                    var w = $(".imagesList").css("width");
-                    var w = w + 150;
-                    $(".imagesList").css("width", w);
-                }
-                */
-                var count = $("input[name='lastUploaded']").val();
-                var metadataForForm = $(".metadata.prop:lt("+count+")").clone();
-                $(metadataForForm).css("display","none");
-                $("form.createResource").find(".metadata.prop").remove();
-                $(metadataForForm).appendTo($("form.createResource"));
+        },
 
-                $("form.createResource").ajaxSubmit({
-                url : $(this).attr("action"),
-                dataType : 'json', 
-                type : 'POST',
-                success : function(data, statusText, xhr, form) {
-                    $(".addedResource.thumbnail").draggable({helper:'clone'});  
-
-                    $(".imageHolder").droppable({
-                        accept: ".addedResource.thumbnail",
-                        drop: function(event,ui){
-                            dropAction(event, ui, this);    
-                        }
-                    });
-                }, error : function (xhr, ajaxOptions, thrownError){
-
-                }  
-                });
-                $("input[name='obvDir']").val('');
-            }
-
-            },
-
-                onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
-                    var successHandler = this.success, errorHandler;
+        onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
+            var successHandler = this.success, errorHandler;
             var me = this;
             handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
                 if(data && data.status == 401) {

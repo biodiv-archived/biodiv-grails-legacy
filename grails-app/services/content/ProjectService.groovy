@@ -10,7 +10,7 @@ import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.util.NamedList;
 import species.utils.Utils;
-
+import species.AbstractObjectService;
 
 
 import content.eml.Document;
@@ -18,7 +18,7 @@ import content.eml.UFile;
 import content.eml.DocumentService;
 
 
-class ProjectService {
+class ProjectService extends AbstractObjectService {
 
 	static transactional = false
 	def grailsApplication;
@@ -218,11 +218,13 @@ class ProjectService {
 		List result = new ArrayList();
 
 		def queryResponse = projectSearchService.terms(params.term, params.field, params.max);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Project Pages"]);
-		}
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Project Pages"]);
+            }
+        }
 		return result;
 	}
 

@@ -12,7 +12,7 @@ class ExportJob {
 	private final static String SPECIES = "Species"
 	
 	def obvUtilService
-	def observationService
+    def utilsService;
 	def checklistService
 	def speciesService
 	
@@ -51,7 +51,7 @@ class ExportJob {
 					dl.filePath = f.getAbsolutePath()
 					setStatus(dl, ObvUtilService.SUCCESS)
 					log.debug "finish task $dl"
-					observationService.sendNotificationMail(observationService.DOWNLOAD_REQUEST, dl, null, null, null);
+					utilsService.sendNotificationMail(utilsService.DOWNLOAD_REQUEST, dl, null, null, null);
 				}else{
 					setStatus(dl, ObvUtilService.FAILED)
 					log.debug "Error $dl"

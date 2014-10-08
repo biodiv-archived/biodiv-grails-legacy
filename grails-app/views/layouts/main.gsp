@@ -36,7 +36,7 @@
 </head>
 <body>
 	<div id="loading" class="loading" style="display: none;">
-		<span>Loading ...</span>
+		<span><g:message code="msg.loading" /> </span>
 	</div>
 	<div id="postToUGroup" class="overlay" style="display: none;">
         <i class="icon-plus"></i>
@@ -53,9 +53,11 @@
 		</div>
 
 		<domain:showSiteFooter />
-
 	</div>
 <%--	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>--%>
 	<r:layoutResources />
+
+
+
 </body>
 </html>

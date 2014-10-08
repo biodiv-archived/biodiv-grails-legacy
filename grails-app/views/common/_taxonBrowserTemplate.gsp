@@ -3,7 +3,6 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
-
 <g:if test="${classifications}">
 <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
     <g:each in="${classifications}" var="classification">
@@ -13,7 +12,7 @@
     </g:each>
 </select>
 <div class="attributionBlock">
-    <span class="ui-icon-info ui-icon-control " title="Show details"
+    <span class="ui-icon-info ui-icon-control " title="${g.message(code:'title.show.details')}"
         style="position: absolute; top: 0; right: 0; margin: 10px;"></span>
     <div class="ui-corner-all toolbarIconContent attribution"
         style="display: none;">
@@ -28,8 +27,7 @@
 
     </div>
 </div>
-
-<table id="taxonHierarchy" class="emptyField"></table>
+ <table id="taxonHierarchy" class="emptyField"></table>
 
 </g:if>
 <g:else>

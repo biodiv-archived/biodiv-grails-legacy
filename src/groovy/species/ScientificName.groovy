@@ -1,9 +1,11 @@
 package species
 
-abstract class ScientificName extends NameMetadata {
+import org.springframework.context.MessageSourceResolvable;
+
+abstract class ScientificName extends NamesMetadata {
 
 	public enum RelationShip {
-		
+
 		AMBIGUOUS_SYNONYM("Ambiguous Synonym"),
 		ANAMORPH("Anamorph"),
 		BASIONYM("Basionym"),
@@ -22,42 +24,41 @@ abstract class ScientificName extends NameMetadata {
 		ACCEPTED_NAME("Accepted Name"),
 		PROTONYM("Protonym"),
 		OTHERS("Other");
-		
+
 		private String value;
-		
+
 		RelationShip(String value) {
 			this.value = value;
 		}
-		
+
 		String value() {
 			return this.value;
 		}
-	
+
 		static def toList() {
-	        return [
-	            AMBIGUOUS_SYNONYM,
-	            ANAMORPH,
-	            BASIONYM,
-	            HETEROTYPIC_SYNONYM,
-	            JUNIOR_SYNONYM,
-	            MISAPPLIED_NAME,
-	            NOMENCLATURAL_SYNONYM,
-	            OBJECTIVE_SYNONYM,
-	            SENIOR_SYNONYM,
-	            SUBJECTIVE_SYNONYM,
-	            SYNONYM,
-	            TELEOMORPH,
-	            UNAVAILABLE_NAME,
-	            VALID_NAME,
-	            ACCEPTED_NAME,
-	            PROTONYM,
-	            OTHERS
-	
-	        ]
-	    }
+			return [
+				AMBIGUOUS_SYNONYM,
+				ANAMORPH,
+				BASIONYM,
+				HETEROTYPIC_SYNONYM,
+				JUNIOR_SYNONYM,
+				MISAPPLIED_NAME,
+				NOMENCLATURAL_SYNONYM,
+				OBJECTIVE_SYNONYM,
+				SENIOR_SYNONYM,
+				SUBJECTIVE_SYNONYM,
+				SYNONYM,
+				TELEOMORPH,
+				UNAVAILABLE_NAME,
+				VALID_NAME,
+				ACCEPTED_NAME,
+				PROTONYM,
+				OTHERS
+			]
+		}
 	}
 
-	public enum TaxonomyRank {
+	public enum TaxonomyRank implements MessageSourceResolvable {
 		KINGDOM("Kingdom"),
 		PHYLUM("Phylum"),
 		CLASS("Class"),
@@ -69,13 +70,13 @@ abstract class ScientificName extends NameMetadata {
 		SUB_GENUS("Sub-Genus"),
 		SPECIES("Species"),
 		INFRA_SPECIFIC_TAXA("infra-specific-taxa");
-	
+
 		private String value;
-	
+
 		TaxonomyRank(String value) {
 			this.value = value;
 		}
-	
+
 		static list() {
 			[
 				KINGDOM,
@@ -91,13 +92,25 @@ abstract class ScientificName extends NameMetadata {
 				INFRA_SPECIFIC_TAXA
 			]
 		}
-	
+
 		String value() {
 			return this.value;
 		}
-	
+
 		String toString() {
 			return this.value();
+		}
+
+		Object[] getArguments() {
+			[] as Object[]
+		}
+
+		String[] getCodes() {
+			["${getClass().name}.${name()}"] as String[]
+		}
+
+		String getDefaultMessage() {
+			value()
 		}
 	}
 
@@ -105,11 +118,10 @@ abstract class ScientificName extends NameMetadata {
 	String normalizedForm;
 	String italicisedForm;
 	String binomialForm;
-	
-    static constraints = {
+
+	static constraints = {
 		normalizedForm nullable:true;
 		italicisedForm nullable:true;
 		binomialForm nullable:true;
-    }
-	
+	}
 }

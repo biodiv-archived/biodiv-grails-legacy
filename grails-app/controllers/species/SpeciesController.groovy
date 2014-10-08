@@ -40,12 +40,11 @@ class SpeciesController extends AbstractObjectController {
     def speciesUploadService;
 	def speciesService;
 	def speciesPermissionService;
-	def observationService;
 	def userGroupService;
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-
+    def observationService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -128,14 +127,15 @@ class SpeciesController extends AbstractObjectController {
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
-                        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
-                        flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
+                        def tmp_var   = params.id?speciesName+(params.id):''
+                        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
+                        //flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
 
                         def url = uGroup.createLink(controller:"species", action:"contribute");
                         redirect url: url
                         return;
                     } else {
-                    flash.message = result.msg ? result.msg+result.errors:"Error while creating page"+result.errors
+                    flash.message = result.msg ? result.msg+result.errors:${message(code: 'default.species.error.Create',null)}+result.errors
 			        render(view: "create", model: result)
                     return;
                     }
@@ -149,28 +149,28 @@ class SpeciesController extends AbstractObjectController {
                         //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
                             //flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
                         //} else {
-                            flash.message = "Successfully created species."
+                            flash.message =  messageSource.getMessage("default.species.success.Create", null, request.locale)
                             speciesUploadService.postProcessSpecies([speciesInstance]);
                         //}
                         
                         def feedInstance = activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
 
-                        observationService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
+                        utilsService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
 
 
                         redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
                         return;
                     } else {
-                        flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
+                        flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, request.locale) +" "+ result.errors
                     }
                 }
                 else {
-                    flash.message = result.msg ? result.msg + result.errors : "Error while saving species " + result.errors
+                    flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, request.locale) +" "+ result.errors
                 }
             } catch(e) {
                 e.printStackTrace();
                 result.errors << e.getMessage();
-                flash.message = result.msg ? result.msg+result.errors : "Error while saving species "+result.errors
+                flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, request.locale) +" "+ result.errors
             }
         }
         render(view: "create", model:result)
@@ -193,8 +193,9 @@ class SpeciesController extends AbstractObjectController {
 		else {
             if(params.editMode) {
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-			        //flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), params.id])}"
-                    flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesInstance.title+' ( '+params.id+' )':''}. Please request for permission below."
+                	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
+			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
+                   // flash.message = "Sorry, you don't have permission to contribute to this species ${}. Please request for permission below."
                     if(request.getHeader('X-Auth-Token')) {
                         render (['success':false, 'msg':flash.message] as JSON)
                         return
@@ -217,11 +218,11 @@ class SpeciesController extends AbstractObjectController {
 
 			Map map = getTreeMap(speciesInstance, fields);
 			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
-			def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
-			def observationInstanceList = relatedObservations?.observations?.observation
-			def instanceTotal = relatedObservations?relatedObservations.count:0
+			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
+			//def observationInstanceList = relatedObservations?.observations?.observation
+			//def instanceTotal = relatedObservations?relatedObservations.count:0
 
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], observationInstanceList:observationInstanceList, instanceTotal:instanceTotal, queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
+			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
 
             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
@@ -421,7 +422,7 @@ class SpeciesController extends AbstractObjectController {
         return false;
     }
 
-	@Secured(['ROLE_USER'])
+	/*@Secured(['ROLE_USER'])
 	def edit() {
 		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
@@ -437,12 +438,17 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-	}
+	}*/
 
 	@Secured(['ROLE_USER'])
     def update() {
+    	def msg;
+        println "===========UPDATE STARTED========= "
+        def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
+        def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         if(!(params.name && params.pk)) {
-            render ([success:false, msg:'Either field name or field id is missing'] as JSON)
+        	msg=messageSource.getMessage("default.species.error.fieldOrname", null, request.locale)
+            render ([success:false, msg:msg] as JSON)
             return;
         }
         try {
@@ -553,15 +559,29 @@ class SpeciesController extends AbstractObjectController {
                 
                 break;
                 default :
-                result=['success':false, msg:'Incorrect datatype'];
+                msg=messageSource.getMessage("default.species.incorrect.datatype", null, request.locale)
+                result=['success':false, msg:msg];
             }
  
             if(result.success) {
                 def feedInstance;
                 if(result.activityType)
                     feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
-                if(result.mailType) 
-                    observationService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, ['info':result.activityType]);
+                if(result.mailType) {
+                    def otherParams = ['info':result.activityType]
+                    def spIns = result.speciesFieldInstance
+                    if(spIns) {
+                        def des = spIns.description
+                        des = des.replaceAll("<(.|\n)*?>", '');
+                        des = des.replaceAll("&nbsp;", '');
+                        if(des.length() > 150) {
+                            otherParams['spFDes'] = des[0..147] + "...";
+                        } else {
+                            otherParams['spFDes'] = des
+                        }
+                    }
+                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParams);
+                }
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
@@ -580,8 +600,10 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def addResource() {
+		def msg;
 		if(!params.id) {
-			render ([success:false, errors:[msg:'Species id is missing']] as JSON)
+			msg=messageSource.getMessage("default.species.id.missing", null, request.locale)
+			render ([success:false, errors:[msg:msg]] as JSON)
 			return;
 		}
 
@@ -590,7 +612,8 @@ class SpeciesController extends AbstractObjectController {
 		def speciesInstance = Species.get(speciesInstanceId);
 
 		if(!speciesInstance) {
-			render ([success:false, errors:[msg:'Species instance with id not found']] as JSON)
+			msg=messageSource.getMessage("default.species.id.notFound", null, request.locale)
+			render ([success:false, errors:[msg:msg]] as JSON)
 			return;
 		}
 
@@ -602,7 +625,8 @@ class SpeciesController extends AbstractObjectController {
 				resourcesXML = speciesService.createVideoXML(params);
 			} else {
 				log.error "No resource is given in the parameters"
-				render ([success:false, errors:[msg:'No resource is given in the parameters']] as JSON)
+				msg=messageSource.getMessage("default.species.no.resource", null, request.locale)
+				render ([success:false, errors:[msg:msg]] as JSON)
 				return;
 			}
 
@@ -620,14 +644,16 @@ class SpeciesController extends AbstractObjectController {
 					return;
 				} else {
 					speciesInstance.errors.each { log.error it }
-					render ([success:false, errors:[msg:"Error while updating species "]]) as JSON
+					msg = messageSource.getMessage("default.species.error.message", null, request.locale)
+					render ([success:false, errors:[msg:msg]]) as JSON
 					return;
 				}
 
 
 			}
 		} catch(e) {
-			render ([success:false, errors:[msg:'Error adding resource: $e.message']] as JSON)
+			msg = messageSource.getMessage("default.species.error.message.add", null, request.locale)
+			render ([success:false, errors:[msg:msg]] as JSON)
 		}
 
 	} 
@@ -792,7 +818,8 @@ class SpeciesController extends AbstractObjectController {
             def msg = speciesPermissionService.sendPermissionRequest(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
-            render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
+        	def msg = messageSource.getMessage("default.species.error.request", null, request.locale)
+            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,request.locale)] as JSON)
         }
 		return
     }
@@ -816,19 +843,19 @@ class SpeciesController extends AbstractObjectController {
             }
 
             if(success) {
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
+                utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
                 if(conf) {
                     log.debug "Deleting confirmation code and usertoken params";
                     conf.delete();
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
-                flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
+                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)
             } else {
-                flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)            
             }
         }else{
-            flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -844,7 +871,8 @@ class SpeciesController extends AbstractObjectController {
             def msg = speciesPermissionService.sendPermissionInvitation(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
-            render (['success':false, 'statusComplete':false, 'shortMsg':'Error while sending request.', 'msg':'Please select a node'] as JSON)
+        	def msg = messageSource.getMessage("default.species.error.request", null, request.locale)
+            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,request.locale)] as JSON)
          }
 		return
     } 
@@ -876,12 +904,13 @@ class SpeciesController extends AbstractObjectController {
                 }
 
                 observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
-                flash.message="Successfully added ${user} as a ${invitetype} to ${taxonConcept.name}"
+                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)
+                utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
             } else{
-                flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)            
             }
         } else{
-            flash.error="Couldn't add ${user} as ${invitetype} to ${taxonConcept.name} because of missing information."            
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -916,7 +945,8 @@ class SpeciesController extends AbstractObjectController {
         return;
     }
 
-    def uploadImage() {
+    @Secured(['ROLE_USER'])
+    def pullImageForSpecies() {
         log.debug params
         //pass that same species
         def species = Species.get(params.speciesId.toLong())
@@ -931,18 +961,19 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
-        log.debug params
-        def spInstance = Species.get(params.speciesId.toLong())
+        def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
         def relatedObvCount = relatedObvMap.count
         def obvLinkList = relatedObvMap.obvLinkList
-        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:params.offset.toInteger() ]);
+        def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:(params.offset.toInteger() + relatedObvCount)]);
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON
     }
-
+/*
+    @Secured(['ROLE_USER'])
     def pullObvImage() {
         log.debug params  
         //pass that same species
@@ -958,6 +989,7 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
+    @Secured(['ROLE_USER'])
     def pullSpeciesFieldImage() {
         log.debug params
         def species = Species.get(params.speciesId.toLong())
@@ -971,7 +1003,7 @@ class SpeciesController extends AbstractObjectController {
         }   
         render result as JSON
     }
-
+*/
     @Secured(['ROLE_USER'])
     def validate() {
 /*        List hierarchy = [];
@@ -979,7 +1011,7 @@ class SpeciesController extends AbstractObjectController {
             hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
         }
 */
-
+		def msg;
         def result = [requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
         if(params.page && params.rank) {
             try {
@@ -988,15 +1020,18 @@ class SpeciesController extends AbstractObjectController {
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
                     if(!taxon) {
-                        result = ['success':true, 'msg':"Name validated and no match was found with existing species names on the portal. Please fill in the taxonomic hierarchy so that a species page can be created. Taxa marked with * are compulsory fields.", rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
+                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, request.locale)
+                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
                     } else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
                         def taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
-                            result = ['success':true, 'msg':'Already a species page exists with this name. ', id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
+                        	msg = messageSource.getMessage("default.species.error.already", null, request.locale)
+                            result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         } else {
-                            result = ['success':true, 'msg':"Adding a new species page for an existing concept ${taxon.name}", rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
+                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, request.locale)
+                            result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         }
                         result['taxonRegistry'] = [:];
                         taxonRegistry.each {classification, h ->
@@ -1010,11 +1045,13 @@ class SpeciesController extends AbstractObjectController {
                 }
             } catch(e) {
                 e.printStackTrace();
-                result = ['success':false, 'msg':"Error while validating : ${e.getMessage()}", requestParams:[taxonRegistry:params.taxonRegistry]]
+                msg = messageSource.getMessage("default.species.error.validate", null, request.locale)
+                result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
             }
 
         } else {
-            result = ['success':false, 'msg':'Not a valid name.', requestParams:[taxonRegistry:params.taxonRegistry]]
+        	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], request.locale)
+            result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
         render result as JSON
     }
@@ -1033,13 +1070,88 @@ class SpeciesController extends AbstractObjectController {
                 ilike("canonicalForm", page.canonicalForm);
             }
             if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
-                result = ['success':false, 'msg':"Not a valid name ${name}."]
+            	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], request.locale)
+                result = ['success':false, 'msg':msg]
             } else {
                 result = ['success':true, 'taxon':taxon];        
             }
         } else {
-            result = ['success':false, 'msg':"Not a valid name ${name}."]
+        	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], request.locale)
+            result = ['success':false, 'msg':msg]
         }
         return result;
+    }
+
+    def saveModifiedSpeciesFile = {
+        //log.debug params
+        File file = speciesUploadService.saveModifiedSpeciesFile(params);
+        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+        /*
+        if (f.exists()) {
+            println "here here===================="
+            //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+            response.outputStream << f.readBytes()
+            response.outputStream.flush()
+            println "==YAHAN HUN == " 
+            return render(text: [success:true] as JSON, contentType:'text/html')
+        } else {
+            println "in else================"
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            log.error msg
+            flash.message = msg
+            redirect controller: params.errorController, action: params.errorAction
+            return
+        }
+        */
+    }
+    
+    @Secured(['ROLE_USER'])
+    def getSpeciesFieldMedia() {
+        def resList = []
+        def obvLinkList = []
+        def resCount = 0
+        def offset = 0
+        def result
+        if(params.speciesId){
+            def spInstance = Species.read(params.speciesId?.toLong())
+            resList = speciesService.getSpeciesFieldMedia(params.spFieldId)
+            def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: resList, resourceListType: params.resourceListType, obvLinkList:obvLinkList, resCount:resCount, offset:offset]);
+            result = [statusComplete:true, addPhotoHtml: addPhotoHtml]
+        } else {
+            log.debug params  
+            result = [statusComplete:false]
+        }
+        render result as JSON
+    }
+
+    @Secured(['ROLE_USER'])
+    def pullObvMediaInSpField(){
+        log.debug params  
+        //pass that same species
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
+        def out = speciesService.updateSpecies(params, speciesField)
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }    
+    }
+
+    @Secured(['ROLE_USER'])
+    def uploadMediaInSpField(){
+        def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
+        def out = speciesService.updateSpecies(params, speciesField)
+        def result
+        if(out){
+            result = ['success' : true]
+        }
+        else{
+            result = ['success'  : false]
+        }    
+
     }
 }

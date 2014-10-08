@@ -8,7 +8,7 @@
 
 <html>
     <head>
-        <g:set var="title" value="Observations"/>
+        <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
         <style>
@@ -47,11 +47,9 @@
             </div>
             <%
             %>
-            <form id="upload_resource" 
+            <form class="upload_resource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" 
                 title="Add a photo for this observation"
-                method="post"
-                class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
-
+                method="post">
                 <span class="msg" style="float: right"></span>
                 <input class="videoUrl" type="hidden" name='videoUrl' value="" />
                 <input type="hidden" name='obvDir' value="${obvDir}" />

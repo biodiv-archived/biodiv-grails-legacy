@@ -14,7 +14,7 @@
 
 <html>
     <head>
-        <g:set var="title" value="Checklist"/>
+        <g:set var="title" value="${g.message(code:'default.checklist.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="checklist_create"/>
         <uploader:head />
@@ -36,7 +36,7 @@
                 def form_id = "addObservation"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Add Checklist"
-                def form_button_val = "Add Checklist"
+                def form_button_val = "${g.message(code:'button.add.checklist')}"
                 if(params.action == 'edit' || params.action == 'update'){
                 form_action = uGroup.createLink(action:'update', controller:'checklist', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 form_button_name = "Update Checklist"
@@ -46,7 +46,7 @@
                 %>
                 <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal ${form_id}">
                     <div class="span12 super-section">
-                        <h3>What did you observe?</h3>
+                        <h3><g:message code="checklist.create.what.observe" /></h3>
 
                         <div id="textAreaSection" class="section ${params.action != 'create'?'hide':''}">
                             <div>
@@ -61,9 +61,9 @@
 
                             <div class="tabbable checklist-tabs">
                                 <ul class="nav nav-tabs" id="checklist-tabs" style="margin:0px;background-color:transparent;">
-                                    <li id ="tab_grid"class="active"><a href="#tab0" class="btn" data-toggle="tab">Spreadsheet</a></li>
-                                    <li id ="tab_up_file"><a href="#tab1" class="btn" data-toggle="tab">Upload File</a></li>
-                                    <li id ="tab_type_list"><a href="#tab2" class="btn" data-toggle="tab">Text Area</a></li>
+                                    <li id ="tab_grid"class="active"><a href="#tab0" class="btn" data-toggle="tab"><g:message code="checklist.create.spreadsheet" /></a></li>
+                                    <li id ="tab_up_file"><a href="#tab1" class="btn" data-toggle="tab"><g:message code="checklist.create.upload.file" /></a></li>
+                                    <li id ="tab_type_list"><a href="#tab2" class="btn" data-toggle="tab"><g:message code="checklist.create.text.area" /></a></li>
                                 </ul>
 
                                 <div class="tab-content ">
@@ -85,9 +85,9 @@
                                                 code="checklist.checklistColumns.label" default="Headers" />
                                             </label>
                                             <div class="controls">
-                                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="scientific name, common name, uses, notes,.... " title='Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....'/>
+                                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeholder="${g.message(code:'placeholder.create.checklist')}"                                                title="${g.message(code:'checklist.create.enter.column.headers')}"/>
                                                 <small class="help-inline">
-                                                    Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....
+                                                    <g:message code="checklist.create.enter.column.headers" />
                                                 </small> 
 
                                             </div>
@@ -97,9 +97,8 @@
                                             <label for="checklistData" class="control-label"><g:message
                                                 code="checklist.checklistData.label" default="Data" /></label>
                                             <div class="controls">
-                                                <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Mangifera indica, Mango, Fruits are edible, Have this in my backyard'
-                                                title='Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ,).' />
-                                                <small class="help-inline"> Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ","). </small> 
+                                                <input type=textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="${g.message(code:'placeholder.checklist.create')}" title="${g.message(code:'checklist.create.enter.one.line')}" />
+                                                <small class="help-inline"> <g:message code="checklist.create.enter.one.line" /> </small> 
                                                 <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                                             </div>
                                         </div>
@@ -109,13 +108,13 @@
                         </div>
 
                         <div id="gridSection" class="section checklist-slickgrid ${params.action=='create'?'hide':''}">
-                            <span id="addNewColumn" class="btn-link">+ Add New Column</span>
-                            <span class="help-inline"> (Mark scientific and common name column using <img src="${resource(dir:'images', file:'dropdown_active.gif',absolute:'true')}"/>)</span>
+                            <span id="addNewColumn" class="btn-link"><g:message code="checklist.create.add.new.column" /></span>
+                            <span class="help-inline"> <g:message code="checklist.create.mark.name" /> <img src="${resource(dir:'images', file:'dropdown_active.gif',absolute:'true')}"/>)</span>
                             
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
                             <div id="legend" class="hide">
-                                <span class="incorrectName badge">Incorrect Names</span>
+                                <span class="incorrectName badge"><g:message code="error.incorrect.names" /></span>
                             </div>
 
                             <div class="section" style="clear:both;margin:0;">
@@ -136,14 +135,14 @@
                                 </div>	
                             </div> 
                                 <a id="parseNames" class="btn btn-primary"
-                                            style="float: right; margin: 5px;display:none;">Validate Names</a>
+                                            style="float: right; margin: 5px;display:none;"><g:message code="button.validate.names" /></a>
          
                         </div>
                     </div>
 
                 <div id="restOfForm" class="pull-left" style="${(params.action == 'create')?'display:none;':''}">
                     <div class="span12 super-section" style="clear:both">
-                            <h3>What is this list about</h3>
+                            <h3><g:message code="checklist.create.what.list" /></h3>
 
                             <div class="section" style="clear:both;">
                                 <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
@@ -163,7 +162,7 @@
 
 
                         <div class="span12 super-section" style="clear:both">
-                            <h3>Save this list as ...</h3>
+                            <h3><g:message code="checklist.create.save.list" /></h3>
 
                             <div class="section">
                                 <g:render template="/checklist/details" model="['observationInstance':observationInstance]"/>
@@ -175,11 +174,11 @@
 
                             <g:if test="${observationInstance?.id}">
                             <a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
-                                style="float: right; margin-right: 30px;"> Cancel </a>
+                                style="float: right; margin-right: 30px;"><g:message code="button.cancel" />  </a>
                             </g:if>
                             <g:else>
                             <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
-                                style="float: right; margin-right: 30px;"> Cancel </a>
+                                style="float: right; margin-right: 30px;"><g:message code="button.cancel" />  </a>
                             </g:else>
 
                             <g:if test="${observationInstance?.id}">
@@ -187,8 +186,7 @@
                                 style="float: right; margin-right: 5px;">
                                 <a
                                     href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:observationInstance.id)}"
-                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
-                                    Checklist </a>
+                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><g:message code="button.delete.checklist" /> </a>
                             </div>
                             </g:if>
 
@@ -199,7 +197,7 @@
                                 <label class="checkbox" style="text-align: left;"> 
                                     <g:checkBox style="margin-left:0px;"
                                     name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
-                                    <span class="policy-text"> By submitting this form, you agree that any supporting media submitted as photos or videos are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses.</span></label>
+                                    <span class="policy-text"> <g:message code="checklist.create.submit.form" /></span></label>
                             </div>
 
                         </div>
@@ -207,16 +205,16 @@
 
                     <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;${params.action=='create'?:'display:none;'}">
                         <a id="addNames" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;">Load List</a>
+                            style="float: right; margin-right: 5px;"><g:message code="button.load.list" /></a>
                         <a id="createChecklist" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
+                            style="float: right; margin-right: 5px;display:none;"> <g:message code="button.create.checkist" /> </a>
                    </div>
 
                 </form>
                 
                 <g:render template="/checklist/addPhoto" model="['observationInstance':observationInstance, 'resourceListType':'ofChecklist']"/>
                 <form id="upload_resource" 
-                    title="Add a photo for this observation"
+                    title="${g.message(code:'title.checklist.create')}"
                     method="post"
                     class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
@@ -246,10 +244,10 @@
             for (var i =0 ; i<10 ; i++ ){
                 rowDataForBlankSheet.push({S_No:"",Scientific_Name:"",Common_Name:""});
             }
+            var columnDataForBlankSheet = [{id: "S_No", name:window.i8ln.species.parseUtil.sno, field:"S_No",editor: Slick.Editors.Text, width:50},
+                {id: "Scientific_Name", name:window.i8ln.species.parseUtil.snu , field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
+                {id: "Common_Name", name:window.i8ln.species.parseUtil.cnu, field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
 
-            var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
-                {id: "Scientific_Name", name: "Scientific_Name", field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
-                {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
                 ]
 
             columnDataForBlankSheet.push(getMediaColumnOptions());

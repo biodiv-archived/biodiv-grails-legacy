@@ -1,6 +1,6 @@
 package species
 
-class CommonNames extends NameMetadata {
+class CommonNames extends NamesMetadata {
 
 	String name;
 	Language language;

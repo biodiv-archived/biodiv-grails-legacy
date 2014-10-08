@@ -5,7 +5,7 @@
 <g:if test="${nameRecords}">
 <div class="sidebar_section" style="clear:both;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
-        <h5>Taxon Record Name</h5>
+        <h5><g:message code="showspeciesnames.taxon.record.name" /></h5>
     </a>
 
     <div id="taxonRecordName" class="speciesField collapse in">
@@ -48,7 +48,7 @@
 <g:if test="${synonyms}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
-        <h5>Synonyms</h5>
+        <h5><g:message code="showspeciesnames.synonyms" /></h5>
     </a> 
     <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;padding:0px;">
             <g:each in="${synonyms}" var="synonym">
@@ -58,7 +58,7 @@
                     ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
-                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
+                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="${g.message(code:'title.click.edit')}">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
             </div>    
             </li>
             </g:each>
@@ -81,7 +81,7 @@
 <g:elseif test="${isSpeciesContributor}">
 <div class="sidebar_section emptyField" style="display:none;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
-        <h5>Synonyms</h5>
+        <h5><g:message code="showspeciesnames.synonyms" /></h5>
     </a> 
     <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
            <li>
@@ -121,7 +121,7 @@ list.sort();
 %>
 <g:if test="${names}">
 <div class="sidebar_section">
-    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
+    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> <g:message code="showspeciesnames.common.names" /></h5></a> 
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;padding:0px;">
         <g:each in="${names}">
         <li>
@@ -161,7 +161,7 @@ list.sort();
 </g:if>
 <g:elseif test="${isSpeciesContributor}">
 <div class="sidebar_section emptyField" style="display:none;">
-    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
+    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> <g:message code="showspeciesnames.common.names" /></h5></a> 
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
         <li>
         <div class="span3">

@@ -34,13 +34,13 @@
 
         <div class="control-group commonNameDiv">
             <label for="recommendationVote" class="control-label"> <g:message
-                code="observation.recommendationVote.label" default="Common name" />
+                code="observation.recommendationVote.label" default="${g.message(code:'default.common.name.label')}" />
             </label>
             <div class="controls">
                 <div class="nameContainer textbox" style="position:relative;">
 
                     <input type="text" name="commonName" class="commonName input-block-level" style="width:87%"
-                        value="${species_cn_name}" placeholder='Suggest a common name'
+                        value="${species_cn_name}" placeholder='${g.message(code:"editrecomendation.placeholder.suggest")}'
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                     <input type="hidden" class="mappedRecoNameForcanName" />
 
@@ -57,14 +57,14 @@
 
             <div class="control-group sciNameDiv" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
-                    code="observation.recommendationVote.label" default="Scientific name" />
+                    code="observation.recommendationVote.label" default="${g.message(code:'default.scientific.name.label')}" />
                 </label>
                 <div class="controls">
                     <div class="textbox nameContainer">
 
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
-                        <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}"
-                            placeholder='Suggest a scientific name'
+                        <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}" rel="${g.message(code:'placeholder.suggest.species.name')}"
+                            placeholder='${g.message(code:"editrecomendation.placeholder.scientific")}'
                             class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                         <div class='nameSuggestions' style='display: block;'></div>
                         <input type="hidden" name="canName" class="canName" value="${species_canonical_name }"/>
@@ -77,13 +77,13 @@
 
             <div class="control-group recoCommentDiv"  style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
-                    code="observation.recommendationVote.label" default="Comment" />
+                    code="observation.recommendationVote.label" default="${g.message(code:'default.comment.label')}" />
                 </label>
                 <div class="controls">
                     <div class="nameContainer textbox">
                         <input type="text" name="recoComment" id="recoComment" value="${species_call_comment}"
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
-                        placeholder="Write comment on species call"/>
+                        placeholder="${g.message(code:'editrecomendation.placeholder.comment')}"/>
                     </div>
                 </div>
             </div>

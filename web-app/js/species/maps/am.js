@@ -43,7 +43,7 @@ function getWFS() {
 }
 
 function getSummaryColumns(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getSummaryColumns';
     
     var params = {
         request:'getSummaryColumns',
@@ -81,7 +81,7 @@ function getSummaryColumns(layer) {
 }
 
 function getColumnTitle(layer, columnName) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getColumnTitle';
     
     var params = {
         request:'getColumnTitle',
@@ -171,7 +171,7 @@ function getThemeNames(theme_type) {
 }
 
 function getLayersByTheme(theme) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayersByTheme';
     
     var params = {
         request:'getLayersByTheme',
@@ -206,7 +206,7 @@ function getLayersByTheme(theme) {
 }
 
 function getLayerColumns(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerColumns';
     
     var params = {
         request:'getLayerColumns',
@@ -241,7 +241,7 @@ function getLayerColumns(layer) {
 }
 
 function getLayerAttribution(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerAttribution';
     
     var params = {
         request:'getLayerAttribution',
@@ -276,7 +276,7 @@ function getLayerAttribution(layer) {
 }
 
 function getLayerSummary(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerSummary';
     
     var params = {
         request:'getLayerSummary',
@@ -311,7 +311,7 @@ function getLayerSummary(layer) {
 }
 
 function getLayerDetails(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerDetails';
     
     var params = {
         request:'getLayerDetails',
@@ -345,7 +345,7 @@ function getLayerDetails(layer) {
 }
 
 function getLayerLinkTables(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerLinkTables';
     
     var params = {
         request:'getLayerLinkTables',
@@ -379,7 +379,7 @@ function getLayerLinkTables(layer) {
 }
 
 function getLayersAccessStatus() {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayersAccessStatus';
     
     var params = {
         request:'getLayersAccessStatus',

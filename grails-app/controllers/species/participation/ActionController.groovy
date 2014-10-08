@@ -41,6 +41,7 @@ import species.participation.ActivityFeedService
 class ActionController {
     
     def grailsApplication;
+    def utilsService;
 	def observationService;
 	def springSecurityService;
 	def mailService;
@@ -53,6 +54,7 @@ class ActionController {
 	def SUserService;
 	def obvUtilService;
     def chartService;
+    def messageSource;
 
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -79,7 +81,7 @@ class ActionController {
         //NOTE: Putting rootHolder & activity holder Same for IBP group case
         def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
         searchIndex(params.type,obv)
-        observationService.sendNotificationMail(act.activityType, obv, null, null, act)
+        utilsService.sendNotificationMail(act.activityType, obv, null, null, act)
         return true
     }
 
@@ -136,7 +138,7 @@ class ActionController {
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }
                         else {
-                            msg = "You don't have the permission!!"
+                            msg = msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
                             status = false;
                             r["status"] = status?'success':'error'
                             r['msg'] = msg
@@ -148,7 +150,7 @@ class ActionController {
                         if (ug.isFounder(params.author) || ug.isExpert(params.author)) {
                         }  
                         else {
-                             msg = "You don't have the permission!!" 
+                             msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
                              status = false;
                              r["status"] = status?'success':'error'
                              r['msg'] = msg
@@ -165,14 +167,14 @@ class ActionController {
 		                    if(!obv.save(flush:true)) {
                                 obv.errors.allErrors.each { log.error it }
                             }
-                            if(status) msg = "Successfully featured ${obv.class.simpleName}"
+                            if(status) msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
                         } 
                         else {
                             if(featuredInstance.author == params.author){
                                 featuredInstance.notes = params.notes
                                 featuredInstance.createdOn = new Date()
                                 status = saveActMail(params, featuredInstance, obv, ug) 
-                                if(status) msg = "Successfully updated notes for the featued ${obv.class.simpleName}"
+                                if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes", [obv.class.simpleName] as Object[], request.locale)
                             }
                             else{
                                 try{
@@ -182,7 +184,7 @@ class ActionController {
                                 }
                                 featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
                                 status = saveActMail(params, featuredInstance, obv, ug)
-                                if(status) msg = "Successfully featued ${obv.class.simpleName} again and updated notes given previously"
+                                if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes.again", [obv.class.simpleName] as Object[], request.locale)
 
                             }
                         }
@@ -241,7 +243,7 @@ class ActionController {
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }
                         else {
-                            msg = "You don't have the permission!!"
+                            msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
                             status =false;
                             r["status"] = status?'success':'error'
                             r['msg'] = msg
@@ -253,7 +255,7 @@ class ActionController {
                         if (ug.isFounder(params.author) || ugroup.isExpert(params.author)) {
                         } 
                         else {
-                             msg = "You don't have the permission!!" 
+                             msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
                              status = false;
                              r["status"] = status?'success':'error'
                              r['msg'] = msg
@@ -276,16 +278,16 @@ class ActionController {
 
                     def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, params.author, activityFeedService.UNFEATURED, featuredInstance.notes);
                     searchIndex(params.type,obv)
-                    observationService.sendNotificationMail(act.activityType, obv, null, null, act)
+                    utilsService.sendNotificationMail(act.activityType, obv, null, null, act)
                     status = true
                     if(status) {
-                        msg = "Successfully removed featured ${obv.class.simpleName}"
+                        msg = messageSource.getMessage("default.remove.featured", [obv.class.simpleName] as Object[], request.locale)
                     }
                     return
                 }catch (org.springframework.dao.DataIntegrityViolationException e) {
                     status false
                     if(!status){
-                        msg = "Error while featuring the ${obv.class.simpleName}"                    
+                        msg = messageSource.getMessage("default.fetured.error", [obv.class.simpleName] as Object[], request.locale)
                     }
                     flash.message = "${message(code: 'featured.delete.error', default: 'Error while unfeaturing')}"
                 }
@@ -322,7 +324,7 @@ class ActionController {
                     obv.save(flush:true)
                     def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
                     searchIndex(params.type,obv)				
-                    observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
+                    utilsService.sendNotificationMail(utilsService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
                     flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
                     msg = "Flagged..."
                 }

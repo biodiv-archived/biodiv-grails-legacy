@@ -37,6 +37,8 @@ class LoginController {
 
 	def grailsApplicaiton
 
+	def messageSource;
+
 	/**
 	 * Default action; redirects to 'defaultTargetUrl' if logged in, /login/auth otherwise.
 	 */
@@ -147,25 +149,26 @@ class LoginController {
 
 		if (exception) {
 			if (exception instanceof AccountExpiredException) {
-				msg = g.message(code: "springSecurity.errors.login.expired")
+				msg = messageSource.getMessage("springSecurity.errors.login.expired", null, request.locale)
+				
 			}
 			else if (exception instanceof CredentialsExpiredException) {
-				msg = g.message(code: "springSecurity.errors.login.passwordExpired")
+				msg = messageSource.getMessage("springSecurity.errors.login.passwordExpired", null, request.locale)
 			}
 			else if (exception instanceof DisabledException) {
-				msg = g.message(code: "springSecurity.errors.login.disabled")
+				msg = messageSource.getMessage("springSecurity.errors.login.disabled", null, request.locale)				
 			}
 			else if (exception instanceof LockedException) {
 				//check if the email has been verified and give option to resend the email
 				def registerationCode = RegistrationCode.findAllByUsername(username.decodeHTML()) 
 				if(registerationCode) {
 					def url = Utils.getDomainServerUrl(request) + "/register/resend?email="+username	
-					msg = g.message(code: "You have not verified your email yet! Please resend the email by clicking on this url ${url}")
+					msg = messageSource.getMessage("email.verified.resend.url", [url] as Object[], request.locale)
 				}else 
-					msg = g.message(code: "springSecurity.errors.login.locked")
+					msg = messageSource.getMessage("springSecurity.errors.login.locked", null, request.locale)
 			}
 			else {
-				msg = g.message(code: "springSecurity.errors.login.fail");
+				msg = messageSource.getMessage("springSecurity.errors.login.fail", null, request.locale)
                 msg += " ("+exception.message+")"
 			}
 		}

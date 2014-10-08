@@ -8,10 +8,10 @@
 
             <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
-                <g:set var="i" value="${1+offset}"/>
+                <g:set var="i" value="${offset-1}"/>
             </g:if>
             <g:else>
-                <g:set var="i" value="${res?.size()?:1}"/>
+                <g:set var="i" value="${res?(res.size()-1):0}"/>
             </g:else>
             <%
                 def counter = 0 
@@ -31,6 +31,7 @@
                 <div class="translucent_box"></div>
                 <div class="progress_bar"></div>
                 <div class="progress_msg"></div>
+                <div class="mediaProgressBar" style ="margin-top:117px"></div>
             </div>
 
             </li>
@@ -63,9 +64,9 @@
                 }
                 }
                 def resSource = r.url
-                if(obvLinkList.size()!= 0){
+                if(obvLinkList?.size()!= 0){
                     if(!r.url){
-                        resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList.get(counter.toInteger()), 'absolute': true);
+                        resSource = uGroup.createLink(action:'show', controller:'observation', 'id' : obvLinkList?.get(counter.toInteger()), 'absolute': true);
                         counter++
                     }
                 }
@@ -78,7 +79,7 @@
 
             <div class='metadata prop'
                 style="position: relative; top: -30px;">
-                <input name="file_${i}" type="hidden" value='${r.fileName}' />
+                <input class="fileName" name="file_${i}" type="hidden" value='${r.fileName}' />
                 <input name="url_${i}" type="hidden" value='${r.url}' />
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
                 <input name="date_${i}" type="hidden" value='${flag19}'/>
@@ -99,9 +100,9 @@
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="Contributor">
-                    <input name="source_${i}" type="text" value="${resSource}" placeholder="Source">
-                    <input name="title_${i}" type="text" value="${r.description}" placeholder="Caption">
+                    <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="${g.message(code:'placeholder.contributor')}">
+                    <input name="source_${i}" type="text" value="${resSource}" placeholder="${g.message(code:'placeholder.source')}">
+                    <input name="title_${i}" type="text" value="${r.description}" placeholder="${g.message(code:'placeholder.caption')}">
                     <g:if test="${resourceListType == 'fromRelatedObv' || resourceListType == 'fromSpeciesField'}">
                         <%
                             def isChecked = ""
@@ -109,8 +110,11 @@
                             if(resAlreadyPres.contains(r.id)){
                                 isChecked = "checked"
                             }
+                            if(checkFlag){
+                               isChecked = "" 
+                            }
                         %>
-                        <input name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -170px;float: right;margin-left: -81px;" ${isChecked} >
+                        <input class="pullImage" name="pullImage_${i}" type="checkbox" value="true" style="position: absolute;z-index: 1;top: -140px;float: right;margin-left: -81px;" ${isChecked} >
                     </g:if>
                 </div>
             </div>
@@ -134,7 +138,7 @@
     </div>
 
     <div class='metadata prop' style="position:relative; top:-30px;">
-        <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
+        <input class="fileName" name="file_{{>i}}" type="hidden" value='{{>file}}'/>
         <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
         <input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
         
@@ -147,11 +151,11 @@
         
         <div id="license_div_{{>i}}" class="license_div pull-left dropdown">
             <a id="selected_license_{{>i}}" class="btn dropdown-toggle" data-toggle="dropdown">
-                <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="${g.message(code:'title.set.license')}"/>
                 <b class="caret"></b>
             </a>            
                 <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
-                <span>Choose a license</span>
+                <span><g:message code="default.choose.license.label" /></span>
                 <g:each in="${species.License.list()}" var="l">
                     <li class="license_option" onclick="selectLicense($(this), {{>i}})">
                     <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
@@ -164,9 +168,9 @@
         <g:if test="${observationInstance instanceof Species}">
             <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_{{>i}}" type="text" value="" placeholder="Contributor">
-                    <input name="source_{{>i}}" type="text" value="" placeholder="Source">
-                    <input name="title_{{>i}}" type="text" value="" placeholder="Caption">
+                    <input name="contributor_{{>i}}" type="text" value="${currentUser?.name}" placeholder="${g.message(code:'placeholder.contributor')}">
+                    <input name="source_{{>i}}" type="text" value="" placeholder="${g.message(code:'placeholder.source')}">
+                    <input name="title_{{>i}}" type="text" value="" placeholder="${g.message(code:'placeholder.caption')}">
                     <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->
                 </div>
             </div>

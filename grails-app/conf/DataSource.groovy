@@ -26,7 +26,8 @@ dataSource {
 hibernate {
     cache.use_second_level_cache = true
     cache.use_query_cache = true
-    cache.provider_class = 'net.sf.ehcache.hibernate.EhCacheProvider'
+    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // For Hibernate before 4.0
+    //cache.provider_class = 'net.sf.ehcache.hibernate.EhCacheProvider'
 }
 
 // environment specific settings
@@ -78,4 +79,6 @@ environments {
 /* Added by the Hibernate Spatial Plugin. */
 dataSource {
    driverClassName = "org.postgresql.Driver"
+   //driverClassName = "net.sf.log4jdbc.DriverSpy"
+   //driverClassName = "net.sf.log4jdbc.sql.jdbcapi.DriverSpy"
 }

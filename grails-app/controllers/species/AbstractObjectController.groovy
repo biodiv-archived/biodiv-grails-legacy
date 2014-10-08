@@ -40,17 +40,43 @@ import species.participation.Featured
 class AbstractObjectController {
     
     def observsationService;
-   
-    def related() {
-		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+    def utilsService;
 
-		if(relatedObv) {
-			if(relatedObv.observations)
-				relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));
-		} else {
-            log.debug "no related observations"
-		}
-		render relatedObv as JSON
-	}
+    def related() {
+        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+        if(params.filterProperty != 'bulkUploadResources'){
+            if(relatedObv) {
+                if(relatedObv.observations)
+                    relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));
+            } else {
+                log.debug "no related observations"
+            }
+            render relatedObv as JSON
+        } else {
+            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            List urlList = []
+            for(param in relatedObv.observations){
+                def res = param['observation'];
+                def item = [:]
+                item.id = res.id
+                if(res.type == ResourceType.IMAGE) {
+                    item.imageLink = res.thumbnailUrl(config.speciesPortal.usersResource.serverURL)//thumbnailUrl(iconBasePath)
+                } else if(res.type == ResourceType.VIDEO) {
+                    item.imageLink = res.thumbnailUrl()
+                } else if(res.type == ResourceType.AUDIO) {
+                    item.imageLink = config.grails.serverURL+"/images/audioicon.png"
+                } 
+                item.url = "/resource/bulkUploadResources"
+                item.title = param['title']
+                item.type = 'resource'
+                if(param.inGroup) {
+                    item.inGroup = param.inGroup;
+                } 
+                urlList << item;
+            }
+            relatedObv.observations = urlList
+            render relatedObv as JSON
+        }
+    }
 
 }

@@ -62,6 +62,7 @@ class ActivityFeedService {
 	//static final String SPECIES_POSTED_ON_GROUP = "Posted species to group"
 	//static final String SPECIES_REMOVED_FROM_GROUP = "Removed species from group"
 	static final String SPECIES_CREATED = "Created species"
+	static final String SPECIES_UPDATED = "Updated species gallery"  //updation mail on when media changes
 	static final String SPECIES_FIELD_UPDATED = "Updated species field"
 	static final String SPECIES_FIELD_CREATED = "Added species field"
 	static final String SPECIES_FIELD_DELETED = "Deleted species field"
@@ -110,11 +111,10 @@ class ActivityFeedService {
 	
 	
 	static transactional = false
-	
+
+    def utilsService
 	def grailsApplication
 	def springSecurityService
-	def observationService
-	def userGroupService
 	
 	def getActivityFeeds(params){
 //		log.debug params;
@@ -166,21 +166,7 @@ class ActivityFeedService {
 	}
 	
 	def getDomainObject(className, id){
-		def retObj = null
-		if(!className || className.trim() == ""){
-			return retObj
-		}
-		
-		id = id.toLong()
-		switch (className) {
-			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
-				retObj = [objectType:className, id:id]
-				break
-			default:
-				retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-				break
-		}
-		return retObj
+        return utilsService.getDomainObject(className, id);
 	}
 	
 	// this will return class of object in general used in comment framework
@@ -289,11 +275,11 @@ class ActivityFeedService {
 				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
-				activityTitle = getResType(activityRootObj).capitalize() + " flagged"
+				activityTitle = utilsService.getResType(activityRootObj).capitalize() + " flagged"
 				text = feedInstance.activityDescrption
 				break
             case REMOVED_FLAG:
-				activityTitle = getResType(activityRootObj).capitalize() + " flag removed" 
+				activityTitle = utilsService.getResType(activityRootObj).capitalize() + " flag removed" 
 				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
@@ -341,6 +327,10 @@ class ActivityFeedService {
                 }
                 text = feedInstance.activityDescrption
                 break
+            case SPECIES_UPDATED:
+                activityTitle = SPECIES_UPDATED
+                break
+
 			default:
 				activityTitle = activityType
 				break
@@ -390,7 +380,7 @@ class ActivityFeedService {
 		def speciesId = reco?.taxonConcept?.findSpeciesId();
 		String sb = ""
 		if(speciesId != null){
-			sb =  '<a href="' + observationService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
+			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
             //sb = sb.replaceAll('"|\'','\\\\"')
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
@@ -401,18 +391,13 @@ class ActivityFeedService {
 	}
 	
 	def getUserHyperLink(user, userGroup){
-		String sb = '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
+		String sb = '<a href="' +  utilsService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
         return sb;
         //return sb.replaceAll('"|\'','\\\\"')
 	}
 	
 	def getUserGroupHyperLink(userGroup){
-        if(!userGroup){
-            return ""
-        }
-		String sb = '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
-        return sb;
-        //return sb.replaceAll('"|\'','\\\\"')
+        return utilsService.getUserGroupHyperLink(userGroup);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -439,14 +424,14 @@ class ActivityFeedService {
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(!isBulkPull && sendMail){
-				observationService.sendNotificationMail(activityType, r, null, null, af)
+				utilsService.sendNotificationMail(activityType, r, null, null, af)
 			}
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
 			af = addActivityFeed(ug, ug, author, activityType, description, true)
             if(sendMail)
-			    observationService.sendNotificationMail(activityType, ug, null, null, af)
+			    utilsService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
 		return af
 	}
@@ -490,36 +475,14 @@ class ActivityFeedService {
         return res 
     }	
 
-
-    def getResType(r) {
-        def desc = ""
-        switch(r.class.canonicalName){
-            case Checklists.class.canonicalName:
-            desc += "checklist"
-            break
-            default:
-            desc += r.class.simpleName.toLowerCase()
-            break
-        }
-        return desc
-    }
     def getDescriptionForFeature(r, ug, isFeature)  {
-        def desc = isFeature ? "Featured " : "Removed featured "
-        String temp = getResType(r)
-        desc+= temp
-        if(ug == null) {
-            return desc
-        }
-        desc +=  isFeature ? " to group" : " from group"
-        return desc
-
-
+        return utilsService.getDescriptionForFeature(r, ug, isFeature);
     }
 /*
     def getMailSubject(r, isFeature) {
         def desc = ""
         desc += isFeature ? "Featured " : "Removed featured "
-        String temp = getResType(r)
+        String temp = utilsService.getResType(r)
         desc+= temp
         return desc
      }*/

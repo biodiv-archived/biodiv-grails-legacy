@@ -18,7 +18,7 @@ class ObservationTagLib {
 	def grailsApplication
     def springSecurityService;
     def chartService;
-    def SUserService;
+    //def SUserService;
 
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
@@ -251,7 +251,7 @@ class ObservationTagLib {
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
 
             out << """
-               <span class="star_${divClass} 
+               <span class="star_${divClass}" 
                     title="Rate" data-score='${averageRating}' data-input-name="${name}"  data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="like" ></span>
                     <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
                 """
@@ -276,13 +276,13 @@ class ObservationTagLib {
             """
 
             if(!hideForm) {
-                out << """<form class="ratingForm" method="get" title="Rate it">
+                out << """<form class="ratingForm" method="get" title="${g.message(code:'observationtaglib.title.rate')}">
                     """
             }
             out << """
-                <span class="like_${divClass} 
-                    title="${(userRating>0)?'Unlike':'Like'}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
-                    <span class="noOfRatings" title='No of likes'>${resource.totalRatings ?: 0}</span>
+                <span class="like_${divClass}" 
+                    title="${(userRating>0)?g.message(code:'default.unlike'):g.message(code:'default.like')}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
+                    <span class="noOfRatings" title='${g.message(code:"observationtaglib.title.likes")}'>${resource.totalRatings ?: 0}</span>
                 """
             if(!hideForm) {
                 out << "</form>"
@@ -358,26 +358,33 @@ class ObservationTagLib {
                 resList = relObvMap.resList
                 resCount = relObvMap.count
                 obvLinkList = relObvMap.obvLinkList
+                offset = resCount
             break
 
             case "fromSpeciesField" :
-                def allSpField = resInstance?.fields
-                allSpField.each{
-                    def r = it.resources
-                    r.each{
-                        resList.add(it)
+                if(attrs.model.spFieldId == ""){
+                } else {
+                    def allSpField = resInstance?.fields
+                    allSpField.each{
+                        def r = it.resources
+                        r.each{
+                            resList.add(it)
+                        }
                     }
                 }
                 resCount = resList.size()
             break
+            case "fromSingleSpeciesField" :
+                
+            break
 
             case "usersResource" :
                 def usersResList
-                if(SUserService.isAdmin(userInstance?.id)){
+                /*if(SUserService.isAdmin(userInstance?.id)){
                     usersResList = UsersResource.findAllByStatus(UsersResource.UsersResourceStatus.NOT_USED.toString())
-                } else {
-                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString())
-                }
+                } else {*/
+                    usersResList = UsersResource.findAllByUserAndStatus(userInstance, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+                //}
                 usersResList.each{
                     resList.add(it.res)
                 }
@@ -385,11 +392,26 @@ class ObservationTagLib {
             break
     
         }
+        if(springSecurityService.currentUser) {
+            attrs.model['currentUser'] = springSecurityService.currentUser
+        }
         attrs.model['resList'] = resList
         attrs.model['offset'] = offset
         attrs.model['resCount'] = resCount
         attrs.model['obvLinkList'] = obvLinkList
         out << render(template:"/observation/addPhotoWrapper", model:attrs.model);
+    }
+
+    def showNoOfBulkUploadResOfUser = { attrs, body ->
+        def res = UsersResource.findAllByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+        out << res.size()
+    }
+
+    def showBulkUploadRes = { attrs, body ->
+        def res = UsersResource.findAllByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+        if(res.size() > 0){
+            out << body()
+        }
     }
 }
 

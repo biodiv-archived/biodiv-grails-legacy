@@ -14,9 +14,9 @@ grails.project.fork = [
 // configure settings for the test-app JVM, uses the daemon by default
 test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 // configure settings for the run-app JVM
-run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the run-war JVM
-war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the Console UI JVM
 console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 ]
@@ -129,7 +129,9 @@ grails.project.dependency.resolution = {
         compile 'jmimemagic:jmimemagic:0.1.2'
         //compile 'net.sf.jtidy:jtidy:r938'
         compile 'com.mchange:c3p0:0.9.5-pre6'
-
+        runtime ('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16') {
+            excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
+        }
     }
 
     plugins { 
@@ -174,11 +176,11 @@ grails.project.dependency.resolution = {
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
-        //        compile ":grails-melody:1.47.2"
+        compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.2.1"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
-        compile (":mail:1.0.5")
+        compile (":mail:1.0.7")
         compile ":quartz:1.0.2"
         compile ":rateable:0.7.1"
         //      compile ":recaptcha:0.5.2"
@@ -187,6 +189,7 @@ grails.project.dependency.resolution = {
         compile ":taggable:1.0.1"
         runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
+    
     } 
 
     grails.war.resources = { stagingDir ->
@@ -199,8 +202,8 @@ grails.project.dependency.resolution = {
         //        delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
     }
 
-    /*grails.tomcat.jvmArgs = ["-server", "-XX:MaxPermSize=512m", "-XX:MaxNewSize=256m", "-XX:NewSize=256m",
+    grails.tomcat.jvmArgs = ["-server", "-XX:MaxPermSize=512m", "-XX:MaxNewSize=256m", "-XX:NewSize=256m",
     "-Xms768m", "-Xmx1024m", "-XX:SurvivorRatio=128", "-XX:MaxTenuringThreshold=0",
     "-XX:+UseTLAB", "-XX:+UseConcMarkSweepGC", "-XX:+CMSClassUnloadingEnabled",
-    "-XX:+CMSIncrementalMode", "-XX:-UseGCOverheadLimit", "-XX:+ExplicitGCInvokesConcurrent"]*/
+    "-XX:+CMSIncrementalMode", "-XX:-UseGCOverheadLimit", "-XX:+ExplicitGCInvokesConcurrent", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]
 }

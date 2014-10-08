@@ -33,18 +33,17 @@ ${username},
 	</tr>
 	<tr>
 		<td colspan="2">
-			You will be notified by mail on any social activity on the
-			observation.<br />
+			<g:message code="msg.notified.mail" /><br />
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2">
-			If you do not want to receive notifications please go to your
-			<a href="${userProfileUrl}">user profile</a> and switch it off.<br />
+			<g:message code="msg.receive.notifications" />
+			<a href="${userProfileUrl}"><g:message code="msg.user.profile" /></a> <g:message code="msg.switch.off" /><br />
 		</td>
 	</tr>
 </table>
 <br />
-Thank you,
+<g:message code="msg.Thank.you" />
 <br />
--The portal team
+<g:message code="msg.-The.portal.team" />

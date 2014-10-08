@@ -13,7 +13,7 @@
 		<b> ${commentInstance.author.name} :
 		</b>
 		<comment:showCommentContext
-			model="['commentInstance' : commentInstance]" />
+			model="['commentInstance' : commentInstance,'userLanguage' : userLanguage]" />
 		<div class="yj-message-body">
 			${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
 		</div>
@@ -21,6 +21,9 @@
 			<time class="timeago" datetime="${commentInstance.lastUpdated.getTime()}"></time>
 			${commentInstance.author }
 			<sUser:ifOwns model="['user':commentInstance.author]">
+				<a href="javascript:void(0);" onclick="editCommentActivity(this.parentNode, ${commentInstance.id}); return false;">
+					<span class="editFlagIcon"><i class="icon-edit"></i></span>
+				</a>
 				<a href="#"
 					onclick="deleteComment(${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">
 					<span class="deleteFlagIcon"><i class="icon-trash"></i></span>

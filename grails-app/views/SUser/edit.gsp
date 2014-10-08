@@ -11,7 +11,7 @@
 </sec:ifNotSwitched>
 
 <head>
-<g:set var="title" value="User"/>
+<g:set var="title" value="${g.message(code:'value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_show" />
 <style>
@@ -43,8 +43,7 @@
 		
 						<div style="float: right; margin: 10px 0;">
 							<a class="btn btn-info pull-right"
-								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">View
-								my profile </a>
+								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.view.my.profile" /></a>
 						</div>
 					</div>
 				</div>
@@ -73,7 +72,7 @@
 										src='${createLink(url: user.mainImage().fileName)}' class='logo '/>
 										<div style="clear:both;">
 											<i class="icon-picture"></i>
-											<span>Upload picture of size < 2MB</span>
+											<span><g:message code="suser.edit.upload.picture" />< 2MB</span>
 										</div>
 									</a>
 								</div>
@@ -179,7 +178,7 @@
 							class="super-section control-group  ${hasErrors(bean: user, field: 'aboutMe', 'error')}"
 							style="clear: both;">
 							<h5>
-								<i class="icon-user"></i>About Me
+								<i class="icon-user"></i><g:message code="default.about.me.label" />
 							</h5>
 							<textarea cols='70' rows='3' style="width: 99%" name="aboutMe"
 								id="aboutMe">
@@ -195,12 +194,12 @@
 						<div class="super-section"
 								style="position: relative; overflow: visible;">
 								<h5>
-									<i class="icon-screenshot"></i>Interests
+									<i class="icon-screenshot"></i><g:message code="suser.edit.intrests" />
 								</h5>
 								
 								<div class="row control-group left-indent">
 									
-										<label class="control-label">Species Groups & Habitats
+										<label class="control-label"><g:message code="default.species.habitats.label" />
 										</label>
 									
 									<div class="filters controls textbox" style="position: relative;">
@@ -212,7 +211,7 @@
 						
 						<div class="super-section" style="clear: both;">
 							<h5>
-								<i class="icon-cog"></i>Settings
+								<i class="icon-cog"></i><g:message code="suser.edit.settings" />
 							</h5>
 							<div
 								class="control-group ${hasErrors(bean: user, field: 'sendNotification', 'error')}">
@@ -277,10 +276,10 @@
 						</div>
 						<div class="super-section" style="clear: both;">
 							<h5>
-								<i class="icon-cog"></i>Actions
+								<i class="icon-cog"></i><g:message code="suser.edit.actions" />
 							</h5>
                                                         <ul>
-                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }">Change Password</a></li>
+                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
                                                         </ul>
 
                                                 </div>
@@ -350,7 +349,7 @@
 							style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
 							 <a id="userEditFormSubmit"
 								class="btn btn-primary" style="float: right; margin-right: 5px;">
-								Update
+								<g:message code="suser.edit.update" />
 							 </a>
 <%--							<s2ui:submitButton elementId='update' form='userEditForm'--%>
 <%--								messageCode='default.button.update.label'--%>
@@ -413,9 +412,8 @@
 				</g:if>
 				
 				
-				<form id="upload_resource" enctype="multipart/form-data"
-					title="Upload profile picture" method="post"
-					class="${hasErrors(bean: user, field: 'profilePic', 'errors')}">
+				<form class="upload_resource ${hasErrors(bean: user, field: 'profilePic', 'errors')}" enctype="multipart/form-data"
+					title="Upload profile picture" method="post">
 					<input type="file" id="attachFile" name="resources" accept="image/*"/> 
 					<span class="msg" style="float: right"></span> 
 					<input type="hidden" name='dir' value="${userGroupDir}" />
@@ -487,16 +485,16 @@
 			
 		//hack: for fixing ie image upload
         if (navigator.appName.indexOf('Microsoft') != -1) {
-            $('#upload_resource').css({'visibility':'visible'});
+            $('.upload_resource').css({'visibility':'visible'});
         } else {
-            $('#upload_resource').css({'visibility':'hidden'});
+            $('.upload_resource').css({'visibility':'hidden'});
         }
 		
 		$('#attachFile').change(function(e){
-  			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+  			$('.upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		});
 
-     	$('#upload_resource').ajaxForm({ 
+     	$('.upload_resource').ajaxForm({ 
 			url:'${g.createLink(controller:'SUser', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
@@ -514,7 +512,7 @@
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
 				var dir = $(responseXML).find('dir').text();
-				var dirInput = $('#upload_resource input[name="dir"]');
+				var dirInput = $('.upload_resource input[name="dir"]');
 				if(!dirInput.val()){
 					$(dirInput).val(dir);
 				}
@@ -539,7 +537,7 @@
 						
 						var messageNode = $(".message .resources");
 						if(messageNode.length == 0 ) {
-							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+							$(".upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
 						} else {
 							messageNode.append(response?response.error:"Error");
 						}

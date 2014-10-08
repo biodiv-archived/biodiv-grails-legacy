@@ -23,8 +23,7 @@ import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 class MigrationService {
 
     static transactional = false
-	def uFileService;
-	def observationService
+    def utilsService;
 	def grailsApplication
 	
 	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
@@ -285,7 +284,7 @@ def migrateProjects() {
 		File projectDir = new File(projectDirPath)
 		if(!projectDir.exists())
 			projectDir.mkdirs()
-		File dst = observationService.getUniqueFile(projectDir, Utils.generateSafeFileName(fileName));
+		File dst = utilsService.getUniqueFile(projectDir, Utils.generateSafeFileName(fileName));
 		
 		//TODO : get domain url 
 		File src = new File("/data/augmentedmaps/"+filePath)

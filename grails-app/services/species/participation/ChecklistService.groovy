@@ -47,7 +47,8 @@ import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ChecklistService {
 
 	static transactional = false
@@ -67,8 +68,9 @@ class ChecklistService {
 	def activityFeedService;
 	def observationsSearchService;
 	def dataSource;
-	def checklistUtilService
-	
+	def utilsService
+	def messageSource;
+	//SessionLocaleResolver localeResolver;
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Create ///////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
@@ -135,7 +137,7 @@ class ChecklistService {
                 }
             }
             if(!validObvPresent) {
-				return ['success' : false, 'msg':'No valid observation present. Ignoring saving checklist', checklistInstance:checklistInstance]
+				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
 
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
@@ -401,11 +403,13 @@ class ChecklistService {
 		List result = new ArrayList();
 
 		def queryResponse = checklistSearchService.terms(params.term, params.field, params.max);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
-		}
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
+            }
+        }
 		return result;
 	}
 
@@ -534,6 +538,8 @@ class ChecklistService {
 
 	
 	def List getObservationData(id, params=[:]){
+        //Done because of java melody error - junk coming with offset value
+        params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
 		params.max = params.max ? params.max.toInteger() :50
 		params.offset = params.offset ? params.offset.toInteger() :0
 		def sql =  Sql.newInstance(dataSource);
@@ -663,7 +669,7 @@ class ChecklistService {
 					
 				}
 				
-				checklistUtilService.cleanUpGorm(true)
+				utilsService.cleanUpGorm(true)
 				
 				Checklists.withTransaction(){ 
 					cl = Checklists.get(id)

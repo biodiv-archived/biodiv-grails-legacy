@@ -7,6 +7,7 @@ import species.utils.Utils;
 
 class TaxonomyDefinition extends ScientificName {
 
+
 	int rank;
 	String name;
 

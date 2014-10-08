@@ -5,7 +5,7 @@
 <head>
 <meta name="layout" content="main" />
 <r:require modules="species_list" />
-<title>Species names list</title>
+<title><g:message code="cuation.names.species.names.list" /></title>
 </head>
 <body>
 	<div class="span12">
@@ -14,10 +14,9 @@
 
 
 		<form id="namesFileForm" enctype="multipart/form-data" method="POST">
-			<label>Please provide a simple text file with a single
-				scientific name per line </label> <input type="file" name="namesFile"
-				placeholder="Names file with <5000 names">
-			<button type="submit" class="btn">Upload & Curate</button>
+			<label><g:message code="default.file.with.scientific.name.label" /> </label> <input type="file" name="namesFile"
+				placeholder="${g.message(code:'curation.names')}">
+			<button type="submit" class="btn"><g:message code="button.upload.curate" /></button>
 		</form>
 
 		<table class="table table-bordered">
@@ -26,10 +25,10 @@
 					<g:sortableColumn property="name"
 						title="${message(code: 'commonNames.name.label', default: 'Given Name')}" />
 
-					<th>Given Name Canonical Form</th>
+					<th><g:message code="default.name.canonical.form.label" /></th>
 
-					<th>Existing Concept Name</th>
-					<th>Existing Concept Canonical Form</th>
+					<th><g:message code="default.existing.concept.name.label" /></th>
+					<th><g:message code="default.Concept.canonical.form.label" /></th>
 
 				</tr>
 			</thead>

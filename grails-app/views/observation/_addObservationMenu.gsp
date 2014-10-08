@@ -3,25 +3,25 @@
 <div class="page-header clearfix">
     <div style="width: 100%;">
         <div class="main_heading navbar" style="margin: 0px;">
-            <h1>
+            <h1 style="font-size:20px;">
                 <g:if test="${(params.action=='create' || params.action == 'save' || params.action == 'bulkCreate')}">
                 <ul class="nav">
                     <li class="${(params.controller == 'observation' && (params.action == 'create' || params.action == 'save'))?'active':''}"><a
                         href="${uGroup.createLink(
                         controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                        > Add Observation</a>
+                        > <g:message code="link.add.observation" /></a>
                     </li>
                     <li class="divider-vertical"></li>
                     <li class="${(params.controller == 'observation' && params.action == 'bulkCreate')?'active':''}"><a
                         href="${uGroup.createLink(
                         controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                        > Add Multiple Observations (β*)</a>
+                        > <g:message code="link.add.multiple" /></a>
                     </li>
                     <li class="divider-vertical"></li>
                     <li class="${params.controller == 'checklist'?'active':''}"><a
                         href="${uGroup.createLink(
                         controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                        > Add List</a></li>
+                        > <g:message code="link.add.list" /></a></li>
                 </ul>
                 </g:if>
                 <g:else>

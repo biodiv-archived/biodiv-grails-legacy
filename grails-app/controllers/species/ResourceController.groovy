@@ -17,7 +17,6 @@ class ResourceController {
 
 	def list() {
 		log.debug params
-		
 		def model = getResourceList(params);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/resource/showResourceListTemplate", model:model);
@@ -164,8 +163,28 @@ class ResourceController {
     }
     
     def deleteUsersResourceById(){
-        resourcesService.deleteUsersResourceById(params.resId);
-        def res = [status:true]
+        def res
+        if(!params.resId && params.fileName) {
+            def temp = Resource.findByFileName(params.fileName);
+            params.resId = temp?.id;
+        }
+        if(params.resId) {
+            resourcesService.deleteUsersResourceById(params.resId);
+            res = [status:true]
+        } else { 
+            res = [status:false]
+        }
         render res as JSON
+    } 
+
+    def bulkUploadResources() {
+		def model = getBulkUploadResourcesList(params);
+        render (view:"list", model:model)
+		return;
+    }
+
+    def getBulkUploadResourcesList(params) {
+        def result = resourcesService.getBulkUploadResourcesList(params);
+        return [resourceInstanceList: result.resourceInstanceList, userCountList: result.userCountList ]
     }
 }

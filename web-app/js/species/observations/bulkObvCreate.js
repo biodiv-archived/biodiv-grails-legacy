@@ -6,7 +6,7 @@ function bulkObservationSubmission(ele, showListPage){
     $("body").css("cursor", "progress");
     var me = ele;
     if($(me).hasClass('disabled')) {
-        alert("Uploading is in progress. Please submit after it is over.");
+        alert(window.i8ln.observation.bulkObvCreate.up);
         event.preventDefault();
         return false; 		 		
     }
@@ -30,7 +30,7 @@ function bulkObservationSubmission(ele, showListPage){
         submitForms(0, size, formsWithData, showListPage); 
         return false;
     } else {
-        alert("Please agree to the terms mentioned at the end of the form to submit the observation.");    
+        alert(window.i8ln.observation.bulkObvCreate.agree);    
         $("#addBulkObservationsSubmit").removeClass("disabled");
         $("#addBulkObservationsAndListPage").removeClass("disabled");
     }
@@ -64,7 +64,7 @@ function submitForms(counter, size, allForms, showListPage){
     }
     if(counter == size){
         $("body").css("cursor", "default");
-        alert("Observations created successfully = " + (counter - errorCount) + "\n Errors in observation submission = " +errorCount);
+        alert(window.i8ln.observation.bulkObvCreate.suc + (counter - errorCount) + "\n"+ window.i8ln.observation.bulkObvCreate.submit +errorCount);
         
         if(!showListPage) {
             if(!gotError){
@@ -133,7 +133,7 @@ function submitForms(counter, size, allForms, showListPage){
                 submitForms(counter+1, size, allForms, showListPage);
             }, error : function (xhr, ajaxOptions, thrownError){
                 //successHandler is used when ajax login succedes
-                alert("Sorry, a server error occured.Please refresh the page & try again or else report the error.");
+                alert(window.i8ln.observation.bulkObvCreate.error);
                 var successHandler = this.success;
                 handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
                     var response = $.parseJSON(xhr.responseText);
@@ -205,12 +205,12 @@ function dropAction(event, ui, ele) {
 
 
 
-
+//alert($(".obvCreateTags").attr('rel'));
 
 $(".obvCreateTags").tagit({
     select:true, 
     allowSpaces:true, 
-    placeholderText:'Add some tags',
+    placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
     fieldName: 'tags', 
     autocomplete:{
         source: '/observation/tags'
@@ -287,7 +287,7 @@ function initializers(){
     $(".obvCreateTags").tagit({
         select:true, 
         allowSpaces:true, 
-        placeholderText:'Add some tags',
+        placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
         fieldName: 'tags', 
         autocomplete:{
             source: '/observation/tags'
@@ -357,4 +357,38 @@ function initializers(){
     if($("input[name='applyToAll']").val() == "true"){
         $(".applyToAll").trigger("click");
     }
+}
+
+function sortMediaOnExif() {
+    if($(".sortMediaOnExif").hasClass("disabled")) {
+        return;
+    }
+    var allMedia = $(".imagesList .addedResource.thumbnail");
+    var unsorted = []
+    $.each(allMedia, function(index, value){
+        var temp = {};
+        temp.key = value;
+        var img = $(value).find(".geotagged_image");
+        $(img).exifLoad(function() {
+            var imageDate =  $(img).exif("DateTimeOriginal")[0];
+            if(imageDate) {
+                var date = imageDate.split(" ")[0];
+                var time = imageDate.split(" ")[1];
+                date = date.replace(/:/g, "-");
+                var modDate = date + " " + time
+                temp.value = modDate;
+            } else {
+                temp.value = '1970-01-01 00:00:00'
+            }
+        });
+        unsorted[index] = temp;
+    });
+    var sorted = unsorted.slice(0).sort(function(a, b) {
+        return (new Date(b.value)) - (new Date(a.value));
+    });
+    $(".imagesList .addedResource.thumbnail").remove();
+    $.each(sorted, function(index, value){
+        $(".imagesList").append(value.key);
+    });
+    $(".imagesList .addedResource.thumbnail").draggable({helper:'clone'});  
 }

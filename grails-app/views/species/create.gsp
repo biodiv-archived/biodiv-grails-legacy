@@ -26,7 +26,7 @@
     <body>
 
         <div class="observation_create">
-            <h1> Add Species </h1>
+            <h1> <g:message code="species.create.add.species" /> </h1>
             <g:hasErrors bean="${speciesInstance}">
             <i class="icon-warning-sign"></i>
             <span class="label label-important"> <g:message
@@ -41,30 +41,30 @@
             <div class="section help-block"> 
                 <ul>
                     <li>
-                    Contributors need to have create rights on the species page in order to add content. If you have not already been allotted rights, please request permission for the taxa of your interest <a href="${uGroup.createLink('controller':'species', 'action':'taxonBrowser')}">here</a>.
+                    <g:message code="species.create.contributors.create.rights" /> <a href="${uGroup.createLink('controller':'species', 'action':'taxonBrowser')}"><g:message code="msg.here" /></a>.
                     </li>
                     <li>
-                    Please input a species name and validate. If a name is validated and found to already exist on the portal, you will be taken to the species page to add content. If the name is validated and found to be new, you can fill in the taxonomic hierarchy so that the new species page can be created.
+                   <g:message code="species.create.validate.species.name" /> 
                     </li>
                 </ul>
            </div>
 
                     <div class="section">
                     <div class="control-group">
-                        <label class="control-label span3" for="name">Add page</label> 
+                        <label class="control-label span3" for="name"><g:message code="default.add.page.label" /> </label> 
                         <div class="pull-left" style="width:700px;margin-left:20px;">
  
                             <div class="input-prepend">
                                 <select id="rank" name="rank" class="add-on">
                                 <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
-                                    <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}>${rank.value()}</option>
+                                    <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}><g:message error="${rank}"/></option>
                                 </g:each>
                             </select>
 
                             <input id="page" 
                             data-provide="typeahead" type="text" class="taxonRank" style=""
                             name="page" value="${requestParams?requestParams.speciesName:''}" data-rank="${requestParams?requestParams.rank:TaxonomyRank.SPECIES.ordinal()}"
-                            placeholder="Add Page" />
+                            placeholder="${g.message(code:'placeholder.create.add')}" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
 
@@ -80,18 +80,18 @@
 
                     <g:if test="${speciesInstance?.id}">
                     <a href="${uGroup.createLink(controller:params.controller, action:'show', id:speciesInstance.id)}" class="btn"
-                        style="float: right; margin-right: 30px;"> Cancel </a>
+                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>
                     </g:if>
                     <g:else>
                     <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
-                        style="float: right; margin-right: 30px;"> Cancel </a>
+                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>
                     </g:else>
                     <a id="validateSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> Validate</a>
+                        style="float: right; margin-right: 5px;"> <g:message code="button.validate" /></a>
 
 
                     <a id="addSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;display:none;"> Add Page</a>
+                        style="float: right; margin-right: 5px;display:none;"> <g:message code="default.add.page.label" /></a>
 
                 </div>
 
@@ -121,12 +121,13 @@
         });
 
         var taxonRanks = [];
+
         <g:each in="${TaxonomyRank.list()}" var="t">
         <g:if test="${t == TaxonomyRank.SUB_GENUS || t == TaxonomyRank.SUB_FAMILY}">
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
         </g:if>
         <g:else>
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
+        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
         </g:else>
         </g:each>
 

@@ -13,7 +13,7 @@
         <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
                     <div class="controls">
                         <g:select name="limit" class="input-mini"
-                            placeholder="Select no of observations to show"
+                            placeholder="${g.message(code:'showobservationlisttemp.select.show')}"
                             from="${[12,24,36,48,60]}"
                             value="${queryParams?.max}" />
 
@@ -52,8 +52,8 @@
         <g:if test="${instanceTotal > (queryParams.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
-				<span class="progress" style="display: none;">Loading ... </span> <span
-					class="buttonTitle">Load more</span>
+				<span class="progress" style="display: none;"><g:message code="msg.loading" /></span> <span
+					class="buttonTitle"><g:message code="msg.load.more" /></span>
 			</div>
 		</div>
 	</g:if>

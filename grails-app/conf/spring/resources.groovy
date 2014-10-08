@@ -39,6 +39,7 @@ import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
 import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
 import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
+import grails.plugin.mail.MailMessageContentRenderer
 
 // Place your Spring DSL code here
 beans = {
@@ -228,24 +229,25 @@ beans = {
         appUserConnectionPropertyName = dbConf.facebook.domain.appUserConnectionPropertyName
         userDomainClassName = dbConf.userLookup.userDomainClassName
         rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
-        //coreUserDetailsService = ref('userDetailsService')
-        //defaultRoleNames = ['ROLE_USER']
+        coreUserDetailsService = ref('userDetailsService')
+        defaultRoleNames = ['ROLE_USER']
 
     }
-    //   }
 
     facebookAuthUtils(FacebookAuthUtils) { 
         grailsApplication = ref('grailsApplication') 
-    }
-     /*   apiKey = conf.facebook.apiKey
+        apiKey = conf.facebook.apiKey
         secret = conf.facebook.secret
         applicationId = conf.facebook.appId
         filterTypes = ['cookie', 'transparent']
         requiredPermissions = ['email']
 
-    }*/
+    }
 
-    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
+    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { 
+        facebookAuthUtils = ref('facebookAuthUtils') 
+        facebookAuthDao = ref('facebookAuthDao')
+    }
     SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
 
     fbAuthenticationFailureHandler(AjaxAwareAuthenticationFailureHandler) {
@@ -269,6 +271,7 @@ beans = {
     facebookAuthService(FacebookAuthService) {
         grailsApplication = ref('grailsApplication')
         userDomainClassName = conf.userLookup.userDomainClassName
+        facebookAuthDao = ref('facebookAuthDao')
     }
 
 
@@ -321,10 +324,10 @@ beans = {
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
-        //unreturnedConnectionTimeout = 5 // seconds
+        unreturnedConnectionTimeout = 50 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
-      } 
+     } 
 
     /*if (Environment.current == Environment.DEVELOPMENT) {
     log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
@@ -385,6 +388,5 @@ beans = {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
-
 
 }

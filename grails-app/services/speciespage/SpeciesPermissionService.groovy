@@ -21,9 +21,8 @@ class SpeciesPermissionService {
 
     static transactional = true
 
-    def springSecurityService;
     def emailConfirmationService;
-    def observationService;
+    def utilsService;
 
 
     List<SUser> getCurators(Species speciesInstance) {
@@ -100,8 +99,6 @@ class SpeciesPermissionService {
                     return false
                 }
 
-                //observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, [speciesPermission:newCon]);
-                log.error "done"
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -116,8 +113,8 @@ class SpeciesPermissionService {
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        println "IS SPECIES CONTRIBUTOR -----------------"
-        println speciesInstance.taxonConcept;
+        //println "IS SPECIES CONTRIBUTOR -----------------"
+        //println speciesInstance.taxonConcept;
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
@@ -315,7 +312,7 @@ println res;
 
                 List<SUser> speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
                 speciesAdmins.each {
-                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:observationService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
+                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:utilsService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
                 }
 
                 msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        

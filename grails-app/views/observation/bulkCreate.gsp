@@ -8,7 +8,7 @@
 
 <html>
     <head>
-        <g:set var="title" value="Observations"/>
+        <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
         <style>
@@ -52,10 +52,10 @@
                 background-color: rgb(106, 201, 162) !important;
             }
             .column.block_row {
-                width:444px;
+                width:443px;
             }
             .miniObvWrapper.column {
-                width:290px;
+                width:291px;
                 margin:2px;
                 height:auto;
                 background-color: #a6dfc8;
@@ -137,7 +137,8 @@
                 overflow-x:scroll;
                 overflow-y:hidden;
                 height: 250px;
-                width:890px;
+                width:884px;
+                margin-left:2px;
             }
             .imageHolder {
                 border: 1px solid grey ;
@@ -185,6 +186,14 @@
             .propagateLocation .map_canvas{
                 width:99% !important;
             }
+            .section {
+                border:1px solid lightgrey;
+                border-radius:7px;
+            }
+            .sortMediaOnExif {
+                margin-right:2px;
+                margin-top:2px;
+            }
         </style>
     </head>
     <body>
@@ -195,19 +204,19 @@
                 def form_id = "addBulkObservations"
                 def form_action = uGroup.createLink(action:'saveBulkObservations', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Submit & and more"
-                def form_button_val = "Submit & Add More"
-                def submitFinish = "Submit & Finish"
+                def form_button_val = "${g.message(code:'button.submit.add')}"
+                def submitFinish = "${g.message(code:'button.submit.finish')}"
                 %>
                 <div class="super-section">
                     <div class="section">
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'userInstance':userInstance, 'resourceListType':'usersResource']"></obv:addPhotoWrapper>
                     </div>
-                    <div class="section clearfix">
-                        <a class="btn btn-primary togglePropagateDiv"> Show Bulk Action <b class="caret"></b></a>
+                    <div class="section clearfix" style="text-align:center;">
+                        <a class="btn btn-primary togglePropagateDiv" style="width:269px;"> <g:message code="button.show.bulk" /> <b class="caret"></b></a>
                         <div class= "propagateBlock hide clearfix">
                             <div >
                                 <div class="column propagateLicense">
-                                    <label>License</label>
+                                    <label><g:message code="default.licenses.label" /></label>
                                     <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
@@ -230,9 +239,9 @@
                                     </div>
                                 </div>
                                 <div class="column span6 propagateTags block_row">
-                                    <label>Tags</label>
+                                    <label><g:message code="default.tags.label" /></label>
                                     <div class="create_tags" style="clear: both;">
-                                        <ul class="obvCreateTags">
+                                        <ul class="obvCreateTags" rel="${g.message(code:'placeholder.add.tags')}">
                                             <g:each in="${obvTags}" var="tag">
                                                 <li>${tag}</li>
                                             </g:each>
@@ -243,26 +252,26 @@
                             </div>
                             <div>
                                 <div class="column propagateGroups small_block_row">
-                                    <label>User Groups</label>
+                                    <label><g:message code="button.user.groups" /></label>
                                     <div style="clear:both">
-                                        <button type="button" class="btn toggleGrpsDiv"> User Groups</button> 
+                                        <button type="button" class="btn toggleGrpsDiv"> <g:message code="button.user.groups" /></button> 
                                         <div class="postToGrpsToggle" style="display:none;">
                                             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="column propagateHelpID small_block_row">
-                                    <label>Help Identify</label>
+                                    <label><g:message code="link.help.identify" /></label>
                                     <div style="margin-left:40px;clear:both">
                                         <input class="helpID" type="checkbox">
                                     </div>
                                 </div>
                                 <div class="column small_block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply Below
+                                        style=" margin-right: 5px; margin-top:17px;"> <g:message code="button.apply.below" />
                                     </a>
                                     <a class="applyAll applyToAll btn btn-primary"
-                                        style=" margin-right: 5px; margin-top:17px;"> Apply to All
+                                        style=" margin-right: 5px; margin-top:17px;"> <g:message code="button.apply.all" />
                                     </a>
                                      <input type="hidden" name='applyToAll' value="" />
                                 </div>
@@ -272,6 +281,7 @@
                     </div>
 
                         <div class="section clearfix">
+                            <div><span style="font-weight:bold;margin-left:5px;">Observation Templates</span></div>
                             <div class="miniObvWrapper column">
                                 <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>
@@ -294,7 +304,7 @@
                         <label class="checkbox" style="text-align: left;"> 
                             <g:checkBox style="margin-left:0px;"
                             name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
-                            <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
+                            <span class="policy-text"> <g:message code="checklist.create.submit.form" /> </span></label>
                     </div>
                 <%
 
@@ -302,11 +312,9 @@
                 //def obvDir = resDir     
                 //obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
                 %>
-                <form id="upload_resource" 
+                <form class="upload_resource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" 
                     title="Add a photo for this observation"
-                    method="post"
-                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
-
+                    method="post">
                     <span class="msg" style="float: right"></span>
                     <input class="videoUrl" type="hidden" name='videoUrl' value="" />
                     <input type="hidden" name='obvDir' value="${obvDir}" />
