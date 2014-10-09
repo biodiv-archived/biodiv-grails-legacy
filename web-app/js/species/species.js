@@ -590,7 +590,7 @@ function onAddableDisplay(value, sourceData, response, context) {
     } else {
         //me.html('Add'); 
     }
-    return 'Successfully added data';
+    return window.i8ln.species.specie.sad;
 }
 
 function onAddableError(response, newValue) {
@@ -932,7 +932,7 @@ $(document).ready(function() {
 
             $('.emptyField').show();
             //$('.hidePoint').show();
-            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>'+window.i8ln.species.specie.eem);
             if($e) rate($e.find('.star_rating'));
         }
 

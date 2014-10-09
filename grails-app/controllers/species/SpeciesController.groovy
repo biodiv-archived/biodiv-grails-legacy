@@ -46,7 +46,7 @@ class SpeciesController extends AbstractObjectController {
     def activityFeedService;
     def observationService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-
+     def messageSource;
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     
     String contentRootDir = config.speciesPortal.content.rootDir

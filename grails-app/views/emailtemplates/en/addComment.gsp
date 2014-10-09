@@ -19,24 +19,32 @@ ${username},
 		<td><g:link
 				url="${uGroup.createLink(controller:'user', action:'show', id:actor.id, userGroupWebaddress:userGroupWebaddress, absolute:true) }">
 				${actor.name}
-			</g:link> : ${activity.activityTitle} <g:message code="msg.on.the" /><a href="${obvUrl}"><g:message code="msg.Observation" /></a><br />
+			</g:link> : ${activity.activityTitle} on a
+			<g:if test="${domainObjectTitle}">
+				${domainObjectType} <a href="${obvUrl}">${domainObjectTitle}</a>
+			</g:if>
+			<g:else>
+				<a href="${obvUrl}">${domainObjectType}</a>
+			</g:else> 
+			<br />
 			<g:if test="${activity.text }">
 				${activity.text }
 			</g:if></td>
 	</tr>
 	<tr>
 		<td colspan="2">
-			<g:message code="msg.notified.mail" /><br />
+			You will be notified by mail on any social activity on the
+			observation.<br />
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2">
-			<g:message code="msg.receive.notifications" />
-			<a href="${userProfileUrl}"><g:message code="msg.user.profile" /></a> <g:message code="msg.switch.off" /><br />
+			If you do not want to receive notifications please go to your
+			<a href="${userProfileUrl}">user profile</a> and switch it off.<br />
 		</td>
 	</tr>
 </table>
 <br />
-<g:message code="msg.Thank.you" />
+Thank you,
 <br />
-<g:message code="msg.-The.portal.team" />
+-The portal team

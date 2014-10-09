@@ -5,11 +5,12 @@ import species.auth.SUser
 import species.NamesSorucedata;
 import species.Language;
 
+import org.springframework.context.MessageSourceResolvable;
 class SpeciesField extends NamesSorucedata implements Rateable {
 
 	def activityFeedService
 	
-	public enum Status {
+	public enum Status implements org.springframework.context.MessageSourceResolvable{
 		UNDER_CREATION("Under Creation"),
 		PUBLISHED("Published"),
 		UNDER_VALIDATION("Under Validation"),
@@ -33,9 +34,18 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 				VALIDATED 
             ]
 		}
+	Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            
+            println "${getClass().name}.${name()}"
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+
+        String getDefaultMessage() { value() }
 	}
 	
-	public enum AudienceType {
+	public enum AudienceType implements org.springframework.context.MessageSourceResolvable{
 		CHILDREN("Children"), 
 		GENERAL_PUBLIC("General Audience"), 
 		EXPERT_USERS("Expert"),
@@ -57,6 +67,15 @@ class SpeciesField extends NamesSorucedata implements Rateable {
                 EXPERT_USERS
             ]
         }
+	Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            
+            println "${getClass().name}.${name()}"
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+
+        String getDefaultMessage() { value() }
 	}
 	
 	Status status = Status.UNDER_CREATION;

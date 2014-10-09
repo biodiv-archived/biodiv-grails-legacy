@@ -40,7 +40,7 @@ class NamesIndexerService {
 	void rebuild() {
 
 		
-		log.info "Publishing names to autocomplete index";
+		/*log.info "Publishing names to autocomplete index";
 		Lookup lookup1 = new TSTLookup();
 
 		setDirty(false);
@@ -74,7 +74,7 @@ class NamesIndexerService {
 		log.info "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
-		store(indexStoreDir);
+		store(indexStoreDir);*/
 	
 		
 	}

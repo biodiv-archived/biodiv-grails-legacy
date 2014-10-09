@@ -21,8 +21,8 @@
         },
 
         initButtons : function() {
-            this.$element.find(this.addSelector).before("<a class='addFieldButton btn btn-success pull-left' title='Add'><i class='icon-plus'></i>Add</a>");
-            this.$element.find(this.editSelector).before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+            this.$element.find(this.addSelector).before("<a class='addFieldButton btn btn-success pull-left' title="+window.i8ln.species.specie.adon+"><i class='icon-plus'></i>"+window.i8ln.species.specie.adon+"</a>");
+            this.$element.find(this.editSelector).before("<a class='pull-right deleteFieldButton btn btn-danger' title="+window.i8ln.species.specie.bdel+"><i class='icon-trash'></i>"+window.i8ln.species.specie.bdel+"</a><a class='pull-right editFieldButton btn btn-primary' title="+window.i8ln.species.specie.bedi+"><i class='icon-edit'></i>"+window.i8ln.species.specie.bedi+"</a>");
         },
 
         onEdit : function(e){    

@@ -17,7 +17,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				<ol>
 	
                     <li  style="margin-bottom:15px;"><b><g:message code="species.contributetemp.online.species" /></b> <g:message code="species.contributetemp.request.permission" />  <br/>
-                    <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary"><g:message code="link.request" /></a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary"><g:message code="link.request" /><g:message code="button.create.species" /></a>
+                    <a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary"><g:message code="link.request" /></a> <a href="${uGroup.createLink(controller:'species', 'action':'create')}" class="btn btn-primary"><g:message code="button.create.species" /></a>
 					</li>
 
 					<li><b><g:message code="species.contributetemp.Offline.creation" /></b> :<g:message code="species.contributetemp.template" /><a
