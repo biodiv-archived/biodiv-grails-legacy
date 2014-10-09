@@ -37,7 +37,6 @@ class UserGroupController {
 	def namesIndexerService;
 	def activityFeedService;
     def digestService;
-    def utilsService;
 
     def messageSource;
 	
