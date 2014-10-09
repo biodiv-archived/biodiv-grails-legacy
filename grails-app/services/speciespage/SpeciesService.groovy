@@ -53,6 +53,7 @@ import species.AbstractObjectService;
 import species.TaxonomyRegistry;
 import org.hibernate.FetchMode;
 import grails.converters.JSON;
+import species.participation.ActivityFeedService;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -365,6 +366,9 @@ class SpeciesService extends AbstractObjectService  {
         if(!params.contributor) {
             params.contributor = springSecurityService.currentUser.id+'';
         }
+
+        // Language
+        speciesField.language = params.locale_language;
 
         //contributors
         speciesField.contributors.clear();

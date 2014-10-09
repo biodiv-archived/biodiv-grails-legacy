@@ -82,7 +82,7 @@
                                         <div
                                             class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistColumns', 'error')}">
                                             <label for="checklistColumns" class="control-label"><g:message
-                                                code="checklist.checklistColumns.label" default="Headers" />
+                                                code="checklist.checklistColumns.label"  />
                                             </label>
                                             <div class="controls">
                                                 <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeholder="${g.message(code:'placeholder.create.checklist')}"                                                title="${g.message(code:'checklist.create.enter.column.headers')}"/>
@@ -95,7 +95,7 @@
                                         <div
                                             class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistData', 'error')}">
                                             <label for="checklistData" class="control-label"><g:message
-                                                code="checklist.checklistData.label" default="Data" /></label>
+                                                code="button.data"  /></label>
                                             <div class="controls">
                                                 <input type=textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="${g.message(code:'placeholder.checklist.create')}" title="${g.message(code:'checklist.create.enter.one.line')}" />
                                                 <small class="help-inline"> <g:message code="checklist.create.enter.one.line" /> </small> 

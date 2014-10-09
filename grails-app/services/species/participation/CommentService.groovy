@@ -3,6 +3,8 @@ package species.participation
 import species.auth.SUser;
 import species.participation.Follow;
 import species.participation.ActivityFeed;
+import org.springframework.web.multipart.MultipartHttpServletRequest
+
 class CommentService {
 
 	static transactional = false

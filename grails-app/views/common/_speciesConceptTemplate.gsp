@@ -89,7 +89,7 @@
                         </g:if>
                         <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
                         <g:showSpeciesField
-                        model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
+                        model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage]" />
                         </g:each>
                     </div>
                     </g:elseif>

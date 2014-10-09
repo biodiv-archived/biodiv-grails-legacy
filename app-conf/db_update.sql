@@ -100,6 +100,10 @@ alter table comment alter column language_id set not null;
 alter table species_field add column language_id bigint;
 update species_field set language_id = 205;
 
+alter table field add column language_id bigint;
+update field set language_id = 205;
+
+
 /** After updating code */
 update document set geo_privacy = false;
 update document set latitude = 0.0 where latitude is null;

@@ -46,7 +46,8 @@ class SpeciesController extends AbstractObjectController {
     def activityFeedService;
     def observationService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-
+    def messageSource;
+    def utilsService;
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     
     String contentRootDir = config.speciesPortal.content.rootDir
@@ -206,10 +207,12 @@ class SpeciesController extends AbstractObjectController {
                     }
                 }
             }
-
+            def userLanguage = utilsService.getCurrentLanguage(request);
 			def c = Field.createCriteria();
 			def fields = c.list(){
-				and{ order('displayOrder','asc') }
+				and{ order('displayOrder','asc')
+					 eq("language", userLanguage) 
+					}
 			};
             if(request.getHeader('X-Auth-Token')) {
                 render speciesInstance as JSON;
@@ -221,8 +224,8 @@ class SpeciesController extends AbstractObjectController {
 			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
 			//def observationInstanceList = relatedObservations?.observations?.observation
 			//def instanceTotal = relatedObservations?relatedObservations.count:0
-
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
+			
+			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage]
 
             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
@@ -446,6 +449,7 @@ class SpeciesController extends AbstractObjectController {
         println "===========UPDATE STARTED========= "
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
+        
         if(!(params.name && params.pk)) {
         	msg=messageSource.getMessage("default.species.error.fieldOrname", null, request.locale)
             render ([success:false, msg:msg] as JSON)
@@ -455,6 +459,7 @@ class SpeciesController extends AbstractObjectController {
             def result;
             long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
+            params.locale_language = utilsService.getCurrentLanguage(request);
 
             switch(params.name) {
                 case "contributor":

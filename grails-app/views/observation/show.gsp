@@ -217,7 +217,7 @@ if(r) {
                     <uGroup:objectPostToGroupsWrapper 
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
                     <div class="union-comment">
-                    <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+                    <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
                     <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                     </div>
                 </div>

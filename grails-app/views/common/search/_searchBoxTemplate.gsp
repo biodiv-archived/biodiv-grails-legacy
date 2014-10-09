@@ -105,7 +105,7 @@ $(document).ready(function() {
                 "sub":"${g.message(code:'resubmit.login')}",
                 "un":"${g.message(code:'service.later')}",
                 "er":"${g.message(code:'fix.errors')}"
-
+                
             },
             "ajaxLogin" : {
                 "ewp": "${g.message(code:'while.processing')}"    
@@ -131,7 +131,16 @@ $(document).ready(function() {
                 "oc":"${g.message(code:'species.occurrence')}",
                 "obs":"${g.message(code:'species.observation')}",
                 "ckl":"${g.message(code:'species.checklist')}",
-                "sdel": "${g.message(code:'species.deleted.sure')}"
+                "sdel": "${g.message(code:'species.deleted.sure')}",
+                "eem":"${g.message(code:'species.exit.edit')}",
+                "adon":"${g.message(code:'title.value.add')}",
+                "sad":"${g.message(code:'species.success.data')}",
+                "bdel":"${g.message(code:'button.delete')}",
+                "bedi":"${g.message(code:'button.edit')}",
+                "bsav":"${g.message(code:'button.save')}",
+                "bcanc":"${g.message(code:'button.cancel')}"
+                
+                
             } ,
             "speciesPermission" : {
                 "ius":"${g.message(code:'image.edited.uploaded')}",

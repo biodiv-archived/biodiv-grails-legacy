@@ -3,7 +3,7 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
-<%@ page import="species.TaxonomyDefinition.Season"%>
+
 <g:if test="${classifications}">
 <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
     <g:each in="${classifications}" var="classification">

@@ -71,7 +71,7 @@ import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
-import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
+ 
 
 class ObservationService extends AbstractObjectService {
 
@@ -2127,15 +2127,5 @@ class ObservationService extends AbstractObjectService {
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
-
-
-     // Get Language id
-   Language getCurrentLanguage(request){
-        String langStr = RCU.getLocale(request)
-        def (langtwo, lang1) = langStr.tokenize( '_' );
-        def languageInstance = Language.findByTwoLetterCode(langtwo);
-        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);        
-   }
-
 
 }

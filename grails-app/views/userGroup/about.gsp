@@ -61,7 +61,7 @@
 					<div class="tab-pane">
 						<div class="super-section userGroup-section">
 							<div class="description notes_view">
-								<g:render template="/common/languagewrap" model="['domainInstance': userGroupInstance , 'userLanguage' : userLanguage, 'contentValue' : userGroupInstance.description]"/>
+								<g:render template="/common/languagewrap" model="['domainInstance': userGroupInstance , 'userLanguage' : userLanguage, 'contentValue' : userGroupInstance.description, 'isHtml' : true]"/>
 							</div>
 							<div class="section">
 								<div class="prop">
