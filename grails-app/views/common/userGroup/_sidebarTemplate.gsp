@@ -14,6 +14,8 @@
     
     <g:if test="${localeLanguages && !hideLanguages}">
     <li class="dropdown open">
+
+    
         <a class="dropdown-toggle" data-toggle="dropdown" style="color:#bbb;">
                  ${g.message(code:'button.language')} <b class="caret"></b>
         </a>

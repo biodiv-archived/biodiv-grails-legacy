@@ -62,8 +62,7 @@
             
             <!--a href="#" class="status ${isSpeciesFieldContributor?'selector':''}" data-type="select" data-pk="${speciesFieldInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="status"  data-value="${speciesFieldInstance?.status?.value()}" data-original-title="Edit status">
                 ${speciesFieldInstance?.status?.value()}</a-->
-                ${speciesFieldInstance?.status?.value()}
-
+                ${g.message(error:speciesFieldInstance.status)}
         </div>
     </div>
     </g:if>
@@ -74,7 +73,7 @@
             in="${ speciesFieldInstance?.audienceTypes}"
             var="audienceType">
 
-            <span class="audienceType ${isSpeciesFieldContributor?'selector':''}" data-type="select"  data-name="audienceType" data-value="${audienceType.value}" data-original-title="Edit Audience Type"> ${audienceType.value}</span>
+            <span class="audienceType ${isSpeciesFieldContributor?'selector':''}" data-type="select"  data-name="audienceType" data-value="${audienceType.value}" data-original-title="Edit Audience Type"> ${g.message(error:audienceType)}</span>
             </g:each>
         </div>
     </div>
@@ -94,7 +93,7 @@
     <!-- references -->
     <g:if test="${speciesFieldInstance.references?.size() > 0}">
     <div class="prop span11">
-        <div class="name" style="float:none;"><g:message code="default.references.label=References" /></div>
+        <div class="name" style="float:none;"><g:message code="default.references.label" /></div>
         <div>
             <ul>
                 <g:each in="${speciesFieldInstance.references}" var="r">

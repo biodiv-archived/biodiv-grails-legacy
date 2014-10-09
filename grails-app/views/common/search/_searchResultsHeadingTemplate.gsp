@@ -11,7 +11,7 @@
 <div class="navbar">
 	<div class="container">
 		<h1 class="brand">
-			<g:message code="default.search.heading" default="Search Results" />
+			<g:message code="default.search.heading"  />
 		</h1>
 	</div>
 </div>
