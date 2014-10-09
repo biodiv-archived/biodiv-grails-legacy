@@ -56,7 +56,7 @@ class ObservationController extends AbstractObjectController {
     def messageSource;
     def commentService;
     def utilsService;
-
+    def setupService;
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -1625,5 +1625,10 @@ class ObservationController extends AbstractObjectController {
         output = ['imageStatus':pi.status];
         render output as JSON
         return;
+    }
+
+    def testy(){
+    	
+	    	setupService.uploadFields("/home/sathish/grails_workspace/biodiv/app-conf/data/datarep/species/templates/add_definitions.xlsx");
     }
 }
