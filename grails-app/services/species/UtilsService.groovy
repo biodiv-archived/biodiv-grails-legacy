@@ -276,7 +276,7 @@ class UtilsService {
                     mailSubject = "Observation updated"
                     templateMap["message"] = " updated the following observation:"
                 }
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
@@ -289,14 +289,14 @@ class UtilsService {
                     mailSubject = "Checklist updated"
                     templateMap["message"] = " updated a checklist on ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
                 }
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["actionObject"] = "checklist"
                 toUsers.add(getOwner(obv))
                 break
 
                 case SPECIES_CURATORS:
                 mailSubject = "Request to curate species"
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/speciesCurators"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/speciesCurators"
                 templateMap["link"] = otherParams["link"]
                 templateMap["curator"] = otherParams["curator"]
                 //templateMap["link"] = URLDecoder.decode(templateMap["link"])
@@ -307,7 +307,7 @@ class UtilsService {
 
                 case SPECIES_CONTRIBUTOR:
                 mailSubject = "Species uploaded"
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/speciesContributor"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/speciesContributor"
                 templateMap["link"] = otherParams["link"]
                 def user = springSecurityService.currentUser;                
                 templateMap["contributor"] = user.name
@@ -321,7 +321,7 @@ class UtilsService {
 
                 case OBSERVATION_FLAGGED :
                 mailSubject = getResType(obv).capitalize() + " flagged"
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 toUsers.add(getOwner(obv))
                 if(obv?.getClass() == Observation) {
                     templateMap["actionObject"] = 'obvSnippet'
@@ -335,7 +335,7 @@ class UtilsService {
 
                 case OBSERVATION_DELETED :
                 mailSubject = conf.ui.observationDeleted.emailSubject
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = " deleted the following observation:"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
@@ -343,7 +343,7 @@ class UtilsService {
 
                 case CHECKLIST_DELETED :
                 mailSubject = conf.ui.checklistDeleted.emailSubject
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["actionObject"] = "checklist"
                 templateMap["message"] = " deleted a checklist. The URL of the checklist was ${templateMap['obvUrl']}"
                 toUsers.add(getOwner(obv))
@@ -351,21 +351,21 @@ class UtilsService {
 
 
                 case SPECIES_RECOMMENDED :
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 mailSubject = conf.ui.addRecommendationVote.emailSubject
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
 
                 case SPECIES_AGREED_ON:
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 mailSubject = conf.ui.addRecommendationVote.emailSubject
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
 
                 case ActivityFeedService.RECOMMENDATION_REMOVED:
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 mailSubject = conf.ui.removeRecommendationVote.emailSubject
                 toUsers.addAll(getParticipants(obv))
@@ -373,7 +373,7 @@ class UtilsService {
 
                 case [ActivityFeedService.RESOURCE_POSTED_ON_GROUP,  ActivityFeedService.RESOURCE_REMOVED_FROM_GROUP]:
                 mailSubject = feedInstance.activityDescrption
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
                 //templateMap['message'] = ActivityFeedService.getContextInfo(feedInstance, [:])
@@ -382,7 +382,7 @@ class UtilsService {
                 break
 
                 case ActivityFeedService.COMMENT_ADDED:				
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
                 mailSubject = "New comment in ${templateMap['domainObjectType']}"
@@ -392,7 +392,7 @@ class UtilsService {
                 break;
 
                 case "COMMENT_ADD_USER_TAG":
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
                 mailSubject = "Tagged in ${templateMap['domainObjectType']} comment"
@@ -411,7 +411,7 @@ class UtilsService {
 
                 case DOWNLOAD_REQUEST:
                 mailSubject = conf.ui.downloadRequest.emailSubject
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 toUsers.add(getOwner(obv))
                 templateMap['userProfileUrl'] = createHardLink('user', 'show', obv.author.id)
                 templateMap['message'] = conf.ui.downloadRequest.message 
@@ -419,7 +419,7 @@ class UtilsService {
 
                 case ActivityFeedService.DOCUMENT_CREATED:
                 mailSubject = conf.ui.addDocument.emailSubject
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = " uploaded a document to ${domain}. Thank you for your contribution."
                 toUsers.add(getOwner(obv))
                 break
@@ -433,7 +433,7 @@ class UtilsService {
                     a = false
                 }
                 mailSubject = ActivityFeedService.getDescriptionForFeature(obv, null , a)
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 def ug = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
                 def groupName
@@ -461,7 +461,7 @@ class UtilsService {
                 templateMap["resourcesServerURL"] = grailsApplication.config.speciesPortal.resources.serverURL
                 templateMap["grailsApplication"] = grailsApplication
                 mailSubject = "Activity digest on " + otherParams["userGroup"].name
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/digest"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/digest"
                 templateMap["digestContent"] = otherParams["digestContent"]
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -471,7 +471,7 @@ class UtilsService {
 
                 case DIGEST_PRIZE_MAIL:
                 mailSubject = "Neighborhood Trees Campaign extended till tonight"
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/digestPrizeEmail"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/digestPrizeEmail"
                 templateMap["userGroup"] = otherParams["userGroup"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(otherParams["usersEmailList"]);
@@ -482,7 +482,7 @@ class UtilsService {
                     if(otherParams['resURLs']){
                         templateMap['resURLs'] = otherParams['resURLs']
                     }
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 if(notificationType == ActivityFeedService.SPECIES_CREATED){
                     templateMap["message"] = " added the following species:"
                 } else {
@@ -497,7 +497,7 @@ class UtilsService {
 
                 case REMOVE_USERS_RESOURCE:
                 mailSubject = "Attn: Your image uploads are due for deletion"
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/deleteUsersResource"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/deleteUsersResource"
                 templateMap["uploadedDate"] = otherParams["uploadedDate"]
                 templateMap["toDeleteDate"] = otherParams["toDeleteDate"]
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -507,7 +507,7 @@ class UtilsService {
 
                 case [ActivityFeedService.SPECIES_FIELD_CREATED, ActivityFeedService.SPECIES_SYNONYM_CREATED, ActivityFeedService.SPECIES_COMMONNAME_CREATED, ActivityFeedService.SPECIES_HIERARCHY_CREATED] :
                 mailSubject = notificationType;
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
@@ -516,7 +516,7 @@ class UtilsService {
 
                 case [ActivityFeedService.SPECIES_FIELD_UPDATED, ActivityFeedService.SPECIES_SYNONYM_UPDATED, ActivityFeedService.SPECIES_COMMONNAME_UPDATED, ActivityFeedService.SPECIES_HIERARCHY_UPDATED] :
                 mailSubject = notificationType;
-                bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/addObservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
@@ -524,7 +524,7 @@ class UtilsService {
 
                 case [ActivityFeedService.SPECIES_FIELD_DELETED, ActivityFeedService.SPECIES_SYNONYM_DELETED, ActivityFeedService.SPECIES_COMMONNAME_DELETED, ActivityFeedService.SPECIES_HIERARCHY_DELETED] :
                 mailsubject = notificationType;
-                bodyview = "/emailtemplates/"+userLanguage.twoLetterCode+"/addobservation"
+                bodyview = "/emailtemplates/"+userLanguage.threeLetterCode+"/addobservation"
                 templatemap["message"] = introspector.decapitalize(otherparams['info']);
                 populatetemplate(obv, templatemap, usergroupwebaddress, feedinstance, request)
                 toUsers.addAll(getParticipants(obv))
@@ -532,7 +532,7 @@ class UtilsService {
 
                 case NEW_SPECIES_PERMISSION : 
                 mailSubject = notificationType
-                    bodyView = "/emailtemplates/"+userLanguage.twoLetterCode+"/grantedPermission"
+                    bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/grantedPermission"
                     def user = otherParams['user'];
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
