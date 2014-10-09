@@ -271,7 +271,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private saveAndRender(params, sendMail=true){
-		params.locale_language = observationService.getCurrentLanguage(request);
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
         /*if(request.getHeader('X-Auth-Token')) {
             if(!result.success) result.remove('observationInstance');
@@ -340,7 +340,7 @@ class ObservationController extends AbstractObjectController {
 					return
 				}
 				observationInstance.incrementPageVisit()
-				def userLanguage = observationService.getCurrentLanguage(request);   
+				def userLanguage = utilsService.getCurrentLanguage(request);   
                 int pos = params.pos?params.int('pos'):0;
 				def prevNext = getPrevNextObservations(pos, params.webaddress);
 					
@@ -606,8 +606,11 @@ class ObservationController extends AbstractObjectController {
 								type = ResourceType.AUDIO	
 								
 
-						}		
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
+						}
+                        if(pi)
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
+                        else 
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
 					}
 				}
 				
@@ -1601,7 +1604,7 @@ class ObservationController extends AbstractObjectController {
         log.debug params;
         if(request.method == 'POST') {
             //TODO:edit also calls here...handle that wrt other domain objects
-            params.locale_language = observationService.getCurrentLanguage(request);
+            params.locale_language = utilsService.getCurrentLanguage(request);
             def result = observationService.saveObservation(params, false)
             if(result.success){
                 forward(action: 'addRecommendationVote', params:params);
@@ -1629,6 +1632,6 @@ class ObservationController extends AbstractObjectController {
 
     def testy(){
     	
-	    	setupService.uploadFields("/home/sathish/grails_workspace/biodiv/app-conf/data/datarep/species/templates/add_definitions.xlsx");
+	    	setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
     }
 }

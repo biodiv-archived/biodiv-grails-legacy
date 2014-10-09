@@ -26,10 +26,11 @@
             <div>
                 <h5><g:message code="default.search" /></h5>
                 <ul>
-                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadSpeciesSearchIndex')}"><g:message code="biodivadmin.index.reload.species.search.index" /></a></li>
-                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadObservationsSearchIndex')}"><g:message code="biodivadmin.index.reload.observations.search.index" /></a></li>
-                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadUsersSearchIndex')}"><g:message code="biodivadmin.index.reload.users.search.index" /></a></li>
-                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadDocumentSearchIndex')}"><g:message code="biodivadmin.index.reload.documents.search.index" /></a></li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadBiodivSearchIndex')}">Reload Biodiv Search Index</a></li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadSpeciesSearchIndex')}">Reload Species Search Index</a></li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadObservationsSearchIndex')}">Reload Observations Search Index</a></li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadUsersSearchIndex')}">Reload Users Search Index</a></li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadDocumentSearchIndex')}">Reload Documents Search Index</a></li>
                 </ul>
             </div>
         </div>

@@ -761,7 +761,6 @@ class UtilsService {
         }
     }
 
-
     /**
      * 
      * @param groupId
@@ -775,7 +774,5 @@ class UtilsService {
         }
         return groupId
     }
-
-
 }
 

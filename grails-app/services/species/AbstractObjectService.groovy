@@ -352,6 +352,4 @@ class AbstractObjectService {
         return utilsService.getSpeciesGroupIds(groupId);
     }
 
-
-
 }

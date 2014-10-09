@@ -44,7 +44,7 @@ class SUserController extends UserController {
     def SUserSearchService;
     def messageSource;
     def speciesPermissionService;
-
+    
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST", resetPassword: "POST"]
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
@@ -133,7 +133,7 @@ class SUserController extends UserController {
         }
         def SUserInstance = SUser.get(params.long("id"))
 
-        def userLanguage =observationService.getCurrentLanguage(request);
+        def userLanguage =utilsService.getCurrentLanguage(request);
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
             	msg = messageSource.getMessage("id.required", ['Id'] as Object[], request.locale)
@@ -233,7 +233,7 @@ class SUserController extends UserController {
 
 			user.website = (params.website.trim() != "") ? params.website.trim().split(",").join(", ") : null
 
-			user.language = observationService.getCurrentLanguage(request);
+			user.language = utilsService.getCurrentLanguage(request);
 
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)

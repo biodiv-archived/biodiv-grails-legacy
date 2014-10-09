@@ -406,6 +406,17 @@ speciesPortal {
 		USERNAME = "username"
 		ABOUT_ME = "about_me"
 		LAST_LOGIN = "lastlogindate"
+        SP_OVERVIEW = "sp_overview"
+        SP_NC = "sp_nc"
+        SP_NH = "sp_nh"
+        SP_DC = "sp_dc"
+        SP_IL = "sp_il"
+        SP_HD = "sp_hd"
+        SP_UM = "sp_um"
+        PAGES = "pages"
+        OBJECT_TYPE = "object_type"
+        MEMBERS = "members"
+        DOC_TYPE = "doc_type"
 	}
 
 	nameSearchFields {
@@ -458,7 +469,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            names.parser.serverURL = "127.0.0.1"
+            names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false
         grails.resources.debug = false
@@ -532,7 +543,8 @@ environments {
                     'org.pac4j'
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
-            debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 
 
             info    'grails.app.filters.species'
@@ -917,6 +929,8 @@ environments {
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 
        }
 	}
@@ -1028,6 +1042,8 @@ environments {
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 		}
 	}
 }

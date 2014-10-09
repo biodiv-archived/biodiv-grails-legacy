@@ -46,7 +46,8 @@ class SpeciesController extends AbstractObjectController {
     def activityFeedService;
     def observationService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-     def messageSource;
+    def messageSource;
+    def utilsService;
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     
     String contentRootDir = config.speciesPortal.content.rootDir
@@ -206,7 +207,7 @@ class SpeciesController extends AbstractObjectController {
                     }
                 }
             }
-            def userLanguage = observationService.getCurrentLanguage(request);
+            def userLanguage = utilsService.getCurrentLanguage(request);
 			def c = Field.createCriteria();
 			def fields = c.list(){
 				and{ order('displayOrder','asc')
@@ -458,7 +459,7 @@ class SpeciesController extends AbstractObjectController {
             def result;
             long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
-            params.locale_language = observationService.getCurrentLanguage(request);
+            params.locale_language = utilsService.getCurrentLanguage(request);
 
             switch(params.name) {
                 case "contributor":

@@ -124,6 +124,9 @@
                                     <div class="controls">
                                         <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"/>
                                         <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"/>
+                                        <input type="hidden" id="latitude" class="markColumn" name="latitude" value=""/>
+                                        <input type="hidden" id="longitude" class="markColumn" name="longitude" value=""/>
+                                        <input type="hidden" id="obvDate" class="markColumn" name="obvDate" value=""/>
                                         <div class="help-inline">
                                             <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
                                             <g:message code="checklist.scientific_name.validator.invalid" />
@@ -244,10 +247,9 @@
             for (var i =0 ; i<10 ; i++ ){
                 rowDataForBlankSheet.push({S_No:"",Scientific_Name:"",Common_Name:""});
             }
-            var columnDataForBlankSheet = [{id: "S_No", name:window.i8ln.species.parseUtil.sno, field:"S_No",editor: Slick.Editors.Text, width:50},
-                {id: "Scientific_Name", name:window.i8ln.species.parseUtil.snu , field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
-                {id: "Common_Name", name:window.i8ln.species.parseUtil.cnu, field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
-
+            var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
+                {id: "Scientific_Name", name: "Scientific_Name", field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
+                {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
                 ]
 
             columnDataForBlankSheet.push(getMediaColumnOptions());

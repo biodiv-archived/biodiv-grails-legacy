@@ -325,10 +325,10 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 			while(it.hasNext()) {
 				def doc = it.next()
-				def user = SUser.read(Long.parseLong(doc.getFieldValue("id") + ""))
+				def user = SUser.read(Long.parseLong(doc.getFieldValue("id").tokenize("_")[1] + ""))
 
 				if(user)  {
-					totalUserList.add(Long.parseLong(doc.getFieldValue("id") + ""))
+					totalUserList.add(Long.parseLong(doc.getFieldValue("id").tokenize("_")[1] + ""))
 					userList.add(user)
 				}
 			}

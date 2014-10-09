@@ -37,6 +37,7 @@ class UserGroupController {
 	def namesIndexerService;
 	def activityFeedService;
     def digestService;
+    def utilsService;
 
     def messageSource;
 	
@@ -153,7 +154,7 @@ class UserGroupController {
 	def save() {
 		log.debug params;
 		params.domain = Utils.getDomainName(request)
-		params.locale_language = observationService.getCurrentLanguage(request);
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		def userGroupInstance = userGroupService.create(params);
 		if (userGroupInstance.hasErrors()) {
 			userGroupInstance.errors.allErrors.each { log.error it }
@@ -171,7 +172,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
-			def userLanguage = observationService.getCurrentLanguage(request);
+			def userLanguage = utilsService.getCurrentLanguage(request);
 			if(params.pos) {
 				int pos = params.int('pos');
 				def prevNext = getPrevNextUserGroups(pos);
@@ -243,7 +244,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def update() {
 		log.debug params;
-		params.locale_language = observationService.getCurrentLanguage(request);
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (userGroupInstance) {
 			if (params.version) {
@@ -826,7 +827,7 @@ class UserGroupController {
 	def about() {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
-		def userLanguage = observationService.getCurrentLanguage(request);
+		def userLanguage = utilsService.getCurrentLanguage(request);
 		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(),userLanguage:userLanguage]
 	}
 
