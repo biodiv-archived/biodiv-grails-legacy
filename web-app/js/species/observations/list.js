@@ -732,7 +732,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
-        $('#filterPanel').replaceWith(data.filterPanel);
+        //$('#filterPanel').replaceWith(data.filterPanel);
         //$('.observation_location').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);

@@ -1,9 +1,8 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="java.text.SimpleDateFormat" %>
+<g:set var="modules"  value="[[name:'All'], [name:'Species', template:'species'], [name:'Observation', template:'observation'], [name:'Document', template:'document'], [name:'SUser', template:'SUser'], [name:'UserGroup', template:'userGroup']]"/>
 
-<g:set var="modules"  value="[[name:'All'], [name:'Species'], [name:'Observation'], [name:'Document'], [name:'SUser'], [name:'UserGroup']]"/>
-
-<div  class="block-tagadelic ">
+<div  class="block-tagadelic">
 
     <form id="advSearchForm" method="get"  title="Advanced Search"
         action="${uGroup.createLink(controller:'search', action:params.action?:'select') }"
@@ -81,10 +80,10 @@
         </div>
 
         <g:each in="${modules}" var="module">
-        <g:if test="${!module.name.equalsIgnoreCase('All') && !module.name.equalsIgnoreCase('SUser') && !module.name.equalsIgnoreCase('UserGroup') }">
+        <g:if test="${!module.name.equalsIgnoreCase('All')}">
 
         <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.name)?'':'hide' }">
-            <g:render template="/${module.name.toLowerCase()}/advSearchTemplate"/>
+            <g:render template="/${module.template}/advSearchTemplate"/>
         </div>
         </g:if>
         </g:each>
@@ -167,20 +166,25 @@ $(document).ready(function(){
 
     $('select.moduleFilter option[value="${activeFilters?activeFilters['aq.object_type']:'' }"]').attr("selected",true);
     $('select.moduleFilter').click(function(e) {
-    var val = $(this).val();
-    $('.aq_modules').hide();
-    $('.aq_modules input').val('');
+        var val = $(this).val();
+        $('.aq_modules').hide();
+        $('input[name*="aq."]').val('').parent().parent().show();
+        hideAqSearchControls(val);
+    });
 
-    $('input[name*="aq."]').val('').show().prev('label').show();
-    if(val == 'Observation') {
-    $('input[name="aq.attribution"]').val('').parent().parent().hide();
-    } else if (val == 'SUser') {
-    $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.tag"]').val('').parent().parent().hide();
-    } else if (val == 'UserGroup') {
-    $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.text"],input[name="aq.tag"],input[name="aq.uGroup"]').val('').parent().parent().hide();
+    function hideAqSearchControls(val) {
+
+        if(val == 'Observation') {
+            $('input[name="aq.attribution"]').val('').parent().parent().hide();
+        } else if (val == 'SUser') {
+            $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.tag"]').val('').parent().parent().hide();
+        } else if (val == 'UserGroup') {
+            $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.text"],input[name="aq.tag"],input[name="aq.uGroup"]').val('').parent().parent().hide();
+        }
+
+        $('.'+val.toLowerCase()+'_aq_filters').show()
     }
 
-    $('.'+val.toLowerCase()+'_aq_filters').show()
-    });
+    hideAqSearchControls($('select.moduleFilter').val());
 });
 </r:script>

@@ -2897,3 +2897,10 @@ small {
 {
     width:25px; float:left; margin-right:6px
 }
+#advSearchForm .control-label {
+    width:120px;
+}
+#advSearchForm .controls {
+    margin-left:140px;
+}
+
