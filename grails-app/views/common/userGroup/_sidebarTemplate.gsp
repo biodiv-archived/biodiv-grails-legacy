@@ -24,18 +24,13 @@
 	<uGroup:showSuggestedUserGroups />
     
     <g:if test="${localeLanguages && !hideLanguages}">
-    <li class="dropdown open">
-        <a class="dropdown-toggle" data-toggle="dropdown" style="color:#bbb;">
-                 ${g.message(code:'button.language')} <b class="caret"></b>
-        </a>
-        <ul class="dropdown-menu" style="max-height:300px;overflow-x:hidden;overflow-y:auto;">
+    <li class="btn-toolbar" style="margin-top:0px;margin-bottom:0px;">
+        <div class="btn-group">
             <g:each in="${localeLanguages}" var="localeLanguage">
-                <li>
-                <a class="btn btn-link ${(params?.lang == localeLanguage.code)?'disabled':''}" href="#" onclick="setLanguage('${localeLanguage.code}')">${localeLanguage.name}</a>
-                </li>
+                <a class="btn btn-link ${((params?.lang == null && localeLanguage.code == 'en') || (params?.lang == localeLanguage.code))?'disabled':''}" href="#" onclick="setLanguage('${localeLanguage.code}')">${localeLanguage.code}</a>
             </g:each>
 
-        </ul>
+        </div>
     </li>
     </g:if>
 
