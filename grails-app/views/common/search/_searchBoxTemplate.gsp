@@ -137,6 +137,8 @@ $(document).ready(function() {
                 "sad":"${g.message(code:'species.success.data')}",
                 "bdel":"${g.message(code:'button.delete')}",
                 "bedi":"${g.message(code:'button.edit')}",
+                "bsav":"${g.message(code:'button.save')}",
+                "bcanc":"${g.message(code:'button.cancel')}"
                 
                 
             } ,

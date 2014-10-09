@@ -31,6 +31,7 @@
             var $conEntry = $(e.currentTarget).parent();
             var $container = $conEntry.parent();
             this.initEditableForm($container, $conEntry, $container.data());
+
         },
 
         onAdd : function(e) {    
