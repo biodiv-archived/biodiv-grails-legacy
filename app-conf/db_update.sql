@@ -90,6 +90,13 @@ alter table resource add constraint language_id foreign key (id) references lang
 update resource set language_id = 205;
 alter table resource alter column language_id set not null;
 
+ALTER TABLE comment ADD language_id bigint;
+alter table comment add constraint language_id foreign key (id) references language(id) match full;
+update comment set language_id = 205;
+alter table comment alter column language_id set not null;
+
+
+
 alter table species_field add column language_id bigint;
 update species_field set language_id = 205;
 

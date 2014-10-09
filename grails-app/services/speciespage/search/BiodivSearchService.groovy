@@ -200,14 +200,14 @@ class BiodivSearchService extends AbstractSearchService {
             paramsList.add('facet', "true");
             paramsList.add('facet.mincount', "1");
             paramsList.add('facet.field', searchFieldsConfig.OBJECT_TYPE);
-            paramsList.add('facet.field', searchFieldsConfig.SGROUP);
-            paramsList.add('facet.field', searchFieldsConfig.TAG);
-            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.limit', max);
-            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.offset', 0);
+//            paramsList.add('facet.field', searchFieldsConfig.SGROUP);
+//            paramsList.add('facet.field', searchFieldsConfig.TAG);
+//            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.limit', max);
+//            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.offset', 0);
 
-            paramsList.add('facet.field', searchFieldsConfig.CONTRIBUTOR+"_exact");
-            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.limit', max);
-            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.offset', 0);
+//            paramsList.add('facet.field', searchFieldsConfig.CONTRIBUTOR+"_exact");
+//            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.limit', max);
+//            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.offset', 0);
 
 
             def queryResponse = search(paramsList);
@@ -219,7 +219,7 @@ class BiodivSearchService extends AbstractSearchService {
                     objectTypes << [name:it.getName(), count:it.getCount()]
                 }
 
-                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
+/*                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
                 sGroupFacets.each {
                     //TODO: sort on name
                     sGroups << [name:it.getName(), count:it.getCount()]
@@ -236,7 +236,7 @@ class BiodivSearchService extends AbstractSearchService {
                     //TODO: sort on name
                     contributors << [name:it.getName(), count:it.getCount()]
                 }
- 
+*/ 
             }
 
             responseHeader = queryResponse?.responseHeader;
@@ -282,7 +282,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         }
 
-        return [responseHeader:responseHeader, instanceList:instanceList, instanceTotal:noOfResults, objectTypes:objectTypes, sGroups:sGroups, tags:tags, contributors:contributors, queryParams:queryParams, activeFilters:activeFilters]
+        return [responseHeader:responseHeader, instanceList:instanceList, instanceTotal:noOfResults, objectTypes:objectTypes, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 

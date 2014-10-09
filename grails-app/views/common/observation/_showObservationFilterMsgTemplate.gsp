@@ -14,6 +14,7 @@
 	$(document).ready(function() {
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
+
 </script>
 <div class="info-message" id="info-message">
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
@@ -134,7 +135,7 @@
 						href="#">[X]</a> </span>
 			</g:if>
 			
-			<g:if test="${queryParam.key.startsWith('aq.') && queryParam.value}">
+			<g:if test="${queryParam.key.startsWith('aq.') && queryParam.value && !queryParam.key.equalsIgnoreCase('aq.object_type')}">
                                     ${queryParam.key.replace('aq.','')}:<span
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
@@ -142,15 +143,6 @@
 						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="#${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>
-
-			<g:if test="${queryParam.key == 'object_type' && queryParam.value }">
-                           		in <span class="highlight"><a
-					href="${uGroup.createLink(
-					mapping:"userGroupGeneric", action:"list",
-					params:[object_type: queryParam.value])}">
-						${queryParam.value } <a href="#"
-						onclick="setDefaultModule(); return false;">[X]</a> </a> </span> modules
-            </g:if>
 
 
 		</g:each>

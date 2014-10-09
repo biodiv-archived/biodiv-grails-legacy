@@ -18,7 +18,6 @@
         <div class="span12">
             <search:searchResultsHeading />
             <g:if test="${instanceTotal}">
-            <% objectTypes.push(['name':'All', 'count':'-'])%>
             <g:render template="/search/sidebar" model="[modules:objectTypes, sGroups:sGroups, tags:tags, contributors:contributors]"/>
             <div class="searchResults span8" style="margin-left: 0px;">
                 <g:render template="/search/showSearchResultsListTemplate"/>
