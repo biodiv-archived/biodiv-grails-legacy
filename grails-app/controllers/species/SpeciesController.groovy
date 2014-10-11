@@ -220,7 +220,7 @@ class SpeciesController extends AbstractObjectController {
             } 
 
 			Map map = getTreeMap(speciesInstance, fields);
-			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
+			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsArray);
 			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
 			//def observationInstanceList = relatedObservations?.observations?.observation
 			//def instanceTotal = relatedObservations?relatedObservations.count:0
@@ -235,12 +235,12 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	private Map getTreeMap(Species speciesInstance, List fields) {
+	private def getTreeMap(Species speciesInstance, List fields) {
         def user = springSecurityService.currentUser;
 
 		Map map = new LinkedHashMap();
         boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user)
-
+        ArrayList fieldsArray = new ArrayList(fields.size());
 		for(Field field : fields) {
 			Map finalLoc;
 			Map conceptMap, categoryMap, subCategoryMap;
@@ -273,16 +273,17 @@ class SpeciesController extends AbstractObjectController {
 					}
 				}
 				finalLoc.put ("field", field);
+                fieldsArray.putAt(field.displayOrder, finalLoc);
                 if(user && isSpeciesContributor) {
                     finalLoc.put('isContributor', 1);
                 }
 			}
 		}
 
-		return map;
+		return [map:map,fieldsArray:fieldsArray];
 	}
 
-	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map) {
+	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsArray) {
 
 		def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
@@ -290,8 +291,8 @@ class SpeciesController extends AbstractObjectController {
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
             //concept
-			if(map.containsKey(sField.field.concept)) {
-				finalLoc = map.get(sField.field.concept);
+			if(map.containsKey(sField.field.concept) || fieldsArray[sField.field.displayOrder]) {
+				finalLoc = map.get(sField.field.concept)?:fieldsArray[sField.field.displayOrder];
                 if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                     finalLoc.put('hasContent', true);
                 }
@@ -789,6 +790,10 @@ class SpeciesController extends AbstractObjectController {
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+            params.locale_language = languageInstance;
+            println "+++++++++++++++++++++++++++++++++++++++"
+            println  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			res = speciesUploadService.upload(res.sBulkUploadEntry)
@@ -797,7 +802,9 @@ class SpeciesController extends AbstractObjectController {
 	}
 	
 	def getDataColumns() {
-        List res = speciesUploadService.getDataColumns();
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+
+        List res = speciesUploadService.getDataColumns(languageInstance);
         render res as JSON
     }
     

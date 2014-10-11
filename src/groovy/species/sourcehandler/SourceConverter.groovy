@@ -10,6 +10,7 @@ import species.formatReader.SpreadsheetWriter;
 import species.auth.SUser;
 import species.TaxonomyDefinition;
 import species.TaxonomyDefinition.TaxonomyRank;
+import species.Language;
 
 class SourceConverter {
     protected Map licenseUrlMap;
@@ -257,7 +258,7 @@ class SourceConverter {
 	
 	
 
-	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="") {
+	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="", Language language="") {
 		log.debug "Creating images ${imageIds}"
 		
 		if(!imageIds){
@@ -278,6 +279,7 @@ class SourceConverter {
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source"));
 				new Node(image, "caption", imageData.get("caption"));
+				new Node(image, "language", language);
 				
 				List<String> contributors = getContributors(imageData.get("contributor"));
 				for(c in contributors) {
@@ -592,5 +594,9 @@ class SourceConverter {
 			println str
 		}
 	}
+
+    String getFieldFromName(String fieldName) {
+        return fieldName
+    }
 }
 

@@ -21,6 +21,7 @@ import species.Resource
 import species.Species
 import species.SpeciesField
 import species.Synonyms
+import species.Language
 import species.TaxonomyDefinition
 import species.TaxonomyRegistry
 import species.License.LicenseType
@@ -95,12 +96,12 @@ class XMLConverter extends SourceConverter {
 
         try {
             log.info "Creating/Updating species"
-            log.debug species;
+            log.info species
             s = new Species();
             removeInvalidNode(species);
 
             //sciName is must for the species to be populated
-            Node speciesNameNode = species.field.find {it.subcategory.text().equalsIgnoreCase(fieldsConfig.SCIENTIFIC_NAME);}
+            Node speciesNameNode = species.field.find {it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME));}
 
             //XXX: sending just the first element need to decide on this if list has multiple elements
             def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
@@ -174,35 +175,35 @@ class XMLConverter extends SourceConverter {
                             String category = fieldNode.category?.text()?.trim();
                             String subcategory = fieldNode.subcategory?.text()?.trim();
 
-                            if(category && category.equalsIgnoreCase(fieldsConfig.COMMON_NAME)) {
+                            if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.COMMON_NAME))) {
                                 List<CommonNames> commNames = createCommonNames(fieldNode, s.taxonConcept);
                                 //commNames.each { s.addToCommonNames(it); }
-                            } else if(category && category.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
+                            } else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS))) {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
                                 //synonyms.each { s.addToSynonyms(it); }
                             }
-                             else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+                             else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY))) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
                                         s.addToGlobalDistributionEntities(it);
                                     }
                                 }
-                            } else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+                            } else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY))) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
                                         s.addToGlobalEndemicityEntities(it);
                                     }
                                 }
-                            }  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
+                            }  else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY))) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
                                         s.addToIndianDistributionEntities(it);
                                     }
                                 }
-                            }   else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
+                            }   else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY))) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
                                 countryGeoEntities.each {
                                     if(it.species == null) {
@@ -211,9 +212,9 @@ class XMLConverter extends SourceConverter {
                                 }
 
                             } 
-                            else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
+                            else if(category && category.toLowerCase().endsWith(getFieldFromName(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase()))) {
                                 //ignore
-                                println "ignoring hierarchy" 
+                                log.debug "ignoring hierarchy" 
                             } else {
                                 List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0], synonyms);
                                 speciesFields.each {
@@ -331,6 +332,8 @@ class XMLConverter extends SourceConverter {
             }
         }
 
+        Language language = fieldNode.language[0].value();
+
         for(Node dataNode : fieldNode.data) {
             String data = getData(dataNode);
             data = cleanData(data, s.taxonConcept, synonyms);
@@ -407,14 +410,14 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
-                references.each { println it; speciesField.addToReferences(it); }
+                references.each { speciesField.addToReferences(it); }
+                speciesField.language = language;
                 speciesFields.add(speciesField);
             } else {
                 log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}"
                 addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }           
         }
-        println speciesFields
         return speciesFields;
     } 
 
@@ -472,6 +475,7 @@ class XMLConverter extends SourceConverter {
         String concept = fieldNode.concept?.text()?.trim();
         String category = fieldNode.category?.text()?.trim();
         String subCategory = fieldNode.subcategory?.text()?.trim();
+        String language = fieldNode.language[0]?.value();
         def fieldCriteria = Field.createCriteria();
 
         Field field = fieldCriteria.get {
@@ -479,6 +483,7 @@ class XMLConverter extends SourceConverter {
                 ilike("concept", concept);
                 category ? ilike("category", category) : isNull("category");
                 subCategory ? ilike("subCategory", subCategory) : isNull("subCategory");
+                eq("language", language);
             }
         }
 
@@ -1409,7 +1414,7 @@ class XMLConverter extends SourceConverter {
         fieldNodes.each { fieldNode ->
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
-            if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
+            if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) && rank == TaxonomyRank.SPECIES.ordinal()) {
                 def cleanSciName = Utils.cleanSciName(scientificName);
                 name = cleanSciName
             } else {
@@ -1433,7 +1438,7 @@ class XMLConverter extends SourceConverter {
             log.debug "Taxon : "+name+" and rank : "+rank;
             if(name && rank >= 0) {
                 //TODO:HACK to populate sciName in species level of taxon hierarchy
-                //              if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
+                //              if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
                 //                  def cleanSciName = cleanSciName(scientificName);
                 //                  name = cleanSciName
                 //              }
@@ -1501,7 +1506,7 @@ class XMLConverter extends SourceConverter {
                 }
             }
         }
-        //      if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {
+        //      if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {
         //          updateSpeciesGroup(taxonEntities);
         //      }
         return taxonEntities;
@@ -1545,15 +1550,15 @@ class XMLConverter extends SourceConverter {
     }
 
     TaxonomyDefinition getTaxonConcept(List taxonomyRegistry) {
-        def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
+        def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)));
         if(!taxonConcept) {
-            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY));
+            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY)));
         }
         if(!taxonConcept) {
-            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.GBIF_TAXONOMIC_HIERARCHY));
+            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromName(fieldsConfig.GBIF_TAXONOMIC_HIERARCHY)));
         }
         if(!taxonConcept) {
-            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.IUCN_TAXONOMIC_HIERARCHY));
+            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromName(fieldsConfig.IUCN_TAXONOMIC_HIERARCHY)));
         }
         return taxonConcept;
     }

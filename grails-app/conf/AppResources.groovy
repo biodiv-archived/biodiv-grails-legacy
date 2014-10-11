@@ -292,8 +292,13 @@ modules = {
 		resource url:'/js/species/observations/list.js'
     }
 
+    biodiv_fileuploader {
+        resource url:'/js/fileuploader.js'
+        resource url:'/css/uploader.css'
+    }
+
 	checklist_create {
-		dependsOn 'observations_create, checklist, slickgrid, add_file'
+		dependsOn 'observations_create, checklist, biodiv_fileuploader, slickgrid, add_file'
 		
 		resource url:'/js/species/parseUtil.js'
 		resource url:'/js/species/jquery.csv-0.71.min.js'
