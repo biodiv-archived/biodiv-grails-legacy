@@ -5,6 +5,9 @@
     <%
     ug = new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName, icon:'/'+grailsApplication.config.speciesPortal.app.logo);
     ug.id = 0L;
+    if(!observationInstance.userGroups) {
+        observationInstance.userGroups = []
+    }
     observationInstance.userGroups.add(ug)
     def featuredInUserGroups = [:];
     %>
