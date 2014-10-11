@@ -375,4 +375,8 @@ modules = {
 		resource url:'/js/species/maps/mapapp.js'
 		resource url:'/js/species/maps/cookie-chef.js'
     }
+
+    curation {
+        resource url:'/js/species/curation.js'
+    }
 }

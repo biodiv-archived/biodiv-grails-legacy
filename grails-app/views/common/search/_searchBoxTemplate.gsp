@@ -44,6 +44,12 @@ $(document).ready(function() {
                 'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
                 "queryParamsMax":"${queryParams?.max}",
                 'getProcessedImageUrl' : "${createLink(controller:'observation',  action:'getProcessedImageStatus')}",
+                'curation':{
+                    'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
+                    'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
+                    'searchCol' : "${uGroup.createLink('controller':'namelist', action:'searchCol')}",
+                    'getColDetails' : "${uGroup.createLink('controller':'namelist', action:'getColDetails')}"
+                },
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",

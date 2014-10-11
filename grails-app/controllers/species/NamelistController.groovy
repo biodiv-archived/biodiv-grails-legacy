@@ -1,5 +1,8 @@
 package species
 
+import grails.converters.JSON;
+import grails.converters.XML;
+
 class NamelistController {
 
     def index() { }
@@ -7,11 +10,13 @@ class NamelistController {
 	
 	/**
 	 * input : taxon id of ibp 
-	 * @return A map which contain keys as dirty, clean and working list. Values of this key is again a map with key as name and id
+	 * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
 	 * 
 	 */
 	def getNamesFromTaxon(){
-		//[dirtyList:[name:'aa', id:11], workingList:[name:'aa', id:11]]	
+        println "====CALL HERE ====== " + params
+		def res = [dirtyList:[[name:'aa', id:11], [name:'bb', id:22]], workingList:[[name:'aa', id:11], [name:'bb', id:22]]]
+        render res as JSON
 	}
 	
 	/**
