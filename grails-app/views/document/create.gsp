@@ -7,7 +7,6 @@
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="add_file" />
-<uploader:head />
 
 <style>
 .control-group.error  .help-inline {
