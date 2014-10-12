@@ -28,6 +28,10 @@
                 <%
                 def latitude='',longitude='',areas='';
                 def geoPrivacyAdjustment = observationInstance.fetchGeoPrivacyAdjustment()
+                def checklistObvPoints
+                if(observationInstance.isChecklist) {
+                    checklistObvPoints = observationInstance.fetchObservationsLatLongs()
+                }
                 latitude = observationInstance.latitude + geoPrivacyAdjustment
                 longitude = observationInstance.longitude + geoPrivacyAdjustment
 
@@ -47,7 +51,7 @@
 
                 <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"/>
                 <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"/>
-
+                
             </td>
         </tr>
         <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
@@ -82,13 +86,50 @@
 </g:if>
 
 <r:script>
+
+    function markChecklistObvs(checklistObvPoints, mapLocationPicker) {
+        if(mapLocationPicker.markers) {
+            mapLocationPicker.markers.clearLayers();
+        } else { 
+            mapLocationPicker.markers = new mapLocationPicker.M.MarkerClusterGroup({maxClusterRadius:50});
+        }
+        var m = [];
+        var data = checklistObvPoints //[['255', '17', '78', true, false]]
+        
+        for(var i=0; i<data.length; i++) {
+            var obv = data[i];
+            var latitude = obv.lat?obv.lat:obv[1];
+            var longitude = obv.lng?obv.lng:obv[2];
+            var icon;
+
+            if(obv.geoPrivacy){
+                latitude += obv.geoPrivacyAdjust;
+                longitude += obv.geoPrivacyAdjust;
+            }
+            var marker = mapLocationPicker.createMarker(latitude, longitude, {
+                draggable: false,
+                clusterable: true,
+                icon:icon,
+                clickable:load_content,
+                data:{id:(obv.id?obv.id:obv[0])}
+            });
+            if(marker) m.push(marker);
+        }
+        mapLocationPicker.markers.addLayers(m);
+        mapLocationPicker.markers.addTo(mapLocationPicker.map);
+    }
+
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
             var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             mapLocationPicker.initialize();
             <g:if test="${!observationInstance.isChecklist}">
-            showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
+                showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
             </g:if>
+             <g:if test="${observationInstance.isChecklist}">
+                markChecklistObvs(${checklistObvPoints}, mapLocationPicker);
+            </g:if>
+
             var icon;
             
             var ptIcon = mapLocationPicker.M.AwesomeMarkers.icon({

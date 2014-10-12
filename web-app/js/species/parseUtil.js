@@ -203,12 +203,19 @@ function getHeaderMenuOptions() {
                 title: "Common Name",
                 command: "commonNameColumn"
             }
-            /*,
+            ,
             {
-                iconCssClass: "icon-help",
-                title: "Help",
-                command: "help"
-            }*/
+                title: "Latitude",
+                command: "latitude"
+            },
+            {
+                title: "Longitude",
+                command: "longitude"
+            },
+            {
+                title: "Date",
+                command: "obvDate"
+            }
             ]
         }
     }

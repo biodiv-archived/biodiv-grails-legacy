@@ -148,11 +148,13 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             var iconClass = undefined
             menu.items[0].iconCssClass = (args.column.name === $("#sciNameColumn").val())?'icon-check':undefined
             menu.items[1].iconCssClass = (args.column.name === $("#commonNameColumn").val())?'icon-check':undefined
+            menu.items[1].iconCssClass = (args.column.name === $("#latitude").val())?'icon-check':undefined
+            menu.items[1].iconCssClass = (args.column.name === $("#longitude").val())?'icon-check':undefined
+            menu.items[1].iconCssClass = (args.column.name === $("#obvDate").val())?'icon-check':undefined
         });
         
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
             var name = args.column.name;
-
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
                     name = ''
@@ -165,7 +167,27 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
                 if(args.column.name == $('#sciNameColumn').val())
                     $('#sciNameColumn').val('');
                 $('#commonNameColumn').val(name);
+            } else if(args.command === 'latitude') {
+                if(args.column.name == $('#latitude').val())
+                    name = ''
+                if(args.column.name != $('#latitude').val())
+                    //$('#sciNameColumn').val('');
+                $('#latitude').val(name); 
+            } else if(args.command === 'longitude') {
+                if(args.column.name == $('#longitude').val())
+                    name = ''
+                if(args.column.name != $('#longitude').val())
+                    //$('#sciNameColumn').val('');
+                $('#longitude').val(name); 
+            } else if(args.command === 'obvDate') {
+                if(args.column.name == $('#obvDate').val())
+                    name = ''
+                if(args.column.name != $('#obvDate').val())
+                    //$('#sciNameColumn').val('');
+                $('#obvDate').val(name); 
             }
+
+    
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         });

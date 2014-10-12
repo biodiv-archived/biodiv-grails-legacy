@@ -47,6 +47,7 @@ import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.awt.Point;
 
 class ChecklistService {
 
@@ -212,7 +213,16 @@ class ChecklistService {
 					}else{
 						obsParams.action = "save"
 					}
-					
+                    if(params.obvDate != '') {
+                        obsParams.fromDate = m.get(params.obvDate)
+                        obsParams.toDate = m.get(params.obvDate)
+                    }
+                    if(params.latitude != '' && params.longitude != '') {
+                        //Generating point string if lat long columns marked for each rows
+                        if(m.get(params.latitude) != '' && m.get(params.longitude) != '') {
+                            obsParams.areas = "POINT("+m.get(params.longitude)+" " + m.get(params.latitude)+")"
+                        }
+                    }
 					obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
 					def res = observationService.saveObservation(obsParams, false)
 					Observation observationInstance = res.observationInstance

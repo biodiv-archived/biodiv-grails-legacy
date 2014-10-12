@@ -144,7 +144,8 @@ class XMLConverter extends SourceConverter {
                             log.info "Merging with already existing species information : "+existingSpecies.id;
                             //mergeSpecies(existingSpecies, s);
                             s = existingSpecies;
-                            s.resources?.clear();
+							//XXX: not removing resources so if same spreadsheet uploaded multiple times will see duplicate images
+                            //s.resources?.clear();
                         } else {
                             log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
                             addToSummary("Ignoring species as a duplicate is already present : "+existingSpecies.id)
@@ -434,46 +435,9 @@ class XMLConverter extends SourceConverter {
     * 
     **/
     private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, attributors, data) {
-        return (new HashSet(sField.contributors) == new HashSet(contributors)) && (new HashSet(sField.attributors) == new HashSet(attributors))
-//        for(c1 in sField.contributors) {
-//            for(c2 in contributors) {
-//                if(c1.id == c2.id) {
-//                    return true;
-//                }
-//            }
-//        }
-
-        /**
-        * Hack to find duplicate where conributor is not specified or specified to be dummy
-        * Resetting contributor back to the fields contributors.
-        * TODO: need to remove
-        **/
-        /*for(c1 in sField.contributors) {
-            if((c1.name.equals("dummy")||c1.name.equals("pearlsravanthi"))) {
-                println 'is dummy node'
-                println sField.description
-                println data
-                def desc = sField.description.replaceAll("</?p>","");
-                if( desc.equals(data)) {
-                    println "is duplicate"
-                    println "resetting contributor ${contributors}"
-                    sField.removeFromContributors(c1);
-                    contributors.each { sField.addToContributors(it); }
-                    sField.save();
-                    return true;
-                }
-            }
-        }
-
-        //HACK .. contributors shd never be empty
-        def desc = sField.description.replaceAll("</?p>","");
-        if(sField.contributors.isEmpty() && desc.equals(data)) {
-            println "resetting contributor ${contributors}"
-            contributors.each { sField.addToContributors(it); }
-            sField.save();
-            return true;
-        }*/
-        return false;
+		boolean a =  (new HashSet(sField.contributors).equals(new HashSet(contributors)))
+		boolean c = (new HashSet(sField.attributors.collect{it.id}).equals(new HashSet(attributors.collect {it.id})))
+		return  (a && c)
     }
 
     private String cleanData(String text, TaxonomyDefinition taxon, List<Synonyms> synonyms) {
@@ -813,7 +777,6 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
-                    println "=====LICENSE ON NEW RES======== " + l
                     res.addToLicenses(l);
                 }
                 if(!res.save(flush:true)){
@@ -838,8 +801,8 @@ class XMLConverter extends SourceConverter {
                     println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
                     res.addToLicenses(l);
                 }
-                res.merge();
-                res.refresh();
+                //res.merge();
+                //res.refresh();
                 if(!res.save(flush:true)){
                     res.errors.allErrors.each { log.error it }
                 }
