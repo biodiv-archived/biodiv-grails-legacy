@@ -50,9 +50,9 @@ class DigestService {
         def emailFlag = true
 
         while(emailFlag){
-                        List<SUser> usersEmailList = [];
+            List<SUser> usersEmailList = [];
             Digest.withTransaction { status ->
-                usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+                usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
 
                 if(usersEmailList.size() != 0){
                     sendDigest(digest, usersEmailList, false, digestContent)
@@ -419,5 +419,21 @@ log.debug resultSet
         //res['users'] = userList
         
         return res
+    }
+
+    def List getParticipantsForDigest(userGroup, max, offset) {
+        List participants = [];
+        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
+
+            result.each { user ->
+                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
+            participants << springSecurityService.currentUser;
+        }
+        return participants;
     }
 }

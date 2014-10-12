@@ -612,8 +612,8 @@ class UserGroupController {
 			}
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0L);
-            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount(), 0L));
+		def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount() as int, 0L);
+            founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount() as int, 0L));
             msg = messageSource.getMessage("default.confirm.membership", null, request.locale)
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"

@@ -1733,9 +1733,7 @@ class ObservationService extends AbstractObjectService {
         return [success:success, url:url, msg:message, errors:errors]
     }
 
-    /**
-     */
-    def addAnnotation(params, Observation obv){
+   def addAnnotation(params, Observation obv){
         def ann = new Annotation(params)
         obv.addToAnnotations(ann);
     }
@@ -2127,9 +2125,14 @@ class ObservationService extends AbstractObjectService {
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
+<<<<<<< HEAD
 
 
      // Get Language id
+=======
+    
+    // Get Language id
+>>>>>>> 1b0cd3b2a808aeb8f39df277b86affab2b91820c
    Language getCurrentLanguage(request){
         String langStr = RCU.getLocale(request)
         def (langtwo, lang1) = langStr.tokenize( '_' );
@@ -2137,5 +2140,8 @@ class ObservationService extends AbstractObjectService {
         return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);        
    }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1b0cd3b2a808aeb8f39df277b86affab2b91820c
 }

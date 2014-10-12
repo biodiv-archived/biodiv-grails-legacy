@@ -764,7 +764,6 @@ class XMLConverter extends SourceConverter {
             }
             String path = imageFile.absolutePath.replace(resourcesRootDir, "");
             def res = Resource.findByFileNameAndType(path, resourceType);
-
             if(!res) {
                 log.debug "Creating new resource"
                 res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text(),language:imageNode.language[0]?.value());

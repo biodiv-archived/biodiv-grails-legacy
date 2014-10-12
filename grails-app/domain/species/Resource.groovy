@@ -76,6 +76,8 @@ class Resource extends Sourcedata implements Rateable {
 	ResourceContext context;
     def grailsApplication
     Language language;
+    Language language;
+
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
 	static belongsTo = [SpeciesField, Observation];
 	

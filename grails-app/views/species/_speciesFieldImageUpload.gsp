@@ -3,7 +3,7 @@
         <g:if test="${isSpeciesContributor}">
             <li id="speciesFieldImage-li0" class="active"><a href="#speciesFieldImage-tab0" class="btn" data-toggle="tab"><g:message code="speciesimageupload.add.observation.images" /></a></li>
             <li id="speciesFieldImage-li1"><a href="#speciesFieldImage-tab1" class="btn" data-toggle="tab"><g:message code="speciesimageupload.upload.edit.images" /> </a></li>
-            </g:if>
+        </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
         <div class="tab-content" id="speciesFieldImage-tab-content">

@@ -80,6 +80,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
+
+	// Language 
+	Language language;
     
     // Language
     Language language;
