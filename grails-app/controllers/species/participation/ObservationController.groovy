@@ -1243,7 +1243,7 @@ class ObservationController extends AbstractObjectController {
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			def conf = SpringSecurityUtils.securityConfig
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
