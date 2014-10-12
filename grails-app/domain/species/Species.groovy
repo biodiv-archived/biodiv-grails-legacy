@@ -187,7 +187,7 @@ class Species implements Rateable {
 
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
-		resources.each {
+		this.resources.each {
 			if(it?.type == species.Resource.ResourceType.ICON) {
                 icons.add(it);
 			}
@@ -364,7 +364,7 @@ class Species implements Rateable {
 	 * @return
 	 */
 	def clearBasicContent(){
-		resources?.clear();
+		//this.resources?.clear();
 		fields.each { sf -> 
 			removeFromFields(sf)
 			def ge = GeographicEntity.read(sf.id)

@@ -576,7 +576,7 @@ class SUserController extends UserController {
 				return
 			}
 		}
-		String s = g.render (template:"/domain/ibpHeaderTemplate")
+		String s = g.render (template:"/domain/wikwioHeaderTemplate")
         render s;
 	}
 
@@ -586,7 +586,7 @@ class SUserController extends UserController {
     }
 
 	def footerTemplate() { 
-        String s = g.render template:"/domain/ibpFooterTemplate" 
+        String s = g.render template:"/domain/wikwioFooterTemplate" 
         render s;
     }
 

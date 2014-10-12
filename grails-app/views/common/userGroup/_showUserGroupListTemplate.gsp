@@ -84,7 +84,7 @@ thead th {
 <script type="text/javascript">
 $(document).ready(function(){
 	
-	$(".joinUs").unbind('click').on('click', function() {
+	$(".mainContentList").unbind('click').on('click', '.joinUs', function() {
 		console.log('livejoin ');
 		var joinUsUrl =  "${uGroup.createLink(controller:'userGroup', action:'joinUs') }";
 		joinUsUrl = joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";

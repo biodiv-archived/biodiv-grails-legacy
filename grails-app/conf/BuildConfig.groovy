@@ -14,7 +14,7 @@ grails.project.fork = [
 // configure settings for the test-app JVM, uses the daemon by default
 test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 // configure settings for the run-app JVM
-//run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
+run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the run-war JVM
 war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the Console UI JVM
@@ -69,12 +69,12 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
-        compile ('org.apache.solr:solr-solrj:4.4.0') {
+        compile ('org.apache.solr:solr-solrj:4.10.0') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
 
         if (Environment.current == Environment.DEVELOPMENT) {
-            compile ('org.apache.solr:solr-core:4.4.0') {
+            compile ('org.apache.solr:solr-core:4.10.0') {
                 excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec', 'hadoop-hdfs', 'hadoop-auth', 'hadoop-annotations', 'hadoop-common'
             }
         }
@@ -164,7 +164,7 @@ grails.project.dependency.resolution = {
                 excludes 'spring-security-core', 'cors'
         }
 
-        runtime ":webxml:1.4.1" 
+        compile ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
         //compile ":error-pages-fix:0.2"
         compile ":ajax-uploader:1.1"

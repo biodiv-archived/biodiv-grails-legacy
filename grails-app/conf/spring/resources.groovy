@@ -44,7 +44,6 @@ import grails.plugin.mail.MailMessageContentRenderer
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
-
     authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
         requestCache = ref('requestCache')
         defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
@@ -102,6 +101,7 @@ beans = {
         usersSolrServer(EmbeddedSolrServer, container, "users" );
 
     } else {
+        //TODO: use ConcurrentUpdateSolrServer for updates and HttpSolrServer for query interface
         speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -111,7 +111,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/species"
+            println "Initialized search server to "+config.serverURL+"/species"
         }
 
         observationsSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
@@ -123,7 +123,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/observations"
+            println "Initialized search server to "+config.serverURL+"/observations"
         }
 
         newsletterSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
@@ -135,7 +135,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/newsletters"
+            println "Initialized search server to "+config.serverURL+"/newsletters"
         }
 
         /*checklistSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
@@ -147,7 +147,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/checklists"
+            println "Initialized search server to "+config.serverURL+"/checklists"
         }*/
 
         projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
@@ -159,7 +159,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/projects"
+            println "Initialized search server to "+config.serverURL+"/projects"
         }
 
         documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
@@ -171,7 +171,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/documents"
+            println "Initialized search server to "+config.serverURL+"/documents"
          }
         
 	usersSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/users", config.queueSize, config.threadCount ) {
@@ -183,7 +183,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/users"
+            println "Initialized search server to "+config.serverURL+"/users"
          }
     }//end of initializing solr Server
 
@@ -324,7 +324,7 @@ beans = {
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
-        unreturnedConnectionTimeout = 50 // seconds
+        //unreturnedConnectionTimeout = 50 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
      } 

@@ -32,6 +32,9 @@ import grails.plugin.springsecurity.annotation.Secured
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 import species.participation.UserToken;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
+
 class SpeciesController extends AbstractObjectController {
 
 	def dataSource
@@ -1154,4 +1157,23 @@ class SpeciesController extends AbstractObjectController {
         }    
 
     }
+	
+	def testReader(){
+		def filePath = params.xlsFilePath
+		def compContent = SpreadsheetReader.readSpreadSheet(filePath)
+		def spread = compContent.get(0)
+		def headerNameList = spread.get(0).collect {
+			StringEscapeUtils.escapeCsv(it.getKey());
+		}
+		def  joinedHeader = headerNameList.join(",")
+		println "header name list ===== " + joinedHeader
+
+		spread.each { rowMap->
+			List rowValues = []
+			rowMap.each{
+				rowValues << StringEscapeUtils.escapeCsv(it.getValue());
+				println " --- " + it.getValue() + " ||||| " + StringEscapeUtils.escapeCsv(it.getValue())
+			}
+		}
+	}
 }

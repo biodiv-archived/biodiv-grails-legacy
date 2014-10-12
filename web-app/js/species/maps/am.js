@@ -1,3 +1,9 @@
+OpenLayers._getScriptLocation=function() {
+       return "/map/"
+}
+OpenLayers.nullHandler=function(request) {
+       console.log("Error while loading URL");
+}
 
 function getHost() {
     return window.params.map.domain;
@@ -689,17 +695,17 @@ if (!Array.prototype.indexOf) {
 
 
 function getMaxExtent() {
-    var ext = "5801108.428222222,-7.081154550627198, 12138100.077777777, 4439106.786632658";
+     var ext = "-20037508.34,-20037508.34,20037508.34,20037508.34";
     return new OpenLayers.Bounds.fromString(ext);
 }
 
 function getMapExtent() {
-    var ext = "6567849.955888889,1574216.547942332,11354588.059333334,3763310.626620795";
+     var ext = "-20037508.34,-20037508.34,20037508.34,20037508.34";
     return new OpenLayers.Bounds.fromString(ext);
 }
 
 function getRestrictedExtent() {
-    var ext = "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658";
+     var ext = "-20037508.34,-20037508.34,20037508.34,20037508.34";
     return new OpenLayers.Bounds.fromString(ext);
 }
 
@@ -1260,9 +1266,9 @@ function AugmentedMap(map_div, options) {
     function onZoom() {
         activateNavigationControl();
 	var zoom = map.getZoom();
-  	if ( zoom < 4) 
+  	/*if ( zoom < 4) 
     		map.zoomTo(4);
-
+    */
     }
 
     function getLayers() {
@@ -1390,10 +1396,10 @@ function AugmentedMap(map_div, options) {
 
         // Google.v3 uses EPSG:900913 as projection, so we have to
         // transform our coordinates
-        map.setCenter(new OpenLayers.LonLat(77.22, 22.77).transform(
+        map.setCenter(new OpenLayers.LonLat(-81.50, 28.36).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
-            ), 5);
+            ), 2);
     }
 
     this.layers = map.layers;
@@ -1856,7 +1862,7 @@ function createLayerExplorerLinks(layers) {
     html = html + '<div id="layer_explorer_sidebar">';
     html = html + '<ul class="layer_explorer_sidebar_items">';
 
-    html = html + '<li><a href="#" onClick="updateLayersList(\'new\')" style="font-weight:normal; text-decoration:underline; font-style: italic; ">New layers</a></li>';
+    //html = html + '<li><a href="#" onClick="updateLayersList(\'new\')" style="font-weight:normal; text-decoration:underline; font-style: italic; ">New layers</a></li>';
     html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">All layers</a></li>';
     html = html + '<li><div class="collapsible_box"><a class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_theme\', \'fade\'); hideDiv(\'layers_by_geography\', \'fade\', 1);">By theme</a>';
     html = html + '<div id="layers_by_theme">';
@@ -1868,7 +1874,7 @@ function createLayerExplorerLinks(layers) {
     }
     html = html + '</ul>';
     html = html + '</div></div></li>';
-    html = html + '<li><div class="collapsible_box"><a  class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_geography\', \'fade\'); hideDiv(\'layers_by_theme\', \'fade\', 1);">By geography</a>';
+  /*  html = html + '<li><div class="collapsible_box"><a  class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_geography\', \'fade\'); hideDiv(\'layers_by_theme\', \'fade\', 1);">By geography</a>';
     html = html + '<div id="layers_by_geography" style="display:none;">';
     html = html + '<ul class="layer_explorer_sidebar_subitems">';
     var geography = getThemeNames(2);
@@ -1879,7 +1885,7 @@ function createLayerExplorerLinks(layers) {
 
     html = html + '</ul>';
     html = html + '</div></div></li>';
-
+*/
     html = html + '</ul>';
     html = html + '</div>';
 
@@ -1971,7 +1977,7 @@ function generateHTMLForLayersAsList(layers, hasMap) {
         html = html + '<li class="layer_details_link" onclick="toggleLayerDetails(\'layer_details_' + i + '\',\'' + layers[i].name + '\');">details</li>';
         html = html + '<div id="layer_details_' + i + '" style="display:none;" class="layer_details_box"></div>';
 	
-        if (layers[i].name !== undefined && layers_access[layers[i].name.replace(getWorkspace()+":", "")]) {
+        if (layers[i].name !== undefined && layers_access && layers_access[layers[i].name.replace(getWorkspace()+":", "")]) {
             var layer_download_div = 'layer_download_box_' + i;
             html = html + '<li id=\'' + layer_download_div + '_link\' class="layer_download_link" onclick="toggleDownloadBox(\'' + layer_download_div + '\',\'' + layers[i].name + '\',' + isAuthorised + ');">download</li>';
             html = html + '<div class="layer_download_box" id="' + layer_download_div + '" style="display:none;"></div>';
@@ -2058,7 +2064,7 @@ function showLayersExplorer(layers_explorer_div, map) {
             }
         }
 	
-	updateLayersList("new");
+	updateLayersList("all");
     }
 
     var params = {
@@ -2497,7 +2503,7 @@ function getLayerBoundingBoxString(layer) {
         }
     }
 
-    return "68.106,6.76,97.415,37.074";
+    return "-180,-85,180,85";
 }
 
 function getLayerBoundingBox(layer) {

@@ -165,24 +165,25 @@ else {
 
 
 speciesPortal {
-    app.siteName = "India Biodiversity Portal"
+    app.siteName = "WIKWIO Portal V.1.0"
     app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
-    app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
-    app.siteCode = 'ibp'
+    app.homepageDescription = "WIKWIO aims to strengthen science and technology orientation to achieving food security by enhancing agricultural productivity in the Southern African region. Agricultural productivity is hampered by many factors, one important among them being weeds. Wikwio aims to build and leverage a Science & Technology network which will consolidate existing scientific knowledge and facilitate sharing of new scientific knowledge on weeds of food and cash crops of the region and effective management practices. Wikwio will deploy appropriate ICT solutions to build a multi-stakeholder community of researchers, extension services, civil society and farmers around an ICT knowledge base of weeds. The action aims at enhancing the capacities of researchers, reinforce the institutional capabilities of the National Agricultural Research System (NARS) and Universities, empower extension services and improving their quality of service, through a participatory, technology facilitated platform."
+    app.siteCode = 'wikwio'
+    app.siteName2 = "Weed Identification and Knowledge in the Western Indian Ocean<br>WIKWIO"
 
-    app.twitterUrl = "https://twitter.com/inbiodiversity"
-    app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
-    app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
-	app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
+    //app.twitterUrl = "https://twitter.com/inbiodiversity"
+    //app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
+    //app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
+	//app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
 
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  
-    app.logo = "logo/IBP.png"
+    app.logo = "logo/wikwio.png"
     app.favicon = "logo/favicon.png"
    
-    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com"]
 
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
@@ -519,8 +520,13 @@ environments {
                     'grails.app.controllers.com.odobo',
                     'grails.app.services.com.odobo',
                     'org.pac4j'
+            debug   'grails.app.services.species.participation.DigestService'
+            debug   'species.DigestJob'
+            debug   'grails.app.services.speciespage.ObservationService'
+
+
             info    'grails.app.filters.species'
-            info    'jdbc.sqltiming'
+            fatal    'jdbc.sqltiming'
             info    'jdbc.connection'
             fatal   'jdbc.sqlonly'
             fatal   'jdbc.audit'
@@ -897,6 +903,11 @@ environments {
             info   'grails.app.filters.species.SecurityFilters'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+            
+            debug   'grails.app.services.species.participation.DigestService'
+            debug   'species.DigestJob'
+            debug   'grails.app.services.speciespage.ObservationService'
+
        }
 	}
 	kk {
@@ -1004,6 +1015,9 @@ environments {
             off   'jdbc.resultset'
             off   'jdbc.resultsettable'
             info   'grails.app.filters.species.SecurityFilters'
+            debug   'grails.app.services.species.participation.DigestService'
+            debug   'species.DigestJob'
+            debug   'grails.app.services.speciespage.ObservationService'
 		}
 	}
 }
@@ -1113,8 +1127,8 @@ grails.plugin.springsecurity.facebook.domain.classname='species.auth.FacebookUse
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="notification@indiabiodiversity.org"
-emailConfirmation.from="notification@indiabiodiversity.org"
+grails.mail.default.from="notification@wikwio.org"
+emailConfirmation.from="notification@wikwio.org"
 
 grails.plugin.springsecurity.password.algorithm = 'MD5'
 grails.plugin.springsecurity.password.hash.iterations = 1
@@ -1168,7 +1182,7 @@ If you didn't make this request then ignore the email; no changes have been made
 <br/>
 If you did make the request, then click <a href="$url">here</a> to reset your password.
 '''
-//grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@wikwio.org'
 grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugin.springsecurity.ui.addObservation.emailSubject = 'Observation added'

@@ -76,10 +76,12 @@ class SpeciesService extends AbstractObjectService  {
     def nameTerms(params) {
         List result = new ArrayList();
         def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
-        NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-        for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-            Map.Entry tag = (Map.Entry) iterator.next();
-            result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
+            }
         }
         return result;
     }
@@ -1173,16 +1175,11 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                println "checking permissions +++++++++++++++++++++++++++++++++++++++++"
                 def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
-                println taxonRegistryNodes
 
                 List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
-                println tR
-                println "tR: .... +++++++++++++++++++++++++++++++++++"
                 def tD = tR.taxonDefinition
                 if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;
@@ -1333,7 +1330,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         }
 
         queryParams.sort = params.sort?:"lastrevised"
-        if(queryParams.sort.equals('lastrevised')) {
+        if(queryParams.sort.equals('lastrevised') || queryParams.sort.equals('lastupdated')) {
             queryParams.sort = 'lastUpdated'
 
         } else if(queryParams.sort.equals('percentofinfo') || queryParams.sort.equals('score')) {
@@ -1603,7 +1600,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
                 }
             }
         }
-        species.refresh();
+        //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
                 if(!resource.save(flush:true)){
@@ -1615,7 +1612,7 @@ println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             }
             species.addToResources(resource);
         }
-        species.merge();
+        //species.merge();
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false

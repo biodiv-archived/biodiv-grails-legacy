@@ -281,7 +281,7 @@ $(document).ready(function(){
 */    
    
 
-    $('.loadMore').on('click', function() {
+    $('.observation').on("click", ".loadMore", function() {
         console.log('loadmore');
         $.autopager({
 

@@ -294,17 +294,18 @@ class DocumentService extends AbstractObjectService {
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = documentSearchService.search(paramsList);
+            if(queryResponse) {
 			List<Document> documentInstanceList = new ArrayList<Document>();
-			Iterator iter = queryResponse.getResults().listIterator();
-			while(iter.hasNext()) {
-				def doc = iter.next();
-				log.debug "doc : "+ doc
-				def documentInstance = Document.get(doc.getFieldValue("id"));
-				if(documentInstance)
-					documentInstanceList.add(documentInstance);
-			}
-			
-			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), documentInstanceList:documentInstanceList, snippets:queryResponse.getHighlighting()]
+                Iterator iter = queryResponse.getResults().listIterator();
+                while(iter.hasNext()) {
+                    def doc = iter.next();
+                    def documentInstance = Document.get(doc.getFieldValue("id"));
+                    if(documentInstance)
+                        documentInstanceList.add(documentInstance);
+                }
+                
+                result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), documentInstanceList:documentInstanceList, snippets:queryResponse.getHighlighting()]
+            }
 			log.debug "result returned from search: "+ result
 			return result;
 		} catch(SolrException e) {

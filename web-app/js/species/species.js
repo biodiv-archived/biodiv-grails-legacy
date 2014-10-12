@@ -115,7 +115,6 @@ var showOccurence = function(speciesName) {
     {
         title :window.i8ln.species.specie.ckl,
         layers : 'ibp:checklist_species_locations',
-        styles : '',
         cql_filter : "species_name='" + speciesName + "'",
         opacity : 0.7
     }

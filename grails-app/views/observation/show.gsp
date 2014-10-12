@@ -161,8 +161,8 @@ if(r) {
                                                 
                         </g:if>
                         <g:else>
-                                                <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
-                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
+                            <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
+                            src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
                         </g:else>
 
                     </div>

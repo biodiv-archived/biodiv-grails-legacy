@@ -11,12 +11,12 @@
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
 		<g:else>
-			<a class="pull-left" href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" style="margin-left: 0px;"> <img
+			<a class="pull-left" href="${grailsApplication.config.speciesPortal.app.siteUrl }" style="margin-left: 0px;"> <img
                             class="logo" src="${Utils.getIBPServerDomain()+'/'+grailsApplication.config.speciesPortal.app.logo}"
-                            title="${grailsApplication.config.speciesPortal.app.siteName}" alt="${grailsApplication.config.speciesPortal.app.siteName}">
+                            title="${grailsApplication.config.speciesPortal.app.siteName2}" alt="${grailsApplication.config.speciesPortal.app.siteName}">
 			</a>
-			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="brand">
-                            <h1>${grailsApplication.config.speciesPortal.app.siteName}</h1>
+			<a href="${grailsApplication.config.speciesPortal.app.siteUrl }" class="brand" style="width:100%;float:none;">
+                            <h1>${raw(grailsApplication.config.speciesPortal.app.siteName2)}</h1>
 			</a>
         
 

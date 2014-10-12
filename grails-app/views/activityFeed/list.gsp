@@ -28,7 +28,7 @@
             <uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
             <div class="userGroup-section">
            
-                <feed:showFeedWithFilter model="[feedType:feedType, feedCategory:UserGroup.class.canonicalName,'feedOrder':'latestFirst']" />
+                <feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
             </div>
         </div>
 

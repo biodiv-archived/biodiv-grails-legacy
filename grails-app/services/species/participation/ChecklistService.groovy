@@ -49,6 +49,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import java.awt.Point;
 class ChecklistService {
 
 	static transactional = false
@@ -214,7 +215,16 @@ class ChecklistService {
 					}else{
 						obsParams.action = "save"
 					}
-					
+                    if(params.obvDate != '') {
+                        obsParams.fromDate = m.get(params.obvDate)
+                        obsParams.toDate = m.get(params.obvDate)
+                    }
+                    if(params.latitude != '' && params.longitude != '') {
+                        //Generating point string if lat long columns marked for each rows
+                        if(m.get(params.latitude) != '' && m.get(params.longitude) != '') {
+                            obsParams.areas = "POINT("+m.get(params.longitude)+" " + m.get(params.latitude)+")"
+                        }
+                    }
 					obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
 					def res = observationService.saveObservation(obsParams, false)
 					Observation observationInstance = res.observationInstance
@@ -403,11 +413,13 @@ class ChecklistService {
 		List result = new ArrayList();
 
 		def queryResponse = checklistSearchService.terms(params.term, params.field, params.max);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
-		}
+        if(queryResponse) {
+            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+                Map.Entry tag = (Map.Entry) iterator.next();
+                result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
+            }
+        }
 		return result;
 	}
 

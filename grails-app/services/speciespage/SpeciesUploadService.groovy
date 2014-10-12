@@ -803,8 +803,7 @@ class SpeciesUploadService {
 				between("uploadTime", start, end)
 			}
 		}
-		
-		if(!sFields && !tRegistries && !resourceList){
+	if(!sFields && !tRegistries && !resourceList){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
 			return "Nothing to rollback."
@@ -817,7 +816,7 @@ class SpeciesUploadService {
 		//This is done to avaoid cascade resaving of object. better way requried.
 		Species.withTransaction{   
 			sList.each { s->
-				unpostFromUsergroup(s, sFields, user, sbu)
+				unpostFromUserGroup(s, sFields, user, sbu)
 			}
 		}
 		

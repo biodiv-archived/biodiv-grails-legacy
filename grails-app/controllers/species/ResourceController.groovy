@@ -17,19 +17,14 @@ class ResourceController {
 
 	def list() {
 		log.debug params
-		println "======PARAMS LIST========== " + params
 		def model = getResourceList(params);
-        println "=======MODEL========== " + model
 		if(params.loadMore?.toBoolean()){
-            println "====IN THIS CASE 1====="
 			render(template:"/resource/showResourceListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
-            println "====IN THIS CASE 2====="
 			render (view:"list", model:model)
 			return;
 		} else{
-            println "====IN THIS CASE 3====="
 			def obvListHtml =  g.render(template:"/resource/showResourceListTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, instanceTotal:model.instanceTotal]
@@ -169,8 +164,9 @@ class ResourceController {
     
     def deleteUsersResourceById(){
         def res
-        if(!params.resId) {
-            params.resId = Resource.findByFileName(params.fileName).id;
+        if(!params.resId && params.fileName) {
+            def temp = Resource.findByFileName(params.fileName);
+            params.resId = temp?.id;
         }
         if(params.resId) {
             resourcesService.deleteUsersResourceById(params.resId);

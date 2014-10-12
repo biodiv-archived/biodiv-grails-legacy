@@ -606,8 +606,11 @@ class ObservationController extends AbstractObjectController {
 								type = ResourceType.AUDIO	
 								
 
-						}		
-						resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
+						}
+                        if(pi)
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
+                        else 
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
 					}
 				}
 				
@@ -764,10 +767,8 @@ class ObservationController extends AbstractObjectController {
 					} else if(!params["createNew"] && isMobileApp){
 						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
 					} else {
-                                println "1______________________________________________"
                         if(params.oldAction != "bulkSave"){
                             if(isMobileApp){
-                                println "2______________________________________________"
                                 render (['status':'success', 'success' : true, observationInstance:observationInstance.refresh()] as JSON);
                             } else {
     						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))

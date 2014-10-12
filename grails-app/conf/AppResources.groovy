@@ -312,7 +312,7 @@ modules = {
 	}
 
 	add_file {
-		dependsOn 'core, tagit, list_utils'
+		dependsOn 'core, tagit, list_utils, fileuploader'
 		
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'

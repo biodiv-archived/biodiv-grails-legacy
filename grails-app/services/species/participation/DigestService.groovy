@@ -1,4 +1,5 @@
 package species.participation
+
 import species.*;
 import content.eml.Document;
 import species.groups.UserGroup;
@@ -18,38 +19,55 @@ class DigestService {
     def dataSource;
 
     public static final MAX_DIGEST_OBJECTS = 5
-    static transactional = true
+    static transactional = false
 
     def sendDigestAction() {
+        log.debug "Send digest action called"
         def digestList = Digest.list()
         def setTime = true
         digestList.each{ dig ->
+            log.debug "Sending digest for ${dig}"
             sendDigestWrapper(dig, setTime)
         }
 
     }
 
     def sendDigestWrapper(Digest digest, setTime=true){
-        def max = 50
-        def offset = 0
+        int max = 50
+        long offset = 0
         Date lastSent;
         if(setTime){
             lastSent = new Date()
         }
+
+        def digestContent;
+        Digest.withTransaction {
+            digestContent = fetchDigestContent(digest)
+        }
+
+        log.debug  "Fetched digestContent ${digestContent}"
+
         def emailFlag = true
+
         while(emailFlag){
-            def usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-            if(usersEmailList.size() != 0){
-                sendDigest(digest, usersEmailList, false)
-                offset = offset + max
+                        List<SUser> usersEmailList = [];
+            Digest.withTransaction { status ->
+                usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+
+                if(usersEmailList.size() != 0){
+                    sendDigest(digest, usersEmailList, false, digestContent)
+                    offset = offset + max
+                }
+                else{
+                    emailFlag = false
+                }
+            }
+            if(emailFlag) 
                 Thread.sleep(600000L);
-            }
-            else{
-                emailFlag = false
-            }
         }
         if(setTime) {
             digest.lastSent = lastSent;
+            log.debug "Saving digest lastSent ${digest}"
             if(!digest.save(flush:true))
                 digest.errors.allErrors.each { log.error it }
         }
@@ -57,8 +75,8 @@ class DigestService {
 
     }
 
-    def sendDigest(Digest digest, usersEmailList, setTime){
-        def digestContent = fetchDigestContent(digest)
+    def sendDigest(Digest digest, usersEmailList, setTime, digestContent){
+        //def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
             def otherParams = [:]
@@ -71,8 +89,6 @@ class DigestService {
             }
 
             otherParams['usersEmailList'] = usersEmailList  
-            println "============================== Sending email" 
-            println usersEmailList
             utilsService.sendNotificationMail(utilsService.DIGEST_MAIL,sp,null,null,null,otherParams)
             
             if(setTime) {
@@ -85,7 +101,8 @@ class DigestService {
         }
     }
 
-    private def fetchDigestContent(Digest digest){
+    def fetchDigestContent(Digest digest){
+        log.debug "fetchDigestContent"
         def params = [:]
         params.rootHolderId = digest.userGroup.id
         params.rootHolderType = UserGroup.class.getCanonicalName()
@@ -95,10 +112,13 @@ class DigestService {
         params.feedType = ActivityFeedService.GROUP_SPECIFIC
 
         def res = [:]
+        res = latestContentsByGroup(digest)
         def obvList = [], unidObvList = [], spList = [], docList = [], userList = [];
         boolean obvFlag = false, unidObvFlag = false, spFlag = false, docFlag = false, userFlag = false;
         //HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
+        log.debug "Fetching activity after refTime satisfying params ${params}"
         def feedsList = activityFeedService.getActivityFeeds(params)
+        log.debug "Feeds List : ${feedsList}"
         def feedCount = 0
         feedsList.each{
             switch(it.rootHolderType){
@@ -114,6 +134,7 @@ class DigestService {
         else{
             for (def feed : feedsList){
                 switch(feed.rootHolderType){
+                    /*
                     case Observation.class.getCanonicalName():
                     if(obvList.size() < MAX_DIGEST_OBJECTS) { 
                         def obv = Observation.read(feed.rootHolderId)
@@ -150,7 +171,7 @@ class DigestService {
                     }
                     //obvIds.add(it.rootHolderId);
                     break
-
+                    */
 
                     case Species.class.getCanonicalName():
                     if(spList.size() < MAX_DIGEST_OBJECTS){
@@ -192,7 +213,7 @@ class DigestService {
                     break
                 } 
                 
-                if(obvFlag && unidObvFlag && spFlag && docFlag && userFlag){
+                if(spFlag && docFlag && userFlag){
                     break;
                 }
 
@@ -215,11 +236,14 @@ class DigestService {
                     isNotNull('maxVotedReco')
                 }
             }*/
+            /*
             res['observations'] = obvList
             res['unidObvs'] = unidObvList
             res['species'] = spList
+            */
             res['documents'] = docList
             res['users'] = userList
+
 
             def p = [webaddress:digest.userGroup.webaddress];
 
@@ -237,17 +261,21 @@ class DigestService {
             def currentDateInFormat = "'"+dateFormat.format(newDate) + "'";
 
             if(digest.sendTopContributors){
+                log.debug "activeUserStatsAuthorAndCount in ${userGroupInstance}"
                 recentTopContributors = chartService.activeUserStatsAuthorAndCount(max, userGroupInstance, startDate );
+                log.debug "recentTopContributors in ${userGroupInstance} ${recentTopContributors}"
                 res['recentTopContributors'] = recentTopContributors
             }
 
             if(digest.sendTopIDProviders){
+                log.debug "topIDProviders in ${userGroupInstance}"
                 def sql =  Sql.newInstance(dataSource);
                 def resultSet = sql.rows("select u.id as userid, u.username, u.date_created as registered, u.last_login_date, recoCount from ( select rv.author_id uid, count(*) recoCount from recommendation_vote rv, observation o, user_group_observations ugo where rv.observation_id = o.id and o.id = ugo.observation_id and o.is_deleted = false and o.is_showable = true and o.is_checklist = false and ugo.user_group_id="+digest.userGroup.id+" and  rv.voted_on >= "+startDateInFormat+" and rv.voted_on <= "+currentDateInFormat+" group by rv.author_id) group_user_reco, suser u where u.id = group_user_reco.uid order by recoCount desc limit 5")                
-
+log.debug resultSet
                 for (row in resultSet){
                     topIDProviders.add(["user":SUser.findById(row.getProperty("userid")), "recoCount":row.getProperty("recocount")])
                 }
+                log.debug "topIDProviders in ${userGroupInstance} ${topIDProviders}"
                 res['topIDProviders'] = topIDProviders
             }
 
@@ -314,20 +342,82 @@ class DigestService {
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-    def List getParticipantsForDigest(userGroup, max, offset) {
-        List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
-
-            result.each { user ->
-                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
-                    participants << user
+    def latestContentsByGroup(Digest digest) {
+        log.debug "latestContentsByGroup ${digest}"
+		def res = [:]
+        int max = 5
+        def obvList = Observation.withCriteria(){
+            and{
+                // taking undeleted observation
+                eq('isDeleted', false)
+                eq('isShowable', true)
+                
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups {
+                        eq('id', digest.userGroup.id)
+                    }
                 }
             }
-        } else {
-            participants << springSecurityService.currentUser;
+            maxResults max
+            order 'lastRevised', 'desc'
         }
-        return participants;
-    }
 
+        log.debug "latest ${max} observations ${obvList}"
+
+        def unidObvList = Observation.withCriteria(){
+            and{
+                // taking undeleted observation
+                eq('isDeleted', false)
+                eq('isShowable', true)
+                eq('isChecklist', false)
+                isNull('maxVotedReco')
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastRevised', 'desc'
+        }
+        log.debug "latest ${max} unidentified observations ${unidObvList}"
+        /*
+        def spList = Species.withCriteria(){
+            and{
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastUpdated', 'desc'
+        }
+
+        def docList = Document.withCriteria(){
+            and{
+                //filter by usergroup
+                if(digest.userGroup){
+                    userGroups{
+                        eq('id', digest.userGroup.id)
+                    }
+                }
+            }
+            maxResults max
+            order 'lastRevised', 'desc'
+        }
+        //wrong suser desc
+        //def userList = UserGroupMemberRole.findAllByUserGroup(digest.userGroup, [max: max, sort: "sUser", order: "desc"]).collect {it.sUser};
+        */
+        res['observations'] = obvList
+        res['unidObvs'] = unidObvList
+        //res['species'] = spList
+        //res['documents'] = docList
+        //res['users'] = userList
+        
+        return res
+    }
 }
