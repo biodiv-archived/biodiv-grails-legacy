@@ -198,7 +198,13 @@
 							</div>
 							<div class="row-fluid">	
 								<div class="span4"><label>Rank</label></div>
-								<div class="span8"> <select class="rank span12" ><option>Name Status</option></select></div>
+                                <div class="span8"> 
+                                    <select id="rankDropDown" class="rankDropDown span12" ><option value="chooseRank">Choose Rank</option><option value="kingdom">Kingdom</option>
+                                        <option value="phylum">Phylum</option><option value="class">Class</option><option value="order">Order</option>
+                                        <option value="superfamily">Superfamily</option><option value="family">Family</option><option value="genus">Genus</option>
+                                        <option value="species">Species</option>
+                                    </select>
+                                </div>
 							</div>	
 							
 					</div>
@@ -209,7 +215,9 @@
 											Author String :- <input type="text" placeholder="Name" class="authorString span6"/>
 									</div>
 									<div class="span6">
-											Status :- <select class="status span9" ><option>Name Status</option></select>
+                                        Status :- <select id="statusDropDown" class="statusDropDown span9" >
+                                            <option value="chooseNameStatus">Choose Name Status</option><option value="acceptedName">Accepted Name</option><option value="synonym">Synonym</option>
+                                        </select>
 									</div>
 							</div>
 							
@@ -307,7 +315,24 @@
 	
 	</div>
   	<div class="span2 column detailsareaRight">
-  
+        
+        <div class= row-fluid>
+            <div>
+            <select id="queryDatabase" class="queryDatabase span12" >
+                <option value="databaseName">Database name</option>
+                <option value="col">Catalogue of Life</option>
+                <option value="gbif">GBIF</option>
+                <option value="ubio">Ubio</option>
+                <option value="tnrs">TNRS</option>
+                <option value="gni">Global Names Index</option>
+                <option value="eol">EoL</option>
+                <option value="worms">WoRMS</option>
+            </select>
+            <input type="text" placeholder= "Query string" class="queryString span10"><i class="icon-search" onClick='searchDatabase()'></i>
+            </div>
+        </div>
+
+        <div class="row-fluid">
 		  <div class="connection_wrapper">Connections</div>
 		  
 		  <div class="connection_wrapper_row1">Species Page</div>
@@ -329,16 +354,18 @@
 		  <div class="connection_wrapper_row1">Documents</div>
 		  
 		  <div class="connection_wrapper_row2">123456</div>
-  
+      </div>
+
 	</div>
- </div>
- <script type="text/javascript">
+</div>
+
+    <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
+    
+<script type="text/javascript">
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
         </g:each>
-        console.log("=========================================");
-    console.log(taxonRanks);
     <r:script>
         $(document).ready(function() {
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({

@@ -47,8 +47,8 @@ $(document).ready(function() {
                 'curation':{
                     'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
                     'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
-                    'searchCol' : "${uGroup.createLink('controller':'namelist', action:'searchCol')}",
-                    'getColDetails' : "${uGroup.createLink('controller':'namelist', action:'getColDetails')}"
+                    'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
+                    'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}"
                 },
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",

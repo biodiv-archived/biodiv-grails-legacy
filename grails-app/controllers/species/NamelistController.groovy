@@ -14,6 +14,7 @@ class NamelistController {
 	 * 
 	 */
 	def getNamesFromTaxon(){
+        //input in params.taxonId
         println "====CALL HERE ====== " + params
 		def res = [dirtyList:[[name:'aa', id:11], [name:'bb', id:22]], workingList:[[name:'aa', id:11], [name:'bb', id:22]]]
         render res as JSON
@@ -24,22 +25,29 @@ class NamelistController {
 	 * @return All detail like kingdom, order etc
 	 */
 	def getNameDetails(){
+        //input in params.taxonId
 		//[name:'aa', kingdom:'kk', .....]
-	
+	    println "====CALL HERE NAME DETAILS====== " + params
+		def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
+        render res as JSON
 	}
 	
 	/**
-	 * input : string name
+	 * input : string name and dbName
 	 * @return list of map where each map represent one result
 	 */
-	def searchCol(){
-		//[[name:'aa', namestatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb'], [name:'bb', namestatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb']]
+	def searchExternalDb(){
+		//[[name:'aa', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb']]
+        println "====SEARCH COL====== " + params.name+"====== "+ params.dbName
+        //SWITCH CASE BASED ON DB NAME
+		def res = [[name:'aa', nameStatus:'st', colId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
+        render res as JSON
 	}
 	/**
-	 * input : col id
+	 * input : id & dbName
 	 * @return same as api getNameDetails
 	 */
-	def getColDetails(){
+	def getExternalDbDetails(){
 		//same getNameDetails
 	}
 }
