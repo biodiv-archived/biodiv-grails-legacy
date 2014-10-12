@@ -40,7 +40,6 @@ import species.participation.Featured
 class AbstractObjectController {
     
     def observsationService;
-    def utilsService;
 
     def related() {
         def relatedObv = observationService.getRelatedObservations(params).relatedObv;
