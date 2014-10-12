@@ -428,12 +428,11 @@ speciesPortal {
 		serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
     }
     
-    ibpmapdatabase {
+    ibpMapDatabase {
 		url = "jdbc:postgresql://localhost:5432/ibp"
 		username = "biodiv"
 		password = "prharasr"
 		driver   = "org.postgresql.Driver"
-
 	}
 }
 
