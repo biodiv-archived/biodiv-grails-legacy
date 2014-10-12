@@ -428,6 +428,14 @@ speciesPortal {
         rootDir = "${app.rootDir}/usersRes"
 		serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
     }
+    
+    ibpmapdatabase {
+		url = "jdbc:postgresql://localhost:5432/ibp"
+		username = "biodiv"
+		password = "prharasr"
+		driver   = "org.postgresql.Driver"
+
+	}
 }
 
 speciesPortal.validCrossDomainOrigins = [
