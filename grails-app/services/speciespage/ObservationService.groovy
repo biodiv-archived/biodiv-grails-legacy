@@ -138,7 +138,6 @@ class ObservationService extends AbstractObjectService {
         observation.group = params.group?:SpeciesGroup.get(params.group_id);
         observation.notes = params.notes;
         if( params.fromDate != ""){
-
             observation.fromDate = parseDate(params.fromDate);
             observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
         }

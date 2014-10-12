@@ -777,7 +777,6 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
-                    println "=====LICENSE ON NEW RES======== " + l
                     res.addToLicenses(l);
                 }
                 if(!res.save(flush:true)){
@@ -802,8 +801,8 @@ class XMLConverter extends SourceConverter {
                     println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
                     res.addToLicenses(l);
                 }
-                res.merge();
-                res.refresh();
+                //res.merge();
+                //res.refresh();
                 if(!res.save(flush:true)){
                     res.errors.allErrors.each { log.error it }
                 }

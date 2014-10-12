@@ -1601,7 +1601,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
         }
-        species.refresh();
+        //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
                 if(!resource.save(flush:true)){
@@ -1613,7 +1613,7 @@ class SpeciesService extends AbstractObjectService  {
             }
             species.addToResources(resource);
         }
-        species.merge();
+        //species.merge();
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
