@@ -103,6 +103,12 @@ update species_field set language_id = 205;
 alter table field add column language_id bigint;
 update field set language_id = 205;
 
+alter table field add column connection bigint;
+alter table field alter column connection set not null;
+
+
+update suser set language_id = 205;
+
 
 /** After updating code */
 update document set geo_privacy = false;
