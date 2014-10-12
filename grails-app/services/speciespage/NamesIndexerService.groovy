@@ -46,7 +46,7 @@ class NamesIndexerService {
 		setDirty(false);
 
 		def a = new StandardAnalyzer(Version.LUCENE_44)
-		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, ' ', true, true)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, ' ', true, true, '')
 		//analyzer.setOutputUnigrams(true);
 
 		//TODO fetch in batches
@@ -88,7 +88,7 @@ class NamesIndexerService {
 		def a = new StandardAnalyzer(Version.LUCENE_44)
 		/* setOutputUnigrams(boolean outputUnigrams) is deprecated....Confgure outputUnigrams during construction as shown below.*/
 		//def analyzer = new ShingleAnalyzerWrapper(Analyzer, minShingleSize, maxShingleSize, tokenSeprator, outputUnigram, outputUnigramsIfNoShingles)
-		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true, '')
 		return addRecoWithAnalyzer(reco, analyzer, lookup);
 	}
 
