@@ -251,7 +251,8 @@ function computeUserTag(postComp){
 
 
 function stripTags(source,destination){  
-  destination.html(source.html().replace(/<\/?([b-z]+)[^>]*>/gi, function(match, tag) {
+//console.log(source.html());
+destination.html(source.html().replace(/<\/?([b-z]+)[^>]*>/gi, function(match, tag) {
     if(tag === "br"){
         return match;
     }else if(tag === "a"){ 
@@ -259,10 +260,29 @@ function stripTags(source,destination){
     }else{
         return "";
     }
-    
 }));
-  
-}  
+destination.html(destination.html().replace(/&lt;\/?([b-z]+)*&gt;/gi, function(match, tag) {  	
+    if(tag === "br"){
+        return match;
+    }else if(tag === "a"){ 
+        return match;
+    }else{
+        return "";
+    }
+}));  
+
+destination.html(destination.html().replace(/&lt;\/?([a]+)[^>]*&gt;/gi, function(match, tag) {  	
+    if(tag === "a"){ 
+    	match.replace(/&lt;\/?([a-z]+)*&gt;/gi, function(match, tag) {    		
+    			return "";
+    	});
+        return match;
+    }else{
+        return "";
+    }
+}));    
+  //console.log(destination.html());
+}   
 
 function appendCommentWrapper(that){
 	that.after('<div class="commentContainer"><div class="contentbox" contenteditable="true"></div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />');
