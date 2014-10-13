@@ -27,7 +27,8 @@ class MapService {
 
      private Sql getConnection() throws SQLException {
        // return dataSourceibp.getConnection();
-        def db = [url:grailsApplication.config.speciesPortal.ibpmapdatabase.url, user:grailsApplication.config.speciesPortal.ibpmapdatabase.username, password:grailsApplication.config.speciesPortal.ibpmapdatabase.password, driver:grailsApplication.config.speciesPortal.ibpmapdatabase.driver];
+		def dbConf = grailsApplication.config.speciesPortal.ibpMapDatabase
+        def db = [url:dbConf.url, user:dbConf.username, password:dbConf.password, driver:dbConf.driver];
         def driver = Class.forName(db.driver).newInstance() as Driver;
         
         def props = new Properties()
