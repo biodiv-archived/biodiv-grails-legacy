@@ -108,6 +108,12 @@ update field set language_id = 205;
 alter table field alter column language_id set not null;
 
 
+alter table field add column connection bigint;
+alter table field alter column connection set not null;
+
+
+update suser set language_id = 205;
+
 
 /** After updating code */
 update document set geo_privacy = false;
