@@ -2,6 +2,9 @@
 	#externalDbResults {
 		width: 900px;
     }
+    .extDbResTable {
+        text-align:center;
+    }
     .modal {
         left:39%;
     }

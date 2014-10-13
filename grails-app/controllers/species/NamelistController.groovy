@@ -33,21 +33,24 @@ class NamelistController {
 	}
 	
 	/**
-	 * input : string name and dbName
-	 * @return list of map where each map represent one result
-	 */
-	def searchExternalDb(){
-		//[[name:'aa', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb']]
+     * input : string name and dbName
+     * @return list of map where each map represent one result
+     */
+    def searchExternalDb(){
+        //[[name:'aa', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb']]
         println "====SEARCH COL====== " + params.name+"====== "+ params.dbName
-        //SWITCH CASE BASED ON DB NAME
-		def res = [[name:'aa', nameStatus:'st', colId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
+        //SWITCH CASE BASED ON DB NAME [col,gbif,ubio,tnrs,gni,eol,worms] and if value "databaseName" - means no database selected to query
+        def res = [[name:'aa', nameStatus:'st', colId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
         render res as JSON
-	}
-	/**
-	 * input : id & dbName
-	 * @return same as api getNameDetails
-	 */
-	def getExternalDbDetails(){
-		//same getNameDetails
-	}
+    }
+    /**
+     * input : id & dbName
+     * @return same as api getNameDetails
+     */
+    def getExternalDbDetails(){
+        //same getNameDetails
+        println "====EXTERNAL DB DETAILS====== " + params
+        def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
+        render res as JSON
+    }
 }

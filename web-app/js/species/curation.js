@@ -96,7 +96,11 @@ function populateNameDetails(data){
 //takes name for search
 function searchDatabase() {
     var name = $(".queryString").val();
-    var dbName = $( "#queryDatabase").val();
+    var dbName = $("#queryDatabase").val();
+    if(dbName == "databaseName") {
+        alert("Please select a database to query from!!");
+        return;
+    }
     var url = window.params.curation.searchExternalDbUrl;
     $.ajax({
         url: url,
@@ -105,6 +109,7 @@ function searchDatabase() {
         success: function(data) {
             //show the popup
             $("#externalDbResults").modal('show');
+            fillPopupTable(data , $("#externalDbResults"));
             console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
@@ -113,15 +118,26 @@ function searchDatabase() {
     });
 }
 
+function fillPopupTable(data, $ele) {
+    var rows = "";
+    $.each(data, function(index, value) {
+        rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onClick='getExternalDbDetails("+value['id']+")'>Select this</button></td></tr>"        
+    });
+    $ele.find("table").append(rows);
+    return
+}
+
 //takes COL id
-function getCOLDetails(colId) {
-    var url = window.params.curation.getCOLDetailsUrl;
+function getExternalDbDetails(id) {
+    var url = window.params.curation.getExternalDbDetailsUrl;
+    var dbName = $("#queryDatabase").val();
     $.ajax({
         url: url,
         dataType: "json",
-        data: {colId:colId},	
+        data: {id:id, dbName:dbName},	
         success: function(data) {
             //show the popup
+            $("#externalDbResults").modal('hide');
             populateNameDetails(data)
             console.log("======SUCCESS====");
             console.log(data);  
