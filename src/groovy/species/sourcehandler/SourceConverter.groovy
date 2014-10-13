@@ -604,8 +604,9 @@ class SourceConverter {
                     synchronized(Field.class) {
                         if(fieldsMap == null || connectionMap == null) {
                             fieldsMap = new HashMap<String, Field>();
+                            connectionMap = new HashMap<Integer, Field>();
                             def fields = Field.list(sort:'id')
-                            for(Field field in field) {
+                            for(Field field in fields) {
                                 if(!field.category) fieldsMap.put(field.concept, field);
                                 else if(!field.subCategory) fieldsMap.put(field.category, field);
                                 else fieldsMap.put(field.subCategory, field);
@@ -622,18 +623,15 @@ class SourceConverter {
                         }
                     }
                 }
-
             }
 
             public static Map<String, Field> getFieldsMap() {
                init();
-               println fieldsMap
                return fieldsMap;
             }
 
             public static Map<Integer, Field> getConnectionMap() {
                init();
-               println connectionMap
                return connectionMap;
             }
     }
@@ -641,6 +639,7 @@ class SourceConverter {
     String getFieldFromName(String fieldName, int level, Language language) {
         println "+++++++++++++"
         println fieldName
+        println language;
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
         println field
         if(field) {
@@ -648,7 +647,8 @@ class SourceConverter {
             println t
             if(language) {
                 t.each {
-                    if(it.language == language) field = it;
+                    println language.id +" "+ it.language.id
+                    if(it.language.id == language.id) { field = it; return;}
                 }
             } else {
                 field = t[0];

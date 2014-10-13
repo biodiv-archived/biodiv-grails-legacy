@@ -818,8 +818,7 @@ println map;
 		if(params.xlsxFileUrl){
             Language languageInstance = utilsService.getCurrentLanguage(request);
             params.locale_language = languageInstance;
-            println "+++++++++++++++++++++++++++++++++++++++"
-            println  "Choosen languauge is ${languageInstance}"
+            log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			res = speciesUploadService.upload(res.sBulkUploadEntry)
