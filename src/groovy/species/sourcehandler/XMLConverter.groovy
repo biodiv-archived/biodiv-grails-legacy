@@ -103,8 +103,8 @@ class XMLConverter extends SourceConverter {
             Language language;
             //sciName is must for the species to be populated
             Node speciesNameNode = species.field.find {
-                language = fieldNode.language[0].value();
-                it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME, 3, language.id));
+                language = it.language[0].value();
+                it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME, 3, language));
             }
 
             //XXX: sending just the first element need to decide on this if list has multiple elements

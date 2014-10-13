@@ -599,23 +599,23 @@ class SourceConverter {
             private static Map<String, Field> fieldsMap = null;
             private static Map<Integer, Field> connectionMap = null;
             
-            private void init() {
+            private static void init() {
                 if (fieldsMap == null || connectionMap == null) {
                     synchronized(Field.class) {
                         if(fieldsMap == null || connectionMap == null) {
                             fieldsMap = new HashMap<String, Field>();
                             def fields = Field.list(sort:'id')
-                            fields.each { field ->
-                                if(!category) fieldsMap.put(field.concept, field);
-                                else if(!subcategory) fieldsMap.put(field.category, field);
-                                else fieldsMap.put(field.subcategory, field);
+                            for(Field field in field) {
+                                if(!field.category) fieldsMap.put(field.concept, field);
+                                else if(!field.subCategory) fieldsMap.put(field.category, field);
+                                else fieldsMap.put(field.subCategory, field);
 
                                 List t;
-                                if(!connectionMap.get(field.displayOrder)) {
+                                if(!connectionMap.get(field.connection)) {
                                     t = [];
-                                    connectionMap.put(field.displayOrder, t);
+                                    connectionMap.put(field.connection, t);
                                 } else {
-                                    t = connectionMap.get(field.displayOrder);
+                                    t = connectionMap.get(field.connection);
                                 }
                                 t << field;
                             }
@@ -627,19 +627,25 @@ class SourceConverter {
 
             public static Map<String, Field> getFieldsMap() {
                init();
+               println fieldsMap
                return fieldsMap;
             }
 
             public static Map<Integer, Field> getConnectionMap() {
                init();
+               println connectionMap
                return connectionMap;
             }
     }
 
     String getFieldFromName(String fieldName, int level, Language language) {
+        println "+++++++++++++"
+        println fieldName
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
+        println field
         if(field) {
-            def t = FieldsMapHolder.getConnectionMap().get(field.displayOrder)
+            def t = FieldsMapHolder.getConnectionMap().get(field.connection)
+            println t
             if(language) {
                 t.each {
                     if(it.language == language) field = it;
@@ -647,10 +653,11 @@ class SourceConverter {
             } else {
                 field = t[0];
             }
+            println field
+            if(level == 1) return field.concept;
+            if(level == 2) return field.category;
+            if(level == 3) return field.subCategory;
         }
-        if(level == 1) return field.concept;
-        if(level == 2) return field.category;
-        if(level == 3) return field.subcategory;
         return null;
     }
 }
