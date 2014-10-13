@@ -248,7 +248,7 @@ class SpeciesController extends AbstractObjectController {
 		Map map = new LinkedHashMap();
 		ArrayList fieldsConnectionArray = new ArrayList(fields.size());
         boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user)
-
+        ArrayList fieldsArray = new ArrayList(fields.size());
 		for(Field field : fields) {
 			Map finalLoc;
 			Map conceptMap, categoryMap, subCategoryMap;
@@ -297,7 +297,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsConnectionArray) {
-
+		
 		def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
@@ -816,6 +816,10 @@ println map;
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+            params.locale_language = languageInstance;
+            println "+++++++++++++++++++++++++++++++++++++++"
+            println  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			res = speciesUploadService.upload(res.sBulkUploadEntry)
@@ -824,7 +828,9 @@ println map;
 	}
 	
 	def getDataColumns() {
-        List res = speciesUploadService.getDataColumns();
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+
+        List res = speciesUploadService.getDataColumns(languageInstance);
         render res as JSON
     }
     
