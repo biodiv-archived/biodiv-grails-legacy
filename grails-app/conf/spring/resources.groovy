@@ -44,7 +44,6 @@ import grails.plugin.mail.MailMessageContentRenderer
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
-
     authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
         requestCache = ref('requestCache')
         defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
@@ -114,7 +113,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized species search server to "+config.serverURL+"/biodiv"
+            println "Initialized search server to "+config.serverURL+"/species"
         }
 
         observationsSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
@@ -126,7 +125,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized observations search server to "+config.serverURL+"/biodiv"
+            println "Initialized search server to "+config.serverURL+"/observations"
         }
 
         newsletterSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
@@ -138,7 +137,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized newsletter search server to "+config.serverURL+"/biodiv"
+            println "Initialized search server to "+config.serverURL+"/newsletters"
         }
 
         projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/biodiv", config.queueSize, config.threadCount ) {
@@ -150,7 +149,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized project search server to "+config.serverURL+"/biodiv"
+            println "Initialized search server to "+config.serverURL+"/checklists"
         }
 
         documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
@@ -162,19 +161,7 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized documents search server to "+config.serverURL+"/biodiv"
-         }
-        
-	    usersSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized users search server to "+config.serverURL+"/biodiv"
+            println "Initialized search server to "+config.serverURL+"/documents"
          }
         
         userGroupSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
@@ -198,8 +185,8 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized search server to "+config.serverURL+"/biodiv"
-        }
+            println "Initialized search server to "+config.serverURL+"/users"
+         }
     }//end of initializing solr Server
     
     speciesSearchService(speciespage.search.SpeciesSearchService) {

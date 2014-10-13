@@ -396,6 +396,9 @@ class TaxonController {
 
         def errors = [], result=[success:false];
         if(params.classification) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             String speciesName;
             Map list = params.taxonRegistry?:[];
             List t = taxonService.getTaxonHierarchyList(list);
@@ -414,7 +417,7 @@ class TaxonController {
                 }
 
                 def classification = params.classification ? Classification.read(params.long('classification')) : null;
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, language);
                 result.action = 'create';
 
                 if(result.success) {
@@ -449,6 +452,9 @@ class TaxonController {
         def msg;
         def errors = [], result=[success:false];
         if(params.classification) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             String speciesName;
             Map list = params.taxonRegistry?:[];
             List t = taxonService.getTaxonHierarchyList(list);
@@ -488,7 +494,7 @@ class TaxonController {
                 }
                 
 
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, language);
                 result.action = 'update';
 
                 if(result.success) {

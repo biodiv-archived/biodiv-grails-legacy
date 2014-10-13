@@ -592,4 +592,11 @@ class Observation extends Metadata implements Taggable, Rateable {
             }
         }
     }
+
+    private deleteFromChecklist() {
+        if(id != sourceId) {
+            def ckl = Checklists.get(sourceId)
+            ckl.deleteObservation(this)
+        }
+    }
 }

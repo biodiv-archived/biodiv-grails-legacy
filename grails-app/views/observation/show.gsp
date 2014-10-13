@@ -128,6 +128,7 @@ if(r) {
                     <div id="gallery1" style="visibility:hidden; margin-top: 60px;">
                          <% def audioResource = 0 
                             def audioCount    = 0
+                            def imageCount = 0
                             def observationInstanceListResources  %>
                         <g:if test="${observationInstance.resource}">
                             <%  
@@ -135,8 +136,9 @@ if(r) {
                             %>
                             <g:each in="${observationInstanceListResources}" var="r">
                                 <g:if test="${r.type == ResourceType.IMAGE}">
-                               
-                                <%def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
+                                
+                                <% imageCount += 1
+                                def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
                                 <%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
                                 <a target="_blank"
                                     rel="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
@@ -150,7 +152,9 @@ if(r) {
                                 <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
                                 </g:if>
                                 <g:elseif test="${r.type == ResourceType.VIDEO}">
-                                
+                                    <%
+                                        imageCount += 1
+                                    %> 
                                     <a href="${r.url }"><span class="video galleryImage"><g:message code="link.watch.in.youtube" /></span></a>
                                     <g:imageAttribution model="['resource':r]" />
                                 </g:elseif>
@@ -161,10 +165,15 @@ if(r) {
                                                 
                         </g:if>
                         <g:else>
-                                                <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
-                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
-                        </g:else>
+                            <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
+                            src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
 
+                        </g:else>
+                        <g:if test="${imageCount == 0 && audioCount != 0}">
+                            <r:script>
+                                $(".noTitle").hide();
+                            </r:script>
+                        </g:if>
                     </div>
                     </div>
 

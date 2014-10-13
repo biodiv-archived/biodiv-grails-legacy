@@ -87,7 +87,7 @@ class SourceConverter {
         return data;
     }
 
-    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor) {
+    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language) {
         NodeBuilder builder = NodeBuilder.newInstance();
         List nodes = [];
         names.eachWithIndex { name, index ->
@@ -95,6 +95,7 @@ class SourceConverter {
                 Node field = builder.createNode("field");
                 new Node(field, "category", classification);
                 new Node(field, "subcategory", TaxonomyRank.list()[index].value());
+                new Node(field, "language", language);
 
                 Node data = new Node(field, "data", name);
                 new Node(data, "contributor", contributor.email);
@@ -605,9 +606,15 @@ class SourceConverter {
                         if(fieldsMap == null || connectionMap == null) {
                             fieldsMap = new HashMap<String, Field>();
                             connectionMap = new HashMap<Integer, Field>();
-                            def fields = Field.list(sort:'id')
+                            def fields = Field.list(sort:'id');
+
+                            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                            def fieldsConfig = config.speciesPortal.fields
+
                             for(Field field in fields) {
-                                if(!field.category) fieldsMap.put(field.concept, field);
+                                //HACK
+                                if(field.category?.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) fieldsMap.put(field.category, field);
+                                else if(!field.category) fieldsMap.put(field.concept, field);
                                 else if(!field.subCategory) fieldsMap.put(field.category, field);
                                 else fieldsMap.put(field.subCategory, field);
 
@@ -639,6 +646,7 @@ class SourceConverter {
     String getFieldFromName(String fieldName, int level, Language language) {
         println "+++++++++++++"
         println fieldName
+        println level
         println language;
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
         println field

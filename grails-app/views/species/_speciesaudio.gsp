@@ -28,18 +28,7 @@
 
 </g:each>
 
-<g:if test="${ isOtherResource == 0}">
-
-    <style type="text/css">
-            .noTitle{
-                display:none !important;
-            }
-
-    </style>    
-
-</g:if>
-
- <g:if test="${audioCount >=2 }" > 
+<g:if test="${audioCount >=2 }" > 
         <ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">            
             <% audioTextNum = 0 %>
             <g:each in="${resourcesInstanceList}" var="r" status="tempVar">

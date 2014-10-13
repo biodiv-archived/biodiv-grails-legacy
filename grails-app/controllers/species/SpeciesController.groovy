@@ -107,6 +107,9 @@ class SpeciesController extends AbstractObjectController {
         List errors = [];
         Map result = [errors:errors];
         if(params.page && params.rank) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
@@ -124,7 +127,7 @@ class SpeciesController extends AbstractObjectController {
             //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
-                result = speciesService.createSpecies(speciesName, rank, t);
+                result = speciesService.createSpecies(speciesName, rank, t, languageInstance);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
@@ -364,7 +367,7 @@ class SpeciesController extends AbstractObjectController {
 			}
 		}
         //remove empty information hierarchy
-/*		for(concept in map.clone()) {
+		for(concept in map.clone()) {
             if(concept.value.get('speciesFieldInstance')) {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
@@ -431,11 +434,6 @@ class SpeciesController extends AbstractObjectController {
 				}
 			}
 		}
-*/
-
-
-println "FINAL MAP ========================="
-println map;
 		return map;
 	}
 
@@ -816,8 +814,8 @@ println map;
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
-            Language languageInstance = utilsService.getCurrentLanguage(request);
-            params.locale_language = languageInstance;
+            language languageinstance = utilsservice.getcurrentlanguage(request);
+            params.locale_language = languageinstance;
             log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"

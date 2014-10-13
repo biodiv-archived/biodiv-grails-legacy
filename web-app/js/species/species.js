@@ -371,17 +371,6 @@ function initGalleryTabs() {
 
 $.fn.editable.defaults.mode = 'inline';
 
-$.fn.editableform.buttons = '<button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>'+window.i8ln.species.specie.bsav+'</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>'+window.i8ln.species.specie.bcanc+'</button>'
-
-$.fn.neweditableform_template = '\
-                                <form class="form-horizontal editableform">\
-                                <div class="control-group">\
-                                <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right">'+$.fn.editableform.buttons+'</div></div>\
-                                <div class="editable-error-block"></div>\
-                                </div> \
-                                </form>';
-
-
 function onEditableSuccess(response, newValue) {
     if(!response) {
         return "Unknown error!";
