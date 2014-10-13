@@ -5,7 +5,6 @@
 <%@ page import="species.Classification"%>
 <%@page import="species.utils.Utils"%>
 
-${resourceInstanceList}
 <div class="span4 pull-right">
     <g:render template="/species/showTaxonBrowserTemplate" model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor]"/>
     <g:render template="/species/inviteForContribution" model="['hide':true]"/>

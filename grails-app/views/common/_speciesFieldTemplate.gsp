@@ -6,7 +6,7 @@
     </g:if>
 </s:isSpeciesFieldContributor>
 
-<div class="speciesField ${speciesFieldInstance.description?'':'dummy hide'}" data-name="speciesField" data-act ="${speciesFieldInstance.description?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
+<div class="speciesField ${(speciesFieldInstance.description && speciesFieldInstance?.language?.id == userLanguage?.id )?'':'dummy hide'}" data-name="speciesField" data-act ="${(speciesFieldInstance.description && speciesFieldInstance?.language?.id == userLanguage?.id) ?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
     <g:if test="${isSpeciesContributor}">
     <!--a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn" onclick='getSpeciesFieldMedia("${speciesInstance?.id}","${speciesFieldInstance.id?:speciesFieldInstance.field.id}", "fromSingleSpeciesField","${createLink(controller:'species',  action:'getSpeciesFieldMedia')}" )'>Add Media</a-->
     </g:if>

@@ -315,7 +315,6 @@ class SpeciesController extends AbstractObjectController {
 
               //  println "===============finalLoc===================="+finalLoc;
 
-                finalLoc.put("lang", sField.language);
                 if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                     finalLoc.put('hasContent', true);
                 }
@@ -354,6 +353,7 @@ class SpeciesController extends AbstractObjectController {
 					}
 
 				}
+                finalLoc.put("lang", sField.language);
 			}
 			if(finalLoc.containsKey('field')) { 
 				def t = finalLoc.get('speciesFieldInstance');
@@ -362,6 +362,7 @@ class SpeciesController extends AbstractObjectController {
 					finalLoc.put('speciesFieldInstance', t);
 				} 
 				t.add(sField); 
+
                 //TODO:do an insertion sort instead of sorting collection again and again
             //    speciesService.sortAsPerRating(t);
 			}
@@ -372,7 +373,7 @@ class SpeciesController extends AbstractObjectController {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
 			for(category in concept.value.clone()) {
-				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equalsIgnoreCase('Species Resources'))  {
+				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
 					boolean show = false;
@@ -406,7 +407,7 @@ class SpeciesController extends AbstractObjectController {
 
 
 				for(subCategory in category.value.clone()) {
-					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor")  ) continue;
+					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor") || subCategory.key.equals("lang") ) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
 					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||
@@ -418,6 +419,8 @@ class SpeciesController extends AbstractObjectController {
                         }
 					}
 
+                    println "++++++++++++++++++++++++++++"
+                    println subCategory
                     if(subCategory.value.get('hasContent')) { 
                         map.get(concept.key).get(category.key).put('hasContent', true);
                         map.get(concept.key).put('hasContent', true);

@@ -43,7 +43,7 @@ class AbstractObjectController {
     def utilsService;
 
     def related() {
-        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+        def relatedObv = observationService?.getRelatedObservations(params).relatedObv;
         if(params.filterProperty != 'bulkUploadResources'){
             if(relatedObv) {
                 if(relatedObv.observations)
