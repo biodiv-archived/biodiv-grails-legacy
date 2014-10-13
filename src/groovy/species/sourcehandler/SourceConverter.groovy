@@ -21,6 +21,8 @@ class SourceConverter {
 	private StringBuilder summary;
 	private StringBuilder shortSummary;
 
+    protected fieldsMap;
+
     protected SourceConverter() {
         licenseUrlMap = new HashMap();
         licenseUrlMap.put(LicenseType.CC_PUBLIC_DOMAIN, "http://creativecommons.org/licenses/publicdomain/");
@@ -587,16 +589,69 @@ class SourceConverter {
 		return summary.toString()
 	}
 
-	
-	
 	def myPrint(str){
 		if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
 			println str
 		}
 	}
 
-    String getFieldFromName(String fieldName) {
-        return fieldName
+    private static class FieldsMapHolder {
+            private static Map<String, Field> fieldsMap = null;
+            private static Map<Integer, Field> connectionMap = null;
+            
+            private void init() {
+                if (fieldsMap == null || connectionMap == null) {
+                    synchronized(Field.class) {
+                        if(fieldsMap == null || connectionMap == null) {
+                            fieldsMap = new HashMap<String, Field>();
+                            def fields = Field.list(sort:'id')
+                            fields.each { field ->
+                                if(!category) fieldsMap.put(field.concept, field);
+                                else if(!subcategory) fieldsMap.put(field.category, field);
+                                else fieldsMap.put(field.subcategory, field);
+
+                                List t;
+                                if(!connectionMap.get(field.displayOrder)) {
+                                    t = [];
+                                    connectionMap.put(field.displayOrder, t);
+                                } else {
+                                    t = connectionMap.get(field.displayOrder);
+                                }
+                                t << field;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            public static Map<String, Field> getFieldsMap() {
+               init();
+               return fieldsMap;
+            }
+
+            public static Map<Integer, Field> getConnectionMap() {
+               init();
+               return connectionMap;
+            }
+    }
+
+    String getFieldFromName(String fieldName, int level, Language language) {
+        Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
+        if(field) {
+            def t = FieldsMapHolder.getConnectionMap().get(field.displayOrder)
+            if(language) {
+                t.each {
+                    if(it.language == language) field = it;
+                }
+            } else {
+                field = t[0];
+            }
+        }
+        if(level == 1) return field.concept;
+        if(level == 2) return field.category;
+        if(level == 3) return field.subcategory;
+        return null;
     }
 }
 

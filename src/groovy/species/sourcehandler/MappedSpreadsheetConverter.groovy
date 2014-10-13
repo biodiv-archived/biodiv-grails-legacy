@@ -83,7 +83,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					Node concept = new Node(field, "concept", mappedField.get("concept"));
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
-					Node language = new Node(field, "language", Language.read(Long.parseLong(mappedField.get("language")+"")));
+                    Language language = Language.read(Long.parseLong(mappedField.get("language")+""));
+					Node languageNode = new Node(field, "language", language);
 
                     //TODO: remove hardcodings for field names
 					if (mappedField.get("category")?.equalsIgnoreCase("images")) {
@@ -96,7 +97,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (category.text().equalsIgnoreCase("video")) {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
-					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
+					} else if (concept.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.INFORMATION_LISTING,1,language)) && field.category.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.REFERENCES,1,language))) {
 						fieldName.split(SpreadsheetWriter.FIELD_SEP).each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
 							String delimiter = delimiterMap.get(fieldNameToken);
@@ -120,7 +121,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 								}
 							}
 						}
-					} else if(ignoreCustomFormat(mappedField)) {
+					} else if(ignoreCustomFormat(mappedField, language)) {
 						// Here honouring delimiter if given but ingnoring custom format 
 						fieldName.split(SpreadsheetWriter.FIELD_SEP).each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
@@ -214,15 +215,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	 * @param mappedFieldString
 	 * @return
 	 */
-	private boolean ignoreCustomFormat(Map mappedFieldString){
+	private boolean ignoreCustomFormat(Map mappedFieldString, Language language){
 		String concept = mappedFieldString.get("concept").trim()
 		String category = mappedFieldString.get("category").trim()
 
-		boolean ignore = (concept.equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING))
-		ignore = (ignore || concept.equalsIgnoreCase((String)fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION))
-	    ignore = (ignore || ( concept.equalsIgnoreCase((String)fieldsConfig.OVERVIEW) && category.equalsIgnoreCase("SubSpecies Varieties Races")))
+		boolean ignore = (concept.equalsIgnoreCase(getFieldFromName(fieldsConfig.INFORMATION_LISTING, 1, language)))
+		ignore = (ignore || concept.equalsIgnoreCase(getFieldFromName(fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION,1,language)))
+	    ignore = (ignore || ( concept.equalsIgnoreCase(getFieldFromName(fieldsConfig.OVERVIEW,1,language)) && category.equalsIgnoreCase(getFieldFromName("SubSpecies Varieties Races",2,language))));
 				
-		return ignore
+		return ignore;
 	}
 	
 	private Map getCustomDelimiterMap(String text){
