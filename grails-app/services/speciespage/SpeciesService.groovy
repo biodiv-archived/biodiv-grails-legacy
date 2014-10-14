@@ -71,7 +71,7 @@ class SpeciesService extends AbstractObjectService  {
     def speciesPermissionService;
     def taxonService;
     def activityFeedService;
-    def MessageSource;
+    def messageSource;
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
     //static int noOfFields = Field.count();

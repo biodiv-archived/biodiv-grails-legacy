@@ -22,7 +22,7 @@
     </head>
 
     <body>
-<h1>=========================================================================================</h1>
+
         <div id="home" class="observation  span12">
 
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
