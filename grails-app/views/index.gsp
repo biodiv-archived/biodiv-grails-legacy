@@ -31,13 +31,13 @@
             </div>
         
             <div class="navblock" style="margin-top:20px;">
-                <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";></div>
-                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"></div>
-                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"></div>
+                <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";><span class="content">Species</span></div>
+                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">Observations</span></div>
+                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">Maps</span></div>
 
-                <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"></div>
-                <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"></div>
-                <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"></div></a>                
+                <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">Documents</span></div>
+                <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"><span class="content">Checklists</span></div>
+                <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"><span class="content">IDAO Tool</span></div></a>                
             </div>
 
         <div id="stats" class="navblock">
