@@ -38,7 +38,6 @@ import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -304,12 +303,12 @@ class ObservationController extends AbstractObjectController {
             if(params.id) {
     			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
 	    		if (!observationInstance) {
-	    			msg = messageSource.getMessage("default.not.find.by.id", ['Observation',params.id] as Object[], LCH.getLocale())
+	    			msg = messageSource.getMessage("default.not.find.by.id", ['Observation',params.id] as Object[], RCU.getLocale(request))
                     render (['success':false, 'msg':msg] as JSON)
                     return
                 } else {
     				if(observationInstance.instanceOf(Checklists)){
-    					msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], LCH.getLocale())
+    					msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], RCU.getLocale(request))
                         render (['success':false, 'msg':msg] as JSON)
 					    return
 	    			}
@@ -323,7 +322,7 @@ class ObservationController extends AbstractObjectController {
                 }
 
             } else {
-            	msg = messageSource.getMessage("id.required", ['Valid id'] as Object[], LCH.getLocale())
+            	msg = messageSource.getMessage("id.required", ['Valid id'] as Object[], RCU.getLocale(request))
                 render (['success':false, 'msg':msg] as JSON)
                 return
             }
@@ -459,7 +458,7 @@ class ObservationController extends AbstractObjectController {
 		def message;
 		def msg;
 		if(params.ajax_login_error == "1") {
-			msg = messageSource.getMessage("default.login.continue", null, LCH.getLocale())
+			msg = messageSource.getMessage("default.login.continue", null, RCU.getLocale(request))
             message = [status:401, error:msg]
 			render message as JSON 
 			return;
@@ -626,10 +625,10 @@ class ObservationController extends AbstractObjectController {
 						res.setUrl(videoUrl);				
 						resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
 						} else {
-						message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , LCH.getLocale())
+						message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , RCU.getLocale(request))
 						}
 					} else {
-						message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , LCH.getLocale())
+						message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , RCU.getLocale(request))
 					}
 				}
 
@@ -795,7 +794,7 @@ class ObservationController extends AbstractObjectController {
                             def formattedMessage = messageSource.getMessage(it, null);
                             errors << [field: it.field, message: formattedMessage]
                         }
-                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, LCH.getLocale())
+                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
                         render (['status':'error', 'success' : 'false', 'msg':msg, 'errors':errors] as JSON)
                     }
                     if(params.oldAction != "bulkSave"){
@@ -907,14 +906,14 @@ class ObservationController extends AbstractObjectController {
                             def formattedMessage = messageSource.getMessage(it, null);
                             errors << [field: it.field, message: formattedMessage]
                         }
-                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, LCH.getLocale())
+                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
                         render (['status':'error', 'success' : 'false', 'msg':msg, 'errors':errors] as JSON)
                     }            
 				}
 			} catch(e) {
 				e.printStackTrace();
                 if(request.getHeader('X-Auth-Token')){
-                	msg = messageSource.getMessage("default.error.adding.vote", [e.getMessage()] as Object[], LCH.getLocale())
+                	msg = messageSource.getMessage("default.error.adding.vote", [e.getMessage()] as Object[], RCU.getLocale(request))
                     render (['status':'error', 'success':'false', 'msg':msg] as JSON);
                 } else{
                     //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -1568,13 +1567,13 @@ class ObservationController extends AbstractObjectController {
             }
             obv.maxVotedReco = reco; 
             obv.isLocked = true;
-            msg = messageSource.getMessage("default.observation.locked", null, LCH.getLocale())
+            msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
             
         }else{
             obv.removeResourcesFromSpecies()
             obv.isLocked = false;
             obv.calculateMaxVotedSpeciesName()
-            msg = messageSource.getMessage("default.observation.unlocked", null, LCH.getLocale())
+            msg = messageSource.getMessage("default.observation.unlocked", null, RCU.getLocale(request))
         }
         if(!obv.save(flush:true)){
             obv.errors.allErrors.each { log.error it } 
