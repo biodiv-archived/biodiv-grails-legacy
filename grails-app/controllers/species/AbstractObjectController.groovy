@@ -39,11 +39,11 @@ import species.participation.Featured
 
 class AbstractObjectController {
     
-    def observationService;
     def utilsService;
+    def observationService;
 
     def related() {
-        def relatedObv = observationService?.getRelatedObservations(params).relatedObv;
+        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
         if(params.filterProperty != 'bulkUploadResources'){
             if(relatedObv) {
                 if(relatedObv.observations)

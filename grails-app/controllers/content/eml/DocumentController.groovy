@@ -18,7 +18,7 @@ class DocumentController extends AbstractObjectController {
 	def activityFeedService
 	def utilsService
 	def documentSearchService
-	def observationService
+	//def observationService
 	def index = {
 		redirect(action: "browser", params: params)
 	}

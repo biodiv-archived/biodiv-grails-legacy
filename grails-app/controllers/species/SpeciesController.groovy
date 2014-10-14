@@ -44,7 +44,7 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    def observationService;
+    //def observationService; //injected in AbstractController
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
     def utilsService;

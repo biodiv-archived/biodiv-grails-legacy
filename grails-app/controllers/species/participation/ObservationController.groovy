@@ -43,7 +43,7 @@ class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
-	def observationService;
+	//def observationService; //injected in AbstractObjectController
 	def springSecurityService;
 	def mailService;
 	def observationsSearchService;
