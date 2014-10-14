@@ -45,7 +45,7 @@ class SecurityFilters {
 
             after = { model ->
                 //setting user group and permission for view
-                if(model){
+                if(model!=null){
                     def userGroupInstance = model.userGroupInstance
                     def userGroup = model.userGroup
                     if(!userGroupInstance) {

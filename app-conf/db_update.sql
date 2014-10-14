@@ -98,10 +98,21 @@ alter table comment alter column language_id set not null;
 
 
 alter table species_field add column language_id bigint;
+alter table species_field add constraint language_id foreign key (id) references language(id) match full;
 update species_field set language_id = 205;
+ alter table species_field alter column language_id set not null;
 
 alter table field add column language_id bigint;
+alter table field add constraint language_id foreign key (id) references language(id) match full;
 update field set language_id = 205;
+alter table field alter column language_id set not null;
+
+
+alter table field add column connection bigint;
+alter table field alter column connection set not null;
+
+
+update suser set language_id = 205;
 
 
 /** After updating code */

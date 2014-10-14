@@ -340,6 +340,8 @@ function saveHeaderMetadata(headerMetadata) {
 }
 
 function populateHeaderMetadata(headerName, headerInfo) {
+    console.log(headerName);
+    console.log(headerInfo);
     var headerMetadata = getHeaderMetadata();
     headerMetadata[headerName] = headerInfo;
     saveHeaderMetadata(headerMetadata);

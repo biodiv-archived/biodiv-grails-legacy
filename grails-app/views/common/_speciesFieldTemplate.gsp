@@ -100,18 +100,9 @@
 
             </textarea>        
 
-            <div class="description" >
-    <g:each in="${speciesFieldInstance?.description?.split('\n')}"
-    var="para">
-    <g:if test="${para}">
-    <div>        
-        <g:render template="/common/languagewrap" model="['domainInstance': speciesFieldInstance , 'userLanguage' : userLanguage, 'contentValue' : para.trim(), 'isHtml' : true]"/>
-    </div>
-    </g:if>
-
-    </g:each>
-
-</div>
+            <div class="description">
+                <g:render template="/common/languagewrap" model="['domainInstance': speciesFieldInstance , 'userLanguage' : userLanguage, 'contentValue' : speciesFieldInstance?.description, 'isHtml' : true]"/>
+            </div>
 <!-- description -->
 <g:if
 test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Distribution Geographic Entity') && speciesInstance.globalDistributionEntities.size()>0}">

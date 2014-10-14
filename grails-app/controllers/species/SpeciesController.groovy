@@ -211,8 +211,10 @@ class SpeciesController extends AbstractObjectController {
             def userLanguage = utilsService.getCurrentLanguage(request);
 			def c = Field.createCriteria();
 			def fields = c.list(){
-				and{ order('displayOrder','asc')
-					 eq("language", userLanguage) 
+				eq('language', userLanguage)
+				and{ 
+                        order('displayOrder','asc')
+					 
 					}
 			};
             if(request.getHeader('X-Auth-Token')) {
@@ -220,8 +222,13 @@ class SpeciesController extends AbstractObjectController {
                 return;
             } 
 
-			Map map = getTreeMap(speciesInstance, fields);
-			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
+			Map map = getTreeMap(speciesInstance, fields, userLanguage);
+
+            println "=========Map Size========="+map.size();
+
+			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray);
+
+           
 			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
 			//def observationInstanceList = relatedObservations?.observations?.observation
 			//def instanceTotal = relatedObservations?relatedObservations.count:0
@@ -236,17 +243,23 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}
 
-	private Map getTreeMap(Species speciesInstance, List fields) {
+	private Map getTreeMap(Species speciesInstance, List fields, Language userLanguage) {
         def user = springSecurityService.currentUser;
 
 		Map map = new LinkedHashMap();
+		ArrayList fieldsConnectionArray = new ArrayList(fields.size());
         boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user)
-
+        ArrayList fieldsArray = new ArrayList(fields.size());
 		for(Field field : fields) {
 			Map finalLoc;
 			Map conceptMap, categoryMap, subCategoryMap;
 			if(field.concept && !field.concept.equals("")) {
 				if(map.containsKey(field.concept)) {
+
+                   // println "=======language========"+userLanguage.id;
+                    //println "=======fieldId========="+field.language.id;
+                    //println "=======fieldConnection========="+field.connection;
+                    //println "=======field.concept========="+field.concept;
 					conceptMap = map.get(field.concept);
 				} else {
 					conceptMap = new LinkedHashMap();
@@ -274,25 +287,33 @@ class SpeciesController extends AbstractObjectController {
 					}
 				}
 				finalLoc.put ("field", field);
+				fieldsConnectionArray.putAt(field.connection, finalLoc);
                 if(user && isSpeciesContributor) {
                     finalLoc.put('isContributor', 1);
                 }
 			}
 		}
 
-		return map;
+		return [map:map, fieldsConnectionArray:fieldsConnectionArray];
 	}
 
-	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map) {
-
+	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsConnectionArray) {
+		
 		def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
+            Language lang;
             //concept
-			if(map.containsKey(sField.field.concept)) {
-				finalLoc = map.get(sField.field.concept);
+           // println "species fields ============"+sField.language;
+			if(map.containsKey(sField.field.concept) || fieldsConnectionArray[sField.field.connection]) {
+
+				finalLoc = map.get(sField.field.concept)?:fieldsConnectionArray[sField.field.connection];
+
+              //  println "===============finalLoc===================="+finalLoc;
+
+                finalLoc.put("lang", sField.language);
                 if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                     finalLoc.put('hasContent', true);
                 }
@@ -344,7 +365,7 @@ class SpeciesController extends AbstractObjectController {
 			}
 		}
         //remove empty information hierarchy
-		for(concept in map.clone()) {
+/*		for(concept in map.clone()) {
             if(concept.value.get('speciesFieldInstance')) {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
@@ -411,7 +432,11 @@ class SpeciesController extends AbstractObjectController {
 				}
 			}
 		}
+*/
 
+
+println "FINAL MAP ========================="
+println map;
 		return map;
 	}
 
@@ -447,6 +472,7 @@ class SpeciesController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
     def update() {
     	def msg;
+        def userLanguage;
         println "===========UPDATE STARTED========= "
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
@@ -460,7 +486,8 @@ class SpeciesController extends AbstractObjectController {
             def result;
             long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
-            params.locale_language = utilsService.getCurrentLanguage(request);
+            userLanguage = utilsService.getCurrentLanguage(request);
+            params.locale_language = userLanguage;
 
             switch(params.name) {
                 case "contributor":
@@ -559,7 +586,7 @@ class SpeciesController extends AbstractObjectController {
                 List html = [];
                 result.content.each {sf ->
                     boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
-                    html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor]);
+                    html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor,'userLanguage':userLanguage]);
                 }
                 result.content = html.join();
                 
@@ -790,6 +817,10 @@ class SpeciesController extends AbstractObjectController {
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+            params.locale_language = languageInstance;
+            println "+++++++++++++++++++++++++++++++++++++++"
+            println  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			res = speciesUploadService.upload(res.sBulkUploadEntry)
@@ -798,7 +829,9 @@ class SpeciesController extends AbstractObjectController {
 	}
 	
 	def getDataColumns() {
-        List res = speciesUploadService.getDataColumns();
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+
+        List res = speciesUploadService.getDataColumns(languageInstance);
         render res as JSON
     }
     
