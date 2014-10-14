@@ -1,81 +1,81 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="java.text.SimpleDateFormat" %>
-<g:set var="modules"  value="[[name:'All'], [name:'Species', template:'species'], [name:'Observation', template:'observation'], [name:'Document', template:'document'], [name:'SUser', template:'SUser'], [name:'UserGroup', template:'userGroup']]"/>
+<g:set var="modules"  value="[[name:'All',displayName:g.message(code:'default.all.label') ], [name:'Species', template:'species',displayName:g.message(code:'default.species.label')], [name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], [name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], [name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], [name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')]]"/>
 
 <div  class="block-tagadelic">
 
-    <form id="advSearchForm" method="get"  title="Advanced Search"
+    <form id="advSearchForm" method="get"  title="${g.message(code:'button.advanced.search')}"
         action="${uGroup.createLink(controller:'search', action:params.action?:'select') }"
         class="searchbox form-horizontal">
 
         <div class="control-group">
-            <label class="control-label" for="module">Module</label>
+            <label class="control-label" for="module">${g.message(code:"default.label.module")}</label>
             <div class="controls">
                 <select class="searchFilter moduleFilter" name="aq.object_type" style="width:100%">
                     <g:each in="${modules}" var="module">
-                    <option value="${module.name}">${module.name}</option>
+                   <option value="${module.name}">${module.displayName}</option>
                     </g:each>
                 </select>
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="name">Species</label> 
+            <label class="control-label" for="name">${g.message(code:"default.species.label")}</label> 
             <div class="controls">
                 <input id="aq.name"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.name" value="${queryParams?queryParams['aq.name']?.encodeAsHTML():'' }"
-                placeholder="Search by species name" />
+                placeholder="${g.message(code:'placeholder.search.species.name')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="location">Location</label> 
+            <label class="control-label" for="location">${g.message(code:"default.location.label")}</label> 
             <div class="controls">
                 <input id="aq.location"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.location" value="${queryParams?queryParams['aq.location']?.encodeAsHTML():''}"
-                placeholder="Search by location name" />
+                placeholder="${g.message(code:'placeholder.search.location.name')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="contributor">Contributor</label> 
+            <label class="control-label" for="contributor">${g.message(code:"placeholder.contributor")}</label> 
             <div class="controls">
                 <input id="aq.contributor"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.contributor" value="${queryParams?queryParams['aq.contributor']?.encodeAsHTML():'' }"
-                placeholder="Search all contributors" />
+                placeholder="${g.message(code:'placeholder.all.search.contributors')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="attribution">Attribution</label> 
+            <label class="control-label" for="attribution">${g.message(code:"default.attribution.label")}</label> 
             <div class="controls">
                 <input id="aq.attribution"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.attribution" value="${queryParams?queryParams['aq.attribution']?.encodeAsHTML():'' }"
-                placeholder="Search all attributions" />
+                placeholder="${g.message(code:'placeholder.all.search.attributions')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="license">License</label> 
+            <label class="control-label" for="license">${g.message(code:"default.licenses.label")}</label> 
             <div class="controls">
                 <input id="aq.license"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.license" value="${queryParams?queryParams['aq.license']?.encodeAsHTML():'' }"
-                placeholder="Search licence" />
+                placeholder="${g.message(code:'placeholder.license')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="text">Content</label> 
+            <label class="control-label" for="text">${g.message(code:"default.content.label")}</label> 
             <div class="controls">
                 <input id="aq.text"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.text" value="${queryParams?queryParams['aq.text']?.encodeAsHTML():''}"
-                placeholder="Search all text content" /> 
+                placeholder="${g.message(code:'placeholder.search.all.content')}" /> 
             </div>
         </div>
 
@@ -91,7 +91,7 @@
     </form>
     <div class="form-action">
         <button type="submit" id="advSearch"
-            class="btn btn-primary pull-right" style="margin-top:10px;">Search</button>
+            class="btn btn-primary pull-right" style="margin-top:10px;">${g.message(code:"default.search")}</button>
     </div>
 
     <div class="clearfix"></div>

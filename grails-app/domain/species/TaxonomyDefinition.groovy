@@ -55,7 +55,7 @@ class TaxonomyDefinition extends NamesSorucedata {
 
         String[] getCodes() {
             
-            println "${getClass().name}.${name()}"
+            
             ["${getClass().name}.${name()}"] as String[]
         }   
 

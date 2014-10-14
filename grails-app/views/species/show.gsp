@@ -265,7 +265,7 @@
                     <div id="toc" class="tile"></div>
                     </div-->
                     <!--div id="map" class="sidebar_section">
-                    <h5>Occurrence Map</h5>
+                    <h5>${g.message(code:'heading.occurence.map')}</h5>
                     <div id="mapSpinner" class="spinner">
                         <center>
                             <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
@@ -278,7 +278,7 @@
                         style="height: 350px; width: 100%"></div>
                     <div class="alert alert-info">
                         <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
-                        The current map showing distribution of species is only indicative.
+                        ${g.message(code:'info.about.map.species')}
                     </div>
 
                     <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	

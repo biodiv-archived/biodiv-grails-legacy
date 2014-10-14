@@ -22,6 +22,7 @@
     </head>
 
     <body>
+<h1>=========================================================================================</h1>
         <div id="home" class="observation  span12">
 
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
@@ -44,24 +45,24 @@
 
             <div id="stats" class="navblock" style="margin-top:-20px">
                 <div class="entry">
-                    <div class="stats_number" title="Number of Species">${Species.countByPercentOfInfoGreaterThan(0)}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countByPercentOfInfoGreaterThan(0)}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="Number of Observations">${Observation.countObservations()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.observations')}">${Observation.countObservations()}</div>
                 </div>
 
                 <div class="entry">
-                    <div class="stats_number" title="Number of Maps">202</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">202</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="Number of Documents">${Document.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>
                 </div>
  
                 <div class="entry">
-                    <div class="stats_number" title="Number of Groups">${UserGroup.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.count()}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="Number of Activity">${ActivityFeed.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.activity')}">${ActivityFeed.count()}</div>
                 </div>
 
             </div>

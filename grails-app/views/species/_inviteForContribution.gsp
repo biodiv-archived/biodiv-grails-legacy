@@ -31,10 +31,10 @@
 <sec:ifAnyGranted roles='ROLE_SPECIES_ADMIN,ROLE_ADMIN'>
 <div class="invite">
     <a id="inviteCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteCuratorsDialog" role="button" data-toggle="modal" data-invitetype='curator'><i
-            class="icon-envelope"></i> <g:message code="userGroup.members.label" default="Invite Curators" /> </a>
+            class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.curators" /> </a>
         <a id="inviteContributors" class="btn btn-primary  ${hide?'hide':''}" href="#inviteContributorsDialog" role="button" data-toggle="modal" data-invitetype='contributor'><i
-                class="icon-envelope"></i> <g:message code="userGroup.members.label"
-            default="Invite Contributors" /> </a>
+                class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.contributors"
+            /> </a>
 
         <div class="modal hide fade" id="inviteCuratorsDialog" tabindex='-1'
             role="dialog" aria-labelledby="inviteCuratorsModalLabel"
@@ -84,8 +84,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="msg.Close" /></a>
-                <a href="#" class="inviteButton btn btn-primary"><g:message code="msg.Invite" /></a>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="button.close" /></a>
+                <a href="#" class="inviteButton btn btn-primary"><g:message code="button.invite" /></a>
             </div>
         </div>
 

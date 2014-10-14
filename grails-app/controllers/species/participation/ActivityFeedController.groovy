@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import species.participation.Follow
 import species.auth.SUser
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 
 class ActivityFeedController {
@@ -69,13 +70,13 @@ class ActivityFeedController {
         def msg
 		if(params.follow.toBoolean()){
 			Follow.addFollower(domainObj, author)
-			msg = messageSource.getMessage("default.followed", null, request.locale)
+			msg = messageSource.getMessage("default.followed", null, LCH.getLocale())
 			if(!author.sendNotification){
-				msg += messageSource.getMessage("default.turn.notification", null, request.locale)
+				msg += messageSource.getMessage("default.turn.notification", null, LCH.getLocale())
 			}
 		}else{
 			Follow.deleteFollower(domainObj, author)
-			msg = messageSource.getMessage("default.unfollowed", null, request.locale)
+			msg = messageSource.getMessage("default.unfollowed", null, LCH.getLocale())
 		}
 		def r = [status:'success']
 		r['msg']= msg 

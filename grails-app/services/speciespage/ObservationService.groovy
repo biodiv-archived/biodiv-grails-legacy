@@ -71,7 +71,8 @@ import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
- 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class ObservationService extends AbstractObjectService {
 
@@ -1315,7 +1316,15 @@ class ObservationService extends AbstractObjectService {
         templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
         templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
         templateMap["userMessage"] = m.userMessage?: ""
-        def body = conf.ui.askIdentification.emailBody
+        def messagesourcearg = new Object[6];
+             messagesourcearg[0] = currentUserProfileLink;
+             messagesourcearg[1] = currentUser;
+             messagesourcearg[2] = templateMap["domain"];
+             messagesourcearg[3] = activitySource != null ? 'about <a href="'+templateMap["activitySourceUrl"]+'">'+activitySource+'</a>':'';
+             messagesourcearg[4] = templateMap["userMessage"];
+             messagesourcearg[5] = templateMap["unsubscribeUrl"];
+             
+        def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, LCH.getLocale())
 
         if (body.contains('$')) {
             body = evaluate(body, templateMap)

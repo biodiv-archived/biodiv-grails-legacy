@@ -2,7 +2,7 @@
 <%@page import="species.utils.Utils"%>
 <%@ page contentType="text/html"%>
 
-gfvfgrgdf
+Bonjour
 ${username},
 <br />
 <br />
@@ -19,7 +19,8 @@ ${username},
 		<td><g:link
 				url="${uGroup.createLink(controller:'user', action:'show', id:actor.id, userGroupWebaddress:userGroupWebaddress, absolute:true) }">
 				${actor.name}
-			</g:link> : ${activity.activityTitle} on a
+			</g:link> : ${activity.activityTitle} sur un
+
 			<g:if test="${domainObjectTitle}">
 				${domainObjectType} <a href="${obvUrl}">${domainObjectTitle}</a>
 			</g:if>
@@ -33,18 +34,17 @@ ${username},
 	</tr>
 	<tr>
 		<td colspan="2">
-			You will be notified by mail on any social activity on the
-			observation.<br />
+			Vous serez informé par message électronique de toute acitivté sur l'Observation.<br />
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2">
-			If you do not want to receive notifications please go to your
-			<a href="${userProfileUrl}">user profile</a> and switch it off.<br />
+			Si vous ne voulez pas recevoir de notification merci d'aller dans votre
+			<a href="${userProfileUrl}">profil utilisateur</a> et de décocher la fonction de notification.<br />
 		</td>
 	</tr>
 </table>
 <br />
-Thank you,
+Merci,
 <br />
--The portal team
+L'équipe du portail "

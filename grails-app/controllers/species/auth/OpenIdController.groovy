@@ -29,6 +29,8 @@ import species.auth.SUser
 import species.auth.SUserRole
 import species.utils.Utils;
 import species.auth.CustomRegisterCommand;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
+
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
  * associated with an OpenID and also by associating a new OpenID to an existing account.
@@ -83,7 +85,7 @@ class OpenIdController {
 					try {
 						targetUrl = URLEncoder.encode(targetUrl, "UTF-8");
 					} catch (UnsupportedEncodingException e) {
-						def msg = messageSource.getMessage("utf.shouldnt.support", null, request.locale)
+						def msg = messageSource.getMessage("utf.shouldnt.support", null, LCH.getLocale())
 						throw new IllegalStateException(msg);
 					}
 				}
@@ -119,7 +121,7 @@ class OpenIdController {
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
 
 		if (!openId) {
-			flash.error = messageSource.getMessage("login.errors.openid.found", null, request.locale)
+			flash.error = messageSource.getMessage("login.errors.openid.found", null, LCH.getLocale())
 			return
 		}
 
@@ -135,7 +137,7 @@ class OpenIdController {
 		String email = emailAttribute.values[0];
 
 		if (!email) {
-			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, request.locale)
+			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, LCH.getLocale())
 			return
 		}
 
@@ -169,7 +171,7 @@ class OpenIdController {
 
 		String openId = session[OIAFH.LAST_OPENID_USERNAME]
 		if (!openId) {
-			flash.error = messageSource.getMessage("login.errors.openid.found", null, request.locale)
+			flash.error = messageSource.getMessage("login.errors.openid.found", null, LCH.getLocale())
 			return [command: command]
 		}
 
@@ -187,7 +189,7 @@ class OpenIdController {
 			registerAccountOpenId command.username, command.password, openId
 		}
 		catch (AuthenticationException e) {
-			flash.error = messageSource.getMessage("login.errors.validate.msg", null, request.locale)
+			flash.error = messageSource.getMessage("login.errors.validate.msg", null, LCH.getLocale())
 			return [command: command, openId: openId]
 		}
 
@@ -201,7 +203,7 @@ class OpenIdController {
 		def token = session["LAST_FACEBOOK_USER"]
 
 		if (!token) {
-			flash.error = messageSource.getMessage("login.errors.facebook.fetch.accessToken", null, request.locale)
+			flash.error = messageSource.getMessage("login.errors.facebook.fetch.accessToken", null, LCH.getLocale())
 			return
 		}
 
@@ -214,7 +216,7 @@ class OpenIdController {
 		String email = fbProfile.email;
 
 		if (!email) {
-			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, request.locale)
+			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, LCH.getLocale())
 			return
 		}
 
