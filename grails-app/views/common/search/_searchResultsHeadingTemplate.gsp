@@ -18,11 +18,6 @@
 </div>
 
     <div style="width:100%;">
-        <div class="main_heading" style="margin-left:0px;">
-
-            <h1>${g.message(code:'default.search.heading')}</h1>
-
-        </div>
         <obv:showObservationFilterMessage
         model="['observationInstanceList':instanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'search result']" />
     </div>
