@@ -1,14 +1,14 @@
 <%@ page contentType="text/html"%>
 
-Hi ${curator.name.capitalize()},
+Bonjour ${curator.name.capitalize()},
 <br/><br/> 
-You have been invited as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
+Vous avez été invité en tant que ${invitetype} pour ${rankLevel} : ${taxon.name} sur le ${domain}.<br/>
 <g:if test="${message}">
 <br/>
 Message : ${message}
 <br/>
 </g:if>
-Please <a href="${uri}" title="Confirmation code">click here</a> to accept being a ${invitetype}.<br/>
+Merci <a href="${uri}" title="Confirmation code">cliquer ici</a> pour accepter d'être  ${invitetype}.<br/>
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+Merci,<br/>
+L'équipe du portail "

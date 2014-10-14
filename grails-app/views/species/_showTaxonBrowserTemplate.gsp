@@ -33,7 +33,7 @@
 
                     </g:elseif>
                     </g:each>
-                    <input class='classification' type="hidden" name="classification" value="${Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY).id}" readonly/>
+                    <input class='classification' type="hidden" name="classification" value="${Classification.findByName(fieldFromName.acth).id}" readonly/>
                 </div>
                 <div class="editable-buttons editable-buttons-bottom pull-right">
                     <button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i><g:message code="button.save" /></button>

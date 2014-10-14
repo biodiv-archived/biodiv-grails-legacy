@@ -128,8 +128,8 @@ $(document).ready(function() {
                 "cnu":"${g.message(code:'name.common.another')}",
                 "snu":"${g.message(code:'name.scientific.another')}",
                 "sno":"${g.message(code:'serial.number')}",
-                "med":"${g.message(code:'default.media.label')}"
-
+                "med":"${g.message(code:'default.media.label')}",
+                "comment":"${g.message(code:'alert.comment.delete')}"
 
 
             },
@@ -144,7 +144,11 @@ $(document).ready(function() {
                 "bdel":"${g.message(code:'button.delete')}",
                 "bedi":"${g.message(code:'button.edit')}",
                 "bsav":"${g.message(code:'button.save')}",
-                "bcanc":"${g.message(code:'button.cancel')}"
+                "bcanc":"${g.message(code:'button.cancel')}",
+                "bupdate":"${g.message(code:'suser.edit.update')}",
+                "bcmnt":"${g.message(code:'button.update.comment')}"
+
+
                 
                 
             } ,

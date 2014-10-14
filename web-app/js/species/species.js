@@ -622,7 +622,8 @@ function initAddables($ele) {
     })
 
     if($ele.find('.addFieldButton').length == 0)
-        $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='Add'><i class='icon-plus'></i>Add</a>");
+        $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='"+window.i8ln.species.specie.adont+"'><i class='icon-plus'></i>"+window.i8ln.species.specie.adont+"</a>");
+
 
     $ele.find('.addFieldButton').click(function(e){    
         e.stopPropagation();

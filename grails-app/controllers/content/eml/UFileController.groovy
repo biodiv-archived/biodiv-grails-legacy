@@ -40,7 +40,7 @@ import species.utils.Utils
 import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
-
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class UFileController {
 
@@ -51,7 +51,7 @@ class UFileController {
     def grailsApplication
     def speciesUploadService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-
+    def messageSource
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
@@ -234,7 +234,7 @@ class UFileController {
 
         UFile ufile = UFile.get(params.id)
         if (!ufile) {
-            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], RCU.getLocale(request))
             log.debug msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -251,7 +251,7 @@ class UFileController {
             response.outputStream << file.readBytes()
             return
         } else {
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -280,7 +280,7 @@ class UFileController {
             return render(text: [success:true] as JSON, contentType:'text/html')
         } else {
             println "in else================"
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction

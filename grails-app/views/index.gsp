@@ -22,6 +22,7 @@
     </head>
 
     <body>
+<h1>=========================================================================================</h1>
         <div id="home" class="observation  span12">
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
                 <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;"><g:message code="index.welcome" /> ${grailsApplication.config.speciesPortal.app.siteName}</h2>
@@ -31,36 +32,36 @@
             </div>
         
             <div class="navblock" style="margin-top:20px;">
-                <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";></div>
-                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"></div>
-                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"></div>
+                <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";><span class="content">Species</span></div>
+                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">Observation</span></div>
+                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">Maps</span></div>
 
-                <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"></div>
-                <div id="groups_entry" class="entry"  onclick="location.href='${uGroup.createLink(controller:'group', action:'list', absolute:true)}'";></div>
-                <div id="dashboard" class="entry" onclick="location.href='${uGroup.createLink(controller:'chart', action:'show', absolute:true)}'"></div>
+                <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">Documents</span></div>
+                <div id="groups_entry" class="entry"  onclick="location.href='${uGroup.createLink(controller:'group', action:'list', absolute:true)}'";><span class="content">Groups</span></div>
+                <div id="dashboard" class="entry" onclick="location.href='${uGroup.createLink(controller:'chart', action:'show', absolute:true)}'"><span class="content">Dashboard</span></div>
 
             </div>
 
             <div id="stats" class="navblock" style="margin-top:-20px">
                 <div class="entry">
-                    <div class="stats_number" title="Number of Species">${Species.countByPercentOfInfoGreaterThan(0)}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countByPercentOfInfoGreaterThan(0)}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="Number of Observations">${Observation.countObservations()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.observations')}">${Observation.countObservations()}</div>
                 </div>
 
                 <div class="entry">
-                    <div class="stats_number" title="Number of Maps">202</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">202</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="Number of Documents">${Document.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>
                 </div>
  
                 <div class="entry">
-                    <div class="stats_number" title="Number of Groups">${UserGroup.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.count()}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="Number of Activity">${ActivityFeed.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.activity')}">${ActivityFeed.count()}</div>
                 </div>
 
             </div>

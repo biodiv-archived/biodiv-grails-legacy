@@ -1,5 +1,5 @@
 <%@ page contentType="text/html"%>
-<html><head><title>Welcome</title>
+<html><head><title>Bienvenue</title>
 
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 <style type="text/css">
@@ -130,7 +130,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <td class="w580" width="580">
 <p class="article-title" align="left"><singleline label="Title"><br>
 </singleline></p>
-<div class="article-content" align="left"><big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username}</small></big><span style="font-weight: bold;">,</span><br><br>
+<div class="article-content" align="left"><big style="font-weight: bold;"> <small>Cher</small> <small>&nbsp;${username}</small></big><span style="font-weight: bold;">,</span><br><br>
     <g:message code="welcomeEmail.intro" />
 </div>
 </td>
@@ -163,7 +163,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tr>
 <tr>
 <td class="w580" style="width: 580px; vertical-align: bottom;">
-    <p class="article-title" align="left"><a style="font-weight: bold;" href="${uGroup.createLink(controller:'map', absolute:true)}"><big>Maps</big></a></p>
+    <p class="article-title" align="left"><a style="font-weight: bold;" href="${uGroup.createLink(controller:'map', absolute:true)}"><big>Cartes</big></a></p>
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
@@ -206,7 +206,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tr>
 <tr>
 <td class="w580" width="580">
-    <p class="article-title" align="left"><small><big><a style="font-weight: bold;" href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><big>Species</big></a></big></small></p>
+    <p class="article-title" align="left"><small><big><a style="font-weight: bold;" href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><big>Espèce</big></a></big></small></p>
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
@@ -225,7 +225,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tr>
 <tr>
 <td class="w580" width="580">
-    <p class="article-title" align="left"><small><big><a href="${uGroup.createLink(controller:'group', action:'list', absolute:true)}"><span style="font-weight: bold;"><big>Groups</big></span></a></big></small></p>
+    <p class="article-title" align="left"><small><big><a href="${uGroup.createLink(controller:'group', action:'list', absolute:true)}"><span style="font-weight: bold;"><big>groupes</big></span></a></big></small></p>
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
@@ -243,22 +243,18 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </tr>
 <tr>
 <td class="w580" width="580">
-<div class="article-content" align="left">The portal is in a state of
-perpetual beta, with new features and improvements being constantly
-added. So, follow us on <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}">Facebook
-</a>or <a href="${grailsApplication.config.speciesPortal.app.twitterUrl}">Twitter
-</a>to stay updated. You can also leave <a href="${grailsApplication.config.speciesPortal.app.feedbackFormUrl}">feedback</a>,
-suggestions and feature requests.<br><br>
-We're excited to have you as a member. Please update your <a href="${userProfileUrl}">user profile</a>.
-Thank you for joining and we
-hope you enjoy using the portal.<br><br>
-Please add <a href="mailto:${grailsApplication.config.grails.mail.default.from}">${grailsApplication.config.grails.mail.default.from}</a>
-to your address book to ensure you continue to receive emails from us
-in your inbox.<br>
+<div class="article-content" align="left">Le portail est dans un état d'évolution permanente, avec de nouvelles fonctionnalités et des améliorations constamment ajoutées. Alors, suivez-nous sur <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}">Facebook
+</a>ou <a href="${grailsApplication.config.speciesPortal.app.twitterUrl}">Twitter
+</a>pour rester à jour.Vous pouvez également laisser des  <a href="${grailsApplication.config.speciesPortal.app.feedbackFormUrl}">commentaires</a>,
+suggestions et demandes de fonctionnalités. <br><br>
+Nous sommes ravis de vous avoir en tant que membre. Merci de mettre à jour votre  <a href="${userProfileUrl}">profil d'utilisateur.</a>.
+Merci de vous rejoindre et nous espérons que vous apprécierez l'utilisation du portail. <br><br>
+Merci d'ajouter <a href="mailto:${grailsApplication.config.grails.mail.default.from}">${grailsApplication.config.grails.mail.default.from}</a>
+à votre carnet d'adresses pour vous assurer que vous continuez à recevoir des emails de notre part dans votre boîte de réception. <br>
 <br>
-Sincerely,<br>
+Cordialement,<br>
 <br><span style="font-weight: bold;">
-The ${grailsApplication.config.speciesPortal.app.siteName} Team</span> </div>
+de ${grailsApplication.config.speciesPortal.app.siteName} L'équipe</span> </div>
 </td>
 </tr>
 
