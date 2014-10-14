@@ -115,7 +115,7 @@ class XMLConverter extends SourceConverter {
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
 
                 //taxonConcept is being taken from only author contributed taxonomy hierarchy
-                TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy, language);
+                TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
 
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
@@ -218,7 +218,8 @@ class XMLConverter extends SourceConverter {
                                 }
 
                             } 
-                            else if(category && category.toLowerCase().endsWith(getFieldFromName(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase(), 2, language))) {
+                            else if(category && ( category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase()) ||  category.toLowerCase().startsWith("Hiérarchie Taxonomique".toLowerCase()))) {
+                                //HACK
                                 //ignore
                                 log.debug "ignoring hierarchy" 
                             } else {
@@ -481,7 +482,7 @@ class XMLConverter extends SourceConverter {
         String concept = fieldNode.concept?.text()?.trim();
         String category = fieldNode.category?.text()?.trim();
         String subCategory = fieldNode.subcategory?.text()?.trim();
-        String language = fieldNode.language[0]?.value();
+        Language language = fieldNode.language[0]?.value();
         def fieldCriteria = Field.createCriteria();
 
         Field field = fieldCriteria.get {
@@ -1556,7 +1557,7 @@ class XMLConverter extends SourceConverter {
         return parentTaxon;
     }
 
-    TaxonomyDefinition getTaxonConcept(List taxonomyRegistry, Language language = null) {
+    TaxonomyDefinition getTaxonConcept(List taxonomyRegistry) {
         def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
         if(!taxonConcept) {
             taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY));

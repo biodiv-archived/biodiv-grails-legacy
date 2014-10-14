@@ -18,6 +18,7 @@ import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Featured;
+import species.sourcehandler.XMLConverter;
 
 class Species implements Rateable { 
  	String title;
@@ -77,7 +78,7 @@ class Species implements Rateable {
 	//used for debugging
 	static transients = [ "sLog" ]
 
-    Species() {
+    Species() { 
         super();
         //new Throwable("init").printStackTrace() 
     }
@@ -196,14 +197,20 @@ class Species implements Rateable {
 	}
 	
 	String notes() {
+        XMLConverter converter = new XMLConverter();
+
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
-			field.concept.equalsIgnoreCase(fieldsConfig.OVERVIEW) && field.category.equalsIgnoreCase(fieldsConfig.SUMMARY)
+            String overview = converter.getFieldFromName(fieldsConfig.OVERVIEW,1,field.language) 
+            String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,1,field.language)
+
+			field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(summary)
 		}
 		if(!f) {
 			f = this.fields.find { speciesField ->
 				Field field = speciesField.field;
-				field.concept.equalsIgnoreCase(fieldsConfig.OVERVIEW) && field.category.equalsIgnoreCase(fieldsConfig.BRIEF)
+                brief = converter.getFieldFromName(fieldsConfig.BRIEF,1,field.language)
+				field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(brief)
 			}
 		}
 		return f?.description;
