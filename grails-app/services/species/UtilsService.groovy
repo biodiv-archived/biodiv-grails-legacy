@@ -775,5 +775,12 @@ class UtilsService {
         }
         return groupId
     }
+
+    def benchmark(String blockName, Closure closure) {
+        def start = System.currentTimeMillis()  
+        closure.call()  
+        def now = System.currentTimeMillis()  
+        log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
+    }  
 }
 

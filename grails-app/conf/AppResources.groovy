@@ -258,7 +258,7 @@ modules = {
 	
 	slickgrid {
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
-		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
+//		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
 		resource url:'/js/SlickGrid-2.0.2/examples/examples.css'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'

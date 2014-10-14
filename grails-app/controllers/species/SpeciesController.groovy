@@ -210,6 +210,12 @@ class SpeciesController extends AbstractObjectController {
                     }
                 }
             }
+            
+            if(request.getHeader('X-Auth-Token')) {
+                render speciesInstance as JSON;
+                return;
+            } 
+
             def userLanguage = utilsService.getCurrentLanguage(request);
 			def c = Field.createCriteria();
 			def fields = c.list(){
@@ -219,16 +225,16 @@ class SpeciesController extends AbstractObjectController {
 					 
 					}
 			};
-            if(request.getHeader('X-Auth-Token')) {
-                render speciesInstance as JSON;
-                return;
-            } 
 
-			Map map = getTreeMap(speciesInstance, fields, userLanguage);
+			Map map;
+            
+            utilsService.benchmark('getTreeMap') {
+                map = getTreeMap(speciesInstance, fields, userLanguage);
+            }
 
-            println "=========Map Size========="+map.size();
-
-			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray);
+            utilsService.benchmark('mapSpeciesInstanceFields') {
+			    map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray);
+            }
 
            
 			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
@@ -237,7 +243,7 @@ class SpeciesController extends AbstractObjectController {
 			
 			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage]
 
-            if(springSecurityService.currentUser) {
+             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
                 result['newSpeciesFieldInstance'] = newSpeciesFieldInstance
             }
@@ -304,6 +310,7 @@ class SpeciesController extends AbstractObjectController {
 		def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
+        utilsService.benchmark('grouping sFields') {
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
             Language lang;
@@ -367,6 +374,10 @@ class SpeciesController extends AbstractObjectController {
             //    speciesService.sortAsPerRating(t);
 			}
 		}
+        }
+
+
+        utilsService.benchmark('remove empty info hierarchy') {
         //remove empty information hierarchy
 		for(concept in map.clone()) {
             if(concept.value.get('speciesFieldInstance')) {
@@ -419,8 +430,6 @@ class SpeciesController extends AbstractObjectController {
                         }
 					}
 
-                    println "++++++++++++++++++++++++++++"
-                    println subCategory
                     if(subCategory.value.get('hasContent')) { 
                         map.get(concept.key).get(category.key).put('hasContent', true);
                         map.get(concept.key).put('hasContent', true);
@@ -437,6 +446,7 @@ class SpeciesController extends AbstractObjectController {
 				}
 			}
 		}
+        }
 		return map;
 	}
 
@@ -473,7 +483,6 @@ class SpeciesController extends AbstractObjectController {
     def update() {
     	def msg;
         def userLanguage;
-        println "===========UPDATE STARTED========= "
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         

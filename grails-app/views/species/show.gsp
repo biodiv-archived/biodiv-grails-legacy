@@ -10,7 +10,6 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
-<%@page import="species.participation.ActivityFeedService"%>
 <%@page import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 <%@page import="species.Synonyms"%>
 <%@page import="species.Language"%>
@@ -209,8 +208,10 @@
         </s:isSpeciesContributor>
  
         <%def converter = new XMLConverter()%>
-        <% String summary = converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage);
-            Map fieldFromName = [occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
+        <% 
+        Map fieldFromName = [
+            summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
+            occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
             references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
             brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
             gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
@@ -266,36 +267,12 @@
                         </g:each>
                     </ul>
                 </div>			
-
                 <g:if test="${!sparse}">
                 <div id="speciesFieldContainer" class="grid_12"></div>
                 </g:if>
 
                 <!-- right side bar -->
                 <div class="span12 classifications" style="margin-left:0px;">
-                    <!--div id="tocContainer" class="sidebar_section">
-                    <div id="toc" class="tile"></div>
-                    </div-->
-                    <!--div id="map" class="sidebar_section">
-                    <h5>Occurrence Map</h5>
-                    <div id="mapSpinner" class="spinner">
-                        <center>
-                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
-                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
-                        </center>
-                    </div>
-
-
-                    <div id="map1311326056727" class="occurenceMap"
-                        style="height: 350px; width: 100%"></div>
-                    <div class="alert alert-info">
-                        <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
-                        The current map showing distribution of species is only indicative.
-                    </div>
-
-                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	
-
-                    </div-->
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
@@ -308,8 +285,6 @@
 
                 </div>
                 
-
-
             </div>	 
             <script type="text/javascript">
            var licenseSelectorOptions = [];

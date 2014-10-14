@@ -645,24 +645,17 @@ class SourceConverter {
     }
     
     String getFieldFromName(String fieldName, int level, Language language) {
-        println "+++++++++++++"
-        println fieldName
-        println level
-        println language;
+        println "getFieldFromName ${fieldName}"
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
-        println field
         if(field) {
             def t = FieldsMapHolder.getConnectionMap().get(field.connection)
-            println t
             if(language) {
                 t.each {
-                    println language.id +" "+ it.language.id
                     if(it.language.id == language.id) { field = it; return;}
                 }
             } else {
                 field = t[0];
             }
-            println field
             if(level == 1) return field.concept;
             if(level == 2) return field.category;
             if(level == 3) return field.subCategory;
