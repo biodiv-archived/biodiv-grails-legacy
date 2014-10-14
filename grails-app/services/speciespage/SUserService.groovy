@@ -21,7 +21,8 @@ import species.utils.ImageType
 import speciespage.search.SUserSearchService;
 import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
-
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
@@ -30,6 +31,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def mailService
 	def SUserSearchService
 	def speciesPermissionService
+    def messageSource;
     private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -181,7 +183,9 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		def replyTo = conf.ui.notification.emailReplyTo;
 		switch ( notificationType ) {
 			case NEW_USER:
-				mailSubject = conf.ui.newuser.emailSubject
+				def messagesourcearg = new Object[1];
+                messagesourcearg[0] = domain;
+				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.newuser.emailSubject", messagesourcearg, LCH.getLocale())
 			//bodyContent = g.render(template:"/emailtemplates/welcomeEmail", model:templateMap)
 				if (mailSubject.contains('$')) {
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
@@ -206,8 +210,13 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 				return;
 			case USER_DELETED:
-				mailSubject = conf.ui.userdeleted.emailSubject
-				bodyContent = conf.ui.userdeleted.emailBody
+				def messagesourcearg = new Object[1];
+                messagesourcearg[0] = domain;
+				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailSubject", messagesourcearg, LCH.getLocale())
+				def msgsourcearg = new Object[2];
+                msgsourcearg[1] = email;
+                msgsourcearg[2] = domain;
+				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, LCH.getLocale())
 				if (bodyContent.contains('$')) {
 					bodyContent = evaluate(bodyContent, templateMap)
 				}

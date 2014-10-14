@@ -6,8 +6,8 @@ function editCommentActivity(targetComp, commentId){
 
 	var output  = '<div class="editCommentWrapper" id='+commentId+'><textarea name="commentBody" class="comment-textbox" placeholder="Write comment" style="display: none;"></textarea>';
 		output += '<div class="commentContainer"><div class="contentbox" contenteditable="true">'+commentVal+'</div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />';
-		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right cancelComment" title="Cancel" >Cancel</a>';
-		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right updateComment" title="Update comment" >Update</a>';
+		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right cancelComment" title="'+window.i8ln.species.specie.bcanc+'" >'+window.i8ln.species.specie.bcanc+'</a>';
+		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right updateComment" title="'+window.i8ln.species.specie.bcmnt+'" >'+window.i8ln.species.specie.bupdate+'</a>';
 		output += '</div>';
 	message_body.hide().after(output);
 
@@ -53,7 +53,7 @@ function showComment(that){
 }
 
 function deleteCommentActivity(targetComp, commentId, url){
-	if(confirm('This comment will be deleted. Are you sure ?')){
+    if(confirm(window.i8ln.species.parseUtil.comment)){
 		deleteComment(commentId, url);
 		removeActivity(targetComp);
 	}

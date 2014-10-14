@@ -281,7 +281,7 @@
                     </div>
 
                         <div class="section clearfix">
-                            <div><span style="font-weight:bold;margin-left:5px;">Observation Templates</span></div>
+                            <div><span style="font-weight:bold;margin-left:5px;"><g:message code="heading.observation.templates" /></span></div>
                             <div class="miniObvWrapper column">
                                 <g:render template="/observation/miniObvCreateTemplate" model="['observationInstance': observationInstance]"/>
                             </div>

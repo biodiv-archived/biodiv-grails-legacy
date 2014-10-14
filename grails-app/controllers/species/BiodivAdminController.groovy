@@ -10,7 +10,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils;
 import species.auth.SUser;
 
 import grails.plugin.springsecurity.annotation.Secured;
-
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 @Secured(['ROLE_ADMIN'])
 class BiodivAdminController {
 
@@ -43,7 +43,7 @@ class BiodivAdminController {
     def setup = {
         try {
             setupService.setupDefs();
-            flash.message = messageSource.getMessage("default.success.loaded", null, request.locale)
+            flash.message = messageSource.getMessage("default.success.loaded", null, LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -55,10 +55,10 @@ class BiodivAdminController {
         int noOfInsertions = 0;
         try {
             noOfInsertions = speciesUploadService.loadData();
-            flash.message = messageSource.getMessage("default.addNo.records", [noOfInsertions] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.addNo.records", [noOfInsertions] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
-            flash.message = messageSource.getMessage("default.insert.record.error", [noOfInsertions,e.getMessage()] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.insert.record.error", [noOfInsertions,e.getMessage()] as Object[], LCH.getLocale())
         }
         redirect(action: "index")
     }
@@ -66,10 +66,10 @@ class BiodivAdminController {
     def loadNames = {
         try {
             taxonService.loadTaxon(true);
-            flash.message = messageSource.getMessage("default.admin.finished.loading", null, request.locale)
+            flash.message = messageSource.getMessage("default.admin.finished.loading", null, LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
-            flash.message = messageSource.getMessage("default.admin.error", [e.getMessage()] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.error", [e.getMessage()] as Object[], LCH.getLocale())
         }
 
         redirect (action:"index");
@@ -79,7 +79,7 @@ class BiodivAdminController {
         try {
             log.debug "Syncing names into recommendations"
             namesLoaderService.syncNamesAndRecos(false);
-            flash.message = messageSource.getMessage("default.admin.success.loaded.name", null, request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.loaded.name", null, LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -93,7 +93,7 @@ class BiodivAdminController {
             //speciesSearchService.deleteIndex();
             speciesSearchService.publishSearchIndex();
             speciesSearchService.optimize();
-            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['species'] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['species'] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -106,7 +106,7 @@ class BiodivAdminController {
             //observationsSearchService.deleteIndex();
             observationsSearchService.publishSearchIndex();
             observationsSearchService.optimize();
-            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['observations'] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['observations'] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -119,7 +119,7 @@ class BiodivAdminController {
             //SUserSearchService.deleteIndex();
             SUserSearchService.publishSearchIndex();
             SUserSearchService.optimize();
-            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['users'] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['users'] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -132,7 +132,7 @@ class BiodivAdminController {
             //documentSearchService.deleteIndex();
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
-            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -143,7 +143,7 @@ class BiodivAdminController {
     def reloadNamesIndex = {
         try {
             namesIndexerService.rebuild();
-            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['names'] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['names'] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -155,7 +155,7 @@ class BiodivAdminController {
         int noOfUpdations = 0;
         try {
             noOfUpdations = groupHandlerService.updateGroups();
-            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -166,7 +166,7 @@ class BiodivAdminController {
     def updateExternalLinks = {
         try {
             int noOfUpdations = externalLinksService.updateExternalLinks();
-            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['externalLinks',noOfUpdations] as Object[], request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['externalLinks',noOfUpdations] as Object[], LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -177,7 +177,7 @@ class BiodivAdminController {
     def recomputeInfoRichness = {
         try {
             speciesService.computeInfoRichness();
-            flash.message = messageSource.getMessage("default.admin.success.updated.richness", null, request.locale)
+            flash.message = messageSource.getMessage("default.admin.success.updated.richness", null, LCH.getLocale())
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()

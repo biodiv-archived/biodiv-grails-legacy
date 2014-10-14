@@ -1,7 +1,7 @@
 
 <div  class="block-tagadelic ">
 
-	<form id="advSearchForm" method="get"  title="Search"
+	<form id="advSearchForm" method="get"  title="${g.message(code:'default.search')}"
 		action="${uGroup.createLink(controller:params.controller, action:params.action, userGroup:userGroupInstance) }"
 		class="searchbox">
 		<label class="control-label" for="name"><g:message code="default.title.label" /></label>

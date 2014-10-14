@@ -1,13 +1,13 @@
 <%@ page contentType="text/html"%>
 
-Dear ${contributor},<br />
+Cher ${contributor},<br />
 <br />
-Your species page bulk upload of ${uploadCount} species has been processed. Below is a summary of the upload:<br/><br/>
-New species created with content : ${speciesCreated}<br/>
-Existing species updated : ${speciesUpdated} <br/>
-New species stubs created : ${stubsCreated} <br/><br/>
-You may view your contribution <a href ="${link}" >here</a> .<br />
+Le transfert en masse de page espèce de l'espèce ${uploadCount} a été réalisé. Ci après le résumé de ce chargement:<br/><br/>
+Nouvelle espèce créée avec contenu : ${speciesCreated}<br/>
+Espèce existante mise à jour : ${speciesUpdated} <br/>
+Nouvelle fiche espèce créée : ${stubsCreated} <br/><br/>
+Vous pouvez visualiser votre contribution à <a href ="${link}" >ici</a> .<br />
 <br />
-Thank You,<br />
-The Portal Team
+Merci,<br/>
+L'équipe du portail "
 

@@ -124,21 +124,21 @@
 				</ul>
 				<ul class="nav">
 					<li class=" ${(params.controller == 'species')?'active':''}"><a
-						href="${uGroup.createLink('controller':'species')}" title="<g:message code='default.species.label' />">
+						href="${uGroup.createLink('controller':'species')}" title="${g.message(code:'default.species.label')}">
 							<g:message code="default.species.label" /></a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${uGroup.createLink('controller':'observation')}"
-                                                title="<g:message code='default.observation.label' />"><g:message code="default.observation.label" /></a>
+                                                title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a>
                                             <!--a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a--> 
 </li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
-						href="/map" title="<g:message code='button.maps' />"><g:message code="button.maps" /></a></li>
+						href="/map" title="${g.message(code:'button.maps')}"><g:message code="button.maps" /></a></li>
 						
 					<li
                     	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
                     	href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                        title="<g:message code='button.documents' />"><g:message code="button.documents" /></a></li>	
+                        title="${g.message(code:'button.documents')}"><g:message code="button.documents" /></a></li>	
 <%--					<li--%>
 <%--						class="${(params.controller == 'checklist')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"checklist")}' title="Checklists">Checklists</a></li>--%>
@@ -158,13 +158,13 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="<g:message code='button.discussions' />"><g:message code="button.discussions" /></a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li class="${(params.action == 'pages')?' active':''}"><a
 								href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
-								title="<g:message code='default.pages.label' />"><g:message code="default.pages.label" /></a>
+								title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
 					</li>
 					
 					<li
@@ -177,7 +177,7 @@
 							<li
 								class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 								href="${uGroup.createLink(controller:'user', action:'list')}"
-								title="<g:message code='default.members.label' />"><g:message code="default.members.label" /></a></li>
+								title="${g.message(code:'default.members.label')}"><g:message code="default.members.label" /></a></li>
 <%--							<li--%>
 <%--								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a--%>
 <%--								href="/calendar" title="Events">Events</a></li>--%>
@@ -188,7 +188,7 @@
 							<li
 								class="${(params.controller == 'chart')?' active':''}"><a
 								href="${uGroup.createLink(controller:'chart')}"
-								title="<g:message code='button.dashboard' />"><g:message code="button.dashboard" /></a> </li>
+								title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a> </li>
 						</ul>
 					</li>
 				</ul>

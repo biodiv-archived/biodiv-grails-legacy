@@ -3,7 +3,7 @@
 				<i class=" icon-search"></i><g:message code="button.search.filter" />
 			</h5> </a>
 		<div id="searchBox" class="collapse" style="height: 0px; overflow: hidden;">
-		<g:render template="/document/advSearchForm" />
+		<g:render template="/document/advSearchTemplate" />
 		</div>
 		
 </div>

@@ -23,7 +23,9 @@ import species.utils.Utils;
 import grails.converters.JSON;
 import grails.plugin.springsecurity.annotation.Secured;
 import groovy.text.SimpleTemplateEngine
-
+import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class UserGroupController {
 
 	def springSecurityService;
@@ -268,7 +270,9 @@ class UserGroupController {
 				activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_UPDATED);
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
 				if(params.founders) {
-					flash.message += ". Sent email invitation to ${params.founders} to join as founders"
+					def messagesourcearg = new Object[1];
+                messagesourcearg[0] = params.founders;
+					flash.message += messageSource.getMessage("info.email.join.founders", messagesourcearg, LCH.getLocale())
 				}
 				redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", userGroup:userGroupInstance)
 			}
@@ -502,7 +506,7 @@ class UserGroupController {
 		def msg
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
-			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], LCH.getLocale())
 			render (['success':true,'statusComplete':false, 'msg':msg] as JSON);
 			return;
 		}
@@ -510,19 +514,19 @@ class UserGroupController {
 		def user = springSecurityService.currentUser;
 		if(user) {
 			if(userGroupInstance.isMember(user)) {
-				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], LCH.getLocale())
 				flash.message = msg;
 				render ([success:true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg]as JSON);
 			} else {
 				if(userGroupInstance.addMember(user)) {
-					msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], request.locale)
+					msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], LCH.getLocale())
 					flash.message = msg;
 					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':msg]as JSON);
 					return;
 				}
 			}
 		}
-		msg = messageSource.getMessage("default.not.able.process", null, request.locale)
+		msg = messageSource.getMessage("default.not.able.process", null, LCH.getLocale())
 		flash.error = msg;
 		render ([success:true, 'statusComplete':false, 'shortMsg':'Cannot process now', 'msg':msg]as JSON);
 	} 
@@ -536,23 +540,23 @@ class UserGroupController {
 		if(members) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], LCH.getLocale())
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 
 			int membersCount = members.size();
 			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request), params.message);
-			msg = messageSource.getMessage("default.usergroup.send.invite.success", [members.size()] as Object[], request.locale)
+			msg = messageSource.getMessage("default.usergroup.send.invite.success", [members.size()] as Object[], LCH.getLocale())
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
 
-				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], request.locale)	
+				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], LCH.getLocale())	
 			}
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 			return
 		}
-		msg = messageSource.getMessage("default.provide.details.invite", null, request.locale)
+		msg = messageSource.getMessage("default.provide.details.invite", null, LCH.getLocale())
 		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':msg] as JSON)
 	}
 	
@@ -565,7 +569,7 @@ class UserGroupController {
 		if(members) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], LCH.getLocale())
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
@@ -580,16 +584,16 @@ class UserGroupController {
 			members.removeAll(groupExperts);
 			
 			userGroupService.sendExpertInvitation(userGroupInstance, members, params.message, Utils.getDomainName(request));
-			msg = messageSource.getMessage("default.usergroup.send.invite.success", [members.size()] as Object[], request.locale)			
+			msg = messageSource.getMessage("default.usergroup.send.invite.success", [members.size()] as Object[], LCH.getLocale())			
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
 
-				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], request.locale)
+				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], LCH.getLocale())
 			}
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 			return
 		}
-		msg = messageSource.getMessage("default.provide.details.invite", null, request.locale)
+		msg = messageSource.getMessage("default.provide.details.invite", null, LCH.getLocale())
 		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':msg] as JSON)
 	}
 
@@ -602,13 +606,13 @@ class UserGroupController {
 		if(user) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], LCH.getLocale())
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 
 			if(userGroupInstance.isMember(user)) {
-				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], LCH.getLocale())
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
@@ -616,7 +620,7 @@ class UserGroupController {
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount() as int, 0L);
             founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount() as int, 0L));
-            msg = messageSource.getMessage("default.confirm.membership", null, request.locale)
+            msg = messageSource.getMessage("default.confirm.membership", null, LCH.getLocale())
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
@@ -624,11 +628,11 @@ class UserGroupController {
 				emailConfirmationService.sendConfirmation(founder.email,
 						msg ,  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
-			msg = messageSource.getMessage("default.sent.request.admin", null, request.locale)
+			msg = messageSource.getMessage("default.sent.request.admin", null, LCH.getLocale())
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
 			return;
 		}
-		msg = messageSource.getMessage("default.login.confirm", null, request.locale)
+		msg = messageSource.getMessage("default.login.confirm", null, LCH.getLocale())
 		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':msg] as JSON);
 
 	}
@@ -641,13 +645,13 @@ class UserGroupController {
 		if(user) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], LCH.getLocale())
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 				return;
 			}
 
 			if(userGroupInstance.isExpert(user)) {
-				msg = messageSource.getMessage("default.already.user", ['moderator'] as Object[], request.locale)
+				msg = messageSource.getMessage("default.already.user", ['moderator'] as Object[], LCH.getLocale())
 				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a moderator', 'msg':msg] as JSON);
 				return;
 			}
@@ -655,7 +659,7 @@ class UserGroupController {
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount().toInteger(), 0L);
 			founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount().toInteger(), 0L));
-			msg = messageSource.getMessage("default.confirm.membership", ['moderator'] as Object[], request.locale)
+			msg = messageSource.getMessage("default.confirm.membership", ['moderator'] as Object[], LCH.getLocale())
 			founders.each { founder ->
 				log.debug "Sending email to  founder or expert ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
@@ -663,11 +667,11 @@ class UserGroupController {
 				emailConfirmationService.sendConfirmation(founder.email,
 						msg,  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestModeratorship'], userToken.token);
 			}
-			msg = messageSource.getMessage("default.sent.request.admin", null, request.locale)
+			msg = messageSource.getMessage("default.sent.request.admin", null, LCH.getLocale())
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
 			return;
 		}
-		msg = messageSource.getMessage("default.login.confirm", null, request.locale)
+		msg = messageSource.getMessage("default.login.confirm", null, LCH.getLocale())
 		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':msg] as JSON);
 
 	}
@@ -691,15 +695,15 @@ class UserGroupController {
         switch(role) {
             case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
                 if(ug.isFounder(user)) {
-                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], request.locale)
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], LCH.getLocale())
                     return true
                 }
                 else if (ug.isExpert(user)) {
-                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'moderator'] as Object[], request.locale)
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'moderator'] as Object[], LCH.getLocale())
                     return true
                 }
                 else if( ug.isMember(user)) {
-                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'member'] as Object[], request.locale)
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'member'] as Object[], LCH.getLocale())
                     return true
                 }
                 else {
@@ -708,11 +712,11 @@ class UserGroupController {
                 break;
             case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
                 if(ug.isFounder(user)) {
-                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], request.locale)
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], LCH.getLocale())
                     return true
                 }
                 else if (ug.isExpert(user)) {
-                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'moderator'] as Object[], request.locale)
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'moderator'] as Object[], LCH.getLocale())
                     return true
                 }
                 else {
@@ -721,7 +725,7 @@ class UserGroupController {
                 break;
             case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
                 if(ug.isFounder(user)) {
-                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], request.locale)
+                    flash.message=messageSource.getMessage("default.usergroup.already.label", [user,'founder'] as Object[], LCH.getLocale())
                     return true
                 }
                 else {
@@ -756,7 +760,7 @@ class UserGroupController {
                             break;
                         }
                         if(userGroupInstance.addMember(user)) {
-                            flash.message=messageSource.getMessage("default.addresource.success", [user,'member'] as Object[], request.locale)
+                            flash.message=messageSource.getMessage("default.addresource.success", [user,'member'] as Object[], LCH.getLocale())
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
@@ -765,7 +769,7 @@ class UserGroupController {
                             break;
                         }
                         if(userGroupInstance.addFounder(user)) {
-							flash.message=messageSource.getMessage("default.addresource.success", [user,'founder'] as Object[], request.locale)
+							flash.message=messageSource.getMessage("default.addresource.success", [user,'founder'] as Object[], LCH.getLocale())
 						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value():
@@ -774,7 +778,7 @@ class UserGroupController {
                             break;
                         }
                         if(userGroupInstance.addExpert(user)) {
-							flash.message=messageSource.getMessage("default.addresource.success", [user,'moderator'] as Object[], request.locale)
+							flash.message=messageSource.getMessage("default.addresource.success", [user,'moderator'] as Object[], LCH.getLocale())
 						}
 						break;
 					default: log.error "No proper role type is specified."
@@ -787,14 +791,14 @@ class UserGroupController {
 				}
 			} else {
 				if(user && userGroupInstance) {
-					flash.error=messageSource.getMessage("default.userCouldntaddedToGroup.permission", null, request.locale)				} else {
-					flash.error=messageSource.getMessage("default.userCouldntaddedToGroup.permission", null, request.locale)
+					flash.error=messageSource.getMessage("default.userCouldntaddedToGroup.permission", null, LCH.getLocale())				} else {
+					flash.error=messageSource.getMessage("default.userCouldntaddedToGroup.permission", null, LCH.getLocale())
 				}
 			}
 			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", 'userGroup':userGroupInstance);
 			return
 		}
-		flash.error=messageSource.getMessage("default.userPermission.to.confirmation", null, request.locale)
+		flash.error=messageSource.getMessage("default.userPermission.to.confirmation", null, LCH.getLocale())
 		redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:"list");
 	}
 
@@ -803,7 +807,7 @@ class UserGroupController {
 		def msg;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
-			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], request.locale)
+			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], LCH.getLocale())
 			flash.error = msg
 			render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
 			return;
@@ -812,12 +816,12 @@ class UserGroupController {
 		def user = springSecurityService.currentUser;
 		if(user && userGroupInstance.deleteMember(user)) {
 			activityFeedService.addActivityFeed(userGroupInstance, user, user, activityFeedService.MEMBER_LEFT);
-			msg = messageSource.getMessage("default.thankYouForBeingWithUS", null, request.locale)
+			msg = messageSource.getMessage("default.thankYouForBeingWithUS", null, RCU.getLocale(request))
 			flash.message = msg
 			render (['msg':msg, 'shortMsg':'Thank you', 'success':true, 'statusComplete':true] as JSON);
 			return;
 		}
-		msg = messageSource.getMessage("default.YourPresenceImportant", null, request.locale)
+		msg = messageSource.getMessage("default.YourPresenceImportant", null, LCH.getLocale())
 		flash.error = msg
 		render (['msg':msg, 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
 	}
@@ -839,7 +843,7 @@ class UserGroupController {
 
 		def observationInstance = Observation.get(params.long('id'))
 		if (!observationInstance) {
-			flash.message = messageSource.getMessage("default.Not.Founded", ['Observation',params.id] as Object[], request.locale)
+			flash.message = messageSource.getMessage("default.Not.Founded", ['Observation',params.id] as Object[], LCH.getLocale())
 			return;
 		}
 
@@ -1030,7 +1034,7 @@ class UserGroupController {
 
 		def userInstance = SUser.get(params.long('id'))
 		if (!userInstance) {
-			flash.message = messageSource.getMessage("default.Not.Founded", ['SUser',params.id] as Object[], request.locale)
+			flash.message = messageSource.getMessage("default.Not.Founded", ['SUser',params.id] as Object[], LCH.getLocale())
 			return;
 		}
 

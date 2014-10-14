@@ -19,6 +19,8 @@ import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import species.groups.UserGroup;
 import grails.converters.JSON;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 	
@@ -29,6 +31,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	def openIDAuthenticationFilter;
 	def jcaptchaService;
 	def activityFeedService;
+	def messageSource;
 	//def recaptchaService;	
     //def grailsApplication
 
@@ -139,7 +142,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                     log.debug "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities ";
                     SpringSecurityUtils.doWithAuth(founder.email, {
                         if(userGroupInstance.addMember(user)) {
-                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], request.locale);                            
+                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], LCH.getLocale());                            
                         }
                     });
                 }
@@ -170,7 +173,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		def msg
 		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
-			msg = messageSource.getMessage("login.already", null, request.locale)
+			msg = messageSource.getMessage("login.already", null, LCH.getLocale())
             render(['success':false, 'msg':msg] as JSON) 
 			return;
 		}
@@ -182,7 +185,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
                 errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
             }
-            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], request.locale)
+            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], LCH.getLocale())
             render(['success':false, 'msg':msg] as JSON) 
 			return
 		}
@@ -203,10 +206,10 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
             }
             } else {
-                errors << messageSource.getMessage("user.null", null, request.locale)
+                errors << messageSource.getMessage("user.null", null, LCH.getLocale())
             }
             
-            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], request.locale)
+            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], LCH.getLocale())
             render(['success':false, 'msg':msg] as JSON) 
 			return
 		}
@@ -218,10 +221,10 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         def registrationCode = registerAndEmail user.username, user.email, request, false	
         
 		if (registrationCode == null || registrationCode.hasErrors()) {
-			msg = messageSource.getMessage("register.errors.send.verification.token", [user] as Object[], request.locale)
+			msg = messageSource.getMessage("register.errors.send.verification.token", [user] as Object[], LCH.getLocale())
             render(['success':false, 'msg':msg] as JSON) 
         }
-        msg = messageSource.getMessage("register.success.send.verification.token", [user,user.email] as Object[], request.locale)
+        msg = messageSource.getMessage("register.success.send.verification.token", [user,user.email] as Object[], LCH.getLocale())
         render(['success':true, 'msg':msg] as JSON) 
 	}
 
@@ -306,7 +309,13 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		
 		String url = generateLink('register', 'resetPassword', [t: registrationCode.token], request)
 		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.forgotPassword.emailBody
+		def messagesourcearg = new Object[2];
+                messagesourcearg[0] = username;
+                messagesourcearg[1] = url;
+               
+
+               def body=  messageSource.getMessage("grails.plugin.springsecurity.ui.forgotPassword.emailBody", messagesourcearg, LCH.getLocale())
+		 
 		if (body.contains('$')) {
 			body = evaluate(body, [username: user.name.capitalize(), url: url])
 		}
@@ -314,11 +323,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			mailService.sendMail {
 				to user.email
 				from grailsApplication.config.grails.mail.default.from
-				subject conf.ui.forgotPassword.emailSubject
+				subject messageSource.getMessage("grails.plugin.springsecurity.ui.forgotPassword.emailSubject", null, LCH.getLocale())
 				html body.toString()
 			}
             if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
-            	msg = messageSource.getMessage("register.success.email.nofity", [user.email] as Object[], request.locale)
+            	msg = messageSource.getMessage("register.success.email.nofity", [user.email] as Object[], LCH.getLocale())
                 render (['success':true, 'msg':msg] as JSON);
                 return;
             } else {
@@ -328,7 +337,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             all.printStackTrace();
             if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
 		        log.error all.getMessage()
-		        msg = messageSource.getMessage("register.generating.token",[all.getMessage()]as Object[], request.locale)
+		        msg = messageSource.getMessage("register.generating.token",[all.getMessage()]as Object[], LCH.getLocale())
                 render (['success':false, 'msg':msg] as JSON);
                 return;
             } else {
@@ -426,18 +435,18 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
                 SUser user = SUser.findByEmail(username);
                 sendVerificationMail(user.name, username, url, request)
-                msg = messageSource.getMessage("resend.email.verficiation.code.success", [username] as Object[], request.locale)
+                msg = messageSource.getMessage("resend.email.verficiation.code.success", [username] as Object[], LCH.getLocale())
                 render ([success:true, 'msg':msg] as JSON)
                 return;
             } else {
                 log.error "registration code for ${username} is not present"
-                msg = messageSource.getMessage("resend.email.verficiation.code.fail", [username] as Object[], request.locale)
+                msg = messageSource.getMessage("resend.email.verficiation.code.fail", [username] as Object[], LCH.getLocale())
                 render ([success:false, 'msg':msg] as JSON)
                 return;
             }
         } else {
             log.error "username is null"
-            msg = messageSource.getMessage("registerCommand.email.email.invalid", null, request.locale)
+            msg = messageSource.getMessage("registerCommand.email.email.invalid", null, LCH.getLocale())
             render ([success:false, 'msg':msg] as JSON)
         }
 	}
@@ -445,11 +454,16 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	protected void sendVerificationMail(String username, String email, String url, request)  {
 
 		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.register.emailBody
+		def msgsourcearg = new Object[2];
+            msgsourcearg[1] = username;
+            msgsourcearg[2] = url;
+		def body = messageSource.getMessage("grails.plugin.springsecurity.ui.register.emailBody", msgsourcearg, LCH.getLocale())
 		if (body.contains('$')) {
 			body = evaluate(body, [username: username.capitalize(), url: url])
 		}
-		def sub = conf.ui.register.emailSubject
+		def messagesourcearg = new Object[1];
+                messagesourcearg[0] = domain;
+		def sub = messageSource.getMessage("grails.plugin.springsecurity.ui.register.emailSubject", messagesourcearg, LCH.getLocale())
 		
 		if (sub.contains('$')) {
 			sub = evaluate(sub, [domain: Utils.getDomainName(request)])

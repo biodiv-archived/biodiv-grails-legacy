@@ -68,7 +68,7 @@
                 <span class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></span>
             </div>
             <div class="span8">
-                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></span>
+                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="${g.message(code:'placeholder.add.synonym')}"></span>
             </div>
             </li>
             </g:if>
@@ -89,7 +89,7 @@
                 <span class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></span>
             </div>
             <div class="span8">
-                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></span>
+                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="${g.message(code:'placeholder.add.synonym')}"></span>
             </div>
             </li>
 
@@ -133,7 +133,7 @@ list.sort();
         <div class="span8" style="display:table;">
             <g:each in="${it.value}"  status="i" var ="n">
                 <div class="entry pull-left" style="display:table-row;"> 
-                <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
+                <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="${g.message(code:'title.click.edit')}">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
                 </div>
             </g:each>
         </div>
@@ -148,7 +148,7 @@ list.sort();
                 </div> 
                 <div class="span8" style="display:table;">
                     <div style="display:table-row;"> 
-                        <span class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
+                        <span class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="${g.message(code:'placeholder.add.common')}">  
                             </span>
                     </div>
                 </div>
@@ -170,7 +170,7 @@ list.sort();
         </div> 
         <div class="span8" style="display:table;">
             <div style="display:table-row;"> 
-                <span class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
+                <span class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="${g.message(code:'placeholder.add.common')}">  
                     </span>
             </div>
         </div>

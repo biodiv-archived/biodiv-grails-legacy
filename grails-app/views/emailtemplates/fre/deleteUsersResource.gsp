@@ -1,8 +1,8 @@
 <%@ page contentType="text/html"%>
 
-Dear ${username},<br/><br/>
-The images that you have uploaded to your "My image uploads" area on the India Biodiversity Portal on ${uploadedDate} are due to expire tomorrow. If you do not utilize them these images will be cleared from your upload area on ${toDeleteDate}.<br/>
-You may view your image uploads <a href="${uGroup.createLink(controller:'SUser', action:'myuploads', absolute:true)}">here</a>.
+Cher ${username},<br/><br/>
+Les images que vous avez téléchargées sur votre «Mes images ajouts" "zone" sur le portail Wikwio le ${uploadedDate} arrivent à échéance demain. Si vous n'avez pas utilisé ces images celles-ci seront effacées de votre zone de téléchargement le​​ ${toDeleteDate}.<br/>
+Vous pouvez consulter vos ajouts d'images <a href="${uGroup.createLink(controller:'SUser', action:'myuploads', absolute:true)}">ici</a>.
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+Merci,<br/>
+L'équipe du portail "

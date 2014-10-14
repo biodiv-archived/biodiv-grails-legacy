@@ -37,6 +37,7 @@ import species.auth.SUser;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 import species.participation.ActivityFeedService
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class ActionController {
     
@@ -138,7 +139,7 @@ class ActionController {
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }
                         else {
-                            msg = msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
+                            msg = msg = messageSource.getMessage("default.notHave.permission", null, LCH.getLocale())
                             status = false;
                             r["status"] = status?'success':'error'
                             r['msg'] = msg
@@ -150,7 +151,7 @@ class ActionController {
                         if (ug.isFounder(params.author) || ug.isExpert(params.author)) {
                         }  
                         else {
-                             msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
+                             msg = messageSource.getMessage("default.notHave.permission", null, LCH.getLocale())
                              status = false;
                              r["status"] = status?'success':'error'
                              r['msg'] = msg
@@ -167,14 +168,14 @@ class ActionController {
 		                    if(!obv.save(flush:true)) {
                                 obv.errors.allErrors.each { log.error it }
                             }
-                            if(status) msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
+                            if(status) msg = messageSource.getMessage("default.notHave.permission", null, LCH.getLocale())
                         } 
                         else {
                             if(featuredInstance.author == params.author){
                                 featuredInstance.notes = params.notes
                                 featuredInstance.createdOn = new Date()
                                 status = saveActMail(params, featuredInstance, obv, ug) 
-                                if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes", [obv.class.simpleName] as Object[], request.locale)
+                                if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes", [obv.class.simpleName] as Object[], LCH.getLocale())
                             }
                             else{
                                 try{
@@ -184,7 +185,7 @@ class ActionController {
                                 }
                                 featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
                                 status = saveActMail(params, featuredInstance, obv, ug)
-                                if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes.again", [obv.class.simpleName] as Object[], request.locale)
+                                if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes.again", [obv.class.simpleName] as Object[], LCH.getLocale())
 
                             }
                         }
@@ -243,7 +244,7 @@ class ActionController {
                         if(SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
                         }
                         else {
-                            msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
+                            msg = messageSource.getMessage("default.notHave.permission", null, LCH.getLocale())
                             status =false;
                             r["status"] = status?'success':'error'
                             r['msg'] = msg
@@ -255,7 +256,7 @@ class ActionController {
                         if (ug.isFounder(params.author) || ugroup.isExpert(params.author)) {
                         } 
                         else {
-                             msg = messageSource.getMessage("default.notHave.permission", null, request.locale)
+                             msg = messageSource.getMessage("default.notHave.permission", null, LCH.getLocale())
                              status = false;
                              r["status"] = status?'success':'error'
                              r['msg'] = msg
@@ -281,13 +282,13 @@ class ActionController {
                     utilsService.sendNotificationMail(act.activityType, obv, null, null, act)
                     status = true
                     if(status) {
-                        msg = messageSource.getMessage("default.remove.featured", [obv.class.simpleName] as Object[], request.locale)
+                        msg = messageSource.getMessage("default.remove.featured", [obv.class.simpleName] as Object[], LCH.getLocale())
                     }
                     return
                 }catch (org.springframework.dao.DataIntegrityViolationException e) {
                     status false
                     if(!status){
-                        msg = messageSource.getMessage("default.fetured.error", [obv.class.simpleName] as Object[], request.locale)
+                        msg = messageSource.getMessage("default.fetured.error", [obv.class.simpleName] as Object[], LCH.getLocale())
                     }
                     flash.message = "${message(code: 'featured.delete.error', default: 'Error while unfeaturing')}"
                 }

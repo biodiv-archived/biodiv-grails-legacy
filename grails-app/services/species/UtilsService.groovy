@@ -17,7 +17,8 @@ import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
-
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class UtilsService {
 
     def grailsApplication;
@@ -25,6 +26,7 @@ class UtilsService {
     def sessionFactory
     def mailService;
     def springSecurityService
+    def messageSource;
     //def observationService
  //   def activityFeedService
 
@@ -269,12 +271,12 @@ class UtilsService {
             switch ( notificationType ) {
                 case [OBSERVATION_ADDED, ActivityFeedService.OBSERVATION_UPDATED]:
                 if( notificationType == OBSERVATION_ADDED ) {
-                    mailSubject = conf.ui.addObservation.emailSubject
-                    templateMap["message"] = " added the following observation:"
+                    mailSubject = messageSource.getMessage("mail.obs.added", null, LCH.getLocale())
+                    templateMap["message"] = messageSource.getMessage("mail.add.obs", null, LCH.getLocale())
                 } else {
-                    mailSubject = conf.ui.addObservation.emailSubject
-                    mailSubject = "Observation updated"
-                    templateMap["message"] = " updated the following observation:"
+                    mailSubject = messageSource.getMessage("mail.obs.added", null, LCH.getLocale())
+                    mailSubject = messageSource.getMessage("mail.obs.updated", null, LCH.getLocale())
+                    templateMap["message"] = messageSource.getMessage("mail.following.obs", null, LCH.getLocale())
                 }
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -283,11 +285,15 @@ class UtilsService {
 
                 case [ActivityFeedService.CHECKLIST_CREATED, ActivityFeedService.CHECKLIST_UPDATED]:
                 if( notificationType == ActivityFeedService.CHECKLIST_CREATED ) {
-                    mailSubject = conf.ui.addChecklist.emailSubject
-                    templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
+                    mailSubject = messageSource.getMessage("mail.list.added", null, LCH.getLocale())
+                    def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = templateMap['domain'];
+                    templateMap["message"] = messageSource.getMessage("mail.upload.list", messagesourcearg, LCH.getLocale())+ "<a href=\"${templateMap['obvUrl']}\">"+messageSource.getMessage("msg.here", null, LCH.getLocale())+"</a>"
                 } else {
-                    mailSubject = "Checklist updated"
-                    templateMap["message"] = " updated a checklist on ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
+                    mailSubject = messageSource.getMessage("mail.list.updated", null, LCH.getLocale())
+                    def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = templateMap['domain'];
+                    templateMap["message"] = messageSource.getMessage("mail.update.list", messagesourcearg, LCH.getLocale())+ "<a href=\"${templateMap['obvUrl']}\">"+messageSource.getMessage("msg.here", null, LCH.getLocale())+"</a>"
                 }
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["actionObject"] = "checklist"
@@ -334,32 +340,34 @@ class UtilsService {
                 break
 
                 case OBSERVATION_DELETED :
-                mailSubject = conf.ui.observationDeleted.emailSubject
+                mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.observationDeleted.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
-                templateMap["message"] = " deleted the following observation:"
+                templateMap["message"] = messageSource.getMessage("mail.delete.obs", null, LCH.getLocale())
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
                 break
 
                 case CHECKLIST_DELETED :
-                mailSubject = conf.ui.checklistDeleted.emailSubject
+                mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.checklistDeleted.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
-                templateMap["actionObject"] = "checklist"
-                templateMap["message"] = " deleted a checklist. The URL of the checklist was ${templateMap['obvUrl']}"
+                templateMap["actionObject"] = messageSource.getMessage("default.checklist.label", null, LCH.getLocale())
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = templateMap['obvUrl'];
+                templateMap["message"] = messageSource.getMessage("mail.delete.list", messagesourcearg, LCH.getLocale())
                 toUsers.add(getOwner(obv))
                 break
 
 
                 case SPECIES_RECOMMENDED :
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
-                mailSubject = conf.ui.addRecommendationVote.emailSubject
+                mailSubject = messageSource.getMessage("mail.name.suggest", null, LCH.getLocale())
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
 
                 case SPECIES_AGREED_ON:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
-                mailSubject = conf.ui.addRecommendationVote.emailSubject
+                mailSubject = messageSource.getMessage("mail.name.suggest", null, LCH.getLocale())
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -367,7 +375,7 @@ class UtilsService {
                 case ActivityFeedService.RECOMMENDATION_REMOVED:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                mailSubject = conf.ui.removeRecommendationVote.emailSubject
+                mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.removeRecommendationVote.emailSubject", null, LCH.getLocale())
                 toUsers.addAll(getParticipants(obv))
                 break
 
@@ -385,8 +393,11 @@ class UtilsService {
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
-                mailSubject = "New comment in ${templateMap['domainObjectType']}"
-                templateMap['message'] = " added a comment to the page listed below."
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = templateMap['domainObjectType'];
+
+                mailSubject = messageSource.getMessage("mail.new.comment", messagesourcearg, LCH.getLocale())
+                templateMap['message'] = messageSource.getMessage("mail.added.comment", null, LCH.getLocale())
                 templateMap['discussionUrl'] = generateLink('activityFeed', 'list', [], request)
                 toUsers.addAll(getParticipants(obv))
                 break;
@@ -395,32 +406,42 @@ class UtilsService {
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
-                mailSubject = "Tagged in ${templateMap['domainObjectType']} comment"
-                templateMap['message'] = "has tagged you in a comment on the page listed below."
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = templateMap['domainObjectType'];
+                mailSubject = messageSource.getMessage("mail.tagged.comment", messagesourcearg, LCH.getLocale())
+                templateMap['message'] = messageSource.getMessage("mail.tag.info", null, LCH.getLocale())
                 templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
                 toUsers.addAll(otherParams["taggedUsers"])
                 break;
 
                 case SPECIES_REMOVE_COMMENT:
-                mailSubject = conf.ui.removeComment.emailSubject
+                mailSubject = messageSource.getMessage("mail.comment.remove", null, LCH.getLocale())
                 //bodyView = "/emailtemplates/addObservation"
                 //populateTemplateMap(obv, templateMap)
-                bodyContent = conf.ui.removeComment.emailBody
+               def messagesourcearg = new Object[4];
+                messagesourcearg[0] = username;
+                messagesourcearg[1] = domain;
+                messagesourcearg[2] = obvUrl;
+                messagesourcearg[3] = userProfileUrl;
+
+                bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.removeComment.emailBody", messagesourcearg, LCH.getLocale())
                 toUsers.add(getOwner(obv))
                 break;
 
                 case DOWNLOAD_REQUEST:
-                mailSubject = conf.ui.downloadRequest.emailSubject
+                mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.downloadRequest.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 toUsers.add(getOwner(obv))
                 templateMap['userProfileUrl'] = createHardLink('user', 'show', obv.author.id)
-                templateMap['message'] = conf.ui.downloadRequest.message 
+                templateMap['message'] = messageSource.getMessage("grails.plugin.springsecurity.ui.downloadRequest.message", null, LCH.getLocale())
                 break;
 
                 case ActivityFeedService.DOCUMENT_CREATED:
-                mailSubject = conf.ui.addDocument.emailSubject
+                mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.addDocument.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
-                templateMap["message"] = " uploaded a document to ${domain}. Thank you for your contribution."
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = domain;
+                templateMap["message"] = messageSource.getMessage("mail.upload.doc", messagesourcearg, LCH.getLocale())
                 toUsers.add(getOwner(obv))
                 break
 
@@ -484,19 +505,19 @@ class UtilsService {
                     }
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 if(notificationType == ActivityFeedService.SPECIES_CREATED){
-                    templateMap["message"] = " added the following species:"
+                    templateMap["message"] = messageSource.getMessage("mail.added.species", null, LCH.getLocale())
                 } else {
                     //templateMap['domainObjectType'] = 'species'
                     templateMap['obvUrl'] = generateLink("species", "show", ["id": otherParams['spId']], request)
                     templateMap['obvId'] = otherParams['spId']
-                    templateMap["message"] = " updated the following species with these media:"
+                    templateMap["message"] = messageSource.getMessage("mail.updated.species", null, LCH.getLocale())
                 }
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
 
                 case REMOVE_USERS_RESOURCE:
-                mailSubject = "Attn: Your image uploads are due for deletion"
+                mailSubject = messageSource.getMessage("mail.info.message", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/deleteUsersResource"
                 templateMap["uploadedDate"] = otherParams["uploadedDate"]
                 templateMap["toDeleteDate"] = otherParams["toDeleteDate"]

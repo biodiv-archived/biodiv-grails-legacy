@@ -31,6 +31,7 @@ import species.utils.Utils;
 import grails.plugin.springsecurity.annotation.Secured
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 import species.participation.UserToken;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class SpeciesController extends AbstractObjectController {
 
@@ -153,7 +154,7 @@ class SpeciesController extends AbstractObjectController {
                         //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
                             //flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
                         //} else {
-                            flash.message =  messageSource.getMessage("default.species.success.Create", null, request.locale)
+                            flash.message =  messageSource.getMessage("default.species.success.Create", null, LCH.getLocale())
                             speciesUploadService.postProcessSpecies([speciesInstance]);
                         //}
                         
@@ -165,16 +166,16 @@ class SpeciesController extends AbstractObjectController {
                         redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
                         return;
                     } else {
-                        flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, request.locale) +" "+ result.errors
+                        flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, LCH.getLocale()) +" "+ result.errors
                     }
                 }
                 else {
-                    flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, request.locale) +" "+ result.errors
+                    flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, LCH.getLocale()) +" "+ result.errors
                 }
             } catch(e) {
                 e.printStackTrace();
                 result.errors << e.getMessage();
-                flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, request.locale) +" "+ result.errors
+                flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, LCH.getLocale()) +" "+ result.errors
             }
         }
         render(view: "create", model:result)
@@ -475,7 +476,7 @@ class SpeciesController extends AbstractObjectController {
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         
         if(!(params.name && params.pk)) {
-        	msg=messageSource.getMessage("default.species.error.fieldOrname", null, request.locale)
+        	msg=messageSource.getMessage("default.species.error.fieldOrname", null, LCH.getLocale())
             render ([success:false, msg:msg] as JSON)
             return;
         }
@@ -589,7 +590,7 @@ class SpeciesController extends AbstractObjectController {
                 
                 break;
                 default :
-                msg=messageSource.getMessage("default.species.incorrect.datatype", null, request.locale)
+                msg=messageSource.getMessage("default.species.incorrect.datatype", null, LCH.getLocale())
                 result=['success':false, msg:msg];
             }
  
@@ -632,7 +633,7 @@ class SpeciesController extends AbstractObjectController {
 	def addResource() {
 		def msg;
 		if(!params.id) {
-			msg=messageSource.getMessage("default.species.id.missing", null, request.locale)
+			msg=messageSource.getMessage("default.species.id.missing", null, LCH.getLocale())
 			render ([success:false, errors:[msg:msg]] as JSON)
 			return;
 		}
@@ -642,7 +643,7 @@ class SpeciesController extends AbstractObjectController {
 		def speciesInstance = Species.get(speciesInstanceId);
 
 		if(!speciesInstance) {
-			msg=messageSource.getMessage("default.species.id.notFound", null, request.locale)
+			msg=messageSource.getMessage("default.species.id.notFound", null, LCH.getLocale())
 			render ([success:false, errors:[msg:msg]] as JSON)
 			return;
 		}
@@ -655,7 +656,7 @@ class SpeciesController extends AbstractObjectController {
 				resourcesXML = speciesService.createVideoXML(params);
 			} else {
 				log.error "No resource is given in the parameters"
-				msg=messageSource.getMessage("default.species.no.resource", null, request.locale)
+				msg=messageSource.getMessage("default.species.no.resource", null, LCH.getLocale())
 				render ([success:false, errors:[msg:msg]] as JSON)
 				return;
 			}
@@ -674,7 +675,7 @@ class SpeciesController extends AbstractObjectController {
 					return;
 				} else {
 					speciesInstance.errors.each { log.error it }
-					msg = messageSource.getMessage("default.species.error.message", null, request.locale)
+					msg = messageSource.getMessage("default.species.error.message", null, LCH.getLocale())
 					render ([success:false, errors:[msg:msg]]) as JSON
 					return;
 				}
@@ -682,7 +683,7 @@ class SpeciesController extends AbstractObjectController {
 
 			}
 		} catch(e) {
-			msg = messageSource.getMessage("default.species.error.message.add", null, request.locale)
+			msg = messageSource.getMessage("default.species.error.message.add", null, LCH.getLocale())
 			render ([success:false, errors:[msg:msg]] as JSON)
 		}
 
@@ -853,8 +854,8 @@ class SpeciesController extends AbstractObjectController {
             def msg = speciesPermissionService.sendPermissionRequest(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
-        	def msg = messageSource.getMessage("default.species.error.request", null, request.locale)
-            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,request.locale)] as JSON)
+        	def msg = messageSource.getMessage("default.species.error.request", null, LCH.getLocale())
+            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,LCH.getLocale())] as JSON)
         }
 		return
     }
@@ -885,12 +886,12 @@ class SpeciesController extends AbstractObjectController {
                     conf.delete();
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
-                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)
+                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())
             } else {
-                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)            
+                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())            
             }
         }else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -906,8 +907,8 @@ class SpeciesController extends AbstractObjectController {
             def msg = speciesPermissionService.sendPermissionInvitation(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
-        	def msg = messageSource.getMessage("default.species.error.request", null, request.locale)
-            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,request.locale)] as JSON)
+        	def msg = messageSource.getMessage("default.species.error.request", null, LCH.getLocale())
+            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,LCH.getLocale())] as JSON)
          }
 		return
     } 
@@ -939,13 +940,13 @@ class SpeciesController extends AbstractObjectController {
                 }
 
                 observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
-                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)
+                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())
                 utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
             } else{
-                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)            
+                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())            
             }
         } else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], request.locale)           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -1055,17 +1056,17 @@ class SpeciesController extends AbstractObjectController {
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
                     if(!taxon) {
-                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, request.locale)
+                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, LCH.getLocale())
                         result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
                     } else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
                         def taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
-                        	msg = messageSource.getMessage("default.species.error.already", null, request.locale)
+                        	msg = messageSource.getMessage("default.species.error.already", null, LCH.getLocale())
                             result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         } else {
-                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, request.locale)
+                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, LCH.getLocale())
                             result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         }
                         result['taxonRegistry'] = [:];
@@ -1080,12 +1081,12 @@ class SpeciesController extends AbstractObjectController {
                 }
             } catch(e) {
                 e.printStackTrace();
-                msg = messageSource.getMessage("default.species.error.validate", null, request.locale)
+                msg = messageSource.getMessage("default.species.error.validate", null, LCH.getLocale())
                 result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
             }
 
         } else {
-        	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], request.locale)
+        	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], LCH.getLocale())
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
         render result as JSON
@@ -1105,13 +1106,13 @@ class SpeciesController extends AbstractObjectController {
                 ilike("canonicalForm", page.canonicalForm);
             }
             if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
-            	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], request.locale)
+            	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], LCH.getLocale())
                 result = ['success':false, 'msg':msg]
             } else {
                 result = ['success':true, 'taxon':taxon];        
             }
         } else {
-        	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], request.locale)
+        	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], LCH.getLocale())
             result = ['success':false, 'msg':msg]
         }
         return result;
@@ -1133,7 +1134,7 @@ class SpeciesController extends AbstractObjectController {
             return render(text: [success:true] as JSON, contentType:'text/html')
         } else {
             println "in else================"
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], LCH.getLocale())
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
