@@ -217,5 +217,13 @@ class Checklists extends Observation {
         }
         return results
     }	
-   	
+   
+    def deleteObservation(obv) {
+        this.removeFromObservations(obv);
+        this.speciesCount -= 1;
+        if(!this.save(flush:true)){
+            this.errors.allErrors.each { log.error it } 
+        }
+        return
+    }
 }

@@ -109,8 +109,8 @@ class ChecklistController {
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
-                flash.error = result.msg;//"${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn, latitude:params.latitude, longitude:params.longitude])
+                //flash.error = result.msg;//"${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns.encodeAsJSON(), sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn, latitude:params.latitude, longitude:params.longitude])
             }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))

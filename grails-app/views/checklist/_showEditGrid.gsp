@@ -10,7 +10,6 @@ $(document).ready(function(){
                 $.extend(columns[i], getMediaColumnOptions())
             }
         }
-        console.log(columns);
         loadDataToGrid(data, columns, 'checklist', '${sciNameColumn?:""}', '${commonNameColumn?:""}');
     } else {
     	loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance.id}");
