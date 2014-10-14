@@ -25,6 +25,7 @@ import species.Species
 import species.SpeciesField;
 import species.GeographicEntity;
 import species.TaxonomyDefinition;
+import species.Language;
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
@@ -59,6 +60,7 @@ import species.TaxonomyRegistry
 import species.SpeciesPermission
 import species.groups.SpeciesGroupMapping
 import species.groups.UserGroup
+import org.codehaus.groovy.grails.web.json.JSONObject;
 
 class SpeciesUploadService {
 
@@ -94,87 +96,6 @@ class SpeciesUploadService {
 	 */
 	def loadData() {
 		int noOfInsertions = 0;
-
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Dung_beetle_Species_pages_IBP_v13.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
-		//
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Trees_descriptives_prabha_final_6.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
-
-		//		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Bats/WG_bats_account_01Nov11_sanjayMolur.xls", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/WG_bats_account_01Nov11_sanjayMolurspecies_mapping_v2.xlsx", 0, 0, 0, 0);
-		//
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages";
-		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages/species accounts188_v2.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/speciesaccount188_mapping_v1.xlsx", 0, 0, 0, 0);
-
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone";
-		//		String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone/keystone_mapping_v1.xlsx";
-		//		noOfInsertions += uploadKeyStoneData("jdbc:mysql://localhost:3306/ezpz", "sravanthi", "sra123", mappingFile, 0, 0);
-
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
-		//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
-		//
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
-		//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
-		//
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
-		//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
-		//
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
-		//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
-		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
-
-		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/1.5/photos_bryo/";
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/1.5/abctrust_mosses.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/1.5/abctrust_mosses_mappingfile.xls", 0, 0, 0, 0);
-
-		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ranwa/uploadready/";
-		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ranwa/uploadready/plant_speciesimages.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ranwa/uploadready/plant_speciesimages_mapping.xlsx", 0, 0, 0, 0);
-
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_1.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_mappingfile.xls", 0, 0, 0, 0);
-
-		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/climbers_images";
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers_mapping.xlsx", 0, 0, 0, 0,1);
-
-		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/epi_saprophytes_images";
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/epi_saprophytes.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/epi_saprophytes_mapping.xlsx", 0, 0, 0, 0,1);
-
-		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/herbs_images";
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/herbs.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/herbs_mapping.xlsx", 0, 0, 0, 0,1);
-
-		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/shrubs_images";
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/shrubs.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/shrubs_mapping.xlsx", 0, 0, 0, 0,1);
-
-		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/trees_images";
-		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/trees.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/trees_mapping.xlsx", 0, 0, 0, 0,1);
-
-        //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0";
-        //noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/species accounts188.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/speciesaccount188_mapping.xlsx", 0, 0, 0, 0, 1);
-
-     /*   grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/uploadready/images";
-        noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/uploadready/aparnawatve.xlsx");
-
-        grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/thomas/uploadready/bird_images";
-        noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/thomas/uploadready/BirdsspeciesPages.xlsx");
-
-        grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/odonates.xls";
-        noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/odonates.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/odonates_mapping.xls", 0, 0, 0, 0,1);
-
-
-        grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/associate_plants_of_grasslands_of_Palni_hills";
-        noOfInsertions += speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/associate_plants_of_grasslands_of_palni_hills.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/associate_plants_of_grasslands_of_Palni_hills_mapping.xlsx", 0, 0, 0, 0,-1);
-
-        grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/grasses_of_palni_hills";
-        noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/grasses_of_palni_hills.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/grasses_of_palni_hills_mapping.xlsx", 0, 0, 0, 0,-1);
-*/
-        //noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/thomas/1.6/MammalsspeciesPages.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/thomas/1.6/images");
-
-      //  noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.5/Northeast Butterflies-RG4.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.5/NE_Butterflies_RG4");
-
-
-        noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/indian_molluscs/1.6/indian_molluscs_asr_cr1.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/indian_molluscs/1.6/molluscs_images");
-        noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/indian_molluscs/1.6/indian_molluscs_asr_cr2.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/indian_molluscs/1.6/molluscs_images");
-        noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.6/NortheastButterflies-RG25.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.6/NE_Butterflies_RG25");
-
 		return noOfInsertions;
 	}
 	
@@ -193,7 +114,7 @@ class SpeciesUploadService {
 		
 		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir)
 		
-		return ['msg': 'Bulk upload in progres. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
+		return ['msg': 'Bulk upload in progress. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
 		
 	}
 	
@@ -270,7 +191,6 @@ class SpeciesUploadService {
 		def uploadCount = 0
 		try {
 			log.info "Uploading mapped spreadsheet : "+file;
-			println "Uploading mapped spreadsheet : "+file;
 	
 			List<Species> species = new ArrayList<Species>();
 			converter = new MappedSpreadsheetConverter();
@@ -688,9 +608,9 @@ class SpeciesUploadService {
     ////////////////////////////////Online upload related //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    def List getDataColumns(){
+    def List getDataColumns(Language languageInstance){
     	List columnList = []
-    	Field.findAllByCategoryNotEqual("Catalogue of Life Taxonomy Hierarchy", [sort:"displayOrder", order:"asc"]).each {
+    	Field.findAllByLanguageAndCategoryNotEqual(languageInstance, "Catalogue of Life Taxonomy Hierarchy", [sort:"displayOrder", order:"asc"]).each {
 			def tmpList = []
     		tmpList << it.concept
 			if(it.category)
@@ -708,18 +628,33 @@ class SpeciesUploadService {
         def gData = JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
+
+        //storing current locale language information
+        //this will be available in mappingConfig for each field
+        if(headerMarkers) {
+            println headerMarkers.class;
+            def newHeaders = new JSONObject();
+            headerMarkers.each {
+                println it.class
+                it.value.language = params.locale_language.id.toString();
+                println it
+                newHeaders.put(it.key, it.value);
+            }
+            headerMarkers = newHeaders;
+        }
+
         String fileName = "speciesSpreadsheet"
         String uploadDir = "species"
         def ext = params.xlsxFileUrl.split("\\.")[-1];
-        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
-        println "=========THE SPLITED LIST ================ " + ext
+        log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+        log.debug "=========THE SPLITED LIST ================ " + ext
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
-        println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+        log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
         fileName = fileName + "."+ext;
-        println "===FILE NAME CREATED ================ " + fileName
+        log.debug "===FILE NAME CREATED ================ " + fileName
         File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
-        println "=== NEW MODIFIED SPECIES FILE === " + file
+        log.debug "=== NEW MODIFIED SPECIES FILE === " + file
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
@@ -803,7 +738,6 @@ class SpeciesUploadService {
 				between("uploadTime", start, end)
 			}
 		}
-		
 		if(!sFields && !tRegistries && !resourceList){
 			log.debug "Nothing to rollback"
 			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)

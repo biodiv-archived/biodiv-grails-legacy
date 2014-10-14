@@ -25,7 +25,7 @@
     <g:if test="${commentInstance?.language?.id != userLanguage?.id}">
         <%  
           styleVar = "none"
-          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+commentInstance?.language?.twoLetterCode.toUpperCase()+'</a>';
+          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+commentInstance?.language?.twoLetterCode?.toUpperCase()+'</a>';
         %>
     </g:if>
         

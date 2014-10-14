@@ -31,8 +31,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService extends AbstractSearchService {
 
-    int BATCH_SIZE = 10;
-
+    
     /**
      * 
      */
@@ -42,12 +41,14 @@ class ObservationsSearchService extends AbstractSearchService {
         //TODO: change limit
         int limit = BATCH_SIZE//Observation.count()+1, 
         int offset = 0;
+        int noIndexed = 0;
 
         def observations;
         def startTime = System.currentTimeMillis()
-        while(true) {
+        while(noIndexed < INDEX_DOCS) {
             observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
-            if(!observations) break;
+            noIndexed += observations.size()
+            if(!observations && noIndexed > INDEX_DOCS) break;
             publishSearchIndex(observations, true);
             observations.clear();
             offset += limit;
@@ -82,17 +83,18 @@ class ObservationsSearchService extends AbstractSearchService {
 
     /**
      */
-    private List<SolrInputDocument> getSolrDocument(Observation obv) {
+    public List<SolrInputDocument> getSolrDocument(Observation obv) {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         List docs = [];
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
-            doc.addField(searchFieldsConfig.ID, obv.id.toString());
+            doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
+			doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
             doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
             doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name +" ### "+obv.author.email +" "+obv.author.username+" "+obv.author.id.toString());
 
             doc.addField(searchFieldsConfig.FROM_DATE, obv.fromDate);
             doc.addField(searchFieldsConfig.TO_DATE, obv.toDate);
@@ -124,6 +126,14 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
             doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
             doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
+
+            String memberInfo = ""
+            List allMembers = utilsServiceBean.getParticipants(obv)
+            allMembers.each { mem ->
+                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+            }
+
             //boolean geoPrivacy = false;
             //String locationAccuracy;
             obv.tags.each { tag ->
@@ -152,9 +162,10 @@ class ObservationsSearchService extends AbstractSearchService {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
         def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
+        //distRecoVotes = obv.maxVotedReco;
         distRecoVotes.each { vote ->
             doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name);
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
             if(vote.recommendation.taxonConcept)
                 doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
         }
@@ -175,7 +186,11 @@ class ObservationsSearchService extends AbstractSearchService {
         doc.addField(searchFieldsConfig.SOURCE_TEXT, chk.sourceText);
 
         chk.contributors.each { s ->
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, s.name);
+            String userInfo = ""
+            if(s.user) {
+                userInfo = " ### "+s.user.email+" "+s.user.username+" "+s.user.id.toString()
+            }
+            doc.addField(searchFieldsConfig.CONTRIBUTOR, s.name + userInfo);
         }
         chk.attributions.each { s ->
             doc.addField(searchFieldsConfig.ATTRIBUTION, s.name);
@@ -195,8 +210,10 @@ class ObservationsSearchService extends AbstractSearchService {
         chk.observations.each { row ->
             //addNameToDoc(row, doc)
             def d = getSolrDocument(Observation.read(row.id));
-            d[0].addField(searchFieldsConfig.TITLE, chk.title);
-            docs.addAll(d);
+            if(d) {
+                d[0].addField(searchFieldsConfig.TITLE, chk.title);
+                docs.addAll(d);
+            }
         }
         return docs;
     }

@@ -371,17 +371,6 @@ function initGalleryTabs() {
 
 $.fn.editable.defaults.mode = 'inline';
 
-$.fn.editableform.buttons = '<button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button>'
-
-$.fn.neweditableform_template = '\
-                                <form class="form-horizontal editableform">\
-                                <div class="control-group">\
-                                <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right">'+$.fn.editableform.buttons+'</div></div>\
-                                <div class="editable-error-block"></div>\
-                                </div> \
-                                </form>';
-
-
 function onEditableSuccess(response, newValue) {
     if(!response) {
         return "Unknown error!";
@@ -590,7 +579,7 @@ function onAddableDisplay(value, sourceData, response, context) {
     } else {
         //me.html('Add'); 
     }
-    return 'Successfully added data';
+    return window.i8ln.species.specie.sad;
 }
 
 function onAddableError(response, newValue) {
@@ -932,7 +921,7 @@ $(document).ready(function() {
 
             $('.emptyField').show();
             //$('.hidePoint').show();
-            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>'+window.i8ln.species.specie.eem);
             if($e) rate($e.find('.star_rating'));
         }
 

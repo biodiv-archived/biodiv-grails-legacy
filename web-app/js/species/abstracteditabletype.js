@@ -21,8 +21,8 @@
         },
 
         initButtons : function() {
-            this.$element.find(this.addSelector).before("<a class='addFieldButton btn btn-success pull-left' title='Add'><i class='icon-plus'></i>Add</a>");
-            this.$element.find(this.editSelector).before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+            this.$element.find(this.addSelector).before("<a class='addFieldButton btn btn-success pull-left' title="+window.i8ln.species.specie.adon+"><i class='icon-plus'></i>"+window.i8ln.species.specie.adon+"</a>");
+            this.$element.find(this.editSelector).before("<a class='pull-right deleteFieldButton btn btn-danger' title="+window.i8ln.species.specie.bdel+"><i class='icon-trash'></i>"+window.i8ln.species.specie.bdel+"</a><a class='pull-right editFieldButton btn btn-primary' title="+window.i8ln.species.specie.bedi+"><i class='icon-edit'></i>"+window.i8ln.species.specie.bedi+"</a>");
         },
 
         onEdit : function(e){    
@@ -31,6 +31,7 @@
             var $conEntry = $(e.currentTarget).parent();
             var $container = $conEntry.parent();
             this.initEditableForm($container, $conEntry, $container.data());
+
         },
 
         onAdd : function(e) {    
@@ -70,6 +71,18 @@
             var addMediaHtml = '<a title="Add Media" style="position: relative;top: 54px;margin-right: 5px;right: 233px;" class="pull-right speciesFieldMedia"><i class="icon-picture"></i></a>';
 
             $container.prepend(addMediaHtml);
+
+            $.fn.editableform.buttons = '<button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>'+window.i8ln.species.specie.bsav+'</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>'+window.i8ln.species.specie.bcanc+'</button>'
+
+            $.fn.neweditableform_template = '\
+                                            <form class="form-horizontal editableform">\
+                                            <div class="control-group">\
+                                            <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right">'+$.fn.editableform.buttons+'</div></div>\
+                                            <div class="editable-error-block"></div>\
+                                            </div> \
+                                            </form>';
+
+
             $(".speciesFieldMedia").unbind("click").click(function(){
                 var me = this;
                 var $container = $(me).closest(".speciesField");

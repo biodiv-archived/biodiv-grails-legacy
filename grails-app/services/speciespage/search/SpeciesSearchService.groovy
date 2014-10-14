@@ -22,11 +22,11 @@ import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
+import species.auth.SUser;
 
 class SpeciesSearchService extends AbstractSearchService {
 	
-	int BATCH_SIZE = 20;
-
+	
 	/**
 	 * 
 	 */
@@ -34,12 +34,13 @@ class SpeciesSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to search index"
 		
 		//TODO: change limit
-		int limit=BATCH_SIZE, offset = 0;
+		int limit=BATCH_SIZE, offset = 0, noIndexed = 0;
 		
 		def species;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+		while(noIndexed < INDEX_DOCS) {
 			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
+            noIndexed += species.size();
 			if(!species) break;
 			publishSearchIndex(species);
 			species = null;
@@ -74,7 +75,8 @@ class SpeciesSearchService extends AbstractSearchService {
 		species.each { s ->
 			log.debug "Reading Species : "+s.id;
 			SolrInputDocument doc = new SolrInputDocument();
-			doc.addField(searchFieldsConfig.ID, s.id.toString());
+			doc.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
+			doc.addField(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
 			doc.addField(searchFieldsConfig.GUID, s.guid);
 			addNameToDoc(doc, s.taxonConcept);
 
@@ -114,8 +116,12 @@ class SpeciesSearchService extends AbstractSearchService {
 				String subcategory = field.field.subCategory;
 
 				field.contributors.each { contributor ->
+                    String userInfo = ""
+                    if(contributor.id) {
+                        userInfo = " ### "+contributor.email+" "+contributor.username+" "+contributor.id.toString()
+                    }
 					if(contributor.name)
-						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
+						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
 				field.attributors.each { attribution ->
 					if(attribution.name)
@@ -129,15 +135,54 @@ class SpeciesSearchService extends AbstractSearchService {
 				if(field.description && copyDesc) {
 					message += field.description+" ";
 				}
+                
+                switch(concept) {
+                    case "Overview" :
+						doc.addField(searchFieldsConfig.SP_OVERVIEW, field.description);
+                    break
+
+                    case "Nomenclature and Classification" :
+						doc.addField(searchFieldsConfig.SP_NC, field.description);
+                    break
+
+                    case "Natural History" :
+						doc.addField(searchFieldsConfig.SP_NH, field.description);
+                    break
+
+                    case "Habitat and Distribution" :
+						doc.addField(searchFieldsConfig.SP_HD, field.description);
+                    break
+
+                    case "Demography and Conservation" :
+						doc.addField(searchFieldsConfig.SP_DC, field.description);
+                    break
+
+                    case "Uses and Management" :
+						doc.addField(searchFieldsConfig.SP_UM, field.description);
+                    break
+
+                    case "Information Listing" :
+						doc.addField(searchFieldsConfig.SP_IL, field.description);
+                    break
+
+                    default:
+                    log.info "Not indexing this concept ${concept} separately"
+
+                }
+
 			}
 
 			s.resources.each { resource ->
 
 				doc.addField(resource.type.value().toLowerCase(), resource.description);
 
-				resource.contributors.each { contributor ->
+                resource.contributors.each { contributor ->
+                    String userInfo = ""
+                    if(contributor.user) {
+                        userInfo = " ### "+contributor.user.email+" "+contributor.user.username+" "+contributor.user.id.toString()
+                    }
 					if(contributor.name)
-						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
+						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
 				resource.attributors.each { attributor ->
 					if(attributor.name)
@@ -152,7 +197,19 @@ class SpeciesSearchService extends AbstractSearchService {
 			doc.addField(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
 			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id.longValue());
 			//doc.addField(searchFieldsConfig.HABITAT, s.);
-			
+		    
+            String memberInfo = ""
+            List allMembers = utilsServiceBean.getParticipants(s)
+            allMembers.each { mem ->
+                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+            }
+            
+            s.userGroups.each { userGroup ->
+                doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+                doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+            }
+
 			docs.add(doc);
 		}
 

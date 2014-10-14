@@ -17,7 +17,6 @@
         <g:set var="title" value="${g.message(code:'default.checklist.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="checklist_create"/>
-        <uploader:head />
         <style>
             .upload_file div {
                 display:inline-block;
@@ -82,7 +81,7 @@
                                         <div
                                             class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistColumns', 'error')}">
                                             <label for="checklistColumns" class="control-label"><g:message
-                                                code="checklist.checklistColumns.label" default="Headers" />
+                                                code="checklist.checklistColumns.label"  />
                                             </label>
                                             <div class="controls">
                                                 <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeholder="${g.message(code:'placeholder.create.checklist')}"                                                title="${g.message(code:'checklist.create.enter.column.headers')}"/>
@@ -95,7 +94,7 @@
                                         <div
                                             class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistData', 'error')}">
                                             <label for="checklistData" class="control-label"><g:message
-                                                code="checklist.checklistData.label" default="Data" /></label>
+                                                code="button.data"  /></label>
                                             <div class="controls">
                                                 <input type=textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="${g.message(code:'placeholder.checklist.create')}" title="${g.message(code:'checklist.create.enter.one.line')}" />
                                                 <small class="help-inline"> <g:message code="checklist.create.enter.one.line" /> </small> 
@@ -124,6 +123,9 @@
                                     <div class="controls">
                                         <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"/>
                                         <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"/>
+                                        <input type="hidden" id="latitude" class="markColumn" name="latitude" value=""/>
+                                        <input type="hidden" id="longitude" class="markColumn" name="longitude" value=""/>
+                                        <input type="hidden" id="obvDate" class="markColumn" name="obvDate" value=""/>
                                         <div class="help-inline">
                                             <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
                                             <g:message code="checklist.scientific_name.validator.invalid" />
@@ -244,10 +246,9 @@
             for (var i =0 ; i<10 ; i++ ){
                 rowDataForBlankSheet.push({S_No:"",Scientific_Name:"",Common_Name:""});
             }
-            var columnDataForBlankSheet = [{id: "S_No", name:window.i8ln.species.parseUtil.sno, field:"S_No",editor: Slick.Editors.Text, width:50},
-                {id: "Scientific_Name", name:window.i8ln.species.parseUtil.snu , field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
-                {id: "Common_Name", name:window.i8ln.species.parseUtil.cnu, field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
-
+            var columnDataForBlankSheet = [{id: "S_No", name:"S_No", field:"S_No",editor: Slick.Editors.Text, width:50},
+                {id: "Scientific_Name", name: "Scientific_Name", field: "Scientific_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()},
+                {id: "Common_Name", name: "Common_Name", field: "Common_Name",editor: Slick.Editors.Text,  width:150, header:getHeaderMenuOptions()}
                 ]
 
             columnDataForBlankSheet.push(getMediaColumnOptions());

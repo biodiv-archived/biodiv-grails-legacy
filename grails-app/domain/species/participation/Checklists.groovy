@@ -207,6 +207,23 @@ class Checklists extends Observation {
 	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
    }
 
-	
-   	
+    private List fetchObservationsLatLongs() {
+        def obvs = this.observations
+        List results = []
+        obvs.each { obv ->    
+            if(obv.latitude && obv.longitude) {
+                results.add([obv.id.toString(), obv.latitude.toString(), obv.longitude.toString(), true, false])
+            }
+        }
+        return results
+    }	
+   
+    def deleteObservation(obv) {
+        this.removeFromObservations(obv);
+        this.speciesCount -= 1;
+        if(!this.save(flush:true)){
+            this.errors.allErrors.each { log.error it } 
+        }
+        return
+    }
 }

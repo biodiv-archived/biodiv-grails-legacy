@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import species.Resource;
 import species.Habitat;
 import species.Language;
-import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.Resource.ResourceType;
 import species.auth.SUser;
@@ -72,7 +71,7 @@ import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
-import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
+ 
 
 class ObservationService extends AbstractObjectService {
 
@@ -117,7 +116,6 @@ class ObservationService extends AbstractObjectService {
         observation.group = params.group?:SpeciesGroup.get(params.group_id);
         observation.notes = params.notes;
         if( params.fromDate != ""){
-
             observation.fromDate = parseDate(params.fromDate);
             observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
         }
@@ -368,7 +366,8 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
         } else if(params.filterProperty == "latestUpdatedSpecies") {
             relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
-        } else if(params.filterProperty == 'bulkUploadResources') {
+        } 
+        else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
         
@@ -1681,6 +1680,7 @@ class ObservationService extends AbstractObjectService {
                         def mailType = observationInstance.instanceOf(Checklists) ? utilsService.CHECKLIST_DELETED : utilsService.OBSERVATION_DELETED
                         try {
                             observationInstance.isDeleted = true;
+                            observationInstance.deleteFromChecklist();
                             if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
                                 utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
                                 observationsSearchService.delete(observationInstance.id);
@@ -2128,15 +2128,5 @@ class ObservationService extends AbstractObjectService {
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
-
-
-     // Get Language id
-   Language getCurrentLanguage(request){
-        String langStr = RCU.getLocale(request)
-        def (langtwo, lang1) = langStr.tokenize( '_' );
-        def languageInstance = Language.findByTwoLetterCode(langtwo);
-        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);        
-   }
-
 
 }

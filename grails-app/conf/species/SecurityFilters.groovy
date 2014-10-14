@@ -45,7 +45,7 @@ class SecurityFilters {
 
             after = { model ->
                 //setting user group and permission for view
-                if(model){
+                if(model!=null){
                     def userGroupInstance = model.userGroupInstance
                     def userGroup = model.userGroup
                     if(!userGroupInstance) {
@@ -105,7 +105,7 @@ class SecurityFilters {
                     "'$request.forwardURI', " +
                     " 'at ${new Date()}', 'Ajax: $request.xhr', 'controller: $controllerName', " +
                     "'action: $actionName', 'params: ${params}', " +
-                    "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"'"
+                    "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"',"+
                     "'${end - start}ms'"
 
                     if (log.traceEnabled) {
@@ -128,7 +128,7 @@ class SecurityFilters {
                         log.error "$msg \n\texception: $e.message", e
                     }
                     else {
-                        //log.info msg
+                        log.info msg
                     }
             }
 

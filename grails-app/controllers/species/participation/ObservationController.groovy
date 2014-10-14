@@ -43,7 +43,7 @@ class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
-	def observationService;
+	//def observationService; //injected in AbstractObjectController
 	def springSecurityService;
 	def mailService;
 	def observationsSearchService;
@@ -56,7 +56,7 @@ class ObservationController extends AbstractObjectController {
     def messageSource;
     def commentService;
     def utilsService;
-
+    def setupService;
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -271,7 +271,7 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private saveAndRender(params, sendMail=true){
-		params.locale_language = observationService.getCurrentLanguage(request);
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
         /*if(request.getHeader('X-Auth-Token')) {
             if(!result.success) result.remove('observationInstance');
@@ -340,7 +340,7 @@ class ObservationController extends AbstractObjectController {
 					return
 				}
 				observationInstance.incrementPageVisit()
-				def userLanguage = observationService.getCurrentLanguage(request);   
+				def userLanguage = utilsService.getCurrentLanguage(request);   
                 int pos = params.pos?params.int('pos'):0;
 				def prevNext = getPrevNextObservations(pos, params.webaddress);
 					
@@ -1604,7 +1604,7 @@ class ObservationController extends AbstractObjectController {
         log.debug params;
         if(request.method == 'POST') {
             //TODO:edit also calls here...handle that wrt other domain objects
-            params.locale_language = observationService.getCurrentLanguage(request);
+            params.locale_language = utilsService.getCurrentLanguage(request);
             def result = observationService.saveObservation(params, false)
             if(result.success){
                 forward(action: 'addRecommendationVote', params:params);
@@ -1628,5 +1628,10 @@ class ObservationController extends AbstractObjectController {
         output = ['imageStatus':pi.status];
         render output as JSON
         return;
+    }
+
+    def testy(){
+    	
+	    	setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
     }
 }

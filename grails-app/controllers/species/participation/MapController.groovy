@@ -7,6 +7,7 @@ import java.util.List;
 class MapController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	def mapService;
 
     def index = {
         redirect(action: "show", params: params)
@@ -323,6 +324,5 @@ public def getLayerDetails(){
 public def getLayerAttribution(){
     render mapService.getLayerAttribution(params, response);
 }
-
 
 }

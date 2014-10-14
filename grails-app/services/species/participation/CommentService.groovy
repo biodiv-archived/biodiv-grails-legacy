@@ -3,6 +3,8 @@ package species.participation
 import species.auth.SUser;
 import species.participation.Follow;
 import species.participation.ActivityFeed;
+import org.springframework.web.multipart.MultipartHttpServletRequest
+
 class CommentService {
 
 	static transactional = false
@@ -185,5 +187,6 @@ class CommentService {
 		utilsService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
 
 	}
+
 
 }

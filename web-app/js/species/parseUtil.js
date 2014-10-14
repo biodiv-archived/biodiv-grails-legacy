@@ -203,12 +203,19 @@ function getHeaderMenuOptions() {
                 title: window.i8ln.species.parseUtil.cnm,
                 command: "commonNameColumn"
             }
-            /*,
+            ,
             {
-                iconCssClass: "icon-help",
-                title: "Help",
-                command: "help"
-            }*/
+                title: "Latitude",
+                command: "latitude"
+            },
+            {
+                title: "Longitude",
+                command: "longitude"
+            },
+            {
+                title: "Date",
+                command: "obvDate"
+            }
             ]
         }
     }

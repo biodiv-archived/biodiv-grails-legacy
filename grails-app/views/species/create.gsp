@@ -67,6 +67,7 @@
                             placeholder="${g.message(code:'placeholder.create.add')}" />
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
+                            <input type="hidden" name="lang" value="${lang?:params.lang}"/>
 
                         </div>
                             <div id="errorMsg" class="alert hide"></div>

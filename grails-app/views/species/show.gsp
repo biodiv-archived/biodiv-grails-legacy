@@ -10,12 +10,12 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
-<%@page import="species.participation.ActivityFeedService"%>
 <%@page import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 <%@page import="species.Synonyms"%>
 <%@page import="species.Language"%>
 <%@page import="species.License"%>
 <%@page import="species.SpeciesField"%>
+<%@page import="species.sourcehandler.XMLConverter"%>
 
 <html>
     <head>
@@ -207,6 +207,24 @@
         <g:set var="isSpeciesContributor" value="${Boolean.TRUE}"/>
         </s:isSpeciesContributor>
  
+        <%def converter = new XMLConverter()%>
+        <% 
+        Map fieldFromName = [
+            summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
+            occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
+            references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
+            brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
+            gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
+            gege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage) ,
+            idge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage), 
+            iege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage),
+            tri  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXONRECORDID,1,userLanguage),
+            gui  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER,1,userLanguage),
+            nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
+            md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage)           
+            ]
+        %>
+
         <div class="span12">
             <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor]"/>
 
@@ -230,13 +248,13 @@
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
 
-                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
+                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor, converter:converter, userLanguage:userLanguage]"/>
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
                         <s:hasContent model="['map':concept.value]">
                         <g:if
-                        test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.META_DATA)}">
+                        test="${concept.key.equalsIgnoreCase(fieldFromName.tri) || concept.key.equalsIgnoreCase(fieldFromName.gui) || concept.key.equalsIgnoreCase(fieldFromName.nc) || concept.key.equalsIgnoreCase(fieldFromName.md)}">
                         </g:if>
                         <g:else>
 
@@ -246,7 +264,7 @@
                         <g:else>
                         <li class="nav ui-state-default">
                         </g:else>
-                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor]" />
+                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, converter:converter, 'userLanguage':userLanguage, fieldFromName:fieldFromName]" />
                         </li>
                         <%conceptCounter++%>
                         </g:else>
@@ -254,50 +272,24 @@
                         </g:each>
                     </ul>
                 </div>			
-
                 <g:if test="${!sparse}">
                 <div id="speciesFieldContainer" class="grid_12"></div>
                 </g:if>
 
                 <!-- right side bar -->
                 <div class="span12 classifications" style="margin-left:0px;">
-                    <!--div id="tocContainer" class="sidebar_section">
-                    <div id="toc" class="tile"></div>
-                    </div-->
-                    <!--div id="map" class="sidebar_section">
-                    <h5>Occurrence Map</h5>
-                    <div id="mapSpinner" class="spinner">
-                        <center>
-                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
-                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
-                        </center>
-                    </div>
-
-
-                    <div id="map1311326056727" class="occurenceMap"
-                        style="height: 350px; width: 100%"></div>
-                    <div class="alert alert-info">
-                        <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
-                        The current map showing distribution of species is only indicative.
-                    </div>
-
-                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
-
-                    </div-->
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
                         <h5> <g:message code="button.activity" /> </h5>
                         <div class="union-comment">
                             <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false]" />
+                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                         </div>
                     </div>
 
                 </div>
                 
-
-
             </div>	 
             <script type="text/javascript">
            var licenseSelectorOptions = [];

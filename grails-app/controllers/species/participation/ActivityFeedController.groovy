@@ -14,14 +14,14 @@ class ActivityFeedController {
 	def springSecurityService;
 	def messageSource;
 	def observationService;
+	def utilsService;
 	
 	def getFeeds(){
 		//log.debug params;
 		params.author = springSecurityService.currentUser;
 
 		def feeds = activityFeedService.getActivityFeeds(params);
-		println "===================feeds================"+feeds
-		def userLanguage = observationService.getCurrentLanguage(request);
+		def userLanguage = utilsService.getCurrentLanguage(request);
 		if(!feeds.isEmpty()){
 			if(params.checkFeed){
 				def m = [feedAvailable:true]
