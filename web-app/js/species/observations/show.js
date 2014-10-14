@@ -16,7 +16,7 @@ function showRecos(data, textStatus) {
 
 function lockObv(url, lockType, recoId, obvId, ele) {
     if($(ele).hasClass('disabled')) {
-        alert("This species ID has already been locked!!");
+        alert(window.i8ln.observation.show.lock);
         event.preventDefault();
         return false; 		 		
     }

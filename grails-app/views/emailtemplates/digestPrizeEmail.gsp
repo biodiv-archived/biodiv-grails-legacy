@@ -4,7 +4,7 @@
 
 <html>
     <head>
-        <title>Competitions and Prizes</title>
+        <title><g:message code="msg.Competitions.Prizes" /></title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <style type="text/css">
         </style>
@@ -19,10 +19,10 @@
             </tr>
             <tr>
                 <td>
-                    <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
-                    <p>Due to an issue we experienced with a third party plugin some users were unable to upload observations. To compensate, we have decided to extend the <a href="http://treesindia.indiabiodiversity.org/">Neighborhood Trees Campaign</a> for one more day.The campaign will close at midnight today (28/4/2014) and prize winners and campaign results will be announced <a href="http://treesindia.indiabiodiversity.org/page/56">here</a> shortly. <br><br><a href="http://treesindia.indiabiodiversity.org/">TreesIndia</a> will continue to accept tree observation uploads even after the campaign.<br><br>
-                    Thanks,<br>
-                    The TreesIndia Team</p>
+                    <big style="font-weight: bold;"> <small><g:message code="msg.Dear" /></small> <small>&nbsp;${username},</small></big>
+                    <p><g:message code="msg.issue" /> <a href="http://treesindia.indiabiodiversity.org/"><g:message code="msg.Trees.campaign" /></a><g:message code="msg.campaign.close" /> <a href="http://treesindia.indiabiodiversity.org/page/56"><g:message code="msg.here" /></a> <g:message code="msg.shortly" /> <br><br><a href="http://treesindia.indiabiodiversity.org/"><g:message code="msg.Trees.India" /></a> <g:message code="msg.will.accept" /><br><br>
+                    <g:message code="msg.Thanks" /><br>
+                    <g:message code="msg.Trees.India.Team" /></p>
                 </td>
             </tr>
         </table>

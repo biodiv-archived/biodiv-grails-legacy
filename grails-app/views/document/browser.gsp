@@ -5,7 +5,7 @@
 <%@ page import="species.participation.ActivityFeedService"%>
 <html>
     <head>
-        <g:set var="title" value="Documents"/>
+        <g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="add_file, content_view, activityfeed" />
         <style type="text/css">
@@ -25,7 +25,7 @@
 
             <obv:featured model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
 
-            <h4>Browse Documents</h4>
+            <h4><g:message code="heading.browse.documents" /></h4>
 
             <div class="document-list span8 right-shadow-box" style="margin:0;">
                 <g:render template="/document/search" model="['params':params]" />

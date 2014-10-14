@@ -23,29 +23,27 @@ class AbstractObjectService {
 	def dataSource;
 	def springSecurityService;
 	def sessionFactory;
+    def utilsService;
 
 	protected static final log = LogFactory.getLog(this);
 
     /**
     */
-    protected static List createUrlList2(observations){
+    protected static List createUrlList2(observations) {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
 		def urlList = createUrlList2(observations, iconBasePath)
-//		urlList.each {
-//			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-//		}
 		return urlList
 	}
 
-	protected static List createUrlList2(observations, String iconBasePath){
+	protected static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
             def obv = param['observation'];
 
 			def item = asJSON(obv, iconBasePath) 
             
-            def controller = getTargetController(obv);
+            def controller = UtilsService.getTargetController(obv);
 			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
             item.type = controller
@@ -105,18 +103,6 @@ class AbstractObjectService {
 			}
             return item;
     }
-
-    //XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
-	// to resolve controller name
-	protected static getTargetController(domainObj){
-		if(domainObj.instanceOf(Checklists)){
-			return "checklist"
-		}else if(domainObj.instanceOf(SUser)){
-			return "user"
-		}else{
-			return domainObj.class.getSimpleName().toLowerCase()
-		}
-	}
 	
     /**
     */
@@ -209,7 +195,7 @@ class AbstractObjectService {
         def result = []
         def i = 0;
         observations.each {key,value ->
-            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':getTargetController(key)]);
+            result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':utilsService.getTargetController(key)]);
         }
 		
         return['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
@@ -307,6 +293,7 @@ class AbstractObjectService {
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
+                new Node(image, "language", params.locale_language);
                 //new Node(image, "resContext", resContext.getAt(key));
                 if( params.resourceListType == "ofObv" || params.resourceListType == "usersResource" ){
                     if(!params.author){
@@ -353,6 +340,16 @@ class AbstractObjectService {
         }
         relImagesContext = new File(relImagesContext).getParent();
         return converter.createMedia(resourcesXML, relImagesContext);
+    }
+
+
+    /**
+     * 
+     * @param groupId
+     * @return
+     */
+    Object getSpeciesGroupIds(groupId){
+        return utilsService.getSpeciesGroupIds(groupId);
     }
 
 

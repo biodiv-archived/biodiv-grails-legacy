@@ -16,7 +16,7 @@ class DocumentController extends AbstractObjectController {
 	def userGroupService
 	def SUserService
 	def activityFeedService
-	def observationService
+	def utilsService
 	def documentSearchService
 	def index = {
 		redirect(action: "browser", params: params)
@@ -59,7 +59,7 @@ class DocumentController extends AbstractObjectController {
 					documentService.setUserGroups(documentInstance, userGroups);
 				}
 			}
-			observationService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
+			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
 			redirect(action: "show", id: documentInstance.id)
 		}

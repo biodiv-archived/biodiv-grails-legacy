@@ -518,7 +518,6 @@ environments {
             info   'org.springframework.security'
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
-
             debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
@@ -542,6 +541,7 @@ environments {
             fatal   'jdbc.resultsettable'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+		//debug  'org.springframework.beans'
        }
     }
 	test {
@@ -671,7 +671,7 @@ environments {
 			debug	'species',
 					'speciespage'
 			info 'com.mchange.v2.resourcepool.BasicResourcePool' 
-            debug   'grails.app.filters.species.SecurityFilters'
+           // debug   'grails.app.filters.species.SecurityFilters'
 		}
 	}
 	pambaTest {
@@ -772,18 +772,18 @@ environments {
                     'grails.plugin',
                     'grails.app'
             info   'org.springframework.security'
-            debug   'org.springframework.security.web'
-            debug   'org.springframework.security.authentication'
+           // debug   'org.springframework.security.web'
+           // debug   'org.springframework.security.authentication'
 
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+           // debug   'speciespage',
+                   // 'species'
+          //  debug   'com.the6hours', 
+                  //  'grails.app.taglib.com.the6hours'
+           // debug   'species.auth'
+           // debug   'com.odobo',
+                 //   'grails.app.controllers.com.odobo',
+                   // 'grails.app.services.com.odobo',
+                  //  'org.pac4j'
  
         }
 
@@ -892,7 +892,7 @@ environments {
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
 
-            debug   'speciespage',
+           debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
                     'grails.app.taglib.com.the6hours'

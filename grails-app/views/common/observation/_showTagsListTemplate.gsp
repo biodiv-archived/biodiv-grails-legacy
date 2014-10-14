@@ -10,7 +10,7 @@
 		</ul>
 	</g:if>
 	<g:else>
-		<span class="msg" style="padding-left: 50px;">No tags</span>
+		<span class="msg" style="padding-left: 50px;"><g:message code="link.no.tags" /></span>
 	</g:else>
 	
 <script type="text/javascript">

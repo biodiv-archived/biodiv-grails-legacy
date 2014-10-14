@@ -32,7 +32,7 @@
 
 
         <div class="prop">
-            <span class="name">File</span>
+            <span class="name"><g:message code="default.file.label" /></span>
             <div class="value">
 
                 <fileManager:displayFile
@@ -44,7 +44,7 @@
 
         <g:if test="${documentInstance.uri}">
         <div class="prop">
-            <span class="name">URL</span>
+            <span class="name"><g:message code="default.url.label" /></span>
             <div class="value">
                 <span class="linktext" style="word-wrap: break-word;">
                     ${documentInstance.uri}
@@ -54,7 +54,7 @@
         </g:if>
 
         <div class="prop">
-            <span class="name">Type</span>
+            <span class="name"><g:message code="default.type.label" /></span>
             <div class="value">
                 ${documentInstance.type?.value }
             </div>
@@ -63,7 +63,7 @@
         <g:if
         test="${documentInstance?.notes && documentInstance?.notes.trim() != ''}">
         <div class="prop">
-            <span class="name">Description</span>
+            <span class="name"><g:message code="default.description.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(documentInstance?.notes)}
             </div>
@@ -71,7 +71,7 @@
         </g:if>
         <g:if test="${documentInstance?.contributors}">
         <div class="prop">
-            <span class="name">Contributor(s)</span>
+            <span class="name"><g:message code="default.contributors.label" /></span>
             <div class="value">
                 ${documentInstance?.contributors}
             </div>
@@ -79,7 +79,7 @@
         </g:if>
         <g:if test="${documentInstance?.attribution}">
         <div class="prop">
-            <span class="name">Attribution</span>
+            <span class="name"><g:message code="default.attribution.label" /></span>
             <div class="value">
                 ${documentInstance?.attribution}
             </div>
@@ -87,7 +87,7 @@
         </g:if>
         <g:if test="${documentInstance?.license}">
         <div class="prop">
-            <span class="name">License</span>
+            <span class="name"><g:message code="default.licenses.label" /></span>
 
             <div class="value">
                 <img
@@ -99,7 +99,7 @@
 
         <g:if test="${showDetails && documentInstance?.fetchSource()}">
         <div class="prop">
-            <span class="name">Source</span>
+            <span class="name"><g:message code="default.source.label" /></span>
             <%	
             def sourceObj = documentInstance.fetchSource()
             def className = sourceObj.class.getSimpleName()
@@ -116,7 +116,7 @@
 
         <g:if test="${showDetails && documentInstance?.tags}">
         <div class="prop">
-            <span class="name">Tags</span>
+            <span class="name"><g:message code="default.tags.label" /></span>
 
             <div class="value">
                 <g:render template="/project/showTagsList"

@@ -12,8 +12,8 @@
                 <g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
                 <th title="${cName}">${cName.replaceAll("_", " ")}</th>
                 </g:each>
-                <th title="Observation">Observation</th>
-                <th title="Comments">Comments</th>
+                <th title="${g.message(code:'observation.label')}"><g:message code="default.observation.label" /></th>
+                <th title="${g.message(code:'default.comments.label')}"><g:message code="default.comments.label" /></th>
             </tr>
         </thead>
         <tbody class="mainContentList rowlink" name="p${params?.offset}">
@@ -54,8 +54,8 @@
     <g:if test="${checklistInstance.speciesCount > (params.max?:50)}">
     <div class="centered">
         <div class="btn loadMore">
-            <span class="progress" style="display: none;">Loading ... </span> <span
-                class="buttonTitle">Load more</span>
+            <span class="progress" style="display: none;"><g:message code="msg.loading" /> </span> <span
+                class="buttonTitle"><g:message code="msg.load.more" /></span>
         </div>
     </div>
     </g:if>

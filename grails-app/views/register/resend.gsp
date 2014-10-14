@@ -1,6 +1,6 @@
 <html>
 <head>
-<g:set var="title" value="Email Verification Sent"/>
+<g:set var="title" value="${g.message(code:'register.value.verification')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="auth" />
 </head>
@@ -11,7 +11,7 @@ form {
 </style>
 <body>
 <div class="alert alert-success">
-<i>The Email Verification email has been resent. Please check your mail. </i>
+<i><g:message code="register.resend.verifications.email" /> </i>
 </div>
 
 </body>

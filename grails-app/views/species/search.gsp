@@ -2,7 +2,7 @@
 <%@page import="species.Species"%>
 <html>
 <head>
-<g:set var="title" value="Species"/>
+<g:set var="title" value="${g.message(code:'showobservationstoryfooter.title.species')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="species, species_list" />
 <style>

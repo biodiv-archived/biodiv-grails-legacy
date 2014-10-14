@@ -75,7 +75,7 @@ class NamesIndexerService {
 
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		store(indexStoreDir);
-
+	
 		
 	}
 

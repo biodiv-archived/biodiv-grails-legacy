@@ -8,12 +8,13 @@ import java.lang.*;
 import java.text.SimpleDateFormat;
 import org.codehaus.groovy.runtime.DateGroovyMethods;
 import groovy.sql.Sql;
+import grails.util.Environment;
 import species.groups.UserGroupMemberRole;
 
 class DigestService {
 
+    def utilsService;
     def activityFeedService;
-    def observationService;
     def chartService;
     def dataSource;
 
@@ -51,7 +52,7 @@ class DigestService {
         while(emailFlag){
             List<SUser> usersEmailList = [];
             Digest.withTransaction { status ->
-                usersEmailList = observationService.getParticipantsForDigest(digest.userGroup, max, offset)
+                usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
 
                 if(usersEmailList.size() != 0){
                     sendDigest(digest, usersEmailList, false, digestContent)
@@ -88,7 +89,7 @@ class DigestService {
             }
 
             otherParams['usersEmailList'] = usersEmailList  
-            observationService.sendNotificationMail(observationService.DIGEST_MAIL,sp,null,null,null,otherParams)
+            utilsService.sendNotificationMail(utilsService.DIGEST_MAIL,sp,null,null,null,otherParams)
             
             if(setTime) {
                 if(!digest.save(flush:true))
@@ -297,7 +298,7 @@ log.debug resultSet
         def emailFlag = true
         def userGroup = UserGroup.read(18L)
         while(emailFlag){
-            def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+            def usersEmailList = getParticipantsForDigest(userGroup, max, offset)
             if(usersEmailList.size() != 0){
                 def otherParams = [:]
                 otherParams['userGroup'] = userGroup
@@ -305,7 +306,7 @@ log.debug resultSet
                 def sp = new Species() 
                 println "============================== Sending DIGEST PRIZE Email" 
                 println usersEmailList
-                observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+                utilsService.sendNotificationMail(utilsService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
                 offset = offset + max
                 Thread.sleep(300000L);
             }
@@ -322,7 +323,7 @@ log.debug resultSet
         def emailFlag = true
         def userGroup = UserGroup.read(18L)
         //while(emailFlag){
-        //def usersEmailList = observationService.getParticipantsForDigest(userGroup, max, offset)
+        //def usersEmailList = getParticipantsForDigest(userGroup, max, offset)
         //if(usersEmailList.size() != 0){
         def otherParams = [:]
         otherParams['userGroup'] = userGroup
@@ -330,7 +331,7 @@ log.debug resultSet
         def sp = new Species() 
         println "============================== Sending DIGEST PRIZE Email" 
         println usersEmailList
-        observationService.sendNotificationMail(observationService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
+        utilsService.sendNotificationMail(utilsService.DIGEST_PRIZE_MAIL,sp,null,null,null,otherParams)
         offset = offset + max
         //Thread.sleep(300000L);
         //}
@@ -418,5 +419,21 @@ log.debug resultSet
         //res['users'] = userList
         
         return res
+    }
+
+    def List getParticipantsForDigest(userGroup, max, offset) {
+        List participants = [];
+        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
+
+            result.each { user ->
+                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
+            participants << springSecurityService.currentUser;
+        }
+        return participants;
     }
 }

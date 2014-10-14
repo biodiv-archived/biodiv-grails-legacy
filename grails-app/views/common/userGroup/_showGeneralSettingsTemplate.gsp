@@ -1,14 +1,14 @@
 	<div class="prop">
 		<div class="row control-group left-indent">
 
-			<label class="control-label">Home Page </label>
+			<label class="control-label"><g:message code="default.home.page.label" /> </label>
 			<g:hiddenField name="homePage" />
 			<div class="controls">
 				<div class="btn-group" style="margin-top: 10px;">
 					<button id="homePageSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
-						data-original-title="Home page">
-                                                ${userGroupInstance?.fetchHomePageTitle() ?: 'Select home page '}<span
+						data-original-title="${g.message(code:'ugroup.title.homepage')}">
+                                                ${userGroupInstance?.fetchHomePageTitle() ?: g.message(code:"usergroup.select.home.page") }<span
 							class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
@@ -42,14 +42,14 @@
 	<div class="prop">
 		<div class="row control-group left-indent">
 
-			<label class="control-label">Theme</label>
+			<label class="control-label"><g:message code="default.theme.label" /></label>
 			<g:hiddenField name="theme" />
 			<div class="controls">
 				<div class="btn-group" style="margin-top: 10px;">
 					<button id="themeSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
-						data-original-title="Theme">
-						${userGroupInstance?.theme ?: 'Select theme '}<span class="caret"></span>
+						data-original-title="${g.message(code:'ugroup.title.theme')}">
+						${userGroupInstance?.theme ?: g.message(code:"usergroup.select.theme") }<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
 						<g:each var="theme" in="${userGroupInstance?.getThemes()}">

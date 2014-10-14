@@ -42,7 +42,7 @@ form {
 									default='E-mail *' /> </label>
 							<div class="controls">
 								<input class="input-large focused" id="username" type="text"
-									name="username" placeholder="Enter your email id...">
+									name="username" placeholder="${g.message(code:'placeholder.enter.emailid')}">
 
 							</div>
 						</div>

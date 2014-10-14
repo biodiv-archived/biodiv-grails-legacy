@@ -8,8 +8,9 @@ class CommentService {
 	static transactional = false
 	
 	def grailsApplication
+    def springSecurityService
 	def activityFeedService
-	def observationService
+    def utilsService
 	def userGroupService
 	
 	def addComment(params){
@@ -29,13 +30,14 @@ class CommentService {
 		if(params.commentId){
 			c 	= Comment.findById(params.commentId?.toLong());			
 			c.body 	= params.commentBody.trim();
+			c.language 	=	params.locale_language;
 			c.lastUpdated = new Date();
 			
 		}else{
 			
 			c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 							commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
-							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim());
+							parentId:params.parentId, mainParentId:params.mainParentId, subject:params.commentSubject?.trim(), language:params.locale_language);
 			
 
 			if(params.dateCreated) {
@@ -56,7 +58,7 @@ class CommentService {
 			def feedInstance;
 			if(!params.commentId){				
 				feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
-				observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
+				utilsService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
 			}else{
 				feedInstance = ActivityFeed.findByActivityHolderIdAndActivityHolderType(c.id,c.class.getCanonicalName());
 			}
@@ -163,6 +165,15 @@ class CommentService {
 		params.offset = params.offset ? params.offset.toLong() : 0
 	}
 
+    def addRecoComment(commentHolder, rootHolder, recoComment){
+        recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
+        if(recoComment){
+            def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
+                commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName()]
+                addComment(m);
+        }
+    }
+
 	private userTagNofity(tagUserIds,domainObject,feedInstance,webaddress){
 		def tu =[];			
 		tagUserIds.each(){
@@ -171,7 +182,7 @@ class CommentService {
 			Follow.addFollower(domainObject, tagUser);
 		}			
 		def otherParams = ['taggedUsers' : tu];
-		observationService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
+		utilsService.sendNotificationMail("COMMENT_ADD_USER_TAG", domainObject, null, webaddress, feedInstance,otherParams);
 
 	}
 

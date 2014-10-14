@@ -25,20 +25,19 @@
         <div id="home" class="observation  span12">
 
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
-                <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;">Welcome to ${grailsApplication.config.speciesPortal.app.siteName}</h2>
+                <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;"><g:message code="index.welcome" /> ${grailsApplication.config.speciesPortal.app.siteName}</h2>
                 <p style="line-height:1.5">${grailsApplication.config.speciesPortal.app.homepageDescription}
-                
                 </p>
             </div>
         
             <div class="navblock" style="margin-top:20px;">
-                <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";></div>
-                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"></div>
-                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"></div>
+                <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";><span class="content">Species</span></div>
+                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">Observations</span></div>
+                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">Maps</span></div>
 
-                <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"></div>
-                <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"></div>
-                <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"></div></a>                
+                <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">Documents</span></div>
+                <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"><span class="content">Checklists</span></div>
+                <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"><span class="content">IDAO Tool</span></div></a>                
             </div>
 
         <div id="stats" class="navblock">
@@ -80,7 +79,7 @@
                         <ul style="list-style: none; width: 880px; margin-left: 0px;">
                         </ul>
                         <div class="observation_links" style="margin-top: 5px; margin-bottom: 3px;">
-                            <a class="btn btn-mini" href="/observation/list?sort=lastRevised">Show all</a>
+                            <a class="btn btn-mini" href="/observation/list?sort=lastRevised"><g:message code="button.show.all" /></a>
                         </div>
                     </div>
                 </div>

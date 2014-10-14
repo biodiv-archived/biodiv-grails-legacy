@@ -21,7 +21,7 @@
 <ul class="nav header_userInfo pull-right">
 	<sec:ifNotLoggedIn>
 		<li><a id="loginLink"
-			href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
+			href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><g:message code="button.login" /></a>
 		</li>
 	</sec:ifNotLoggedIn>
 	<sec:ifLoggedIn>
@@ -39,17 +39,17 @@
 
 				<li><a
 					href="${uGroup.createLink(controller:'activityFeed', absolute:'true', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.MY_FEEDS])}"><i
-						class="icon-home"></i>My Feed</a>
+						class="icon-home"></i><g:message code="link.my.feed" /></a>
 				</li>
 
 				<li><a
 					href="${uGroup.createLink(controller:'user', absolute:'true', action:'show', id:sUser.renderCurrentUserId())}"><i
-						class="icon-user"></i>My Profile</a>
+						class="icon-user"></i><g:message code="link.my.profile" /></a>
 				</li>
 
 				<li><a style="margin-right: 5px; display: inline-block;"
 					href="${uGroup.createLink(controller:'observation', absolute:'true', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
-						class="icon-screenshot"></i>My Observations</a> <!-- a class="pull-right" style="display:inline-block;"
+						class="icon-screenshot"></i><g:message code="link.my.observations" /> </a> <!-- a class="pull-right" style="display:inline-block;"
 					href="${uGroup.createLink(controller:'observation', action:'create', absolute:'true')}"><i class="icon-plus"></i>
 				</a-->
 				</li>
@@ -57,11 +57,11 @@
 				<li><a
 					href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list', params:['user':sUser.renderCurrentUserId()])}"
 					title="Groups"><i
-						class="icon-user"></i>My Groups<sup>Beta</sup> </a> <uGroup:getCurrentUserUserGroupsSidebar />
+						class="icon-user"></i><g:message code="link.my.groups" /> <sup><g:message code="msg.beta" /></sup> </a> <uGroup:getCurrentUserUserGroupsSidebar />
 				</li>
 				<li><a id="logout"
 					href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><i
-						class="icon-off"></i>Logout</a></li>
+						class="icon-off"></i><g:message code="button.logout" /></a></li>
 
 			</ul></li>
 
@@ -72,8 +72,8 @@
 <%--<div class="login-box">--%>
 <%--	<div class="register">--%>
 <%--		<sec:ifNotLoggedIn>--%>
-<%--			<g:link controller='login'>Login</g:link> | <g:link--%>
-<%--				controller='register'>Register</g:link>--%>
+<%--			<g:link controller='login'><g:message code="button.login" /></g:link> | <g:link--%>
+<%--				controller='register'><g:message code="button.register" /></g:link>--%>
 <%--		</sec:ifNotLoggedIn>--%>
 <%--	</div>--%>
 <%----%>
@@ -82,7 +82,7 @@
 <%--		</sec:ifLoggedIn> </span>--%>
 <%--	<div class="login-box-options" style="display: none;">--%>
 <%--		<sec:ifLoggedIn>--%>
-<%--			<a id="logout" href="${createLink(controller:'logout')}">Logout</a>--%>
+<%--			<a id="logout" href="${createLink(controller:'logout')}"><g:message code="button.logout" /></a>--%>
 <%--		</sec:ifLoggedIn>--%>
 <%--	</div>--%>
 <%--</div>--%>

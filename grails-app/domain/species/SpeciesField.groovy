@@ -3,7 +3,8 @@ package species
 import org.grails.rateable.*
 import species.auth.SUser
 import species.NamesSorucedata;
-
+import species.Language;
+import org.springframework.context.MessageSourceResolvable;
 class SpeciesField extends NamesSorucedata implements Rateable {
 
 	def activityFeedService
@@ -15,7 +16,7 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 		VALIDATED("Validated");
 		
 		private String value;
-		
+		 
 		Status(String value) {
 			this.value = value;
 		}
