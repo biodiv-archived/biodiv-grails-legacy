@@ -417,7 +417,7 @@ class TaxonController {
                 }
 
                 def classification = params.classification ? Classification.read(params.long('classification')) : null;
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, language);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'create';
 
                 if(result.success) {
@@ -494,14 +494,14 @@ class TaxonController {
                 }
                 
 
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, language);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'update';
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
                     utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                }
+                } 
 
                 render result as JSON
                 return;

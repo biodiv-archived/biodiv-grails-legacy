@@ -257,9 +257,6 @@ class SourceConverter {
 		}
 	}
 	
-	
-	
-	
 
 	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="", Language language="") {
 		log.debug "Creating images ${imageIds}"
@@ -613,10 +610,10 @@ class SourceConverter {
 
                             for(Field field in fields) {
                                 //HACK
-                                if(field.category?.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) fieldsMap.put(field.category, field);
-                                else if(!field.category) fieldsMap.put(field.concept, field);
-                                else if(!field.subCategory) fieldsMap.put(field.category, field);
-                                else fieldsMap.put(field.subCategory, field);
+ //                               if(field.category?.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) fieldsMap.put(field.category, field);
+                                if(field.concept) fieldsMap.put(field.concept, field);
+                                if(field.category) fieldsMap.put(field.category, field);
+                                if(field.subCategory) fieldsMap.put(field.subCategory, field);
 
                                 List t;
                                 if(!connectionMap.get(field.connection)) {
@@ -643,25 +640,22 @@ class SourceConverter {
             }
     }
 
+    String getFieldFromName(String fieldName, int level, String languageName) {
+        return getFieldFromName(fieldName, level, Language.getLanguage(languageName)); 
+    }
+    
     String getFieldFromName(String fieldName, int level, Language language) {
-        println "+++++++++++++"
-        println fieldName
-        println level
-        println language;
+        println "getFieldFromName ${fieldName}"
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
-        println field
         if(field) {
             def t = FieldsMapHolder.getConnectionMap().get(field.connection)
-            println t
             if(language) {
                 t.each {
-                    println language.id +" "+ it.language.id
                     if(it.language.id == language.id) { field = it; return;}
                 }
             } else {
                 field = t[0];
             }
-            println field
             if(level == 1) return field.concept;
             if(level == 2) return field.category;
             if(level == 3) return field.subCategory;

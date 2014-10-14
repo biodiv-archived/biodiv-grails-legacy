@@ -17,8 +17,8 @@ import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import java.beans.Introspector;
+
 class UtilsService {
 
     def grailsApplication;
@@ -795,5 +795,12 @@ class UtilsService {
         }
         return groupId
     }
+
+    def benchmark(String blockName, Closure closure) {
+        def start = System.currentTimeMillis()  
+        closure.call()  
+        def now = System.currentTimeMillis()  
+        log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
+    }  
 }
 

@@ -10,12 +10,12 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
-<%@page import="species.participation.ActivityFeedService"%>
 <%@page import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 <%@page import="species.Synonyms"%>
 <%@page import="species.Language"%>
 <%@page import="species.License"%>
 <%@page import="species.SpeciesField"%>
+<%@page import="species.sourcehandler.XMLConverter"%>
 
 <html>
     <head>
@@ -207,6 +207,25 @@
         <g:set var="isSpeciesContributor" value="${Boolean.TRUE}"/>
         </s:isSpeciesContributor>
  
+        <%def converter = new XMLConverter()%>
+        <% 
+        Map fieldFromName = [
+            summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
+            occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
+            references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
+            brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
+            gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
+            gege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage) ,
+            idge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage), 
+            iege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage),
+            tri  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXONRECORDID,1,userLanguage),
+            gui  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER,1,userLanguage),
+            nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
+            md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
+            acth  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,2,userLanguage)
+            ]
+        %>
+
         <div class="span12">
             <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor]"/>
 
@@ -223,20 +242,20 @@
                     model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
                 </div>
 
-                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName]"/>
                 <div class="span12" style="margin-left:0px">
 
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
 
-                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
+                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor, converter:converter, userLanguage:userLanguage]"/>
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
                         <s:hasContent model="['map':concept.value]">
                         <g:if
-                        test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.META_DATA)}">
+                        test="${concept.key.equalsIgnoreCase(fieldFromName.tri) || concept.key.equalsIgnoreCase(fieldFromName.gui) || concept.key.equalsIgnoreCase(fieldFromName.nc) || concept.key.equalsIgnoreCase(fieldFromName.md)}">
                         </g:if>
                         <g:else>
 
@@ -246,7 +265,7 @@
                         <g:else>
                         <li class="nav ui-state-default">
                         </g:else>
-                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage]" />
+                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage, fieldFromName:fieldFromName]" />
                         </li>
                         <%conceptCounter++%>
                         </g:else>
@@ -254,7 +273,6 @@
                         </g:each>
                     </ul>
                 </div>			
-
                 <g:if test="${!sparse}">
                 <div id="speciesFieldContainer" class="grid_12"></div>
                 </g:if>
@@ -296,8 +314,6 @@
 
                 </div>
                 
-
-
             </div>	 
             <script type="text/javascript">
            var licenseSelectorOptions = [];
