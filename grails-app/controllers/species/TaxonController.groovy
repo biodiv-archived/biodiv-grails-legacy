@@ -25,6 +25,7 @@ class TaxonController {
     def activityFeedService;
     def utilsService;
     def grailsApplication;
+    def messageSource;
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
@@ -417,7 +418,7 @@ class TaxonController {
                 }
 
                 def classification = params.classification ? Classification.read(params.long('classification')) : null;
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, language);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'create';
 
                 if(result.success) {
@@ -485,7 +486,7 @@ class TaxonController {
                         result = taxonService.deleteTaxonHierarchy(reg, true);
                     }
                     if(!result.success) {
-                        msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], request.locale)
+                        msg = messageSource.getMessage("default.error.hierarchy", ['deleting old taxon hierarchy'] as Object[], request.locale)
                         render ([success:false, msg:msg] as JSON)
                         return;
                     }
@@ -494,14 +495,14 @@ class TaxonController {
                 }
                 
 
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, language);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'update';
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
                     utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                }
+                } 
 
                 render result as JSON
                 return;

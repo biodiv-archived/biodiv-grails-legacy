@@ -27,7 +27,7 @@
     <li class="btn-toolbar" style="margin-top:0px;margin-bottom:0px;">
         <div class="btn-group">
             <g:each in="${localeLanguages}" var="localeLanguage">
-                <a class="btn btn-link ${((params?.lang == null && localeLanguage.code == 'en') || (params?.lang == localeLanguage.code))?'disabled':''}" href="#" onclick="setLanguage('${localeLanguage.code}')">${localeLanguage.code}</a>
+                <a class="btn btn-link" href="#" onclick="setLanguage('${localeLanguage.code}')">${localeLanguage.code}</a>
             </g:each>
 
         </div>
