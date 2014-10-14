@@ -40,8 +40,7 @@ import species.utils.Utils
 import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
-
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class UFileController {
 
@@ -235,7 +234,7 @@ class UFileController {
 
         UFile ufile = UFile.get(params.id)
         if (!ufile) {
-            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], LCH.getLocale())
+            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], RCU.getLocale(request))
             log.debug msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -252,7 +251,7 @@ class UFileController {
             response.outputStream << file.readBytes()
             return
         } else {
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], LCH.getLocale())
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -281,7 +280,7 @@ class UFileController {
             return render(text: [success:true] as JSON, contentType:'text/html')
         } else {
             println "in else================"
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], LCH.getLocale())
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction

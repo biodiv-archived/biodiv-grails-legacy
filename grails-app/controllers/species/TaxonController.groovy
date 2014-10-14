@@ -15,7 +15,7 @@ import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class TaxonController {
 
@@ -396,6 +396,9 @@ class TaxonController {
 
         def errors = [], result=[success:false];
         if(params.classification) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             String speciesName;
             Map list = params.taxonRegistry?:[];
             List t = taxonService.getTaxonHierarchyList(list);
@@ -408,13 +411,13 @@ class TaxonController {
             try {
 
                 if(!taxonService.validateHierarchy(t)) {
-                    msg = messageSource.getMessage("default.taxon.mandatory.missing", null, LCH.getLocale())
+                    msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
                     render ([success:false, msg:msg, errors:errors] as JSON)
                     return;
                 }
 
                 def classification = params.classification ? Classification.read(params.long('classification')) : null;
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'create';
 
                 if(result.success) {
@@ -429,16 +432,16 @@ class TaxonController {
            } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], LCH.getLocale())
+                msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
                 render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], LCH.getLocale())
+            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], LCH.getLocale())
-            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], LCH.getLocale())
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
         }
 
@@ -449,6 +452,9 @@ class TaxonController {
         def msg;
         def errors = [], result=[success:false];
         if(params.classification) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             String speciesName;
             Map list = params.taxonRegistry?:[];
             List t = taxonService.getTaxonHierarchyList(list);
@@ -466,7 +472,7 @@ class TaxonController {
                 }
 
                 if(!taxonService.validateHierarchy(t)) {
-                     msg = messageSource.getMessage("default.taxon.mandatory.missing", null, LCH.getLocale())
+                     msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
                     render ([success:false, msg:msg, errors:errors] as JSON)
                     return;
                 }
@@ -479,7 +485,7 @@ class TaxonController {
                         result = taxonService.deleteTaxonHierarchy(reg, true);
                     }
                     if(!result.success) {
-                        msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], LCH.getLocale())
+                        msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))
                         render ([success:false, msg:msg] as JSON)
                         return;
                     }
@@ -488,30 +494,30 @@ class TaxonController {
                 }
                 
 
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'update';
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
                     utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                }
+                } 
 
                 render result as JSON
                 return;
            } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], LCH.getLocale())
+                msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
                 render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], LCH.getLocale())
+            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], LCH.getLocale())
-            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], LCH.getLocale())
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
         }
 
@@ -542,14 +548,14 @@ class TaxonController {
             } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], LCH.getLocale())
+                msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], RCU.getLocale(request))
                 render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
             render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], LCH.getLocale())
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
         }
     }

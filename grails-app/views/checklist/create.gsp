@@ -17,7 +17,6 @@
         <g:set var="title" value="${g.message(code:'default.checklist.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="checklist_create"/>
-        <uploader:head />
         <style>
             .upload_file div {
                 display:inline-block;

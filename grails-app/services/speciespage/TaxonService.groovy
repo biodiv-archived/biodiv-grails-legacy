@@ -14,6 +14,7 @@ import species.sourcehandler.XMLConverter
 import species.auth.SUser;
 import grails.converters.JSON;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import species.Language;
 
 class TaxonService {
 
@@ -777,14 +778,14 @@ class TaxonService {
     *
     */
 
-    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor) {
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language) {
         List errors = [];
         if(!classification) {
             return [success:false, msg:"Not a valid classification ${classification?.name}."]
         }
         
         XMLConverter converter = new XMLConverter();
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor);
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
         List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);
 /*        //check if user has permission to contribute to the taxon hierarchy
         if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {

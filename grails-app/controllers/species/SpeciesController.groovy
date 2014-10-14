@@ -31,7 +31,7 @@ import species.utils.Utils;
 import grails.plugin.springsecurity.annotation.Secured
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 import species.participation.UserToken;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class SpeciesController extends AbstractObjectController {
 
@@ -45,7 +45,7 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    def observationService;
+    //def observationService; //injected in AbstractController
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
     def utilsService;
@@ -108,6 +108,9 @@ class SpeciesController extends AbstractObjectController {
         List errors = [];
         Map result = [errors:errors];
         if(params.page && params.rank) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
@@ -125,7 +128,7 @@ class SpeciesController extends AbstractObjectController {
             //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
 
             try {
-                result = speciesService.createSpecies(speciesName, rank, t);
+                result = speciesService.createSpecies(speciesName, rank, t, languageInstance);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
@@ -151,7 +154,7 @@ class SpeciesController extends AbstractObjectController {
                         //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
                             //flash.message = "Successfully created species. But there was a problem in adding current user as contributor."
                         //} else {
-                            flash.message =  messageSource.getMessage("default.species.success.Create", null, LCH.getLocale())
+                            flash.message =  messageSource.getMessage("default.species.success.Create", null, RCU.getLocale(request))
                             speciesUploadService.postProcessSpecies([speciesInstance]);
                         //}
                         
@@ -163,16 +166,16 @@ class SpeciesController extends AbstractObjectController {
                         redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
                         return;
                     } else {
-                        flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, LCH.getLocale()) +" "+ result.errors
+                        flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
                     }
                 }
                 else {
-                    flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, LCH.getLocale()) +" "+ result.errors
+                    flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
                 }
             } catch(e) {
                 e.printStackTrace();
                 result.errors << e.getMessage();
-                flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, LCH.getLocale()) +" "+ result.errors
+                flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
             }
         }
         render(view: "create", model:result)
@@ -208,6 +211,12 @@ class SpeciesController extends AbstractObjectController {
                     }
                 }
             }
+            
+            if(request.getHeader('X-Auth-Token')) {
+                render speciesInstance as JSON;
+                return;
+            } 
+
             def userLanguage = utilsService.getCurrentLanguage(request);
 			def c = Field.createCriteria();
 			def fields = c.list(){
@@ -217,16 +226,16 @@ class SpeciesController extends AbstractObjectController {
 					 
 					}
 			};
-            if(request.getHeader('X-Auth-Token')) {
-                render speciesInstance as JSON;
-                return;
-            } 
 
-			Map map = getTreeMap(speciesInstance, fields, userLanguage);
+			Map map;
+            
+            utilsService.benchmark('getTreeMap') {
+                map = getTreeMap(speciesInstance, fields, userLanguage);
+            }
 
-            println "=========Map Size========="+map.size();
-
-			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray);
+            utilsService.benchmark('mapSpeciesInstanceFields') {
+			    map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray);
+            }
 
            
 			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
@@ -235,7 +244,7 @@ class SpeciesController extends AbstractObjectController {
 			
 			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage]
 
-            if(springSecurityService.currentUser) {
+             if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
                 result['newSpeciesFieldInstance'] = newSpeciesFieldInstance
             }
@@ -302,6 +311,7 @@ class SpeciesController extends AbstractObjectController {
 		def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
+        utilsService.benchmark('grouping sFields') {
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
             Language lang;
@@ -313,7 +323,6 @@ class SpeciesController extends AbstractObjectController {
 
               //  println "===============finalLoc===================="+finalLoc;
 
-                finalLoc.put("lang", sField.language);
                 if(speciesService.hasContent(sField) || finalLoc.get('hasContent')) {
                     finalLoc.put('hasContent', true);
                 }
@@ -352,6 +361,7 @@ class SpeciesController extends AbstractObjectController {
 					}
 
 				}
+                finalLoc.put("lang", sField.language);
 			}
 			if(finalLoc.containsKey('field')) { 
 				def t = finalLoc.get('speciesFieldInstance');
@@ -360,17 +370,22 @@ class SpeciesController extends AbstractObjectController {
 					finalLoc.put('speciesFieldInstance', t);
 				} 
 				t.add(sField); 
+
                 //TODO:do an insertion sort instead of sorting collection again and again
             //    speciesService.sortAsPerRating(t);
 			}
 		}
+        }
+
+
+        utilsService.benchmark('remove empty info hierarchy') {
         //remove empty information hierarchy
-/*		for(concept in map.clone()) {
+		for(concept in map.clone()) {
             if(concept.value.get('speciesFieldInstance')) {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
 			for(category in concept.value.clone()) {
-				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equalsIgnoreCase('Species Resources'))  {
+				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
 					boolean show = false;
@@ -404,7 +419,7 @@ class SpeciesController extends AbstractObjectController {
 
 
 				for(subCategory in category.value.clone()) {
-					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor")  ) continue;
+					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor") || subCategory.key.equals("lang") ) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
 					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||
@@ -432,11 +447,7 @@ class SpeciesController extends AbstractObjectController {
 				}
 			}
 		}
-*/
-
-
-println "FINAL MAP ========================="
-println map;
+        }
 		return map;
 	}
 
@@ -473,12 +484,11 @@ println map;
     def update() {
     	def msg;
         def userLanguage;
-        println "===========UPDATE STARTED========= "
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         
         if(!(params.name && params.pk)) {
-        	msg=messageSource.getMessage("default.species.error.fieldOrname", null, LCH.getLocale())
+        	msg=messageSource.getMessage("default.species.error.fieldOrname", null, RCU.getLocale(request))
             render ([success:false, msg:msg] as JSON)
             return;
         }
@@ -592,7 +602,7 @@ println map;
                 
                 break;
                 default :
-                msg=messageSource.getMessage("default.species.incorrect.datatype", null, LCH.getLocale())
+                msg=messageSource.getMessage("default.species.incorrect.datatype", null, RCU.getLocale(request))
                 result=['success':false, msg:msg];
             }
  
@@ -635,7 +645,7 @@ println map;
 	def addResource() {
 		def msg;
 		if(!params.id) {
-			msg=messageSource.getMessage("default.species.id.missing", null, LCH.getLocale())
+			msg=messageSource.getMessage("default.species.id.missing", null, RCU.getLocale(request))
 			render ([success:false, errors:[msg:msg]] as JSON)
 			return;
 		}
@@ -645,7 +655,7 @@ println map;
 		def speciesInstance = Species.get(speciesInstanceId);
 
 		if(!speciesInstance) {
-			msg=messageSource.getMessage("default.species.id.notFound", null, LCH.getLocale())
+			msg=messageSource.getMessage("default.species.id.notFound", null, RCU.getLocale(request))
 			render ([success:false, errors:[msg:msg]] as JSON)
 			return;
 		}
@@ -658,7 +668,7 @@ println map;
 				resourcesXML = speciesService.createVideoXML(params);
 			} else {
 				log.error "No resource is given in the parameters"
-				msg=messageSource.getMessage("default.species.no.resource", null, LCH.getLocale())
+				msg=messageSource.getMessage("default.species.no.resource", null, RCU.getLocale(request))
 				render ([success:false, errors:[msg:msg]] as JSON)
 				return;
 			}
@@ -677,7 +687,7 @@ println map;
 					return;
 				} else {
 					speciesInstance.errors.each { log.error it }
-					msg = messageSource.getMessage("default.species.error.message", null, LCH.getLocale())
+					msg = messageSource.getMessage("default.species.error.message", null, RCU.getLocale(request))
 					render ([success:false, errors:[msg:msg]]) as JSON
 					return;
 				}
@@ -685,7 +695,7 @@ println map;
 
 			}
 		} catch(e) {
-			msg = messageSource.getMessage("default.species.error.message.add", null, LCH.getLocale())
+			msg = messageSource.getMessage("default.species.error.message.add", null, RCU.getLocale(request))
 			render ([success:false, errors:[msg:msg]] as JSON)
 		}
 
@@ -817,10 +827,9 @@ println map;
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
-            Language languageInstance = utilsService.getCurrentLanguage(request);
-            params.locale_language = languageInstance;
-            println "+++++++++++++++++++++++++++++++++++++++"
-            println  "Choosen languauge is ${languageInstance}"
+            language languageinstance = utilsservice.getcurrentlanguage(request);
+            params.locale_language = languageinstance;
+            log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			res = speciesUploadService.upload(res.sBulkUploadEntry)
@@ -857,8 +866,8 @@ println map;
             def msg = speciesPermissionService.sendPermissionRequest(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
-        	def msg = messageSource.getMessage("default.species.error.request", null, LCH.getLocale())
-            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,LCH.getLocale())] as JSON)
+        	def msg = messageSource.getMessage("default.species.error.request", null, RCU.getLocale(request))
+            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,RCU.getLocale(request))] as JSON)
         }
 		return
     }
@@ -889,12 +898,12 @@ println map;
                     conf.delete();
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
-                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())
+                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))
             } else {
-                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())            
+                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))            
             }
         }else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -910,8 +919,8 @@ println map;
             def msg = speciesPermissionService.sendPermissionInvitation(selectedNodes, members, Utils.getDomainName(request), params.invitetype, params.message)
             render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
         } else {
-        	def msg = messageSource.getMessage("default.species.error.request", null, LCH.getLocale())
-            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,LCH.getLocale())] as JSON)
+        	def msg = messageSource.getMessage("default.species.error.request", null, RCU.getLocale(request))
+            render (['success':false, 'statusComplete':false, 'shortMsg':msg, 'msg':messageSource.getMessage("default.species.info.selectNode",null,RCU.getLocale(request))] as JSON)
          }
 		return
     } 
@@ -943,13 +952,13 @@ println map;
                 }
 
                 observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
-                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())
+                flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))
                 utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
             } else{
-                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())            
+                flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))            
             }
         } else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], LCH.getLocale())           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -1059,17 +1068,17 @@ println map;
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
                     if(!taxon) {
-                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, LCH.getLocale())
+                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
                         result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
                     } else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
                         def taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
-                        	msg = messageSource.getMessage("default.species.error.already", null, LCH.getLocale())
+                        	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
                             result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         } else {
-                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, LCH.getLocale())
+                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
                             result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         }
                         result['taxonRegistry'] = [:];
@@ -1084,12 +1093,12 @@ println map;
                 }
             } catch(e) {
                 e.printStackTrace();
-                msg = messageSource.getMessage("default.species.error.validate", null, LCH.getLocale())
+                msg = messageSource.getMessage("default.species.error.validate", null, RCU.getLocale(request))
                 result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
             }
 
         } else {
-        	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], LCH.getLocale())
+        	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
         render result as JSON
@@ -1109,13 +1118,13 @@ println map;
                 ilike("canonicalForm", page.canonicalForm);
             }
             if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
-            	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], LCH.getLocale())
+            	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
                 result = ['success':false, 'msg':msg]
             } else {
                 result = ['success':true, 'taxon':taxon];        
             }
         } else {
-        	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], LCH.getLocale())
+        	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg]
         }
         return result;
@@ -1137,7 +1146,7 @@ println map;
             return render(text: [success:true] as JSON, contentType:'text/html')
         } else {
             println "in else================"
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], LCH.getLocale())
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction

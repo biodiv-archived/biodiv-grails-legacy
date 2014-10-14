@@ -1689,6 +1689,7 @@ class ObservationService extends AbstractObjectService {
                         def mailType = observationInstance.instanceOf(Checklists) ? utilsService.CHECKLIST_DELETED : utilsService.OBSERVATION_DELETED
                         try {
                             observationInstance.isDeleted = true;
+                            observationInstance.deleteFromChecklist();
                             if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
                                 utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
                                 observationsSearchService.delete(observationInstance.id);

@@ -38,7 +38,6 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 
         String[] getCodes() {
             
-            
             ["${getClass().name}.${name()}"] as String[]
         }   
 
@@ -70,7 +69,6 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	Object[] getArguments() { [] as Object[] }
 
         String[] getCodes() {
-            
             
             ["${getClass().name}.${name()}"] as String[]
         }   

@@ -103,8 +103,8 @@ class XMLConverter extends SourceConverter {
             Language language;
             //sciName is must for the species to be populated
             Node speciesNameNode = species.field.find {
-                language = fieldNode.language[0].value();
-                it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME, 3, language.id));
+                language = it.language[0].value();
+                it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME, 3, language));
             }
 
             //XXX: sending just the first element need to decide on this if list has multiple elements
@@ -338,7 +338,7 @@ class XMLConverter extends SourceConverter {
             }
         }
 
-        Language language = fieldNode.language[0].value();
+        Language language = field.language;
 
         for(Node dataNode : fieldNode.data) {
             String data = getData(dataNode);
@@ -788,7 +788,6 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
-                    println "=====LICENSE ON NEW RES======== " + l
                     res.addToLicenses(l);
                 }
                 if(!res.save(flush:true)){
@@ -814,8 +813,8 @@ class XMLConverter extends SourceConverter {
                     println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
                     res.addToLicenses(l);
                 }
-                res.merge();
-                res.refresh();
+                //res.merge();
+                //res.refresh();
                 if(!res.save(flush:true)){
                     res.errors.allErrors.each { log.error it }
                 }

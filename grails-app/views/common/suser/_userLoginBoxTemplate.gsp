@@ -4,8 +4,8 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.groups.UserGroup"%>
 <%@ page import="species.participation.ActivityFeedService"%>
+<sec:ifLoggedIn>
 <script>
-	<sec:ifLoggedIn>
 	$(function() {
 		$('.login-box').mouseover(function() {
 			$('.login-box-options').show();
@@ -15,8 +15,8 @@
 			$('.login-box-options').hide();
 		});
 	});
-	</sec:ifLoggedIn>
 </script>
+</sec:ifLoggedIn>
 
 <ul class="nav header_userInfo pull-right">
 	<sec:ifNotLoggedIn>
@@ -68,21 +68,3 @@
 
 	</sec:ifLoggedIn>
 </ul>
-
-<%--<div class="login-box">--%>
-<%--	<div class="register">--%>
-<%--		<sec:ifNotLoggedIn>--%>
-<%--			<g:link controller='login'><g:message code="button.login" /></g:link> | <g:link--%>
-<%--				controller='register'><g:message code="button.register" /></g:link>--%>
-<%--		</sec:ifNotLoggedIn>--%>
-<%--	</div>--%>
-<%----%>
-<%--	<span class='loginLink'> <sec:ifLoggedIn>--%>
-<%--			<sUser:renderProfileLink />--%>
-<%--		</sec:ifLoggedIn> </span>--%>
-<%--	<div class="login-box-options" style="display: none;">--%>
-<%--		<sec:ifLoggedIn>--%>
-<%--			<a id="logout" href="${createLink(controller:'logout')}"><g:message code="button.logout" /></a>--%>
-<%--		</sec:ifLoggedIn>--%>
-<%--	</div>--%>
-<%--</div>--%>

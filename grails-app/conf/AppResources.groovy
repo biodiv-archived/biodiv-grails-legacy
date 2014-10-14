@@ -258,7 +258,7 @@ modules = {
 	
 	slickgrid {
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
-		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
+//		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
 		resource url:'/js/SlickGrid-2.0.2/examples/examples.css'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'
@@ -292,13 +292,8 @@ modules = {
 		resource url:'/js/species/observations/list.js'
     }
 
-    biodiv_fileuploader {
-        resource url:'/js/fileuploader.js'
-        resource url:'/css/uploader.css'
-    }
-
 	checklist_create {
-		dependsOn 'observations_create, checklist, biodiv_fileuploader, slickgrid, add_file'
+		dependsOn 'observations_create, checklist, slickgrid, add_file'
 		
 		resource url:'/js/species/parseUtil.js'
 		resource url:'/js/species/jquery.csv-0.71.min.js'
@@ -316,7 +311,7 @@ modules = {
 	}
 
 	add_file {
-		dependsOn 'core, tagit, list_utils'
+		dependsOn 'core, tagit, list_utils, fileuploader'
 		
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'

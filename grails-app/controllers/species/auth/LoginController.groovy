@@ -21,7 +21,7 @@ import grails.plugin.springsecurity.ui.RegistrationCode;
 import species.utils.Utils;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class LoginController {
 
@@ -149,26 +149,26 @@ class LoginController {
 
 		if (exception) {
 			if (exception instanceof AccountExpiredException) {
-				msg = messageSource.getMessage("springSecurity.errors.login.expired", null, LCH.getLocale())
+				msg = messageSource.getMessage("springSecurity.errors.login.expired", null, RCU.getLocale(request))
 				
 			}
 			else if (exception instanceof CredentialsExpiredException) {
-				msg = messageSource.getMessage("springSecurity.errors.login.passwordExpired", null, LCH.getLocale())
+				msg = messageSource.getMessage("springSecurity.errors.login.passwordExpired", null, RCU.getLocale(request))
 			}
 			else if (exception instanceof DisabledException) {
-				msg = messageSource.getMessage("springSecurity.errors.login.disabled", null, LCH.getLocale())				
+				msg = messageSource.getMessage("springSecurity.errors.login.disabled", null, RCU.getLocale(request))				
 			}
 			else if (exception instanceof LockedException) {
 				//check if the email has been verified and give option to resend the email
 				def registerationCode = RegistrationCode.findAllByUsername(username.decodeHTML()) 
 				if(registerationCode) {
 					def url = Utils.getDomainServerUrl(request) + "/register/resend?email="+username	
-					msg = messageSource.getMessage("email.verified.resend.url", [url] as Object[], LCH.getLocale())
+					msg = messageSource.getMessage("email.verified.resend.url", [url] as Object[], RCU.getLocale(request))
 				}else 
-					msg = messageSource.getMessage("springSecurity.errors.login.locked", null, LCH.getLocale())
+					msg = messageSource.getMessage("springSecurity.errors.login.locked", null, RCU.getLocale(request))
 			}
 			else {
-				msg = messageSource.getMessage("springSecurity.errors.login.fail", null, LCH.getLocale())
+				msg = messageSource.getMessage("springSecurity.errors.login.fail", null, RCU.getLocale(request))
                 msg += " ("+exception.message+")"
 			}
 		}

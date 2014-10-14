@@ -1225,7 +1225,7 @@ class SpeciesService extends AbstractObjectService  {
     /**
     * Create Species given species name and atleast one taxon hierarchy
     */
-    def createSpecies(String speciesName, int rank, List taxonRegistryNames) {
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames, Language language) {
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
@@ -1256,7 +1256,7 @@ class SpeciesService extends AbstractObjectService  {
                 return result
             }
 
-            Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+            Classification classification = Classification.findByName(converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,2,language));
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
                 def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
@@ -1273,7 +1273,7 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             //save taxonomy hierarchy
-            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
             result.taxonRegistry = taxonRegistry;
@@ -1682,7 +1682,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
         }
-        species.refresh();
+        //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
                 if(!resource.save(flush:true)){
@@ -1694,7 +1694,7 @@ class SpeciesService extends AbstractObjectService  {
             }
             species.addToResources(resource);
         }
-        species.merge();
+        //species.merge();
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false

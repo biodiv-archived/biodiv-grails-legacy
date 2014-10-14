@@ -87,7 +87,7 @@ class SourceConverter {
         return data;
     }
 
-    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor) {
+    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language) {
         NodeBuilder builder = NodeBuilder.newInstance();
         List nodes = [];
         names.eachWithIndex { name, index ->
@@ -95,6 +95,7 @@ class SourceConverter {
                 Node field = builder.createNode("field");
                 new Node(field, "category", classification);
                 new Node(field, "subcategory", TaxonomyRank.list()[index].value());
+                new Node(field, "language", language);
 
                 Node data = new Node(field, "data", name);
                 new Node(data, "contributor", contributor.email);
@@ -255,9 +256,6 @@ class SourceConverter {
 			map
 		}
 	}
-	
-	
-	
 	
 
 	protected void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData, String imagesDir="", Language language="") {
@@ -599,30 +597,36 @@ class SourceConverter {
             private static Map<String, Field> fieldsMap = null;
             private static Map<Integer, Field> connectionMap = null;
             
-            private void init() {
+            private static void init() {
                 if (fieldsMap == null || connectionMap == null) {
                     synchronized(Field.class) {
                         if(fieldsMap == null || connectionMap == null) {
                             fieldsMap = new HashMap<String, Field>();
-                            def fields = Field.list(sort:'id')
-                            fields.each { field ->
-                                if(!category) fieldsMap.put(field.concept, field);
-                                else if(!subcategory) fieldsMap.put(field.category, field);
-                                else fieldsMap.put(field.subcategory, field);
+                            connectionMap = new HashMap<Integer, Field>();
+                            def fields = Field.list(sort:'id');
+
+                            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                            def fieldsConfig = config.speciesPortal.fields
+
+                            for(Field field in fields) {
+                                //HACK
+ //                               if(field.category?.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) fieldsMap.put(field.category, field);
+                                if(field.concept) fieldsMap.put(field.concept, field);
+                                if(field.category) fieldsMap.put(field.category, field);
+                                if(field.subCategory) fieldsMap.put(field.subCategory, field);
 
                                 List t;
-                                if(!connectionMap.get(field.displayOrder)) {
+                                if(!connectionMap.get(field.connection)) {
                                     t = [];
-                                    connectionMap.put(field.displayOrder, t);
+                                    connectionMap.put(field.connection, t);
                                 } else {
-                                    t = connectionMap.get(field.displayOrder);
+                                    t = connectionMap.get(field.connection);
                                 }
                                 t << field;
                             }
                         }
                     }
                 }
-
             }
 
             public static Map<String, Field> getFieldsMap() {
@@ -636,21 +640,26 @@ class SourceConverter {
             }
     }
 
+    String getFieldFromName(String fieldName, int level, String languageName) {
+        return getFieldFromName(fieldName, level, Language.getLanguage(languageName)); 
+    }
+    
     String getFieldFromName(String fieldName, int level, Language language) {
+        println "getFieldFromName ${fieldName}"
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
         if(field) {
-            def t = FieldsMapHolder.getConnectionMap().get(field.displayOrder)
+            def t = FieldsMapHolder.getConnectionMap().get(field.connection)
             if(language) {
                 t.each {
-                    if(it.language == language) field = it;
+                    if(it.language.id == language.id) { field = it; return;}
                 }
             } else {
                 field = t[0];
             }
+            if(level == 1) return field.concept;
+            if(level == 2) return field.category;
+            if(level == 3) return field.subCategory;
         }
-        if(level == 1) return field.concept;
-        if(level == 2) return field.category;
-        if(level == 3) return field.subcategory;
         return null;
     }
 }

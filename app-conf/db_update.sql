@@ -207,3 +207,4 @@ alter table facebook_user  add column access_token_expires timestamp without tim
  delete from user_group_member_role  where s_user_id = 4507;
  update user_group_member_role  set s_user_id = 4509 where s_user_id=4507;
 
+insert into classification(id,version,name) values (6,0,'Hiérarchie Taxonomique d''Auteur')

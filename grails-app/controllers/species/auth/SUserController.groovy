@@ -29,7 +29,7 @@ import species.utils.ImageUtils;
 import species.Habitat;
 import species.groups.SpeciesGroup;
 import species.participation.Follow;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class SUserController extends UserController {
 
@@ -137,12 +137,12 @@ class SUserController extends UserController {
         def userLanguage =utilsService.getCurrentLanguage(request);
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
-            	msg = messageSource.getMessage("id.required", ['Id'] as Object[], LCH.getLocale())
+            	msg = messageSource.getMessage("id.required", ['Id'] as Object[], RCU.getLocale(request))
                 render (['success':false, 'msg':msg] as JSON)
                 return
             } else {
                 if (!SUserInstance) {
-                	msg = messageSource.getMessage("default.not.find.by.id", ['user',params.id] as Object[], LCH.getLocale())
+                	msg = messageSource.getMessage("default.not.find.by.id", ['user',params.id] as Object[], RCU.getLocale(request))
                     render (['success':false, 'msg':msg] as JSON)
                     return
                 } else {
@@ -828,7 +828,7 @@ class SUserController extends UserController {
                         def formattedMessage = messageSource.getMessage(it, null);
                         errors << [field: it.field, message: formattedMessage]
                     }
-                    msg = messageSource.getMessage("reset.password.fail", null, LCH.getLocale())
+                    msg = messageSource.getMessage("reset.password.fail", null, RCU.getLocale(request))
                     render (['success' : false, 'msg':msg, 'errors':errors] as JSON); 
                     return
                 } else {
@@ -841,10 +841,10 @@ class SUserController extends UserController {
 				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
 				user.password = command2.password
 				if(!user.save()) {
-					msg = msg = messageSource.getMessage("password.errors.save", null, LCH.getLocale())
+					msg = msg = messageSource.getMessage("password.errors.save", null, RCU.getLocale(request))
 				} else {
                     success = true;
-					msg = messageSource.getMessage("password.update.success", null, LCH.getLocale())
+					msg = messageSource.getMessage("password.update.success", null, RCU.getLocale(request))
                 }
 			}
 
