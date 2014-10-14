@@ -1392,7 +1392,8 @@ class XMLConverter extends SourceConverter {
         for(Node fieldNode : speciesNodes) {
             if(fieldNode.name().equals("field")) {
                 String cat = fieldNode.category?.text()?.trim().toLowerCase();
-                if(cat && cat.equalsIgnoreCase(category)) {
+                Language language = fieldNode.language[0].value();
+                if(cat && (cat.equalsIgnoreCase(category) || cat.equalsIgnoreCase(getFieldFromName(category,2,language))) ) {
                     result.add(fieldNode);
                 }
             }
@@ -1420,7 +1421,7 @@ class XMLConverter extends SourceConverter {
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             Language language = fieldNode.language[0].value();
-            if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, 2, language)) && rank == TaxonomyRank.SPECIES.ordinal()) {
+            if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
                 def cleanSciName = Utils.cleanSciName(scientificName);
                 name = cleanSciName
             } else {
@@ -1556,9 +1557,9 @@ class XMLConverter extends SourceConverter {
     }
 
     TaxonomyDefinition getTaxonConcept(List taxonomyRegistry, Language language = null) {
-        def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromNode(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,2,language)));
+        def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
         if(!taxonConcept) {
-            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromNode(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY,2,language)));
+            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY));
         }
         if(!taxonConcept) {
             taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.GBIF_TAXONOMIC_HIERARCHY));

@@ -107,6 +107,12 @@ alter table field add constraint language_id foreign key (id) references languag
 update field set language_id = 205;
 alter table field alter column language_id set not null;
 
+alter table classification add column language_id bigint;
+alter table classification add constraint language_id foreign key (id) references language(id) match full;
+update classification set language_id = 205;
+alter table classification alter column language_id set not null;
+
+
 
 alter table field add column connection bigint;
 alter table field alter column connection set not null;
