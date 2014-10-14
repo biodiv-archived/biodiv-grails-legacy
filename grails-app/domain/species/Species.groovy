@@ -196,23 +196,23 @@ class Species implements Rateable {
 		return icons;
 	}
 	
-	String notes() {
+	String notes(Language userLanguage) {
         XMLConverter converter = new XMLConverter();
+        String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,1,userLanguage)
+        String overview = converter.getFieldFromName(fieldsConfig.OVERVIEW,1,userLanguage) 
+        String brief = converter.getFieldFromName(fieldsConfig.BRIEF,1,userLanguage)
 
-		def f = this.fields.find { speciesField ->
-			Field field = speciesField.field;
-            String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,1,field.language)
 
-			field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(summary)
-		}
-		if(!f) {
-			f = this.fields.find { speciesField ->
-				Field field = speciesField.field;
-                String overview = converter.getFieldFromName(fieldsConfig.OVERVIEW,1,field.language) 
-                String brief = converter.getFieldFromName(fieldsConfig.BRIEF,1,field.language)
-				field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(brief)
-			}
-		}
+        def f = this.fields.find { speciesField ->
+            Field field = speciesField.field;
+            field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(summary)
+        }
+        if(!f) {
+            f = this.fields.find { speciesField ->
+                Field field = speciesField.field;
+                field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(brief)
+            }
+        }
 		return f?.description;
 	}
 

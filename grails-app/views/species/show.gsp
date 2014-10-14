@@ -22,7 +22,7 @@
     <head>
         <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, base:Utils.getIBPServerDomain()])}"/>
         <g:set var="title" value="${speciesInstance.taxonConcept.name}"/>
-        <g:set var="description" value="${Utils.stripHTML(speciesInstance.notes()?:'')}" />
+        <g:set var="description" value="${Utils.stripHTML(speciesInstance.notes(userLanguage)?:'')}" />
         <%
         def r = speciesInstance.mainImage();
         def imagePath = '';
@@ -244,7 +244,7 @@
                     model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
                 </div>
 
-                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName]"/>
+                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
                 <div class="span12" style="margin-left:0px">
 
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
