@@ -209,7 +209,7 @@ class Species implements Rateable {
 		if(!f) {
 			f = this.fields.find { speciesField ->
 				Field field = speciesField.field;
-                brief = converter.getFieldFromName(fieldsConfig.BRIEF,1,field.language)
+                String brief = converter.getFieldFromName(fieldsConfig.BRIEF,1,field.language)
 				field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(brief)
 			}
 		}
