@@ -22,6 +22,7 @@
 
 
 	<uGroup:showSuggestedUserGroups />
+
     <g:if test="${localeLanguages && !hideLanguages}">
     <li class="btn-toolbar" style="margin-top:0px;margin-bottom:0px;">
         <div class="btn-group">
@@ -33,7 +34,9 @@
     </li>
     </g:if>
 
-    <li><sUser:userLoginBox model="['userGroup':userGroupInstance]" /></li>
+    <li>
+        <g:render template="/common/suser/userLoginBoxTemplate" model="['userGroup':userGroupInstance]" />
+    </li>
 
 
 

@@ -23,7 +23,6 @@
 
     <body>
         <div id="home" class="observation  span12">
-
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
                 <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;"><g:message code="index.welcome" /> ${grailsApplication.config.speciesPortal.app.siteName}</h2>
                 <p style="line-height:1.5">${grailsApplication.config.speciesPortal.app.homepageDescription}
