@@ -11,6 +11,6 @@
 	%>
     <li class="${tmpliclass} activity_post">
     <feed:showActivityFeed
-    model="['feedInstance':feedInstance, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:feedHomeObject]" />
+    model="['feedInstance':feedInstance, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:feedHomeObject, 'userLanguage':userLanguage]" />
     </li>
 </g:each>

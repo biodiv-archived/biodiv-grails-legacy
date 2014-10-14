@@ -12,7 +12,7 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
+<g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():g.message(code:'link.help.identify')}"/>
 
 <%
 def r = observationInstance.mainImage();
@@ -91,11 +91,11 @@ if(r) {
                                                 
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                                    <i class="icon-edit"></i>Edit</a>
+                                                    <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                                                     href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
                                                 
                                                 </sUser:ifOwns>
 
@@ -155,7 +155,7 @@ if(r) {
                                     <%
                                         imageCount += 1
                                     %> 
-                                    <a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
+                                    <a href="${r.url }"><span class="video galleryImage"><g:message code="link.watch.in.youtube" /></span></a>
                                     <g:imageAttribution model="['resource':r]" />
                                 </g:elseif>
                                 <g:elseif test="${r.type == ResourceType.AUDIO}">                                                                    
@@ -182,7 +182,7 @@ if(r) {
 
 
                     <obv:showStory
-                        model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                        model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
                         
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
@@ -191,7 +191,7 @@ if(r) {
 
                             </ul>
                             <div id="seeMoreMessage" class="message"></div>
-                            <div id="seeMore" class="btn btn-mini">Show all</div>
+                            <div id="seeMore" class="btn btn-mini"><g:message code="button.show.all" /></div>
                         </div>
                         <div class="input-append" style="width:100%;">
                             <g:hasErrors bean="${recommendationInstance}">
@@ -214,7 +214,7 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
                                 </div>
                                 
                             </form>
@@ -226,8 +226,8 @@ if(r) {
                     <uGroup:objectPostToGroupsWrapper 
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
                     <div class="union-comment">
-                    <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-                    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
+                    <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
+                    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                     </div>
                 </div>
 
@@ -239,14 +239,14 @@ if(r) {
                                     <!--  static species content -->
 
                                     <div class="sidebar_section">
-                                        <h5>Related observations</h5>
+                                        <h5><g:message code="observation.show.related.observations" /> </h5>
                                         <div class="tile" style="clear: both">
-                                            <div class="title">Other observations of the same species</div>
+                                            <div class="title"><g:message code="observation.show.other.observations" /></div>
                                             <obv:showRelatedStory
                                             model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
                                         </div>
                                         <div class="tile">
-                                            <div class="title">Observations nearby</div>
+                                            <div class="title"><g:message code="text.observations.nearby" /></div>
                                             <obv:showRelatedStory
                                             model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearByRelated', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
                                         </div>
@@ -257,7 +257,7 @@ if(r) {
                                     %>
                                     <g:if test="${annotations?.size() > 0}">
                                     <div class="sidebar_section">
-                                        <h5>Annotations</h5>
+                                        <h5><g:message code="heading.annotations" /></h5>
                                         <div>
                                             <obv:showAnnotation model="[annotations:annotations]" />
                                         </div>
@@ -344,7 +344,7 @@ $(document).ready(function(){
                             });
 
                             this.bind('lightbox_image', function(e){
-                                //$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
+                                //$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'"><g:message code="show.view.full.image" /> </a>');
                             })
 
                         }

@@ -1,4 +1,3 @@
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <%@ page import="species.Species"%>
@@ -14,7 +13,7 @@
     </g:each>
 </select>
 <div class="attributionBlock">
-    <span class="ui-icon-info ui-icon-control " title="Show details"
+    <span class="ui-icon-info ui-icon-control " title="${g.message(code:'title.show.details')}"
         style="position: absolute; top: 0; right: 0; margin: 10px;"></span>
     <div class="ui-corner-all toolbarIconContent attribution"
         style="display: none;">
@@ -29,8 +28,7 @@
 
     </div>
 </div>
-
-<table id="taxonHierarchy" class="emptyField"></table>
+ <table id="taxonHierarchy" class="emptyField"></table>
 
 </g:if>
 <g:else>

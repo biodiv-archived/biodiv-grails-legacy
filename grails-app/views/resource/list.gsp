@@ -11,7 +11,7 @@
 <meta name="layout" content="main" />
 
 <g:set var="entityName"
-	value="${message(code: 'resource.label', default: 'Resources')}" />
+	value="${message(code: 'resource.label')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
 <r:require modules="observations_list,prettyPhoto" />
@@ -32,32 +32,32 @@
 						data-original-title="Sort by">
 
 						<g:if test="${params.sort == 'visitCount'}">
-                                               Most Viewed
+                                              <g:message code="button.most.viewed" />
                                             </g:if>
 						<g:elseif test="${params.sort == 'createdOn'}">
-                                                Latest
+                                                <g:message code="button.latest" />
                                             </g:elseif>
 						<g:elseif test="${params.sort == 'score'}">
-                                                Relevancy
+                                                <g:message code="button.relevancy" />
                                             </g:elseif>
 						<g:else>
-                                                Last Updated
+                                                <g:message code="button.latest" />
                                             </g:else>
 						<span class="caret"></span>
                     </button>
                     </g:if>
 					<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" sort_filter_label"
-							value="createdOn"> Latest </a></li>
+							value="createdOn"> <g:message code="button.latest" /> </a></li>
 						<li class="group_option"><a class=" sort_filter_label"
-							value="lastRevised"> Last Updated </a></li>
+							value="lastRevised"> <g:message code="button.latest" /> </a></li>
 						<g:if test="${isSearch}">
 							<li class="group_option"><a class=" sort_filter_label"
-								value="score"> Relevancy </a></li>
+								value="score"> <g:message code="button.relevancy" /> </a></li>
 						</g:if>
 						<g:else>
 							<li class="group_option"><a class=" sort_filter_label"
-								value="visitCount"> Most Viewed </a></li>
+								value="visitCount"> <g:message code="button.most.viewed" /> </a></li>
 						</g:else>
 					</ul>
 
@@ -132,21 +132,21 @@ $(document).ready(function(){
                         <div class="pp_content"> \
                             <div class="pp_loaderIcon"></div> \
                             <div class="pp_fade"> \
-                                <a href="#" class="pp_expand" title="Expand the image">Expand</a> \
+                                <a href="#" class="pp_expand" title="${g.message(code:'title.expand.image')}"><g:message code="label.expand" /></a> \
                                 <div class="pp_hoverContainer"> \
-                                    <a class="pp_next" href="#">next</a> \
-                                    <a class="pp_previous" href="#">previous</a> \
+                                    <a class="pp_next" href="#"><g:message code="button.next" /></a> \
+                                    <a class="pp_previous" href="#"><g:message code="default.paginate.prev" /></a> \
                                 </div> \
                                 <div id="pp_full_res"></div> \
                                 <div class="pp_details"> \
                                     <div class="pp_nav"> \
-                                        <a href="#" class="pp_arrow_previous">Previous</a> \
+                                        <a href="#" class="pp_arrow_previous"><g:message code="default.paginate.prev" /></a> \
                                         <p class="currentTextHolder">0/0</p> \
-                                        <a href="#" class="pp_arrow_next">Next</a> \
+                                        <a href="#" class="pp_arrow_next"><g:message code="button.next" /></a> \
                                     </div> \
                                     <p class="pp_description"></p> \
                                     <div class="rating pull-right" style="padding-top:7px;"></div> \
-                                    <a class="pp_close" href="#">Close</a> \
+                                    <a class="pp_close" href="#"><g:message code="button.Close" /></a> \
                                 </div> \
                             </div> \
                         </div> \

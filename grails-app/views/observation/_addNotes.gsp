@@ -3,11 +3,11 @@
 
 
 <div class="section" style="position: relative; overflow: visible;">
-    <h3>Additional Information </h3>
+    <h3><g:message code="observation.addnotes.additional.information" /> </h3>
     <div class="span6 block">
         <!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
         <h5><label><i
-                    class="icon-pencil"></i>Notes <small><g:message code="observation.notes.message" default="Description" /></small></label><br />
+                    class="icon-pencil"></i><g:message code="default.notes.label" /> <small><g:message code="observation.notes.message" default="Description" /></small></label><br />
             </h5><div class="section-item" style="margin-right: 10px;">
             <!-- g:textArea name="notes" rows="10" value=""
             class="text ui-corner-all" /-->
@@ -31,10 +31,10 @@
 
     <div class="span6 block sidebar-section" style="margin:0px 0px 20px -10px;">
         <h5><label><i
-                    class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
+                    class="icon-tags"></i><g:message code="default.tags.label" /> <small><g:message code="observation.tags.message" default="" /></small></label>
         </h5>
         <div class="create_tags section-item" style="clear: both;">
-            <ul id="tags" class="obvCreateTags">
+            <ul id="tags" class="obvCreateTags" rel="${g.message(code:'placeholder.add.tags')}">
                 <g:each in="${obvTags}" var="tag">
                 <li>${tag}</li>
                 </g:each>
@@ -49,7 +49,7 @@
         <div class="create_tags" >
             <label class="checkbox" > <g:checkBox style="margin-left:0px;"
                 name="postToFB" />
-                Post to Facebook</label>
+                <g:message code="default.post.facebook.label" /></label>
         </div>
     </div>
     </sUser:isFBUser>

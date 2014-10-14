@@ -8,27 +8,33 @@
 
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
-<title>Taxonomy Browser</title>
+<title><g:message code="taxonbrowser.taxonomy.browser" /></title>
 
 <r:require modules="species_show"/>
 
 </head>
 <body>
+
+
         <div class="span12">
-        <s:showSubmenuTemplate model="['entityName':'Taxonomy Browser']"/>
+        <%
+        def taxonomy_browser="${g.message(code:'taxonbrowser.taxonomy.browser')}"
+        %>
+        <s:showSubmenuTemplate model="['entityName':taxonomy_browser]"/>
 
             <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
-                <h5>Classifications</h5>	
+                <h5><g:message code="button.classifications" /></h5>	
                 <div class="section help-block"> 
                     <ul>
                         <li>
 
-                        Species page content is sourced from researchers and experts who have been authenticated by curators. If you are a researcher and would like to contribute, please expand the taxon browser, select the taxa for which you would like to be a contributor and request permission. Please also follow up by sending an email to  <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> with a brief curriculum vitae (CV) or summary of your expertise so that curators can evaluate your application. You will be able to contribute once you have been allotted create/edit rights for the taxa.
+                        <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
                         </li>
                     </ul>
                 </div>
  
                 <div id="taxaHierarchy">
+
 
                     <%
                     def classifications = [];
@@ -37,9 +43,11 @@
                     }
                     classifications = classifications.sort {return it[1].name};
                     %>
-
+                   
                     <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
-                </div>
+                
+                     
+                    </div>
             </div>
             <g:render template="/species/inviteForContribution"/>
         </div>
@@ -81,13 +89,13 @@
 
             </form>
         </div-->
-
         <script type="text/javascript">
         var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
-            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
-            </g:each>
 
+            
+            taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
+            </g:each>
             </script>	
 
         <r:script>

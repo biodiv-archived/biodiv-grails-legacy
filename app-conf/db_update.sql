@@ -64,6 +64,63 @@ ALTER TABLE document RENAME COLUMN date_created TO created_on;
 ALTER TABLE document RENAME COLUMN last_updated TO last_revised;
 ALTER TABLE document RENAME COLUMN description TO notes;
 
+/** 19th Septembaer 2014 for language */
+ALTER TABLE observation ADD language_id bigint;
+alter table observation add constraint language_id foreign key (id) references language(id) match full;
+update observation set language_id = 205;
+alter table observation alter column language_id set not null;
+
+ALTER TABLE document ADD language_id bigint;
+alter table document add constraint language_id foreign key (id) references language(id) match full;
+update document set language_id = 205;
+alter table document alter column language_id set not null;
+
+ALTER TABLE suser ADD language_id bigint;
+alter table suser add constraint language_id foreign key (id) references language(id) match full;
+update suser set language_id = 205;
+alter table suser alter column language_id set not null;
+
+ALTER TABLE user_group ADD language_id bigint;
+alter table user_group add constraint language_id foreign key (id) references language(id) match full;
+update user_group set language_id = 205;	
+alter table user_group alter column language_id set not null;
+
+ALTER TABLE resource ADD language_id bigint;
+alter table resource add constraint language_id foreign key (id) references language(id) match full;
+update resource set language_id = 205;
+alter table resource alter column language_id set not null;
+
+ALTER TABLE comment ADD language_id bigint;
+alter table comment add constraint language_id foreign key (id) references language(id) match full;
+update comment set language_id = 205;
+alter table comment alter column language_id set not null;
+
+
+
+alter table species_field add column language_id bigint;
+alter table species_field add constraint language_id foreign key (id) references language(id) match full;
+update species_field set language_id = 205;
+ alter table species_field alter column language_id set not null;
+
+alter table field add column language_id bigint;
+alter table field add constraint language_id foreign key (id) references language(id) match full;
+update field set language_id = 205;
+alter table field alter column language_id set not null;
+
+alter table classification add column language_id bigint;
+alter table classification add constraint language_id foreign key (id) references language(id) match full;
+update classification set language_id = 205;
+alter table classification alter column language_id set not null;
+
+
+
+alter table field add column connection bigint;
+alter table field alter column connection set not null;
+
+
+update suser set language_id = 205;
+
+
 /** After updating code */
 update document set geo_privacy = false;
 update document set latitude = 0.0 where latitude is null;
@@ -156,3 +213,4 @@ alter table facebook_user  add column access_token_expires timestamp without tim
  delete from user_group_member_role  where s_user_id = 4507;
  update user_group_member_role  set s_user_id = 4509 where s_user_id=4507;
 
+insert into classification(id,version,name) values (6,0,'Hiérarchie Taxonomique d''Auteur')

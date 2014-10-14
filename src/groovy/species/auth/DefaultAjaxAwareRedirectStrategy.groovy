@@ -39,8 +39,6 @@ class DefaultAjaxAwareRedirectStrategy extends DefaultRedirectStrategy {
 	
 	private String calculateRedirectUrl(String contextPath, String url) {
         
-        println "+++++++++++++++++++++++++++++++++++++++"
-        println url
         url =  java.net.URLDecoder.decode(url, "UTF-8"); 
 		if (!UrlUtils.isAbsoluteUrl(url)) {
 			if (contextRelative) {
@@ -51,7 +49,6 @@ class DefaultAjaxAwareRedirectStrategy extends DefaultRedirectStrategy {
 		}
 
 		// Full URL, including http(s)://
-println contextRelative;
 		if (!contextRelative) {
 			return url;
 		}

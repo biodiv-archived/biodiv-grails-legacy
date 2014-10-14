@@ -407,6 +407,17 @@ speciesPortal {
 		USERNAME = "username"
 		ABOUT_ME = "about_me"
 		LAST_LOGIN = "lastlogindate"
+        SP_OVERVIEW = "sp_overview"
+        SP_NC = "sp_nc"
+        SP_NH = "sp_nh"
+        SP_DC = "sp_dc"
+        SP_IL = "sp_il"
+        SP_HD = "sp_hd"
+        SP_UM = "sp_um"
+        PAGES = "pages"
+        OBJECT_TYPE = "object_type"
+        MEMBERS = "members"
+        DOC_TYPE = "doc_type"
 	}
 
 	nameSearchFields {
@@ -435,6 +446,10 @@ speciesPortal {
 		password = "prharasr"
 		driver   = "org.postgresql.Driver"
 	}
+
+    localeLanguages = [['name':'English','code':'en']]
+    hideLanguages = true
+
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -455,7 +470,7 @@ environments {
         speciesPortal {
 	        app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            names.parser.serverURL = "127.0.0.1"
+            names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false
         grails.resources.debug = false
@@ -518,7 +533,6 @@ environments {
             info   'org.springframework.security'
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
-
             debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
@@ -530,7 +544,8 @@ environments {
                     'org.pac4j'
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
-            debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 
 
             info    'grails.app.filters.species'
@@ -542,6 +557,7 @@ environments {
             fatal   'jdbc.resultsettable'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+		//debug  'org.springframework.beans'
        }
     }
 	test {
@@ -671,7 +687,7 @@ environments {
 			debug	'species',
 					'speciespage'
 			info 'com.mchange.v2.resourcepool.BasicResourcePool' 
-            debug   'grails.app.filters.species.SecurityFilters'
+           // debug   'grails.app.filters.species.SecurityFilters'
 		}
 	}
 	pambaTest {
@@ -772,18 +788,18 @@ environments {
                     'grails.plugin',
                     'grails.app'
             info   'org.springframework.security'
-            debug   'org.springframework.security.web'
-            debug   'org.springframework.security.authentication'
+           // debug   'org.springframework.security.web'
+           // debug   'org.springframework.security.authentication'
 
-            debug   'speciespage',
-                    'species'
-            debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+           // debug   'speciespage',
+                   // 'species'
+          //  debug   'com.the6hours', 
+                  //  'grails.app.taglib.com.the6hours'
+           // debug   'species.auth'
+           // debug   'com.odobo',
+                 //   'grails.app.controllers.com.odobo',
+                   // 'grails.app.services.com.odobo',
+                  //  'org.pac4j'
  
         }
 
@@ -892,7 +908,7 @@ environments {
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
 
-            debug   'speciespage',
+           debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
                     'grails.app.taglib.com.the6hours'
@@ -914,6 +930,8 @@ environments {
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 
        }
 	}
@@ -1025,6 +1043,8 @@ environments {
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
+            debug   'grails.app.services.speciespage'
+            debug   'grails.app.services.species'
 		}
 	}
 }
