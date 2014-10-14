@@ -2,30 +2,30 @@
 <%@page import="java.text.SimpleDateFormat" %>
 
 <div class="control-group">
-    <label class="control-label" for="members">Members</label> 
+    <label class="control-label" for="members">${g.message(code:'default.members.label')}</label> 
     <div class="controls">
         <input id="aq.members"
         data-provide="typeahead" type="text" class="input-block-level"
         name="aq.members" value="${queryParams?queryParams['aq.members']?.encodeAsHTML():''}"
-        placeholder="Search all members" /> 
+        placeholder="${g.message(code:'placeholder.search.members')}" /> 
     </div>
 </div>
 
 
 <div class="control-group">
-    <label class="control-label" for="text">Tags</label> 
+    <label class="control-label" for="text">${g.message(code:'default.tags.label')}</label> 
     <div class="controls">
         <input id="aq.tag"
         data-provide="typeahead" type="text" class="input-block-level"
         name="aq.tag" value="${queryParams?queryParams['aq.tag']?.encodeAsHTML():''}"
-        placeholder="Search all tags" /> 
+        placeholder="${g.message(code:'placeholder.search.members')}" /> 
     </div>
 </div>
 
 
 <div class="control-group">
     <label
-        class="control-label" for="observedOn">Last updated during</label>
+        class="control-label" for="observedOn">${g.message(code:'label.last.update')}</label>
     <div class="controls">
 
         <div id="uploadedOnDatePicker" style="position: relative;overflow:visible">
@@ -40,7 +40,7 @@
 <br/>	
 <div class="control-group">
     <label
-        class="control-label" for="observedOn">Observed during</label>
+        class="control-label" for="observedOn">${g.message(code:'label.observed.during')}</label>
 
     <div class="controls">
         <div id="observedOnDatePicker" style="position: relative;overflow:visible">
@@ -57,10 +57,10 @@
     <div class="control-group">
         <label class="radio inline"> 
             <input type="radio" id="uGroup_ALL" name="uGroup" 
-            value="ALL"> Search in all groups </label> <label
+            value="ALL">${g.message(code:'default.search.in.all.groups')} </label> <label
             class="radio inline"> 
             <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-            value="THIS_GROUP"> Search within this group </label>
+            value="THIS_GROUP"> ${g.message(code:'default.search.within.this.group')} </label>
     </div>
 </div>
 

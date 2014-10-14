@@ -2,14 +2,14 @@
 
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-Hi ${user.name.capitalize()},
+Bonjour ${user.name.capitalize()},
 <br/><br/> 
 
 
-You have been granted permission as a ${permissionType.toLowerCase()} on species pages for the taxonomic level ${TaxonomyRank.list()[taxonConcept.rank].value()} : ${taxonConcept.name} on the ${domain}.<br/>
+Vous avez reçu la permission de  ${permissionType.toLowerCase()} sur les pages espèces au niveau taxonomique ${TaxonomyRank.list()[taxonConcept.rank].value()} : ${taxonConcept.name} sur le ${domain}.<br/>
 
-Please click <g:link href="${uGroup.createLink(controller:'species', action:'create', absolute:true)}">here</g:link> to begin creating content. 
+Merci de cliquer <g:link href="${uGroup.createLink(controller:'species', action:'create', absolute:true)}">ici</g:link> pour commencer à créer du contenu. 
 
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+Merci,<br/>
+L'équipe du portail "

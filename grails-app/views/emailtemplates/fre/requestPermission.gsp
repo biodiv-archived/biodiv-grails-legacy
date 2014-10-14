@@ -1,14 +1,14 @@
 <%@ page contentType="text/html"%>
 
-Hi ${admin.name.capitalize()},
+Bonjour ${admin.name.capitalize()},
 <br/><br/> 
-<a href="${requesterUrl}" title="${requester.name}">${requester.name.capitalize()}</a> has requested for permission as a ${invitetype} for ${rankLevel} : ${taxon.name} on the ${domain}.<br/>
+<a href="${requesterUrl}" title="${requester.name}">${requester.name.capitalize()}</a> a demandé l'autorisation d'accès en tant que ${invitetype} pour le ${rankLevel} : ${taxon.name} sur le ${domain}.<br/>
 <g:if test="${message}">
 <br/>
 Message : ${message}
 <br/>
 </g:if>
-Please <a href="${uri}" title="Confirmation code">click here</a> to confirm granting a ${invitetype} permission.<br/>
+Merci <a href="${uri}" title="Confirmation code">cliquer ici</a> pour confirmer l'octroi d'une de ${invitetype} autorisation.<br/>
 <br/><br/>
-Thank you,<br/>
-The Portal Team
+Merci,<br/>
+L'équipe du portail "

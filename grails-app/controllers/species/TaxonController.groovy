@@ -15,7 +15,7 @@ import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class TaxonController {
 
@@ -26,7 +26,6 @@ class TaxonController {
     def utilsService;
     def grailsApplication;
     def messageSource;
-
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
@@ -412,7 +411,7 @@ class TaxonController {
             try {
 
                 if(!taxonService.validateHierarchy(t)) {
-                    msg = messageSource.getMessage("default.taxon.mandatory.missing", null, request.locale)
+                    msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
                     render ([success:false, msg:msg, errors:errors] as JSON)
                     return;
                 }
@@ -433,16 +432,16 @@ class TaxonController {
            } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], request.locale)
+                msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
                 render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], request.locale)
+            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], request.locale)
-            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], request.locale)
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
         }
 
@@ -473,7 +472,7 @@ class TaxonController {
                 }
 
                 if(!taxonService.validateHierarchy(t)) {
-                     msg = messageSource.getMessage("default.taxon.mandatory.missing", null, request.locale)
+                     msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
                     render ([success:false, msg:msg, errors:errors] as JSON)
                     return;
                 }
@@ -486,7 +485,7 @@ class TaxonController {
                         result = taxonService.deleteTaxonHierarchy(reg, true);
                     }
                     if(!result.success) {
-                        msg = messageSource.getMessage("default.error.hierarchy", ['deleting old taxon hierarchy'] as Object[], request.locale)
+                        msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))
                         render ([success:false, msg:msg] as JSON)
                         return;
                     }
@@ -509,16 +508,16 @@ class TaxonController {
            } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], request.locale)
+                msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
                 render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], request.locale)
+            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], request.locale)
-            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], request.locale)
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
         }
 
@@ -549,14 +548,14 @@ class TaxonController {
             } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], request.locale)
+                msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], RCU.getLocale(request))
                 render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
             render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], request.locale)
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], RCU.getLocale(request))
             render ([success:false, msg:msg, errors:errors] as JSON)
         }
     }
