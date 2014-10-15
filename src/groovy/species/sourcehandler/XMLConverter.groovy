@@ -34,6 +34,7 @@ import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
 import species.auth.SUser
+import species.NamesMetadata.NameStatus;
 
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
@@ -1372,13 +1373,14 @@ class XMLConverter extends SourceConverter {
      * Creating the given classification entries hierarchy.
      * Saves any new taxondefinition found 
      */
-     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
+     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false) {
         log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         def taxonHierarchies = new ArrayList();
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
-            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy);
+            println "=========YAHAN SE AYA====="
+            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName);
             if(t) {
                 cleanUpGorm();
                 taxonHierarchies.addAll(t);
@@ -1407,9 +1409,11 @@ class XMLConverter extends SourceConverter {
      * @param scientificName
      * @return
      */
-    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
+    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false) {
         log.debug "Getting classification hierarchy : "+classification.name;
-
+        println "================ABORT ON NEW NAME================ " + abortOnNewName
+        //to be used only in case of namelist
+        boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
 
         List<String> names = new ArrayList<String>();
@@ -1433,81 +1437,96 @@ class XMLConverter extends SourceConverter {
         }
         parsedNames = namesParser.parse(names);
         fieldNodes = sortedFieldNodes;
-
+    
         int i=0;
+        boolean flag = true;
         fieldNodes.each { fieldNode ->
-            if(fieldNode) {
-            log.debug "Adding taxonomy registry from node: "+fieldNode;
-            int rank = getTaxonRank(fieldNode?.subcategory?.text());
-            String name = getData(fieldNode.data);
+            if(flag) {
+                println "========NODES========"
+                if(fieldNode) {
+                    log.debug "Adding taxonomy registry from node: "+fieldNode;
+                    int rank = getTaxonRank(fieldNode?.subcategory?.text());
+                    String name = getData(fieldNode.data);
 
-            log.debug "Taxon : "+name+" and rank : "+rank;
-            if(name && rank >= 0) {
-                //TODO:HACK to populate sciName in species level of taxon hierarchy
-                //              if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
-                //                  def cleanSciName = cleanSciName(scientificName);
-                //                  name = cleanSciName
-                //              }
+                    log.debug "Taxon : "+name+" and rank : "+rank;
+                    if(name && rank >= 0) {
+                        //TODO:HACK to populate sciName in species level of taxon hierarchy
+                        //              if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
+                        //                  def cleanSciName = cleanSciName(scientificName);
+                        //                  name = cleanSciName
+                        //              }
 
-                def parsedName = parsedNames.get(i++);
-                log.debug "Parsed name ${parsedName?.canonicalForm}"
-                if(parsedName?.canonicalForm) {
-                    //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
-                    //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
-                    def taxonCriteria = TaxonomyDefinition.createCriteria();
-                    TaxonomyDefinition taxon = taxonCriteria.get {
-                        eq("rank", rank);
-                        ilike("canonicalForm", parsedName.canonicalForm);
-                    }
+                        def parsedName = parsedNames.get(i++);
+                        log.debug "Parsed name ${parsedName?.canonicalForm}"
+                        if(parsedName?.canonicalForm) {
+                            //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
+                            //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
+                            def taxonCriteria = TaxonomyDefinition.createCriteria();
+                            TaxonomyDefinition taxon = taxonCriteria.get {
+                                eq("rank", rank);
+                                ilike("canonicalForm", parsedName.canonicalForm);
+                            }
 
-                    if(!taxon && saveTaxonHierarchy) {
-                        log.debug "Saving taxon definition"
-                        taxon = parsedName;
-                        taxon.rank = rank;
-                        if(!taxon.save()) {
-                            taxon.errors.each { log.error it }
-                        }
+                            //abort becoz new name saved in curation interface
+                            if(newNameSaved && abortOnNewName) {
+                                //abort
+                                println "==========ABORTING============  "
+                                flag = false;
+                                return;
+                            }
+                            if(!taxon && saveTaxonHierarchy) {
+                                log.debug "Saving taxon definition"
+                                taxon = parsedName;
+                                taxon.rank = rank;
+                                if(!taxon.save()) {
+                                    taxon.errors.each { log.error it }
+                                }
+                                newNameSaved = true;
+                                taxon.updateContributors(getUserContributors(fieldNode.data))
+                            } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
+                                def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+                                if(synonym)
+                                    synonym.updateContributors(getUserContributors(fieldNode.data))
+                            }
 
-						taxon.updateContributors(getUserContributors(fieldNode.data))
-                    } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
-                        def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
-                        if(synonym)
-                            synonym.updateContributors(getUserContributors(fieldNode.data))
-                    }
+                            def ent = new TaxonomyRegistry();
+                            ent.taxonDefinition = taxon
+                            //newNameSaved true becoz now this taxon cant be used in hierarchy 
+                            //of a lower level as its status is not accepted 
+                            newNameSaved = newNameSaved || taxon.status != NameStatus.ACCEPTED 
+                            ent.classification = classification;
+                            ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                            log.debug("Parent Taxon : "+ent.parentTaxon)
+                            ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
+                            //same taxon at same parent and same path may exist from same classification.
+                            def criteria = TaxonomyRegistry.createCriteria()
+                            TaxonomyRegistry registry = criteria.get {
+                                eq("taxonDefinition", ent.taxonDefinition);
+                                eq("path", ent.path);
+                                eq("classification", ent.classification);
+                            }
+                            println "===========REGISTRY=========== " + registry
+                            if(registry) {
+                                log.debug "Taxon registry already exists : "+registry;
+                                if(saveTaxonHierarchy)
+                                    registry.updateContributors(getUserContributors(fieldNode.data))
+                                    taxonEntities.add(registry);
+                            } else if(saveTaxonHierarchy) {
+                                log.debug "Saving taxon registry entity : "+ent;
+                                if(!ent.save()) {
+                                    ent.errors.each { log.error it }
+                                } else {
+                                    log.debug "Saved taxon registry entity : "+ent;
+                                }
+                                ent.updateContributors(getUserContributors(fieldNode.data))
+                                taxonEntities.add(ent);
+                                println "=======SAVING THIS TAX REG======= " + ent
+                            }
 
-                    def ent = new TaxonomyRegistry();
-                    ent.taxonDefinition = taxon
-                    ent.classification = classification;
-                    ent.parentTaxon = getParentTaxon(taxonEntities, rank);
-                    log.debug("Parent Taxon : "+ent.parentTaxon)
-                    ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
-                    //same taxon at same parent and same path may exist from same classification.
-                    def criteria = TaxonomyRegistry.createCriteria()
-                    TaxonomyRegistry registry = criteria.get {
-                        eq("taxonDefinition", ent.taxonDefinition);
-                        eq("path", ent.path);
-                        eq("classification", ent.classification);
-                    }
-                    
-                    if(registry) {
-                        log.debug "Taxon registry already exists : "+registry;
-                        if(saveTaxonHierarchy)
-                            registry.updateContributors(getUserContributors(fieldNode.data))
-                        taxonEntities.add(registry);
-                    } else if(saveTaxonHierarchy) {
-                        log.debug "Saving taxon registry entity : "+ent;
-                        if(!ent.save()) {
-                            ent.errors.each { log.error it }
                         } else {
-                            log.debug "Saved taxon registry entity : "+ent;
+                            log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
+                            addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                         }
-                        ent.updateContributors(getUserContributors(fieldNode.data))
-                        taxonEntities.add(ent);
-                    }
-
-                } else {
-                        log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
-                        addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                     }
                 }
             }

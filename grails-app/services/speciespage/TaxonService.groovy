@@ -777,7 +777,7 @@ class TaxonService {
     *
     */
 
-    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language) {
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false) {
         List errors = [];
         if(!classification) {
             return [success:false, msg:"Not a valid classification ${classification?.name}."]
@@ -785,7 +785,8 @@ class TaxonService {
         
         XMLConverter converter = new XMLConverter();
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
-        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);
+        println "======YAHAN HAI=========";
+        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName);
 /*        //check if user has permission to contribute to the taxon hierarchy
         if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {
             taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);            
@@ -1001,7 +1002,7 @@ class TaxonService {
 
     boolean validateHierarchy(List<String> taxonEntries) {
         for (int i=0; i< taxonEntries.size(); i++) {
-            if(TaxonomyRank.list()[i] != TaxonomyRank.SUB_FAMILY && TaxonomyRank.list()[i] != TaxonomyRank.SUB_GENUS) {
+            if(TaxonomyRank.list()[i] != TaxonomyRank.SUB_FAMILY && TaxonomyRank.list()[i] != TaxonomyRank.SUB_GENUS && TaxonomyRank.list()[i] != TaxonomyRank.SUPER_FAMILY) {
                 if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) {
                     log.debug "${TaxonomyRank.list()[i]} is missing" 
                     return false;

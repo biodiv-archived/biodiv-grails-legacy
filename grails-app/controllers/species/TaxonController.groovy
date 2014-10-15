@@ -392,6 +392,7 @@ class TaxonController {
 
 	@Secured(['ROLE_USER'])
     def create() {
+        println "=======PARAMS IN CREATE======== " + params
         def msg;
 
         def errors = [], result=[success:false];
@@ -446,9 +447,14 @@ class TaxonController {
         }
 
     }
+    
+    def testCode() {
+        println "==========================="
+    }
 
 	@Secured(['ROLE_USER'])
     def update()  {
+        println "=======PARAMS UPDATE======== " + params
         def msg;
         def errors = [], result=[success:false];
         if(params.classification) {
@@ -494,15 +500,15 @@ class TaxonController {
                 }
                 
 
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, true);
                 result.action = 'update';
-
-                if(result.success) {
-                    def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
-                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
-                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                } 
-
+                if(params.controller != 'taxon'){
+                    if(result.success) {
+                        def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
+                        def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
+                        utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                    } 
+                }
                 render result as JSON
                 return;
            } catch(e) {

@@ -72,7 +72,7 @@
                 classifications = classifications.sort {return it[1].name};
                 %>
 
-                <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false, 'showCheckBox':false]"/>
 
 
             </div>
@@ -195,14 +195,16 @@
 							<div class ="row-fluid">
 								<div class="span4"><label>Name</label></div>
 								<div class="span8"> <input type="text" placeholder="Name" class="name span12"/></div>
-							</div>
+                            </div>
+                            <input type="hidden" class="taxonReg" value="">
 							<div class="row-fluid">	
-								<div class="span4"><label>Rank</label></div>
+                                <div class="span4"><label>Rank</label></div>
                                 <div class="span8"> 
-                                    <select id="rankDropDown" class="rankDropDown span12" ><option value="chooseRank">Choose Rank</option><option value="kingdom">Kingdom</option>
-                                        <option value="phylum">Phylum</option><option value="class">Class</option><option value="order">Order</option>
-                                        <option value="superfamily">Superfamily</option><option value="family">Family</option><option value="genus">Genus</option>
-                                        <option value="species">Species</option>
+                                    <select id="rankDropDown" class="rankDropDown span12" >
+                                        <option value="chooseRank">Choose Rank</option>
+                                        <g:each in="${TaxonomyRank.list()}" var="t">
+                                            <option value="${t.toString().toLowerCase()}">${t}</option>
+                                        </g:each>
                                     </select>
                                 </div>
 							</div>	
@@ -304,7 +306,7 @@
                                 <g:render template="/namelist/dataTableTemplate" model="[]"/>
                             </div>
                         </div>
-                        <button type="button" class="btn">Save & retain</button> 
+                        <button type="button" class="btn" onClick='saveHierarchy()'>Save & retain</button> 
                         <button type="button" class="btn">Save & Move to WKG</button> 
                         <button type="button" class="btn">Save & Move to Clean List</button> 
                     </div>
@@ -369,57 +371,10 @@
     <r:script>
         $(document).ready(function() {
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-                expandAll:false
+                expandAll:false,
+                showCheckBox:false
             });	
-            /*$("#searchPermission").autofillNames({
-                'appendTo' : '#nameSuggestions',
-                'nameFilter':'scientificNames',
-                focus: function( event, ui ) {
-                    $("#canName").val("");
-                    $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
-                    $("#nameSuggestions li a").css('border', 0);
-                    return false;
-                },
-                select: function( event, ui ) {
-                    $("#page").val( ui.item.label.replace(/<.*?>/g,"") );
-                    $("#canName").val( ui.item.value );
-                    $("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
-                    return false;
-                },open: function(event, ui) {
-                    //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
-                }
-            });
-
-            var users_autofillUsersComp = $("#userAndEmailList_user").autofillUsers({
-                usersUrl : window.params.userTermsUrl
-            });
-
-            $('#searchPermission').click(function() {
-                var params = {};
-                $("#addSpecies input").each(function(index, ele) {
-                    if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
-                });
-                params['rank'] = $('#rank').find(":selected").val(); 
-                $.ajax({
-                    url:'/species/searchPermission',
-                    data:params,
-                    method:'POST',
-                    dataType:'json',
-                    success:function(data) {
-                    console.log(data);
-                        if(data.success == true) {
-
-                        } else {
-                            $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
-                        }
-                    }, error: function(xhr, status, error) {
-                        handleError(xhr, status, error, this.success, function() {
-                            var msg = $.parseJSON(xhr.responseText);
-                            $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
-                        });
-                    }
-                });
-            });*/
+            
         });
         </r:script>
 </script>

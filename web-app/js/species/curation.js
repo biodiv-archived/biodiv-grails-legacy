@@ -1,17 +1,23 @@
-function getNamesFromTaxon(taxonId) {
-    console.log("called--------------");
-    taxonId = $(".taxDefIdCheck:checked").parent("span").find(".taxDefIdVal").val();
+function getNamesFromTaxon(ele) {
+    console.log(ele);
+    $("#taxonHierarchy tr").css('background', 'white');
+    console.log($(ele).parents("tr"));
+    $(ele).parents("tr").css('background', 'burlywood');
+    var taxonId = $(ele).parent("span").find(".taxDefIdVal").val();
+    var classificationId = $('#taxaHierarchy option:selected').val();
     var url = window.params.curation.getNamesFromTaxonUrl;
+    console.log("===URL=== " + url);
     $.ajax({
         url: url,
         dataType: "json",
-        data: {taxonId:taxonId},	
+        type: "POST",
+        data: {taxonId:taxonId, classificationId:classificationId},	
         success: function(data) {
             console.log("======SUCCESS====");
             if(data.dirtyList){
                 var dlContent = "<ul>";
                 $.each(data.dirtyList, function(index, value){
-                    dlContent += "<li onclick='getNameDetails("+value.id+")'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    dlContent += "<li onclick='getNameDetails("+value.id +","+ value.classificationId+")'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 dlContent += "</ul>";
@@ -21,7 +27,7 @@ function getNamesFromTaxon(taxonId) {
             if(data.workingList){
                 var wlContent = "<ul>";
                 $.each(data.workingList, function(index, value){
-                    wlContent +="<li onclick='getNameDetails("+value.id+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    wlContent +="<li onclick='getNameDetails("+value.id+","+ value.classificationId+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 wlContent += "</ul>";
@@ -32,7 +38,7 @@ function getNamesFromTaxon(taxonId) {
             if(data.cleanList){
                 var clContent = "<ul><li>";
                 $.each(data.cleanList, function(index, value){
-                    clContent +="<li onclick='getNameDetails("+value.id+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    clContent +="<li onclick='getNameDetails("+value.id+","+ value.classificationId+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 clContent += "</ul>";
@@ -40,11 +46,6 @@ function getNamesFromTaxon(taxonId) {
                 $(".cl_content").append(dlContent);
 
             }
-
-            console.log(dlContent);
-            console.log(wlContent);
-            console.log(clContent);
-            console.log(data);
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -52,13 +53,14 @@ function getNamesFromTaxon(taxonId) {
 
 }
 
-function getNameDetails(taxonId) {
+function getNameDetails(taxonId, classificationId) {
     console.log("=======NAME DEATILS=======" + taxonId);
     var url = window.params.curation.getNameDetailsUrl;
     $.ajax({
         url: url,
         dataType: "json",
-        data: {taxonId:taxonId},	
+        type: "POST",
+        data: {taxonId:taxonId, classificationId:classificationId},	
         success: function(data) {
             populateNameDetails(data)
             console.log("======SUCCESS====");
@@ -105,6 +107,7 @@ function searchDatabase() {
     $.ajax({
         url: url,
         dataType: "json",
+        type: "POST",
         data: {name:name, dbName:dbName},	
         success: function(data) {
             //show the popup
@@ -121,20 +124,21 @@ function searchDatabase() {
 function fillPopupTable(data, $ele) {
     var rows = "";
     $.each(data, function(index, value) {
-        rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onClick='getExternalDbDetails("+value['id']+")'>Select this</button></td></tr>"        
+        rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onClick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
     });
     $ele.find("table").append(rows);
     return
 }
 
 //takes COL id
-function getExternalDbDetails(id) {
+function getExternalDbDetails(externalId) {
     var url = window.params.curation.getExternalDbDetailsUrl;
     var dbName = $("#queryDatabase").val();
     $.ajax({
         url: url,
         dataType: "json",
-        data: {id:id, dbName:dbName},	
+        type: "POST",
+        data: {externalId:externalId, dbName:dbName},	
         success: function(data) {
             //show the popup
             $("#externalDbResults").modal('hide');
@@ -145,4 +149,70 @@ function getExternalDbDetails(id) {
             alert(xhr.responseText);
         } 
     });
+}
+
+function saveHierarchy() {
+    var taxonRegistryData = fetchTaxonRegistryData();
+    taxonRegistryData['abortOnNewName'] = true;
+    console.log("===============");
+    console.log(taxonRegistryData);
+    var url =  window.params.taxon.classification.updateUrl;
+    console.log("====URL========= " + url);
+    $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        data: taxonRegistryData,	
+        success: function(data) {
+            //show the popup
+            $("#externalDbResults").modal('hide');
+            populateNameDetails(data)
+            console.log("======SUCCESS====");
+            console.log(data);  
+        }, error: function(xhr, status, error) {
+            alert(xhr.responseText);
+        } 
+    });
+}
+
+function fetchTaxonRegistryData() {
+    var result = {}
+    result['taxonRegistry.0'] = $('.kingdom').val();
+    result['taxonRegistry.1'] = $('.phylum').val();
+    result['taxonRegistry.2'] = $('.class').val();
+    result['taxonRegistry.3'] = $('.order').val();
+    result['taxonRegistry.4'] = $('.superfamily').val();
+    result['taxonRegistry.5'] = $('.family').val();
+    result['taxonRegistry.6'] = $('.subfamily').val();
+    result['taxonRegistry.7'] = $('.genus').val();
+    result['taxonRegistry.8'] = $('.subgenus').val();
+    result['taxonRegistry.9'] = $('.species').val();
+    
+    result['reg'] = $(".taxonReg").val()          //$('#taxaHierarchy option:selected').val();
+    result['classification'] = 817; //for author contributed
+    
+    var res = {};
+    res['0'] = $('.kingdom').val();
+    res['1'] = $('.phylum').val();
+    res['2'] = $('.class').val();
+    res['3'] = $('.order').val();
+    res['4'] = $('.superfamily').val();
+    res['5'] = $('.family').val();
+    res['6'] = $('.subfamily').val();
+    res['7'] = $('.genus').val();
+    res['8'] = $('.subgenus').val();
+    res['9'] = $('.species').val();
+    result['taxonRegistry'] = res;
+
+    var metadata1 = {};
+    metadata1['name'] = $('.name').val();
+    metadata1['rank'] = $('.rankDropDown').val();
+    metadata1['authorString'] = $('.authorString').val();
+    metadata1['nameStatus'] = $('.statusDropDown').val();
+    metadata1['source'] = $('.source').val();
+    metadata1['via'] = $('.via').val();
+    metadata1['id'] = $('.id').val();
+    result['metadata'] = metadata1;
+
+    return result;
 }

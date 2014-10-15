@@ -123,5 +123,6 @@ abstract class ScientificName extends NamesMetadata {
 		normalizedForm nullable:true;
 		italicisedForm nullable:true;
 		binomialForm nullable:true;
+		status nullable:true;
 	}
 }

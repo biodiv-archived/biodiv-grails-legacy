@@ -16,6 +16,7 @@
 <%@page import="species.License"%>
 <%@page import="species.SpeciesField"%>
 <%@page import="species.sourcehandler.XMLConverter"%>
+<%@page import="species.participation.ActivityFeedService"%>
 
 <html>
     <head>
