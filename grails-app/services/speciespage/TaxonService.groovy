@@ -13,7 +13,7 @@ import species.formatReader.SpreadsheetReader
 import species.sourcehandler.XMLConverter
 import species.auth.SUser;
 import grails.converters.JSON;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.Language;
 
 class TaxonService {
@@ -807,9 +807,9 @@ class TaxonService {
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            return ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, LCH.getLocale()), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
+            return ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, RCU.getLocale(request)), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
         }
-        return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, LCH.getLocale()), errors:errors]
+        return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, RCU.getLocale(request)), errors:errors]
     }
 
     def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {

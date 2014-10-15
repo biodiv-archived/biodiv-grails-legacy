@@ -519,7 +519,7 @@ class UserGroupController {
 				if(userGroupInstance.addMember(user)) {
 					msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request))
 					flash.message = msg;
-					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':msg]as JSON);
+					render ([success:true, 'statusComplete':true, 'shortMsg':${messageSource.getMessage("info.joined", null, RCU.getLocale(request))}, 'msg':msg]as JSON);
 					return;
 				}
 			}
