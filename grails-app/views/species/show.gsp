@@ -10,6 +10,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
+<%@page import="species.participation.ActivityFeedService"%>
 <%@page import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 <%@page import="species.Synonyms"%>
 <%@page import="species.Language"%>

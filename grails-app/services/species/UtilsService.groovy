@@ -19,7 +19,6 @@ import species.CommonNames;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 
 import java.beans.Introspector;
-
 class UtilsService {
 
     def grailsApplication;
