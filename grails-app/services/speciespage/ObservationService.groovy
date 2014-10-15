@@ -1274,30 +1274,30 @@ class ObservationService extends AbstractObjectService {
         def activitySource = ""
         switch (source) {
             case "observationShow":
-            mailSubject = "Share Observation"
-            activitySource = "observation"
+            mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
+            activitySource = messageSource.getMessage("observation.label", null, LCH.getLocale())
             break
 
             case  "observationList" :
-            mailSubject = "Share Observation List"
-            activitySource = "observation list"
+            mailSubject = messageSource.getMessage("info.share.list", null, LCH.getLocale())
+            activitySource = messageSource.getMessage("info.observation.list", null, LCH.getLocale())
             break
 
             case "userProfileShow":
-            mailSubject = "Share User Profile"
-            activitySource = "user profile"
+            mailSubject = messageSource.getMessage("info.share.profile", null, LCH.getLocale())
+            activitySource = messageSource.getMessage("info.user.profile", null, LCH.getLocale())
             break
 
             case "userGroupList":
-            mailSubject = "Share Groups List"
-            activitySource = "user groups list"
+            mailSubject = messageSource.getMessage("info.share.lists", null, LCH.getLocale())
+            activitySource = messageSource.getMessage("info.user.lists", null, LCH.getLocale())
             break
             case "userGroupInvite":
-            mailSubject = "Invitation to join group"
-            activitySource = "user group"
+            mailSubject = messageSource.getMessage("info.invitation.join", null, LCH.getLocale())
+            activitySource = messageSource.getMessage("info.user.group", null, LCH.getLocale())
             break
             case controller+action.capitalize():
-            mailSubject = "Share "+controller
+            mailSubject = messageSource.getMessage("button.share", null, LCH.getLocale())+" "+controller
             activitySource = controller
             break;
             default:
@@ -1307,7 +1307,11 @@ class ObservationService extends AbstractObjectService {
         def currentUserProfileLink = currentUser?utilsService.generateLink("SUser", "show", ["id": currentUser.id], null):'';
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
         def conf = SpringSecurityUtils.securityConfig
-        def staticMessage = conf.ui.askIdentification.staticMessage
+        def messagesourcearg1 = new Object[3];
+             messagesourcearg1[0] = currentUser;
+             messagesourcearg1[1] = activitySource;
+             messagesourcearg1[2] = templateMap["domain"];
+        def staticMessage = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.staticMessage", messagesourcearg1, LCH.getLocale())
         if (staticMessage.contains('$')) {
             staticMessage = evaluate(staticMessage, templateMap)
         } 

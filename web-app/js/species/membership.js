@@ -15,7 +15,7 @@ function joinAction(me, joinUsUrl) {
         success: function(data) {
         	if(data.statusComplete) {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
-        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+". Please press <a href='#' onclick='document.location.reload(true);'>reload</a> to load new changes.");
+        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+"."+ window.i8ln.species.specie.reload);
         		//document.location.reload(true);
         	} else {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");

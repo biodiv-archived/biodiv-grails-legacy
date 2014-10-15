@@ -965,7 +965,7 @@ function loadSpeciesGroupCount() {
                             document.getElementById('speciesGroupCountList'));
 
                         columnChart.draw(visualization_data,  {
-                            title:"No of observations per species group",
+                            title:window.i8ln.species.specie.ops,
                             vAxis:{minValue:0, maxValue:5, format: '#'},
                             legend:{position: 'bottom'},
                             chartArea:{width:'80%'}

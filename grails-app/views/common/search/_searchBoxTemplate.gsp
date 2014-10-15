@@ -140,9 +140,11 @@ $(document).ready(function() {
                 "bsav":"${g.message(code:'button.save')}",
                 "bcanc":"${g.message(code:'button.cancel')}",
                 "bupdate":"${g.message(code:'suser.edit.update')}",
-                "bcmnt":"${g.message(code:'button.update.comment')}"
-
-
+                "bcmnt":"${g.message(code:'button.update.comment')}",
+                "reload":"${g.message(code:'link.press.reload')}",
+                "unf":"${g.message(code:'followtemp.unfollow')}",
+                "flo":"${g.message(code:'followtemp.follow')}",                 
+                "ops":"${g.message(code:'observations.species.group')}"
                 
                 
             } ,
