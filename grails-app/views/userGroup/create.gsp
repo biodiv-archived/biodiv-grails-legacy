@@ -316,7 +316,7 @@ max-width: 100%;
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowUsersToJoin" checked="${userGroupInstance.allowUsersToJoin}"/>
-								 <g:message code="userGroup.permissions.members.joining" default="Can users join the Group without invitation?" /> </label>
+								 <g:message code="userGroup.permissions.members.joining" default="user can join the group without invitation." /> </label>
 						</div>
 <%--						<div class="row control-group left-indent">--%>
 <%--							--%>
