@@ -43,8 +43,8 @@
 			</div>
 			<input type="hidden" name="userIdsAndEmailIds"
 				id="userIdsAndEmailIds" /> <input class="btn btn-mini btn-primary"
-				type="submit" value="SEND" style="margin: 10px; float: right" />
-			<div id="email-form-close" class="popup-form-close" value="close">
+				type="submit" value="${g.message(code:'button.send')}" style="margin: 10px; float: right" />
+			<div id="email-form-close" class="popup-form-close" value="${g.message(code:'button.close')}">
 				<i class="icon-remove"></i>
 
 			</div>

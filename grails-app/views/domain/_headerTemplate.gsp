@@ -36,21 +36,21 @@
 					<li
 						class="${((params.controller == 'userGroup' && params.action == 'species')||(params.controller == 'species'))?' active':''}"><a
 						href="${uGroup.createLink('controller':'species', 'action':'list', 'userGroup':userGroupInstance)}"
-						title="Species"><g:message code="default.species.label" /></a>
+						title="${g.message(code:'default.species.label')}"><g:message code="default.species.label" /></a>
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('controller':'observation', 'action':'list', 'userGroup':userGroupInstance)}"
-                                                title="Observationis"><g:message code="default.observation.label" /></a> 
+                                                title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a> 
                                             <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
 					<li
 						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
-						href="${uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)}" title="Maps"><g:message code="button.maps" /></a></li>
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)}" title="${g.message(code:'button.maps')}"><g:message code="button.maps" /></a></li>
 					
 			 		<li
                     	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
                         href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                        title="Documents"><g:message code="button.documents" /></a>
+                        title="${g.message(code:'button.documents')}"><g:message code="button.documents" /></a>
                     </li>
 					
 <%--					<li--%>
@@ -83,17 +83,17 @@
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
 						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
-						title="Discussions"><g:message code="button.discussions" /></a>
+						title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
 					</li>
 					
 					<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
 								href="${uGroup.createLink(mapping:'userGroup', 'action':'pages', 'userGroup':userGroupInstance)}"
-								title="Pages"><g:message code="default.pages.label" /></a>
+								title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
 					</li>
 
 					<li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
 						href="${uGroup.createLink(mapping:'userGroup', 'action':'about', 'userGroup':userGroupInstance)}"
-						title="About Us"><g:message code="button.about.us" /></a>
+						title="${g.message(code:'button.about.us')}"><g:message code="button.about.us" /></a>
 					</li>
 					
 
@@ -103,7 +103,7 @@
                                                     <li
                                                     class="${((params.controller == 'user' && params.action == 'list') ||(params.controller == 'user'))?' active':''}"><a
                                                         href="${uGroup.createLink('controller':'user', 'action':'list', 'userGroup':userGroupInstance)}"
-                                                        title="Members"><g:message code="default.members.label" /></a>
+                                                        title="${g.message(code:'default.members.label')}"><g:message code="default.members.label" /></a>
                                                     </li>
 
                                                    
@@ -111,7 +111,7 @@
                                                     <li
                                                     class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
                                                         href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
-                                                        title="Dashboard"><g:message code="button.dashboard" /></a>
+                                                        title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a>
                                                     </li>
 						
 						</ul></li>

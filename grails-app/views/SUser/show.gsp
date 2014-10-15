@@ -122,7 +122,7 @@
                                         <li style="padding:5px 0px">
                                         <% String staticMessage = '';
                                         if(currentUser) {
-                                            staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
+                                            staticMessage = g.message(code:'suser.message')+' <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
                                         }
 def contact_me_text=g.message(code:'button.contact.me')                                     
 %>
