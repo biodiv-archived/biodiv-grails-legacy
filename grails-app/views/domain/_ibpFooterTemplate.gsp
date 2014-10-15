@@ -77,7 +77,7 @@
 	<p> <a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}"><img src="${resource(dir:'images',file:'facebook.png', absolute:true)}"></a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}"><img src="${resource(dir:'images',file:'twitter.png', absolute:true)}"></a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}"><img src="${resource(dir:'images',file:'google_plus.png', absolute:true)}"></a><br />
 <g:message code="text.supported.on" /><br />
 <g:message code="text.powered.by" /> <a href="https://github.com/strandls/biodiv" target="_blank"><g:message code="link.informatics.platform" /></a>
-<g:message code="text.technology.partner" /> <a href="http://www.strandls.com" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
+<g:message code="text.technology.partner" /> <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
 </p>
 	</div>
 </div>
