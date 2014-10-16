@@ -6,7 +6,7 @@
         <g:render template="/common/titleTemplate"/>
         <r:require modules="maps" />
         <style>
-            .container {
+            div.container.outer-wrapper{
                 width:100%;
             }
         </style>

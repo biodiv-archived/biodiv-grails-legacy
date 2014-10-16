@@ -14,7 +14,6 @@ class MapController {
     }
 
     def show = {
-        render (view:'show');
     }
 /*
     def getLinkTableEntries = {
