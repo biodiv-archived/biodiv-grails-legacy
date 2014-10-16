@@ -38,7 +38,7 @@
 
             <uGroup:rightSidebar/>
             <obv:featured 
-            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance, 'userLanguage' : userLanguage]" />
 
             <h4><g:message code="heading.browse.observations" /></h4>
             <obv:showObservationsListWrapper />

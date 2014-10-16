@@ -53,7 +53,7 @@
                         </g:else>
                     </div>
                 </div>
-                <g:render template="/common/featureNotesTemplate" model="['instance':observationInstance, 'featuredNotes':featuredNotes]"/>
+                <g:render template="/common/featureNotesTemplate" model="['instance':observationInstance, 'featuredNotes':featuredNotes, 'userLanguage': userLanguage]"/>
             </div>
             </g:if>
             <g:else>
