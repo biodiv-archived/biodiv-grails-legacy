@@ -33,47 +33,35 @@
             <div class="navblock" style="margin-top:20px;">
 
                 <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.species.label')}</span></div>
-                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">${g.message(code:'species.observation')}</span></div>
+                <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">${g.message(code:'default.observation.label')}</span></div>
                 <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">${g.message(code:'button.maps')}</span></div>
 
                 <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">${g.message(code:'button.documents')}</span></div>
-                <div id="groups_entry" class="entry"  onclick="location.href='${uGroup.createLink(controller:'group', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.groups.label')}</span></div>
+                
 
-                <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"></div>
-                <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"></div></a>                
-            </div>
-
-        <div id="stats" class="navblock">
-            <div class="entry">
-                <span class="stats_normal">Number of</span><br><span class="stats_big_bold">SPECIES</span> <span class="stats_big">PAGES</span>
-                <div class="stats_number">${Species.count()}</div>
-            </div>
-            <div class="entry"><span class="stats_normal">Number of</span><br><span class="stats_big_bold">OBSERVATIONS</span>
-                <div class="stats_number">${Observation.countObservations()}</div>
+                <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"><span class="content">${g.message(code:'title.checklists')}</span></div>
+                <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"><span class="content">${g.message(code:'idao.tool')}</span></div></a>                
             </div>
 
-            <div class="entry">
-                <span class="stats_normal">Number of</span><br><span class="stats_big">MAP</span> <span class="stats_big_bold">LAYERS</span>
-                <div class="stats_number">1</div>
-            </div>
-            <div class="entry">
-                <span class="stats_normal">Number of</span><br><span class="stats_big_bold">DOCUMENTS</span>
-                <div class="stats_number">${Document.count()}</div>
-            </div>
+        
 
             <div id="stats" class="navblock" style="margin-top:-20px">
                 <div class="entry">
+<span class="stats_normal">Number of</span><br><span class="stats_big_bold">SPECIES</span><span class="stats_big"> PAGES</span>
                     <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countByPercentOfInfoGreaterThan(0)}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.observations')}">${Observation.countObservations()}</div>
+                    <span class="stats_normal">Number of</span><br><span class="stats_big_bold">OBSERVATIONS</span>
+                    <div class="stats_number" >${Observation.countObservations()}</div>
                 </div>
 
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">1</div>
+		    <span class="stats_normal">Number of</span><br> <span class="stats_big">MAP </span><span class="stats_big_bold">LAYERS</span>
+                    <div class="stats_number" >1</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>
+ 		    <span class="stats_normal">Number of</span><br><span class="stats_big_bold">DOCUMENTS</span>
+                    <div class="stats_number" >${Document.count()}</div>
                 </div>
 
             <div class="entry">
@@ -86,7 +74,7 @@
             </div>
         </div>
 
-        <div class="navblock" style="margin-top:20px;">
+        <!--div class="navblock" style="margin-top:20px;">
             <b><big>&nbsp;<a name="latestObservations"><g:message code="index.button.latest.observations" /></a></big></b>
             <div class="sidebar_section" style="margin: 5px; overflow: hidden; background-color: white;">
                 <div class="jcarousel-skin-ie7" data-contextfreeurl="/observation/show&quot;" data-url="/observation/related" id="carousel_latestUpdatedObservations" style="clear: both; width: 880px; margin-top: 23px;">
@@ -97,7 +85,7 @@
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>--> 
         </div>
         </div>
     </body>
