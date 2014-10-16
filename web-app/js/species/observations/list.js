@@ -607,7 +607,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
             var query = $( this ).val();
-            if(query){
+            if(field == 'aq.object_type' && query == 'All') {
+
+            } else if(query){
                 params[field] = query;
             } else {
                 // removing old tag from url
