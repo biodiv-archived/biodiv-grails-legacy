@@ -3,6 +3,8 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.groups.UserGroup"%>
 <%@ page import="species.participation.ActivityFeedService"%>
+<%@ page import ="org.springframework.web.servlet.support.RequestContextUtils" %>
+
 
 <ul class="nav left-sidebar pull-right">
 
@@ -22,16 +24,27 @@
 
 
 	<uGroup:showSuggestedUserGroups />
-
     <g:if test="${localeLanguages && !hideLanguages}">
     <li class="btn-toolbar" style="margin-top:0px;margin-bottom:0px;">
-        <div class="btn-group">
+        <div class="btn-group" style="padding: 6px 12px 6px 0px;">
             <g:each in="${localeLanguages}" var="localeLanguage">
-                <a class="btn btn-link" href="#" onclick="setLanguage('${localeLanguage.code}')">${localeLanguage.code}</a>
+                <%  
+                    def lang_code = RequestContextUtils.getLocale(request); 
+                    def isDisabled = (lang_code.toString() == localeLanguage.code) ? 'disabled' : '' ;
+                %>
+                <button class="btn btn-mini lang_c ${isDisabled}" rel="${localeLanguage.code}">${localeLanguage.code?.toUpperCase()}</button>
             </g:each>
-
         </div>
     </li>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('.lang_c').click(function(){
+            if(!$(this).hasClass('disabled')){
+                setLanguage($(this).attr('rel'));
+            }                
+        });
+    });
+    </script>
     </g:if>
 
     <li>

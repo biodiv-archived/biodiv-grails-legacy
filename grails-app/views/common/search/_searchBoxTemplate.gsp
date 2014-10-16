@@ -3,7 +3,7 @@
 
 <div id='searchToggleBox' class="input-append" style="z-index:1">
 	<form method="get"
-		action="${uGroup.createLink(controller:'search', action:params.action?:'select') }"
+		action="${uGroup.createLink(controller:'search', action:'select') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 		
 		<input type="text" name="query" id="searchTextField" style="width:400px;"

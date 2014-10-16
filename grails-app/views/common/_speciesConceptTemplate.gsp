@@ -2,7 +2,7 @@
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 
-<div class="sidebar_section  <%=sparse?'':'menubutton'%>  ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
+<div class="sidebar_section  <%=sparse?'':'menubutton'%>  <%=concept.key.equalsIgnoreCase(fieldFromName.overview)?'defaultSpeciesConcept':''%>   ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
     <g:set var="fieldCounter" value="${1}" />
     <a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
