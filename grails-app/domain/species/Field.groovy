@@ -11,7 +11,7 @@ class Field {
 	String urlIdentifier
 	// Language
     Language language;
-    int connection;
+    Integer connection;
 	static mapping = {
 		description type:'text';
 		version : false;

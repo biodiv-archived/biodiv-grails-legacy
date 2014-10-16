@@ -1534,8 +1534,8 @@ class XMLConverter extends SourceConverter {
 
         for(TaxonomyRank type : TaxonomyRank) {
             String message = messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request));
-            println message + "   "+rankStr
-            if(message.equalsIgnoreCase(rankStr)) {
+            println type.value()+"  "+ message + "   "+rankStr
+            if(type.value().equalsIgnoreCase(rankStr) || message.equalsIgnoreCase(rankStr)) {
                 return type.ordinal();
             }
         }

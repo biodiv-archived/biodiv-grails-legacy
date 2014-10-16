@@ -17,6 +17,7 @@ import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
+import org.springframework.web.context.request.RequestContextHolder
 
 import java.beans.Introspector;
 class UtilsService {
@@ -223,8 +224,9 @@ class UtilsService {
 
         return null;
     }
-    Language getCurrentLanguage(request){
+    Language getCurrentLanguage(request = null){
        // println "====================================="+request
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         String langStr = RCU.getLocale(request)
         def (langtwo, lang1) = langStr.tokenize( '_' );
         def languageInstance = Language.findByTwoLetterCode(langtwo);
