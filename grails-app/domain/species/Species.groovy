@@ -42,6 +42,7 @@ class Species implements Rateable {
     def externalLinksService;
     def speciesUploadService;
     def speciesPermissionService;
+    def utilsService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -197,7 +198,9 @@ class Species implements Rateable {
 	}
 	
 	String notes(Language userLanguage = null) {
-        if(!userLanguage) userLanguage = Language.getLanguage(null);
+        if(!userLanguage) {
+            userLanguage = utilsService.getCurrentLanguage();
+        }
         XMLConverter converter = new XMLConverter();
         String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,1,userLanguage)
         String overview = converter.getFieldFromName(fieldsConfig.OVERVIEW,1,userLanguage) 
