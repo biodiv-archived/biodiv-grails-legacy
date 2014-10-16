@@ -6,13 +6,14 @@
 <%@page import="species.utils.Utils"%>
 <html>
     <head>
-        <g:set var="title" value="Species"/>
+        <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="species_upload" />
     </head>
     <body>
         <div id="uploadSpeciesDiv">
-            <s:showSubmenuTemplate model="['entityName':'Species Upload']" />
+<% def species_upload=g.message(code:'species.upload') %>
+            <s:showSubmenuTemplate model="['entityName':species_upload]" />
                 <uGroup:rightSidebar/>
                     <div class="super-section span12" style="margin-left: 0px;">
                         <div class="section">

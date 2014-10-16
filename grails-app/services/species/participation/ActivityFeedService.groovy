@@ -7,7 +7,8 @@ import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
-import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
+ 
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ActivityFeedService {
 	
 	static final String COMMENT_ADDED = "Added a comment"
@@ -277,48 +278,48 @@ class ActivityFeedService {
 			case OBSERVATION_FLAGGED:
 			     def messagesourcearg = new Object[1];
                  messagesourcearg[0] =utilsService.getResType(activityRootObj).capitalize();
-				activityTitle = messageSource.getMessage("info.flagged", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.flagged", messagesourcearg, LCH.getLocale())
 				text = feedInstance.activityDescrption
 				break
             case REMOVED_FLAG:
                 def messagesourcearg = new Object[1];
                  messagesourcearg[0] =utilsService.getResType(activityRootObj).capitalize();
-				activityTitle = messageSource.getMessage("info.flag.removed", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.flag.removed", messagesourcearg, LCH.getLocale())
 				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
 				activityTitle = OBSERVATION_UPDATED
-				text = messageSource.getMessage("info.user.updated", null, RCU.getLocale(request))
+				text = messageSource.getMessage("info.user.updated", null, LCH.getLocale())
 				break
 			case USERGROUP_CREATED:
 			def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
-				activityTitle = messageSource.getMessage("info.group.created", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.group.created", messagesourcearg, LCH.getLocale())
 				break
 			case USERGROUP_UPDATED:
 				def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
-				activityTitle = messageSource.getMessage("info.group.updated", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.group.updated", messagesourcearg, LCH.getLocale())
 				break
 			case MEMBER_JOINED:
 			def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
-				activityTitle = messageSource.getMessage("info.joined.group", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.joined.group", messagesourcearg, LCH.getLocale())
 				break
 			case MEMBER_ROLE_UPDATED:
 			def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getUserHyperLink(activityDomainObj, feedInstance.fetchUserGroup());
-				activityTitle = messageSource.getMessage("info.role.updated", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.role.updated", messagesourcearg, LCH.getLocale())
 				break
 			case MEMBER_LEFT:
 			def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
-				activityTitle = messageSource.getMessage("info.left.group", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.left.group", messagesourcearg, LCH.getLocale())
 				break
 			case RECOMMENDATION_REMOVED:
 			def messagesourcearg = new Object[1];
                  messagesourcearg[0] =feedInstance.activityDescrption;
-				activityTitle = messageSource.getMessage("info.removed.name", messagesourcearg, RCU.getLocale(request))
+				activityTitle = messageSource.getMessage("info.removed.name", messagesourcearg, LCH.getLocale())
 				break
 			
 			case [RESOURCE_POSTED_ON_GROUP, RESOURCE_REMOVED_FROM_GROUP]:
@@ -339,7 +340,7 @@ class ActivityFeedService {
                     activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
                 }
                 else {
-                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + ${messageSource.getMessage("info.in", null, RCU.getLocale(request))} + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + ${messageSource.getMessage("info.in", null, LCH.getLocale())} + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
                 }
                 text = feedInstance.activityDescrption
                 break
@@ -370,15 +371,15 @@ class ActivityFeedService {
 					def obv = getDomainObject(comment.commentHolderType,comment.commentHolderId)
 					def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getSpeciesNameHtmlFromReco(obv.maxVotedReco, params);
-					result += ${messageSource.getMessage("info.on.row", messagesourcearg, RCU.getLocale(request))} + (rootObj.observations.indexOf(obv) + 1) 
+					result += ${messageSource.getMessage("info.on.row", messagesourcearg, LCH.getLocale())} + (rootObj.observations.indexOf(obv) + 1) 
 				}
 				break
 			case SpeciesField.class.getCanonicalName():
 				SpeciesField sf = getDomainObject(comment.commentHolderType,comment.commentHolderId)
-				result += ${messageSource.getMessage("info.species.field", null, RCU.getLocale(request))} +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
+				result += ${messageSource.getMessage("info.species.field", null, LCH.getLocale())} +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
 				break
 			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
-				result += ${messageSource.getMessage("info.species.field", null, RCU.getLocale(request))} + comment.commentHolderType.split("_")[1]
+				result += ${messageSource.getMessage("info.species.field", null, LCH.getLocale())} + comment.commentHolderType.split("_")[1]
 				break
 			default:
 				break
