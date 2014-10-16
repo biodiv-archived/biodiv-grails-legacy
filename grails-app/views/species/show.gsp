@@ -177,7 +177,7 @@
                     { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
                     { name: 'insert', items: ['Table'] }
                     ],
-                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/biodivofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/${grailsApplication.metadata['app.name']}ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                     height: '300px',
@@ -192,10 +192,12 @@
     </head>
 
     <body>
-    <link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
-    <script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
-    <script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
-    <script src="/biodiv/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
+
+    
+    <link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.css">
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/galleria-1.3.5.js"></script>
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>

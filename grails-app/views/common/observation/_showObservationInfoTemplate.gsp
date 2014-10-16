@@ -15,7 +15,7 @@
 		</div>
 
 		<div class="user-icon">
-			<a href=/biodiv/SUser/show/${observationInstance.author.id}> <img
+			<a href=/${grailsApplication.metadata['app.name']}/SUser/show/${observationInstance.author.id}> <img
 				src="${observationInstance.author.profilePicture()}" class="small_profile_pic"
 				title="${observationInstance.author.username}" /> </a>
 		</div>
