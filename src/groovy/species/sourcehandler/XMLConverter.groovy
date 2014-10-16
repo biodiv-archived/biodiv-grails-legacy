@@ -37,6 +37,9 @@ import species.auth.SUser
 
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.context.MessageSource
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 //import org.grails.plugins.sanitizer.MarkupSanitizerResult
 
@@ -1526,8 +1529,13 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     static int getTaxonRank(String rankStr) {
+        MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+        def request = RequestContextHolder.currentRequestAttributes().request
+
         for(TaxonomyRank type : TaxonomyRank) {
-            if(type.value().equalsIgnoreCase(rankStr)) {
+            String message = messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request));
+            println message + "   "+rankStr
+            if(message.equalsIgnoreCase(rankStr)) {
                 return type.ordinal();
             }
         }
