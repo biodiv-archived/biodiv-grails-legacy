@@ -20,7 +20,7 @@ import content.eml.Document;
 import species.participation.RecommendationVote;
 import groovy.sql.Sql;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class ChartService {
 
@@ -52,9 +52,9 @@ def messageSource;
 
 		mergeResult(allResult, unidentifiedResult)
     	allResult.columns = [
-			['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
-			['number', messageSource.getMessage("default.all.label", null, LCH.getLocale())],
-			['number', messageSource.getMessage("button.unidentified", null, LCH.getLocale())]
+			['string', messageSource.getMessage("table.species.group", null, RCU.getLocale(request))],
+			['number', messageSource.getMessage("default.all.label", null, RCU.getLocale(request))],
+			['number', messageSource.getMessage("button.unidentified", null, RCU.getLocale(request))]
 		]
 
 		addHtmlResultForObv(allResult, request)
@@ -260,9 +260,9 @@ def messageSource;
 		}
 
 		def res = [data : finalResult, columns : [
-				['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
-				['number', messageSource.getMessage("default.content.label", null, LCH.getLocale())],
-				['number', messageSource.getMessage("table.stubs", null, LCH.getLocale())]
+				['string', messageSource.getMessage("table.species.group", null, RCU.getLocale(request))],
+				['number', messageSource.getMessage("default.content.label", null, RCU.getLocale(request))],
+				['number', messageSource.getMessage("table.stubs", null, RCU.getLocale(request))]
 			]]
 		addHtmlResultForSpecies(res, , request)
 		return res
@@ -277,9 +277,9 @@ def messageSource;
 		res.htmlData = htmlData
 		res.htmlColumns = [
 			['string', ''],
-			['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
-			['number', messageSource.getMessage("default.content.label", null, LCH.getLocale())],
-			['number', messageSource.getMessage("table.stubs", null, LCH.getLocale())]
+			['string', messageSource.getMessage("table.species.group", null, RCU.getLocale(request))],
+			['number', messageSource.getMessage("default.content.label", null, RCU.getLocale(request))],
+			['number', messageSource.getMessage("table.stubs", null, RCU.getLocale(request))]
 		]
 	}
 	
@@ -331,13 +331,13 @@ def messageSource;
 		}
 		
 		return [obvCount:obvCount, data : result, htmlData:finalResult, columns : [
-					['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
-					['number', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
+					['string', messageSource.getMessage("value.user", null, RCU.getLocale(request))],
+					['number', messageSource.getMessage("default.observation.label", null, RCU.getLocale(request))]
 				],
 				htmlColumns : [
 					['string', ''],
-					['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
-					['string', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
+					['string', messageSource.getMessage("value.user", null, RCU.getLocale(request))],
+					['string', messageSource.getMessage("default.observation.label", null, RCU.getLocale(request))]
 				]
 			]
 	}

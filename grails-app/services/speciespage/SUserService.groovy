@@ -22,7 +22,7 @@ import speciespage.search.SUserSearchService;
 import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
@@ -185,7 +185,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 			case NEW_USER:
 				def messagesourcearg = new Object[1];
                 messagesourcearg[0] = domain;
-				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.newuser.emailSubject", messagesourcearg, LCH.getLocale())
+				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.newuser.emailSubject", messagesourcearg, RCU.getLocale(request))
 			//bodyContent = g.render(template:"/emailtemplates/welcomeEmail", model:templateMap)
 				if (mailSubject.contains('$')) {
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
@@ -212,11 +212,11 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 			case USER_DELETED:
 				def messagesourcearg = new Object[1];
                 messagesourcearg[0] = domain;
-				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailSubject", messagesourcearg, LCH.getLocale())
+				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailSubject", messagesourcearg, RCU.getLocale(request))
 				def msgsourcearg = new Object[2];
                 msgsourcearg[1] = email;
                 msgsourcearg[2] = domain;
-				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, LCH.getLocale())
+				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, RCU.getLocale(request))
 				if (bodyContent.contains('$')) {
 					bodyContent = evaluate(bodyContent, templateMap)
 				}
