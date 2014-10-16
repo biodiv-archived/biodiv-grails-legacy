@@ -10,20 +10,20 @@
 				<g:each in="${downloadTypes}" var="downloadType" status="i">
 					<g:if test="${i > 0}">
 						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
-						${'Export as ' + downloadType.value()}</input>
+						${g.message(code:'download.export')} ${downloadType.value()}</input>
 						<br />
 					</g:if>
 					<g:else>
 						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED>
-						${'Export as ' + downloadType.value()}</input>
+						${g.message(code:'download.export')} ${downloadType.value()}</input>
 						<br />
 					</g:else>
 				</g:each>
 				<br />
 				<textarea class="comment-textbox" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
-				<input class="btn pull-right" type="submit" value="OK"></input>
-				<div id="download-close" class="popup-form-close" value="close">
+				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}"></input>
+				<div id="download-close" class="popup-form-close" value="${g.message(code:'button.close')}">
 					<i class="icon-remove"></i>
 				</div>
 			</form>

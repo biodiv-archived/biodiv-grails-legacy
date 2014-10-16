@@ -196,7 +196,8 @@ class Species implements Rateable {
 		return icons;
 	}
 	
-	String notes(Language userLanguage) {
+	String notes(Language userLanguage = null) {
+        if(!userLanguage) userLanguage = Language.getLanguage(null);
         XMLConverter converter = new XMLConverter();
         String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,1,userLanguage)
         String overview = converter.getFieldFromName(fieldsConfig.OVERVIEW,1,userLanguage) 

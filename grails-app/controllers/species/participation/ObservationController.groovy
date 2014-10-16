@@ -38,6 +38,7 @@ import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.TaxonomyDefinition.TaxonomyRank;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -1632,7 +1633,6 @@ class ObservationController extends AbstractObjectController {
     }
 
     def testy(){
-    	
-	    	setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
     }
 }
