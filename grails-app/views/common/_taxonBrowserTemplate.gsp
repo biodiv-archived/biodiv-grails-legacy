@@ -28,12 +28,14 @@
 
     </div>
 </div>
- <table id="taxonHierarchy" class="emptyField" style="width: 938px !important;"></table>
-<style type="text/css">
-        .ui-jqgrid-bdiv, .ui-jqgrid .ui-jqgrid-btable{
-            width:938px !important;
-        }
-</style>
+ <table id="taxonHierarchy" class="emptyField"></table>
+    <g:if test="${actionName == 'list'}">
+    <style type="text/css">
+            .ui-jqgrid-bdiv, .ui-jqgrid .ui-jqgrid-btable{
+                width:938px !important;
+            }
+    </style>
+    </g:if>
 </g:if>
 <g:else>
 <table id="taxonHierarchy" class="emptyField" style="width: 938px;"></table>
