@@ -23,6 +23,7 @@ import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder;
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
@@ -32,6 +33,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def SUserSearchService
 	def speciesPermissionService
     def messageSource;
+    def request;
     private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -170,6 +172,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	}
 
 	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
+		 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
 		def conf = SpringSecurityUtils.securityConfig
 		g = applicationContext.getBean(ApplicationTagLib)
 
