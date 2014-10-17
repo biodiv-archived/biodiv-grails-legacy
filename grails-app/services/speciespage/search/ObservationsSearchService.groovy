@@ -49,7 +49,7 @@ class ObservationsSearchService extends AbstractSearchService {
         while(noIndexed < INDEX_DOCS) {
             observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
             noIndexed += observations.size()
-            if(!observations && noIndexed > INDEX_DOCS) break;
+            if(!observations) break;
             publishSearchIndex(observations, true);
             observations.clear();
             offset += limit;
