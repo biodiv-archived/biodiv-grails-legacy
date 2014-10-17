@@ -25,7 +25,7 @@
         <div id="home" class="observation  span12">
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
                 <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;"><g:message code="index.welcome" /> ${grailsApplication.config.speciesPortal.app.siteName}</h2>
-                <p style="line-height:1.5">${grailsApplication.config.speciesPortal.app.homepageDescription}
+                <p style="line-height:1.5">${g.message(code:'app.homepageDescription')}
                 <a href="about"><g:message code="link.more" /></a>
                 </p>
             </div>
@@ -47,29 +47,29 @@
 
             <div id="stats" class="navblock" style="margin-top:-20px">
                 <div class="entry">
-<span class="stats_normal">Number of</span><br><span class="stats_big_bold">SPECIES</span><span class="stats_big"> PAGES</span>
-                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countByPercentOfInfoGreaterThan(0)}</div>
+				${g.message(code:'title.number.species')}
+                    <div class="stats_number" >${Species.countByPercentOfInfoGreaterThan(0)}</div>
                 </div>
                 <div class="entry">
-                    <span class="stats_normal">Number of</span><br><span class="stats_big_bold">OBSERVATIONS</span>
+                    ${g.message(code:'title.number.observations')}
                     <div class="stats_number" >${Observation.countObservations()}</div>
                 </div>
 
                 <div class="entry">
-		    <span class="stats_normal">Number of</span><br> <span class="stats_big">MAP </span><span class="stats_big_bold">LAYERS</span>
+		    ${g.message(code:'title.number.maps')}
                     <div class="stats_number" >1</div>
                 </div>
                 <div class="entry">
- 		    <span class="stats_normal">Number of</span><br><span class="stats_big_bold">DOCUMENTS</span>
+ 		    ${g.message(code:'title.number.documents')}
                     <div class="stats_number" >${Document.count()}</div>
                 </div>
 
             <div class="entry">
-                <span class="stats_normal">Number of</span><br><span class="stats_big_bold">CHECKLISTS</span>
+                ${g.message(code:'title.number.checklist')}
                 <div class="stats_number">${Observation.countChecklists()}</div>
             </div>
             <div class="entry">
-                <span class="stats_normal">Number of</span><br><span class="stats_big_bold">SPECIES</span> <span class="stats_big">ID</span>
+                ${g.message(code:'title.species.id')}
                 <div class="stats_number">189</div>
             </div>
         </div>
