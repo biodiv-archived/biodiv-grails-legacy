@@ -35,7 +35,7 @@ class ObservationsSearchService extends AbstractSearchService {
     /**
      * 
      */
-    def publishSearchIndex(boolean isFullIndex = false) {
+    def publishSearchIndex() {
         log.info "Initializing publishing to observations search index"
 
         //TODO: change limit
@@ -45,7 +45,8 @@ class ObservationsSearchService extends AbstractSearchService {
 
         def observations;
         def startTime = System.currentTimeMillis()
-        while(isFullIndex || noIndexed < INDEX_DOCS) {
+        INDEX_DOCS = Observation.count()+1;
+        while(noIndexed < INDEX_DOCS) {
             observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
             noIndexed += observations.size()
             if(!observations && noIndexed > INDEX_DOCS) break;

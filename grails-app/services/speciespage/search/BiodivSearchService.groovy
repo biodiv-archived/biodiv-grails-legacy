@@ -94,7 +94,7 @@ class BiodivSearchService extends AbstractSearchService {
     /**
      * 
      */
-    def publishSearchIndex(boolean isFullIndex = false) {
+    def publishSearchIndex() {
         log.info "Initializing publishing to biodiv search index"
 
         //TODO: change limit
@@ -103,7 +103,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         def startTime = System.currentTimeMillis()
         //while(true) {
-        if(!publishSearchIndex(null, true, isFullIndex)) {
+        if(!publishSearchIndex(null, true)) {
             log.error "FAILED to publish biodiv search index"
             return
         }
@@ -114,7 +114,7 @@ class BiodivSearchService extends AbstractSearchService {
     }
 
 
-    def publishSearchIndex(List dummy, boolean commit=true, boolean isFullIndex = false) {
+    def publishSearchIndex(List dummy, boolean commit=true) {
         log.info "=======STARTING======== "
         log.info "Initializing publishing to biodiv search index : ";
 

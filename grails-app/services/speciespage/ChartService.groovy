@@ -21,6 +21,7 @@ import species.participation.RecommendationVote;
 import groovy.sql.Sql;
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder;
 
 class ChartService {
 
@@ -37,8 +38,9 @@ def messageSource;
     def utilsService
 	def userGroupService
     def dataSource
-	
+	def request;
 	def getObservationStats(params, SUser author, request){
+		if(request == null) request = RequestContextHolder.currentRequestAttributes().request
 		UserGroup userGroupInstance
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
@@ -243,6 +245,7 @@ def messageSource;
 
 
 	def getSpeciesPageStats(params, request){
+		if(request == null) request = RequestContextHolder.currentRequestAttributes().request
 		def totalCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id order by count(*) desc";
 		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id order by count(*) desc";
 
@@ -269,6 +272,7 @@ def messageSource;
 	}
 
 	private addHtmlResultForSpecies(Map res, request){
+		if(request == null) request = RequestContextHolder.currentRequestAttributes().request
 		List htmlData = []
 		res.data.each{ r ->
 			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, false), r[1], r[2]])
@@ -291,6 +295,7 @@ def messageSource;
 	} 
 	
 	def activeUserStats(params, request){
+		if(request == null) request = RequestContextHolder.currentRequestAttributes().request
 		int days = params.days ? params.days.toInteger() : 7
 		int max = params.max ? params.max.toInteger() : 10
 

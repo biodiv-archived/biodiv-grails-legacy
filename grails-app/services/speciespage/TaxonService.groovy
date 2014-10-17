@@ -14,6 +14,7 @@ import species.sourcehandler.XMLConverter
 import species.auth.SUser;
 import grails.converters.JSON;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder
 import species.Language;
 
 class TaxonService {
@@ -30,6 +31,7 @@ class TaxonService {
     def activityFeedService;
     def speciesPermissionService;
     def messageSource;
+    def request;
 	static int BATCH_SIZE = 100;
 
 	/**
@@ -779,6 +781,7 @@ class TaxonService {
     */
 
     def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language) {
+    	 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         List errors = [];
         if(!classification) {
         	def messagesourcearg = new Object[1];
@@ -819,6 +822,7 @@ class TaxonService {
     } 
 
     private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+    	 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         String msg = '';
         def content;
         List errors = [];

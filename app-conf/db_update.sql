@@ -114,9 +114,6 @@ alter table field alter column language_id set not null;
 alter table field add column connection bigint;
 alter table field alter column connection set not null;
 
-update suser set language_id = 123;
-
-
 
 /* Added on 16 OCT */
 

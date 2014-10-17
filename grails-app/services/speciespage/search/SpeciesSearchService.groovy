@@ -38,6 +38,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		
 		def species;
 		def startTime = System.currentTimeMillis()
+        INDEX_DOCS = Species.count() + 1;
 		while(noIndexed < INDEX_DOCS) {
 			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
             noIndexed += species.size();
