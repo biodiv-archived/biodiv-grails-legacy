@@ -129,8 +129,7 @@
         <ckeditor:resources />
         <script type="text/javascript" src="ckEditorConfig.js" />
 
-        <script type="text/javascript"
-            src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
+        
         <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
         -->
         <script type="text/javascript">
@@ -153,13 +152,9 @@
 
         $(document).ready(function(){
             if(${sparse}) {
-                if(occurrenceCount > 0) {
+                
                 showOccurence('${speciesName}');
-                //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
-                } else {
-                $("#map").next('.alert').html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.").css('height','auto');
-                $('#map').hide();
-                }
+                
             } else {
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
                 showSpeciesField($(".defaultSpeciesField").attr("id"))
@@ -182,7 +177,7 @@
                     { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
                     { name: 'insert', items: ['Table'] }
                     ],
-                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/biodivofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/${grailsApplication.metadata['app.name']}ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                     height: '300px',
@@ -197,10 +192,12 @@
     </head>
 
     <body>
-    <link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
-    <script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
-    <script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
-    <script src="/biodiv/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
+
+    
+    <link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.css">
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/galleria-1.3.5.js"></script>
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>

@@ -1,6 +1,6 @@
 <g:each in="${featuredNotes}" var="${featuredNotesItem}">
 <div class="featured_notes linktext">
-    ${raw(featuredNotesItem.notes)}
+    <g:render template="/common/languagewrap" model="['domainInstance': featuredNotesItem , 'userLanguage' : userLanguage, 'contentValue' : featuredNotesItem.notes, 'isHtml' : true]"/>
     <small>
         <div class="ellipsis" style="margin:0px;height:${instance.summary()?'20px':'0px'};">${raw(instance.summary())}</div>
         <div class="ellipsis" style="height:20px;"><g:message code="text.featured.on" /> 
