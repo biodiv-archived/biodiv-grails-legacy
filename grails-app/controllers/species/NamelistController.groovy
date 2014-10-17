@@ -5,11 +5,14 @@ import grails.converters.XML;
 import species.TaxonomyRegistry;
 import species.Classification;
 import species.TaxonomyDefinition;
+import grails.plugin.springsecurity.annotation.Secured;
 
 class NamelistController {
-
+    
+	@Secured(['ROLE_USER'])
     def index() { }
-	
+
+    def namelistService
 	
 	/**
 	 * input : taxon id ,classification id of ibp 
@@ -36,7 +39,7 @@ class NamelistController {
         println "=========TAXON REG========= " + taxonReg
         def res
         if(taxonReg) {
-            res = [name:'rahul', kingdom:'Plantae',phylum:'Magnoliophyta', authorString:'author', rank:'super-family', source:'COL', superfamily:'Ydfvsdv',family:'Menispermaceae', 'class':'Equisetopsida', order:'Ranunculales',genus:'Albertisia',species:'Albertisia mecistophylla','sub-genus':'Subsdfsdf','sub-family':'SubFfsad', nameStatus:'acceptedName', via:'xx', id:'123', taxonReg:taxonReg.id?.toString()]
+            res = [name:'rahul', kingdom:'Plantae',phylum:'Magnoliophyta', authorString:'author', rank:'super-family', source:'COL', superfamily:'Ydfvsdv',family:'Menispermaceae', 'class':'Equisetopsida', order:'Ranunculales',genus:'Albertisia',species:'Albertisia mecistophylla','sub-genus':'Subsdfsdf','sub-family':'SubFfsad', nameStatus:'accepted', via:'xx', id:'123', taxonReg:taxonReg.id?.toString()]
         } else {
             println "======TAXON REGISTRY NULL====="
         }
@@ -51,7 +54,17 @@ class NamelistController {
         //[[name:'aa', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb']]
         println "====SEARCH COL====== " + params.name+"====== "+ params.dbName
         //SWITCH CASE BASED ON DB NAME [col,gbif,ubio,tnrs,gni,eol,worms] and if value "databaseName" - means no database selected to query
-        def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
+        def dbName = params.dbName
+        List res = []
+        switch (dbName) {
+            case "col":
+                res = namelistService.searchCOL(params.name, 'name');
+            break
+        }
+        
+        //def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
+
+        println "========RES ======= " + res
         render res as JSON
     }
     /**
@@ -61,7 +74,17 @@ class NamelistController {
     def getExternalDbDetails(){
         //same getNameDetails
         println "====EXTERNAL DB DETAILS====== " + params
-        def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
-        render res as JSON
+        //SWITCH CASE BASED ON DB NAME [col,gbif,ubio,tnrs,gni,eol,worms] and if value "databaseName" - means no database selected to query
+        def dbName = params.dbName
+        List res = []
+        switch (dbName) {
+            case "col":
+                res = namelistService.searchCOL(params.externalId, 'id');
+            break
+        }
+        //def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
+        println "========RES DETAILS====== " + res[0]  
+        //Sending 0th index as only one result as its queried on id
+        render res[0] as JSON
     }
 }

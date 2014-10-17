@@ -218,7 +218,7 @@
 									</div>
 									<div class="span6">
                                         Status :- <select id="statusDropDown" class="statusDropDown span9" >
-                                            <option value="chooseNameStatus">Choose Name Status</option><option value="acceptedName">Accepted Name</option><option value="synonym">Synonym</option>
+                                            <option value="chooseNameStatus">Choose Name Status</option><option value="accepted">Accepted Name</option><option value="synonym">Synonym</option>
                                         </select>
 									</div>
 							</div>
@@ -330,7 +330,7 @@
                 <option value="eol">EoL</option>
                 <option value="worms">WoRMS</option>
             </select>
-            <input type="text" placeholder= "Query string" class="queryString span10"><i class="icon-search" onClick='searchDatabase()'></i>
+            <button class="btn queryString span10" onClick='searchDatabase()'>Query <i class="icon-search"></i></button>
             </div>
         </div>
 

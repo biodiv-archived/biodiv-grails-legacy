@@ -85,6 +85,7 @@ function setOption(selectElement, value) {
 }
 
 function populateNameDetails(data){
+    console.log("=======REACHED POPULATE====");
     for (var key in data) {
         console.log(key +"===== "+ data[key]);
         if(key != "rank" && key!= "status"){
@@ -97,7 +98,7 @@ function populateNameDetails(data){
 
 //takes name for search
 function searchDatabase() {
-    var name = $(".queryString").val();
+    var name = $(".name").val();
     var dbName = $("#queryDatabase").val();
     if(dbName == "databaseName") {
         alert("Please select a database to query from!!");
@@ -122,6 +123,8 @@ function searchDatabase() {
 }
 
 function fillPopupTable(data, $ele) {
+    //clear table
+    $ele.find("table tr td").remove();
     var rows = "";
     $.each(data, function(index, value) {
         rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onClick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
@@ -165,8 +168,8 @@ function saveHierarchy() {
         data: taxonRegistryData,	
         success: function(data) {
             //show the popup
-            $("#externalDbResults").modal('hide');
-            populateNameDetails(data)
+            //$("#externalDbResults").modal('hide');
+            //populateNameDetails(data)
             console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
