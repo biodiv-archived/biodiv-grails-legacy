@@ -8,12 +8,12 @@ class MapController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	def mapService;
+
     def index = {
         redirect(action: "show", params: params)
     }
 
     def show = {
-        render (view:'show');
     }
 /*
     def getLinkTableEntries = {
