@@ -34,16 +34,6 @@
                                 </div>
                             </div>
                     
-                            <!--div
-                                class="control-group">
-                                <label class="control-label span2" for="mappingFile"> Mapping File</label>
-                                <div class="controls span9" style="">
-                                    <g:render template='/UFile/docUpload'
-                                    model="['name': 'speciesmappingfile', 'path': mappingFile?.path, 'size':mappingFile?.size,'allowedExtensions':allowedExtensions, 'fileParams':['uploadDir':'species', 'fileConvert': true]]" />
-                                    <div class="help-inline">
-                                    </div>
-                                </div>
-                            </div-->
 
                             <div
                                 class="control-group">

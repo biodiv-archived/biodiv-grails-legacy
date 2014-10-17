@@ -94,7 +94,7 @@ class BiodivSearchService extends AbstractSearchService {
     /**
      * 
      */
-    def publishSearchIndex() {
+    def publishSearchIndex(boolean isFullIndex = false) {
         log.info "Initializing publishing to biodiv search index"
 
         //TODO: change limit
@@ -103,7 +103,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         def startTime = System.currentTimeMillis()
         //while(true) {
-        if(!publishSearchIndex(null, true)) {
+        if(!publishSearchIndex(null, true, isFullIndex)) {
             log.error "FAILED to publish biodiv search index"
             return
         }
@@ -114,7 +114,7 @@ class BiodivSearchService extends AbstractSearchService {
     }
 
 
-    def publishSearchIndex(List dummy, boolean commit=true) {
+    def publishSearchIndex(List dummy, boolean commit=true, boolean isFullIndex = false) {
         log.info "=======STARTING======== "
         log.info "Initializing publishing to biodiv search index : ";
 
@@ -357,7 +357,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -366,13 +366,13 @@ class BiodivSearchService extends AbstractSearchService {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }
