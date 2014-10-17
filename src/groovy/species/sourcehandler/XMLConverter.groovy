@@ -1373,14 +1373,14 @@ class XMLConverter extends SourceConverter {
      * Creating the given classification entries hierarchy.
      * Saves any new taxondefinition found 
      */
-     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false) {
+     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false) {
         log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         def taxonHierarchies = new ArrayList();
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
             println "=========YAHAN SE AYA====="
-            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName);
+            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL);
             if(t) {
                 cleanUpGorm();
                 taxonHierarchies.addAll(t);
@@ -1409,9 +1409,9 @@ class XMLConverter extends SourceConverter {
      * @param scientificName
      * @return
      */
-    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false) {
+    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false) {
         log.debug "Getting classification hierarchy : "+classification.name;
-        println "================ABORT ON NEW NAME================ " + abortOnNewName
+        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1478,6 +1478,10 @@ class XMLConverter extends SourceConverter {
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
                                 taxon.rank = rank;
+                                if(fromCOL) {
+                                    println "=========COL SE REQUIRED==============="
+                                    //get its data from col and save
+                                }
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }

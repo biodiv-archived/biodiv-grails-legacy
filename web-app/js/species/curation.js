@@ -62,6 +62,7 @@ function getNameDetails(taxonId, classificationId) {
         type: "POST",
         data: {taxonId:taxonId, classificationId:classificationId},	
         success: function(data) {
+            changeEditingMode(false);
             populateNameDetails(data)
             console.log("======SUCCESS====");
             console.log(data);  
@@ -145,7 +146,10 @@ function getExternalDbDetails(externalId) {
         success: function(data) {
             //show the popup
             $("#externalDbResults").modal('hide');
-            populateNameDetails(data)
+            populateNameDetails(data);
+            if(dbName == 'col') {
+                changeEditingMode(true);
+            }
             console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
@@ -157,6 +161,10 @@ function getExternalDbDetails(externalId) {
 function saveHierarchy() {
     var taxonRegistryData = fetchTaxonRegistryData();
     taxonRegistryData['abortOnNewName'] = true;
+    taxonRegistryData['fromCOL'] = $('.fromCOL').val();
+    if($('.fromCOL').val() == "true") {
+        taxonRegistryData['abortOnNewName'] = false;
+    }
     console.log("===============");
     console.log(taxonRegistryData);
     var url =  window.params.taxon.classification.updateUrl;
@@ -218,4 +226,14 @@ function fetchTaxonRegistryData() {
     result['metadata'] = metadata1;
 
     return result;
+}
+
+function changeEditingMode(mode) {
+    if(mode == false) {
+        $(".fromCOL").val(mode);
+    } else {
+        $(".fromCOL").val(mode);
+    }
+    $(".canBeDiasbled input").prop("disabled", mode); 
+    $(".canBeDiasbled select").prop("disabled", mode); 
 }

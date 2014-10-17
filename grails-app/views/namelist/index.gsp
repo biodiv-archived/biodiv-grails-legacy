@@ -186,17 +186,18 @@
 
  <div class="row-fluid">
 
-	<div class="span10">
+	<div class="span10 metadataDetails">
 	
 	
 				<div class="row-fluid">
 					
-					<div class="span3 column">
+					<div class="span3 canBeDiasbled column">
 							<div class ="row-fluid">
 								<div class="span4"><label>Name</label></div>
 								<div class="span8"> <input type="text" placeholder="Name" class="name span12"/></div>
                             </div>
                             <input type="hidden" class="taxonReg" value="">
+                            <input type="hidden" class="fromCOL" value=false>
 							<div class="row-fluid">	
                                 <div class="span4"><label>Rank</label></div>
                                 <div class="span8"> 
@@ -211,7 +212,7 @@
 							
 					</div>
 				
-					<div class="span9 column">
+					<div class="span9 canBeDiasbled column">
 							<div class="row-fluid">
 									<div class="span6">
 											Author String :- <input type="text" placeholder="Name" class="authorString span6"/>
@@ -242,7 +243,7 @@
 				
                 <div class="row-fluid">
 
-                    <div class="span3 column">
+                    <div class="span3 canBeDiasbled column">
                         <table style="width:100%">
                             <tr>
                                 <td>Kingdom</td>

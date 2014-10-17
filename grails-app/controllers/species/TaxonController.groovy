@@ -499,8 +499,8 @@ class TaxonController {
                     classification = params.classification ? Classification.read(params.long('classification')) : null;
                 }
                 
-
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, true);
+                println "=========TO BOOLEAN====== " + params.abortOnNewName + "==== " + params.fromCOL
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName.toBoolean()?params.abortOnNewName.toBoolean():false) , (params.fromCOL.toBoolean()?params.fromCOL.toBoolean():false));
                 result.action = 'update';
                 if(params.controller != 'taxon'){
                     if(result.success) {
