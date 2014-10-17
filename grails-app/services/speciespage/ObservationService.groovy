@@ -72,7 +72,8 @@ import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder
 
 class ObservationService extends AbstractObjectService {
 
@@ -87,7 +88,7 @@ class ObservationService extends AbstractObjectService {
     //def speciesService;
     def messageSource;
     def resourcesService;
-
+    def request;
     /**
      * 
      * @param params
@@ -1269,35 +1270,36 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         def source = m.source;
         def mailSubject = ""
         def activitySource = ""
         switch (source) {
             case "observationShow":
-            mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
-            activitySource = messageSource.getMessage("observation.label", null, LCH.getLocale())
+            mailSubject = messageSource.getMessage("info.share.observation", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("observation.label", null, RCU.getLocale(request))
             break
 
             case  "observationList" :
-            mailSubject = messageSource.getMessage("info.share.list", null, LCH.getLocale())
-            activitySource = messageSource.getMessage("info.observation.list", null, LCH.getLocale())
+            mailSubject = messageSource.getMessage("info.share.list", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.observation.list", null, RCU.getLocale(request))
             break
 
             case "userProfileShow":
-            mailSubject = messageSource.getMessage("info.share.profile", null, LCH.getLocale())
-            activitySource = messageSource.getMessage("info.user.profile", null, LCH.getLocale())
+            mailSubject = messageSource.getMessage("info.share.profile", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.profile", null, RCU.getLocale(request))
             break
 
             case "userGroupList":
-            mailSubject = messageSource.getMessage("info.share.lists", null, LCH.getLocale())
-            activitySource = messageSource.getMessage("info.user.lists", null, LCH.getLocale())
+            mailSubject = messageSource.getMessage("info.share.lists", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.lists", null, RCU.getLocale(request))
             break
             case "userGroupInvite":
-            mailSubject = messageSource.getMessage("info.invitation.join", null, LCH.getLocale())
-            activitySource = messageSource.getMessage("info.user.group", null, LCH.getLocale())
+            mailSubject = messageSource.getMessage("info.invitation.join", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.group", null, RCU.getLocale(request))
             break
             case controller+action.capitalize():
-            mailSubject = messageSource.getMessage("button.share", null, LCH.getLocale())+" "+controller
+            mailSubject = messageSource.getMessage("button.share", null, RCU.getLocale(request))+" "+controller
             activitySource = controller
             break;
             default:
@@ -1311,7 +1313,7 @@ class ObservationService extends AbstractObjectService {
              messagesourcearg1[0] = currentUser;
              messagesourcearg1[1] = activitySource;
              messagesourcearg1[2] = templateMap["domain"];
-        def staticMessage = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.staticMessage", messagesourcearg1, LCH.getLocale())
+        def staticMessage = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.staticMessage", messagesourcearg1, RCU.getLocale(request))
         if (staticMessage.contains('$')) {
             staticMessage = evaluate(staticMessage, templateMap)
         } 
@@ -1328,7 +1330,7 @@ class ObservationService extends AbstractObjectService {
              messagesourcearg[4] = templateMap["userMessage"];
              messagesourcearg[5] = templateMap["unsubscribeUrl"];
              
-        def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, LCH.getLocale())
+        def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, RCU.getLocale(request))
 
         if (body.contains('$')) {
             body = evaluate(body, templateMap)
