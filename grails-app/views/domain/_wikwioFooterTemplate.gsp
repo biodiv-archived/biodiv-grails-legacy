@@ -95,8 +95,8 @@
             </div-->
 <div class="powered" style="text-align:center;">
 	<p> 
-Best supported on Google Chrome, Firefox 3.0+, Internet Explorer 8.0+, Safari 4.0+, Opera 10+.<br />
-Powered by the open source <a href="https://github.com/strandls/biodiv" target="_blank">Biodiversity Informatics Platform.</a></p>
+${g.message(code:'text.supported.on')}<br />
+ ${g.message(code:'text.powered.by')}<a href="https://github.com/strandls/biodiv" target="_blank"> ${g.message(code:'footer.platform')}</a> ${g.message(code:'text.technology.partner')} <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank" > ${g.message(code:'technology.partner.strandlifesciences')} </p>
 	</div>
 </div>
 <r:script>
