@@ -31,6 +31,7 @@ class SUserSearchService extends AbstractSearchService {
 		
 		def susers;
 		def startTime = System.currentTimeMillis()
+        INDEX_DOCS = SUser.count()+1;
 		while(noIndexed < INDEX_DOCS) { 
 			susers = SUser.findAll("from SUser as u where u.accountLocked =:ae and u.accountExpired =:al and u.enabled=:en", [ae:false, al:false, en:true], [max:limit, offset:offset, sort: "id"]);
             noIndexed += susers.size();
