@@ -10,7 +10,7 @@
         <g:if test="${!hideShare}">
 		<div class="footer-item">
 			<obv:identificationByEmail
-                        model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', title:'Share']" />
+                        model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', title:g.message(code:'button.share')]" />
 		</div>
         </g:if>
 
@@ -116,19 +116,19 @@
         if(pos>=0 && (prevObservationId || nextObservationId)) 
             navParams['pos'] = pos-1; 
         %>
-        <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink(navParams.clone())}"><i class="icon-backward"></i>Prev</a>
+        <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink(navParams.clone())}"><i class="icon-backward"></i><g:message code="button.prev" /></a>
 
         <% navParams['id'] = nextId; 
         if(pos>=0 && (prevObservationId || nextObservationId))
             navParams['pos'] = pos+1; 
         %>
-        <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink(navParams.clone())}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
+        <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink(navParams.clone())}"><g:message code="button.next" /><i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
 
         <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
         if(pos)
                 lastListParams.put('fragment', pos);	 
         %>
-        <a class="btn btn-mini" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
+    <a class="btn btn-mini" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;"><g:message code="default.list.label" /></a>
     </div>
 
 

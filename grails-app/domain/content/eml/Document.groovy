@@ -14,7 +14,8 @@ import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Follow;
 import species.participation.Featured;
-
+import species.Language;
+import org.springframework.context.MessageSourceResolvable;
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -27,7 +28,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	def SUserService;
 	def documentService
 	
-	public enum DocumentType {
+	public enum DocumentType implements org.springframework.context.MessageSourceResolvable{
 		Report("Report"),
 		Poster("Poster"),
 		Proposal("Proposal"),
@@ -43,6 +44,16 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		public String value() {
 			return this.value;
 		}
+	 Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            
+            println "${getClass().name}.${name()}"
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+                String getDefaultMessage() { value() }
+
+
 	}
 
 	DocumentType type
@@ -70,6 +81,9 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	
 	//Date createdOn  <=== dateCreated
 	//Date lastRevised <=== lastUpdated
+
+	// Language
+    Language language;
 	
 	boolean deleted
 	
@@ -87,6 +101,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		uri validator : {val, obj -> 
 			val || obj.uFile
 		},nullable:true
+		language nullable:false
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true

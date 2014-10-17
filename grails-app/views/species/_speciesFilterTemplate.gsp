@@ -11,35 +11,35 @@
 	<div class="btn-group pull-right" style="z-index: 10">
 		<button id="selected_sort" class="btn dropdown-toggle"
 			data-toggle="dropdown" href="#" rel="tooltip"
-			data-original-title="Sort by">
+			data-original-title="${g.message(code:'showobservationlistwrapertemp.sort')}">
 
 			<g:if test="${params.sort == 'title'}">
-            	Name
+            	<g:message code="default.name.label" />
             </g:if>
             <g:elseif test="${params.sort == 'lastrevised' || params.sort == 'lastUpdated'}">
-				Last Updated
+				<g:message code="button.last.updated" /> 
             </g:elseif>
 			<g:elseif test="${params.sort == 'score'}">
-				Relevancy
+				<g:message code="button.relevancy" />
             </g:elseif>
 			<g:else>
-            	Last Updated
+            	<g:message code="button.last.updated" />
             </g:else>
 			<span class="caret"></span>
 		</button>
 		<ul id="sortFilter" class="dropdown-menu">
 			<g:if test="${isSearch}">
 				<li class="group_option"><a class=" sort_filter_label"
-					value="score"> Relevancy </a>
+					value="score"> <g:message code="button.relevancy" /> </a>
 				</li>
 			</g:if>
 			<g:else>
 				<li class="group_option"><a class=" sort_filter_label"
-					value="title"> Name </a></li>
+					value="title"> <g:message code="default.name.label" /> </a></li>
 				<li class="group_option"><a class=" sort_filter_label"
-					value="percentOfInfo"> Richness </a></li>
+					value="percentOfInfo"> <g:message code="speciesfilter.richness" /> </a></li>
 				<li class="group_option"><a class=" sort_filter_label"
-					value="lastrevised"> Last Updated </a></li>
+					value="lastrevised"> <g:message code="button.last.updated" /> </a></li>
 			</g:else>
 		</ul>
 	</div>

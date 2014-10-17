@@ -2620,7 +2620,20 @@ small {
     background-repeat: no-repeat;
     box-shadow: -3px -1px 21px #777777;
     background-size:200% 100%;
+    position:relative;
 }
+
+#home .content {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: whitesmoke;
+    position:absolute;
+    bottom: 9px;
+    left: 0px;
+    right: 0px;
+}
+
 .navblock {
     display: inline-block;
     float: left;
@@ -2897,3 +2910,10 @@ small {
 {
     width:25px; float:left; margin-right:6px
 }
+#advSearchForm .control-label {
+    width:120px;
+}
+#advSearchForm .controls {
+    margin-left:140px;
+}
+

@@ -1,7 +1,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <g:if test="${feedInstance.activityType == ActivityFeedService.COMMENT_ADDED}">
-	<comment:showCommentWithReply model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
+	<comment:showCommentWithReply model="['feedInstance' : feedInstance, 'feedPermission':feedPermission, 'userLanguage':userLanguage]" />
 </g:if>
 <g:else>
 	<div class="yj-message-container">

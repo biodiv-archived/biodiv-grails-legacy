@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import species.Resource;
 import species.Habitat;
 import species.Language;
-import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.Resource.ResourceType;
 import species.auth.SUser;
@@ -72,6 +71,9 @@ import species.groups.UserGroupController;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
+import org.springframework.context.MessageSource;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder
 
 class ObservationService extends AbstractObjectService {
 
@@ -79,36 +81,14 @@ class ObservationService extends AbstractObjectService {
 
     def recommendationService;
     def observationsSearchService;
-    def curationService;
-    def commentService;
+    //def curationService;
     def userGroupService;
     def activityFeedService;
-    def mailService;
     def SUserService;
-    def speciesPermissionService;
-    def speciesService;
+    //def speciesService;
     def messageSource;
     def resourcesService;
-
-    static final String OBSERVATION_ADDED = "observationAdded";
-    static final String SPECIES_CONTRIBUTOR = "speciesContributor";
-    static final String SPECIES_CURATORS = "speciesCurators"
-    static final String SPECIES_RECOMMENDED = "speciesRecommended";
-    static final String SPECIES_AGREED_ON = "speciesAgreedOn";
-    static final String SPECIES_NEW_COMMENT = "speciesNewComment";
-    static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
-    static final String OBSERVATION_FLAGGED = "observationFlagged";
-    static final String OBSERVATION_DELETED = "observationDeleted";
-    static final String CHECKLIST_DELETED= "checklistDeleted";
-    static final String DOWNLOAD_REQUEST = "downloadRequest";
-    static final int MAX_EXPORT_SIZE = -1;
-    static final String FEATURED = "Featured";
-    static final String UNFEATURED = "UnFeatured";
-    static final String DIGEST_MAIL = "digestMail";
-    static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
-    static final String REMOVE_USERS_RESOURCE = "deleteUsersResource";
-    static final String NEW_SPECIES_PERMISSION = "New permission on species";
-    static final String COMMENT_ADD_USER_TAG = "Comment_add_user_tag";
+    def request;
     /**
      * 
      * @param params
@@ -153,6 +133,7 @@ class ObservationService extends AbstractObjectService {
         observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
+        observation.language = params.locale_language;
 
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         //        if(params.latitude && params.longitude) {
@@ -203,7 +184,7 @@ class ObservationService extends AbstractObjectService {
                 observationInstance = createObservation(params);
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
-                mailType = OBSERVATION_ADDED
+                mailType = utilsService.OBSERVATION_ADDED
             }else{
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
@@ -224,7 +205,7 @@ class ObservationService extends AbstractObjectService {
                 saveObservationAssociation(params, observationInstance, sendMail)
 
                 if(sendMail)
-                    sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                    utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
 
                 params["createNew"] = true
                 params["oldAction"] = params.action
@@ -248,7 +229,7 @@ class ObservationService extends AbstractObjectService {
                         log.debug "=====NEW OBV DIR CREATED======== " + obvDir
                         obvDir.mkdir();                
                         /////change filename of resource to this uuid and inside that check for clash of filename
-                        File newUniq = getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
+                        File newUniq = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
                         def a = newUniq.getAbsolutePath().tokenize('/')[-1]
                         def newFileName = a.tokenize('.')[0]
                         log.debug "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
@@ -387,7 +368,8 @@ class ObservationService extends AbstractObjectService {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
         } else if(params.filterProperty == "latestUpdatedSpecies") {
             relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
-        } else if(params.filterProperty == 'bulkUploadResources') {
+        } 
+        else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
         
@@ -523,21 +505,6 @@ class ObservationService extends AbstractObjectService {
 
         return result
     }
-
-    /**
-     * 
-     * @param groupId
-     * @return
-     */
-    Object getSpeciesGroupIds(groupId){
-        def groupName = SpeciesGroup.read(groupId)?.name
-        //if filter group is all
-        if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
-            return null
-        }
-        return groupId
-    }
-
 
     /**
      * 	
@@ -1218,6 +1185,15 @@ class ObservationService extends AbstractObjectService {
     }
 
     /**
+    * getUserGroupObservations
+    */
+    def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
+		if(!userGroupInstance) return;
+        params['userGroup'] = userGroupInstance;
+        return getFilteredObservations(params, max, offset, isMapView); 
+	}
+
+    /**
      * Gets users observations depending on user group
      **/
     long getAllObservationsOfUser(SUser user , UserGroup userGroupInstance = null) {
@@ -1294,45 +1270,50 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         def source = m.source;
         def mailSubject = ""
         def activitySource = ""
         switch (source) {
             case "observationShow":
-            mailSubject = "Share Observation"
-            activitySource = "observation"
+            mailSubject = messageSource.getMessage("info.share.observation", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("observation.label", null, RCU.getLocale(request))
             break
 
             case  "observationList" :
-            mailSubject = "Share Observation List"
-            activitySource = "observation list"
+            mailSubject = messageSource.getMessage("info.share.list", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.observation.list", null, RCU.getLocale(request))
             break
 
             case "userProfileShow":
-            mailSubject = "Share User Profile"
-            activitySource = "user profile"
+            mailSubject = messageSource.getMessage("info.share.profile", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.profile", null, RCU.getLocale(request))
             break
 
             case "userGroupList":
-            mailSubject = "Share Groups List"
-            activitySource = "user groups list"
+            mailSubject = messageSource.getMessage("info.share.lists", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.lists", null, RCU.getLocale(request))
             break
             case "userGroupInvite":
-            mailSubject = "Invitation to join group"
-            activitySource = "user group"
+            mailSubject = messageSource.getMessage("info.invitation.join", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.group", null, RCU.getLocale(request))
             break
             case controller+action.capitalize():
-            mailSubject = "Share "+controller
+            mailSubject = messageSource.getMessage("button.share", null, RCU.getLocale(request))+" "+controller
             activitySource = controller
             break;
             default:
             log.debug "invalid source type ${source}"
         }
         def currentUser = springSecurityService.currentUser?:""
-        def currentUserProfileLink = currentUser?generateLink("SUser", "show", ["id": currentUser.id], null):'';
+        def currentUserProfileLink = currentUser?utilsService.generateLink("SUser", "show", ["id": currentUser.id], null):'';
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
         def conf = SpringSecurityUtils.securityConfig
-        def staticMessage = conf.ui.askIdentification.staticMessage
+        def messagesourcearg1 = new Object[3];
+             messagesourcearg1[0] = currentUser;
+             messagesourcearg1[1] = activitySource;
+             messagesourcearg1[2] = templateMap["domain"];
+        def staticMessage = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.staticMessage", messagesourcearg1, RCU.getLocale(request))
         if (staticMessage.contains('$')) {
             staticMessage = evaluate(staticMessage, templateMap)
         } 
@@ -1341,7 +1322,15 @@ class ObservationService extends AbstractObjectService {
         templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
         templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
         templateMap["userMessage"] = m.userMessage?: ""
-        def body = conf.ui.askIdentification.emailBody
+        def messagesourcearg = new Object[6];
+             messagesourcearg[0] = currentUserProfileLink;
+             messagesourcearg[1] = currentUser;
+             messagesourcearg[2] = templateMap["domain"];
+             messagesourcearg[3] = activitySource != null ? 'about <a href="'+templateMap["activitySourceUrl"]+'">'+activitySource+'</a>':'';
+             messagesourcearg[4] = templateMap["userMessage"];
+             messagesourcearg[5] = templateMap["unsubscribeUrl"];
+             
+        def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, RCU.getLocale(request))
 
         if (body.contains('$')) {
             body = evaluate(body, templateMap)
@@ -1533,7 +1522,7 @@ class ObservationService extends AbstractObjectService {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -1542,13 +1531,13 @@ class ObservationService extends AbstractObjectService {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }
@@ -1673,37 +1662,6 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
-    File getUniqueFile(File root, String fileName){
-        File imageFile = new File(root, fileName);
-
-        if(!imageFile.exists()) {
-            return imageFile
-        }
-
-        int i = 0;
-        int duplicateFileLimit = 20
-        while(++i < duplicateFileLimit){
-            def newFileName = "" + i + "_" + fileName
-            File newImageFile = new File(root, newFileName);
-
-            if(!newImageFile.exists()){
-                return newImageFile
-            }
-
-        }
-        log.error "Too many duplicate files $fileName"
-        return imageFile
-    }
-
-    def addRecoComment(commentHolder, rootHolder, recoComment){
-        recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
-        if(recoComment){
-            def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
-                commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName()]
-                commentService.addComment(m);
-        }
-    }
-
     def nameTerms(params) {
         List result = new ArrayList();
 
@@ -1720,7 +1678,7 @@ class ObservationService extends AbstractObjectService {
 
     def delete(params){
         String messageCode;
-        String url = generateLink(params.controller, 'list', []);
+        String url = utilsService.generateLink(params.controller, 'list', []);
         String label = Utils.getTitleCase(params.controller?:'Observation')
         def messageArgs = [label, params.id]
         def errors = [];
@@ -1734,20 +1692,20 @@ class ObservationService extends AbstractObjectService {
                     observationInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
                     if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
-                        def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
+                        def mailType = observationInstance.instanceOf(Checklists) ? utilsService.CHECKLIST_DELETED : utilsService.OBSERVATION_DELETED
                         try {
                             observationInstance.isDeleted = true;
                             observationInstance.deleteFromChecklist();
                             if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
-                                sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                                utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
                                 observationsSearchService.delete(observationInstance.id);
                                 messageCode = 'default.deleted.message'
-                                url = generateLink(params.controller, 'list', [])
+                                url = utilsService.generateLink(params.controller, 'list', [])
                                 ActivityFeed.updateIsDeleted(observationInstance)
                                 success = true;
                             } else {
                                 messageCode = 'default.not.deleted.message'
-                                url = generateLink(params.controller, 'show', [id: params.id])
+                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
                                 observationInstance.errors.allErrors.each { log.error it }
                                 observationInstance.errors.allErrors .each {
                                     def formattedMessage = messageSource.getMessage(it, null);
@@ -1758,7 +1716,7 @@ class ObservationService extends AbstractObjectService {
                         }
                         catch (org.springframework.dao.DataIntegrityViolationException e) {
                             messageCode = 'default.not.deleted.message'
-                            url = generateLink(params.controller, 'show', [id: params.id])
+                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
                             e.printStackTrace();
                             log.error e.getMessage();
                             errors << [message:e.getMessage()];
@@ -1776,11 +1734,11 @@ class ObservationService extends AbstractObjectService {
                     }
                 } else {
                     messageCode = 'default.not.found.message'
-                    url = generateLink(params.controller, 'list', [])
+                    url = utilsService.generateLink(params.controller, 'list', [])
                 }
             } catch(e) {
                 e.printStackTrace();
-                url = generateLink(params.controller, 'list', [])
+                url = utilsService.generateLink(params.controller, 'list', [])
                 messageCode = 'default.not.deleted.message'
                 errors << [message:e.getMessage()];
             }
@@ -1789,494 +1747,6 @@ class ObservationService extends AbstractObjectService {
         String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
 				
         return [success:success, url:url, msg:message, errors:errors]
-    }
-
-    /**
-     */
-    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
-        def conf = SpringSecurityUtils.securityConfig
-        log.debug "Sending email"
-        try {
-
-            def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
-            def obvUrl, domain, baseUrl
-
-            if(notificationType != DIGEST_MAIL) {
-                try {
-                    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-                } catch(IllegalStateException e) {
-                    log.error e.getMessage();
-                }
-            }
-            if(request) {
-                obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
-                domain = Utils.getDomainName(request)
-                baseUrl = Utils.getDomainServerUrl(request)
-            }
-
-            def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
-            templateMap["currentUser"] = springSecurityService.currentUser
-            templateMap["action"] = notificationType;
-			templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
-            def mailSubject = ""
-            def bodyContent = ""
-            String htmlContent = ""
-            String bodyView = '';
-            def replyTo = conf.ui.notification.emailReplyTo;
-            Set toUsers = []
-            //Set bcc = ["xyz@xyz.com"];
-            //def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
-
-            switch ( notificationType ) {
-                case [OBSERVATION_ADDED, activityFeedService.OBSERVATION_UPDATED]:
-                if( notificationType == OBSERVATION_ADDED ) {
-                    mailSubject = conf.ui.addObservation.emailSubject
-                    templateMap["message"] = " added the following observation:"
-                } else {
-                    mailSubject = "Observation updated"
-                    templateMap["message"] = " updated the following observation:"
-                }
-                bodyView = "/emailtemplates/addObservation"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(getOwner(obv))
-                break
-
-                case [activityFeedService.CHECKLIST_CREATED, activityFeedService.CHECKLIST_UPDATED]:
-                if( notificationType == activityFeedService.CHECKLIST_CREATED ) {
-                    mailSubject = conf.ui.addChecklist.emailSubject
-                    templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
-                } else {
-                    mailSubject = "Checklist updated"
-                    templateMap["message"] = " updated a checklist on ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
-                }
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["actionObject"] = "checklist"
-                toUsers.add(getOwner(obv))
-                break
-                
-                case SPECIES_CURATORS:
-                mailSubject = "Request to curate species"
-                bodyView = "/emailtemplates/speciesCurators"
-                templateMap["link"] = otherParams["link"]
-                templateMap["curator"] = otherParams["curator"]
-                //templateMap["link"] = URLDecoder.decode(templateMap["link"])
-                //println "========THE URL  =============" + templateMap["link"]
-                populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
-                toUsers = otherParams["usersMailList"]
-                break
-                
-                case SPECIES_CONTRIBUTOR:
-                mailSubject = "Species uploaded"
-                bodyView = "/emailtemplates/speciesContributor"
-                templateMap["link"] = otherParams["link"]
-                def user = springSecurityService.currentUser;                
-                templateMap["contributor"] = user.name
-                templateMap["speciesCreated"] = otherParams["speciesCreated"]
-				templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
-				templateMap["stubsCreated"] = otherParams["stubsCreated"]
-				templateMap["uploadCount"] = otherParams["uploadCount"]
-				populateTemplate(obv, templateMap,userGroupWebaddress, feedInstance, request )
-                toUsers.add(user)
-                break
-
-                case OBSERVATION_FLAGGED :
-                mailSubject = activityFeedService.getResType(obv).capitalize() + " flagged"
-                bodyView = "/emailtemplates/addObservation"
-                toUsers.add(getOwner(obv))
-                if(obv?.getClass() == Observation) {
-                    templateMap["actionObject"] = 'obvSnippet'
-                }
-                else {
-                    templateMap["actionObject"] = 'usergroup'
-                }
-                templateMap["message"] = " flagged your " + activityFeedService.getResType(obv)
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                break
-
-                case OBSERVATION_DELETED :
-                mailSubject = conf.ui.observationDeleted.emailSubject
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = " deleted the following observation:"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.add(getOwner(obv))
-                break
-
-                case CHECKLIST_DELETED :
-                mailSubject = conf.ui.checklistDeleted.emailSubject
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["actionObject"] = "checklist"
-                templateMap["message"] = " deleted a checklist. The URL of the checklist was ${templateMap['obvUrl']}"
-                toUsers.add(getOwner(obv))
-                break
-
-
-                case SPECIES_RECOMMENDED :
-                bodyView = "/emailtemplates/addObservation"
-                mailSubject = conf.ui.addRecommendationVote.emailSubject
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipants(obv))
-                break
-
-                case SPECIES_AGREED_ON:
-                bodyView = "/emailtemplates/addObservation"
-                mailSubject = conf.ui.addRecommendationVote.emailSubject
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipants(obv))
-                break
-
-                case activityFeedService.RECOMMENDATION_REMOVED:
-                bodyView = "/emailtemplates/addObservation"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                mailSubject = conf.ui.removeRecommendationVote.emailSubject
-                toUsers.addAll(getParticipants(obv))
-                break
-
-                case [activityFeedService.RESOURCE_POSTED_ON_GROUP,  activityFeedService.RESOURCE_REMOVED_FROM_GROUP]:
-                mailSubject = feedInstance.activityDescrption
-                bodyView = "/emailtemplates/addObservation"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
-                //templateMap['message'] = activityFeedService.getContextInfo(feedInstance, [:])
-                templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId));
-                toUsers.addAll(getParticipants(obv))
-                break
-
-                case activityFeedService.COMMENT_ADDED:				
-                bodyView = "/emailtemplates/addObservation"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                templateMap["userGroupWebaddress"] = userGroupWebaddress
-                mailSubject = "New comment in ${templateMap['domainObjectType']}"
-                templateMap['message'] = " added a comment to the page listed below."
-                templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
-                toUsers.addAll(getParticipants(obv))
-                break;
-
-                case "COMMENT_ADD_USER_TAG":
-                bodyView = "/emailtemplates/addObservation"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                templateMap["userGroupWebaddress"] = userGroupWebaddress
-                mailSubject = "Tagged in ${templateMap['domainObjectType']} comment"
-                templateMap['message'] = "has tagged you in a comment on the page listed below."
-                templateMap['discussionUrl'] =  generateLink('activityFeed', 'list', [], request)
-                toUsers.addAll(otherParams["taggedUsers"])
-                break;
-
-                case SPECIES_REMOVE_COMMENT:
-                mailSubject = conf.ui.removeComment.emailSubject
-                //bodyView = "/emailtemplates/addObservation"
-                //populateTemplateMap(obv, templateMap)
-                bodyContent = conf.ui.removeComment.emailBody
-                toUsers.add(getOwner(obv))
-                break;
-
-                case DOWNLOAD_REQUEST:
-                mailSubject = conf.ui.downloadRequest.emailSubject
-                bodyView = "/emailtemplates/addObservation"
-                toUsers.add(getOwner(obv))
-                templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
-                templateMap['message'] = conf.ui.downloadRequest.message 
-                break;
-
-                case activityFeedService.DOCUMENT_CREATED:
-                mailSubject = conf.ui.addDocument.emailSubject
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = " uploaded a document to ${domain}. Thank you for your contribution."
-                toUsers.add(getOwner(obv))
-                break
-
-                case [activityFeedService.FEATURED, activityFeedService.UNFEATURED]:
-                boolean a
-                if(notificationType == activityFeedService.FEATURED) {
-                    a = true
-                }
-                else { 
-                    a = false
-                }
-                mailSubject = activityFeedService.getDescriptionForFeature(obv, null , a)
-                bodyView = "/emailtemplates/addObservation"
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                def ug = activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
-                def groupName
-                if(obv == ug){
-                    groupName = grailsApplication.config.speciesPortal.app.siteName 
-                }
-                else{
-                    groupName = activityFeedService.getUserGroupHyperLink(ug)
-                }
-                //templateMap["groupNameWithlink"] = groupName
-                templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + (a ? " in : " : " from : ") + groupName
-
-                if(obv?.getClass() == Observation) {
-                    templateMap["actionObject"] = 'obvSnippet'
-                }
-                else {
-                    templateMap["actionObject"] = 'usergroup'
-                }
-                toUsers.addAll(getParticipants(obv))
-                break
-            
-            case DIGEST_MAIL:
-                templateMap["serverURL"] =  grailsApplication.config.grails.serverURL
-                templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName
-                templateMap["resourcesServerURL"] = grailsApplication.config.speciesPortal.resources.serverURL
-                templateMap["grailsApplication"] = grailsApplication
-                mailSubject = "Activity digest on " + otherParams["userGroup"].name
-                bodyView = "/emailtemplates/digest"
-                templateMap["digestContent"] = otherParams["digestContent"]
-                templateMap["userGroup"] = otherParams["userGroup"]
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(otherParams["usersEmailList"]);
-                //toUsers.addAll(SUser.get(4136L));
-                break
-            
-            case DIGEST_PRIZE_MAIL:
-                mailSubject = "Neighborhood Trees Campaign extended till tonight"
-                bodyView = "/emailtemplates/digestPrizeEmail"
-                templateMap["userGroup"] = otherParams["userGroup"]
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(otherParams["usersEmailList"]);
-                break
-            //below case also had activityFeedService.SPECIES_UPDATED but it was not defined in activityFeedService
-            case [activityFeedService.SPECIES_CREATED, activityFeedService.SPECIES_UPDATED]:
-                mailSubject = notificationType
-                if(otherParams['resURLs']){
-                    templateMap['resURLs'] = otherParams['resURLs']
-                }
-                bodyView = "/emailtemplates/addObservation"
-                if(notificationType == activityFeedService.SPECIES_CREATED){
-                    templateMap["message"] = " added the following species:"
-                } else {
-                    //templateMap['domainObjectType'] = 'species'
-                    templateMap['obvUrl'] = generateLink("species", "show", ["id": otherParams['spId']], request)
-                    templateMap['obvId'] = otherParams['spId']
-                    templateMap["message"] = " updated the following species with these media:"
-                }
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipants(obv))
-                break
-
-            case REMOVE_USERS_RESOURCE:
-                mailSubject = "Attn: Your image uploads are due for deletion"
-                bodyView = "/emailtemplates/deleteUsersResource"
-                templateMap["uploadedDate"] = otherParams["uploadedDate"]
-                templateMap["toDeleteDate"] = otherParams["toDeleteDate"]
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(otherParams["usersList"])
-                break
-
-                
-            case [activityFeedService.SPECIES_FIELD_CREATED, activityFeedService.SPECIES_SYNONYM_CREATED, activityFeedService.SPECIES_COMMONNAME_CREATED, activityFeedService.SPECIES_HIERARCHY_CREATED] :
-                mailSubject = notificationType;
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = Introspector.decapitalize(otherParams['info']);
-                templateMap['spFDes'] = otherParams['spFDes']
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipants(obv))
-                break
-
-
-            case [activityFeedService.SPECIES_FIELD_UPDATED, activityFeedService.SPECIES_SYNONYM_UPDATED, activityFeedService.SPECIES_COMMONNAME_UPDATED, activityFeedService.SPECIES_HIERARCHY_UPDATED] :
-                mailSubject = notificationType;
-                bodyView = "/emailtemplates/addObservation"
-                templateMap["message"] = Introspector.decapitalize(otherParams['info']);
-                templateMap['spFDes'] = otherParams['spFDes']
-                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-                toUsers.addAll(getParticipants(obv))
-                break
-
-            case [activityFeedService.SPECIES_FIELD_DELETED, activityFeedService.SPECIES_SYNONYM_DELETED, activityFeedService.SPECIES_COMMONNAME_DELETED, activityFeedService.SPECIES_HIERARCHY_DELETED] :
-                mailsubject = notificationType;
-                bodyview = "/emailtemplates/addobservation"
-                templatemap["message"] = introspector.decapitalize(otherparams['info']);
-                populatetemplate(obv, templatemap, usergroupwebaddress, feedinstance, request)
-                toUsers.addAll(getParticipants(obv))
-                break
-            
-            case NEW_SPECIES_PERMISSION : 
-                mailSubject = notificationType
-                bodyView = "/emailtemplates/grantedPermission"
-                def user = otherParams['user'];
-                templateMap.putAll(otherParams);
-                toUsers.add(user)
-                break
- 
-
-            default:
-                log.debug "invalid notification type"
-            }
-            toUsers.eachWithIndex { toUser, index ->
-                if(toUser) {
-                    if(!toUser.enabled || toUser.accountLocked){
-                        log.error "Account not enabled or locked - so skipping sending email to ${toUser}"
-                        return
-                    }
-                    templateMap['username'] = toUser.name.capitalize();
-                    templateMap['tousername'] = toUser.username;
-                    if(request){
-                        templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
-                    }
-                    if(notificationType == DIGEST_MAIL){
-                        templateMap['userID'] = toUser.id
-                    }
-                    
-                    log.debug "Sending email to ${toUser}"
-                    try{
-                        mailService.sendMail {
-                            to toUser.email
-                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("kk")) ) {
-                                bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-                            }
-                            from grailsApplication.config.grails.mail.default.from
-                            //replyTo replyTo
-                            subject mailSubject
-                            if(bodyView) {
-                                body (view:bodyView, model:templateMap)
-                            }
-                            else if(htmlContent) {
-                                htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
-                                html htmlContent
-                            } else if(bodyContent) {
-                                if (bodyContent.contains('$')) {
-                                    bodyContent = evaluate(bodyContent, templateMap)
-                                }
-                                html bodyContent
-                            }
-                        }
-                    } catch(Exception e) {
-                        log.error "Error sending message ${e.getMessage()} toUser : ${toUser} "
-                        e.printStackTrace();
-                    }
-                }
-            }
-            } catch (e) {
-                log.error "Error sending email $e.message"
-                e.printStackTrace();
-            }
-    }
-
-    private  void  populateTemplate(def obv, def templateMap, String userGroupWebaddress="", def feed=null, def request=null)  {
-        if(obv?.getClass() == Observation)  {
-            def values = obv?.fetchExportableValue();
-            templateMap["obvOwner"] = values[ObvUtilService.AUTHOR_NAME];
-            templateMap["obvOwnUrl"] = values[ObvUtilService.AUTHOR_URL];
-            templateMap["obvSName"] =  values[ObvUtilService.SN]
-            templateMap["obvCName"] =  values[ObvUtilService.CN]
-            templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
-            templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
-            templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
-            //get All the UserGroups an observation is part of
-            templateMap["groups"] = obv.userGroups
-        }
-        if(obv.instanceOf(Species) && obv.id) {
-            templateMap["obvSName"] = obv.taxonConcept.name  
-            templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name   
-            def imagePath = '';
-            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-            def mainImage = obv.mainImage();
-            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
-                imagePath = mainImage.thumbnailUrl(null, '.png');
-            } else
-                imagePath = mainImage?mainImage.thumbnailUrl():null;
-
-            templateMap["obvImage"] = imagePath.replaceAll(' ','%20');
-            //get All the UserGroups a species is part of
-            templateMap["groups"] = obv.userGroups
-        }
-        if(feed) {
-            templateMap['actor'] = feed.author;
-            templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
-            templateMap["actorIconUrl"] = feed.author.profilePicture(ImageType.SMALL)
-            templateMap["actorName"] = feed.author.name
-            templateMap["activity"] = activityFeedService.getContextInfo(feed, [webaddress:userGroupWebaddress])
-            def domainObject = activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId);
-            templateMap['domainObjectTitle'] = getTitle(domainObject);
-            templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
-            def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
-            if(isCommentThread) {
-                templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
-                templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
-                templateMap['commentInstance'] = activityFeedService.getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
-                templateMap['group'] = domainObject;
-            }
-        }
-    }
-
-    public String generateLink( String controller, String action, linkParams, request=null) {
-	request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
-	userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
-        controller:controller, action: action,
-        params: linkParams)
-    }
-
-    private List getParticipants(observation) {
-        List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-            def result = getUserForEmail(observation) //Follow.getFollowers(observation)
-            result.each { user ->
-                if(user.sendNotification && !participants.contains(user)){
-                    participants << user
-                }
-            }
-        } else {
-            participants << springSecurityService.currentUser;
-        }
-		return participants;
-	}
-
-    def List getParticipantsForDigest(UserGroup userGroup, int max, long offset) {
-        List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-            def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
-            result.each { user ->
-                if(user.sendDigest && !(user.accountLocked) && !participants.contains(user)){
-                    participants << user
-                }
-            }
-        } else {
-            participants << springSecurityService.currentUser;
-        }
-        log.debug "getParticipantsForDigest : ${participants}"
-		return participants;
-	}
-
-	
-	private List getUserForEmail(observation){
-		if(!observation.instanceOf(UserGroup)){
-			return Follow.getFollowers(observation)
-		}else{
-			//XXX for user only sending founders and current user as list members list is too large have to decide on this
-			List userList = observation.getFounders(100, 0)
-			userList.addAll(observation.getExperts(100, 0)) 
-			def currUser = springSecurityService.currentUser
-			if(!userList.contains(currUser)){
-				userList << currUser
-			}
-			return userList
-		}
-	}
-	
-	private SUser getOwner(observation) {
-		def author = null;
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk") ) {
-            if(observation.metaClass.hasProperty(observation, 'author') || observation.metaClass.hasProperty(observation, 'contributors')) {
-                author = observation.author;
-                if(!author.sendNotification) {
-                    author = null;
-                }
-            }
-        } else {
-            author = springSecurityService.currentUser;
-        }
-        return author;
-    } 
-
-    private String getTitle(observation) {
-        if(observation.metaClass.hasProperty(observation, 'title')) {
-            return observation.title
-        } else if(observation.metaClass.hasProperty(observation, 'name')) {
-            return observation.name
-        } else
-            return null
     }
 
     /**
@@ -2493,7 +1963,7 @@ class ObservationService extends AbstractObjectService {
 			return reco.name
 		}
 		
-		def link = generateLink("species", "show", ["id": speciesId])
+		def link = utilsService.generateLink("species", "show", ["id": speciesId])
 		return "" + '<a  href="' +  link +'"><i>' + reco.name + "</i></a>"
 	}
 
@@ -2650,7 +2120,7 @@ class ObservationService extends AbstractObjectService {
                 log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
                 return []
             }
-            return userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
+            return getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
         }
         else{
             return getFilteredObservations(params, max, offset, false).observationInstanceList
@@ -2658,40 +2128,20 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
+    /**
+    * Plz use utilsService.getUserGroup
+    **/
+    @Deprecated
     def getUserGroup(params) {
-
-        if(params.userGroup && params.userGroup instanceof UserGroup) {
-            return params.userGroup
-        }
-
-        if(params.webaddress || (params.userGroup && (params.userGroup instanceof String || params.userGroup instanceof Long ))) {
-            def userGroupController = new UserGroupController();
-            return userGroupController.findInstance(params.userGroup, params.webaddress);
-        }
-
-        return null;
+        return utilsService.getUserGroup(params);
     }
 
-    //Create file with given filename
-    def File createFile(String fileName, String uploadDir, String contentRootDir) {
-        File uploaded
-        if (uploadDir) {
-            File fileDir = new File(contentRootDir + "/"+ uploadDir)
-            if(!fileDir.exists())
-                fileDir.mkdirs()
-                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
-
-        } else {
-
-            File fileDir = new File(contentRootDir)
-            if(!fileDir.exists())
-                fileDir.mkdirs()
-                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
-            //uploaded = File.createTempFile('grails', 'ajaxupload')
-        }
-
-        log.debug "New file created : "+ uploaded.getPath()
-        return uploaded
+    /**
+    * Plz use utilsService.sendNotificationMail
+    **/
+    @Deprecated
+    public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
+    return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 
 }

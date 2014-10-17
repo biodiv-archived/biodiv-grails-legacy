@@ -13,7 +13,7 @@
 		<b> ${commentInstance.author.name} :
 		</b>
 		<comment:showCommentContext
-			model="['commentInstance' : commentInstance]" />
+			model="['commentInstance' : commentInstance,'userLanguage' : userLanguage]" />
 		<div class="yj-message-body">
 			${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
 		</div>

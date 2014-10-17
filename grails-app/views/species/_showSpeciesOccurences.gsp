@@ -11,7 +11,7 @@
     </div>
 
     <div class="alert alert-info">
-        The current map showing distribution of species is only indicative.
+        <g:message code="showspeciesoccurences.map.indicative" />
         <img src="${resource(dir:'images',file:'maplegend.png', absolute:true)}"/>
     </div>
 
@@ -20,7 +20,7 @@
 </div>
 
 <div class="sidebar_section">
-    <h5>Related Observations</h5>
+    <h5><g:message code="observation.show.related.observations" /></h5>
     <div class="tile" style="clear: both">
         <obv:showRelatedStory
         model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupInstance':userGroupInstance]" />

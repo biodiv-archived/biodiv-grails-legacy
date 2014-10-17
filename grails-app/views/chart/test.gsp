@@ -1,7 +1,7 @@
 <%@ page import="org.grails.plugins.google.visualization.data.Cell; org.grails.plugins.google.visualization.util.DateUtil" %>
 <html>
     <head>
-        <title>Google Visualization API plugin</title>
+        <title><g:message code="msg.Google.Visualization.API.plugin" /></title>
         <meta name="layout" content="main" />
         <r:require modules="chart" />
         <gvisualization:apiImport/>
@@ -33,7 +33,7 @@
           def pensColumns = [['date', 'Date'], ['number', 'Sold Pencils'], ['string', 'title1'], ['string', 'text1'], ['number', 'Sold Pens'], ['string', 'title2'], ['string', 'text2']]
           def pensData = [[DateUtil.createDate(2008, 1, 1), 30000, null, null, 40645, null, null], [DateUtil.createDate(2008, 1, 2), 14045, null, null, 20374, null, null], [DateUtil.createDate(2008, 1, 3), 55022, null, null, 50766, null, null], [DateUtil.createDate(2008, 1, 4), 75284, null, null, 14334, 'Out of Stock','Ran out of stock on pens at 4pm'], [DateUtil.createDate(2008, 1, 5), 41476, 'Bought Pens','Bought 200k pens', 66467, null, null], [DateUtil.createDate(2008, 1, 6), 33322, null, null, 39463, null, null]]
           def orgColumns = [['string', 'Name'], ['string', 'Manager'], ['string', 'ToolTip']]
-          def orgData = [[new Cell(value: 'Mike', label: 'Mike<div style="color:red; font-style:italic">President</div>'), '', 'The President'], [new Cell(value: 'Jim', label: 'Jim<div style="color:red; font-style:italic">Vice President<div>'), 'Mike', 'VP'], ['Alice', 'Mike', ''], ['Bob', 'Jim', 'Bob Sponge'], ['Carol', 'Bob', '']]
+          def orgData = [[new Cell(value: 'Mike', label: 'Mike<div style="color:red; font-style:italic"><g:message code="msg.President" /></div>'), '', 'The President'], [new Cell(value: 'Jim', label: 'Jim<div style="color:red; font-style:italic"><g:message code="msg.Vice.President" /><div>'), 'Mike', 'VP'], ['Alice', 'Mike', ''], ['Bob', 'Jim', 'Bob Sponge'], ['Carol', 'Bob', '']]
           def populationColumns = [['string', '', 'Country'], ['number', 'Population (mil)', 'a'], ['number', 'Area (km2)', 'b']]
           def populationData = [['CN', 1324, 9640821], ['IN', 1133, 3287263], ['US', 304, 9629091], ['ID', 232, 1904569], ['BR', 187, 8514877]]
           def popularityColumns = [['string', 'Country'], ['number', 'Popularity']]
@@ -56,7 +56,7 @@
               console.log('Table is ready');
           }
        </script>
-       <h2>Google Visualization API Examples</h2>
+       <h2><g:message code="msg.Google.Visualization.API.Examples" /></h2>
        <gvisualization:pieCoreChart elementId="piechart" title="My Daily Activities" width="${450}" height="${300}" columns="${myDailyActivitiesColumns}" data="${myDailyActivitiesData}" />
        <gvisualization:imagePieChart elementId="imagepiechart" width="${430}" height="${240}" title="My Daily Activities" columns="${myDailyActivitiesColumns}" data="${myDailyActivitiesData}" />
        <gvisualization:barCoreChart elementId="barchart" title="Company Performance" width="${400}" height="${240}" vAxis="${new Expando(title: 'Year', titleColor: 'red')}" columns="${companyPerformanceColumns}" data="${companyPerformanceData}" />
@@ -86,7 +86,7 @@
        <table cellpadding="2" cellspacing="0">
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/piechart.html">Pie Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/piechart.html"><g:message code="msg.Pie.Chart" /></a>
              </td>
              <td>
                 <div id="piechart"></div>
@@ -94,7 +94,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagepiechart.html">Pie Chart (Image)</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagepiechart.html"><g:message code="msg.Pie.Chart(Image)" /></a>
              </td>
              <td>
                 <div id="imagepiechart"></div>
@@ -102,7 +102,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/barchart.html">Bar Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/barchart.html"><g:message code="msg.Bar.Chart" /></a>
              </td>
              <td>
                 <div id="barchart"></div>
@@ -110,7 +110,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagebarchart.html">Bar Chart (Image)</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagebarchart.html"><g:message code="msg.Bar.Chart(Image)" /></a>
              </td>
              <td>
                 <div id="imagebarchart"></div>
@@ -118,7 +118,7 @@
           </tr>
           <tr>
               <td>
-                  <a href="http://code.google.com/apis/chart/interactive/docs/gallery/bubblechart.html">Bubble Chart</a>
+                  <a href="http://code.google.com/apis/chart/interactive/docs/gallery/bubblechart.html"><g:message code="msg.Bubble.Chart" /></a>
               </td>
               <td>
                   <div id="bubblechart" style="width: 900px; height: 500px;"></div>
@@ -126,7 +126,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/columnchart.html">Column Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/columnchart.html"><g:message code="msg.Column.Chart" /></a>
              </td>
              <td>
                 <div id="columnchart"></div>
@@ -134,7 +134,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/areachart.html">Area Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/areachart.html"><g:message code="msg.Area.Chart" /></a>
              </td>
              <td>
                 <div id="areachart"></div>
@@ -142,7 +142,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/imageareachart.html">Area Chart (Image)</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/imageareachart.html"><g:message code="msg.Area.Chart(Image)" /></a>
              </td>
              <td>
                 <div id="imageareachart"></div>
@@ -150,7 +150,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/linechart.html">Line Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/linechart.html"><g:message code="msg.Line.Chart" /></a>
              </td>
              <td>
                 <div id="linechart"></div>
@@ -158,7 +158,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagelinechart.html">Line Chart (Image)</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagelinechart.html"><g:message code="msg.Line.Chart(Image)" /></a>
              </td>
              <td>
                 <div id="imagelinechart"></div>
@@ -166,7 +166,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/scatterchart.html">Scatter Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/scatterchart.html"><g:message code="msg.Scatter.Chart" /></a>
              </td>
              <td>
                 <div id="scatterchart"></div>
@@ -174,7 +174,7 @@
           </tr>
        <tr>
            <td>
-               <a href="http://code.google.com/apis/chart/interactive/docs/gallery/steppedareachart.html">Stepped Area Chart</a>
+               <a href="http://code.google.com/apis/chart/interactive/docs/gallery/steppedareachart.html"><g:message code="msg.Stepped.Area.Chart" /></a>
            </td>
            <td>
                <div id="steppedareachart"></div>
@@ -182,7 +182,7 @@
        </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagesparkline.html">Sparkline (Image)</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagesparkline.html"><g:message code="msg.Sparkline(Image)" /></a>
              </td>
              <td>
                 <div id="imagesparkline"></div>
@@ -190,7 +190,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/chart/interactive/docs/gallery/candlestickchart.html">Candlestick Chart</a>
+                <a href="http://code.google.com/apis/chart/interactive/docs/gallery/candlestickchart.html"><g:message code="msg.Candlestick.Chart" /></a>
              </td>
              <td>
                 <div id="candlestickchart" style="width: 300px; height: 300px;"></div>
@@ -198,7 +198,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagecandlestickchart.html">Candlestick Chart (Image)</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/imagecandlestickchart.html"><g:message code="msg.Candlestick.Chart(Image)" /></a>
              </td>
              <td>
                 <div id="imagecandlestickchart" style='width: 300px; height: 300px;'></div>
@@ -206,7 +206,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/chart/interactive/docs/gallery/combochart.html">Combo Chart</a>
+                <a href="http://code.google.com/apis/chart/interactive/docs/gallery/combochart.html"><g:message code="msg.Combo.Chart" /></a>
              </td>
              <td>
                 <div id="combochart" style="width: 700px; height: 400px;"></div>
@@ -214,7 +214,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/gauge.html">Gauge</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/gauge.html"><g:message code="msg.Gauge" /></a>
              </td>
              <td>
                 <div id="gauge"></div>
@@ -222,7 +222,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/table.html">Table</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/table.html"><g:message code="msg.Table" /></a>
              </td>
              <td>
                 <div id="table"></div>
@@ -230,7 +230,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/map.html">Map</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/map.html"><g:message code="msg.Map" /></a>
              </td>
              <td>
                 <div id="map" style="width: 400px; height: 300px"></div>
@@ -238,7 +238,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/annotatedtimeline.html">Annotated Time Line</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/annotatedtimeline.html"><g:message code="msg.Annotated.Time.Line" /></a>
              </td>
              <td>
                 <div id="annotatedtimeline" style='width: 700px; height: 240px;'></div>
@@ -246,7 +246,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/orgchart.html">Organizational Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/orgchart.html"><g:message code="msg.Organizational Chart" /></a>
              </td>
              <td>
                 <div id="orgchart"></div>
@@ -254,7 +254,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/intensitymap.html">Intensity Map</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/intensitymap.html"><g:message code="msg.Intensity.map" /></a>
              </td>
              <td>
                 <div id="intensitymap"></div>
@@ -262,7 +262,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/geomap.html">Geo Map</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/geomap.html"><g:message code="msg.Geo.Map" /></a>
              </td>
              <td>
                 <div id="geomap"></div>
@@ -270,7 +270,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/chart/interactive/docs/gallery/geochart.html">Geo Chart</a>
+                <a href="http://code.google.com/apis/chart/interactive/docs/gallery/geochart.html"><g:message code="msg.Geo.Chart" /></a>
              </td>
              <td>
                 <div id="geochart"></div>
@@ -278,7 +278,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/motionchart.html">Motion Chart</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/motionchart.html"><g:message code="msg.Motion.Chart" /></a>
              </td>
              <td>
                 <div id="motionchart"></div>
@@ -286,7 +286,7 @@
           </tr>
           <tr>
              <td>
-                <a href="http://code.google.com/apis/visualization/documentation/gallery/treemap.html">Tree Map</a>
+                <a href="http://code.google.com/apis/visualization/documentation/gallery/treemap.html"><g:message code="msg.Tree.Map" /></a>
              </td>
              <td>
                 <div id="treemap" style="width: 900px; height: 500px;"></div>

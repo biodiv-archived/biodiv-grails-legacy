@@ -276,13 +276,13 @@ class ObservationTagLib {
             """
 
             if(!hideForm) {
-                out << """<form class="ratingForm" method="get" title="Rate it">
+                out << """<form class="ratingForm" method="get" title="${g.message(code:'observationtaglib.title.rate')}">
                     """
             }
             out << """
-                <span class="like_${divClass} 
-                    title="${(userRating>0)?'Unlike':'Like'}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
-                    <span class="noOfRatings" title='No of likes'>${resource.totalRatings ?: 0}</span>
+                <span class="like_${divClass}" 
+                    title="${(userRating>0)?g.message(code:'default.unlike'):g.message(code:'default.like')}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
+                    <span class="noOfRatings" title='${g.message(code:"observationtaglib.title.likes")}'>${resource.totalRatings ?: 0}</span>
                 """
             if(!hideForm) {
                 out << "</form>"

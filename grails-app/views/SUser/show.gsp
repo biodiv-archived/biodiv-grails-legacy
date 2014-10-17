@@ -49,8 +49,8 @@
 
 						<a class="btn btn-info pull-right"
 							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
-                                                            class="icon-edit"></i>Edit Profile </a>
-                                                    <a class="btn btn-info" style="float: right; margin-right: 5px;"href="${uGroup.createLink(action:'myuploads', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><iclass="icon-edit"></i>My Uploads </a>
+                                                            class="icon-edit"></i><g:message code="button.edit.profile" /> </a>
+                                                    <a class="btn btn-info" style="float: right; margin-right: 5px;"href="${uGroup.createLink(action:'myuploads', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><iclass="icon-edit"></i><g:message code="button.my.uploads" /> </a>
 
 					</sUser:ifOwns>
 				</div>
@@ -68,7 +68,7 @@
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
 					<div class="prop">
-						<span class="name"><i class="icon-time"></i>Member since </span>
+						<span class="name"><i class="icon-time"></i><g:message code="default.member.since.label" /> </span>
 						<div class="value">
 							<g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"
 								type="datetime" style="MEDIUM" />
@@ -76,7 +76,7 @@
 					</div>
 					<g:if test="${user.lastLoginDate}">
 						<div class="prop">
-							<span class="name"><i class="icon-time"></i>Last visited </span>
+							<span class="name"><i class="icon-time"></i><g:message code="default.last.visited.label" /></span>
 							<div class="value">
 								
 									<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
@@ -101,32 +101,36 @@
                             <div class="navbar-inner">
                                 <ul class="nav">
 
-                                    <li><a href="#aboutMe"><i class="icon-user"></i>About Me</a></li>
+                                    <li><a href="#aboutMe"><i class="icon-user"></i><g:message code="default.about.me.label" /></a></li>
                                     <li class="divider-vertical"></li>
                                     <li class="dropdown">
                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                                <i class="icon-book"></i> Content
+                                                <i class="icon-book"></i> <g:message code="default.content.label" />
                                                 <b class="caret"></b>
                                             </a>
                                             <ul class="dropdown-menu">
-                                                <li><a href="#observations"><i class="icon-screenshot"></i>Observations</a></li>
-                                                <li><a href="#identifications"><i class="icon-eye-open"></i>Identifications</a></li>
-                                                <li><a href="#downloads"><i class="icon-download"></i>Downloads</a></li>
+                                                <li><a href="#observations"><i class="icon-screenshot"></i><g:message code="default.observation.label" /></a></li>
+                                                <li><a href="#identifications"><i class="icon-eye-open"></i><g:message code="suser.show.identifications" /></a></li>
+                                                <li><a href="#downloads"><i class="icon-download"></i><g:message code="suser.show.Downloads" /></a></li>
                                             </ul>
                                     </li>
                                     <li class="divider-vertical"></li>
-                                    <li><a href="#groups"><i class="icon-group"></i>Groups</a></li>
+                                    <li><a href="#groups"><i class="icon-group"></i><g:message code="default.groups.label" /></a></li>
                                     <li class="divider-vertical"></li>
-                                    <li><a href="#activity"><i class="icon-tasks"></i>Activity</a></li>
+                                    <li><a href="#activity"><i class="icon-tasks"></i><g:message code="button.activity" /></a></li>
                                     <g:if test="${user.hideEmailId}">
                                         <li style="padding:5px 0px">
                                         <% String staticMessage = '';
                                         if(currentUser) {
-                                            staticMessage = 'Message from <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
+                                            staticMessage = g.message(code:'suser.message')+' <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
                                         }
-                                        %>
+def contact_me_text=g.message(code:'button.contact.me')                                     
+%>
+
                             			    <obv:identificationByEmail
-                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:'Contact Me', titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:contact_me_text, titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+
+
                                         </li>
                                     </g:if>
                                 </ul>
@@ -135,23 +139,38 @@
                         <div class="container">
                             <div id="aboutMe" class="super-section" style="overflow:hidden;padding-bottom:10px;">
                                 <h5>
-                                    <i class="icon-user"></i>About Me
+                                    <i class="icon-user"></i><g:message code="default.about.me.label" />
                 			<sUser:ifOwns model="['user':user]">
 
 						<a class="btn btn-link"
 							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
-							class="icon-edit"></i>Edit </a>
+							class="icon-edit"></i><g:message code="button.edit" /> </a>
 					</sUser:ifOwns>
                                 </h5>
                                 <div class="section" style="clear:both;margin-left:20px;">
                                     <g:if test="${user.aboutMe}">
+
+                                    <%  def styleVar = 'block';
+                                        def clickcontentVar = '' 
+                                    %> 
+                                    <g:if test="${user?.language?.id != userLanguage?.id}">
+                                        <%  
+                                          styleVar = "none"
+                                          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.twoLetterCode.toUpperCase()+'</a>';
+                                        %>
+                                    </g:if>
+
+                                    ${raw(clickcontentVar)}
+                                    <div style="display:${styleVar}">
                                         ${user.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
-                                        </g:if>
+                                    </div>
+                                        
+                                    </g:if>
                                 </div>
 
                                 <div class="section" style="clear:both;margin-left:20px;">
                                     <h6>
-                                        Interested in Species Groups &amp; Habitats
+                                        <g:message code="suser.show.intrested.species" /> &amp; <g:message code="default.habitats.label" />
                                     </h6>
                                     <sUser:interestedSpeciesGroups model="['userInstance':user]" />
                                     <div style="padding:3px;"></div>
@@ -160,14 +179,18 @@
                                <div id="observations_list_map" class="section observation span6"
                                     style="margin:0px;margin-left:20px;">
                                     <h6>
-                                        Observations Spread
+                                         <g:message code="suser.show.observations.spread" />
                                     </h6>
         			    <obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:460, height:400]">
 				    </obv:showObservationsLocation>
                                 </div>
                                 <div id="expertice" class="section span6" style="margin:0px;margin-left:20px;width:420px;">
-                                         <chart:showStats model="['title':'Observations by Species Group', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/>
+                                <%
+                                def species_group_observations="${g.message(code:'suser.heading.species.observations')}"
+                                %>
+                                
+                                <chart:showStats model="['title':species_group_observations, columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/>
 	                        </div>
  
                             </div>
@@ -176,16 +199,16 @@
                                 <h5>
                                     <span class="name" style="color: #b1b1b1;"> <i
                                             class="icon-book"></i>
-                                    </span> Content
+                                    </span> <g:message code="default.content.label" />
                                 </h5>
                                 <div id="observations" class="section" style="clear:both;margin-left:20px;">
                                     <h6>
                                         <span class="name" style="color: #b1b1b1;"> 
                                             <obv:showNoOfObservationsOfUser
-                                            model="['user':user, 'userGroup':userGroupInstance]" /> </span> Observations
+                                            model="['user':user, 'userGroup':userGroupInstance]" /> </span> <g:message code="default.observation.label" />
                  			<sUser:ifOwns model="['user':user]">
 						<a class="btn btn-link"
-							href="${uGroup.createLink(action:'create', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Add Observation</a>
+							href="${uGroup.createLink(action:'create', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i><g:message code="link.add.observation" /></a>
 					</sUser:ifOwns>
 
                                     </h6>
@@ -197,10 +220,10 @@
                                     <h6>
                                         <span class="name" style="color: #b1b1b1;"> 
                                             <obv:showNoOfRecommendationsOfUser model="['user':user, 'userGroup':userGroupInstance]" /> </span>
-                                        Identifications
+                                       <g:message code="suser.show.identifications" /> 
                  			<sUser:ifOwns model="['user':user]">
 						<a class="btn btn-link"
-							href="${uGroup.createLink(action:'list', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-list"></i>Browse Observations</a>
+							href="${uGroup.createLink(action:'list', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-list"></i><g:message code="heading.browse.observations" /> </a>
 					</sUser:ifOwns>
 
                                     </h6>
@@ -225,7 +248,7 @@
                                 <g:if test="${!downloadLogList.isEmpty()}">
                                 <div id="downloads" class="section" style="clear: both;overflow:auto;">
                                     <h6>
-                                        <span class="name" style="color: #b1b1b1;"></span> Downloads
+                                        <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.Downloads" />
                                     </h6>
                                     <obv:downloadTable model="[downloadLogList:downloadLogList]" />
                                 </div>
@@ -234,7 +257,7 @@
                                 <g:if test="${!speciesBulkUploadList.isEmpty()}">
                                 <div id="uploads" class="section" style="clear: both;overflow:auto;">
                                     <h6>
-                                        <span class="name" style="color: #b1b1b1;"></span> Species Bulk Uploads
+                                        <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.species.bulk.uploads" />
                                     </h6>
                                     <s:rollBackTable model="[uploadList:speciesBulkUploadList]" />
                                 </div>
@@ -244,10 +267,10 @@
 			<div id="groups" class="super-section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
-						class="icon-group"></i></span> Groups
+						class="icon-group"></i></span> <g:message code="default.groups.label" />
                  			<sUser:ifOwns model="['user':user]">
 						<a class="btn btn-link"
-							href="${uGroup.createLink(action:'list', controller:'userGroup', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Join Groups</a>
+							href="${uGroup.createLink(action:'list', controller:'userGroup', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i><g:message code="button.join.groups" /></a>
 					</sUser:ifOwns>
 
 				</h5>
@@ -258,7 +281,7 @@
 			<div id="activity" class="super-section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
-                                                class="icon-tasks"></i> </span>Activity
+                                                class="icon-tasks"></i> </span><g:message code="button.activity" />
                                         </h5>
                                         <feed:showAllActivityFeeds model="['user':user?.id,'userGroup':userGroupInstance, feedType:ActivityFeedService.USER, 'feedPermission':false, 'feedOrder':ActivityFeedService.LATEST_FIRST]" />
                         </div>

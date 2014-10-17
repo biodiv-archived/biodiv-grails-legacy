@@ -256,4 +256,8 @@ jQuery(document).ready(function($) {
         $('#searchToggleBox').slideToggle();
     });
 
+    $('.clickcontent').click(function() {
+        var target = $(this).data('target');
+        $(this).parent().siblings('.'+target).toggle();
+    });
 });
