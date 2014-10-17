@@ -30,7 +30,7 @@
                 def geoPrivacyAdjustment = observationInstance.fetchGeoPrivacyAdjustment()
                 def checklistObvPoints
                 if(observationInstance.isChecklist) {
-                    checklistObvPoints = observationInstance.fetchObservationsLatLongs()
+                    //checklistObvPoints = observationInstance.fetchObservationsLatLongs()
                 }
                 latitude = observationInstance.latitude + geoPrivacyAdjustment
                 longitude = observationInstance.longitude + geoPrivacyAdjustment
@@ -127,7 +127,7 @@
                 showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
             </g:if>
              <g:if test="${observationInstance.isChecklist}">
-                markChecklistObvs(${checklistObvPoints}, mapLocationPicker);
+                //markChecklistObvs(${checklistObvPoints}, mapLocationPicker);
             </g:if>
 
             var icon;
