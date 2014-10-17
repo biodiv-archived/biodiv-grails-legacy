@@ -36,7 +36,7 @@ $(document).ready(function() {
                 <li style="float: left; list-style: none;">
 		
 
-<g:render template="/${relatedInstanceDetails.controller.equalsIgnoreCase('checklist')?'observation':relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller]"/>
+<g:render template="/${relatedInstanceDetails.controller.equalsIgnoreCase('checklist')?'observation':relatedInstanceDetails.controller}/relatedSnippetTemplate" model="[relatedInstanceDetails:relatedInstanceDetails, controller:relatedInstanceDetails.controller?:controller, 'userLanguage' : userLanguage]"/>
                 
                 </li>
             </g:each>
