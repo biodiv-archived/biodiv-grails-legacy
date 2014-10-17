@@ -97,6 +97,10 @@ $(document).ready(function() {
 	}
 
     window.i8ln = {
+        "button" :{
+                "delete" : "${g.message(code:'default.button.delete.label')}",
+                "edit"   : "${g.message(code:'default.button.edit.label')}"
+        },
         "species" : {
             "abstracteditabletype" : {         
 
