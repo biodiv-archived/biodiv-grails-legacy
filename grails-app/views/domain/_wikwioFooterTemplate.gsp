@@ -96,7 +96,7 @@
 <div class="powered" style="text-align:center;">
 	<p> 
 ${g.message(code:'text.supported.on')}<br />
- ${g.message(code:'text.powered.by')}<a href="https://github.com/strandls/biodiv" target="_blank"> ${g.message(code:'footer.platform')}</a> ${g.message(code:'text.technology.partner')} <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank" > ${g.message(code:'technology.partner.strandlifesciences')} </p>
+ ${g.message(code:'text.powered.by')}<a href="https://github.com/strandls/biodiv" target="_blank"> ${g.message(code:'link.informatics.platform')}</a> ${g.message(code:'text.technology.partner')} <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank" > ${g.message(code:'technology.partner.strandlifesciences')} </p>
 	</div>
 </div>
 <r:script>
