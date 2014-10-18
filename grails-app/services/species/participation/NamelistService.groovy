@@ -25,10 +25,10 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
-	List searchCOL(String input, String searchBy){
-		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
+    List searchCOL(String input, String searchBy){
+        //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
-		def http = new HTTPBuilder()
+        def http = new HTTPBuilder()
         http.request( COL_SITE, GET, TEXT ) { req ->
             uri.path = COL_URI
             if(searchBy == 'name') {
@@ -62,6 +62,7 @@ class NamelistService {
         int i = 0
         results.result.each { r ->
             Map temp = new HashMap()
+            Map id_details = new HashMap()
             println " Starting result ======= ${++i}"
             println r.id.text().getClass()
             temp['externalId'] = r.id.text()
@@ -71,6 +72,7 @@ class NamelistService {
             temp['rank'] = r.rank.text().toLowerCase()
             temp[r.rank.text().toLowerCase()] = r.name.text()
             println r.name_status.text()
+            id_details[r.name.text()] = r.id.text();
             temp['nameStatus'] = r.name_status.text().tokenize(' ')[0]
             println r.author.text()
             temp['authorString'] = r.author.text()
@@ -93,6 +95,7 @@ class NamelistService {
                 r.classification.taxon.each { t ->
                     println t.rank.text() + " == " + t.name.text()
                     temp[t.rank.text().toLowerCase()] = t.name.text()
+                    id_details[t.name.text()] = t.id.text()
                 }
 
                 println "============= child taxon  "
@@ -112,6 +115,7 @@ class NamelistService {
                 }
 
             }
+            temp['id_details'] = id_details
             finalResult.add(temp);
             println "============End result========"
         }

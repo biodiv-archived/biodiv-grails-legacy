@@ -35,6 +35,7 @@ import species.utils.ImageUtils
 import species.utils.Utils
 import species.auth.SUser
 import species.NamesMetadata.NameStatus;
+import species.participation.NamelistService;
 
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
@@ -54,6 +55,7 @@ class XMLConverter extends SourceConverter {
     private Species s;
 
     def groupHandlerService;
+    def namelistService;
     //def markupSanitizerService;
 
     public enum SaveAction {
@@ -1373,14 +1375,14 @@ class XMLConverter extends SourceConverter {
      * Creating the given classification entries hierarchy.
      * Saves any new taxondefinition found 
      */
-     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false) {
+     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false, otherParams= null) {
         log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         def taxonHierarchies = new ArrayList();
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
             println "=========YAHAN SE AYA====="
-            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL);
+            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams);
             if(t) {
                 cleanUpGorm();
                 taxonHierarchies.addAll(t);
@@ -1409,9 +1411,10 @@ class XMLConverter extends SourceConverter {
      * @param scientificName
      * @return
      */
-    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false) {
+    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         log.debug "Getting classification hierarchy : "+classification.name;
-        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL
+        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL 
+        println "======OTHRE PARMS=== " + otherParams.id_details['Geometroidea'];
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1449,6 +1452,7 @@ class XMLConverter extends SourceConverter {
                     String name = getData(fieldNode.data);
 
                     log.debug "Taxon : "+name+" and rank : "+rank;
+                    
                     if(name && rank >= 0) {
                         //TODO:HACK to populate sciName in species level of taxon hierarchy
                         //              if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
@@ -1481,6 +1485,40 @@ class XMLConverter extends SourceConverter {
                                 if(fromCOL) {
                                     println "=========COL SE REQUIRED==============="
                                     //get its data from col and save
+                                    println "=======NAME======== " + name
+                                    println "========NAME KA ID ======= " + otherParams.id_details[name]
+                                    def externalId = otherParams.id_details[name].trim();
+                                    println "=========EXTERNAL ID===== " + externalId
+                                    def ctx = ApplicationHolder.getApplication().getMainContext();
+                                    namelistService = ctx.getBean("namelistService");
+                                    def res = namelistService.searchCOL(externalId, 'id')[0];
+                                    println "=========NAMESTATUS===== " + res
+                                    println "=========NAME STATUS============ " + res.nameStatus +"======= " + res.nameStatus.getClass();
+                                    def finalNameStatus;
+                                    switch(res.nameStatus) {
+                                        case "accepted":
+                                        finalNameStatus = NameStatus.ACCEPTED;
+                                        break
+
+                                        case "provisionally":
+                                        finalNameStatus = NameStatus.PROV_ACCEPTED;
+                                        break
+
+
+                                        case ["synonyms", "ambiguous", "misapplied"]:
+                                        finalNameStatus = NameStatus.SYNONYM;
+                                        break
+
+                                        case "common" :
+                                        finalNameStatus = NameStatus.COMMON;
+                                        break
+
+                                        default:
+                                        finalNameStatus = ""
+                                        break
+                                    }
+                                    println "=======FINAL NAME STATUS======= " + finalNameStatus;
+                                    taxon.status = finalNameStatus; 
                                 }
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
