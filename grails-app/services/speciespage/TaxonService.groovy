@@ -777,7 +777,7 @@ class TaxonService {
     *
     */
 
-    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false) {
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
         List errors = [];
         if(!classification) {
             return [success:false, msg:"Not a valid classification ${classification?.name}."]
@@ -786,7 +786,7 @@ class TaxonService {
         XMLConverter converter = new XMLConverter();
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
         println "======YAHAN HAI=========";
-        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL);
+        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams);
 /*        //check if user has permission to contribute to the taxon hierarchy
         if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {
             taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);            

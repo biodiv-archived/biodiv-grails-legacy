@@ -225,6 +225,7 @@
                             </div>
                             <input type="hidden" class="taxonReg" value="">
                             <input type="hidden" class="fromCOL" value=false>
+                            <input type="hidden" class="id_details" value="">
 							<div class="row-fluid">	
                                 <div class="span3"><label>Rank</label></div>
                                 <div class="span9"> 

@@ -454,6 +454,13 @@ class TaxonController {
 
 	@Secured(['ROLE_USER'])
     def update()  {
+        //Do only when params coming from curation interface
+        def otherParams = [:]
+        if(params.taxonData) {
+            params << JSON.parse(params.taxonData)
+            params.remove('taxonData');
+            otherParams['id_details'] = params.id_details;
+        }
         println "=======PARAMS UPDATE======== " + params
         def msg;
         def errors = [], result=[success:false];
@@ -500,7 +507,7 @@ class TaxonController {
                 }
                 
                 println "=========TO BOOLEAN====== " + params.abortOnNewName + "==== " + params.fromCOL
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName.toBoolean()?params.abortOnNewName.toBoolean():false) , (params.fromCOL.toBoolean()?params.fromCOL.toBoolean():false));
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName.toBoolean()?params.abortOnNewName.toBoolean():false) , (params.fromCOL.toBoolean()?params.fromCOL.toBoolean():false), otherParams);
                 result.action = 'update';
                 if(params.controller != 'taxon'){
                     if(result.success) {

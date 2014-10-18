@@ -145,12 +145,15 @@ function getExternalDbDetails(externalId) {
         data: {externalId:externalId, dbName:dbName},	
         success: function(data) {
             //show the popup
+            console.log("======SUCCESS ID DETAILS====");
             $("#externalDbResults").modal('hide');
             populateNameDetails(data);
             if(dbName == 'col') {
                 changeEditingMode(true);
+                console.log("======ID DETAILS====");
+                console.log(data['id_details']);
+                $(".id_details").val(JSON.stringify(data['id_details']));
             }
-            console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
@@ -164,6 +167,7 @@ function saveHierarchy() {
     taxonRegistryData['fromCOL'] = $('.fromCOL').val();
     if($('.fromCOL').val() == "true") {
         taxonRegistryData['abortOnNewName'] = false;
+        taxonRegistryData['id_details'] = JSON.parse($(".id_details").val());
     }
     console.log("===============");
     console.log(taxonRegistryData);
@@ -173,7 +177,8 @@ function saveHierarchy() {
         url: url,
         type: "POST",
         dataType: "json",
-        data: taxonRegistryData,	
+        //contentType: "application/json",
+        data: {taxonData: JSON.stringify(taxonRegistryData)},	
         success: function(data) {
             //show the popup
             //$("#externalDbResults").modal('hide');
@@ -224,7 +229,7 @@ function fetchTaxonRegistryData() {
     metadata1['via'] = $('.via').val();
     metadata1['id'] = $('.id').val();
     result['metadata'] = metadata1;
-
+    
     return result;
 }
 
