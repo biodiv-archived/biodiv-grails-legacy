@@ -18,6 +18,31 @@
                 padding: 20px 0px 0px 0px;
                 border-radius: 0px 0px 7px 7px;
             }
+            #home #species_entry {
+                background-image: url('../images/species.png');
+            }
+            #home #IDAOTool {
+                background-image: url('../images/IDAO.png');
+            }
+            #home #explore {
+                background-image: url('../images/maps.png');
+            }
+            #home #documents {
+                background-image: url('../images/documents.png');
+            }
+            #home #checklists {
+                background-image: url('../images/checklists.png');
+            }
+
+            #home #observations {
+                background-image: url('../images/observations.png');
+            }
+            #home #groups_entry {
+                background-image: url('../images/groups.png');
+            }
+            #home #dashboard {
+                background-image: url('../images/dashboard.png');
+            }  
         </style>
     </head>
 
