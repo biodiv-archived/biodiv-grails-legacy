@@ -2,7 +2,7 @@
 <%@page import="species.utils.ImageType"%>
 <html>
     <head>
-        <g:set var="title" value="${params?.title?:g.message(code:"button.maps") }"/>
+        <g:set var="title" value="${params?.title?:g.message(code:'button.maps') }"/>
         <g:render template="/common/titleTemplate"/>
         <r:require modules="maps" />
         <style>
