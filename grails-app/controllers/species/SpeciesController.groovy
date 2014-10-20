@@ -482,6 +482,13 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
     def update() {
+        println "========PARAMS======== " + params 
+        if(params.synonymData) {
+            params << JSON.parse(params.synonymData)
+            params.remove('synonymData');
+        }
+        println "========PARAMS======== " + params 
+        /*
     	def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
@@ -562,7 +569,11 @@ class SpeciesController extends AbstractObjectController {
                 if(params.act == 'delete') {
                     result = speciesService.deleteSynonym(sid, speciesFieldId);
                 } else {
-                    result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value);
+                    def otherParams = null
+                    if(params.otherParams) {
+                        otherParams = params.otherParams
+                    }
+                    result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value, otherParams);
                 }
                 break;
                 case 'commonname':
@@ -638,7 +649,7 @@ class SpeciesController extends AbstractObjectController {
             render ([success:false, msg:e.getMessage()] as JSON)
             return;
         }
-
+*/
     }
 
 	@Secured(['ROLE_SPECIES_ADMIN'])

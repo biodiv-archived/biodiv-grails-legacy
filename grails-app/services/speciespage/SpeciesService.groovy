@@ -844,22 +844,23 @@ class SpeciesService extends AbstractObjectService  {
 		}
     }
 
-    def updateSynonym(def synonymId, def speciesId, String relationship, String value) {
+    def updateSynonym(def synonymId, def speciesId, String relationship, String value, otherParams = null) {
         if(!value || !relationship) {
             return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
         }
-        Species speciesInstance = Species.get(speciesId);
-   
-        if(!speciesInstance) {
-            def messagesourcearg = new Object[1];
+        if(!otherParams) {
+            Species speciesInstance = Species.get(speciesId);
+
+            if(!speciesInstance) {
+                def messagesourcearg = new Object[1];
                 messagesourcearg[0] = speciesFieldId;
-            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
-        }
+                return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+            }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
+            }
         }
-
         Synonyms oldSynonym;
         if(synonymId) {
             oldSynonym = Synonyms.read(synonymId);

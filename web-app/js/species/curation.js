@@ -180,7 +180,7 @@ function saveHierarchy() {
         //contentType: "application/json",
         data: {taxonData: JSON.stringify(taxonRegistryData)},	
         success: function(data) {
-            //show the popup
+            //show the popup                                   //what in response
             //$("#externalDbResults").modal('hide');
             //populateNameDetails(data)
             console.log("======SUCCESS====");
@@ -241,4 +241,32 @@ function changeEditingMode(mode) {
     }
     $(".canBeDiasbled input").prop("disabled", mode); 
     $(".canBeDiasbled select").prop("disabled", mode); 
+}
+//====================== SYNONYM RELATED ===============================
+function updateSynonym(synonymId) {
+    var url = window.params.species.updateUrl;
+    var p = {}
+    p['name'] = 'synonym';
+    p['act'] = 'update';
+    p['sid'] = synonymId;
+    p['relationship'] = 'synonym';
+    var otherParams = {};
+    otherParams['atAnyLevel'] = true;
+    p['otherParams'] = otherParams
+    $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        //contentType: "application/json",
+        data: {synonymData: JSON.stringify(p)},	
+        success: function(data) {
+            //show the popup
+            //$("#externalDbResults").modal('hide');
+            //populateNameDetails(data)
+            console.log("======SUCCESS====");
+            console.log(data);  
+        }, error: function(xhr, status, error) {
+            alert(xhr.responseText);
+        } 
+    });
 }

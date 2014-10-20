@@ -291,7 +291,7 @@
                                 <td><input type="text" class="order span12"></td> 
                             </tr>
                             <tr>
-                                <td>Superfamily</td>
+                                <td>Super-Family</td>
                                 <td><input type="text" class="superfamily span12"></td> 
                             </tr>
                             <tr>
