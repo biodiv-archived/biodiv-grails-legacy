@@ -9,35 +9,35 @@
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
-        <td><button class="btn btn-mini"><i class="icon-trash"></i></button>
+        <td><button class="btn btn-mini" onClick='modifySynonym(this, "add")'>Add</button>
+            <button class="btn btn-mini"onClick='modifySynonym(this, "delete")'><i class="icon-trash"></i></button></td> 
+    </tr>
+    <tr>
+        <td><input type="text" class="nameInputs"></td> 
+        <td><input type="text" class="nameInputs"></td> 
+        <td><input type="text" class="nameInputs"></td> 
+        <td><button class="btn btn-mini">Add</button>
             <button class="btn btn-mini"><i class="icon-trash"></i></button></td> 
     </tr>
     <tr>
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
-        <td><button class="btn btn-mini"><i class="icon-trash"></i></button>
+        <td><button class="btn btn-mini">Add</button>
             <button class="btn btn-mini"><i class="icon-trash"></i></button></td> 
     </tr>
     <tr>
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
-        <td><button class="btn btn-mini"><i class="icon-trash"></i></button>
-            <button class="btn btn-mini"><i class="icon-trash"></i></button></td> 
-    </tr>
-    <tr>
-        <td><input type="text" class="nameInputs"></td> 
-        <td><input type="text" class="nameInputs"></td> 
-        <td><input type="text" class="nameInputs"></td> 
-        <td><button class="btn btn-mini"><i class="icon-trash"></i></button>
+        <td><button class="btn btn-mini">Add</button>
         <button class="btn btn-mini"><i class="icon-trash"></i></button></td> 
     </tr>
     <tr>
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
         <td><input type="text" class="nameInputs"></td> 
-        <td><button class="btn btn-mini"><i class="icon-trash"></i></button>
+        <td><button class="btn btn-mini" onClick='updateSynonym(this)'>Add</button>
         <button class="btn btn-mini"><i class="icon-trash"></i></button><td> 
     </tr>
 

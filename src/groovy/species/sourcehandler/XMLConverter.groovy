@@ -1268,7 +1268,11 @@ class XMLConverter extends SourceConverter {
             if(rel) {
                 def cleanName = Utils.cleanName(n.text()?.trim());
                 def parsedNames = namesParser.parse([cleanName]);
-                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept);
+                def viaDatasource = null;
+                if(n.viaDatasource) {
+                    viaDatasource = n.viaDatasource.text();
+                }
+                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource);
                 if(sfield) {
                     //adding contributors
                     sfield.updateContributors(getUserContributors(n))
@@ -1282,7 +1286,7 @@ class XMLConverter extends SourceConverter {
         return synonyms;
     }
 
-    private Synonyms saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept) {
+    private Synonyms saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept, viaDatasource = null) {
 
         if(parsedName && parsedName.canonicalForm) {
             //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
@@ -1304,11 +1308,16 @@ class XMLConverter extends SourceConverter {
                 sfield.normalizedForm = parsedName.normalizedForm;;
                 sfield.italicisedForm = parsedName.italicisedForm;;
                 sfield.binomialForm = parsedName.binomialForm;;
+                sfield.status = NameStatus.SYNONYM
+                if(viaDatasource){
+                    sfield.viaDatasource = viaDatasource
+                }
 
                 if(!sfield.save(flush:true)) {
                     sfield.errors.each { log.error it }
                 }
             }
+            println "========S FIELD============= " + sfield
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name

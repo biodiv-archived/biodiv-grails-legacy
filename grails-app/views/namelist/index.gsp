@@ -224,6 +224,7 @@
 								<div class="span9"> <input type="text" placeholder="Name" class="name span12"/></div>
                             </div>
                             <input type="hidden" class="taxonReg" value="">
+                            <input type="hidden" class="taxonId" value="">
                             <input type="hidden" class="fromCOL" value=false>
                             <input type="hidden" class="id_details" value="">
 							<div class="row-fluid">	

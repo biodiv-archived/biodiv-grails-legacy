@@ -480,7 +480,7 @@ class SpeciesController extends AbstractObjectController {
 		}
 	}*/
 
-	@Secured(['ROLE_USER'])
+    @Secured(['ROLE_USER'])
     def update() {
         println "========PARAMS======== " + params 
         if(params.synonymData) {
@@ -488,24 +488,24 @@ class SpeciesController extends AbstractObjectController {
             params.remove('synonymData');
         }
         println "========PARAMS======== " + params 
-        /*
-    	def msg;
+        def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         
-        if(!(params.name && params.pk)) {
+        if(!(params.name && params.pk) && !params.otherParams) {
         	msg=messageSource.getMessage("default.species.error.fieldOrname", null, RCU.getLocale(request))
             render ([success:false, msg:msg] as JSON)
+            println "=======HERE========= "
             return;
         }
         try {
             def result;
-            long speciesFieldId = params.pk ? params.long('pk'):null;
+            Long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
-
+            println "near switch case=================="
             switch(params.name) {
                 case "contributor":
                 long cid = params.cid?params.long('cid'):null;
@@ -567,7 +567,11 @@ class SpeciesController extends AbstractObjectController {
                 String relationship = params.relationship?:null;
 
                 if(params.act == 'delete') {
-                    result = speciesService.deleteSynonym(sid, speciesFieldId);
+                    if(params.otherParams) {
+                        result = speciesService.deleteSynonym(sid, params.otherParams.taxonId);
+                    } else {
+                        result = speciesService.deleteSynonym(sid, speciesFieldId);
+                    }
                 } else {
                     def otherParams = null
                     if(params.otherParams) {
@@ -649,7 +653,6 @@ class SpeciesController extends AbstractObjectController {
             render ([success:false, msg:e.getMessage()] as JSON)
             return;
         }
-*/
     }
 
 	@Secured(['ROLE_SPECIES_ADMIN'])

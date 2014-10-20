@@ -48,7 +48,7 @@
 
                 //if("${speciesInstance}".length == 0){
                 if(me.options.showCheckBox == false){    
-                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;' onClick='getNamesFromTaxon(this)'>Show names</button></span>"
+                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show names</button></span>"
                 } else {
                 el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='checkbox'></input></span>"
                 
@@ -135,12 +135,14 @@
 */
 
                     if ((e.target.nodeName === "INPUT" && $(e.target).hasClass("taxDefIdCheck") )|| ($(e.target).hasClass("taxDefIdSelect"))) {
-
+    
                         state = $(e.target).prop("checked");
                         var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
                         console.log("===LAST==============="+last)
                         $(e.target).parent("span").find(".taxDefIdVal").val(last);
-
+                        if($(e.target).hasClass("taxDefIdSelect")) {
+                            getNamesFromTaxon($(e.target));
+                        }
                         //localData = $this.jqGrid("getLocalRow", rowid);
 
                        //setChechedStateOfChildrenItems($this.jqGrid("getNodeChildren", localData), state);

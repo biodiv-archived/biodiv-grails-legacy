@@ -55,6 +55,7 @@ function getNamesFromTaxon(ele) {
 
 function getNameDetails(taxonId, classificationId) {
     console.log("=======NAME DEATILS=======" + taxonId);
+    $('.taxonId').val(taxonId);
     var url = window.params.curation.getNameDetailsUrl;
     $.ajax({
         url: url,
@@ -242,16 +243,27 @@ function changeEditingMode(mode) {
     $(".canBeDiasbled input").prop("disabled", mode); 
     $(".canBeDiasbled select").prop("disabled", mode); 
 }
+
+
 //====================== SYNONYM RELATED ===============================
-function updateSynonym(synonymId) {
+function modifySynonym(ele, modifyType) {
+    console.log("========UPDATE SY=========");
+    console.log($(ele));
     var url = window.params.species.updateUrl;
     var p = {}
     p['name'] = 'synonym';
-    p['act'] = 'update';
-    p['sid'] = synonymId;
+    p['act'] = modifyType;
+    //====DUMMY DATAS
+    p['sid'] =221555;
+    //var values = $(ele).parent('tr').find('td input');
+    //console.log(values);
+    p['value'] = 'Hello nofeederror';
+    p['source'] = 'SOURCE';
+    p['contributor'] = 'CONTRIBUTOR DUMMY'
     p['relationship'] = 'synonym';
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
+    otherParams['taxonId'] =272991;
     p['otherParams'] = otherParams
     $.ajax({
         url: url,

@@ -845,11 +845,13 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateSynonym(def synonymId, def speciesId, String relationship, String value, otherParams = null) {
+        println "=====parameters========== " + synonymId +"========== "+ speciesId+ "======== "+relationship +"========= " + value+"============ " + otherParams
         if(!value || !relationship) {
             return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
         }
+        Species speciesInstance; 
         if(!otherParams) {
-            Species speciesInstance = Species.get(speciesId);
+            speciesInstance = Species.get(speciesId);
 
             if(!speciesInstance) {
                 def messagesourcearg = new Object[1];
@@ -861,28 +863,45 @@ class SpeciesService extends AbstractObjectService  {
                 return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
             }
         }
+        println "=====2========"
         Synonyms oldSynonym;
         if(synonymId) {
             oldSynonym = Synonyms.read(synonymId);
 
             if(!oldSynonym) {
+        println "=====a========"
                 //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
+        println "=====b========"
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
-            } else if(!oldSynonym.isContributor()) {
+            } else if(!oldSynonym.isContributor() && !otherParams) {
+        println "=====c========"
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
         }
 
+        println "=====3========"
         Species.withTransaction { status ->
+            TaxonomyDefinition taxonConcept;
+            if(otherParams) {
+                taxonConcept = TaxonomyDefinition.get(otherParams['taxonId'].toLong()); 
+            } else {
+                taxonConcept = speciesInstance.taxonConcept;
+            }
             if(oldSynonym) {
-                def result = deleteSynonym(oldSynonym, speciesInstance);
+                def result
+                if(otherParams) {
+                    result = deleteSynonym(oldSynonym, taxonConcept);
+                } else {
+                    result = deleteSynonym(oldSynonym, speciesInstance);
+                }
                 if(!result.success) {
                     def messagesourcearg = new Object[1];
                 messagesourcearg[0] = result.msg;
                     return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
                 }
             } 
+            println "====4========="
             XMLConverter converter = new XMLConverter();
 
             NodeBuilder builder = NodeBuilder.newInstance();
@@ -890,8 +909,10 @@ class SpeciesService extends AbstractObjectService  {
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
             new Node(data, "contributor", springSecurityService.currentUser.email);
- 
-            List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
+            if(otherParams)
+                new Node(data, "viaDatasource", otherParams['source']);
+            
+            List<Synonyms> synonyms = converter.createSynonyms(synonym, taxonConcept);
             
             if(!synonyms) {
                 return [success:false, msg:messageSource.getMessage("info.error.update.synonym", null, LCH.getLocale())]
@@ -899,7 +920,7 @@ class SpeciesService extends AbstractObjectService  {
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
-                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
                 String activityType, mailType;
                 if(oldSynonym) {
                     activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
@@ -908,7 +929,9 @@ class SpeciesService extends AbstractObjectService  {
                     activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
                     mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
-
+                if(otherParams) {
+                    return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, activityType:activityType, mailType:mailType]  
+                }
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
             }
         }
@@ -1158,6 +1181,51 @@ class SpeciesService extends AbstractObjectService  {
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
                 return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+            } 
+            catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+                return [success:false, msg:messageSource.getMessage("info.error.synonym.deletion", messagesourcearg, LCH.getLocale())]
+            }
+        }
+    }
+//RELATED TO CURATION INTERFACE
+    def deleteSynonym(long synonymId, String taxonId) {
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+        }
+        TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(taxonId.toLong())
+        
+        return deleteSynonym(oldSynonym, taxonConcept);
+    }
+
+    def deleteSynonym(Synonyms oldSynonym, TaxonomyDefinition taxonConcept) {
+        if(!oldSynonym) {
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = synonymId;
+            return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
+        } 
+
+        Synonyms.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                
+                if(oldSynonym.contributors.size() == 0) {
+                    oldSynonym.delete(failOnError:true)
+                } else {
+                    if(!oldSynonym.save()) {
+                        oldSynonym.errors.each { log.error it }
+                        return [success:false, msg:messageSource.getMessage("info.error.deleting.synonym", null, LCH.getLocale())]
+                    }
+                }
+                msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
+                content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
+                return [success:true, msg:msg, type:'synonym', content:content, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
