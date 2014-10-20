@@ -56,7 +56,7 @@ import grails.converters.JSON;
 import species.participation.ActivityFeedService;
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
-
+import org.springframework.web.context.request.RequestContextHolder
 class SpeciesService extends AbstractObjectService  {
 
     private static log = LogFactory.getLog(this);
@@ -74,6 +74,7 @@ class SpeciesService extends AbstractObjectService  {
     def messageSource;
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
+    def request;
     //static int noOfFields = Field.count();
 
     def nameTerms(params) {
@@ -149,7 +150,7 @@ class SpeciesService extends AbstractObjectService  {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -157,13 +158,13 @@ class SpeciesService extends AbstractObjectService  {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }
@@ -273,7 +274,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private boolean isValidSortParam(String sortParam) {
-        if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase('lastrevised'))
+        if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchField.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;
         return false;
     }
@@ -282,6 +283,7 @@ class SpeciesService extends AbstractObjectService  {
     * Add Species Field
     */
     def addSpeciesField(long speciesId, long fieldId, params) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!fieldId || !speciesId) {
             return [success:false, msg:messageSource.getMessage("info.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -336,6 +338,7 @@ class SpeciesService extends AbstractObjectService  {
      * Update Species Field
      */
     def updateSpeciesField(SpeciesField speciesField, params) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, RCU.getLocale(request))]
         }
@@ -361,6 +364,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!params.description) {
             return [success:false, msg:messageSource.getMessage("info.about.description", null, RCU.getLocale(request))]
         }
@@ -470,6 +474,7 @@ class SpeciesService extends AbstractObjectService  {
     */
     def deleteSpeciesField(long id) {
         SpeciesField speciesField = SpeciesField.get(id);
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!speciesField) {
             return [success:false, msg:messageSource.getMessage("info.speciesfield.notfound", null, RCU.getLocale(request))]
         } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
@@ -501,6 +506,7 @@ class SpeciesService extends AbstractObjectService  {
     * Update methods for individual metadata fields
     */
     def updateContributor(contributorId, long speciesFieldId, def value, String type) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -558,6 +564,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateAttributor(contributorId, long speciesFieldId, def value, String type) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -615,6 +622,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateReference(referenceId, long speciesFieldId, def value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -661,7 +669,8 @@ class SpeciesService extends AbstractObjectService  {
         }
     }
 
-    def addDescription(long speciesId, long fieldId, String value) { 
+    def addDescription(long speciesId, long fieldId, String value) {
+    if(request == null) request = RequestContextHolder.currentRequestAttributes().request 
         if(!value || !fieldId || !speciesId) {
             return [success:false, msg:messageSource.getMessage("info.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -700,6 +709,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateDescription(long id, String value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value || !id) {
             return [success:false, msg:messageSource.getMessage("info.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -708,6 +718,7 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def updateSpeciesFieldDescription(SpeciesField c, String value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!c) {
             return [success:false, msg:messageSource.getMessage("info.speciesfield.notfound", null, RCU.getLocale(request))]
         } else if(!speciesPermissionService.isSpeciesFieldContributor(c, springSecurityService.currentUser)) {
@@ -725,6 +736,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateLicense(long speciesFieldId, def value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -762,6 +774,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateAudienceType(long speciesFieldId, String value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -800,6 +813,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateStatus(long speciesFieldId, String value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, RCU.getLocale(request))]
         }
@@ -845,6 +859,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateSynonym(def synonymId, def speciesId, String relationship, String value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value || !relationship) {
             return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, RCU.getLocale(request))]
         }
@@ -914,6 +929,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateCommonname(def cnId, def speciesId, String language, String value) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value || !language) {
             return [success:false, msg:messageSource.getMessage("info.name.language.no.empty", null, RCU.getLocale(request))]
         }
@@ -984,6 +1000,7 @@ class SpeciesService extends AbstractObjectService  {
     * Delete methods for individual metadata fields
     */
     def deleteContributor(contributorId, long speciesFieldId, String type) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         SUser oldContrib;
         if(contributorId) {
             oldContrib = SUser.read(contributorId);
@@ -1032,6 +1049,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def deleteAttributor(contributorId, long speciesFieldId, String type) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         Contributor oldContrib;
         if(contributorId) {
             oldContrib = Contributor.read(contributorId);
@@ -1074,7 +1092,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def deleteReference(referenceId, long speciesFieldId) {
-
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         Reference oldReference;
         if(referenceId) {
             oldReference = Reference.read(referenceId);
@@ -1126,6 +1144,7 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def deleteSynonym(Synonyms oldSynonym, Species speciesInstance) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = synonymId;
@@ -1179,6 +1198,7 @@ class SpeciesService extends AbstractObjectService  {
     } 
     
     def deleteCommonname(CommonNames oldCommonname, Species speciesInstance) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!oldCommonname) {
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = cnId;
@@ -1226,6 +1246,7 @@ class SpeciesService extends AbstractObjectService  {
     * Create Species given species name and atleast one taxon hierarchy
     */
     def createSpecies(String speciesName, int rank, List taxonRegistryNames, Language language) {
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];

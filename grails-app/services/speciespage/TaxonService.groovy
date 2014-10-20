@@ -14,6 +14,7 @@ import species.sourcehandler.XMLConverter
 import species.auth.SUser;
 import grails.converters.JSON;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder
 import species.Language;
 
 class TaxonService {
@@ -30,6 +31,7 @@ class TaxonService {
     def activityFeedService;
     def speciesPermissionService;
     def messageSource;
+    def request;
 	static int BATCH_SIZE = 100;
 
 	/**
@@ -779,9 +781,12 @@ class TaxonService {
     */
 
     def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language) {
+    	 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         List errors = [];
         if(!classification) {
-            return [success:false, msg:"Not a valid classification ${classification?.name}."]
+        	def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =classification?.name;
+            return [success:false, msg:messageSource.getMessage("info.not.valid", messagesourcearg, RCU.getLocale(request))]
         }
         
         XMLConverter converter = new XMLConverter();
@@ -817,6 +822,7 @@ class TaxonService {
     } 
 
     private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+    	 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         String msg = '';
         def content;
         List errors = [];
@@ -829,7 +835,7 @@ class TaxonService {
          } 
 
          if(!reg.isContributor()) {
-            return [success:false, msg:"You don't have permission to delete as you are not a contributor.", errors:errors]
+            return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, RCU.getLocale(request)), errors:errors]
         }
 
         def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
@@ -844,7 +850,7 @@ class TaxonService {
 
         if(force == false && otherHierarchiesCount[0] == 1) {
             //if this is the only hierarchy for the species ... then dont delete it.
-            return [success:false, msg:"Cannot remove hierarchy as its the only one available for the species", errors:errors]
+            return [success:false, msg:messageSource.getMessage("info.annot.remove.hierarchy", null, RCU.getLocale(request)), errors:errors]
         }
 
         try {

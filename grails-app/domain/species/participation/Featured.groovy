@@ -7,7 +7,7 @@ import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
-
+import species.Language;
 import species.auth.Role;
 import species.groups.UserGroup;
 import species.groups.UserGroupController;
@@ -25,10 +25,11 @@ class Featured extends AbstractAction {
 
     String notes;
     UserGroup userGroup;
-
+    Language language;
 	private static final log = LogFactory.getLog(this);
 
     static constraints = {
+        language nullable:false
         author(unique: ['objectId', 'objectType', 'userGroup'])
         userGroup nullable:true
         createdOn nullable:false

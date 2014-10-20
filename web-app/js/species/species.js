@@ -439,8 +439,8 @@ function initEditables($ele) {
         $(this).prev().show().prev().show();
         $(this).parent().parent().find('.synRel.selector, .lang.selector').editable('hide'); 
     });
-
-    $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+    
+    $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='"+window.i8ln.button.delete+"'><i class='icon-trash'></i>"+window.i8ln.button.delete+"</a><a class='pull-right editFieldButton btn btn-primary' title='"+window.i8ln.button.edit+"'><i class='icon-edit'></i>"+window.i8ln.button.edit+"</a>");
     $ele.find('.editFieldButton').click(function(e){    
         e.stopPropagation();
 

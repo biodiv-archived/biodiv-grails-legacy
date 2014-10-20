@@ -38,6 +38,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		
 		def species;
 		def startTime = System.currentTimeMillis()
+        INDEX_DOCS = Species.count() + 1;
 		while(noIndexed < INDEX_DOCS) {
 			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
             noIndexed += species.size();
@@ -137,31 +138,31 @@ class SpeciesSearchService extends AbstractSearchService {
 				}
                 
                 switch(concept) {
-                    case "Overview" :
+                    case ["Overview","Généralités"] :
 						doc.addField(searchFieldsConfig.SP_OVERVIEW, field.description);
                     break
 
-                    case "Nomenclature and Classification" :
+                    case ["Nomenclature and Classification","Nomenclature et Classification"] :
 						doc.addField(searchFieldsConfig.SP_NC, field.description);
                     break
 
-                    case "Natural History" :
+                    case ["Natural History","Histoire Naturelle"] :
 						doc.addField(searchFieldsConfig.SP_NH, field.description);
                     break
 
-                    case "Habitat and Distribution" :
+                    case ["Habitat and Distribution","Habitat et Distribution"] :
 						doc.addField(searchFieldsConfig.SP_HD, field.description);
                     break
 
-                    case "Demography and Conservation" :
+                    case ["Demography and Conservation","Démographie et Conservation"] :
 						doc.addField(searchFieldsConfig.SP_DC, field.description);
                     break
 
-                    case "Uses and Management" :
+                    case ["Uses and Management","Usages et Gestion"] :
 						doc.addField(searchFieldsConfig.SP_UM, field.description);
                     break
 
-                    case "Information Listing" :
+                    case ["Information Listing","Liste d'Information"] :
 						doc.addField(searchFieldsConfig.SP_IL, field.description);
                     break
 

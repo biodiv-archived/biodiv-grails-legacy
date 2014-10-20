@@ -95,6 +95,10 @@ alter table comment add constraint language_id foreign key (id) references langu
 update comment set language_id = 123;
 alter table comment alter column language_id set not null;
 
+alter table classification add column language_id bigint;
+alter table classification add constraint language_id foreign key (id) references language(id) match full;
+update classification set language_id = 123;
+alter table classification alter column language_id set not null;
 
 
 alter table species_field add column language_id bigint;
@@ -107,18 +111,16 @@ alter table field add constraint language_id foreign key (id) references languag
 update field set language_id = 123;
 alter table field alter column language_id set not null;
 
-alter table classification add column language_id bigint;
-alter table classification add constraint language_id foreign key (id) references language(id) match full;
-update classification set language_id = 123;
-alter table classification alter column language_id set not null;
-
-
-
 alter table field add column connection bigint;
 alter table field alter column connection set not null;
 
 
-update suser set language_id = 123;
+/* Added on 16 OCT */
+
+alter table featured add column language_id bigint;
+alter table featured add constraint language_id foreign key (id) references language(id) match full;
+update featured set language_id = 123;
+ alter table featured alter column language_id set not null;
 
 
 /** After updating code */

@@ -377,7 +377,7 @@ speciesPortal {
 		SCIENTIFIC_NAME = "scientific_name"
 		OBSERVED_ON = "observedon"
 		UPLOADED_ON = "createdon"
-		UPDATED_ON = "lastrevised"
+		UPDATED_ON = "updatedon"
 		FROM_DATE = "fromdate"
 		TO_DATE = "todate"
 		SGROUP = "sgroup"
