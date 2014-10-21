@@ -21,7 +21,8 @@ class NamelistController {
 	 */
 	def getNamesFromTaxon(){
         //input in params.taxonId
-        println "====CALL HERE ====== " + params
+		println "====CALL HERE ====== " +  namelistService.getNamesFromTaxon(params)
+		println "=================================="
 		def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         render res as JSON
 	}
@@ -33,7 +34,8 @@ class NamelistController {
 	def getNameDetails(){
         //input in params.taxonId
 		//[name:'aa', kingdom:'kk', .....]
-	    println "====CALL HERE NAME DETAILS====== " + params
+	    println "====CALL HERE NAME DETAILS====== " + namelistService.getNameDetails(params)
+		println "========================================="
 		//fetch registry using taxon id and classification id
         def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()),TaxonomyDefinition.read(params.taxonId.toLong())); 
         println "=========TAXON REG========= " + taxonReg
