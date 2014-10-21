@@ -90,6 +90,6 @@ class TaxonomyDefinition extends ScientificName {
    }
    
    Map fetchGeneralInfo(){
-	   return [name:name, rank:rank, position:position, status:status, authorYear:authorYear, matchDatabaseName:matchDatabaseName, viaDatasource: viaDatasource, matchId: matchId ]
+	   return [name:name, rank:rank, position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }
 }

@@ -21,9 +21,11 @@ class NamelistController {
 	 */
 	def getNamesFromTaxon(){
         //input in params.taxonId
-		println "====CALL HERE ====== " +  namelistService.getNamesFromTaxon(params)
+		println "=====PARAMS========= " + params
+        def res = namelistService.getNamesFromTaxon(params)
+        println "====CALL HERE ====== " +  res  //namelistService.getNamesFromTaxon(params)
 		println "=================================="
-		def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
+		//def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         render res as JSON
 	}
 	
@@ -34,17 +36,18 @@ class NamelistController {
 	def getNameDetails(){
         //input in params.taxonId
 		//[name:'aa', kingdom:'kk', .....]
-	    println "====CALL HERE NAME DETAILS====== " + namelistService.getNameDetails(params)
+        def res = namelistService.getNameDetails(params);
+	    println "====CALL HERE NAME DETAILS====== " + res
 		println "========================================="
 		//fetch registry using taxon id and classification id
-        def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()),TaxonomyDefinition.read(params.taxonId.toLong())); 
+        /*def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()),TaxonomyDefinition.read(params.taxonId.toLong())); 
         println "=========TAXON REG========= " + taxonReg
         def res
         if(taxonReg) {
             res = [name:'rahul', kingdom:'Plantae',phylum:'Magnoliophyta', authorString:'author', rank:'super-family', source:'COL', superfamily:'Ydfvsdv',family:'Menispermaceae', 'class':'Equisetopsida', order:'Ranunculales',genus:'Albertisia',species:'Albertisia mecistophylla','sub-genus':'Subsdfsdf','sub-family':'SubFfsad', nameStatus:'accepted', via:'xx', id:'123', taxonReg:taxonReg.id?.toString()]
         } else {
             println "======TAXON REGISTRY NULL====="
-        }
+        }*/
         render res as JSON
 	}
 	

@@ -138,7 +138,7 @@ class NamelistService {
 		def classSystem = params.classificationId.toLong()
 		def parentId = params.parentId
 		if(!parentId) {
-			sqlStr = "select t.id as taxonId, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classsystem, position as position \
+			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classificationid, position as position \
 				from taxonomy_registry s, \
 				taxonomy_definition t \
 				where \
@@ -147,7 +147,7 @@ class NamelistService {
 				"t.rank = 0";
 			rs = sql.rows(sqlStr, [classSystem:classSystem])
 		} else {
-			sqlStr = "select t.id as taxonId, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, position as position \
+			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classificationid, position as position \
 				from taxonomy_registry s, \
 				taxonomy_definition t \
 				where \
@@ -181,11 +181,12 @@ class NamelistService {
 		def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
 		def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
 		def result = taxonDef.fetchGeneralInfo()
+        result['taxonId'] = params.taxonId;
 		if(taxonReg) {
 			result['taxonRegId'] = taxonReg.id?.toString()
 			taxonReg.path.tokenize('_').each { taxonDefinitionId ->
 				def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-				result.put(TaxonomyRank.getTRFromInt(td.rank).value(), td.name);
+				result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
 			}
 		}
 		return result

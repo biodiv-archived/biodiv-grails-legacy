@@ -1,4 +1,4 @@
-function getNamesFromTaxon(ele) {
+function getNamesFromTaxon(ele , parentId) {
     console.log(ele);
     $("#taxonHierarchy tr").css('background', 'white');
     console.log($(ele).parents("tr"));
@@ -11,13 +11,13 @@ function getNamesFromTaxon(ele) {
         url: url,
         dataType: "json",
         type: "POST",
-        data: {taxonId:taxonId, classificationId:classificationId},	
+        data: {parentId:parentId, classificationId:classificationId},	
         success: function(data) {
             console.log("======SUCCESS====");
             if(data.dirtyList){
                 var dlContent = "<ul>";
                 $.each(data.dirtyList, function(index, value){
-                    dlContent += "<li onclick='getNameDetails("+value.id +","+ value.classificationId+")'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    dlContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+")'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 dlContent += "</ul>";
@@ -27,23 +27,23 @@ function getNamesFromTaxon(ele) {
             if(data.workingList){
                 var wlContent = "<ul>";
                 $.each(data.workingList, function(index, value){
-                    wlContent +="<li onclick='getNameDetails("+value.id+","+ value.classificationId+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    wlContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 wlContent += "</ul>";
                 $(".wl_content ul").remove();
-                $(".wl_content").append(dlContent);
+                $(".wl_content").append(wlContent);
 
             }
             if(data.cleanList){
                 var clContent = "<ul><li>";
                 $.each(data.cleanList, function(index, value){
-                    clContent +="<li onclick='getNameDetails("+value.id+","+ value.classificationId+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    clContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 clContent += "</ul>";
                 $(".cl_content ul").remove();
-                $(".cl_content").append(dlContent);
+                $(".cl_content").append(clContent);
 
             }
         }, error: function(xhr, status, error) {
@@ -64,7 +64,8 @@ function getNameDetails(taxonId, classificationId) {
         data: {taxonId:taxonId, classificationId:classificationId},	
         success: function(data) {
             changeEditingMode(false);
-            populateNameDetails(data)
+            populateNameDetails(data);
+            $(".taxonRegId").val(data['taxonRegId']);
             console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
@@ -184,8 +185,20 @@ function saveHierarchy() {
             //show the popup                                   //what in response
             //$("#externalDbResults").modal('hide');
             //populateNameDetails(data)
-            console.log("======SUCCESS====");
-            console.log(data);  
+            console.log("======SUCCESS SAVED HIERARCHY====");
+            console.log(data);
+            if(data['success']) {
+                var index = $(".rankDropDown")[0].selectedIndex -1;
+                var arr = data['activityType'].split('>');
+                var index1 = arr.length -1;
+                if(index1 < index) {
+                    alert("Hierarchy saved only till - " + arr[arr.length - 2]);
+                } else {
+                    alert(data['msg']);
+                }
+            } else {
+                alert(data['msg']);
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -205,7 +218,7 @@ function fetchTaxonRegistryData() {
     result['taxonRegistry.8'] = $('.subgenus').val();
     result['taxonRegistry.9'] = $('.species').val();
     
-    result['reg'] = $(".taxonReg").val()          //$('#taxaHierarchy option:selected').val();
+    result['reg'] = $(".taxonRegId").val()          //$('#taxaHierarchy option:selected').val();
     result['classification'] = 817; //for author contributed
     
     var res = {};
@@ -277,9 +290,10 @@ function modifySynonym(ele) {
     for (var i = 0; i < form_value.length; i++) {
         p[form_value[i].name] = form_value[i].value;        
     }
+    p['name']  = "synonym";
     p['act'] = modifyType;    
-    p['sid'] =221555;
-    p['relationship'] = 'synonym';
+   // p['sid'] =221555;
+   p['relationship'] = 'synonym';
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
     otherParams['taxonId'] =272991;

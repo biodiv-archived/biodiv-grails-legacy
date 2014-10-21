@@ -623,26 +623,38 @@ class SpeciesController extends AbstractObjectController {
  
             if(result.success) {
                 def feedInstance;
-                if(result.activityType)
-                    feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                if(result.activityType) {
+                    if(result.taxonConcept) {
+                        result['synonymId'] = result.synonymInstance.id.toString()
+                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.synonymInstance, springSecurityService.currentUser, result.activityType);
+                    } else {
+                        feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                    }
+                }
                 if(result.mailType) {
-                    def otherParams = ['info':result.activityType]
+                    def otherParamsForMail = ['info':result.activityType]
                     def spIns = result.speciesFieldInstance
                     if(spIns) {
                         def des = spIns.description
                         des = des.replaceAll("<(.|\n)*?>", '');
                         des = des.replaceAll("&nbsp;", '');
                         if(des.length() > 150) {
-                            otherParams['spFDes'] = des[0..147] + "...";
+                            otherParamsForMail['spFDes'] = des[0..147] + "...";
                         } else {
-                            otherParams['spFDes'] = des
+                            otherParamsForMail['spFDes'] = des
                         }
                     }
-                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParams);
+                    //TODO: send mail for adding synonym on any taxon
+                    //create dummy speciesInstance and check the mail template
+                    if(!result.speciesInstance) {
+                        utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParamsForMail);
+                    }
                 }
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
+                result.remove('synonymInstance');
+                result.remove('taxonConcept');
             }
 
             render result as JSON

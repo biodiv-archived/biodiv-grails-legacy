@@ -21,7 +21,11 @@
 </div>
 <div class="row-fluid tab_div">
  <form class="tab_form">
-  <div class="span3"><input type="text" class="nameInputs span12" name="name"></div>
+
+  <div class="span3"> 
+            <input type="hidden" name="sid" value=""/>
+            <input type="text" class="nameInputs span12" name="name">
+  </div>
   <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
   <div class="span4"><input type="text" class="nameInputs span12" name="Contributor"></div>
   <div class="span2">
