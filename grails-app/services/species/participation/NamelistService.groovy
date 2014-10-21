@@ -181,6 +181,7 @@ class NamelistService {
 		def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
 		def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
 		def result = taxonDef.fetchGeneralInfo()
+        result['taxonId'] = params.taxonId;
 		if(taxonReg) {
 			result['taxonRegId'] = taxonReg.id?.toString()
 			taxonReg.path.tokenize('_').each { taxonDefinitionId ->
