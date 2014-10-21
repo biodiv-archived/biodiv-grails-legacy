@@ -1491,6 +1491,9 @@ class XMLConverter extends SourceConverter {
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
                                 taxon.rank = rank;
+                                taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
+                                taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
+                                taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
                                 if(fromCOL) {
                                     println "=========COL SE REQUIRED==============="
                                     //get its data from col and save

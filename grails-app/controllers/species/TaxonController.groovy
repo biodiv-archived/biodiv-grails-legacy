@@ -460,6 +460,7 @@ class TaxonController {
             params << JSON.parse(params.taxonData)
             params.remove('taxonData');
             otherParams['id_details'] = params.id_details;
+            otherParams['metadata'] = params.metadata;
         }
         println "=======PARAMS UPDATE======== " + params
         def msg;
@@ -501,7 +502,8 @@ class TaxonController {
                         classification = reg.classification;
                         result = taxonService.deleteTaxonHierarchy(reg, true);
                     }
-        println "=======5======== " 
+        println "=======5======== " + result 
+        println "=======OTHER PARAMS======== " + otherParams 
                     if(!result.success) {
         println "=======7======== " 
                         msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))

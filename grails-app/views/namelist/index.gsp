@@ -223,7 +223,7 @@
 								<div class="span3"><label>Name</label></div>
 								<div class="span9"> <input type="text" placeholder="Name" class="name span12"/></div>
                             </div>
-                            <input type="hidden" class="taxonReg" value="">
+                            <input type="hidden" class="taxonRegId" value="">
                             <input type="hidden" class="taxonId" value="">
                             <input type="hidden" class="fromCOL" value=false>
                             <input type="hidden" class="id_details" value="">
@@ -232,8 +232,9 @@
                                 <div class="span9"> 
                                     <select id="rankDropDown" class="rankDropDown span12" >
                                         <option value="chooseRank">Choose Rank</option>
+                                        <% def rankCount = 0 %>
                                         <g:each in="${TaxonomyRank.list()}" var="t">
-                                            <option value="${t.toString().toLowerCase()}">${t}</option>
+                                            <option value="${rankCount++}">${t}</option>
                                         </g:each>
                                     </select>
                                 </div>

@@ -112,6 +112,11 @@ abstract class ScientificName extends NamesMetadata {
 		String getDefaultMessage() {
 			value()
 		}
+		
+		static TaxonomyRank getTRFromInt(int i){
+			return list()[i]
+		}
+		
 	}
 
 	String canonicalForm;

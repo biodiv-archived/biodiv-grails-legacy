@@ -140,8 +140,9 @@
                         var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
                         console.log("===LAST==============="+last)
                         $(e.target).parent("span").find(".taxDefIdVal").val(last);
+                        console.log("======PARENT ID==== " + rowid);
                         if($(e.target).hasClass("taxDefIdSelect")) {
-                            getNamesFromTaxon($(e.target));
+                            getNamesFromTaxon($(e.target), rowid);
                         }
                         //localData = $this.jqGrid("getLocalRow", rowid);
 
