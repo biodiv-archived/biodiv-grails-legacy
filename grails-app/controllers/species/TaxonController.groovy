@@ -466,6 +466,7 @@ class TaxonController {
         def errors = [], result=[success:false];
         if(params.classification) {
 
+        println "=======1======== " 
             Language languageInstance = utilsService.getCurrentLanguage(request);
 
             String speciesName;
@@ -477,6 +478,7 @@ class TaxonController {
 //            return [success:false, msg:"You don't have permission to delete synonym"]
 //        }
 
+        println "=======2======== " 
             try {
                 for (int i=0; i< t.size(); i++) {
                     if(!t[TaxonomyRank.list()[i].ordinal()]) {
@@ -484,6 +486,7 @@ class TaxonController {
                     }
                 }
 
+        println "======3======== " 
                 if(!taxonService.validateHierarchy(t)) {
                      msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
                     render ([success:false, msg:msg, errors:errors] as JSON)
@@ -492,17 +495,21 @@ class TaxonController {
 
                 def classification, taxonregistry;
                 if(params.reg) {
+        println "=======4======== " 
                     TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
                     if(reg) {
                         classification = reg.classification;
                         result = taxonService.deleteTaxonHierarchy(reg, true);
                     }
+        println "=======5======== " 
                     if(!result.success) {
+        println "=======7======== " 
                         msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))
                         render ([success:false, msg:msg] as JSON)
                         return;
                     }
                 } else {
+        println "=======6======== " 
                     classification = params.classification ? Classification.read(params.long('classification')) : null;
                 }
                 

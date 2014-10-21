@@ -22,7 +22,7 @@ class NamelistController {
 	def getNamesFromTaxon(){
         //input in params.taxonId
         println "====CALL HERE ====== " + params
-		def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
+		def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:4414, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         render res as JSON
 	}
 	

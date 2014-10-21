@@ -184,8 +184,14 @@ function saveHierarchy() {
             //show the popup                                   //what in response
             //$("#externalDbResults").modal('hide');
             //populateNameDetails(data)
-            console.log("======SUCCESS====");
-            console.log(data);  
+            console.log("======SUCCESS SAVED HIERARCHY====");
+            console.log(data);
+            var index = $(".rankDropDown")[0].selectedIndex -1;
+            var arr = data['activityType'].split('>');
+            var index1 = arr.length -1;
+            if(index1 < index) {
+                alert("Hierarchy saved only till - " + arr[arr.length - 2]);
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -254,10 +260,10 @@ function modifySynonym(ele, modifyType) {
     p['name'] = 'synonym';
     p['act'] = modifyType;
     //====DUMMY DATAS
-    p['sid'] =221555;
+    p['sid'] ='';
     //var values = $(ele).parent('tr').find('td input');
     //console.log(values);
-    p['value'] = 'Hello nofeederror';
+    p['value'] = 'Hello withmail';
     p['source'] = 'SOURCE';
     p['contributor'] = 'CONTRIBUTOR DUMMY'
     p['relationship'] = 'synonym';

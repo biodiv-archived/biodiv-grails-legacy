@@ -1423,7 +1423,6 @@ class XMLConverter extends SourceConverter {
     List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         log.debug "Getting classification hierarchy : "+classification.name;
         println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL 
-        println "======OTHRE PARMS=== " + otherParams.id_details['Geometroidea'];
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1488,6 +1487,7 @@ class XMLConverter extends SourceConverter {
                                 return;
                             }
                             if(!taxon && saveTaxonHierarchy) {
+                                println "=====SAVING NEW TAXON================================== "
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
                                 taxon.rank = rank;
@@ -1532,19 +1532,23 @@ class XMLConverter extends SourceConverter {
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
+                                println "=====VARIABLE SET TRUe================================== "
                                 newNameSaved = true;
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
                             } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
+                                println "=====TAXON WAS THERE================================== "
                                 def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
                                 if(synonym)
                                     synonym.updateContributors(getUserContributors(fieldNode.data))
                             }
-
                             def ent = new TaxonomyRegistry();
                             ent.taxonDefinition = taxon
                             //newNameSaved true becoz now this taxon cant be used in hierarchy 
                             //of a lower level as its status is not accepted 
-                            newNameSaved = newNameSaved || taxon.status != NameStatus.ACCEPTED 
+                            newNameSaved = newNameSaved || taxon.status != NameStatus.ACCEPTED
+                            if(taxon.status != NameStatus.ACCEPTED) {
+                                println "TAXON SAVED WITH NULL STATUS==========================="
+                            }
                             ent.classification = classification;
                             ent.parentTaxon = getParentTaxon(taxonEntities, rank);
                             log.debug("Parent Taxon : "+ent.parentTaxon)
@@ -1564,6 +1568,7 @@ class XMLConverter extends SourceConverter {
                                     taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {
                                 log.debug "Saving taxon registry entity : "+ent;
+                                println "=====SAVING NEW TAXON REGISTRY================================== "
                                 if(!ent.save()) {
                                     ent.errors.each { log.error it }
                                 } else {

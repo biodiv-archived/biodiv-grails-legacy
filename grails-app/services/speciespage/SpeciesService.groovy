@@ -930,7 +930,8 @@ class SpeciesService extends AbstractObjectService  {
                     mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
                 if(otherParams) {
-                    return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, activityType:activityType, mailType:mailType]  
+                    println "========SYNONYMS========== " + synonyms
+                    return [success:true, id:speciesId, msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,synonymInstance:synonyms[0], activityType:activityType, mailType:mailType]  
                 }
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
             }
