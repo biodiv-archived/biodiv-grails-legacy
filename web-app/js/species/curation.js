@@ -246,30 +246,51 @@ function changeEditingMode(mode) {
 
 
 //====================== SYNONYM RELATED ===============================
-function modifySynonym(ele, modifyType) {
+function modifySynonym(ele) {
+    event.preventDefault();
     console.log("========UPDATE SY=========");
-    console.log($(ele));
+    var that = $(ele);
     var url = window.params.species.updateUrl;
-    var p = {}
-    p['name'] = 'synonym';
-    p['act'] = modifyType;
-    //====DUMMY DATAS
+    var p = {};
+    var  modifyType = that.attr('rel');
+    var form_var = that.parent().parent().parent().find('form');   
+
+    if(modifyType == "edit"){
+        form_var.find('input').attr("disabled", false);
+        that.html("<i class='icon-ok icon-white'></i>").attr('rel','update');
+        return false;
+    }   
+
+    if(modifyType == "delete"){
+        var modify = that.prev().attr('rel');
+        if(modify == "update"){
+            form_var.find('input').attr("disabled", true);
+            that.prev().html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
+            return false;
+        }else{
+            confirm("Are you sure to delete?");
+            return false;
+        }    
+    }
+
+    form_value = form_var.serializeArray();
+    for (var i = 0; i < form_value.length; i++) {
+        p[form_value[i].name] = form_value[i].value;        
+    }
+    p['act'] = modifyType;    
     p['sid'] =221555;
-    //var values = $(ele).parent('tr').find('td input');
-    //console.log(values);
-    p['value'] = 'Hello nofeederror';
-    p['source'] = 'SOURCE';
-    p['contributor'] = 'CONTRIBUTOR DUMMY'
     p['relationship'] = 'synonym';
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
     otherParams['taxonId'] =272991;
-    p['otherParams'] = otherParams
-    $.ajax({
+    p['otherParams'] = otherParams    
+    form_var.find('input').attr("disabled", true);
+    console.log(p);
+    that.html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
+  $.ajax({
         url: url,
         type: "POST",
         dataType: "json",
-        //contentType: "application/json",
         data: {synonymData: JSON.stringify(p)},	
         success: function(data) {
             //show the popup
@@ -277,8 +298,10 @@ function modifySynonym(ele, modifyType) {
             //populateNameDetails(data)
             console.log("======SUCCESS====");
             console.log(data);  
+
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
     });
+ 
 }
