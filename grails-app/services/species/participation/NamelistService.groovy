@@ -4,10 +4,16 @@ import org.apache.commons.logging.LogFactory;
 
 import species.TaxonomyDefinition;
 import species.Synonyms;
+import species.NamesMetadata;
+import species.TaxonomyRegistry
+import species.Classification;
+import species.ScientificName.TaxonomyRank
+
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.ContentType.XML
+import groovy.sql.Sql
 import groovy.util.XmlParser
 
 class NamelistService {
@@ -25,6 +31,8 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
+	def dataSource
+	
     List searchCOL(String input, String searchBy){
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
@@ -121,5 +129,66 @@ class NamelistService {
         }
         return finalResult
     }
+	
+	
+	def getNamesFromTaxon(params){
+		log.debug params
+		def sql = new Sql(dataSource)
+		def sqlStr, rs
+		def classSystem = params.classificationId.toLong()
+		def parentId = params.parentId
+		if(!parentId) {
+			sqlStr = "select t.id as taxonId, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classsystem, position as position \
+				from taxonomy_registry s, \
+				taxonomy_definition t \
+				where \
+				s.taxon_definition_id = t.id and "+
+				(classSystem?"s.classification_id = :classSystem and ":"")+
+				"t.rank = 0";
+			rs = sql.rows(sqlStr, [classSystem:classSystem])
+		} else {
+			sqlStr = "select t.id as taxonId, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, position as position \
+				from taxonomy_registry s, \
+				taxonomy_definition t \
+				where \
+				s.taxon_definition_id = t.id and "+
+				(classSystem?"s.classification_id = :classSystem and ":"")+
+				"s.path ~ '^"+parentId+"_[0-9]+\$' " +
+				"order by t.rank, t.name asc";
+			rs = sql.rows(sqlStr, [classSystem:classSystem])
+		}
+		
+		println "total result size === " + rs.size()
+		
+		def dirtyList = []
+		def workingList = []
+		def cleanList = []
+		
+		rs.each {
+			if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
+				dirtyList << it
+			}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+				workingList << it
+			}else{
+				cleanList << it
+			}
+		}		
+		return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]	
+	}
+	
+	def getNameDetails(params){
+		log.debug params
+		def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
+		def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
+		def result = taxonDef.fetchGeneralInfo()
+		if(taxonReg) {
+			result['taxonRegId'] = taxonReg.id?.toString()
+			taxonReg.path.tokenize('_').each { taxonDefinitionId ->
+				def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
+				result.put(TaxonomyRank.getTRFromInt(td.rank).value(), td.name);
+			}
+		}
+		return result
+	}
 
 }

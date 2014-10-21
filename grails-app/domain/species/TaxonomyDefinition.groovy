@@ -89,4 +89,7 @@ class TaxonomyDefinition extends ScientificName {
 	   return result;
    }
    
+   Map fetchGeneralInfo(){
+	   return [name:name, rank:rank, position:position, status:status, authorYear:authorYear, matchDatabaseName:matchDatabaseName, viaDatasource: viaDatasource, matchId: matchId ]
+   }
 }
