@@ -1,4 +1,5 @@
 <%@page import="species.ScientificName.TaxonomyRank"%>
+<%@page import="species.NamesMetadata.NameStatus"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <html>
@@ -235,7 +236,7 @@
                                         <option value="chooseRank">Choose Rank</option>
                                         <% def rankCount = 0 %>
                                         <g:each in="${TaxonomyRank.list()}" var="t">
-                                            <option value="${rankCount++}">${t}</option>
+                                            <option value="${t.toString().toLowerCase()}">${t}</option>
                                         </g:each>
                                     </select>
                                 </div>
@@ -251,7 +252,10 @@
 									</div>
 									<div class="span6">
                                         Status :- <select id="statusDropDown" class="statusDropDown span9" >
-                                            <option value="chooseNameStatus">Choose Name Status</option><option value="accepted">Accepted Name</option><option value="synonym">Synonym</option>
+                                            <option value="chooseNameStatus">Choose Name Status</option>
+                                            <g:each in="${NameStatus.list()}" var="ns">
+                                                <option value="${ns.toString().toLowerCase()}">${ns}</option>
+                                            </g:each>
                                         </select>
 									</div>
 							</div>

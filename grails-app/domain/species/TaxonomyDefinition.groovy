@@ -2,6 +2,7 @@ package species
 
 import java.util.List;
 
+import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
 
@@ -90,6 +91,6 @@ class TaxonomyDefinition extends ScientificName {
    }
    
    Map fetchGeneralInfo(){
-	   return [name:name, rank:rank, position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }
 }

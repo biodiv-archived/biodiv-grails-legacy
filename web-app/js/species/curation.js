@@ -191,10 +191,11 @@ function saveHierarchy() {
                 var index = $(".rankDropDown")[0].selectedIndex -1;
                 var arr = data['activityType'].split('>');
                 var index1 = arr.length -1;
+                var lastName = arr[arr.length - 2];
                 if(index1 < index) {
-                    alert("Hierarchy saved only till - " + arr[arr.length - 2]);
+                    alert(lastName +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ lastName +" from dirty list to continue.");
                 } else {
-                    alert(data['msg']);
+                    alert( "Successfully " + data['activityType']);
                 }
             } else {
                 alert(data['msg']);
