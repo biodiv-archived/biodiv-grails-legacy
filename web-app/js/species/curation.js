@@ -330,3 +330,8 @@ function modifySynonym(ele) {
     });
  
 }
+
+$('.add_new_syn').click(function(){    
+    var html = $('#synonymTmpl').render();
+    $(this).before(html);
+});

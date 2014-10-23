@@ -32,7 +32,7 @@
      .tab-content{
         overflow-y: scroll;
         height: 229px;
-        overflow-x: hidden;
+        overflow-x: hidden !important;
      }   
 	.listarea{
 		border:1px solid #ccc;
