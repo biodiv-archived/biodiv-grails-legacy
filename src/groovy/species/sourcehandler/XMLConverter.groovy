@@ -1270,6 +1270,7 @@ class XMLConverter extends SourceConverter {
                 def parsedNames = namesParser.parse([cleanName]);
                 def viaDatasource = null;
                 if(n.viaDatasource) {
+                    println "=======SOURCE HAI == == " + n.viaDatasource.text();
                     viaDatasource = n.viaDatasource.text();
                 }
                 def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource);

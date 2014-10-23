@@ -30,7 +30,8 @@
       }
      .tab-content{
         overflow-y: scroll;
-        height: 221px;
+        height: 229px;
+        overflow-x: hidden;
      }   
 	.listarea{
 		border:1px solid #ccc;
@@ -173,7 +174,7 @@
 	    border: 1px solid #ccc;
 	    width: 161px !important;
 	    text-align:center;
-        height: 350px;
+        height: 357px;
 	}
 	.connection_wrapper{
 		background-color:#00FFCC;
@@ -185,7 +186,7 @@
         background-color: burlywood;
         height: 18px;
         text-align: center;
-        padding: 5.7px;
+        padding: 6.4px;
     }
     .taxonomyRanks {
 	    border: 1px solid #ccc;

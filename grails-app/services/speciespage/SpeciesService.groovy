@@ -909,9 +909,9 @@ class SpeciesService extends AbstractObjectService  {
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
             new Node(data, "contributor", springSecurityService.currentUser.email);
-            if(otherParams)
+            if(otherParams) {
                 new Node(data, "viaDatasource", otherParams['source']);
-            
+            }
             List<Synonyms> synonyms = converter.createSynonyms(synonym, taxonConcept);
             
             if(!synonyms) {

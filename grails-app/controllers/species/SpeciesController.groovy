@@ -563,6 +563,7 @@ class SpeciesController extends AbstractObjectController {
                 }
                 break;
                 case 'synonym':
+                println "=====HELLO HERE========"
                 Long sid = params.sid?params.long('sid'):null;
                 String relationship = params.relationship?:null;
 
@@ -576,6 +577,8 @@ class SpeciesController extends AbstractObjectController {
                     def otherParams = null
                     if(params.otherParams) {
                         otherParams = params.otherParams
+                        otherParams['source'] = params.source;
+                        otherParams['contributor'] = params.contributor;
                     }
                     result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value, otherParams);
                 }
@@ -646,7 +649,7 @@ class SpeciesController extends AbstractObjectController {
                     }
                     //TODO: send mail for adding synonym on any taxon
                     //create dummy speciesInstance and check the mail template
-                    if(!result.speciesInstance) {
+                    if(result.speciesInstance) {
                         utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParamsForMail);
                     }
                 }

@@ -293,10 +293,10 @@ function modifySynonym(ele) {
     p['name']  = "synonym";
     p['act'] = modifyType;    
    // p['sid'] =221555;
-   p['relationship'] = 'synonym';
+    p['relationship'] = 'synonym';
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
-    otherParams['taxonId'] =272991;
+    otherParams['taxonId'] = $(".taxonId").val();  //272991;
     p['otherParams'] = otherParams    
     form_var.find('input').attr("disabled", true);
     console.log(p);
@@ -310,6 +310,7 @@ function modifySynonym(ele) {
             //show the popup
             //$("#externalDbResults").modal('hide');
             //populateNameDetails(data)
+            form_var.find(".sid").val(data['synonymId']);
             console.log("======SUCCESS====");
             console.log(data);  
 

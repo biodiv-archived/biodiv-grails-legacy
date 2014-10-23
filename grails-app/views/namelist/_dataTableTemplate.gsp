@@ -23,11 +23,11 @@
  <form class="tab_form">
 
   <div class="span3"> 
-            <input type="hidden" name="sid" value=""/>
-            <input type="text" class="nameInputs span12" name="name">
+            <input type="hidden" class ="sid" name="sid" value=""/>
+            <input type="text" class="nameInputs span12" name="value">
   </div>
   <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
-  <div class="span4"><input type="text" class="nameInputs span12" name="Contributor"></div>
+  <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div>
   <div class="span2">
         <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
         <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
@@ -36,9 +36,12 @@
 </div>
 <div class="row-fluid tab_div">
 <form>
-  <div class="span3"><input type="text" class="nameInputs span12" name="name"></div>
+    <div class="span3">
+        <input type="hidden" class ="sid" name="sid" value=""/>
+        <input type="text" class="nameInputs span12" name="value">
+    </div>
   <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
-  <div class="span4"><input type="text" class="nameInputs span12" name="Contributor"></div>
+  <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div>
   <div class="span2">
         <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
         <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
