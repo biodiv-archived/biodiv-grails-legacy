@@ -19,9 +19,10 @@
   <div class="span4 tab_accept_inner"><label>Contributor</label></div>
   <div class="span2 tab_accept_inner"><label>Action</label></div>
 </div>
+
+<g:each in="${1..4}">
 <div class="row-fluid tab_div">
  <form class="tab_form">
-
   <div class="span3"> 
             <input type="hidden" class ="sid" name="sid" value=""/>
             <input type="text" class="nameInputs span12" name="value">
@@ -34,7 +35,12 @@
   </div>
  </form> 
 </div>
-<div class="row-fluid tab_div">
+</g:each>
+
+
+<button class="btn btn-success btn-mini add_new_syn">Add Row</button>
+<script id="synonymTmpl" type="text/x-jquery-tmpl">
+<div class="row-fluid tab_div new">
 <form>
     <div class="span3">
         <input type="hidden" class ="sid" name="sid" value=""/>
@@ -46,6 +52,7 @@
         <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
         <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
   </div>
-</form>  
+</form>
 </div>
+</script>
 
