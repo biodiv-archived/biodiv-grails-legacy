@@ -1226,7 +1226,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
                 content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
-                return [success:true, msg:msg, type:'synonym', content:content, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+                return [success:true, msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();

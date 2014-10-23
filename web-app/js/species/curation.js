@@ -266,7 +266,7 @@ function modifySynonym(ele) {
     var url = window.params.species.updateUrl;
     var p = {};
     var  modifyType = that.attr('rel');
-    var form_var = that.parent().parent().parent().find('form');   
+    var form_var = that.closest('form');   
 
     if(modifyType == "edit"){
         form_var.find('input').attr("disabled", false);
@@ -279,20 +279,24 @@ function modifySynonym(ele) {
         if(modify == "update"){
             form_var.find('input').attr("disabled", true);
             that.prev().html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
+            that.html("<i class='icon-trash'></i>");
             return false;
         }else{
-            confirm("Are you sure to delete?");
-            return false;
+            if(!confirm("Are you sure to delete?")) {
+                return false;
+            } else {
+                form_var.find('input').attr("disabled", false);
+            }
         }    
     }
 
     form_value = form_var.serializeArray();
+    console.log(form_value);
     for (var i = 0; i < form_value.length; i++) {
         p[form_value[i].name] = form_value[i].value;        
     }
     p['name']  = "synonym";
     p['act'] = modifyType;    
-   // p['sid'] =221555;
     p['relationship'] = 'synonym';
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
@@ -300,8 +304,10 @@ function modifySynonym(ele) {
     p['otherParams'] = otherParams    
     form_var.find('input').attr("disabled", true);
     console.log(p);
-    that.html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
-  $.ajax({
+    if(modifyType != 'delete') {
+        that.html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
+    }
+    $.ajax({
         url: url,
         type: "POST",
         dataType: "json",
@@ -311,9 +317,12 @@ function modifySynonym(ele) {
             //$("#externalDbResults").modal('hide');
             //populateNameDetails(data)
             form_var.find(".sid").val(data['synonymId']);
+            that.next().html("<i class='icon-trash'></i>");
             console.log("======SUCCESS====");
             console.log(data);  
-
+            if(modifyType == 'delete') {
+                form_var.parent().hide();
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 

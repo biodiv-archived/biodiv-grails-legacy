@@ -628,7 +628,7 @@ class SpeciesController extends AbstractObjectController {
                 def feedInstance;
                 if(result.activityType) {
                     if(result.taxonConcept) {
-                        result['synonymId'] = result.synonymInstance.id.toString()
+                        result['synonymId'] = result.synonymInstance?.id.toString()
                         feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.synonymInstance, springSecurityService.currentUser, result.activityType);
                     } else {
                         feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
