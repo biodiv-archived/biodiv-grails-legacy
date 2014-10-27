@@ -1554,6 +1554,9 @@ class XMLConverter extends SourceConverter {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
                             ent.classification = classification;
+                            if(fromCOL) {
+                                 ent.classification = Classification.findByName("IBP Taxonomy Hierarchy");
+                            }
                             ent.parentTaxon = getParentTaxon(taxonEntities, rank);
                             log.debug("Parent Taxon : "+ent.parentTaxon)
                             ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;

@@ -92,6 +92,7 @@ function populateNameDetails(data){
     for (var key in data) {
         console.log(key +"===== "+ data[key]);
         if(key != "rank" && key!= "status"){
+            $("."+key).val('');
             $("."+key).val(data[key]);
         }
     }  
@@ -163,7 +164,7 @@ function getExternalDbDetails(externalId) {
     });
 }
 
-function saveHierarchy() {
+function saveHierarchy(moveToWKG) {
     var taxonRegistryData = fetchTaxonRegistryData();
     taxonRegistryData['abortOnNewName'] = true;
     taxonRegistryData['fromCOL'] = $('.fromCOL').val();
@@ -175,6 +176,9 @@ function saveHierarchy() {
     console.log(taxonRegistryData);
     var url =  window.params.taxon.classification.updateUrl;
     console.log("====URL========= " + url);
+    if(moveToWKG == true) {
+        taxonRegistryData['moveToWKG'] = true;
+    }
     $.ajax({
         url: url,
         type: "POST",
@@ -184,7 +188,6 @@ function saveHierarchy() {
         success: function(data) {
             //show the popup                                   //what in response
             //$("#externalDbResults").modal('hide');
-            //populateNameDetails(data)
             console.log("======SUCCESS SAVED HIERARCHY====");
             console.log(data);
             if(data['success']) {
@@ -316,7 +319,6 @@ function modifySynonym(ele) {
         success: function(data) {
             //show the popup
             //$("#externalDbResults").modal('hide');
-            //populateNameDetails(data)
             form_var.find(".sid").val(data['synonymId']);
             that.next().html("<i class='icon-trash'></i>");
             console.log("======SUCCESS====");

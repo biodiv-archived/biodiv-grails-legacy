@@ -343,8 +343,8 @@
                                 <g:render template="/namelist/dataTableTemplate" model="[]"/>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-success" onClick='saveHierarchy()'>Save & retain</button> 
-                        <button type="button" class="btn btn-primary">Save & Move to WKG</button> 
+                        <button type="button" class="btn btn-success" onClick='saveHierarchy(false)'>Save & Retain</button> 
+                        <button type="button" class="btn btn-primary" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
                         <button type="button" class="btn btn-danger">Save & Move to Clean List</button> 
                     </div>
 

@@ -14,6 +14,7 @@ import species.sourcehandler.XMLConverter
 import species.auth.SUser;
 import grails.converters.JSON;
 import species.Language;
+import species.NamesMetadata.NamePosition
 
 class TaxonService {
 
@@ -807,7 +808,7 @@ class TaxonService {
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            return ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
+            return ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors , taxonRegistry:taxonRegistry]
         }
         return ['success':false, msg:'Error while adding hierarchy', errors:errors]
     }
@@ -1067,4 +1068,27 @@ class TaxonService {
 			}
 		}
 	}
+
+    def moveToWKG(taxonRegistry) {
+        def lastTaxonReg = taxonRegistry[-1]
+        def taxonDef = lastTaxonReg.taxonDefinition
+        if(!taxonDef.status) {
+            return false
+        }
+        def classification = lastTaxonReg.classification
+        def taxonsMap = taxonDef.parentTaxonRegistry(classification)
+        println "=======TAXONS MAP====== " + taxonsMap.get(classification)
+        def taxons = taxonsMap.get(classification);
+        taxons.add(taxonDef);
+        taxons.each {
+            if(it.position == NamePosition.DIRTY) {
+                println "=====CHANGING POSITION to WORKING ====="
+                it.position = NamePosition.WORKING
+            }
+            if(!it.save()) {
+                it.errors.each { log.error it}
+            } 
+        }
+        return true;
+    }
 }
