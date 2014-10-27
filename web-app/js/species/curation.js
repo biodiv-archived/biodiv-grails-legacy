@@ -17,7 +17,7 @@ function getNamesFromTaxon(ele , parentId) {
             if(data.dirtyList){
                 var dlContent = "<ul>";
                 $.each(data.dirtyList, function(index, value){
-                    dlContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+")'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    dlContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 dlContent += "</ul>";
@@ -27,7 +27,7 @@ function getNamesFromTaxon(ele , parentId) {
             if(data.workingList){
                 var wlContent = "<ul>";
                 $.each(data.workingList, function(index, value){
-                    wlContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    wlContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+",this)'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 wlContent += "</ul>";
@@ -38,7 +38,7 @@ function getNamesFromTaxon(ele , parentId) {
             if(data.cleanList){
                 var clContent = "<ul><li>";
                 $.each(data.cleanList, function(index, value){
-                    clContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+")'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+                    clContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+",this)'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
                 clContent += "</ul>";
@@ -53,8 +53,10 @@ function getNamesFromTaxon(ele , parentId) {
 
 }
 
-function getNameDetails(taxonId, classificationId) {
+function getNameDetails(taxonId, classificationId, ele) {
     console.log("=======NAME DEATILS=======" + taxonId);
+    console.log(ele);
+    $(ele).find("a").css('background','burlywood');
     $('.taxonId').val(taxonId);
     var url = window.params.curation.getNameDetailsUrl;
     $.ajax({
@@ -104,6 +106,14 @@ function populateNameDetails(data){
 
 //takes name for search
 function searchDatabase() {
+    $("body").css("cursor", "progress");
+    $("#searching").show();
+    $("HTML").mousemove(function(e) {
+        $("#searching").css({
+            "top" : e.pageY,
+            "left" : e.pageX + 15
+        });
+    });
     var name = $(".name").val();
     var dbName = $("#queryDatabase").val();
     if(dbName == "databaseName") {
@@ -117,6 +127,8 @@ function searchDatabase() {
         type: "POST",
         data: {name:name, dbName:dbName},	
         success: function(data) {
+            $("#searching").hide();
+            $("body").css("cursor", "default");
             //show the popup
             $("#externalDbResults").modal('show');
             fillPopupTable(data , $("#externalDbResults"));
@@ -193,12 +205,17 @@ function saveHierarchy(moveToWKG) {
             console.log("======SUCCESS SAVED HIERARCHY====");
             console.log(data);
             if(data['success']) {
+                /*
                 var index = $(".rankDropDown")[0].selectedIndex -1;
                 var arr = data['activityType'].split('>');
                 var index1 = arr.length -1;
+                if(index >= 4) {
+                    index1 = index1 + 1; 
+                }
                 var lastName = arr[arr.length - 2];
-                if(index1 < index) {
-                    alert(lastName +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ lastName +" from dirty list to continue.");
+                */
+                if(data["newlyCreated"]) {
+                    alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
                 } else {
                     alert( "Successfully " + data['activityType']);
                 }
@@ -259,8 +276,8 @@ function changeEditingMode(mode) {
     } else {
         $(".fromCOL").val(mode);
     }
-    $(".canBeDiasbled input").prop("disabled", mode); 
-    $(".canBeDiasbled select").prop("disabled", mode); 
+    $(".canBeDisabled input").prop("disabled", mode); 
+    $(".canBeDisabled select").prop("disabled", mode); 
 }
 
 

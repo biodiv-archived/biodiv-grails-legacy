@@ -808,7 +808,12 @@ class TaxonService {
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            return ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors , taxonRegistry:taxonRegistry]
+            def res  = ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors , taxonRegistry:taxonRegistry]
+            if(!(taxonRegistry[-1].taxonDefinition.status)) {
+                res['newlyCreated'] = true
+                res['newlyCreatedName'] = taxonRegistry[-1].taxonDefinition.name
+            }
+            return res   //['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors , taxonRegistry:taxonRegistry]
         }
         return ['success':false, msg:'Error while adding hierarchy', errors:errors]
     }

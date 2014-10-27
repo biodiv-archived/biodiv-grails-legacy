@@ -211,10 +211,14 @@
     .tab_heading{
         font-size:13px;
     }
+    
+    #searching {
+        display: none;
+        position: absolute;
+    }
 </style>
 
  <div class="row-fluid">
-
 	<div class="span10 metadataDetails">
 	
 	
@@ -400,6 +404,7 @@
 
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
     
+    <div id="searching">Searching...</div>
 <script type="text/javascript">
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">
