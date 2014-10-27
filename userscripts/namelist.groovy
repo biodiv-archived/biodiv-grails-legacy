@@ -86,6 +86,8 @@ def addIBPTaxonHie() {
 
 addIBPTaxonHie();
 */
+/*
 #alter table classification alter column language_id drop not null;
 #UPDATE classification set language_id = 205 where id = (whatever id it gets);
 #alter table classification alter column language_id set not null;
+*/

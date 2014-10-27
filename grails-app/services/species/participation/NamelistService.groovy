@@ -155,7 +155,7 @@ class NamelistService {
 				where \
 				s.taxon_definition_id = t.id and "+
 				(classSystem?"s.classification_id = :classSystem and ":"")+
-				"s.path like '"+parentId+"_%' " +
+				"s.path like '"+parentId+"%' " +
 				"order by t.rank, t.name asc limit :limit offset :offset";
 			rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
 		}
