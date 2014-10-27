@@ -55,8 +55,9 @@ function getNamesFromTaxon(ele , parentId) {
 
 function getNameDetails(taxonId, classificationId, ele) {
     console.log("=======NAME DEATILS=======" + taxonId);
+    $(ele).parent("ul").find("a").css('background-color','inherit');
     console.log(ele);
-    $(ele).find("a").css('background','burlywood');
+    $(ele).find("a").css('background-color','burlywood');
     $('.taxonId').val(taxonId);
     var url = window.params.curation.getNameDetailsUrl;
     $.ajax({
