@@ -89,10 +89,12 @@ function setOption(selectElement, value) {
 
 function populateNameDetails(data){
     console.log("=======REACHED POPULATE====");
+    $(".canBeDisabled input[type='text']").val('');
+    $('.rankDropDown option:first-child').attr("selected", "selected");
+    $('.statusDropDown option:first-child').attr("selected", "selected");
     for (var key in data) {
         console.log(key +"===== "+ data[key]);
         if(key != "rank" && key!= "status"){
-            $("."+key).val('');
             $("."+key).val(data[key]);
         }
     }  

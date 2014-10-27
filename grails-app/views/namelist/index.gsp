@@ -220,7 +220,7 @@
 	
 				<div class="row-fluid">
 					
-					<div class="span3 canBeDiasbled column">
+					<div class="span3 canBeDisabled column">
 							<div class ="row-fluid">
 								<div class="span3"><label>Name</label></div>
 								<div class="span9"> <input type="text" placeholder="Name" class="name span12"/></div>
@@ -244,7 +244,7 @@
 							
 					</div>
 				
-					<div class="span9 canBeDiasbled column" style="width: 610px;">
+					<div class="span9 canBeDisabled column" style="width: 610px;">
 							<div class="row-fluid">
 									<div class="span6">
 											Author String :-
@@ -279,7 +279,7 @@
 				
                 <div class="row-fluid">
 
-                    <div class="span3 canBeDiasbled column">
+                    <div class="span3 canBeDisabled column">
                         <table style="width:100%">
                             <tr>
                                 <td>Kingdom</td>
