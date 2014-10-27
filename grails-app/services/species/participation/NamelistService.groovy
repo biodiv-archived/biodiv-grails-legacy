@@ -137,6 +137,8 @@ class NamelistService {
 		def sqlStr, rs
 		def classSystem = params.classificationId.toLong()
 		def parentId = params.parentId
+		def limit = params.limit ? params.limit.toInteger() : 1000
+		def offset = params.offset ? params.limit.toLong() : 0
 		if(!parentId) {
 			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classificationid, position as position \
 				from taxonomy_registry s, \
@@ -153,9 +155,9 @@ class NamelistService {
 				where \
 				s.taxon_definition_id = t.id and "+
 				(classSystem?"s.classification_id = :classSystem and ":"")+
-				"s.path ~ '^"+parentId+"_[0-9]+\$' " +
-				"order by t.rank, t.name asc";
-			rs = sql.rows(sqlStr, [classSystem:classSystem])
+				"s.path like '"+parentId+"_%' " +
+				"order by t.rank, t.name asc limit :limit offset :offset";
+			rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
 		}
 		
 		println "total result size === " + rs.size()
