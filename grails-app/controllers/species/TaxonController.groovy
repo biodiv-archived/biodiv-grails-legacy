@@ -525,6 +525,11 @@ class TaxonController {
                         utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                     } 
                 }
+                println "========MOVE TO WKG ========== " + params.moveToWKG
+                if(result.success && params.moveToWKG) {
+                    println "========WILL MOVE=========="
+                    taxonService.moveToWKG(result.taxonRegistry)
+                }
                 render result as JSON
                 return;
            } catch(e) {
