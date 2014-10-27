@@ -3,12 +3,13 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import species.TaxonomyRegistry
 
 import species.namelist.Utils
-
+import species.Classification
+/*
 def startDate = new Date()
 println "======== started " 
 species.namelist.Utils.generateColStats("/home/sandeept/col")
 println "======== finish date " + new Date() + "    start date "  + startDate  
-
+*/
 /*
 def testNav(){
 	def tSer = ctx.getBean("taxonService")
@@ -72,3 +73,19 @@ update  synonyms set status = 'SYNONYM';
 update  synonyms set position = 'DIRTY';
 
 */
+/*
+def addIBPTaxonHie() {
+    println "====ADDING IBP TAXON HIERARCHY======"
+    def cl = new Classification();
+    cl.name = "IBP Taxonomy Hierarchy";
+    if(!cl.save(flush:true)) {
+        cl.errors.allErrors.each { log.error it }
+    }
+    println "====DONE======"
+}
+
+addIBPTaxonHie();
+*/
+#alter table classification alter column language_id drop not null;
+#UPDATE classification set language_id = 205 where id = (whatever id it gets);
+#alter table classification alter column language_id set not null;
