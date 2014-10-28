@@ -44,23 +44,20 @@
 	}
 
 	.taxon_selector_wrapper_span{
-		color:white;
-		padding: 3px 65px;
+        padding: 3px 65px;
+        font-weight: bold;
 	}
 	.taxon_selector_span{
-		background-color:#00FFFF;			
+		background-color:#3399FF;			
 	}
 	.dirty_list_span{
-		background-color:#66FF33;
+		background-color:#FF6666;
 	}
 	.working_list_span{
-		background-color:#FF99CC;
+		background-color:#FF9900;
 	}
-
-
-
 	.clean_list_span{
-		background-color:#9933FF;
+		background-color:#FFFF99;
 	}    
 	.listarea_content{
         position: relative;
@@ -230,7 +227,7 @@
 								<div class="span9"> <input type="text" placeholder="Name" class="name span12"/></div>
                             </div>
                             <input type="hidden" class="taxonRegId" value="">
-                            <input type="hidden" class="taxonId" value="">
+                            <input type="hidden" class="taxonId" value="">black
                             <input type="hidden" class="fromCOL" value=false>
                             <input type="hidden" class="id_details" value="">
 							<div class="row-fluid">	
@@ -279,7 +276,7 @@
 							
 					
 					</div>
-				</div>
+				</div>black
 				
                 <div class="row-fluid">
 
@@ -347,9 +344,9 @@
                                 <g:render template="/namelist/dataTableTemplate" model="[]"/>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-success" onClick='saveHierarchy(false)'>Save & Retain</button> 
-                        <button type="button" class="btn btn-primary" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
-                        <button type="button" class="btn btn-danger">Save & Move to Clean List</button> 
+                        <button type="button" class="" style="background-color:#FF6666 " onClick='saveHierarchy(false)'>Save & Retain</button> 
+                        <button type="button" class="" style="background-color:#FF9900" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
+                        <button type="button" class=""style="background-color:#FFFF99">Save & Move to Clean List</button> 
                     </div>
 
 

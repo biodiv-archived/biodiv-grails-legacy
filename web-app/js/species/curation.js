@@ -6,7 +6,7 @@ function getNamesFromTaxon(ele , parentId) {
     $(ele).parents("tr").addClass("clickedEle");
     $("#taxonHierarchy tr").css('background', 'white');
     console.log($(ele).parents("tr"));
-    $(ele).parents("tr").css('background', 'burlywood');
+    $(ele).parents("tr").css('background', '#3399FF');
     var taxonId = $(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
     var url = window.params.curation.getNamesFromTaxonUrl;
@@ -61,7 +61,7 @@ function getNameDetails(taxonId, classificationId, ele) {
     console.log("=======NAME DEATILS=======" + taxonId);
     $(ele).parent("ul").find("a").css('background-color','inherit');
     console.log(ele);
-    $(ele).find("a").css('background-color','burlywood');
+    $(ele).find("a").css('background-color','#3399FF');
     $('.taxonId').val(taxonId);
     var url = window.params.curation.getNameDetailsUrl;
     $.ajax({
