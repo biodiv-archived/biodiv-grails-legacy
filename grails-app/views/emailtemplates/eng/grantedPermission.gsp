@@ -1,6 +1,6 @@
 <%@ page contentType="text/html"%>
 
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@page import="species.ScientificName.TaxonomyRank"%>
 
 Hi ${user.name.capitalize()},
 <br/><br/> 
