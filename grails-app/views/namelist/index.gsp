@@ -180,14 +180,15 @@
 	.connection_wrapper{
 		background-color:#00FFCC;
 	}
-	.connection_wrapper_row1{
-		background-color: rgb(218, 150, 70);
+    .connection_wrapper_row1{
+        color:white;
+		background-color:#009933;
 	}
 	.connection_wrapper_row2{		
-        background-color: burlywood;
-        height: 18px;
+        background-color: beige;
+        height: 17px;
         text-align: center;
-        padding: 6.4px;
+        padding: 5.4px;
     }
     .taxonomyRanks {
 	    border: 1px solid #ccc;
@@ -224,7 +225,7 @@
 	
 				<div class="row-fluid">
 					
-					<div class="span3 canBeDisabled column">
+					<div class="span3 canBeDisabled column" style="background:#FF9900">
 							<div class ="row-fluid">
 								<div class="span3"><label>Name</label></div>
 								<div class="span9"> <input type="text" placeholder="Name" class="name span12"/></div>
@@ -248,7 +249,7 @@
 							
 					</div>
 				
-					<div class="span9 canBeDisabled column" style="width: 610px;">
+					<div class="span9 canBeDisabled column" style="width: 610px;background:#FF9900">
 							<div class="row-fluid">
 									<div class="span6">
 											Author String :-
@@ -283,7 +284,7 @@
 				
                 <div class="row-fluid">
 
-                    <div class="span3 canBeDisabled column">
+                    <div class="span3 canBeDisabled column" style="background:#FF6666">
                         <table style="width:100%">
                             <tr>
                                 <td>Kingdom</td>
@@ -322,7 +323,7 @@
 
                     </div>
 						
-					<div class="span9 column" style="width: 610px;">
+					<div class="span9 column" style="width: 610px;background:#3399FF">
 						
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">
@@ -357,7 +358,7 @@
 
 	
 	</div>
-  	<div class="span2 column detailsareaRight">
+  	<div class="span2 column detailsareaRight" style=" background: #009933; ">
         
         <div class= row-fluid>
             <div>
@@ -376,7 +377,7 @@
         </div>
 
         <div class="row-fluid">
-		  <div class="connection_wrapper" style="padding: 5px 0px;font-weight: bold;">Connections</div>
+		  <div class="connection_wrapper" style="background:grey; padding: 5px 0px;font-weight: bold;">Connections</div>
 		  
 		  <div class="connection_wrapper_row1">Species Page</div>
 		  
