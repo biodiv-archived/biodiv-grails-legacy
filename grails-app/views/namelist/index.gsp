@@ -78,7 +78,10 @@
 	}
 	.taxon_selector_final{
 
-	}
+    }
+    .namelist_wrapper {
+        background : white;
+    }
 </style>
 
 </head>
@@ -215,7 +218,7 @@
     }
 </style>
 
- <div class="row-fluid">
+ <div class="row-fluid" style="background:white;">
 	<div class="span10 metadataDetails">
 	
 	
