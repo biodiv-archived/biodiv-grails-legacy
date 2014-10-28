@@ -530,6 +530,7 @@ class TaxonController {
                     println "========WILL MOVE=========="
                     taxonService.moveToWKG(result.taxonRegistry)
                 }
+                result.remove("taxonRegistry");
                 render result as JSON
                 return;
            } catch(e) {

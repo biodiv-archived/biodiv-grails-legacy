@@ -1,5 +1,9 @@
 function getNamesFromTaxon(ele , parentId) {
     console.log(ele);
+    if($("#taxonHierarchy tr").hasClass("clickedEle")) {
+        $("#taxonHierarchy tr").removeClass("clickedEle");
+    }
+    $(ele).parents("tr").addClass("clickedEle");
     $("#taxonHierarchy tr").css('background', 'white');
     console.log($(ele).parents("tr"));
     $(ele).parents("tr").css('background', 'burlywood');
@@ -92,6 +96,7 @@ function setOption(selectElement, value) {
 
 function populateNameDetails(data){
     console.log("=======REACHED POPULATE====");
+    console.log(data);
     $(".canBeDisabled input[type='text']").val('');
     $('.rankDropDown option:first-child').attr("selected", "selected");
     $('.statusDropDown option:first-child').attr("selected", "selected");
@@ -101,6 +106,12 @@ function populateNameDetails(data){
             $("."+key).val(data[key]);
         }
     }  
+    $(".via").val(data["sourceDatabase"]);
+    if(data["externalId"]) {
+        console.log(data["externalId"]);
+        $(".source").val($("#queryDatabase option:selected ").text());
+        $(".id").val(data["externalId"]);
+    }
     setOption(document.getElementById("rankDropDown"), data["rank"]);
     setOption(document.getElementById("statusDropDown"), data["nameStatus"]);
 }
@@ -131,10 +142,14 @@ function searchDatabase() {
             $("#searching").hide();
             $("body").css("cursor", "default");
             //show the popup
-            $("#externalDbResults").modal('show');
-            fillPopupTable(data , $("#externalDbResults"));
-            console.log("======SUCCESS====");
-            console.log(data);  
+            if(data.length != 0) {
+                $("#externalDbResults").modal('show');
+                fillPopupTable(data , $("#externalDbResults"));
+                console.log("======SUCCESS====");
+                console.log(data); 
+            } else {
+                alert("Sorry no results found, Try other database!!");
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -142,6 +157,12 @@ function searchDatabase() {
 }
 
 function fillPopupTable(data, $ele) {
+    console.log("=====fill popup table====");
+    console.log(data.length);
+    if(data.length == 0) {
+
+        alert("Sorry No results found!!");
+    }
     //clear table
     $ele.find("table tr td").remove();
     var rows = "";
@@ -215,10 +236,15 @@ function saveHierarchy(moveToWKG) {
                 }
                 var lastName = arr[arr.length - 2];
                 */
+                
                 if(data["newlyCreated"]) {
                     alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
                 } else {
                     alert( "Successfully " + data['activityType']);
+                }
+                if(moveToWKG == true) {
+                    console.log("========TRIGGERING CLICK======");
+                    $(".clickedEle .taxDefIdSelect").trigger("click");
                 }
             } else {
                 alert(data['msg']);

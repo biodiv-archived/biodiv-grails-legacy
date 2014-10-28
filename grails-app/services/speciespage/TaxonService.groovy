@@ -814,7 +814,7 @@ class TaxonService {
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, RCU.getLocale(request)), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
+            def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, RCU.getLocale(request)), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors, taxonRegistry: taxonRegistry]
             if(!(taxonRegistry[-1].taxonDefinition.status)) {
                 res['newlyCreated'] = true
                 res['newlyCreatedName'] = taxonRegistry[-1].taxonDefinition.name
@@ -1082,6 +1082,7 @@ class TaxonService {
 	}
 
     def moveToWKG(taxonRegistry) {
+        println "======TAXON REGISTRY====== " + taxonRegistry
         def lastTaxonReg = taxonRegistry[-1]
         def taxonDef = lastTaxonReg.taxonDefinition
         if(!taxonDef.status) {
