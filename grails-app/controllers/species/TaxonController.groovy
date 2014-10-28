@@ -25,7 +25,7 @@ class TaxonController {
     def activityFeedService;
     def utilsService;
     def grailsApplication;
-    def messageSource;
+    def messageSource
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 

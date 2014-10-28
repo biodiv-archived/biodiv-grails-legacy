@@ -3,7 +3,7 @@
 
 <div id='searchToggleBox' class="input-append" style="z-index:1">
 	<form method="get"
-		action="${uGroup.createLink(controller:'search', action:params.action?:'select') }"
+		action="${uGroup.createLink(controller:'search', action:'select') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 		
 		<input type="text" name="query" id="searchTextField" style="width:400px;"
@@ -103,6 +103,10 @@ $(document).ready(function() {
 	}
 
     window.i8ln = {
+        "button" :{
+                "delete" : "${g.message(code:'default.button.delete.label')}",
+                "edit"   : "${g.message(code:'default.button.edit.label')}"
+        },
         "species" : {
             "abstracteditabletype" : {         
 
@@ -146,9 +150,11 @@ $(document).ready(function() {
                 "bsav":"${g.message(code:'button.save')}",
                 "bcanc":"${g.message(code:'button.cancel')}",
                 "bupdate":"${g.message(code:'suser.edit.update')}",
-                "bcmnt":"${g.message(code:'button.update.comment')}"
-
-
+                "bcmnt":"${g.message(code:'button.update.comment')}",
+                "reload":"${g.message(code:'link.press.reload')}",
+                "unf":"${g.message(code:'followtemp.unfollow')}",
+                "flo":"${g.message(code:'followtemp.follow')}",                 
+                "ops":"${g.message(code:'observations.species.group')}"
                 
                 
             } ,

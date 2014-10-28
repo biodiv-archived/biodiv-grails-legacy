@@ -141,11 +141,10 @@
 								<div
 									class="control-group ${hasErrors(bean: user, field: 'website', 'error')}">
 									<label class="control-label" for="website"><i
-										class="icon-road"></i> <g:message code="suser.website.label"
-											default="Website" /> </label>
+										class="icon-road"></i> <g:message code="suser.website.label" /> </label>
 									<div class="controls">
 										<input type="text" name="website" class="input-xlarge"
-											id="website" value="${user.website ?: null}"  placeholder="Provide a comma separated list of urls">
+											id="website" value="${user.website ?: null}"  placeholder="${g.message(code:'suser.provide.url')}">
 										<div class="help-inline">
 											<g:hasErrors bean="${user}" field="website">
 												<g:renderErrors bean="${user}" as="list" field="website" />
@@ -158,7 +157,7 @@
 									class="control-group ${hasErrors(bean: user, field: 'location', 'error')}">
 									<label class="control-label" for="location"><i
 										class="icon-map-marker"></i> <g:message
-											code="suser.location.label" default="Location" /> </label>
+											code="default.location.label" /> </label>
 									<div class="controls">
 										<input type="text" name="location" class="input-xlarge"
 											id="location" value="${user.location}" />
@@ -263,8 +262,7 @@
 								<div class="controls" style="margin-left: 0px;">
 									<label class="checkbox" style="clear: both;"> <g:checkBox
 											name="sendDigest" value="${user.sendDigest}" />
-										<g:message code='user.sendDigest.label'
-											default='Send me digest email' /> </label>
+								<g:message code='user.sendDigest.label'	/> </label>
 									<div class="help-inline">
 										<g:hasErrors bean="${user}" field="sendDigest">
 											<g:renderErrors bean="${user}" as="list"

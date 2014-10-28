@@ -39,6 +39,9 @@ import species.participation.NamelistService;
 
 import org.apache.log4j.Logger; 
 import org.apache.log4j.FileAppender;
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.context.MessageSource
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 //import org.grails.plugins.sanitizer.MarkupSanitizerResult
 
@@ -118,7 +121,7 @@ class XMLConverter extends SourceConverter {
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
 
                 //taxonConcept is being taken from only author contributed taxonomy hierarchy
-                TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy, language);
+                TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
 
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
@@ -221,7 +224,8 @@ class XMLConverter extends SourceConverter {
                                 }
 
                             } 
-                            else if(category && category.toLowerCase().endsWith(getFieldFromName(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase(), 2, language))) {
+                            else if(category && ( category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase()) ||  category.toLowerCase().startsWith("Hiérarchie Taxonomique".toLowerCase()))) {
+                                //HACK
                                 //ignore
                                 log.debug "ignoring hierarchy" 
                             } else {
@@ -484,7 +488,7 @@ class XMLConverter extends SourceConverter {
         String concept = fieldNode.concept?.text()?.trim();
         String category = fieldNode.category?.text()?.trim();
         String subCategory = fieldNode.subcategory?.text()?.trim();
-        String language = fieldNode.language[0]?.value();
+        Language language = fieldNode.language[0]?.value();
         def fieldCriteria = Field.createCriteria();
 
         Field field = fieldCriteria.get {
@@ -1406,7 +1410,8 @@ class XMLConverter extends SourceConverter {
         for(Node fieldNode : speciesNodes) {
             if(fieldNode.name().equals("field")) {
                 String cat = fieldNode.category?.text()?.trim().toLowerCase();
-                if(cat && cat.equalsIgnoreCase(category)) {
+                Language language = fieldNode.language[0].value();
+                if(cat && (cat.equalsIgnoreCase(category) || cat.equalsIgnoreCase(getFieldFromName(category,2,language))) ) {
                     result.add(fieldNode);
                 }
             }
@@ -1436,7 +1441,7 @@ class XMLConverter extends SourceConverter {
             String name = getData(fieldNode.data);
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             Language language = fieldNode.language[0].value();
-            if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY, 2, language)) && rank == TaxonomyRank.SPECIES.ordinal()) {
+            if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
                 def cleanSciName = Utils.cleanSciName(scientificName);
                 name = cleanSciName
             } else {
@@ -1606,8 +1611,13 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     static int getTaxonRank(String rankStr) {
+        MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+        def request = RequestContextHolder.currentRequestAttributes().request
+
         for(TaxonomyRank type : TaxonomyRank) {
-            if(type.value().equalsIgnoreCase(rankStr)) {
+            String message = messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request));
+            println type.value()+"  "+ message + "   "+rankStr
+            if(type.value().equalsIgnoreCase(rankStr) || message.equalsIgnoreCase(rankStr)) {
                 return type.ordinal();
             }
         }
@@ -1637,10 +1647,10 @@ class XMLConverter extends SourceConverter {
         return parentTaxon;
     }
 
-    TaxonomyDefinition getTaxonConcept(List taxonomyRegistry, Language language = null) {
-        def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromNode(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,2,language)));
+    TaxonomyDefinition getTaxonConcept(List taxonomyRegistry) {
+        def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
         if(!taxonConcept) {
-            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(getFieldFromNode(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY,2,language)));
+            taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY));
         }
         if(!taxonConcept) {
             taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.GBIF_TAXONOMIC_HIERARCHY));

@@ -33,6 +33,7 @@ class DocumentSearchService extends AbstractSearchService {
 		
 		def documents;
 		def startTime = System.currentTimeMillis()
+        INDEX_DOCS = Document.count() + 1;
 		while(noIndexed < INDEX_DOCS) {
 			documents = Document.list(max:limit, offset:offset);
             noIndexed += documents.size();

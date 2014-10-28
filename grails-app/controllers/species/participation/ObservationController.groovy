@@ -38,6 +38,7 @@ import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.ScientificName.TaxonomyRank;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -97,13 +98,15 @@ class ObservationController extends AbstractObjectController {
 		
 		def model = runLastListQuery(params);
 		model.resultType = 'observation'
+		def userLanguage = utilsService.getCurrentLanguage(request); 
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
             model['width'] = 300;
             model['height'] = 200;
-			render (view:"list", model:model)
+            model['userLanguage'] = userLanguage;
+            render (view:"list", model:model)
 			return;
 		} else {
 			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
@@ -119,7 +122,9 @@ class ObservationController extends AbstractObjectController {
             chartModel['width'] = 300;
             chartModel['height'] = 270;
 */
-            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+			
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
+
 			render result as JSON
 			return;
 		}
@@ -1632,7 +1637,6 @@ class ObservationController extends AbstractObjectController {
     }
 
     def testy(){
-    	
-	    	setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
     }
 }

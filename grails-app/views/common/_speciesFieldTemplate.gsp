@@ -7,7 +7,7 @@
 </s:isSpeciesFieldContributor>
 
 <g:if test="${speciesFieldInstance.language.id != userLanguage?.id}">
-<div class="alert alert-info">There is content in another language. Please click here to read it. <a href="javascript:void(0);" class="clickcontent btn btn-mini" data-target="clickcontent_${speciesFieldInstance.language.id}">${speciesFieldInstance.language.threeLetterCode?.toUpperCase()}</a></div>
+<div class="alert alert-info"><g:message code="default.content.msg" />  <a href="javascript:void(0);" class="clickcontent btn btn-mini" data-target="clickcontent_${speciesFieldInstance.language.id}">${speciesFieldInstance.language.threeLetterCode?.toUpperCase()}</a></div>
 </g:if>
 
 

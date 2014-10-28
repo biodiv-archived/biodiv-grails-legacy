@@ -607,7 +607,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
             var query = $( this ).val();
-            if(query){
+            if(field == 'aq.object_type' && query == 'All') {
+
+            } else if(query){
                 params[field] = query;
             } else {
                 // removing old tag from url
@@ -965,7 +967,7 @@ function loadSpeciesGroupCount() {
                             document.getElementById('speciesGroupCountList'));
 
                         columnChart.draw(visualization_data,  {
-                            title:"No of observations per species group",
+                            title:window.i8ln.species.specie.ops,
                             vAxis:{minValue:0, maxValue:5, format: '#'},
                             legend:{position: 'bottom'},
                             chartArea:{width:'80%'}

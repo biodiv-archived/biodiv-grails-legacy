@@ -19,8 +19,6 @@
 
 </head>
 <body>
-
-
 	<div class="span12">
       <%
     def species_title=g.message(code:'default.species.label')
@@ -34,11 +32,11 @@
 
 		<div class="tabbable" style="margin-left:0px;clear:both;">
 			<ul class="nav nav-tabs" style="margin-bottom: 0px">
-				<li class="active"><a href="#list" data-toggle="tab"><g:message code="button.gallery" /></a>
+				<li class="active"><a href="#list" ><g:message code="button.gallery" /></a>
 				</li>
-				<li><a href="#taxonBrowser" data-toggle="tab"><g:message code="button.taxon.browser" /></a>
+				<li><a href="#taxonBrowser"><g:message code="button.taxon.browser" /></a>
 				</li>
-				<li><a href="#contribute" data-toggle="tab"><g:message code="button.contribute" /></a>
+				<li><a href="#contribute"><g:message code="button.contribute" /></a>
 				</li>
 
 			</ul>
@@ -108,7 +106,7 @@
         });
         var taxonRanks = [];
         <g:each in="${TaxonomyRank.list()}" var="t">
-        taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
         </g:each>
 	</script>
 
@@ -121,6 +119,16 @@
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
             expandAll:false
         });	
+        $('.nav-tabs a').click(function (e) {
+          e.preventDefault();
+          $('.nav-tabs li').removeClass('active');
+          $(this).parent().addClass('active');
+          var href = $(this).attr('href');
+          $('.tab-pane').removeClass('active');
+          $(href).addClass('active');
+          //$(this).tab('show');
+          return false;
+        })
     });
 
 	</r:script>

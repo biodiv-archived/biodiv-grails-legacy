@@ -45,10 +45,9 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    //def observationService; //injected in AbstractController
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
-    def utilsService;
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     
     String contentRootDir = config.speciesPortal.content.rootDir
@@ -856,8 +855,8 @@ class SpeciesController extends AbstractObjectController {
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){
-            language languageinstance = utilsservice.getcurrentlanguage(request);
-            params.locale_language = languageinstance;
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+            params.locale_language = languageInstance;
             log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
@@ -1159,8 +1158,9 @@ class SpeciesController extends AbstractObjectController {
         return result;
     }
 
-    def saveModifiedSpeciesFile = {
-        //log.debug params
+    def saveModifiedSpeciesFile () {
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         File file = speciesUploadService.saveModifiedSpeciesFile(params);
         return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
         /*

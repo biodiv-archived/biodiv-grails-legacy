@@ -27,6 +27,7 @@ import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
 import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
+import org.springframework.web.context.request.RequestContextHolder
 
 //pdf related
 import au.com.bytecode.opencsv.CSVWriter
@@ -48,7 +49,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import java.awt.Point;
 
 class ChecklistService {
@@ -101,6 +102,7 @@ class ChecklistService {
 		checklist.sciNameColumn =  params.sciNameColumn
 		checklist.commonNameColumn =  params.commonNameColumn
 		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
+        checklist.language = params.locale_language;
 		
 		checklist.isChecklist = true
 	}
@@ -139,7 +141,8 @@ class ChecklistService {
                 }
             }
             if(!validObvPresent) {
-				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
+                def request = RequestContextHolder.currentRequestAttributes().request
+				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, RCU.getLocale(request)), checklistInstance:checklistInstance]
             }
 
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {

@@ -174,6 +174,7 @@ class ActionController {
                             if(featuredInstance.author == params.author){
                                 featuredInstance.notes = params.notes
                                 featuredInstance.createdOn = new Date()
+                                featuredInstance.language = utilsService.getCurrentLanguage(request);  
                                 status = saveActMail(params, featuredInstance, obv, ug) 
                                 if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes", [obv.class.simpleName] as Object[], RCU.getLocale(request))
                             }

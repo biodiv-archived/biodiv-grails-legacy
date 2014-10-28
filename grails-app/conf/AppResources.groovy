@@ -79,6 +79,7 @@ modules = {
         resource url:'/js/flag.js'
 		resource url:'/js/species/abstracttype.js'
 		resource url:'/js/species/relatedStory.js'
+		resource url:'/js/species/search.js'
 	}
 
 	auth {
@@ -215,7 +216,6 @@ modules = {
 	search {
 		dependsOn 'observations_list'
 
-		resource url:'/js/species/search.js'
 	}
 
 	admin { dependsOn	'core' }

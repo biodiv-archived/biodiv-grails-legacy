@@ -13,6 +13,8 @@ import species.formatReader.SpreadsheetReader
 import species.sourcehandler.XMLConverter
 import species.auth.SUser;
 import grails.converters.JSON;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder
 import species.Language;
 import species.NamesMetadata.NamePosition
 
@@ -29,7 +31,8 @@ class TaxonService {
     def springSecurityService;
     def activityFeedService;
     def speciesPermissionService;
-
+    def messageSource;
+    def request;
 	static int BATCH_SIZE = 100;
 
 	/**
@@ -779,9 +782,12 @@ class TaxonService {
     */
 
     def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
+    	 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         List errors = [];
         if(!classification) {
-            return [success:false, msg:"Not a valid classification ${classification?.name}."]
+        	def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =classification?.name;
+            return [success:false, msg:messageSource.getMessage("info.not.valid", messagesourcearg, RCU.getLocale(request))]
         }
         
         XMLConverter converter = new XMLConverter();
@@ -808,14 +814,14 @@ class TaxonService {
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            def res  = ['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors , taxonRegistry:taxonRegistry]
+            def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, RCU.getLocale(request)), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
             if(!(taxonRegistry[-1].taxonDefinition.status)) {
                 res['newlyCreated'] = true
                 res['newlyCreatedName'] = taxonRegistry[-1].taxonDefinition.name
             }
-            return res   //['success':true, msg:'Successfully added hierarchy', activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors , taxonRegistry:taxonRegistry]
+            return res   
         }
-        return ['success':false, msg:'Error while adding hierarchy', errors:errors]
+        return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, RCU.getLocale(request)), errors:errors]
     }
 
     def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
@@ -823,6 +829,7 @@ class TaxonService {
     } 
 
     private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+    	 if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         String msg = '';
         def content;
         List errors = [];
@@ -835,7 +842,7 @@ class TaxonService {
          } 
         /* JUST FOR DEMO
         if(!reg.isContributor()) {
-            return [success:false, msg:"You don't have permission to delete as you are not a contributor.", errors:errors]
+            return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, RCU.getLocale(request)), errors:errors]
         }
         */
         def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
@@ -850,7 +857,7 @@ class TaxonService {
 
         if(force == false && otherHierarchiesCount[0] == 1) {
             //if this is the only hierarchy for the species ... then dont delete it.
-            return [success:false, msg:"Cannot remove hierarchy as its the only one available for the species", errors:errors]
+            return [success:false, msg:messageSource.getMessage("info.annot.remove.hierarchy", null, RCU.getLocale(request)), errors:errors]
         }
 
         try {

@@ -5,11 +5,7 @@
 		data-toggle="dropdown" href="#"> <i class=" icon-download-alt"></i>
 		<g:message code="button.download" />
 	</a>
-        <a id="feature-action"
-		class="btn ${(params.action=='show')?'btn-link':''} dropdown-toggle"
-		data-toggle="dropdown" href="#"> <i class=" icon-download-alt"></i>
-		<g:message code="button.feature" />
-	</a>
+       
 
 	<div id="download-options" class="popup-form" style="display: none">
 		<form id="download-form">
@@ -21,10 +17,10 @@
 			<input type="hidden" name="downloadType" value="ZIP" /> <br />
 			 
 			<textarea class="comment-textbox"
-				placeholder="Please let us know how you intend to use this data"
+				placeholder="${g.message(code:'placeholder.how.intend')}"
 				name="notes"></textarea>
-			<input class="btn pull-right" type="submit" value="OK"></input>
-			<div id="download-close" class="popup-form-close" value="close">
+			<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}"></input>
+			<div id="download-close" class="popup-form-close" value="${g.message(code:'button.close')}">
 				<i class="icon-remove"></i>
 			</div>
 		</form>

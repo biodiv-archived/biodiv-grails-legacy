@@ -3,7 +3,7 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <html>
     <head>
-        <g:set var="title" value="Species"/>
+        <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_create"/>
         <style>

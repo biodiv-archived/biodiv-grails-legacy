@@ -6,13 +6,14 @@
 <%@page import="species.utils.Utils"%>
 <html>
     <head>
-        <g:set var="title" value="Species"/>
+        <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="species_upload" />
     </head>
     <body>
         <div id="uploadSpeciesDiv">
-            <s:showSubmenuTemplate model="['entityName':'Species Upload']" />
+<% def species_upload=g.message(code:'species.upload') %>
+            <s:showSubmenuTemplate model="['entityName':species_upload]" />
                 <uGroup:rightSidebar/>
                     <div class="super-section span12" style="margin-left: 0px;">
                         <div class="section">
@@ -33,16 +34,6 @@
                                 </div>
                             </div>
                     
-                            <!--div
-                                class="control-group">
-                                <label class="control-label span2" for="mappingFile"> Mapping File</label>
-                                <div class="controls span9" style="">
-                                    <g:render template='/UFile/docUpload'
-                                    model="['name': 'speciesmappingfile', 'path': mappingFile?.path, 'size':mappingFile?.size,'allowedExtensions':allowedExtensions, 'fileParams':['uploadDir':'species', 'fileConvert': true]]" />
-                                    <div class="help-inline">
-                                    </div>
-                                </div>
-                            </div-->
 
                             <div
                                 class="control-group">

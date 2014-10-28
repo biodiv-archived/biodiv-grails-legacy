@@ -72,7 +72,8 @@ import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.context.request.RequestContextHolder
 
 class ObservationService extends AbstractObjectService {
 
@@ -87,7 +88,7 @@ class ObservationService extends AbstractObjectService {
     //def speciesService;
     def messageSource;
     def resourcesService;
-
+    def request;
     /**
      * 
      * @param params
@@ -1269,35 +1270,36 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
+        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         def source = m.source;
         def mailSubject = ""
         def activitySource = ""
         switch (source) {
             case "observationShow":
-            mailSubject = "Share Observation"
-            activitySource = "observation"
+            mailSubject = messageSource.getMessage("info.share.observation", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("observation.label", null, RCU.getLocale(request))
             break
 
             case  "observationList" :
-            mailSubject = "Share Observation List"
-            activitySource = "observation list"
+            mailSubject = messageSource.getMessage("info.share.list", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.observation.list", null, RCU.getLocale(request))
             break
 
             case "userProfileShow":
-            mailSubject = "Share User Profile"
-            activitySource = "user profile"
+            mailSubject = messageSource.getMessage("info.share.profile", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.profile", null, RCU.getLocale(request))
             break
 
             case "userGroupList":
-            mailSubject = "Share Groups List"
-            activitySource = "user groups list"
+            mailSubject = messageSource.getMessage("info.share.lists", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.lists", null, RCU.getLocale(request))
             break
             case "userGroupInvite":
-            mailSubject = "Invitation to join group"
-            activitySource = "user group"
+            mailSubject = messageSource.getMessage("info.invitation.join", null, RCU.getLocale(request))
+            activitySource = messageSource.getMessage("info.user.group", null, RCU.getLocale(request))
             break
             case controller+action.capitalize():
-            mailSubject = "Share "+controller
+            mailSubject = messageSource.getMessage("button.share", null, RCU.getLocale(request))+" "+controller
             activitySource = controller
             break;
             default:
@@ -1307,7 +1309,11 @@ class ObservationService extends AbstractObjectService {
         def currentUserProfileLink = currentUser?utilsService.generateLink("SUser", "show", ["id": currentUser.id], null):'';
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
         def conf = SpringSecurityUtils.securityConfig
-        def staticMessage = conf.ui.askIdentification.staticMessage
+        def messagesourcearg1 = new Object[3];
+             messagesourcearg1[0] = currentUser;
+             messagesourcearg1[1] = activitySource;
+             messagesourcearg1[2] = templateMap["domain"];
+        def staticMessage = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.staticMessage", messagesourcearg1, RCU.getLocale(request))
         if (staticMessage.contains('$')) {
             staticMessage = evaluate(staticMessage, templateMap)
         } 
@@ -1324,7 +1330,7 @@ class ObservationService extends AbstractObjectService {
              messagesourcearg[4] = templateMap["userMessage"];
              messagesourcearg[5] = templateMap["unsubscribeUrl"];
              
-        def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, LCH.getLocale())
+        def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, RCU.getLocale(request))
 
         if (body.contains('$')) {
             body = evaluate(body, templateMap)
@@ -1516,7 +1522,7 @@ class ObservationService extends AbstractObjectService {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -1525,13 +1531,13 @@ class ObservationService extends AbstractObjectService {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }
