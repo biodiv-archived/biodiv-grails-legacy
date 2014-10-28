@@ -15,7 +15,7 @@ class Utils {
 	private static final String COL_SITE = 'http://www.catalogueoflife.org'
 	private static final String COL_URI = '/annual-checklist/2014/webservice'
 	
-	private static final int BATCH_SIZE = 100
+	private static final int BATCH_SIZE = 100000
 	private static final log = LogFactory.getLog(this);
 
 	private static final String ACCEPTED_NAME = "accepted name"
@@ -52,7 +52,7 @@ class Utils {
 		long offset = 0
 		int i = 0
 		while(true){
-			List tds = c.list(max: BATCH_SIZE, offset: offset, sort: "id", order: "asc")
+			List tds = c.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "asc")
 			if(tds.isEmpty()){
 				break
 			}
@@ -116,6 +116,8 @@ class Utils {
 	}
 		
 	static void downloadColXml(String sourceDir){
+		println "================ strating "
+		
 		File f = new File(sourceDir)
 		if(!f.exists()){
 			f.mkdirs()
@@ -134,7 +136,10 @@ class Utils {
 		long offset = 0
 		int i = 0
 		while(true){ 
-			List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: "id", order: "asc")
+			List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "asc")
+			tds.each {
+				println it.rank +  "    " + it.id + "   " +  it.canonicalForm 
+			}
 			if(tds.isEmpty()){
 				break
 			}
