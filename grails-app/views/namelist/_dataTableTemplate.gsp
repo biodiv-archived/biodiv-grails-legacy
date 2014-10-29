@@ -4,6 +4,8 @@
     border: 1px solid #ccc;
 }
 .tab_accept_inner{
+    color:white;
+    padding-top:3px;
     border-right: 1px solid #ccc;
     text-align: center;
 }

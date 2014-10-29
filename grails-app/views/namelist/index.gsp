@@ -26,7 +26,7 @@
       color: #555555 !important;
       cursor: default !important;
       background-color: #ffffff !important;
-      border: 1px solid #dddddd !important;
+      border: 2px solid #3D6798 !important;
       border-bottom-color: transparent !important;
       }
      .tab-content{
@@ -51,7 +51,7 @@
 		background-color:#3399FF;			
 	}
 	.dirty_list_span{
-		background-color:#FF6666;
+		background-color:#C0504D;
 	}
 	.working_list_span{
 		background-color:#FF9900;
@@ -284,7 +284,7 @@
 				
                 <div class="row-fluid">
 
-                    <div class="span3 canBeDisabled column" style="background:#FF6666">
+                    <div class="span3 canBeDisabled column" style="background:#C0504D">
                         <table style="width:100%">
                             <tr>
                                 <td>Kingdom</td>
@@ -323,7 +323,7 @@
 
                     </div>
 						
-					<div class="span9 column" style="width: 610px;background:#3399FF">
+					<div class="span9 column" style="width: 610px;background:#3D6798">
 						
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">
@@ -348,9 +348,9 @@
                                 <g:render template="/namelist/dataTableTemplate" model="[]"/>
                             </div>
                         </div>
-                        <button type="button" class="" style="background-color:#FF6666 " onClick='saveHierarchy(false)'>Save & Retain</button> 
-                        <button type="button" class="" style="background-color:#FF9900" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
-                        <button type="button" class=""style="background-color:#FFFF99">Save & Move to Clean List</button> 
+                        <button type="button" class="" style="background-color:#C0504D; border-radius:3px;font-size:16px;line-height:24px;" onClick='saveHierarchy(false)'>Save & Retain</button> 
+                        <button type="button" class="" style="background-color:#FF9900; border-radius:3px;font-size:16px;line-height:24px;" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
+                        <button type="button" class="" style="background-color:#FFFF99; border-radius:3px;font-size:16px;line-height:24px;">Save & Move to Clean List</button> 
                     </div>
 
 
