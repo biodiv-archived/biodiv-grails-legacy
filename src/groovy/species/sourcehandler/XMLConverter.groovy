@@ -1317,7 +1317,7 @@ class XMLConverter extends SourceConverter {
                 if(viaDatasource){
                     sfield.viaDatasource = viaDatasource
                 }
-
+                sfield.uploadTime = new Date();
                 if(!sfield.save(flush:true)) {
                     sfield.errors.each { log.error it }
                 }

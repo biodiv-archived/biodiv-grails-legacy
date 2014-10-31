@@ -57,7 +57,7 @@
 		background-color:#FF9900;
 	}
 	.clean_list_span{
-		background-color:#FFFF99;
+		background-color:#009933;
 	}    
 	.listarea_content{
         position: relative;
@@ -182,6 +182,7 @@
 	}
     .connection_wrapper_row1{
         color:white;
+        height:23px;
 		background-color:#009933;
 	}
 	.connection_wrapper_row2{		
@@ -285,7 +286,7 @@
                 <div class="row-fluid">
 
                     <div class="span3 canBeDisabled column" style="background:#C0504D">
-                        <table style="width:100%">
+                        <table style="width:100% ;color:white">
                             <tr>
                                 <td>Kingdom</td>
                                 <td><input type="text" class="kingdom span12"></td> 
@@ -335,22 +336,39 @@
 
                         <div class="tab-content" id="names-tab-content">
                             <div class="tab-pane active" id="names-tab0" style="">
-                                <g:render template="/namelist/dataTableTemplate" model="[]"/>
+                                <g:render template="/namelist/dataTableTemplate" model="['type':'a']"/>
 
                             </div>
                             <div class="tab-pane" id="names-tab1" style="">
-                                <g:render template="/namelist/dataTableTemplate" model="[]"/>
+                                <g:render template="/namelist/dataTableTemplate" model="['type':'s']"/>
                             </div>
                             <div class="tab-pane" id="names-tab2" style="">
-                                <g:render template="/namelist/dataTableTemplate" model="[]"/>
+                                <g:render template="/namelist/dataTableTemplate" model="['type':'c']"/>
                             </div>
                             <div class="tab-pane" id="names-tab3" style="">
-                                <g:render template="/namelist/dataTableTemplate" model="[]"/>
+                                <g:render template="/namelist/dataTableTemplate" model="['type':'r']"/>
                             </div>
                         </div>
+                        <script id="newRowTmpl" type="text/x-jquery-tmpl">
+                            <div class="row-fluid tab_div new">
+                                <form>
+                                    <div class="span3">
+                                        <input type="hidden" class ="{{>typeClass}}" name="{{>typeClass}}" value=""/>
+                                        <input type="text" class="nameInputs span12" name="value">
+                                    </div>
+                                    <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
+                                    <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div>
+                                    <div class="span2">
+                                        <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
+                                        <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </script>
+
                         <button type="button" class="" style="background-color:#C0504D; border-radius:3px;font-size:16px;line-height:24px;" onClick='saveHierarchy(false)'>Save & Retain</button> 
                         <button type="button" class="" style="background-color:#FF9900; border-radius:3px;font-size:16px;line-height:24px;" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
-                        <button type="button" class="" style="background-color:#FFFF99; border-radius:3px;font-size:16px;line-height:24px;">Save & Move to Clean List</button> 
+                        <button type="button" class="" style="background-color:#009933; border-radius:3px;font-size:16px;line-height:24px;">Save & Move to Clean List</button> 
                     </div>
 
 
@@ -358,7 +376,7 @@
 
 	
 	</div>
-  	<div class="span2 column detailsareaRight" style=" background: #009933; ">
+  	<div class="span2 column detailsareaRight" >
         
         <div class= row-fluid>
             <div>
@@ -372,32 +390,32 @@
                 <option value="eol">EoL</option>
                 <option value="worms">WoRMS</option>
             </select>
-            <button class="btn queryString span12" style="margin:0px; margin-bottom: 6px;" onClick='searchDatabase()'>Query <i class="icon-search" style="margin-left: 10px;"></i></button>
+            <button class="btn btn-primary queryString span12" style="margin:0px; margin-bottom: 6px;" onClick='searchDatabase()'>Query <i class="icon-search icon-white" style="margin-left: 10px;"></i></button>
             </div>
         </div>
 
-        <div class="row-fluid">
+        <div class="row-fluid"style=" background: #009933; ">
 		  <div class="connection_wrapper" style="background:grey; padding: 5px 0px;font-weight: bold;">Connections</div>
 		  
 		  <div class="connection_wrapper_row1">Species Page</div>
 		  
-		  <div class="connection_wrapper_row2">123456</div>
+		  <div class="connection_wrapper_row2 countSp">xx</div>
 
 		  <div class="connection_wrapper_row1">Observations</div>
 		  
-		  <div class="connection_wrapper_row2">123456</div>
+		  <div class="connection_wrapper_row2 countObv">xx</div>
 		  
 		  <div class="connection_wrapper_row1">Lists</div>
 		  
-		  <div class="connection_wrapper_row2">123456</div>
+		  <div class="connection_wrapper_row2 countCKL">xx</div>
 		  
 		  <div class="connection_wrapper_row1">Maps</div>
 		  
-		  <div class="connection_wrapper_row2">123456</div>
+		  <div class="connection_wrapper_row2 countMaps">xx</div>
 		  
 		  <div class="connection_wrapper_row1">Documents</div>
 		  
-		  <div class="connection_wrapper_row2">123456</div>
+		  <div class="connection_wrapper_row2 countDocs">xx</div>
       </div>
 
 	</div>
@@ -405,7 +423,7 @@
 
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
     
-    <div id="searching">Searching...</div>
+    <div id="searching" style="font-weight:bold">Loading...</div>
 <script type="text/javascript">
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">
