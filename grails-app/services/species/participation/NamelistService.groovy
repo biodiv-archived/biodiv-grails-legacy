@@ -2,6 +2,7 @@ package species.participation
 
 import org.apache.commons.logging.LogFactory;
 
+import species.ScientificName
 import species.TaxonomyDefinition;
 import species.Synonyms;
 import species.NamesMetadata;
@@ -59,72 +60,79 @@ class NamelistService {
         }
     }
 
-    List responseAsMap(String xmlText, String searchBy){
-        List finalResult = []
-        def results = new XmlParser().parseText(xmlText)
-        println results.'@total_number_of_results'
-        println results.'@number_of_results_returned'
-        println results.'@error_message'
-        println results.'@version'
+	List responseAsMap(String xmlText, String searchBy){
+		def results = new XmlParser().parseText(xmlText)
+		return responseAsMap(results, searchBy)
+	}
+	
+	
+	List responseAsMap(results, String searchBy){
+		List finalResult = []
+        //println results.'@total_number_of_results'
+        //println results.'@number_of_results_returned'
+        //println results.'@error_message'
+        //println results.'@version'
 
         int i = 0
         results.result.each { r ->
             Map temp = new HashMap()
             Map id_details = new HashMap()
-            println " Starting result ======= ${++i}"
-            println r.id.text().getClass()
+            //println " Starting result ======= ${++i}"
+            //println r.id.text().getClass()
             temp['externalId'] = r.id.text()
-            println r.name.text()
+            //println r.name.text()
             temp['name'] = r.name.text()
-            println r.rank.text()
+            //println r.rank.text()
             temp['rank'] = r.rank.text().toLowerCase()
             temp[r.rank.text().toLowerCase()] = r.name.text()
-            println r.name_status.text()
+            //println r.name_status.text()
             id_details[r.name.text()] = r.id.text();
             temp['nameStatus'] = r.name_status.text().tokenize(' ')[0]
-            println r.author.text()
+            //println r.author.text()
             temp['authorString'] = r.author.text()
-            println r.source_database.text()
+            //println r.source_database.text()
             temp['sourceDatabase'] = r.source_database.text()
-            println r.source_database_url.text()
-            println r.url.text()
-            println "==GETTING GROUP==" 
-            temp['group'] = r.classification.taxon[0].name.text()
-            println r.classification.taxon[0].name.text()
+            //println r.source_database_url.text()
+            //println r.url.text()
+            //println "==GETTING GROUP==" 
+			
+            //temp['group'] = r.classification.taxon[0].name.text()
+            //println r.classification.taxon[0].name.text()
 
             if(searchBy == 'id') {
-                println "============= references  "
+                //println "============= references  "
                 r.references.reference.each { ref ->
-                    println ref.author.text()
-                    println ref.source.text()
+                    //println ref.author.text()
+                    //println ref.source.text()
                 }
 
                 println "============= higher taxon  "
                 r.classification.taxon.each { t ->
-                    println t.rank.text() + " == " + t.name.text()
+                    //println t.rank.text() + " == " + t.name.text()
                     temp[t.rank.text().toLowerCase()] = t.name.text()
                     id_details[t.name.text()] = t.id.text()
                 }
 
                 println "============= child taxon  "
                 r.child_taxa.taxon.each { t ->
-                    println t.name.text()
-                    println t.author.text()
+                   // println t.name.text()
+                   // println t.author.text()
                 }
 
                 println "============= synonyms  "
                 r.synonyms.synonym.each { s ->
-                    println s.rank.text() + " == " + s.name.text()
-                    println "============= references  "
+                    //println s.rank.text() + " == " + s.name.text()
+                    //println "============= references  "
                     s.references.reference.each { ref ->
-                        println ref.author.text()
-                        println ref.source.text()
+                        //println ref.author.text()
+                        //println ref.source.text()
                     }
                 }
 
             }
             temp['id_details'] = id_details
             finalResult.add(temp);
+			
             println "============End result========"
         }
         return finalResult
@@ -193,5 +201,74 @@ class NamelistService {
 		}
 		return result
 	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////// COL Migration related /////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////
+	
+	def populateInfoFromCol(File sourceDir){
+		if(!sourceDir.exists()){
+			log.debug "Source dir does not exist. ${sourceDir} Aborting now..." 
+			return
+		}
+		
+		addNameToIBPHirarchyFromCol(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
+		//addNameToIBPHirarchyFromCol(new File(sourceDir, Synonyms.class.simpleName), Synonyms.class)
+	}
+	
+	
+	private void addNameToIBPHirarchyFromCol(File domainSourceDir, domainClass){
+		if(!domainSourceDir.exists()){
+			log.debug "Source dir does not exist. ${domainSourceDir} Aborting now..."
+			return
+		}
+
+		long offset = 0
+		int i = 0
+		while(true && (offset == 0)){
+			List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "desc")
+			tds.each {
+				log.debug  it.rank +  "    " + it.id + "   " +  it.canonicalForm
+			}
+			if(tds.isEmpty()){
+				break
+			}
+			offset += BATCH_SIZE
+			tds.each {
+				log.debug  "===== starting " + it.canonicalForm + "   index >>>>>> " + (++i)
+				processColData(new File(domainSourceDir, "" + it.id + ".xml"), it)
+			}
+		}
+	}
+	
+	private void processColData(File f, ScientificName sciName){
+		if(!f.exists()){
+			log.debug "File not found for sciName ${sciName} skipping now..."
+			return
+		}
+		def results = new XmlParser().parse(f)
+		
+		String errMsg = results.'@error_message'
+		int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
+		if(errMsg != ""){
+			log.debug "Error in col response " + errMsg
+			return
+		}
+		
+		if(resCount != 1 ){
+			log.debug "Multiple result found [${resCount}]. so skipping this ${sciName} for manual curation"
+			return
+		}
+		
+		//Every thing is fine so now populating CoL info
+		def m = responseAsMap(results, "id")
+		
+		log.debug "================   Response map   =================="
+		log.debug m
+		log.debug "================   Response map   =================="
+	}
+	
+	
+	
 
 }
