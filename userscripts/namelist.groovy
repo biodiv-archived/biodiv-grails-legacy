@@ -4,6 +4,15 @@ import species.TaxonomyRegistry
 
 import species.namelist.Utils
 import species.Classification
+
+def migrate(){
+	def nSer = ctx.getBean("namelistService")
+	nSer.populateInfoFromCol(new File("/home/sandeept/col"))
+	println "done "
+}
+
+migrate()
+
 /*
 def startDate = new Date()
 println "======== started " 

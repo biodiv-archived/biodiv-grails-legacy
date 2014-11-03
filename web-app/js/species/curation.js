@@ -58,6 +58,14 @@ function getNamesFromTaxon(ele , parentId) {
 }
 
 function getNameDetails(taxonId, classificationId, ele) {
+    $("body").css("cursor", "progress");
+    $("#searching").show();
+    $("HTML").mousemove(function(e) {
+        $("#searching").css({
+            "top" : e.pageY,
+            "left" : e.pageX + 15
+        });
+    });
     console.log("=======NAME DEATILS=======" + taxonId);
     $(ele).parent("ul").find("a").css('background-color','inherit');
     console.log(ele);
@@ -72,13 +80,61 @@ function getNameDetails(taxonId, classificationId, ele) {
         success: function(data) {
             changeEditingMode(false);
             populateNameDetails(data);
+            populateTabDetails(data);
+            $(".countSp").text(data["countSp"]);
+            $(".countObv").text(data["countObv"]);
+            $(".countCKL").text(data["countCKL"]);
             $(".taxonRegId").val(data['taxonRegId']);
+            $("#searching").hide();
+            $("body").css("cursor", "default");
             console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
     });
+}
+
+function populateTabDetails(data) {
+    console.log("====TAB DETAILS====");
+    var synonymsList = data['synonymsList']
+    if(synonymsList.length > 0) {
+        console.log(synonymsList);
+        var e = $("#names-tab1 .singleRow").first().clone();
+        $("#names-tab1 .singleRow").remove();
+        $.each(synonymsList, function(index, value){
+            //$("#names-tab1 .add_new_row").trigger("click");
+            var f = $(e).clone();
+            $(f).insertBefore("#names-tab1 .add_new_row");
+            var ele = $("#names-tab1 .singleRow").last();
+            console.log(value["id"]);
+            $(ele).find("input[name='sid']").val(value["id"]);
+            console.log($(ele).find("input[name='value']"));
+            $(ele).find("input[name='value']").val(value["name"]);
+            $(ele).find("input[name='source']").val(value["source"]);
+            $(ele).find("input[name='contributor']").val(value["contributors"]);
+        })
+    }
+
+    var commonNamesList = data['commonNamesList']
+    if(commonNamesList.length > 0) {
+        console.log(commonNamesList);
+        var e = $("#names-tab2 .singleRow").first().clone();
+        $("#names-tab2 .singleRow").remove();
+        $.each(commonNamesList, function(index, value){
+            //$("#names-tab1 .add_new_row").trigger("click");
+            var f = $(e).clone();
+            $(f).insertBefore("#names-tab2 .add_new_row");
+            var ele = $("#names-tab2 .singleRow").last();
+            console.log(value["id"]);
+            $(ele).find("input[name='cid']").val(value["id"]);
+            console.log($(ele).find("input[name='value']"));
+            $(ele).find("input[name='value']").val(value["name"]);
+            $(ele).find("input[name='source']").val(value["source"]);
+            $(ele).find("input[name='contributor']").val(value["contributors"]);
+        })
+    }
+
 }
 
 function setOption(selectElement, value) {
@@ -379,7 +435,13 @@ function modifySynonym(ele) {
  
 }
 
-$('.add_new_syn').click(function(){    
-    var html = $('#synonymTmpl').render();
-    $(this).before(html);
+$('.add_new_row').click(function(){
+    console.log("======ADD NEW CALLED=======");
+    var me = this;
+    var typeClass = $(me).prev().find("input[type='hidden']").attr('name')
+    var p = new Object();
+    p['typeClass']= typeClass;
+    console.log(p);
+    var html = $('#newRowTmpl').render(p);
+    $(me).before(html);
 });

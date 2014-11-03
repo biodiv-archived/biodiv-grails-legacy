@@ -448,146 +448,142 @@ class TaxonController {
 
     }
     
-    def testCode() {
-        println "==========================="
-    }
+	@Secured(['ROLE_USER'])
+	def update()  {
+		//Do only when params coming from curation interface
+		def otherParams = [:]
+		if(params.taxonData) {
+			params << JSON.parse(params.taxonData)
+			params.remove('taxonData');
+			otherParams['id_details'] = params.id_details;
+			otherParams['metadata'] = params.metadata;
+		}
+		println "=======PARAMS UPDATE======== " + params
+		def msg;
+		def errors = [], result=[success:false];
+		if(params.classification) {
+
+			println "=======1======== "
+			Language languageInstance = utilsService.getCurrentLanguage(request);
+
+			String speciesName;
+			Map list = params.taxonRegistry?:[];
+			List t = taxonService.getTaxonHierarchyList(list);
+			speciesName = t[TaxonomyRank.SPECIES.ordinal()];
+
+			//TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+			//            return [success:false, msg:"You don't have permission to delete synonym"]
+			//        }
+
+			println "=======2======== "
+			try {
+				for (int i=0; i< t.size(); i++) {
+					if(!t[TaxonomyRank.list()[i].ordinal()]) {
+						errors << TaxonomyRank.list()[i].value() + " is missing";
+					}
+				}
+
+				println "======3======== "
+				if(!taxonService.validateHierarchy(t)) {
+					msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
+					render ([success:false, msg:msg, errors:errors] as JSON)
+					return;
+				}
+
+				def classification, taxonregistry;
+				if(params.reg) {
+					println "=======4======== "
+					TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
+					if(reg) {
+						classification = reg.classification;
+						result = taxonService.deleteTaxonHierarchy(reg, true);
+					}
+					println "=======5======== " + result
+					println "=======OTHER PARAMS======== " + otherParams
+					if(!result.success) {
+						println "=======7======== "
+						msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))
+						render ([success:false, msg:msg] as JSON)
+						return;
+					}
+				} else {
+					println "=======6======== "
+					classification = params.classification ? Classification.read(params.long('classification')) : null;
+				}
+
+				println "=========TO BOOLEAN====== " + params.abortOnNewName + "==== " + params.fromCOL
+				result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName.toBoolean()?params.abortOnNewName.toBoolean():false) , (params.fromCOL.toBoolean()?params.fromCOL.toBoolean():false), otherParams);
+				result.action = 'update';
+				if(params.controller != 'taxon'){
+					if(result.success) {
+						def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
+						def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
+						utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+					}
+				}
+				println "========MOVE TO WKG ========== " + params.moveToWKG
+				if(result.success && params.moveToWKG) {
+					println "========WILL MOVE=========="
+					taxonService.moveToWKG(result.taxonRegistry)
+				}
+				result.remove("taxonRegistry");
+				render result as JSON
+				return;
+			} catch(e) {
+				e.printStackTrace();
+				errors << e.getMessage();
+				msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
+				render ([success:false, msg:msg, errors:errors] as JSON)
+				return;
+			}
+			msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
+			render ([success:false, msg:msg, errors:errors] as JSON)
+			return;
+		} else {
+			errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+			msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
+			render ([success:false, msg:msg, errors:errors] as JSON)
+		}
+
+	}
 
 	@Secured(['ROLE_USER'])
-    def update()  {
-        //Do only when params coming from curation interface
-        def otherParams = [:]
-        if(params.taxonData) {
-            params << JSON.parse(params.taxonData)
-            params.remove('taxonData');
-            otherParams['id_details'] = params.id_details;
-            otherParams['metadata'] = params.metadata;
-        }
-        println "=======PARAMS UPDATE======== " + params
-        def msg;
-        def errors = [], result=[success:false];
-        if(params.classification) {
+	def delete() {
+		def errors = [];
+		if(params.reg) {
 
-        println "=======1======== " 
-            Language languageInstance = utilsService.getCurrentLanguage(request);
+			//TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+			//            return [success:false, msg:"You don't have permission to delete synonym"]
+			//        }
 
-            String speciesName;
-            Map list = params.taxonRegistry?:[];
-            List t = taxonService.getTaxonHierarchyList(list);
-            speciesName = t[TaxonomyRank.SPECIES.ordinal()];
+			try {
+				TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
+				def result = taxonService.deleteTaxonHierarchy(reg);
+				result.action = 'delete';
 
-            //TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-//            return [success:false, msg:"You don't have permission to delete synonym"]
-//        }
+				if(result.success) {
+					def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
+					def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
+					utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+				}
 
-        println "=======2======== " 
-            try {
-                for (int i=0; i< t.size(); i++) {
-                    if(!t[TaxonomyRank.list()[i].ordinal()]) {
-                        errors << TaxonomyRank.list()[i].value() + " is missing";
-                    }
-                }
+				render result as JSON;
+				return;
+			} catch(e) {
+				e.printStackTrace();
+				errors << e.getMessage();
+				msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], RCU.getLocale(request))
+				render ([success:false, msg:msg, errors:errors] as JSON)
+				return;
+			}
+			render ([success:false, msg:msg, errors:errors] as JSON)
+			return;
+		} else {
+			errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], RCU.getLocale(request))
+			render ([success:false, msg:msg, errors:errors] as JSON)
+		}
+	}
 
-        println "======3======== " 
-                if(!taxonService.validateHierarchy(t)) {
-                     msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
-                    render ([success:false, msg:msg, errors:errors] as JSON)
-                    return;
-                }
-
-                def classification, taxonregistry;
-                if(params.reg) {
-        println "=======4======== " 
-                    TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
-                    if(reg) {
-                        classification = reg.classification;
-                        result = taxonService.deleteTaxonHierarchy(reg, true);
-                    }
-        println "=======5======== " + result 
-        println "=======OTHER PARAMS======== " + otherParams 
-                    if(!result.success) {
-        println "=======7======== " 
-                        msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))
-                        render ([success:false, msg:msg] as JSON)
-                        return;
-                    }
-                } else {
-        println "=======6======== " 
-                    classification = params.classification ? Classification.read(params.long('classification')) : null;
-                }
-                
-                println "=========TO BOOLEAN====== " + params.abortOnNewName + "==== " + params.fromCOL
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName.toBoolean()?params.abortOnNewName.toBoolean():false) , (params.fromCOL.toBoolean()?params.fromCOL.toBoolean():false), otherParams);
-                result.action = 'update';
-                if(params.controller != 'taxon'){
-                    if(result.success) {
-                        def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
-                        def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
-                        utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                    } 
-                }
-                println "========MOVE TO WKG ========== " + params.moveToWKG
-                if(result.success && params.moveToWKG) {
-                    println "========WILL MOVE=========="
-                    taxonService.moveToWKG(result.taxonRegistry)
-                }
-                result.remove("taxonRegistry");
-                render result as JSON
-                return;
-           } catch(e) {
-                e.printStackTrace();
-                errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
-                render ([success:false, msg:msg, errors:errors] as JSON)
-                return;
-            }
-            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
-            render ([success:false, msg:msg, errors:errors] as JSON)
-            return;
-        } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
-            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
-            render ([success:false, msg:msg, errors:errors] as JSON)
-        }
-
-    }
-
-	@Secured(['ROLE_USER'])
-    def delete() {
-        def errors = [];
-        if(params.reg) {
-
-//TODO        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-//            return [success:false, msg:"You don't have permission to delete synonym"]
-//        }
-
-            try {
-                TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
-                def result = taxonService.deleteTaxonHierarchy(reg);
-                result.action = 'delete';
-
-                if(result.success) {
-                    def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
-                    def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
-                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                }
-
-                render result as JSON;
-                return;
-            } catch(e) {
-                e.printStackTrace();
-                errors << e.getMessage();
-                msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], RCU.getLocale(request))
-                render ([success:false, msg:msg, errors:errors] as JSON)
-                return;
-            }
-            render ([success:false, msg:msg, errors:errors] as JSON)
-            return;
-        } else {
-            errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], RCU.getLocale(request))
-            render ([success:false, msg:msg, errors:errors] as JSON)
-        }
-    }
-	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////Navigator query related ///////////////////////////////
