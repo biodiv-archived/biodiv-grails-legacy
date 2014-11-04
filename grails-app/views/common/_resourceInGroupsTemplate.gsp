@@ -8,10 +8,9 @@
     if(!observationInstance.userGroups) {
         observationInstance.userGroups = []
     }
-    observationInstance.userGroups.add(ug)
+    //observationInstance.userGroups.add(ug)
     def featuredInUserGroups = [:];
     %>
-    <g:if test="${observationInstance.userGroups}">
 
     <g:set var="featuredNotes" value="${observationInstance.featuredNotes()}"/>
     <ul class="tile" style="list-style: none;background:transparent;">
@@ -37,7 +36,12 @@
             </li>
 
         </g:each>
-
+            <g:if test="${!featuredInUserGroups.containsKey(ug.id)}">
+            <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
+            <uGroup:showUserGroupSignature model="[ 'userGroup':ug, featured:false]" />
+            </li>
+            </g:if>
+ 
         <g:each in="${observationInstance.userGroups}" var="userGroup">
             <g:if test="${!featuredInUserGroups.containsKey(userGroup.id)}">
             <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
@@ -46,7 +50,6 @@
             </g:if>
         </g:each>
     </ul>
-    </g:if>
 </div>
 
 
