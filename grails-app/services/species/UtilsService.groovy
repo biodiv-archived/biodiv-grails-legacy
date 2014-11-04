@@ -454,8 +454,8 @@ class UtilsService {
                 }
                 else { 
                     a = false
-                }
-                mailSubject = ActivityFeedService.getDescriptionForFeature(obv, null , a)
+                }               
+                mailSubject = getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 def ug = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
