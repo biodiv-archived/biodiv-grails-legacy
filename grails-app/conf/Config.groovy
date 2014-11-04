@@ -556,7 +556,7 @@ environments {
             fatal   'jdbc.resultsettable'
 //            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            debug 'org.springframework.security.acls'
+            /*debug 'org.springframework.security.acls'
             debug 'org.hibernate.jdbc'
             debug 'org.hibernate.persister.entity'
             debug 'org.hibernate.action.EntityUpdateAction'
@@ -564,9 +564,8 @@ environments {
             debug 'org.codehaus.groovy.grails.orm.hibernate.events'
             debug 'org.hibernate.transaction'
             debug 'org.springframework.transaction'
-            debug 'org.springframework.aop.framework'
-            debug 'grails.plugin.springsecurity.acl'
             info    'org.hibernate.jdbc.ConnectionManager'
+            */
        }
     }
 	test {
