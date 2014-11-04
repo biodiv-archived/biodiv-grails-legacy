@@ -160,8 +160,7 @@ class ActionController {
                     }
                      try{
                         featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
-                        println "--------------------------"+featuredInstance;
-                        if(!featuredInstance) {
+                           if(!featuredInstance) {
                             def userLanguage = utilsService.getCurrentLanguage(request); 
                             featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes,language:userLanguage)
                                                         status = saveActMail(params, featuredInstance, obv, ug);
