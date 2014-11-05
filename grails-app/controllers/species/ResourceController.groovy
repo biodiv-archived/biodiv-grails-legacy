@@ -10,6 +10,7 @@ class ResourceController {
 
     def resourcesService;
     def springSecurityService;
+    def utilsService;
 
     def index = {
         redirect(action: "list", params: params)
@@ -154,6 +155,7 @@ class ResourceController {
     
     def createResource(){
         def user = springSecurityService.currentUser;
+         params.locale_language = utilsService.getCurrentLanguage(request);
         List<Resource> resources = resourcesService.createResource(params, user);
         resources.each{
             def flag = resourcesService.createUsersRes(user, it, UsersResource.UsersResourceStatus.NOT_USED)
