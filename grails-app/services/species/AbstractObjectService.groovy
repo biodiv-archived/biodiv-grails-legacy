@@ -46,13 +46,14 @@ class AbstractObjectService {
             def controller = UtilsService.getTargetController(obv);
 			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
-            item.type = controller
+            item.type = controller                  
     		if(param.inGroup) {
 				item.inGroup = param.inGroup;
 			} 
             
             if(param['featuredNotes']) {
                 item.featuredNotes = param['featuredNotes']
+                 item.language= param['featuredNotes'].language
             }
            
             if(param['featuredOn']) {

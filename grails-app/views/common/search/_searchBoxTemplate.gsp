@@ -18,8 +18,9 @@
 			data-target="#" href="#"></a>
 		</div>	
 </div>
+<input type="hidden" id="userLanguage" value="${userLanguage?.id}" />
 <script type="text/javascript">
-$(document).ready(function() {
+$(document).ready(function() {    
 	window.params = {
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",
