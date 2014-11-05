@@ -61,7 +61,7 @@ class SpeciesController extends AbstractObjectController {
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
 		params.action="list"
-
+        model.userLanguage = utilsService.getCurrentLanguage(request);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/species/showSpeciesListTemplate", model:model);
 			return;
