@@ -223,7 +223,7 @@ class UserGroupService {
 		aclUtilService.deletePermission(userGroup, user.email, permission);
 	}
 
-	@Transactional
+	//@Transactional
 	def getUserGroups(SUser userInstance) {
 		return userInstance.getUserGroups()
 	}

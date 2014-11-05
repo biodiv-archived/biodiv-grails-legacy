@@ -109,9 +109,8 @@ input.dms_field {
  <script type="text/javascript">
 
 $(document).ready(function(){
-$('.qq-upload-button').html(function(index, text) {
-return text.replace('Upload a file', '${upload_file_text}');
-}).attr("title","value");
+//$('.qq-upload-button:first').text('${upload_file_text}')
+        $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
 });
 </script>
                             </div>
