@@ -65,6 +65,10 @@ class NamelistController {
             case "col":
                 res = namelistService.searchCOL(params.name, 'name');
             break
+
+            case "gbif":
+                res = namelistService.searchGBIF(params.name, 'name');
+            break
         }
         
         //def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
@@ -86,6 +90,11 @@ class NamelistController {
             case "col":
                 res = namelistService.searchCOL(params.externalId, 'id');
             break
+
+            case "gbif":
+                res = namelistService.searchGBIF(params.externalId, 'id');
+            break
+
         }
         //def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
         println "========RES DETAILS====== " + res[0]  

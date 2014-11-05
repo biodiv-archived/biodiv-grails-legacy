@@ -19,11 +19,15 @@ import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.ContentType.XML
 import groovy.sql.Sql
 import groovy.util.XmlParser
+import grails.converters.JSON;
 
 class NamelistService {
    
     private static final String COL_SITE = 'http://www.catalogueoflife.org'
 	private static final String COL_URI = '/annual-checklist/2014/webservice'
+    
+    private static final String GBIF_SITE = 'http://api.gbif.org'
+	private static final String GBIF_URI = '/v1/species'
 	
 	private static final int BATCH_SIZE = 100
 	private static final log = LogFactory.getLog(this);
@@ -63,6 +67,39 @@ class NamelistService {
         }
     }
 
+
+    List searchGBIF(String input, String searchBy){
+        //http://api.gbif.org/v1/species/match?verbose=true&name=Mangifera
+
+        def http = new HTTPBuilder()
+        println "========GBIF SITE===== " + GBIF_SITE
+        http.request( GBIF_SITE, GET, TEXT ) { req ->
+            if(searchBy == 'name') {
+                uri.path = GBIF_URI + '/match';
+            } else {
+                uri.path = GBIF_URI + '/' + input;
+            }
+            if(searchBy == 'name') {
+                uri.query = [ name:input]
+            }
+            /*else if(searchBy == 'id') {
+                uri.query = [ id:input, format:'xml']
+            }*/
+            //headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
+            headers.Accept = '*/*'
+
+            response.success = { resp, reader ->
+                assert resp.statusLine.statusCode == 200
+                println "Got response: ${resp.statusLine}"
+                println "Content-Type: ${resp.headers.'Content-Type'}"
+                def xmlText =  reader.text
+                return responseFromGBIFAsMap(xmlText, searchBy);
+            }
+            response.'404' = { println 'Not found' }
+        }
+    }
+
+
 	List responseAsMap(String xmlText, String searchBy){
 		def results = new XmlParser().parseText(xmlText)
 		return responseAsMap(results, searchBy)
@@ -99,7 +136,7 @@ class NamelistService {
             //println r.url.text()
             //println "==GETTING GROUP==" 
 			
-            //temp['group'] = r.classification.taxon[0].name.text()
+            temp['group'] = r.classification.taxon[0].name.text()
             //println r.classification.taxon[0].name.text()
 
             if(searchBy == 'id') {
@@ -140,7 +177,34 @@ class NamelistService {
         }
         return finalResult
     }
-	
+
+    List responseFromGBIFAsMap(String xmlText , String searchBy) {
+        def result = JSON.parse(xmlText)
+        def finalResult = []
+        Map temp = new HashMap()
+        temp['externalId'] = result['usageKey'];
+        temp['name'] = result['scientificName'];
+        temp['rank'] = result['rank'].toLowerCase();
+        temp['nameStatus'] = '';
+        temp['sourceDatabase'] = '';
+        temp['group'] = result['kingdom'];
+        if(searchBy == 'id') {
+            temp['externalId'] = result['key'];
+            temp['kingdom'] = result['kingdom']; 
+            temp['phylum'] = result['phylum']; 
+            temp['order'] = result['order']; 
+            temp['family'] = result['family']; 
+            temp['class'] = result['class']; 
+            temp['genus'] = result['kingdom']; 
+            temp['species'] = result['species']; 
+            temp['nameStatus'] = result['taxonomicStatus'].toLowerCase();
+            temp['sourceDatabase'] = result['accordingTo'];
+            temp['authorString'] = result['authorship'];
+        }
+        finalResult.add(temp);
+        println "===========PARSED RESULT ======== " + finalResult
+        return finalResult;
+    }
 
     def getNamesFromTaxon(params){
         log.debug params

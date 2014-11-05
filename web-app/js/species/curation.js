@@ -87,9 +87,16 @@ function getNameDetails(taxonId, classificationId, ele) {
             $(".taxonRegId").val(data['taxonRegId']);
             $("#searching").hide();
             $("body").css("cursor", "default");
+            if($(ele).parents(".dl_content").length) {
+                alert("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
+                $('.queryDatabase option[value="col"]').attr("selected", "selected");
+                $('.queryString').trigger("click");
+            }
             console.log("======SUCCESS====");
             console.log(data);  
         }, error: function(xhr, status, error) {
+            $("#searching").hide();
+            $("body").css("cursor", "default");
             alert(xhr.responseText);
         } 
     });
@@ -183,6 +190,10 @@ function searchDatabase() {
         });
     });
     var name = $(".name").val();
+    if(name == "") {
+        alert("Please provide a name to search!!");
+        return;
+    }
     var dbName = $("#queryDatabase").val();
     if(dbName == "databaseName") {
         alert("Please select a database to query from!!");
@@ -204,9 +215,11 @@ function searchDatabase() {
                 console.log("======SUCCESS====");
                 console.log(data); 
             } else {
-                alert("Sorry no results found, Try other database!!");
+                alert("Sorry no results found from "+ $("#queryDatabase option:selected").text());
             }
         }, error: function(xhr, status, error) {
+            $("#searching").hide();
+            $("body").css("cursor", "default");
             alert(xhr.responseText);
         } 
     });
@@ -421,12 +434,16 @@ function modifySynonym(ele) {
         success: function(data) {
             //show the popup
             //$("#externalDbResults").modal('hide');
-            form_var.find(".sid").val(data['synonymId']);
-            that.next().html("<i class='icon-trash'></i>");
-            console.log("======SUCCESS====");
-            console.log(data);  
-            if(modifyType == 'delete') {
-                form_var.parent().hide();
+            if(data['success']) {
+                form_var.find(".sid").val(data['synonymId']);
+                that.next().html("<i class='icon-trash'></i>");
+                console.log("======SUCCESS====");
+                console.log(data);  
+                if(modifyType == 'delete') {
+                    form_var.parent().hide();
+                }
+            } else {
+                alert("Error in saving - "+data['msg']);
             }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
