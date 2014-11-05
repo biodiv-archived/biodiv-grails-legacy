@@ -546,10 +546,10 @@ class UtilsService {
                 break
 
                 case [ActivityFeedService.SPECIES_FIELD_DELETED, ActivityFeedService.SPECIES_SYNONYM_DELETED, ActivityFeedService.SPECIES_COMMONNAME_DELETED, ActivityFeedService.SPECIES_HIERARCHY_DELETED] :
-                mailsubject = notificationType;
-                bodyview = "/emailtemplates/"+userLanguage.threeLetterCode+"/addobservation"
-                templatemap["message"] = introspector.decapitalize(otherparams['info']);
-                populatetemplate(obv, templatemap, usergroupwebaddress, feedinstance, request)
+                mailSubject = notificationType;
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addobservation"
+                templateMap["message"] = introspector.decapitalize(otherparams['info']);
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
 
