@@ -387,7 +387,7 @@ class UtilsService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
                 //templateMap['message'] = ActivityFeedService.getContextInfo(feedInstance, [:])
-                templateMap["groupNameWithlink"] = ActivityFeedService.getUserGroupHyperLink(getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId));
+                templateMap["groupNameWithlink"] = getUserGroupHyperLink(getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId));
                 toUsers.addAll(getParticipants(obv))
                 break
 

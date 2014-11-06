@@ -2095,6 +2095,9 @@ class ObservationService extends AbstractObjectService {
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
+        
+        hqlQuery.setMaxResults(1000);
+        hqlQuery.setFirstResult(0);
 
         hqlQuery.setProperties(queryParts.queryParams);
         def observationInstanceList = hqlQuery.list();
