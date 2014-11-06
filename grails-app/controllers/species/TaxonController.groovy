@@ -15,7 +15,7 @@ import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class TaxonController {
 
@@ -23,9 +23,9 @@ class TaxonController {
     def taxonService;
     def springSecurityService;
     def activityFeedService;
-    def observationService;
+    def utilsService;
     def grailsApplication;
-
+    def messageSource
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
@@ -392,8 +392,13 @@ class TaxonController {
 
 	@Secured(['ROLE_USER'])
     def create() {
+        def msg;
+
         def errors = [], result=[success:false];
         if(params.classification) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             String speciesName;
             Map list = params.taxonRegistry?:[];
             List t = taxonService.getTaxonHierarchyList(list);
@@ -406,18 +411,19 @@ class TaxonController {
             try {
 
                 if(!taxonService.validateHierarchy(t)) {
-                    render ([success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors] as JSON)
+                    msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
+                    render ([success:false, msg:msg, errors:errors] as JSON)
                     return;
                 }
 
                 def classification = params.classification ? Classification.read(params.long('classification')) : null;
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'create';
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType );
-                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
 
@@ -426,22 +432,29 @@ class TaxonController {
            } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                render ([success:false, msg:'Error while adding hierarchy', errors:errors] as JSON)
+                msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
+                render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            render ([success:false, msg:'Error while adding hierarchy', errors:errors] as JSON)
+            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
+            render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << "Classification is missing"
-            render ([success:false, msg:'Error while adding hierarchy', errors:errors] as JSON)
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+            msg = messageSource.getMessage("default.error.hierarchy", ['adding'] as Object[], RCU.getLocale(request))
+            render ([success:false, msg:msg, errors:errors] as JSON)
         }
 
     }
 
 	@Secured(['ROLE_USER'])
     def update()  {
+        def msg;
         def errors = [], result=[success:false];
         if(params.classification) {
+
+            Language languageInstance = utilsService.getCurrentLanguage(request);
+
             String speciesName;
             Map list = params.taxonRegistry?:[];
             List t = taxonService.getTaxonHierarchyList(list);
@@ -454,12 +467,13 @@ class TaxonController {
             try {
                 for (int i=0; i< t.size(); i++) {
                     if(!t[TaxonomyRank.list()[i].ordinal()]) {
-                        errors << TaxonomyRank.list()[i].value() + " is missing";
+                        errors << g.message(error:TaxonomyRank.list()[i]) +" "+ messageSource.getMessage("taxon.missing", null, RCU.getLocale(request));
                     }
                 }
 
                 if(!taxonService.validateHierarchy(t)) {
-                    render ([success:false, msg:'Mandatory level is missing in the hierarchy', errors:errors] as JSON)
+                     msg = messageSource.getMessage("default.taxon.mandatory.missing", null, RCU.getLocale(request))
+                    render ([success:false, msg:msg, errors:errors] as JSON)
                     return;
                 }
 
@@ -471,7 +485,8 @@ class TaxonController {
                         result = taxonService.deleteTaxonHierarchy(reg, true);
                     }
                     if(!result.success) {
-                        render ([success:false, msg:"Error while updating hierarchy. ${result.msg}"] as JSON)
+                        msg = messageSource.getMessage("default.error.hierarchy", ['updating'] as Object[], RCU.getLocale(request))
+                        render ([success:false, msg:msg] as JSON)
                         return;
                     }
                 } else {
@@ -479,28 +494,31 @@ class TaxonController {
                 }
                 
 
-                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser);
+                result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance);
                 result.action = 'update';
 
                 if(result.success) {
                     def speciesInstance = getSpecies(result.reg.taxonDefinition.id, result.reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, result.reg, springSecurityService.currentUser, result.activityType);
-                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
-                }
+                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_UPDATED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                } 
 
                 render result as JSON
                 return;
            } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                render ([success:false, msg:'Error while editing hierarchy', errors:errors] as JSON)
+                msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
+                render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            render ([success:false, msg:'Error while editing hierarchy', errors:errors] as JSON)
+            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
+            render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << "Classification is missing"
-            render ([success:false, msg:'Error while editing hierarchy', errors:errors] as JSON)
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['classification'] as Object[], RCU.getLocale(request))
+            msg = messageSource.getMessage("default.error.hierarchy", ['editing'] as Object[], RCU.getLocale(request))
+            render ([success:false, msg:msg, errors:errors] as JSON)
         }
 
     }
@@ -522,7 +540,7 @@ class TaxonController {
                 if(result.success) {
                     def speciesInstance = getSpecies(reg.taxonDefinition.id, reg.taxonDefinition.rank);
                     def feedInstance = activityFeedService.addActivityFeed(speciesInstance, reg, springSecurityService.currentUser, result.activityType);
-                    observationService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
+                    utilsService.sendNotificationMail(activityFeedService.SPECIES_HIERARCHY_DELETED, speciesInstance, request, params.webaddress, feedInstance, ['info': result.activityType]);
                 }
 
                 render result as JSON;
@@ -530,14 +548,15 @@ class TaxonController {
             } catch(e) {
                 e.printStackTrace();
                 errors << e.getMessage();
-                render ([success:false, msg:'Error while deleting hierarchy', errors:errors] as JSON)
+                msg = messageSource.getMessage("default.error.hierarchy", ['deleting'] as Object[], RCU.getLocale(request))
+                render ([success:false, msg:msg, errors:errors] as JSON)
                 return;
             }
-            render ([success:false, msg:'Error while deleting hierarchy', errors:errors] as JSON)
+            render ([success:false, msg:msg, errors:errors] as JSON)
             return;
         } else {
-            errors << "Id is missing"
-            render ([success:false, msg:'Error while deleting hierarchy', errors:errors] as JSON)
+            errors << messageSource.getMessage("default.error.hierarchy.missing", ['Id'] as Object[], RCU.getLocale(request))
+            render ([success:false, msg:msg, errors:errors] as JSON)
         }
     }
 }

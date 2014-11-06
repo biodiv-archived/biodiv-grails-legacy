@@ -98,19 +98,24 @@ class SetupService {
 			String description = row.get("description");
 			int displayOrder = Math.round(Float.parseFloat(row.get("s.no.")));
 			String url_identifier = row.get("url identifier");
+			String lang_three_letter_code = row.get("language");
+
+			Language languageInstance = Language.findByThreeLetterCode(lang_three_letter_code);
+			languageInstance = languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
 			
 			def fieldCriteria = Field.createCriteria();
 
 			Field field = fieldCriteria.get {
 				and {
 					eq("concept", concept);
+					eq("language", languageInstance);
 					category ? eq("category", category) : isNull("category");
 					subCategory ? eq("subCategory", subCategory) : isNull("subCategory");
 				}
 			}
 
 			if(!field) {
-				field = new Field(concept:concept, category:category, subCategory:subCategory, displayOrder:displayOrder, description:description, urlIdentifier:url_identifier);
+				field = new Field(concept:concept, category:category, subCategory:subCategory, displayOrder:displayOrder, description:description, urlIdentifier:url_identifier, language:languageInstance);
 			} else {
 				field.displayOrder = displayOrder;
 				field.description = description;

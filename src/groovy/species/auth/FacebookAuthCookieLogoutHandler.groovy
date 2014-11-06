@@ -9,15 +9,16 @@ import org.apache.log4j.Logger
 
 import species.utils.Utils;
 
-class FacebookAuthCookieLogoutHandler implements LogoutHandler {
+class FacebookAuthCookieLogoutHandler extends com.the6hours.grails.springsecurity.facebook.FacebookAuthCookieLogoutHandler {
 
 	private static final Logger logger = Logger.getLogger(this)
 
-	FacebookAuthUtils facebookAuthUtils
-
 	void logout(HttpServletRequest httpServletRequest,
-	HttpServletResponse httpServletResponse,
-	Authentication authentication) {
+	    HttpServletResponse httpServletResponse,
+	    Authentication authentication) {
+        
+		super.logout(httpServletRequest, httpServletResponse, authentication);
+
 		facebookAuthUtils.logout(httpServletRequest, httpServletResponse);
 	}
 

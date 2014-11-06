@@ -340,6 +340,8 @@ function saveHeaderMetadata(headerMetadata) {
 }
 
 function populateHeaderMetadata(headerName, headerInfo) {
+    console.log(headerName);
+    console.log(headerInfo);
     var headerMetadata = getHeaderMetadata();
     headerMetadata[headerName] = headerInfo;
     saveHeaderMetadata(headerMetadata);
@@ -376,7 +378,7 @@ function tagMetadatas(data){
 
 $('#downloadModifiedSpecies').click(function() {
     if($(this).hasClass('disabled')) {
-        alert("Looks like some other work is in progress.Please wait and try again!!");
+        alert(window.i8ln.observation.upload.again);
         event.preventDefault();
         return false; 		 		
     }
@@ -454,7 +456,7 @@ function uploadSpecies(){
             $("#uploadSpecies").removeClass('disabled');
             $("#downloadModifiedSpecies").removeClass('disabled');
             $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
-            alert('Bulk upload in progres. Please visit your profile page to view status.');
+            alert(window.i8ln.observation.upload.statu);
         }
 
     });
@@ -464,12 +466,12 @@ var uploadSpeciesWrapper = function() {
     $('#uploadSpecies').unbind('click');
     var check = validateContLic();
     if(check == false){
-        alert("Please provide Contributor, Attributions and License for all the marked columns and try again!!");
+        alert(window.i8ln.observation.upload.lic);
         $('#uploadSpecies').bind('click', uploadSpeciesWrapper);
         return;
     }
     if($(this).hasClass('disabled')) {
-        alert("Looks like some other work is in progress.Please wait and try again!!");
+        alert(window.i8ln.observation.upload.again);
         event.preventDefault();
         return false; 		 		
     }

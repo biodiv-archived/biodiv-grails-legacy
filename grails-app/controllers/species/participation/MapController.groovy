@@ -324,6 +324,4 @@ public def getLayerAttribution(){
     render mapService.getLayerAttribution(params, response);
 }
 
-
-
 }

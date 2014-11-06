@@ -7,11 +7,13 @@ class CommentController {
 
 	def springSecurityService;
 	def commentService;
+	def observationService;
+	def utilsService;
 
 	@Secured(['ROLE_USER'])
 	def addComment() {
 		params.author = springSecurityService.currentUser;
-		
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		
 		def result = [:]
 		//XXX on ajax pop up login post request is not sending all params 
@@ -85,7 +87,8 @@ class CommentController {
 			if(request.getHeader('X-Auth-Token')) {
 				result['commentList'] = comments
 			}else{
-				result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+				def userLanguage = utilsService.getCurrentLanguage(request);
+				result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments, userLanguage:userLanguage]);
 			}
 		}	
 		return result

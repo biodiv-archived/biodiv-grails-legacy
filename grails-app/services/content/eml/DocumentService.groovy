@@ -24,6 +24,7 @@ import species.License
 import content.Project
 
 import species.sourcehandler.XMLConverter
+import species.AbstractObjectService;
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
@@ -41,19 +42,15 @@ import species.groups.UserGroup;
 import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
 
-class DocumentService {
+class DocumentService extends AbstractObjectService {
 
 	static transactional = false
 	
 	private static final int BATCH_SIZE = 1
 	
 	def documentSearchService
-	def grailsApplication
 	def userGroupService
-	def dataSource
     def sessionFactory
-    def observationService
-	def checklistUtilService
 	def activityFeedService
 	
 	Document createDocument(params) {
@@ -77,7 +74,7 @@ class DocumentService {
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
 		document.locationAccuracy = params.location_accuracy
-
+		document.language = params.locale_language 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 		if(params.areas) {
 			WKTReader wkt = new WKTReader(geometryFactory);
@@ -302,7 +299,8 @@ class DocumentService {
                 Iterator iter = queryResponse.getResults().listIterator();
                 while(iter.hasNext()) {
                     def doc = iter.next();
-                    def documentInstance = Document.get(doc.getFieldValue("id"));
+                    Long id = (doc.getFieldValue("id").tokenize("_")[1]).toLong()
+                    def documentInstance = Document.get(id);
                     if(documentInstance)
                         documentInstanceList.add(documentInstance);
                 }
@@ -400,7 +398,7 @@ class DocumentService {
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
-        def userGroup = observationService.getUserGroup(params);
+        def userGroup = utilsService.getUserGroup(params);
  
         if(params.featureBy == "true"){
 			query = "select document from Document document "
@@ -413,7 +411,7 @@ class DocumentService {
                 queryParams["userGroupId"] = userGroup?.id
 
             }
-            //params.userGroup = observationService.getUserGroup(params);
+            //params.userGroup = utilsService.getUserGroup(params);
             // if(params.userGroup == null) {
                 //filterQuery += "and feat.userGroup is null"
             //}
@@ -523,7 +521,7 @@ class DocumentService {
 				uploadDoc(fileDir, m, resultObv)
 				i++
 				if(i > BATCH_SIZE){
-					checklistUtilService.cleanUpGorm(true)
+					utilsService.cleanUpGorm(true)
 					def obvs = resultObv.collect { Document.read(it) }
 					try{
 						documentSearchService.publishSearchIndex(obvs, true);
@@ -545,7 +543,7 @@ class DocumentService {
 		if(sourceFile.exists()){
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			String contentRootDir = config.speciesPortal.content.rootDir
-			File destinationFile = observationService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+			File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
 			try{
 				Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
 				UFile f = new UFile()

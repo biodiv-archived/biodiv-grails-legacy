@@ -11,7 +11,7 @@
 </sec:ifNotSwitched>
 
 <head>
-<g:set var="title" value="User"/>
+<g:set var="title" value="${g.message(code:'value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_show" />
 <style>
@@ -43,8 +43,7 @@
 		
 						<div style="float: right; margin: 10px 0;">
 							<a class="btn btn-info pull-right"
-								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">View
-								my profile </a>
+								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.view.my.profile" /></a>
 						</div>
 					</div>
 				</div>
@@ -73,7 +72,7 @@
 										src='${createLink(url: user.mainImage().fileName)}' class='logo '/>
 										<div style="clear:both;">
 											<i class="icon-picture"></i>
-											<span>Upload picture of size < 2MB</span>
+											<span><g:message code="suser.edit.upload.picture" />< 2MB</span>
 										</div>
 									</a>
 								</div>
@@ -142,11 +141,10 @@
 								<div
 									class="control-group ${hasErrors(bean: user, field: 'website', 'error')}">
 									<label class="control-label" for="website"><i
-										class="icon-road"></i> <g:message code="suser.website.label"
-											default="Website" /> </label>
+										class="icon-road"></i> <g:message code="suser.website.label" /> </label>
 									<div class="controls">
 										<input type="text" name="website" class="input-xlarge"
-											id="website" value="${user.website ?: null}"  placeholder="Provide a comma separated list of urls">
+											id="website" value="${user.website ?: null}"  placeholder="${g.message(code:'suser.provide.url')}">
 										<div class="help-inline">
 											<g:hasErrors bean="${user}" field="website">
 												<g:renderErrors bean="${user}" as="list" field="website" />
@@ -159,7 +157,7 @@
 									class="control-group ${hasErrors(bean: user, field: 'location', 'error')}">
 									<label class="control-label" for="location"><i
 										class="icon-map-marker"></i> <g:message
-											code="suser.location.label" default="Location" /> </label>
+											code="default.location.label" /> </label>
 									<div class="controls">
 										<input type="text" name="location" class="input-xlarge"
 											id="location" value="${user.location}" />
@@ -179,7 +177,7 @@
 							class="super-section control-group  ${hasErrors(bean: user, field: 'aboutMe', 'error')}"
 							style="clear: both;">
 							<h5>
-								<i class="icon-user"></i>About Me
+								<i class="icon-user"></i><g:message code="default.about.me.label" />
 							</h5>
 							<textarea cols='70' rows='3' style="width: 99%" name="aboutMe"
 								id="aboutMe">
@@ -195,12 +193,12 @@
 						<div class="super-section"
 								style="position: relative; overflow: visible;">
 								<h5>
-									<i class="icon-screenshot"></i>Interests
+									<i class="icon-screenshot"></i><g:message code="suser.edit.intrests" />
 								</h5>
 								
 								<div class="row control-group left-indent">
 									
-										<label class="control-label">Species Groups & Habitats
+										<label class="control-label"><g:message code="default.species.habitats.label" />
 										</label>
 									
 									<div class="filters controls textbox" style="position: relative;">
@@ -212,7 +210,7 @@
 						
 						<div class="super-section" style="clear: both;">
 							<h5>
-								<i class="icon-cog"></i>Settings
+								<i class="icon-cog"></i><g:message code="suser.edit.settings" />
 							</h5>
 							<div
 								class="control-group ${hasErrors(bean: user, field: 'sendNotification', 'error')}">
@@ -264,8 +262,7 @@
 								<div class="controls" style="margin-left: 0px;">
 									<label class="checkbox" style="clear: both;"> <g:checkBox
 											name="sendDigest" value="${user.sendDigest}" />
-										<g:message code='user.sendDigest.label'
-											default='Send me digest email' /> </label>
+								<g:message code='user.sendDigest.label'	/> </label>
 									<div class="help-inline">
 										<g:hasErrors bean="${user}" field="sendDigest">
 											<g:renderErrors bean="${user}" as="list"
@@ -277,10 +274,10 @@
 						</div>
 						<div class="super-section" style="clear: both;">
 							<h5>
-								<i class="icon-cog"></i>Actions
+								<i class="icon-cog"></i><g:message code="suser.edit.actions" />
 							</h5>
                                                         <ul>
-                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }">Change Password</a></li>
+                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
                                                         </ul>
 
                                                 </div>
@@ -350,7 +347,7 @@
 							style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
 							 <a id="userEditFormSubmit"
 								class="btn btn-primary" style="float: right; margin-right: 5px;">
-								Update
+								<g:message code="suser.edit.update" />
 							 </a>
 <%--							<s2ui:submitButton elementId='update' form='userEditForm'--%>
 <%--								messageCode='default.button.update.label'--%>

@@ -17,6 +17,7 @@ class ChecklistController {
 	def observationService
 	def SUserService
 	def chartService
+    def utilsService;
 	
 	def index = {
 		redirect(action:'list', params: params)
@@ -119,6 +120,7 @@ class ChecklistController {
 	}
 
 	private saveAndRender(params, sendMail=true){
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		updateParams(params)
 		return checklistService.saveChecklist(params, sendMail=true)
 	}

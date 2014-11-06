@@ -43,6 +43,7 @@ function rateCallback(ele, successHandler) {
 }
 
 function like(ele, successHandler) {
+var hintLike = $(ele).attr('title');
     return ele.raty({
         number: 1,
         halfShow:false, 
@@ -57,7 +58,8 @@ function like(ele, successHandler) {
                 //cancel rating
             }
         },
-        hints: ['Like'],
+        hints: [hintLike],
+
         starOff  : 'like-icon.png',
         starOn   : 'liked-icon.png'
     });

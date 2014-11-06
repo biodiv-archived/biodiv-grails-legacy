@@ -3,7 +3,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="Documents"/>
+<g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="add_file" />
@@ -34,8 +34,8 @@ input.dms_field {
 
     <% 
     def form_action = uGroup.createLink(action:'save', controller:'document', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-    def form_title = "Create Document"
-    def form_button_name = "Add Document"
+    def form_title = "${g.message(code:'title.create.document')}"
+    def form_button_name = "${g.message(code:'title.document.add')}"
     def form_button_val = "Add Document"
     if(params.action == 'edit' || params.action == 'update'){
     form_action = uGroup.createLink(action:'update', controller:'document', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -64,10 +64,10 @@ input.dms_field {
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'type', 'error')}">
                         <label class="control-label" for="type"><g:message
-                            code="document.type.label" default="Type" /><span class="req">*</span></label>
+                            code="document.type.label" default="${g.message(code:'default.type.label')}" /><span class="req">*</span></label>
                         <div class="controls">
                             <g:select name="type" class="input-block-level"
-                            placeholder="Select document type"
+                            placeholder="${g.message(code:'placeholder.document.select')}"
                             from="${content.eml.Document$DocumentType?.values()}"
                             keys="${content.eml.Document$DocumentType?.values()*.value()}"
                             value="${documentInstance?.type?.value()}" />
@@ -78,11 +78,11 @@ input.dms_field {
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'title', 'error')}">
                         <label class="control-label" for="title"><g:message
-                            code="document.title.label" default="Title" /><span class="req">*</span></label>
+                            code="document.title.label" default="${g.message(code:'default.title.label')}" /><span class="req">*</span></label>
                         <div class="controls">
 
                             <input type="text" class="input-block-level" name="title"
-                            placeholder="Enter the title for the document"
+                            placeholder="${g.message(code:'placeholder.document.enter.title')}"
                             value="${documentInstance?.title}" required />
 
                             <div class="help-inline">
@@ -97,22 +97,31 @@ input.dms_field {
 
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'uFile', 'error')}">
-                        <label class="control-label" for="file"> Resource <span
+                        <label class="control-label" for="file"><g:message code="default.resource.label" /> <span
                                 class="req">*</span></label>
                         <div class="controls" style="">
                             <div class="span2" style="margin-left: 0px;">
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir]]" />
 
+<% def upload_file_text="${g.message(code:'default.upload.file.label')}"
+%>
+ <script type="text/javascript">
+
+$(document).ready(function(){
+//$('.qq-upload-button:first').text('${upload_file_text}')
+        $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
+});
+</script>
                             </div>
-                            <div class="span1">(OR)</div>
+                            <div class="span1"><g:message code="loginformtemplate.or" /></div>
                             <div
                                 class="span6 control-group ${hasErrors(bean: documentInstance, field: 'uri', 'error')}"
                                 style="width: 480px;">
-                                <label class="control-label" for="uri" style="width: 40px;">URL</label>
+                                <label class="control-label" for="uri" style="width: 40px;"><g:message code="default.url.label" /></label>
                                 <div class="controls" style="margin-left: 55px;">
                                     <input type="text" class="input-block-level" name="uri"
-                                    placeholder="Enter URL for the resource"
+                                    placeholder="${g.message(code:'placeholder.document.enter.url')}"
                                     value="${documentInstance?.uri}" />
                                 </div>
                             </div>
@@ -127,11 +136,11 @@ input.dms_field {
 
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
-                        <label class="control-label" for="contributors">Contributors</label>
+                        <label class="control-label" for="contributors"><g:message code="default.contributors.label" /></label>
                         <div class="controls">
                             <g:textField name="contributors" class="input-block-level"
                             value="${documentInstance?.contributors }"
-                            placeholder="Enter the contirbutors for the document" />
+                            placeholder="${g.message(code:'placeholder.document.enter.contributors')}" />
                         </div>
                     </div>
 
@@ -139,17 +148,17 @@ input.dms_field {
 
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
-                        <label class="control-label" for="attribution">Attribution</label>
+                        <label class="control-label" for="attribution"><g:message code="default.attribution.label" /></label>
                         <div class="controls">
                             <g:textField name="attribution" class="input-block-level"
-                            placeholder="Enter the attribution to be given for this document"
+                            placeholder="${g.message(code:'placeholder.document.enter.attribution')}"
                             value="${documentInstance?.attribution}" />
                         </div>
                     </div>
 
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'license', 'error')}">
-                        <label class="control-label" for="License"> License </label>
+                        <label class="control-label" for="License"><g:message code="default.licenses.label" /> </label>
 
                         <div class="controls">
 
@@ -158,11 +167,11 @@ input.dms_field {
                                 <a id="selected_license" class="btn dropdown-toggle btn-mini"
                                     data-toggle="dropdown"> <img
                                     src="${documentInstance.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
-                                    title="Set a license for this file" /> <b class="caret"></b>
+                                    title="${g.message(code:'title.set.license')}" /> <b class="caret"></b>
                                 </a>
 
                                 <ul id="license_options" class="dropdown-menu license_options">
-                                    <span>Choose a license</span>
+                                    <span><g:message code="default.choose.license.label" /></span>
                                     <g:each in="${species.License.list()}" var="l">
                                     <li class="license_option"
                                     onclick="$('#license').val($.trim($(this).text()));$('#selected_license').find('img:first').replaceWith($(this).html());">
@@ -185,12 +194,12 @@ input.dms_field {
 
                     <div
                         class="control-group ${hasErrors(bean: documentInstance, field: 'notes', 'error')}">
-                        <label class="control-label" for="description">Description
+                        <label class="control-label" for="description"><g:message code="default.description.label" />
                         </label>
                         <div class="controls">
 
                             <textarea id="description" name="description"
-                                placeholder="Write a small description about the document.">
+                                placeholder="${g.message(code:'placeholder.document.write.description')}">
                                 ${documentInstance?.notes}
                             </textarea>
 
@@ -220,7 +229,7 @@ CKEDITOR.replace('description', config);
                                             <div
                                                 class="control-group ${hasErrors(bean: documentInstance, field: 'tags', 'error')}">
                                                 <label class="control-label" for='tags'> <i
-                                                        class="icon-tags"></i>Tags
+                                                        class="icon-tags"></i><g:message code="default.tags.label" />
                                                 </label>
                                                 <div class="controls">
                                                     <ul class='file-tags' id="tags" name="tags">
@@ -249,7 +258,7 @@ CKEDITOR.replace('description', config);
                                     <div class="span12 super-section"
                                         style="clear: both; margin-left: 0px;">
                                         <div class="section" style="position: relative; overflow: visible;">
-                                            <h3>Post to User Groups</h3>
+                                            <h3><g:message code="heading.post.user.groups" /></h3>
                                             <div>
                                                 <%
                                                 def docActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
@@ -271,13 +280,13 @@ CKEDITOR.replace('description', config);
                                         <g:if test="${documentInstance?.id}">
                                         <a
                                             href="${uGroup.createLink(controller:'document', action:'show', id:documentInstance.id)}"
-                                            class="btn" style="float: right; margin-right: 30px;"> Cancel
+                                            class="btn" style="float: right; margin-right: 30px;"><g:message code="button.cancel" /> 
                                         </a>
                                         </g:if>
                                         <g:else>
                                         <a
                                             href="${uGroup.createLink(controller:'document', action:'browser')}"
-                                            class="btn" style="float: right; margin-right: 30px;"> Cancel
+                                            class="btn" style="float: right; margin-right: 30px;"><g:message code="button.cancel" /> 
                                         </a>
                                         </g:else>
 
@@ -288,16 +297,13 @@ CKEDITOR.replace('description', config);
                                             <label class="checkbox" style="text-align: left;"> <g:checkBox
                                                 style="margin-left:0px;" name="agreeTerms"
                                                 value="${documentInstance.agreeTerms}" /> <span
-                                                    class="policy-text"> By submitting this form, you agree
-                                                    that the document you are submitting is owned by you, or you have
-                                                    the permission of the copyright holder to distribute on creative
-                                                    commons licenses. </span></label>
+                                                    class="policy-text"> <g:message code="default.submiting.form.label" /> </span></label>
                                         </div>
                                     </div>
 
                                 </form>
                             </div>
-
+<%def alert_msg=g.message(code:'document.error.message')%>
 	<r:script>
 	
 	$(document).ready(function() {
@@ -362,7 +368,8 @@ CKEDITOR.replace('description', config);
 				        $("#documentForm").submit();
 			    	    return false;
 					} else {
-						alert("Please agree to the terms mentioned at the end of the form to submit the document.")
+                        var error_msg="${alert_msg}";
+						alert(error_msg)
 					}       	
 		       	
 	
@@ -414,7 +421,7 @@ CKEDITOR.replace('description', config);
              $("#tags").tagit({
         	select:true, 
         	allowSpaces:true, 
-        	placeholderText:'Add some tags',
+        	placeholderText:'${g.message(code:"placeholder.add.tags")}',
         	fieldName: 'tags', 
         	autocomplete:{
         		source: '/document/tags'

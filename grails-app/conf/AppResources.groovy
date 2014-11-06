@@ -79,6 +79,7 @@ modules = {
         resource url:'/js/flag.js'
 		resource url:'/js/species/abstracttype.js'
 		resource url:'/js/species/relatedStory.js'
+		resource url:'/js/species/search.js'
 	}
 
 	auth {
@@ -213,10 +214,8 @@ modules = {
 	}
 
 	search {
-		dependsOn 'core'
+		dependsOn 'observations_list'
 
-		resource url:'/css/960.css'
-		resource url:'/css/main.css'
 	}
 
 	admin { dependsOn	'core' }
@@ -259,7 +258,7 @@ modules = {
 	
 	slickgrid {
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
-		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
+//		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
 		resource url:'/js/SlickGrid-2.0.2/examples/examples.css'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'

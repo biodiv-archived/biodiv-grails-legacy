@@ -7,7 +7,8 @@ import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
-
+ 
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ActivityFeedService {
 	
 	static final String COMMENT_ADDED = "Added a comment"
@@ -111,12 +112,11 @@ class ActivityFeedService {
 	
 	
 	static transactional = false
-	
+
+    def utilsService
 	def grailsApplication
 	def springSecurityService
-	def observationService
-	def userGroupService
-	
+	def messageSource;
 	def getActivityFeeds(params){
 //		log.debug params;
 		def feeds = ActivityFeed.fetchFeeds(params)
@@ -167,21 +167,7 @@ class ActivityFeedService {
 	}
 	
 	def getDomainObject(className, id){
-		def retObj = null
-		if(!className || className.trim() == ""){
-			return retObj
-		}
-		
-		id = id.toLong()
-		switch (className) {
-			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
-				retObj = [objectType:className, id:id]
-				break
-			default:
-				retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-				break
-		}
-		return retObj
+        return utilsService.getDomainObject(className, id);
 	}
 	
 	// this will return class of object in general used in comment framework
@@ -290,34 +276,50 @@ class ActivityFeedService {
 				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
-				activityTitle = getResType(activityRootObj).capitalize() + " flagged"
+			     def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =utilsService.getResType(activityRootObj).capitalize();
+				activityTitle = messageSource.getMessage("info.flagged", messagesourcearg, LCH.getLocale())
 				text = feedInstance.activityDescrption
 				break
             case REMOVED_FLAG:
-				activityTitle = getResType(activityRootObj).capitalize() + " flag removed" 
+                def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =utilsService.getResType(activityRootObj).capitalize();
+				activityTitle = messageSource.getMessage("info.flag.removed", messagesourcearg, LCH.getLocale())
 				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
 				activityTitle = OBSERVATION_UPDATED
-				text = "User updated the observation details"
+				text = messageSource.getMessage("info.user.updated", null, LCH.getLocale())
 				break
 			case USERGROUP_CREATED:
-				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " created"
+			def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
+				activityTitle = messageSource.getMessage("info.group.created", messagesourcearg, LCH.getLocale())
 				break
 			case USERGROUP_UPDATED:
-				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " updated"
+				def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
+				activityTitle = messageSource.getMessage("info.group.updated", messagesourcearg, LCH.getLocale())
 				break
 			case MEMBER_JOINED:
-				activityTitle = "Joined group " + getUserGroupHyperLink(activityRootObj)
+			def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
+				activityTitle = messageSource.getMessage("info.joined.group", messagesourcearg, LCH.getLocale())
 				break
 			case MEMBER_ROLE_UPDATED:
-				activityTitle = getUserHyperLink(activityDomainObj, feedInstance.fetchUserGroup()) + "'s role updated"
+			def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =getUserHyperLink(activityDomainObj, feedInstance.fetchUserGroup());
+				activityTitle = messageSource.getMessage("info.role.updated", messagesourcearg, LCH.getLocale())
 				break
 			case MEMBER_LEFT:
-				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
+			def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =getUserGroupHyperLink(activityRootObj);
+				activityTitle = messageSource.getMessage("info.left.group", messagesourcearg, LCH.getLocale())
 				break
 			case RECOMMENDATION_REMOVED:
-				activityTitle = "Removed species name " + feedInstance.activityDescrption
+			def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =feedInstance.activityDescrption;
+				activityTitle = messageSource.getMessage("info.removed.name", messagesourcearg, LCH.getLocale())
 				break
 			
 			case [RESOURCE_POSTED_ON_GROUP, RESOURCE_REMOVED_FROM_GROUP]:
@@ -338,7 +340,7 @@ class ActivityFeedService {
                     activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
                 }
                 else {
-                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + " in " + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + messageSource.getMessage("info.in", null, LCH.getLocale()) + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
                 }
                 text = feedInstance.activityDescrption
                 break
@@ -367,15 +369,17 @@ class ActivityFeedService {
 				def rootObj = getDomainObject(comment.rootHolderType,comment.rootHolderId)
 				if(rootObj.instanceOf(Checklists)){
 					def obv = getDomainObject(comment.commentHolderType,comment.commentHolderId)
-					result += " on " + getSpeciesNameHtmlFromReco(obv.maxVotedReco, params) + ": Row " + (rootObj.observations.indexOf(obv) + 1) 
+					def messagesourcearg = new Object[1];
+                 messagesourcearg[0] =getSpeciesNameHtmlFromReco(obv.maxVotedReco, params);
+					result += messageSource.getMessage("info.on.row", messagesourcearg, LCH.getLocale()) + (rootObj.observations.indexOf(obv) + 1) 
 				}
 				break
 			case SpeciesField.class.getCanonicalName():
 				SpeciesField sf = getDomainObject(comment.commentHolderType,comment.commentHolderId)
-				result += " on species field: " +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
+				result += messageSource.getMessage("info.species.field", null, LCH.getLocale()) +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
 				break
 			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
-				result += " on species field: " + comment.commentHolderType.split("_")[1]
+				result += messageSource.getMessage("info.species.field", null, LCH.getLocale()) + comment.commentHolderType.split("_")[1]
 				break
 			default:
 				break
@@ -395,7 +399,7 @@ class ActivityFeedService {
 		def speciesId = reco?.taxonConcept?.findSpeciesId();
 		String sb = ""
 		if(speciesId != null){
-			sb =  '<a href="' + observationService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
+			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
             //sb = sb.replaceAll('"|\'','\\\\"')
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
@@ -406,18 +410,13 @@ class ActivityFeedService {
 	}
 	
 	def getUserHyperLink(user, userGroup){
-		String sb = '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
+		String sb = '<a href="' +  utilsService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
         return sb;
         //return sb.replaceAll('"|\'','\\\\"')
 	}
 	
 	def getUserGroupHyperLink(userGroup){
-        if(!userGroup){
-            return ""
-        }
-		String sb = '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
-        return sb;
-        //return sb.replaceAll('"|\'','\\\\"')
+        return utilsService.getUserGroupHyperLink(userGroup);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -444,14 +443,14 @@ class ActivityFeedService {
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(!isBulkPull && sendMail){
-				observationService.sendNotificationMail(activityType, r, null, null, af)
+				utilsService.sendNotificationMail(activityType, r, null, null, af)
 			}
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
 			af = addActivityFeed(ug, ug, author, activityType, description, true)
             if(sendMail)
-			    observationService.sendNotificationMail(activityType, ug, null, null, af)
+			    utilsService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
 		return af
 	}
@@ -495,36 +494,14 @@ class ActivityFeedService {
         return res 
     }	
 
-
-    def getResType(r) {
-        def desc = ""
-        switch(r.class.canonicalName){
-            case Checklists.class.canonicalName:
-            desc += "checklist"
-            break
-            default:
-            desc += r.class.simpleName.toLowerCase()
-            break
-        }
-        return desc
-    }
-    def getDescriptionForFeature(r, ug, isFeature)  {
-        def desc = isFeature ? "Featured " : "Removed featured "
-        String temp = getResType(r)
-        desc+= temp
-        if(ug == null) {
-            return desc
-        }
-        desc +=  isFeature ? " to group" : " from group"
-        return desc
-
-
+    def getDescriptionForFeature(r, ug, boolean isFeature)  {
+        return utilsService.getDescriptionForFeature(r, ug, isFeature);
     }
 /*
     def getMailSubject(r, isFeature) {
         def desc = ""
         desc += isFeature ? "Featured " : "Removed featured "
-        String temp = getResType(r)
+        String temp = utilsService.getResType(r)
         desc+= temp
         return desc
      }*/

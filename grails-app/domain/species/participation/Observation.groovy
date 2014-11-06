@@ -27,6 +27,7 @@ import species.Species;
 class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
+    def utilsService;
 	def commentService;
 	def springSecurityService;
     def resourceService;
@@ -80,6 +81,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
     
+    // Language
+    Language language;
+
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
 
@@ -96,6 +100,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
+		language nullable:false
         featureCount nullable:false
 		latitude nullable: false
 		longitude nullable:false
@@ -451,7 +456,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		//def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
 		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 		String base = config.speciesPortal.observations.serverURL
-		res[ObvUtilService.AUTHOR_URL] = ObvUtilService.createHardLink('user', 'show', author.id) 
+		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id) 
 		res[ObvUtilService.AUTHOR_NAME] = author.name
 		return res 
 	}

@@ -6,7 +6,7 @@
 
 		<div
 			class="control-group ${hasErrors(bean: uFileInstance, field: 'path', 'error')}">
-			<label class="control-label" for="file"> File <span
+			<label class="control-label" for="file"> <g:message code="default.file.label" /> <span
 							class="req">*</span></label>
 			<div class="controls">
 

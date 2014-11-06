@@ -70,7 +70,9 @@ class NewsletterSearchService extends AbstractSearchService {
 			log.debug "Reading Newsletter : "+obv.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, obv.id.toString());
+                println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
+				doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+ obv.id.toString());
+			    doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
 				doc.addField(searchFieldsConfig.NAME, obv.title);
 				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.date);
 				doc.addField(searchFieldsConfig.UPDATED_ON, obv.date);

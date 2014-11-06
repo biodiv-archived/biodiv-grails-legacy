@@ -6,7 +6,7 @@
 <div class="activityFeed-container">
 <g:if test="${feedType == ActivityFeedService.SPECIFIC}">
 	<feed:showSpecificFeed
-			model="['feedInstance' : feedInstance, 'feedType':feedType, 'feedPermission':feedPermission]" />
+			model="['feedInstance' : feedInstance, 'feedType':feedType, 'feedPermission':feedPermission,'userLanguage':userLanguage]" />
 </g:if>
 
 <g:elseif test="${feedType == ActivityFeedService.GROUP_SPECIFIC}">

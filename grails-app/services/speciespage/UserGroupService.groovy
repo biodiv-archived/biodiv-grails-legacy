@@ -45,7 +45,6 @@ import species.auth.Role;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
-import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
@@ -63,19 +62,17 @@ class UserGroupService {
 
 	static transactional = false
 
+    def utilsService
 	def aclPermissionFactory
 	def aclService
 	def aclUtilService
 	def springSecurityService
 	def dataSource;
-	def observationService;
 	def grailsApplication;
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	def speciesService;
 	def SUserService;
-    def grailsLinkGenerator;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -99,6 +96,7 @@ class UserGroupService {
 		userGroup.properties = params;
 		userGroup.name = userGroup.name?.capitalize();
 		userGroup.webaddress = URLEncoder.encode(userGroup.name.toLowerCase().replaceAll(" ", "_"), "UTF-8");
+		userGroup.language = params.locale_language;
 
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
@@ -383,7 +381,7 @@ class UserGroupService {
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
-			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			def groupId = utilsService.getSpeciesGroupIds(params.sGroup)
 			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			}else{
@@ -451,7 +449,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
-			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
+			//utilsService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
@@ -477,7 +475,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false, sendMail);
-			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
+			//utilsService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}
@@ -538,53 +536,7 @@ class UserGroupService {
         return count;
 	}
 	
-	def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
 
-		if(!userGroupInstance) return;
-        log.debug params
-        params['userGroup'] = userGroupInstance;
-        log.debug params.getClass()
-        return observationService.getFilteredObservations(params, max, offset, isMapView); 
-/*
-		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
-		queryParts.queryParams['userGroup'] = userGroupInstance
-		queryParts.queryParams['isDeleted'] = false;
-
-		String query = queryParts.query;
-		String userGroupQuery = " join obv.userGroups userGroup "
-		queryParts.filterQuery += " and userGroup=:userGroup "
-		if(isMapView) {
-			query = queryParts.mapViewQuery + userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
-		} else {
-			query += userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
-			if(max != -1)
-				queryParts.queryParams["max"] = max
-			if(offset != -1)
-				queryParts.queryParams["offset"] = offset
-		}
-
-		//		String countQuery = "select count(*) from Observation observation " +
-		//			"join observation.userGroups userGroup " +
-		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
-		//
-		//		def countParams = queryParts.queryParams.clone();
-		//		countParams.remove("max");
-		//		println countParams;
-		//		println queryParts.mapViewQuery
-		//		def totalObservationInstanceList = Observation.executeQuery(queryParts.mapViewQuery, countParams)
-		//		def count = totalObservationInstanceList.size()
-
-		//		String query = "select observation from Observation observation " +
-		//			"join observation.userGroups userGroup " +
-		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
-		log.debug query;
-        log.debug queryParts.queryParams;
-
-		def result=['userGroupInstance':userGroupInstance, 'observationInstanceList': Observation.executeQuery(query, queryParts.queryParams), 'queryParams':queryParts.queryParams, 'activeFilters':queryParts.activeFilters, 'showTags':false];
-
-		return result;
-        */
-	}
 
 
 	////////////////////MEMBERS RELATED/////////////////////////
@@ -939,104 +891,9 @@ class UserGroupService {
 		}	
 	}
 	
-	
 	def userGroupBasedLink(attrs) {
-		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
-
-		//println '-------------'
-		//println attrs
-		String url = "";
-
-        if(attrs.userGroupInstance) attrs.userGroup = attrs.userGroupInstance
-		if(attrs.userGroup && attrs.userGroup.id) {
-			attrs.webaddress = attrs.userGroup.webaddress
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');
-			String mappingName = attrs.remove('mapping')?:'userGroupModule';
-			def userGroup = attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
-			boolean absolute = attrs.remove('absolute');
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
-				String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-				//				println url
-				//				println onlyGroupUrl
-				url = url.replace(onlyGroupUrl, "");
-			} else {
-
-				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
-					String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-					//					println url
-					//					println onlyGroupUrl
-					url = url.replace(onlyGroupUrl, "");
-				} else {
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
-					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
-				}
-			}
-
-		} else if(attrs.userGroupWebaddress) {
-			attrs.webaddress = attrs.userGroupWebaddress
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');
-			String mappingName = attrs.remove('mapping')?:'userGroupModule';
-			def userGroup = attrs.remove('userGroup');
-			String userGroupWebaddress = attrs.remove('userGroupWebaddress');
-			boolean absolute = attrs.remove('absolute');
-			def userGroupController = new UserGroupController();
-			userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
-				String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-				//				println url
-				//				println onlyGroupUrl
-				url = url.replace(onlyGroupUrl, "");
-			} else {
-
-				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
-					String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
-					//					println url
-					//					println onlyGroupUrl
-					url = url.replace(onlyGroupUrl, "");
-				} else {
-					url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
-					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
-				}
-			}
-
-		} else {
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');
-			attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
-			String mappingName = attrs.remove('mapping');
-			boolean absolute = attrs.remove('absolute');
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-			} else {
-				url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-			}
-		}
-		//println url;
-		return url;
-	}
+        return utilsService.userGroupBasedLink(attrs);
+    }
 
 	def nameTerms(params) {
 		return getUserGroupSuggestions(params);

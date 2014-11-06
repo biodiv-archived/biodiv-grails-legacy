@@ -4,7 +4,7 @@
     <div class="close_button close_user_group"></div>
     </g:if>
     <div class="section" style="position: relative; overflow: visible;">
-        <h3>Post to User Groups</h3>
+        <h3><g:message code="heading.post.user.groups" /></h3>
         <div>
             <%
             def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
