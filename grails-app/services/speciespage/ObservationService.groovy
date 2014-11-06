@@ -73,7 +73,7 @@ import species.AbstractObjectService;
 import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
-import org.springframework.web.context.request.RequestContextHolder
+
 
 class ObservationService extends AbstractObjectService {
 
@@ -1270,7 +1270,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
-        if(request == null) request = RequestContextHolder.currentRequestAttributes().request
+        
         def source = m.source;
         def mailSubject = ""
         def activitySource = ""
