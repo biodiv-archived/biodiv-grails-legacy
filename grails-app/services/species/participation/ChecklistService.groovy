@@ -150,12 +150,14 @@ class ChecklistService {
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
 				
 				saveAttributions(params, checklistInstance)
-				observationService.saveObservationAssociation(params, checklistInstance)
 				
 				if(sendMail)
 					observationService.sendNotificationMail(mailType, checklistInstance, null, params.webaddress);
 				
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
+
+				observationService.saveObservationAssociation(params, checklistInstance)
+
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
 				return ['success' : true, 'msg':'Successfully saved checklist.', checklistInstance:checklistInstance]
@@ -185,7 +187,7 @@ class ChecklistService {
             
 		//Checklists.withTransaction() {
 			
-			checklistInstance = Checklists.get(checklistInstance.id)
+			//checklistInstance = Checklists.get(checklistInstance.id)
 			log.debug "adding observation to checklist " + checklistInstance.title
 			Set updatedObv = new HashSet()
 			Set newObv = new HashSet()
@@ -230,11 +232,13 @@ class ChecklistService {
                         }
                     }
 					obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
+                    log.debug "saving observation ${obsParams}"
 					def res = observationService.saveObservation(obsParams, false)
 					Observation observationInstance = res.observationInstance
 					saveReco(observationInstance, m, checklistInstance)
 					
 					if(!oldObvId){
+                        log.debug "Adding ${observationInstance} to checklist ${checklistInstance}"
 						checklistInstance.addToObservations(observationInstance)
 						newObv.add(observationInstance.id)
 					}
@@ -251,11 +255,16 @@ class ChecklistService {
 					}
 				}
 			}
+            log.debug "All checklist observations  ${checklistInstance.observations.size()}";
 			//updating obv count
 			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
-			if(!checklistInstance.save(flush:true) || checklistInstance.hasErrors()){
+            log.debug "Updating checklist count to ${checklistInstance.speciesCount}"
+            if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
+            } else {
 				checklistInstance.errors.allErrors.each { log.error it }
 			}
+            log.debug "Updating checklist count to ${checklistInstance.getPersistentValue('speciesCount')}"
+            
 		//}
 			
 		log.debug "saved checklist observations"
