@@ -277,7 +277,7 @@
             var $errorBlock = $sf.$element.find('.editable-error-block');
 
             if(data.errors && data.errors.length > 0) {
-                data.msg += "<div class='alert-error'>window.i8ln.species.abstracteditabletype.er</div><ul class='alert-error'>";
+                data.msg += "<div class='alert-error'>"+ window.i8ln.species.abstracteditabletype.er +"</div><ul class='alert-error'>";
                 $.each(data.errors, function(i, v) {
                     data.msg += "<li>"+v+"</li>"
                 });

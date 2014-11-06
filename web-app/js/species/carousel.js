@@ -1,3 +1,15 @@
+function langwrap(data,dataLanguage){
+    console.log(dataLanguage);
+    var userLanguageId = $('#userLanguage').val();
+    var result;
+    if(dataLanguage[0]['id'] == userLanguageId){
+        return data;
+    }else{
+        result = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataLanguage[0]['twoLetterCode']+'</a>';
+        result += '<div class="hide">'+data+'</div>';
+        return result;
+    }
+}
 var itemLoadCallback = function(carousel, state) {
         carousel.last = carousel.last?carousel.last:3;
         var limit = carousel.last - carousel.first + 1
@@ -156,7 +168,7 @@ var getSnippetHTML = function(carousel, item) {
         for(var i=0; i<item.featuredNotes.length;i++) {
         var featuredNotesItem = item.featuredNotes[i]; 
         eleHTML +=          '<div class="featured_notes linktext">'
-                            + featuredNotesItem.notes
+                            + langwrap(featuredNotesItem.notes,item.language)
                             + '<small><div class="ellipsis" style="margin:0px;height:'+(item.summary?20:0)+'px;">'+item.summary+'</div><div class="ellipsis" style="height:20px;"> Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
 
         if(featuredNotesItem.userGroupUrl) {

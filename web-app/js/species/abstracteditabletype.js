@@ -291,7 +291,7 @@
             var $errorBlock = $form? $form.find('.editable-error-block') : $('<div class="errors"></div>').appendTo($container);
 
             if(data.errors && data.errors.length > 0) {
-                data.msg += "<div class='alert-error'>window.i8ln.species.abstracteditabletype.er</div><ul class='alert-error'>";
+                data.msg += "<div class='alert-error'>"+ window.i8ln.species.abstracteditabletype.er +"</div><ul class='alert-error'>";
                 $.each(data.errors, function(i, v) {
                     data.msg += "<li>"+v+"</li>"
                 });
