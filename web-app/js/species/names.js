@@ -101,7 +101,7 @@ function initializeNameSuggestion() {
     $('.commonName').autofillNames({
         'nameFilter':'commonNames',
         focus: function( event, ui ) {
-            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+            //$(this).val( ui.item.label.replace(/<.*?>/g,"") );
             //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         }, select: function( event, ui ) {
@@ -124,7 +124,7 @@ function initializeNameSuggestion() {
         'nameFilter':'scientificNames',
         focus: function( event, ui ) {
             $(this).closest(".sciNameDiv").find(".canName").val("");
-            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+            //$(this).val( ui.item.label.replace(/<.*?>/g,"") );
             //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         },
