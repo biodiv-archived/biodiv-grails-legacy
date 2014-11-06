@@ -467,7 +467,7 @@ class TaxonController {
             try {
                 for (int i=0; i< t.size(); i++) {
                     if(!t[TaxonomyRank.list()[i].ordinal()]) {
-                        errors << TaxonomyRank.list()[i].value() + " is missing";
+                        errors << g.message(error:TaxonomyRank.list()[i]) +" "+ messageSource.getMessage("taxon.missing", null, RCU.getLocale(request));
                     }
                 }
 
