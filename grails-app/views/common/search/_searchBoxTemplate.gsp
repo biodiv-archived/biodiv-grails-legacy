@@ -98,6 +98,10 @@ $(document).ready(function() {
 	}
 
     window.i8ln = {
+        "text" : {
+                "featured" : "${g.message(code:'text.featured.on')}",
+                "in_group" : "${g.message(code:'text.in.group')}"                
+        },
         "button" :{
                 "delete" : "${g.message(code:'default.button.delete.label')}",
                 "edit"   : "${g.message(code:'default.button.edit.label')}"
