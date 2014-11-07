@@ -996,6 +996,8 @@ class SpeciesController extends AbstractObjectController {
     def pullImageForSpecies() {
         log.debug params
         //pass that same species
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         def species = Species.get(params.speciesId.toLong())
         def out = speciesService.updateSpecies(params, species)
         def result

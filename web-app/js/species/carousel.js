@@ -5,7 +5,7 @@ function langwrap(data,dataLanguage){
     if(dataLanguage[0]['id'] == userLanguageId){
         return data;
     }else{
-        result = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataLanguage[0]['twoLetterCode']+'</a>';
+        result = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataLanguage[0]['twoLetterCode'].toUpperCase()+'</a>';
         result += '<div class="hide">'+data+'</div>';
         return result;
     }
@@ -169,10 +169,10 @@ var getSnippetHTML = function(carousel, item) {
         var featuredNotesItem = item.featuredNotes[i]; 
         eleHTML +=          '<div class="featured_notes linktext">'
                             + langwrap(featuredNotesItem.notes,item.language)
-                            + '<small><div class="ellipsis" style="margin:0px;height:'+(item.summary?20:0)+'px;">'+item.summary+'</div><div class="ellipsis" style="height:20px;"> Featured on <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
+                            + '<small><div class="ellipsis" style="margin:0px;height:'+(item.summary?20:0)+'px;">'+item.summary+'</div><div class="ellipsis" style="height:20px;"> '+window.i8ln.text.featured+' <b>'+$.datepicker.formatDate('MM dd, yy',new Date(featuredNotesItem.createdOn))+'</b>'
 
         if(featuredNotesItem.userGroupUrl) {
-        eleHTML +=          ' in the group <b><a href="'+featuredNotesItem.userGroupUrl+'">'+featuredNotesItem.userGroupName+'</a></b>'
+        eleHTML +=          ' '+window.i8ln.text.in_group+' <b><a href="'+featuredNotesItem.userGroupUrl+'">'+featuredNotesItem.userGroupName+'</a></b>'
         }
 
         eleHTML +=           '</div></small>'
