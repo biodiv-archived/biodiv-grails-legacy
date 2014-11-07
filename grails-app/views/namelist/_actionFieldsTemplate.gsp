@@ -1,10 +1,15 @@
-<% def span_final = 8; def input_width = 156; %>
+<% def span_final = 6; def input_width = 123; %>
 <g:if test="${showArrow}">
 	<% span_final = 6; input_width = 123;%>
 	<div class="span2" style="margin:0px;">
-		<button class="btn btn-mini"><i class="icon-chevron-left"></i></button>
+		<button class="btn btn-mini" ><i class="icon-chevron-left"></i></button>
 	</div>
-</g:if>
+    </g:if>
+    <g:else>
+    <div class="span2" style="margin:0px;">
+        <button class="btn btn-mini" onclick="showNewNamePopup()" title="Add new name"><i class="icon-plus-sign"></i></button>
+    </div>
+</g:else>
 <div class="span2" style="margin:0px;">
 	<button class="btn btn-mini"><i class="icon-trash"></i></button>
 </div>

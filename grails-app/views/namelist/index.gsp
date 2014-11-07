@@ -390,7 +390,7 @@
                 <option value="eol">EoL</option>
                 <option value="worms">WoRMS</option>
             </select>
-            <button class="btn btn-primary queryString span12" style="margin:0px; margin-bottom: 6px;" onClick='searchDatabase()'>Query <i class="icon-search icon-white" style="margin-left: 10px;"></i></button>
+            <button class="btn btn-primary queryString span12" style="margin:0px; margin-bottom: 6px;" onClick='searchDatabase(false)'>Query <i class="icon-search icon-white" style="margin-left: 10px;"></i></button>
             </div>
         </div>
 
@@ -422,6 +422,7 @@
 </div>
 
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
+    <g:render template="/namelist/newNamePopupTemplate" model="[]"/>
     
     <div id="searching" style="font-weight:bold">Loading...</div>
 <script type="text/javascript">

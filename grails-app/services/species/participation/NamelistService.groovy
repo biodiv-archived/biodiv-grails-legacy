@@ -117,27 +117,16 @@ class NamelistService {
         results.result.each { r ->
             Map temp = new HashMap()
             Map id_details = new HashMap()
-            //println " Starting result ======= ${++i}"
-            //println r.id.text().getClass()
-            temp['externalId'] = r.id.text()
-            //println r.name.text()
-            temp['name'] = r.name.text()
-            //println r.rank.text()
-            temp['rank'] = r.rank.text().toLowerCase()
-            temp[r.rank.text().toLowerCase()] = r.name.text()
-            //println r.name_status.text()
-            id_details[r.name.text()] = r.id.text();
-            temp['nameStatus'] = r.name_status.text().tokenize(' ')[0]
-            //println r.author.text()
-            temp['authorString'] = r.author.text()
-            //println r.source_database.text()
-            temp['sourceDatabase'] = r.source_database.text()
-            //println r.source_database_url.text()
-            //println r.url.text()
-            //println "==GETTING GROUP==" 
+            temp['externalId'] = r?.id?.text()
+            temp['name'] = r?.name?.text()
+            temp['rank'] = r?.rank?.text()?.toLowerCase()
+            temp[r?.rank?.text()?.toLowerCase()] = r?.name?.text()
+            id_details[r?.name?.text()] = r?.id?.text();
+            temp['nameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
+            temp['authorString'] = r?.author?.text()
+            temp['sourceDatabase'] = r?.source_database?.text()
 			
-            temp['group'] = r.classification.taxon[0].name.text()
-            //println r.classification.taxon[0].name.text()
+            temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
 
             if(searchBy == 'id') {
                 //println "============= references  "
@@ -149,8 +138,8 @@ class NamelistService {
                 println "============= higher taxon  "
                 r.classification.taxon.each { t ->
                     //println t.rank.text() + " == " + t.name.text()
-                    temp[t.rank.text().toLowerCase()] = t.name.text()
-                    id_details[t.name.text()] = t.id.text()
+                    temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
+                    id_details[t?.name?.text()] = t?.id?.text()
                 }
 
                 println "============= child taxon  "
@@ -172,8 +161,6 @@ class NamelistService {
             }
             temp['id_details'] = id_details
             finalResult.add(temp);
-			
-            println "============End result========"
         }
         return finalResult
     }
@@ -184,7 +171,7 @@ class NamelistService {
         Map temp = new HashMap()
         temp['externalId'] = result['usageKey'];
         temp['name'] = result['scientificName'];
-        temp['rank'] = result['rank'].toLowerCase();
+        temp['rank'] = result['rank']?.toLowerCase();
         temp['nameStatus'] = '';
         temp['sourceDatabase'] = '';
         temp['group'] = result['kingdom'];
@@ -197,7 +184,7 @@ class NamelistService {
             temp['class'] = result['class']; 
             temp['genus'] = result['kingdom']; 
             temp['species'] = result['species']; 
-            temp['nameStatus'] = result['taxonomicStatus'].toLowerCase();
+            temp['nameStatus'] = result['taxonomicStatus']?.toLowerCase();
             temp['sourceDatabase'] = result['accordingTo'];
             temp['authorString'] = result['authorship'];
         }

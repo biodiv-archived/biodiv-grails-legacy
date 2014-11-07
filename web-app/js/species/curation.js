@@ -180,7 +180,7 @@ function populateNameDetails(data){
 }
 
 //takes name for search
-function searchDatabase() {
+function searchDatabase(addNewName) {
     $("body").css("cursor", "progress");
     $("#searching").show();
     $("HTML").mousemove(function(e) {
@@ -189,7 +189,14 @@ function searchDatabase() {
             "left" : e.pageX + 15
         });
     });
-    var name = $(".name").val();
+    var name = "";
+    if(addNewName) {
+        name = $(".newName").val();
+        $("#newNamePopup").modal("hide");
+        $('.queryDatabase option[value="col"]').attr("selected", "selected");
+    } else {
+        name = $(".name").val();
+    }
     if(name == "") {
         alert("Please provide a name to search!!");
         return;
@@ -215,7 +222,7 @@ function searchDatabase() {
                 console.log("======SUCCESS====");
                 console.log(data); 
             } else {
-                alert("Sorry no results found from "+ $("#queryDatabase option:selected").text());
+                alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
             }
         }, error: function(xhr, status, error) {
             $("#searching").hide();
@@ -236,7 +243,7 @@ function fillPopupTable(data, $ele) {
     $ele.find("table tr td").remove();
     var rows = "";
     $.each(data, function(index, value) {
-        rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onClick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
+        rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
     });
     $ele.find("table").append(rows);
     return
@@ -462,3 +469,7 @@ $('.add_new_row').click(function(){
     var html = $('#newRowTmpl').render(p);
     $(me).before(html);
 });
+
+function showNewNamePopup() {
+    $("#newNamePopup").modal("show");
+}

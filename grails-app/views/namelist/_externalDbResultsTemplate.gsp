@@ -1,13 +1,21 @@
 <style type="text/css">
 	#externalDbResults {
 		width: 900px;
-    }
-    .extDbResTable {
-        text-align:center;
-    }
-    .modal {
         left:39%;
     }
+    .extDbResTable {
+        border-bottom: 1px solid lightgray;
+        text-align:center;
+    }
+    .extDbResTable td {
+        border:1px solid lightgray;
+        border-bottom:0px;
+        border-top:0px;
+    }
+    .extDbResTable th {
+        border:1px solid lightgray;
+    }
+
 </style>
 
 <div id="externalDbResults" class="modal fade">

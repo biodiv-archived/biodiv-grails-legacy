@@ -6,6 +6,7 @@ import species.TaxonomyRegistry;
 import species.Classification;
 import species.TaxonomyDefinition;
 import grails.plugin.springsecurity.annotation.Secured;
+import species.NamesParser;
 
 class NamelistController {
     
@@ -59,6 +60,11 @@ class NamelistController {
         //[[name:'aa', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', colId:34, rank:4, group:'plant', sourceDatabase:'sb']]
         println "====SEARCH COL====== " + params.name+"====== "+ params.dbName
         //SWITCH CASE BASED ON DB NAME [col,gbif,ubio,tnrs,gni,eol,worms] and if value "databaseName" - means no database selected to query
+        List<String> givenNames = [params.name]
+        NamesParser namesParser = new NamesParser();
+        List<TaxonomyDefinition> parsedNames = namesParser.parse(givenNames);
+        println "===========PARSED NAMES========= " + parsedNames[0].canonicalForm
+        params.name = parsedNames[0].canonicalForm
         def dbName = params.dbName
         List res = []
         switch (dbName) {

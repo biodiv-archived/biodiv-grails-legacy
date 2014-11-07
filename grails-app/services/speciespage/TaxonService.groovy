@@ -840,11 +840,9 @@ class TaxonService {
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
          } 
-        /* JUST FOR DEMO
         if(!reg.isContributor()) {
             return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, RCU.getLocale(request)), errors:errors]
         }
-        */
         def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
             projections {
                 count('id')
