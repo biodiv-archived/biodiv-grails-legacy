@@ -31,10 +31,10 @@
     <%
         def lockButton
         if(r.showLock){
-            lockButton = ${g.message(code:"button.lock")}
+            lockButton = g.message(code:"button.lock")
         }
         else{
-            lockButton = ${g.message(code:"button.unlock")}
+            lockButton = g.message(code:"button.unlock")
         }
     %>
     <a class="lockObvId pull-right btn btn-primary btn-small ${(lockButton == 'Lock' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
