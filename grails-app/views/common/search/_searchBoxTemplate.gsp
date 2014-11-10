@@ -100,7 +100,9 @@ $(document).ready(function() {
     window.i8ln = {
         "text" : {
                 "featured" : "${g.message(code:'text.featured.on')}",
-                "in_group" : "${g.message(code:'text.in.group')}"                
+                "in_group" : "${g.message(code:'text.in.group')}",
+                "post"     : "${g.message(code:'text.post')}",
+                "posting"     : "${g.message(code:'text.posting')}"             
         },
         "button" :{
                 "delete" : "${g.message(code:'default.button.delete.label')}",
