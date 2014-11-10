@@ -446,7 +446,7 @@ class ActivityFeedService {
 		def af 
 		resources.each { r->
 			def description = getDescriptionForResourcePull(r, isPost)
-			af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
+			af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(!isBulkPull && sendMail){
