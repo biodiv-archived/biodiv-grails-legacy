@@ -255,6 +255,11 @@ class ActivityFeedService {
 		}
 	}
 	
+	def getLocalizedMessage(activityType){
+		activityType = activityType.toLowerCase().replaceAll(' ','.')
+		return messageSource.getMessage(activityType, null,LCH.getLocale())
+	}
+
 	def getContextInfo(ActivityFeed feedInstance, params=null){
 		
 		def activityType = feedInstance.activityType
@@ -266,7 +271,7 @@ class ActivityFeedService {
 		//log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
 		switch (activityType) {
 			case COMMENT_ADDED:
-				activityTitle = COMMENT_ADDED  + getCommentContext(activityDomainObj, params)
+				activityTitle = getLocalizedMessage(COMMENT_ADDED)  + getCommentContext(activityDomainObj, params)
 				text = activityDomainObj.body
 				break
 			case SPECIES_RECOMMENDED:
@@ -345,11 +350,11 @@ class ActivityFeedService {
                 text = feedInstance.activityDescrption
                 break
             case SPECIES_UPDATED:
-                activityTitle = SPECIES_UPDATED
+                activityTitle = getLocalizedMessage(SPECIES_UPDATED)
                 break
 
 			default:
-				activityTitle = activityType
+				activityTitle = getLocalizedMessage(activityType)
 				break
 		}
 		
