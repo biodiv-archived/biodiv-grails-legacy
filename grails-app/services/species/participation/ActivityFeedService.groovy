@@ -256,7 +256,8 @@ class ActivityFeedService {
 	}
 	
 	def getLocalizedMessage(activityType){
-		activityType = activityType.toLowerCase().replaceAll(' ','.')
+		activityType = Arrays.asList(activityType.split(":"));
+		activityType = activityType[0].trim().toLowerCase().replaceAll(' ','.')
 		return messageSource.getMessage(activityType, null,LCH.getLocale())
 	}
 
@@ -275,10 +276,10 @@ class ActivityFeedService {
 				text = activityDomainObj.body
 				break
 			case SPECIES_RECOMMENDED:
-				activityTitle = SPECIES_RECOMMENDED + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				activityTitle = getLocalizedMessage(SPECIES_RECOMMENDED) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case SPECIES_AGREED_ON:
-				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				activityTitle =  getLocalizedMessage(SPECIES_AGREED_ON) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
 			     def messagesourcearg = new Object[1];
@@ -293,7 +294,7 @@ class ActivityFeedService {
 				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
-				activityTitle = OBSERVATION_UPDATED
+				activityTitle = getLocalizedMessage(OBSERVATION_UPDATED)
 				text = messageSource.getMessage("info.user.updated", null, LCH.getLocale())
 				break
 			case USERGROUP_CREATED:
@@ -354,6 +355,7 @@ class ActivityFeedService {
                 break
 
 			default:
+			println "====================activity====================="+activityType
 				activityTitle = getLocalizedMessage(activityType)
 				break
 		}
