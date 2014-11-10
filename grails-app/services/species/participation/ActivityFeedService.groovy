@@ -340,7 +340,7 @@ class ActivityFeedService {
                     activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
                 }
                 else {
-                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + ${messageSource.getMessage("info.in", null, LCH.getLocale())} + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + messageSource.getMessage("info.in", null, LCH.getLocale()) + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
                 }
                 text = feedInstance.activityDescrption
                 break
@@ -371,15 +371,15 @@ class ActivityFeedService {
 					def obv = getDomainObject(comment.commentHolderType,comment.commentHolderId)
 					def messagesourcearg = new Object[1];
                  messagesourcearg[0] =getSpeciesNameHtmlFromReco(obv.maxVotedReco, params);
-					result += ${messageSource.getMessage("info.on.row", messagesourcearg, LCH.getLocale())} + (rootObj.observations.indexOf(obv) + 1) 
+					result += messageSource.getMessage("info.on.row", messagesourcearg, LCH.getLocale()) + (rootObj.observations.indexOf(obv) + 1) 
 				}
 				break
 			case SpeciesField.class.getCanonicalName():
 				SpeciesField sf = getDomainObject(comment.commentHolderType,comment.commentHolderId)
-				result += ${messageSource.getMessage("info.species.field", null, LCH.getLocale())} +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
+				result += messageSource.getMessage("info.species.field", null, LCH.getLocale()) +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
 				break
 			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
-				result += ${messageSource.getMessage("info.species.field", null, LCH.getLocale())} + comment.commentHolderType.split("_")[1]
+				result += messageSource.getMessage("info.species.field", null, LCH.getLocale()) + comment.commentHolderType.split("_")[1]
 				break
 			default:
 				break
@@ -494,7 +494,7 @@ class ActivityFeedService {
         return res 
     }	
 
-    def getDescriptionForFeature(r, ug, isFeature)  {
+    def getDescriptionForFeature(r, ug, boolean isFeature)  {
         return utilsService.getDescriptionForFeature(r, ug, isFeature);
     }
 /*

@@ -115,7 +115,6 @@ class ActionController {
         params.author = springSecurityService.currentUser;
 
         def obv = activityFeedService.getDomainObject(params.type,params.id); 
-        
         def ugParam = params['userGroup']
         def resourceGroupHtml
 
@@ -161,9 +160,10 @@ class ActionController {
                     }
                      try{
                         featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
-                        if(!featuredInstance) {
-                            featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
-                            status = saveActMail(params, featuredInstance, obv, ug);
+                           if(!featuredInstance) {
+                            def userLanguage = utilsService.getCurrentLanguage(request); 
+                            featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes,language:userLanguage)
+                                                        status = saveActMail(params, featuredInstance, obv, ug);
                             obv.featureCount++
 		                    if(!obv.save(flush:true)) {
                                 obv.errors.allErrors.each { log.error it }
