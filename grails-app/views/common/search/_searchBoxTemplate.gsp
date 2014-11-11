@@ -165,7 +165,8 @@ $(document).ready(function() {
                               },  
            
            "util" : {
-               "sem":"${g.message(code:'send.email')}"
+               "sem":"${g.message(code:'send.email')}",
+               "mor":"${g.message(code:'link.moree')}"
             }
         },
         "observation" : {
