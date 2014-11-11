@@ -30,9 +30,9 @@
 
     function abridge(elem) {
       var opts = elem.data("opts");
-      var txt = elem.html();
+      var txt = elem.text();
       var len = opts.substr_len;
-      var dots = "<span>" + opts.ellipses + "</span>";
+      var dots = "<span>" + opts.ellipses + "</span>";  
       var shown = txt.substring(0, len) + dots;
       var hidden = '<span class="hidden" style="display:none;">' + txt.substring(len, txt.length) + '</span>';
       elem.html(shown + hidden);

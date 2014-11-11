@@ -202,10 +202,9 @@ class Species implements Rateable {
             userLanguage = utilsService.getCurrentLanguage();
         }
         XMLConverter converter = new XMLConverter();
-        String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,1,userLanguage)
+        String summary = converter.getFieldFromName(fieldsConfig.SUMMARY,2,userLanguage)
         String overview = converter.getFieldFromName(fieldsConfig.OVERVIEW,1,userLanguage) 
-        String brief = converter.getFieldFromName(fieldsConfig.BRIEF,1,userLanguage)
-
+        String brief = converter.getFieldFromName(fieldsConfig.BRIEF,2,userLanguage)
 
         def f = this.fields.find { speciesField ->
             Field field = speciesField.field;
