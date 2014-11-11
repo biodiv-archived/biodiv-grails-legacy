@@ -20,19 +20,19 @@
     function linkage(elem) {
       elem.append(elem.data("opts").more_link);
       elem.children(".more").click( function () {
-    	if($(this).html() == "Hide")
-    		$(this).html("More");
+    	if($(this).html() == window.i8ln.text.hide)
+    		$(this).html(window.i8ln.text.more);
     	else
-    		$(this).html("Hide");
+    		$(this).html(window.i8ln.text.hide);
         $(this).siblings("span:not(.hidden)").toggle().siblings("span.hidden").animate({'opacity' : 'toggle'},1000);
       });
     }
 
     function abridge(elem) {
       var opts = elem.data("opts");
-      var txt = elem.html();
+      var txt = elem.text();
       var len = opts.substr_len;
-      var dots = "<span>" + opts.ellipses + "</span>";
+      var dots = "<span>" + opts.ellipses + "</span>";  
       var shown = txt.substring(0, len) + dots;
       var hidden = '<span class="hidden" style="display:none;">' + txt.substring(len, txt.length) + '</span>';
       elem.html(shown + hidden);
