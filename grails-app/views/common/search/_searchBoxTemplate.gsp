@@ -168,7 +168,8 @@ $(document).ready(function() {
            
            "util" : {
                "sem":"${g.message(code:'send.email')}",
-               "mor":"${g.message(code:'link.moree')}"
+               "mor":"${g.message(code:'link.moree')}",
+               "rles":"${g.message(code:'link.read.less')}"
             }
         },
         "observation" : {
