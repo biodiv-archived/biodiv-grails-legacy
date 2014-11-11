@@ -20,10 +20,10 @@
     function linkage(elem) {
       elem.append(elem.data("opts").more_link);
       elem.children(".more").click( function () {
-    	if($(this).html() == "Hide")
-    		$(this).html("More");
+    	if($(this).html() == window.i8ln.text.hide)
+    		$(this).html(window.i8ln.text.more);
     	else
-    		$(this).html("Hide");
+    		$(this).html(window.i8ln.text.hide);
         $(this).siblings("span:not(.hidden)").toggle().siblings("span.hidden").animate({'opacity' : 'toggle'},1000);
       });
     }
