@@ -423,7 +423,6 @@
 
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
     <g:render template="/namelist/newNamePopupTemplate" model="[]"/>
-    
     <div id="searching" style="font-weight:bold">Loading...</div>
 <script type="text/javascript">
     var taxonRanks = [];

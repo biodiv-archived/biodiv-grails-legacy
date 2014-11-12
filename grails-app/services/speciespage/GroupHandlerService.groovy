@@ -225,7 +225,7 @@ class GroupHandlerService {
 	 * returns the group for the closest ancestor.
 	 * 
 	 */
-	private SpeciesGroup getGroupByHierarchy(TaxonomyDefinition taxonConcept, List<TaxonomyDefinition> parentTaxon) {
+	public SpeciesGroup getGroupByHierarchy(TaxonomyDefinition taxonConcept, List<TaxonomyDefinition> parentTaxon) {
 		int rank = TaxonomyRank.KINGDOM.ordinal();
 
 		SpeciesGroup group;
