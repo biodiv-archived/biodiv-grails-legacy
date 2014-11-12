@@ -39,7 +39,7 @@
                 if(params.action == 'edit' || params.action == 'update'){
                 form_action = uGroup.createLink(action:'update', controller:'checklist', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 form_button_name = "Update Checklist"
-                form_button_val = "Update Checklist"
+                form_button_val = "${g.message(code:'button.update.checklist')}"
                 }
 
                 %>

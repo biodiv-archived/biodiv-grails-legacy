@@ -102,7 +102,9 @@ $(document).ready(function() {
                 "featured" : "${g.message(code:'text.featured.on')}",
                 "in_group" : "${g.message(code:'text.in.group')}",
                 "post"     : "${g.message(code:'text.post')}",
-                "posting"     : "${g.message(code:'text.posting')}"             
+                "posting"  : "${g.message(code:'text.posting')}",
+                "more"     : "${g.message(code:'text.more')}",
+                "hide"     : "${g.message(code:'text.hide')}"        
         },
         "button" :{
                 "delete" : "${g.message(code:'default.button.delete.label')}",
@@ -165,7 +167,9 @@ $(document).ready(function() {
                               },  
            
            "util" : {
-               "sem":"${g.message(code:'send.email')}"
+               "sem":"${g.message(code:'send.email')}",
+               "mor":"${g.message(code:'link.moree')}",
+               "rles":"${g.message(code:'link.read.less')}"
             }
         },
         "observation" : {

@@ -374,10 +374,10 @@ function last_actions() {
 	$(".ellipsis.multiline").trunk8({
 		lines:2,
                 tooltip:false,
-                fill: '&hellip; <a id="read-more" href="#">more</a>'
+                fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
 	});
         $('#read-more').on('click', function (event) {
-              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
+              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
                 
                 return false;
         });
