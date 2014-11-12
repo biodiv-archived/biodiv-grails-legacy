@@ -27,7 +27,7 @@ import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
 import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
-import org.springframework.web.context.request.RequestContextHolder
+
 
 //pdf related
 import au.com.bytecode.opencsv.CSVWriter
@@ -49,7 +49,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.context.MessageSource;
-import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import java.awt.Point;
 
 class ChecklistService {
@@ -142,7 +142,7 @@ class ChecklistService {
             }
             if(!validObvPresent) {
                 def request = RequestContextHolder.currentRequestAttributes().request
-				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, RCU.getLocale(request)), checklistInstance:checklistInstance]
+				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
 
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
@@ -150,12 +150,14 @@ class ChecklistService {
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
 				
 				saveAttributions(params, checklistInstance)
-				observationService.saveObservationAssociation(params, checklistInstance)
 				
 				if(sendMail)
 					observationService.sendNotificationMail(mailType, checklistInstance, null, params.webaddress);
 				
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
+
+				observationService.saveObservationAssociation(params, checklistInstance)
+
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
 				return ['success' : true, 'msg':'Successfully saved checklist.', checklistInstance:checklistInstance]
@@ -185,7 +187,7 @@ class ChecklistService {
             
 		//Checklists.withTransaction() {
 			
-			checklistInstance = Checklists.get(checklistInstance.id)
+			//checklistInstance = Checklists.get(checklistInstance.id)
 			log.debug "adding observation to checklist " + checklistInstance.title
 			Set updatedObv = new HashSet()
 			Set newObv = new HashSet()
@@ -230,11 +232,13 @@ class ChecklistService {
                         }
                     }
 					obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
+                    log.debug "saving observation ${obsParams}"
 					def res = observationService.saveObservation(obsParams, false)
 					Observation observationInstance = res.observationInstance
 					saveReco(observationInstance, m, checklistInstance)
 					
 					if(!oldObvId){
+                        log.debug "Adding ${observationInstance} to checklist ${checklistInstance}"
 						checklistInstance.addToObservations(observationInstance)
 						newObv.add(observationInstance.id)
 					}
@@ -251,11 +255,16 @@ class ChecklistService {
 					}
 				}
 			}
+            log.debug "All checklist observations  ${checklistInstance.observations.size()}";
 			//updating obv count
 			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
-			if(!checklistInstance.save(flush:true) || checklistInstance.hasErrors()){
+            log.debug "Updating checklist count to ${checklistInstance.speciesCount}"
+            if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
+            } else {
 				checklistInstance.errors.allErrors.each { log.error it }
 			}
+            log.debug "Updating checklist count to ${checklistInstance.getPersistentValue('speciesCount')}"
+            
 		//}
 			
 		log.debug "saved checklist observations"

@@ -23,7 +23,7 @@
                                 </g:if>
 
 
-                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;" title="${(featureCount>0) ? 'Featured':''}" >
+                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;" title="${(featureCount>0) ? g.message(code:'text.featured'):''}" >
                                 </span>
 
 
@@ -35,8 +35,12 @@
 				<td>
 					${documentInstance?.type?.value }
 				</td>
+				<%
+					def docNotes = documentInstance.notes?.replaceAll("<(.|\n)*?>", '')
+					docNotes = docNotes?.replaceAll("&nbsp;", '')
+				%>
 				<td class="ellipsis multiline" style="max-width:220px;">
-					${raw(documentInstance.notes)}
+					${docNotes}
 				</td>
 				<g:if test="${canPullResource}">
 					<td>

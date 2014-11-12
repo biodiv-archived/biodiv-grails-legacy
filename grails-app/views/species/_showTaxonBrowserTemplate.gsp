@@ -20,14 +20,14 @@
                     <input type="hidden"  data-rank ="${taxonRank.ordinal()}"
                     type="text" name="taxonRegistry.${taxonRank.ordinal()}" 
                     value="${speciesInstance.taxonConcept.name}"
-                    placeholder="Add ${taxonRank.value()}" readonly/>
+                    placeholder="${g.message(code:'title.value.add')} ${g.message(error:taxonRank)}" readonly/>
                     </g:if>
                     <g:elseif test="${taxonRank.ordinal() < speciesInstance.taxonConcept.rank}">
                     <div class="input-prepend">
                         <span class="add-on"> ${g.message(error:taxonRank)}</span>
                         <input data-provide="typeahead" data-rank ="${taxonRank.ordinal()}"
                         type="text" class="input-block-level taxonRank" name="taxonRegistry.${taxonRank.ordinal()}" value=""
-                        placeholder="Add ${taxonRank.value()}" />
+                        placeholder="${g.message(code:'title.value.add')} ${g.message(error:taxonRank)}" />
 
                     </div>
 

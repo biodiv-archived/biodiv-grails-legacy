@@ -61,7 +61,7 @@ class SpeciesController extends AbstractObjectController {
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
 		params.action="list"
-
+        model.userLanguage = utilsService.getCurrentLanguage(request);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/species/showSpeciesListTemplate", model:model);
 			return;
@@ -1025,6 +1025,8 @@ class SpeciesController extends AbstractObjectController {
     def pullImageForSpecies() {
         log.debug params
         //pass that same species
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         def species = Species.get(params.speciesId.toLong())
         def out = speciesService.updateSpecies(params, species)
         def result

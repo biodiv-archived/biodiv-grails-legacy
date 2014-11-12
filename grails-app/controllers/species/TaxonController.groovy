@@ -458,9 +458,8 @@ class TaxonController {
 			otherParams['id_details'] = params.id_details;
 			otherParams['metadata'] = params.metadata;
 		}
-        if(params.metadata.nameStatus != "accepted") {
+        if(params.metadata?.nameStatus != "accepted") {
             println "=========STATUS======== " + params.metadata.nameStatus
-            return
         }
 		println "=======PARAMS UPDATE======== " + params
 		def msg;
