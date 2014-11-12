@@ -23,7 +23,7 @@
                                 </g:if>
 
 
-                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;" title="${(featureCount>0) ? 'Featured':''}" >
+                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;" title="${(featureCount>0) ? g.message(code:'text.featured'):''}" >
                                 </span>
 
 

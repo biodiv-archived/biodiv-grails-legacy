@@ -46,8 +46,11 @@
 <body>
 
 	<div class="span12">
+	<%
+	def CEPF_Projects=g.message(code:'link.cepf.projects')
+	%>
 		<g:render template="/project/projectSubMenuTemplate"
-			model="['entityName':'Western Ghats CEPF Projects']" />
+			model="['entityName':CEPF_Projects]" />
 		<uGroup:rightSidebar />
 		<div class="span8 right-shadow-box" style="margin: 0px;">
 			<g:render template="/project/search" model="['params':params]" />
