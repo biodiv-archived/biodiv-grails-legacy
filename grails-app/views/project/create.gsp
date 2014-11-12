@@ -287,7 +287,7 @@ CKEDITOR.replace('summary', image_config);
 						class="control-group ${hasErrors(bean: projectInstance, field: 'projectProposal', 'error')}">
 
 						<label class="control-label" for="projectProposal"><g:message
-								code="project.projectProposal.label" default="Project Proposal" /></label>
+								code="heading.project.proposal" default="Project Proposal" /></label>
 
 						<div class="controls" style="max-width: 100%;">
 
@@ -327,7 +327,7 @@ CKEDITOR.replace('projectProposal', config);
 						class="control-group ${hasErrors(bean: projectInstance, field: 'projectReport', 'error')}">
 
 						<label class="control-label" for="projectReport"><g:message
-								code="project.projectReport.label" default="Project Report" /></label>
+								code="heading.project.report"  /></label>
 						<div class="controls" style="max-width: 100%;">
 
                                                     <textarea id="projectReport" name="projectReport" class="input-block-level" style="height:200px;" placeholder="Write a small description about the project report.">${projectInstance?.projectReport}</textarea>

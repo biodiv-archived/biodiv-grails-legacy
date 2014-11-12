@@ -255,6 +255,12 @@ class ActivityFeedService {
 		}
 	}
 	
+	def getLocalizedMessage(activityType){
+		activityType = Arrays.asList(activityType.split(":"));
+		activityType = activityType[0].trim().toLowerCase().replaceAll(' ','.')
+		return messageSource.getMessage(activityType, null,LCH.getLocale())
+	}
+
 	def getContextInfo(ActivityFeed feedInstance, params=null){
 		
 		def activityType = feedInstance.activityType
@@ -266,14 +272,14 @@ class ActivityFeedService {
 		//log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
 		switch (activityType) {
 			case COMMENT_ADDED:
-				activityTitle = COMMENT_ADDED  + getCommentContext(activityDomainObj, params)
+				activityTitle = getLocalizedMessage(COMMENT_ADDED)  + getCommentContext(activityDomainObj, params)
 				text = activityDomainObj.body
 				break
 			case SPECIES_RECOMMENDED:
-				activityTitle = SPECIES_RECOMMENDED + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				activityTitle = getLocalizedMessage(SPECIES_RECOMMENDED) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case SPECIES_AGREED_ON:
-				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				activityTitle =  getLocalizedMessage(SPECIES_AGREED_ON) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
 			     def messagesourcearg = new Object[1];
@@ -288,7 +294,7 @@ class ActivityFeedService {
 				text = feedInstance.activityDescrption
 				break
 			case OBSERVATION_UPDATED:
-				activityTitle = OBSERVATION_UPDATED
+				activityTitle = getLocalizedMessage(OBSERVATION_UPDATED)
 				text = messageSource.getMessage("info.user.updated", null, LCH.getLocale())
 				break
 			case USERGROUP_CREATED:
@@ -345,11 +351,12 @@ class ActivityFeedService {
                 text = feedInstance.activityDescrption
                 break
             case SPECIES_UPDATED:
-                activityTitle = SPECIES_UPDATED
+                activityTitle = getLocalizedMessage(SPECIES_UPDATED)
                 break
 
 			default:
-				activityTitle = activityType
+			println "====================activity====================="+activityType
+				activityTitle = getLocalizedMessage(activityType)
 				break
 		}
 		
@@ -439,7 +446,7 @@ class ActivityFeedService {
 		def af 
 		resources.each { r->
 			def description = getDescriptionForResourcePull(r, isPost)
-			af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
+			af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(!isBulkPull && sendMail){

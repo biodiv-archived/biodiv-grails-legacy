@@ -5,7 +5,7 @@
 <div  class="block-tagadelic">
 
     <form id="advSearchForm" method="get"  title="${g.message(code:'button.advanced.search')}"
-        action="${uGroup.createLink(controller:'search', action:params.action?:'select') }"
+        action="${uGroup.createLink(controller:'search', action:'select') }"
         class="searchbox form-horizontal">
 
         <div class="control-group">
@@ -88,11 +88,11 @@
         </g:if>
         </g:each>
 
-    </form>
     <div class="form-action">
         <button type="submit" id="advSearch"
             class="btn btn-primary pull-right" style="margin-top:10px;">${g.message(code:"default.search")}</button>
     </div>
+    </form>
 
     <div class="clearfix"></div>
 

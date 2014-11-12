@@ -171,6 +171,7 @@ class DocumentController extends AbstractObjectController {
 		log.debug params
 		
 		def model = getDocumentList(params)
+		model.userLanguage = utilsService.getCurrentLanguage(request);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/document/documentListTemplate", model:model);
 			return;

@@ -90,7 +90,7 @@ function postComment(postComp, url, newCommentUrl) {
 		$(textComp).next('span').show();
 		return false;
 	}
-	loaderFun(submitButton,true,"Posting",'input');//submitButton.attr('disabled',true).attr('value','posting');
+	loaderFun(submitButton,true,window.i8ln.text.posting,'input');//submitButton.attr('disabled',true).attr('value','posting');
 	computeUserTag(postComp);
 	postAsAjax(postComp, url, newCommentUrl, true);
 	
@@ -143,7 +143,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     				$(postComp).children('textarea[name=commentBody]').val("");
     				$(postComp).children('textarea[name=commentSubject]').val("");
     				var submitButton = $(postComp).children('input[type="submit"]');
-					loaderFun(submitButton,false,"Post",'input'); //	submitButton.attr('disabled',false).attr('value','Post');
+					loaderFun(submitButton,false,window.i8ln.text.post,'input'); //	submitButton.attr('disabled',false).attr('value','Post');
     			}
         	}
     		return false;
@@ -199,7 +199,7 @@ function replyOnComment(comp, parentId, url){
 		$(comp).prev().addClass('comment-textEmpty').next('span').show();
 		return false;
 	}
-	loaderFun($(comp),true,"Posting",'anchor'); //$(comp).attr('disabled',true).attr('value','posting');
+	loaderFun($(comp),true,window.i8ln.text.posting,'anchor'); //$(comp).attr('disabled',true).attr('value','posting');
 	computeUserTag($(comp).parent());
 	params["tagUserId"] = $(comp).siblings(".tagUserId").val();
 
@@ -215,7 +215,7 @@ function replyOnComment(comp, parentId, url){
         		alert(data.msg);
         	}
 			else if(data.success){
-				loaderFun($(comp),false,"Post",'anchor'); //$(comp).attr('disabled',false).attr('value','Post');
+				loaderFun($(comp),false,window.i8ln.text.post,'anchor'); //$(comp).attr('disabled',false).attr('value','Post');
 				$(comp).parent().hide().prev().show();
 				updateFeeds();
 			}
