@@ -322,15 +322,56 @@ class NamelistService {
 		}
 		
 		//Every thing is fine so now populating CoL info
-		def m = responseAsMap(results, "id")
+		List res = responseAsMap(results, "id")
 		
 		log.debug "================   Response map   =================="
-		log.debug m
+		log.debug res
+		log.debug "=========ui map ==========="
+		def newRes = fetchTaxonRegistryData(res[0])
+		newRes['nameDbInstance'] = sciName
+		log.debug newRes
 		log.debug "================   Response map   =================="
 	}
 	
 	
-
+	private Map fetchTaxonRegistryData(Map m) {
+		def result = [:]
+		def res = [:]
+		
+		result['taxonRegistry.0'] = res['0'] = m['kingdom']
+		result['taxonRegistry.1'] = res['1'] = m['phylum']
+		result['taxonRegistry.2'] = res['2'] = m['class']
+		result['taxonRegistry.3'] = res['3'] = m['order']
+		result['taxonRegistry.4'] = res['4'] = m['superfamily']
+		result['taxonRegistry.5'] = res['5'] = m['family']
+		result['taxonRegistry.6'] = res['6'] = m['subfamily']
+		result['taxonRegistry.7'] = res['7'] = m['genus']
+		result['taxonRegistry.8'] = res['8'] = m['subgenus']
+		result['taxonRegistry.9'] = res['9'] = m['species']
+		
+		result['taxonRegistry'] = res;
+		result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();
+		result['classification'] = 817; //for author contributed
+		
+		
+	
+		def metadata1 = [:]
+		metadata1['name'] = m['name']
+		metadata1['rank'] = m['rank']
+		metadata1['authorString'] = m['authorString']
+		metadata1['nameStatus'] = m['nameStatus']
+		metadata1['source'] = m['source'] //col
+		metadata1['via'] = m['sourceDatabase']
+		metadata1['id'] = m['externalId']
+		result['metadata'] = metadata1;
+		
+		return result;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
     def getSynonymsOfTaxon(TaxonomyDefinition taxonConcept) {
         def res = Synonyms.findAllByTaxonConcept(taxonConcept);
         def result = []
