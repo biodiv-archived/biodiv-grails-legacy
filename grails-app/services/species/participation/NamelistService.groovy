@@ -40,7 +40,8 @@ class NamelistService {
 	private static final String MIS_APP_NAME = "misapplied name"
 
 	def dataSource
-	
+    def groupHandlerService
+
     List searchCOL(String input, String searchBy){
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
@@ -61,7 +62,8 @@ class NamelistService {
                 println "Content-Type: ${resp.headers.'Content-Type'}"
                 def xmlText =  reader.text
                 //println xmlText
-                return responseAsMap(xmlText, searchBy);
+                def result = responseAsMap(xmlText, searchBy);
+                return result;
             }
             response.'404' = { println 'Not found' }
         }
@@ -100,14 +102,14 @@ class NamelistService {
     }
 
 
-	List responseAsMap(String xmlText, String searchBy){
-		def results = new XmlParser().parseText(xmlText)
-		return responseAsMap(results, searchBy)
-	}
-	
-	
-	List responseAsMap(results, String searchBy){
-		List finalResult = []
+    List responseAsMap(String xmlText, String searchBy) {
+        def results = new XmlParser().parseText(xmlText)
+        return responseAsMap(results, searchBy)
+    }
+
+
+    List responseAsMap(results, String searchBy) {
+        List finalResult = []
         //println results.'@total_number_of_results'
         //println results.'@number_of_results_returned'
         //println results.'@error_message'
@@ -115,50 +117,65 @@ class NamelistService {
 
         int i = 0
         results.result.each { r ->
-            Map temp = new HashMap()
-            Map id_details = new HashMap()
+            Map temp = new HashMap();
+            Map id_details = new HashMap();
             temp['externalId'] = r?.id?.text()
-            temp['name'] = r?.name?.text()
+            temp['name'] = r?.name?.text() 
+            if(searchBy == 'name') {
+                temp['name'] += " " +r?.author?.text()
+            }
             temp['rank'] = r?.rank?.text()?.toLowerCase()
             temp[r?.rank?.text()?.toLowerCase()] = r?.name?.text()
             id_details[r?.name?.text()] = r?.id?.text();
             temp['nameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
             temp['authorString'] = r?.author?.text()
             temp['sourceDatabase'] = r?.source_database?.text()
-			
+
             temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
 
             if(searchBy == 'id') {
                 //println "============= references  "
                 r.references.reference.each { ref ->
-                    //println ref.author.text()
-                    //println ref.source.text()
+                //println ref.author.text()
+                //println ref.source.text()
                 }
 
                 println "============= higher taxon  "
                 r.classification.taxon.each { t ->
-                    //println t.rank.text() + " == " + t.name.text()
-                    temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
-                    id_details[t?.name?.text()] = t?.id?.text()
+                //println t.rank.text() + " == " + t.name.text()
+                temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
+                id_details[t?.name?.text()] = t?.id?.text()
                 }
 
                 println "============= child taxon  "
                 r.child_taxa.taxon.each { t ->
-                   // println t.name.text()
-                   // println t.author.text()
+                // println t.name.text()
+                // println t.author.text()
                 }
 
                 println "============= synonyms  "
                 r.synonyms.synonym.each { s ->
-                    //println s.rank.text() + " == " + s.name.text()
-                    //println "============= references  "
-                    s.references.reference.each { ref ->
-                        //println ref.author.text()
-                        //println ref.source.text()
-                    }
+                //println s.rank.text() + " == " + s.name.text()
+                //println "============= references  "
+                s.references.reference.each { ref ->
+                //println ref.author.text()
+                //println ref.source.text()
                 }
-
+                }
+                println "==========NAME STATUS========= " + temp['nameStatus']
+                if(temp['nameStatus'] == "synonym") {
+                    def aList = []
+                    r.accepted_name.each {
+                        def m = [:]
+                        m['id'] = it.id.text()
+                        m['name'] = it.name.text()
+                        m['source'] = "COL"
+                        aList.add(m);
+                    }
+                    temp['acceptedNamesList'] = aList;
+                }
             }
+            
             temp['id_details'] = id_details
             finalResult.add(temp);
         }
@@ -263,6 +280,27 @@ class NamelistService {
         println "=========COUNTS============= " + counts
         return result
     }
+
+    List searchIBP(String canonicalForm) {
+        def res = TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
+        def finalResult = []
+        res.each { 
+            def taxonConcept = TaxonomyDefinition.get(it.id.toLong());
+            def temp = [:]
+            temp['taxonId'] = it.id
+            temp['externalId'] = it.id
+            temp['name'] = it.canonicalForm
+            temp['rank'] = TaxonomyRank.getTRFromInt(it.rank).value().toLowerCase()
+            temp['nameStatus'] = it.status.value().toLowerCase()
+            temp['group'] = groupHandlerService.getGroupByHierarchy(taxonConcept, taxonConcept.parentTaxon()).name
+            temp['sourceDatabase'] = it.viaDatasource?it.viaDatasource:''
+            finalResult.add(temp);
+        }
+        println "====RESULT FROM IBP==== " + finalResult
+        return finalResult 
+    }
+
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////

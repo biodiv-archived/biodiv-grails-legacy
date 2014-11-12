@@ -58,6 +58,7 @@ function getNamesFromTaxon(ele , parentId) {
 }
 
 function getNameDetails(taxonId, classificationId, ele) {
+    $("#externalDbResults").modal('hide');
     $("body").css("cursor", "progress");
     $("#searching").show();
     $("HTML").mousemove(function(e) {
@@ -87,6 +88,9 @@ function getNameDetails(taxonId, classificationId, ele) {
             $(".taxonRegId").val(data['taxonRegId']);
             $("#searching").hide();
             $("body").css("cursor", "default");
+            if(ele == undefined) {
+                return;
+            }
             if($(ele).parents(".dl_content").length) {
                 alert("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
                 $('.queryDatabase option[value="col"]').attr("selected", "selected");
@@ -104,8 +108,11 @@ function getNameDetails(taxonId, classificationId, ele) {
 
 function populateTabDetails(data) {
     console.log("====TAB DETAILS====");
+    console.log(data);
+    $("#names-tab1 .singleRow input").val('');
+    //clearing synonyms
     var synonymsList = data['synonymsList']
-    if(synonymsList.length > 0) {
+    if(synonymsList && synonymsList.length > 0) {
         console.log(synonymsList);
         var e = $("#names-tab1 .singleRow").first().clone();
         $("#names-tab1 .singleRow").remove();
@@ -122,9 +129,10 @@ function populateTabDetails(data) {
             $(ele).find("input[name='contributor']").val(value["contributors"]);
         })
     }
-
+    //clearing common names
+    $("#names-tab2 .singleRow input").val('');
     var commonNamesList = data['commonNamesList']
-    if(commonNamesList.length > 0) {
+    if(commonNamesList && commonNamesList.length > 0) {
         console.log(commonNamesList);
         var e = $("#names-tab2 .singleRow").first().clone();
         $("#names-tab2 .singleRow").remove();
@@ -141,7 +149,27 @@ function populateTabDetails(data) {
             $(ele).find("input[name='contributor']").val(value["contributors"]);
         })
     }
-
+    
+    //clearing accepted names
+    $("#names-tab0 .singleRow input").val('');
+    var acceptedNamesList = data['acceptedNamesList']
+    if(acceptedNamesList && acceptedNamesList.length > 0) {
+        console.log(acceptedNamesList);
+        var e = $("#names-tab0 .singleRow").first().clone();
+        $("#names-tab0 .singleRow").remove();
+        $.each(acceptedNamesList, function(index, value){
+            //$("#names-tab1 .add_new_row").trigger("click");
+            var f = $(e).clone();
+            $(f).insertBefore("#names-tab0 .add_new_row");
+            var ele = $("#names-tab0 .singleRow").last();
+            console.log(value["id"]);
+            $(ele).find("input[name='aid']").val(value["id"]);
+            console.log($(ele).find("input[name='value']"));
+            $(ele).find("input[name='value']").val(value["name"]);
+            $(ele).find("input[name='source']").val(value["source"]);
+            $(ele).find("input[name='contributor']").val(value["contributors"]);
+        })
+    }
 }
 
 function setOption(selectElement, value) {
@@ -218,11 +246,15 @@ function searchDatabase(addNewName) {
             //show the popup
             if(data.length != 0) {
                 $("#externalDbResults").modal('show');
-                fillPopupTable(data , $("#externalDbResults"));
+                fillPopupTable(data , $("#externalDbResults"), "externalData");
                 console.log("======SUCCESS====");
                 console.log(data); 
             } else {
                 alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                if(addNewName) {
+                    alert("Searching name in IBP Database");
+                    searchIBP(name);
+                }
             }
         }, error: function(xhr, status, error) {
             $("#searching").hide();
@@ -232,18 +264,58 @@ function searchDatabase(addNewName) {
     });
 }
 
-function fillPopupTable(data, $ele) {
+function searchIBP(name) {
+    $("body").css("cursor", "progress");
+    $("#searching").show();
+    $("HTML").mousemove(function(e) {
+        $("#searching").css({
+            "top" : e.pageY,
+            "left" : e.pageX + 15
+        });
+    });
+    var url = window.params.curation.searchIBPURL;
+    $.ajax({
+        url: url,
+        dataType: "json",
+        type: "POST",
+        data: {name:name},	
+        success: function(data) {
+            $("#searching").hide();
+            $("body").css("cursor", "default");
+            //show the popup
+            if(data.length != 0) {
+                $("#externalDbResults").modal('show');
+                fillPopupTable(data , $("#externalDbResults"), "IBPData");
+                console.log("======SUCCESS====");
+                console.log(data); 
+            } else {
+                alert("Sorry no results found from IBP Database. Fill in details manually");
+            }
+        }, error: function(xhr, status, error) {
+            $("#searching").hide();
+            $("body").css("cursor", "default");
+            alert(xhr.responseText);
+        } 
+    });
+
+}
+
+function fillPopupTable(data, $ele, dataFrom) {
     console.log("=====fill popup table====");
     console.log(data.length);
     if(data.length == 0) {
-
         alert("Sorry No results found!!");
     }
+    var classificationId = $('#taxaHierarchy option:selected').val();
     //clear table
     $ele.find("table tr td").remove();
     var rows = "";
     $.each(data, function(index, value) {
-        rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
+        if(dataFrom == "externalData") {
+            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
+        } else {
+            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",undefined)'>Select this</button></td></tr>"
+        }
     });
     $ele.find("table").append(rows);
     return
@@ -263,6 +335,9 @@ function getExternalDbDetails(externalId) {
             console.log("======SUCCESS ID DETAILS====");
             $("#externalDbResults").modal('hide');
             populateNameDetails(data);
+            if(data['nameStatus'] == 'synonym') {
+                populateTabDetails(data);
+            }
             if(dbName == 'col') {
                 changeEditingMode(true);
                 console.log("======ID DETAILS====");

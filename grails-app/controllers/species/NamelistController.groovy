@@ -107,4 +107,17 @@ class NamelistController {
         //Sending 0th index as only one result as its queried on id
         render res[0] as JSON
     }
+    
+    def searchIBP() {
+        List<String> givenNames = [params.name]
+        NamesParser namesParser = new NamesParser();
+        List<TaxonomyDefinition> parsedNames = namesParser.parse(givenNames);
+        println "===========PARSED NAMES========= " + parsedNames[0].canonicalForm
+        params.name = parsedNames[0].canonicalForm
+        List res = []
+        res = namelistService.searchIBP(params.name); 
+        println "========RES ======= " + res
+        render res as JSON
+    }
+    
 }
