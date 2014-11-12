@@ -31,7 +31,7 @@
       }
      .tab-content{
         overflow-y: scroll;
-        height: 229px;
+        height: 197px;
         overflow-x: hidden !important;
      }   
 	.listarea{
@@ -175,7 +175,7 @@
 	    border: 1px solid #ccc;
 	    width: 161px !important;
 	    text-align:center;
-        height: 357px;
+        height: 328px;
 	}
 	.connection_wrapper{
 		background-color:#00FFCC;
@@ -189,7 +189,7 @@
         background-color: beige;
         height: 17px;
         text-align: center;
-        padding: 5.4px;
+        padding: 2.4px;
     }
     .taxonomyRanks {
 	    border: 1px solid #ccc;
@@ -218,6 +218,27 @@
         display: none;
         position: absolute;
     }
+    .save_button{       
+        border-radius: 3px;
+        font-size: 12px;
+        line-height: 24px;
+        font-weight: bold;
+    }
+    .tab-content>.span*{
+        margin-left:2px;
+    }
+    .super_family{
+        line-height:10px;
+    }
+    .lt_family{
+        font-size:12px;
+        font-weight:bold;
+        padding: 18px 0px;
+    }
+  .lt_family input{
+    margin-bottom:3px;
+  }
+
 </style>
 
  <div class="row-fluid" style="background:white;">
@@ -285,7 +306,7 @@
 				
                 <div class="row-fluid">
 
-                    <div class="span3 canBeDisabled column" style="background:#C0504D">
+                    <div class="span3 canBeDisabled column lt_family" style="background:#C0504D">
                         <table style="width:100% ;color:white">
                             <tr>
                                 <td>Kingdom</td>
@@ -304,7 +325,7 @@
                                 <td><input type="text" class="order span12"></td> 
                             </tr>
                             <tr>
-                                <td>Super-Family</td>
+                                <td class="super_family">Super-Family</td>
                                 <td><input type="text" class="superfamily span12"></td> 
                             </tr>
                             <tr>
@@ -324,7 +345,7 @@
 
                     </div>
 						
-					<div class="span9 column" style="width: 610px;background:#3D6798">
+					<div class="span9 column rt_family" style="width: 610px;background:#3D6798">
 						
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">
@@ -343,32 +364,59 @@
                                 <g:render template="/namelist/dataTableTemplate" model="['type':'s']"/>
                             </div>
                             <div class="tab-pane" id="names-tab2" style="">
-                                <g:render template="/namelist/dataTableTemplate" model="['type':'c']"/>
+                                <g:render template="/namelist/dataTableCommonTemplate" model="['type':'c']"/>
                             </div>
                             <div class="tab-pane" id="names-tab3" style="">
-                                <g:render template="/namelist/dataTableTemplate" model="['type':'r']"/>
+                                <g:render template="/namelist/dataTableReferenceTemplate" model="['type':'r']"/>
                             </div>
                         </div>
+
+
+
+
                         <script id="newRowTmpl" type="text/x-jquery-tmpl">
                             <div class="row-fluid tab_div new">
                                 <form>
+                               {{if typeClass == "rid"}}
+                                    <div class="span10">
+                                        <input type="hidden" class ="{{>typeClass}}" name="{{>typeClass}}" value=""/>
+                                        <input type="text" class="nameInputs span12" name="value">
+                                    </div>   
+                               {{else}}
                                     <div class="span3">
                                         <input type="hidden" class ="{{>typeClass}}" name="{{>typeClass}}" value=""/>
                                         <input type="text" class="nameInputs span12" name="value">
-                                    </div>
-                                    <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
-                                    <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div>
+                                    </div>                                    
+                                    {{if typeClass == "cid"}}
+                                        <div class="span2">
+                                              <select class="span12 tab_select">
+                                                      <option>English</option>
+                                                      <option>Tamil</option>
+                                                      <option>Hindi</option>
+                                                      <option>Telugu</option>
+                                              </select>
+                                          </div>
+                                          <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
+                                          <div class="span2"><input type="text" class="nameInputs span12" name="contributor"></div> 
+                                    {{else}}
+                                        <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
+                                        <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div> 
+                                    {{/if}}
+                                {{/if}}    
                                     <div class="span2">
                                         <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
                                         <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
                                     </div>
+
                                 </form>
                             </div>
                         </script>
 
-                        <button type="button" class="" style="background-color:#C0504D; border-radius:3px;font-size:16px;line-height:24px;" onClick='saveHierarchy(false)'>Save & Retain</button> 
-                        <button type="button" class="" style="background-color:#FF9900; border-radius:3px;font-size:16px;line-height:24px;" onClick='saveHierarchy(true)'>Save & Move to WKG</button> 
-                        <button type="button" class="" style="background-color:#009933; border-radius:3px;font-size:16px;line-height:24px;">Save & Move to Clean List</button> 
+
+
+                        <button type="button" class="save_button" style="background-color:#C0504D;" onClick='saveHierarchy(false)'>Save & Retain</button> 
+                        <button type="button" class="save_button" style="background-color:#FF9900;" onClick='saveHierarchy(true)'>Save & Move to Working List</button> 
+                        <button type="button" class="save_button" style="background-color:#009933;">Save & Move to Clean List</button> 
                     </div>
 
 
