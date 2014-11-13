@@ -119,16 +119,21 @@ class BiodivSearchService extends AbstractSearchService {
         log.info "Initializing publishing to biodiv search index : ";
 
         log.info "===INDEXING OBV======== "
+        observationsSearchService.INDEX_DOCS = INDEX_DOCS
         observationsSearchService.publishSearchIndex();
         log.info "===INDEXING SP========"
+        speciesSearchService.INDEX_DOCS = INDEX_DOCS
         speciesSearchService.publishSearchIndex();
         log.info "===INDEXING DOC========"
+        documentSearchService.INDEX_DOCS = INDEX_DOCS
         documentSearchService.publishSearchIndex()
         log.info "===INDEXING USER========"
+        SUserSearchService.INDEX_DOCS = INDEX_DOCS
         SUserSearchService.publishSearchIndex()
         //log.info "===NEWSLETTER========"
         //def f5 = newsletterSearchService.publishSearchIndex(newsletters, commit)
         log.info "=====INDEXING USER GROUP==== "
+        userGroupSearchService.INDEX_DOCS = INDEX_DOCS
         userGroupSearchService.publishSearchIndex()
 
         log.info "===DONE INDEXING========"
@@ -212,38 +217,37 @@ class BiodivSearchService extends AbstractSearchService {
 
             def queryResponse = search(paramsList);
 
-            if(!params.loadMore?.toBoolean()){
-                List objectTypeFacets = queryResponse.getFacetField(searchFieldsConfig.OBJECT_TYPE).getValues()
-                objectTypeFacets.each {
-                    //TODO: sort on name
-                    objectTypes << [name:it.getName(), count:it.getCount()]
-                }
-
-/*                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
-                sGroupFacets.each {
-                    //TODO: sort on name
-                    sGroups << [name:it.getName(), count:it.getCount()]
-                }
-
-                List tagFacets = queryResponse.getFacetField(searchFieldsConfig.TAG).getValues()
-                tagFacets.each {
-                    //TODO: sort on name
-                    tags << [name:it.getName(), count:it.getCount()]
-                }
-
-                List contributorFacets = queryResponse.getFacetField(searchFieldsConfig.CONTRIBUTOR+"_exact").getValues()
-                contributorFacets.each {
-                    //TODO: sort on name
-                    contributors << [name:it.getName(), count:it.getCount()]
-                }
-*/ 
-            }
-
-            responseHeader = queryResponse?.responseHeader;
             if(queryResponse) {
+                if(!params.loadMore?.toBoolean()){
+                    List objectTypeFacets = queryResponse.getFacetField(searchFieldsConfig.OBJECT_TYPE)?.getValues()?:[]
+                    objectTypeFacets.each {
+                        //TODO: sort on name
+                        objectTypes << [name:it.getName(), count:it.getCount()]
+                    }
+
+    /*                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
+                    sGroupFacets.each {
+                        //TODO: sort on name
+                        sGroups << [name:it.getName(), count:it.getCount()]
+                    }
+
+                    List tagFacets = queryResponse.getFacetField(searchFieldsConfig.TAG).getValues()
+                    tagFacets.each {
+                        //TODO: sort on name
+                        tags << [name:it.getName(), count:it.getCount()]
+                    }
+
+                    List contributorFacets = queryResponse.getFacetField(searchFieldsConfig.CONTRIBUTOR+"_exact").getValues()
+                    contributorFacets.each {
+                        //TODO: sort on name
+                        contributors << [name:it.getName(), count:it.getCount()]
+                    }
+    */ 
+                }
+
+                responseHeader = queryResponse.responseHeader;
                 org.apache.solr.common.SolrDocumentList results = queryResponse.getResults();
                 def instance;
-                println queryResponse
                 results.each { doc ->
                     Long instanceId = Long.parseLong(doc.getFieldValue(searchFieldsConfig.ID).split('_')[1])
                     String className = doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)
@@ -251,7 +255,7 @@ class BiodivSearchService extends AbstractSearchService {
                     if(clazz) {
                         instance = clazz.read(instanceId);
                     }
-/*                    switch(doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)) {
+    /*                    switch(doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)) {
                         case Species.simpleName:
                             instance = Species.read(instanceId);
                             break;
@@ -270,16 +274,15 @@ class BiodivSearchService extends AbstractSearchService {
                         default:
                             log.debug "Not a valid object ${doc}"
                     }
-*/
+    */
                     if(instance) {
                         instanceList.add(instance);
                     } else {
                         log.error "${doc} has invalid id in search index. May be out of sync from db"
                     }
                 }
+                noOfResults = queryResponse.getResults().getNumFound();
             }
-            noOfResults = queryResponse.getResults().getNumFound();
-
         }
 
         return [responseHeader:responseHeader, instanceList:instanceList, instanceTotal:noOfResults, objectTypes:objectTypes, queryParams:queryParams, activeFilters:activeFilters]
@@ -357,7 +360,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPLOADED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -366,13 +369,13 @@ class BiodivSearchService extends AbstractSearchService {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPLOADED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPLOADED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }

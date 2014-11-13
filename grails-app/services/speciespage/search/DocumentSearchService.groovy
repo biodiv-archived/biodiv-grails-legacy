@@ -33,7 +33,7 @@ class DocumentSearchService extends AbstractSearchService {
 		
 		def documents;
 		def startTime = System.currentTimeMillis()
-        INDEX_DOCS = Document.count() + 1;
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Document.count()+1;
 		while(noIndexed < INDEX_DOCS) {
 			documents = Document.list(max:limit, offset:offset);
             noIndexed += documents.size();
@@ -72,6 +72,10 @@ class DocumentSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.TITLE, document.title);
             doc.addField(searchFieldsConfig.DESCRIPTION, document.notes);
             doc.addField(searchFieldsConfig.TYPE, document.type.value());
+            doc.addField(searchFieldsConfig.UPLOADED_ON, document.createdOn);
+            if(document.license) {
+                doc.addField(searchFieldsConfig.LICENSE, document.license.name.value());
+            }
 
             if(document.attribution){
                 doc.addField(searchFieldsConfig.ATTRIBUTION, document.attribution);

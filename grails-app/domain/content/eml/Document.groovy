@@ -27,34 +27,44 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	def springSecurityService;
 	def SUserService;
 	def documentService
-	
-	public enum DocumentType implements org.springframework.context.MessageSourceResolvable{
-		Report("Report"),
-		Poster("Poster"),
-		Proposal("Proposal"),
-		Miscellaneous("Miscellaneous"),
 
-		private String value;
-		
+    public enum DocumentType implements org.springframework.context.MessageSourceResolvable{
+        Report("Report"),
+        Poster("Poster"),
+        Proposal("Proposal"),
+        Miscellaneous("Miscellaneous"),
 
-		DocumentType(String value) {
-			this.value = value;
+        private String value;
+
+
+        DocumentType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+                Report,
+                Poster,
+                Proposal,
+                Miscellaneous
+			]
 		}
 
-		public String value() {
-			return this.value;
-		}
-	 Object[] getArguments() { [] as Object[] }
+        Object[] getArguments() { [] as Object[] }
 
         String[] getCodes() {
-            
+
             println "${getClass().name}.${name()}"
             ["${getClass().name}.${name()}"] as String[]
         }   
-                String getDefaultMessage() { value() }
+        String getDefaultMessage() { value() }
 
 
-	}
+    }
 
 	DocumentType type
     int flagCount = 0;

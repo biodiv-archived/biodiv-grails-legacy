@@ -32,6 +32,7 @@ modules = {
 
 		resource url:'/bootstrap/css/bootstrap.min.css'
 		resource url:'/css/bootstrap-combobox.css'
+		resource url:'/css/bootstrap-multiselect.css'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/css/ui.jqgrid.css'
 		resource url:'/css/auth.css'
 //		resource url:[dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui']
@@ -49,6 +50,7 @@ modules = {
 
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
+		resource url:'/js/bootstrap-multiselect.js'
 		resource url:'/js/species/main.js'
 		resource url:'/js/species/util.js'
 		resource url:'/js/readmore/readmore.js'

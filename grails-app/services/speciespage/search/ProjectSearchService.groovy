@@ -28,12 +28,15 @@ class ProjectSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to projects search index"
 		
 		//TODO: change limit
-		int limit = Project.count()+1, offset = 0;
+		int limit = BATCH_SIZE, offset = 0;
+        int noIndexed = 0;
 		
 		def projects;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Project.count()+1;
+		while(noIndexed < INDEX_DOCS) {
 			projects = Project.list(max:limit, offset:offset);
+            noIndexed += projects.size()
 			if(!projects) break;
 			publishSearchIndex(projects, true);
 			projects.clear();
@@ -66,6 +69,10 @@ class ProjectSearchService extends AbstractSearchService {
 				doc.addField(searchFieldsConfig.ID, proj.id.toString());
 				doc.addField(searchFieldsConfig.TITLE, proj.title);
 				doc.addField(searchFieldsConfig.GRANTEE_ORGANIZATION, proj.granteeOrganization);
+
+                doc.addField(searchFieldsConfig.UPLOADED_ON, proj.dateCreated);
+                doc.addField(searchFieldsConfig.UPDATED_ON, proj.lastUpdated);
+
 				
 				proj.locations.each { location ->
 					doc.addField(searchFieldsConfig.SITENAME, location.siteName);				

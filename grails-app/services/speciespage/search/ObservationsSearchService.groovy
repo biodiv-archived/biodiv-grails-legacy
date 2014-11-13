@@ -31,7 +31,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService extends AbstractSearchService {
 
-    
+
     /**
      * 
      */
@@ -45,9 +45,9 @@ class ObservationsSearchService extends AbstractSearchService {
 
         def observations;
         def startTime = System.currentTimeMillis()
-        INDEX_DOCS = Observation.count()+1;
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Observation.count()+1;
         while(noIndexed < INDEX_DOCS) {
-            observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
+            observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id']);
             noIndexed += observations.size()
             if(!observations) break;
             publishSearchIndex(observations, true);
@@ -90,7 +90,7 @@ class ObservationsSearchService extends AbstractSearchService {
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
             doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
-			doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
+            doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
             doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
@@ -181,6 +181,7 @@ class ObservationsSearchService extends AbstractSearchService {
             def chk = obv 
 
             doc.addField(searchFieldsConfig.TITLE, chk.title);
+        doc.addField(searchFieldsConfig.LICENSE, chk.license.name.value());
         doc.removeField(searchFieldsConfig.UPLOADED_ON);
         doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate?:chk.createdOn);
         doc.addField(searchFieldsConfig.REFERENCE, chk.refText);

@@ -90,7 +90,14 @@ class BiodivAdminController {
 
     def reloadSpeciesSearchIndex = {
         try {
-            //speciesSearchService.deleteIndex();
+            if(params.deleteIndex)
+                speciesSearchService.deleteIndex();
+
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                speciesSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             speciesSearchService.publishSearchIndex();
             speciesSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['species'] as Object[], RCU.getLocale(request))
@@ -103,7 +110,13 @@ class BiodivAdminController {
 
     def reloadObservationsSearchIndex = {
         try {
-            //observationsSearchService.deleteIndex();
+            if(params.deleteIndex)
+                observationsSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                observationsSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             observationsSearchService.publishSearchIndex();
             observationsSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['observations'] as Object[], RCU.getLocale(request))
@@ -116,7 +129,13 @@ class BiodivAdminController {
 
     def reloadUsersSearchIndex = {
         try {
-            //SUserSearchService.deleteIndex();
+            if(params.deleteIndex)
+                SUserSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                SUserSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             SUserSearchService.publishSearchIndex();
             SUserSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['users'] as Object[], RCU.getLocale(request))
@@ -129,7 +148,13 @@ class BiodivAdminController {
 
     def reloadDocumentSearchIndex = {
         try {
-            //documentSearchService.deleteIndex();
+            if(params.deleteIndex)
+                documentSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                documentSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], RCU.getLocale(request))
@@ -260,7 +285,12 @@ def user = {
 
     def reloadBiodivSearchIndex = {
         try {
-            biodivSearchService.deleteIndex();
+            if(params.deleteIndex) 
+                biodivSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                biodivSearchService.INDEX_DOCS = indexDocs
+            }
             biodivSearchService.publishSearchIndex();
             biodivSearchService.optimize();
             flash.message = "Successfully created biodiv search index"

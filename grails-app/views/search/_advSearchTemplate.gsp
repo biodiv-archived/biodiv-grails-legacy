@@ -1,5 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="java.text.SimpleDateFormat" %>
+<%@page import="species.License.LicenseType"%>
+
 <g:set var="modules"  value="[[name:'All',displayName:g.message(code:'default.all.label') ], [name:'Species', template:'species',displayName:g.message(code:'default.species.label')], [name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], [name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], [name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], [name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')]]"/>
 
 <div  class="block-tagadelic">
@@ -11,7 +13,7 @@
         <div class="control-group">
             <label class="control-label" for="module">${g.message(code:"default.label.module")}</label>
             <div class="controls">
-                <select class="searchFilter moduleFilter" name="aq.object_type" style="width:100%">
+                <select class="searchFilter moduleFilter btn" name="aq.object_type" style="width:100%">
                     <g:each in="${modules}" var="module">
                    <option value="${module.name}">${module.displayName}</option>
                     </g:each>
@@ -60,16 +62,6 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="license">${g.message(code:"default.licenses.label")}</label> 
-            <div class="controls">
-                <input id="aq.license"
-                data-provide="typeahead" type="text" class="input-block-level"
-                name="aq.license" value="${queryParams?queryParams['aq.license']?.encodeAsHTML():'' }"
-                placeholder="${g.message(code:'placeholder.license')}" />
-            </div>
-        </div>
-
-        <div class="control-group">
             <label class="control-label" for="text">${g.message(code:"default.content.label")}</label> 
             <div class="controls">
                 <input id="aq.text"
@@ -81,12 +73,16 @@
 
         <g:each in="${modules}" var="module">
         <g:if test="${!module.name.equalsIgnoreCase('All')}">
-
         <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.name)?'':'hide' }">
+            <br/>
+            <b>${module.displayName} specific search options</b>
+            <br/>
             <g:render template="/${module.template}/advSearchTemplate"/>
         </div>
         </g:if>
         </g:each>
+    
+        <g:render template="/search/advSearchCommonFooterOptionsTemplate"/>
 
     <div class="form-action">
         <button type="submit" id="advSearch"
@@ -137,14 +133,14 @@ $(document).ready(function(){
     $('#uploadedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' +endDate.toString('dd/MM/yyyy'));
 
     $('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
-    var field = $(this).attr('name');
-    $(this).typeahead({
-    source: function (query, process) {
-    return $.get("${uGroup.createLink(action:'terms', controller:'observation') }"+'?field='+field, { term: query }, function (data) {
-    return process(data);
-    });
-    }
-    });
+        var field = $(this).attr('name');
+        $(this).typeahead({
+            source: function (query, process) {
+                return $.get("${uGroup.createLink(action:'terms', controller:'observation') }"+'?field='+field, { term: query }, function (data) {
+                    return process(data);
+                });
+            }
+        });
     });
 
     $("#advSearch").click(function() {
@@ -152,14 +148,14 @@ $(document).ready(function(){
     });
 
     $( "#advSearchForm" ).submit(function() {
-    if($('#uGroup_ALL').is(':checked')) {
-    $( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
-    updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
-    return false;
-    } 
-    resetSearchFilters();
-    updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
-    return false;
+        if($('#uGroup_ALL').is(':checked')) {
+            $( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
+            updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
+            return false;
+        } 
+        resetSearchFilters();
+        updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
+        return false;
     });
 
     //	$("#uGroup_${queryParams?queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL'):''}").click();
@@ -169,6 +165,7 @@ $(document).ready(function(){
         var val = $(this).val();
         $('.aq_modules').hide();
         $('input[name*="aq."]').val('').parent().parent().show();
+        $('select[name="aq.license"],select[name="aq.type"]').val('').parent().parent().show();
         hideAqSearchControls(val);
     });
 
@@ -178,13 +175,40 @@ $(document).ready(function(){
             $('input[name="aq.attribution"]').val('').parent().parent().hide();
         } else if (val == 'SUser') {
             $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.tag"]').val('').parent().parent().hide();
+            $('select.multiselect').parent().parent().hide()
         } else if (val == 'UserGroup') {
             $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.text"],input[name="aq.tag"],input[name="aq.uGroup"]').val('').parent().parent().hide();
+            $('select.multiselect').parent().parent().hide()
         }
 
         $('.'+val.toLowerCase()+'_aq_filters').show()
     }
 
     hideAqSearchControls($('select.moduleFilter').val());
+
+    var licenses = "${queryParams?queryParams['aq.license']:''}".split(/AND|OR/);
+    $.each(licenses, function(index, value) {
+        $('select.multiselect.licenseFilter option[value="'+value.trim()+'"]').attr("selected",true);
+    });
+
+    var types = "${queryParams?queryParams['aq.type']:''}".split(/AND|OR/);
+    $.each(types, function(index, value) {
+        $('select.multiselect.typeFilter option[value="'+value.trim()+'"]').attr("selected",true);
+    });
+    $('select.multiselect').multiselect({
+        buttonWidth:'100%'
+    });
+
+    $('.daterangepicker').parent().width('230%');
+    
+    $('#advSearchDropdownA').on('click', function (event) {
+        $(this).parent().toggleClass("open");
+    });
+
+    $('body').on('click', function (e) {
+        if (!$('#advSearchDropdown').is(e.target) && $('#advSearchDropdown').has(e.target).length === 0 && $('.open').has(e.target).length === 0) {
+            $('#advSearchDropdown').removeClass('open');
+        }
+    });
 });
 </r:script>
