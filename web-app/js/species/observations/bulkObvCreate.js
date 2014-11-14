@@ -10,8 +10,9 @@ function bulkObservationSubmission(ele, showListPage){
         event.preventDefault();
         return false; 		 		
     }
-
+    
     if (document.getElementById('agreeTerms').checked) {
+        $('.agreeTerms').prop('checked', true);
         $("#addBulkObservationsSubmit").addClass("disabled");
         $("#addBulkObservationsAndListPage").addClass("disabled");
         var allForms = $(".addObservation");
