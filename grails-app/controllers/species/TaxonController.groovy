@@ -452,14 +452,16 @@ class TaxonController {
 	def update()  {
 		//Do only when params coming from curation interface
 		def otherParams = [:]
+        params['fromCurationInterface'] = false;
 		if(params.taxonData) {
+            params['fromCurationInterface'] = true;
 			params << JSON.parse(params.taxonData)
 			params.remove('taxonData');
 			otherParams['id_details'] = params.id_details;
 			otherParams['metadata'] = params.metadata;
 		}
         if(params.metadata?.nameStatus != "accepted") {
-            println "=========STATUS======== " + params.metadata.nameStatus
+            println "=========STATUS======== " + params.metadata?.nameStatus
         }
 		println "=======PARAMS UPDATE======== " + params
 		def msg;
@@ -499,7 +501,13 @@ class TaxonController {
 					TaxonomyRegistry reg = TaxonomyRegistry.read(params.long('reg'));
 					if(reg) {
 						classification = reg.classification;
+                        println "======WILL DELETE THIS REG ====== " + reg
+                        /*if(params['fromCurationInterface']) {
+                            def updateStatus = taxonService.updateTaxonName(params, reg);
+                            return
+                        }*/
 						result = taxonService.deleteTaxonHierarchy(reg, true);
+                        println "======the result ===== " + result
 					}
 					println "=======5======== " + result
 					println "=======OTHER PARAMS======== " + otherParams
@@ -515,7 +523,7 @@ class TaxonController {
 				}
 
 				println "=========TO BOOLEAN====== " + params.abortOnNewName + "==== " + params.fromCOL
-				result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName.toBoolean()?params.abortOnNewName.toBoolean():false) , (params.fromCOL.toBoolean()?params.fromCOL.toBoolean():false), otherParams);
+				result = taxonService.addTaxonHierarchy(speciesName, t, classification, springSecurityService.currentUser, languageInstance, (params.abortOnNewName?.toBoolean()?params.abortOnNewName?.toBoolean():false) , (params.fromCOL?.toBoolean()?params.fromCOL?.toBoolean():false), otherParams);
 				result.action = 'update';
 				if(params.controller != 'taxon'){
 					if(result.success) {

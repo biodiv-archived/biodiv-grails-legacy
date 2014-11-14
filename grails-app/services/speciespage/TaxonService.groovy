@@ -860,6 +860,7 @@ class TaxonService {
 
         try {
             if(reg) {
+                println "====REG HERE=== " + reg
                 String hier = "";
                 def contributor = springSecurityService.currentUser;
                 while(reg != null) {
@@ -878,6 +879,7 @@ class TaxonService {
                         r.success = true;
                         r.msg = 'Successfully removed registry';
                         r.errors << errors
+                        println "=====ITS BREAKING HERE====== " + c[0]
                         break;
                     }
                     //reg.removeFromContributors(contributor);
@@ -888,13 +890,14 @@ class TaxonService {
                     reg = reg.parentTaxon;
 
                 } 
-                
+                println "========to delete LIST=========== " + toDelete 
                 int maxRank = 0, regId;
                 TaxonomyRegistry.withTransaction { status ->
                     toDelete.each { r2 ->
-
+                        println "====ITS RANK====== " + r2.taxonDefinition.rank + "======MAX RANK===== "+ maxRank
                         if(r2.taxonDefinition.rank > maxRank) {
                             regId = r2.id;
+                            println "====HERE REG ID== " + regId
                             maxRank = r2.taxonDefinition.rank;
                         }
 
@@ -1101,5 +1104,29 @@ class TaxonService {
             } 
         }
         return true;
+    }
+
+    def updateTaxonName(params, reg) {
+        def c = TaxonomyRegistry.withCriteria () {
+            projections {
+                count('id')
+            }
+            eq('parentTaxon', reg)
+        }
+        println "=========THE COUNT======== " + c[0]
+        if(c[0] > 1) {
+            //there is another hierarchy sharing same nodes and with same contributor.
+            // so leaving this portion untouched
+            //just updating its name
+            //TODO update contributor also
+            def taxDef = reg.taxonDefinition
+            def rank = taxDef.rank + ""
+            println "=======RANK==== " + rank
+            println "======UPDATE THE NAME with=== " + params.taxonRegistry[rank]
+            return true
+        } else {
+            //not in many paths
+            return false
+        }
     }
 }

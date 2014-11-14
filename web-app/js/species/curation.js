@@ -117,7 +117,6 @@ function populateTabDetails(data) {
         var e = $("#names-tab1 .singleRow").first().clone();
         $("#names-tab1 .singleRow").remove();
         $.each(synonymsList, function(index, value){
-            //$("#names-tab1 .add_new_row").trigger("click");
             var f = $(e).clone();
             $(f).insertBefore("#names-tab1 .add_new_row");
             var ele = $("#names-tab1 .singleRow").last();
@@ -137,7 +136,6 @@ function populateTabDetails(data) {
         var e = $("#names-tab2 .singleRow").first().clone();
         $("#names-tab2 .singleRow").remove();
         $.each(commonNamesList, function(index, value){
-            //$("#names-tab1 .add_new_row").trigger("click");
             var f = $(e).clone();
             $(f).insertBefore("#names-tab2 .add_new_row");
             var ele = $("#names-tab2 .singleRow").last();
@@ -158,7 +156,6 @@ function populateTabDetails(data) {
         var e = $("#names-tab0 .singleRow").first().clone();
         $("#names-tab0 .singleRow").remove();
         $.each(acceptedNamesList, function(index, value){
-            //$("#names-tab1 .add_new_row").trigger("click");
             var f = $(e).clone();
             $(f).insertBefore("#names-tab0 .add_new_row");
             var ele = $("#names-tab0 .singleRow").last();
@@ -335,9 +332,7 @@ function getExternalDbDetails(externalId) {
             console.log("======SUCCESS ID DETAILS====");
             $("#externalDbResults").modal('hide');
             populateNameDetails(data);
-            if(data['nameStatus'] == 'synonym') {
-                populateTabDetails(data);
-            }
+            populateTabDetails(data);
             if(dbName == 'col') {
                 changeEditingMode(true);
                 console.log("======ID DETAILS====");
