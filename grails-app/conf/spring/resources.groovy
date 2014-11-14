@@ -185,18 +185,25 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/users"
+            println "Initialized search server to "+config.serverURL+"/biodiv"
          }
     }//end of initializing solr Server
     
+    resourceSearchService(speciespage.search.ResourceSearchService) {
+        solrServer = ref('biodivSolrServer');
+		sessionFactory = ref("sessionFactory");
+    }
+
     speciesSearchService(speciespage.search.SpeciesSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+        resourceSearchService = ref('resourceSearchService');
     }
     observationsSearchService(speciespage.search.ObservationsSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
-    }
+        resourceSearchService = ref('resourceSearchService');
+     }
     //checklistSearchService(speciespage.search.ChecklistSearchService) {
     //    solrServer = ref('checklistSolrServer');
     //}
@@ -220,6 +227,7 @@ beans = {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
     }
+
     biodivSearchService(speciespage.search.BiodivSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
