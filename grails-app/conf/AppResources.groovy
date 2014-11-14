@@ -72,6 +72,7 @@ modules = {
 		resource url:'/js/jquery/trunk8.min.js'
 		resource url:'/js/species/membership.js'
 		resource url:'/js/date.js'
+		resource url:'/js/moment.min.js'
 		resource url:'/js/daterangepicker.js'
 		resource url:'/js/stats.js'
 		resource url:'/js/jquery.tablesorter.js'

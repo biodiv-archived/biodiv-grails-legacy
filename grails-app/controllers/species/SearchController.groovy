@@ -28,21 +28,16 @@ class SearchController {
         def model = biodivSearchService.select(params);
 
         if(params.loadMore?.toBoolean()){
-            println "111======================="
             params.remove('isGalleryUpdate');
             render(template:"/search/showSearchResultsListTemplate", model:model);
             return;
         } else if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
             render model as JSON
         } else if(!params.isGalleryUpdate?.toBoolean()){
-            println "222======================="
             params.remove('isGalleryUpdate');
-            println model
-            println "result=================++++"
             render (view:"select", model:model)
             return;
         } else {
-            println "333======================="
             params.remove('isGalleryUpdate');
             model['resultType'] = 'search result'
             def listHtml =  g.render(template:"/search/showSearchResultsListTemplate", model:model);
@@ -69,6 +64,27 @@ class SearchController {
         suggestions.addAll(namesLookupResults);
         suggestions.addAll(biodivSearchService.nameTerms(params));
         render suggestions as JSON 
+    }
+
+    def search() {
+        NamedList paramsList = new NamedList()
+        params.each {key,value ->
+            paramsList.add(key, value);
+        }
+        def result = biodivSearchService.search(paramsList)
+
+        println result;
+        println "++++++++++++++++++++++++++++++++++++++++++"
+        List objectTypeFacets = result.getFacetField(params['facet.field']).getValues()
+        def facetResults = [];
+        objectTypeFacets.each {
+            //TODO: sort on name
+            facetResults <<  [name:it.getName(), count:it.getCount()]
+
+        }
+
+
+        render facetResults as JSON
     }
 
 }

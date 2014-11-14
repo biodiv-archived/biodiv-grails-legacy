@@ -629,9 +629,31 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
                 }
             }
         });
+        
+        delete params['daterangepicker_start'];
+        delete params['daterangepicker_end'];
+
+        $.each($(document).find('input[name=daterangepicker_start]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_start'] = $(value).val();
+            } else {
+                params['daterangepicker_start'] = $(value).val();
+            }
+        });
+        $.each($(document).find('input[name=daterangepicker_end]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_end'] = $(value).val();
+            } else {
+                params['daterangepicker_end'] = $(value).val();
+            }
+        });
         if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
             delete params['daterangepicker_start'];
             delete params['daterangepicker_end'];
+        }
+        if((params['observedon_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['observedon_end'] === Date.today().toString('dd/MM/yyyy'))){
+            delete params['observedon_start'];
+            delete params['observedon_end'];
         }
 
         delete params['query'];
@@ -689,6 +711,13 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['object_type'] = object_type
     } else {
         delete params['object_type']
+    }
+
+    var uGroup = getSelectedFilters($("input.uGroupFilter.active:checked"))
+    if(uGroup) {
+        params['uGroup'] = uGroup
+    } else {
+        delete params['uGroup']
     }
 
     var sGroup = getSelectedFilters($("input.sGroupFilter.active:checked"))
