@@ -148,48 +148,48 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             var iconClass = undefined
             menu.items[0].iconCssClass = (args.column.name === $("#sciNameColumn").val())?'icon-check':undefined
             menu.items[1].iconCssClass = (args.column.name === $("#commonNameColumn").val())?'icon-check':undefined
-            menu.items[1].iconCssClass = (args.column.name === $("#latitude").val())?'icon-check':undefined
-            menu.items[1].iconCssClass = (args.column.name === $("#longitude").val())?'icon-check':undefined
-            menu.items[1].iconCssClass = (args.column.name === $("#obvDate").val())?'icon-check':undefined
+            menu.items[2].iconCssClass = (args.column.name === $("#latitude").val())?'icon-check':undefined
+            menu.items[3].iconCssClass = (args.column.name === $("#longitude").val())?'icon-check':undefined
+            menu.items[4].iconCssClass = (args.column.name === $("#obvDate").val())?'icon-check':undefined
         });
         
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
             var name = args.column.name;
+            var cloumnDropdown = ['sciNameColumn','commonNameColumn','latitude','longitude','obvDate'];
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
                     name = ''
-                if(args.column.name == $('#commonNameColumn').val())
-                    $('#commonNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name);                                       
                 $('#sciNameColumn').val(name);
             } else if(args.command === 'commonNameColumn') {
                 if(args.column.name == $('#commonNameColumn').val())
                     name = ''
-                if(args.column.name == $('#sciNameColumn').val())
-                    $('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#commonNameColumn').val(name);
             } else if(args.command === 'latitude') {
                 if(args.column.name == $('#latitude').val())
                     name = ''
-                if(args.column.name != $('#latitude').val())
-                    //$('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#latitude').val(name); 
             } else if(args.command === 'longitude') {
                 if(args.column.name == $('#longitude').val())
                     name = ''
-                if(args.column.name != $('#longitude').val())
-                    //$('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#longitude').val(name); 
             } else if(args.command === 'obvDate') {
                 if(args.column.name == $('#obvDate').val())
                     name = ''
-                if(args.column.name != $('#obvDate').val())
-                    //$('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#obvDate').val(name); 
             }
 
     
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+            selectNameColumn($('#latitude'), null);
+            selectNameColumn($('#longitude'), null);
+            selectNameColumn($('#obvDate'), null);
+
         });
         grid.registerPlugin(headerMenuPlugin);
 
@@ -335,6 +335,17 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         }
     });
 } 
+
+function clearCloumnSelectIfExist(cloumnDropdown,cloumnName){
+
+    $.each(cloumnDropdown,function(key,value){
+
+        if(cloumnName == $('#'+value).val()){
+            $('#'+value).val('');        
+        }
+
+    }); 
+}
 
 function sciNameFormatter(row, cell, value, columnDef, dataContext) {
     if (value == null || value == undefined || !value.length)
