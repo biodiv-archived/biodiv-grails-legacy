@@ -31,7 +31,7 @@ class SUserSearchService extends AbstractSearchService {
 		
 		def susers;
 		def startTime = System.currentTimeMillis()
-        INDEX_DOCS = SUser.count()+1;
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:SUser.count()+1;
 		while(noIndexed < INDEX_DOCS) { 
 			susers = SUser.findAll("from SUser as u where u.accountLocked =:ae and u.accountExpired =:al and u.enabled=:en", [ae:false, al:false, en:true], [max:limit, offset:offset, sort: "id"]);
             noIndexed += susers.size();
@@ -74,6 +74,17 @@ class SUserSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.EMAIL, suser.email);
             doc.addField(searchFieldsConfig.ABOUT_ME, suser.aboutMe);
             doc.addField(searchFieldsConfig.LAST_LOGIN, suser.lastLoginDate);
+
+            String userInfo = suser.name + " ### " + suser.email +" "+ suser.username +" "+suser.id.toString()
+            doc.addField(searchFieldsConfig.MEMBERS, userInfo);
+
+            doc.addField(searchFieldsConfig.UPLOADED_ON, suser.dateCreated);
+            doc.addField(searchFieldsConfig.UPDATED_ON, suser.lastLoginDate);
+
+            suser.groups.each { userGroup ->
+                doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+                doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+            }
 
             docs.add(doc);
 		}

@@ -63,6 +63,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
         </div>
         <input class="resourceListType" type="hidden" name='resourceListType' value= />
+        <input class="agreeTerms" type="checkbox" name='agreeTerms' style ="display:none;"/>
     </div>
 </form>
 <script type="text/javascript">

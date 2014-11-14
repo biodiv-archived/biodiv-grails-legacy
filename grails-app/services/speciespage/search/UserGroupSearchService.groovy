@@ -35,7 +35,7 @@ class UserGroupSearchService extends AbstractSearchService {
 		
 		def userGroups;
 		def startTime = System.currentTimeMillis()
-        INDEX_DOCS = UserGroup.count()+1;
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:UserGroup.count()+1;
 		while(noIndexed < INDEX_DOCS) {
 			userGroups = UserGroup.list(max:limit, offset:offset);
             noIndexed += userGroups.size();
@@ -71,7 +71,7 @@ class UserGroupSearchService extends AbstractSearchService {
 			    doc.addField(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
 				doc.addField(searchFieldsConfig.TITLE, ug.name);
 				//Location
-                //doc.addField(searchFieldsConfig.UPLOADED_ON, obv.date);
+                doc.addField(searchFieldsConfig.UPLOADED_ON, ug.foundedOn);
 				//Pages
                 def allPages = ""
                 ug.newsletters.each {

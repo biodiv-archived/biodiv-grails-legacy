@@ -36,12 +36,15 @@ class NewsletterSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to newsletters search index"
 		
 		//TODO: change limit
-		int limit = Newsletter.count()+1, offset = 0;
+		int limit = BATCH_SIZE, offset = 0;
+        int noIndexed = 0;
 		
 		def newsletters;
 		def startTime = System.currentTimeMillis()
-		while(true) {
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Newsletter.count()+1;
+		while(noIndexed < INDEX_DOCS) {
 			newsletters = Newsletter.list(max:limit, offset:offset);
+            noIndexed += newsletters;
 			if(!newsletters) break;
 			publishSearchIndex(newsletters, true);
 			newsletters.clear();

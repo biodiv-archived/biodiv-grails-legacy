@@ -40,7 +40,7 @@ abstract class AbstractSearchService {
     SolrServer solrServer;
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 20;
-    int INDEX_DOCS = 20;
+    int INDEX_DOCS = -1;
 
     def getUtilsServiceBean() {
         if(!utilsServiceBean) {
@@ -112,7 +112,7 @@ abstract class AbstractSearchService {
         def params = SolrParams.toSolrParams(query);
         log.info "Running ${this.getClass().getName()} search query : "+params
         println "Running ${this.getClass().getName()} search query : "+params
-        def result;
+        def result = [];
         try {
             result = solrServer.query( params );
         } catch(SolrException e) {

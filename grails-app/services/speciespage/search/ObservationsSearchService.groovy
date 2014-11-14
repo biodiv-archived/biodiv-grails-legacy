@@ -31,7 +31,8 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService extends AbstractSearchService {
 
-    
+    def resourceSearchService;
+
     /**
      * 
      */
@@ -45,9 +46,9 @@ class ObservationsSearchService extends AbstractSearchService {
 
         def observations;
         def startTime = System.currentTimeMillis()
-        INDEX_DOCS = Observation.count()+1;
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Observation.count()+1;
         while(noIndexed < INDEX_DOCS) {
-            observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
+            observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id']);
             noIndexed += observations.size()
             if(!observations) break;
             publishSearchIndex(observations, true);
@@ -90,11 +91,12 @@ class ObservationsSearchService extends AbstractSearchService {
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
             doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
-			doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
+            doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
-            doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
-            doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
+            doc.addField(searchFieldsConfig.TITLE, obv.fetchSpeciesCall());
+            //doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
+            //doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
             doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name +" ### "+obv.author.email +" "+obv.author.username+" "+obv.author.id.toString());
 
             doc.addField(searchFieldsConfig.FROM_DATE, obv.fromDate);
@@ -103,6 +105,7 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
             doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
             doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
+            doc.addField(searchFieldsConfig.LICENSE, obv.license.name.value());
             if(obv.notes) {
                 doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
             }
@@ -147,9 +150,12 @@ class ObservationsSearchService extends AbstractSearchService {
             }
 
             def checklistObvs = addChecklistData(obv, doc)
+            
+            List resourceDocs = getResourcesDocs(obv);
 
             docs.add(doc);
             docs.addAll(checklistObvs);
+            docs.addAll(resourceDocs);
         }
         return docs
 
@@ -181,6 +187,7 @@ class ObservationsSearchService extends AbstractSearchService {
             def chk = obv 
 
             doc.addField(searchFieldsConfig.TITLE, chk.title);
+        doc.addField(searchFieldsConfig.LICENSE, chk.license.name.value());
         doc.removeField(searchFieldsConfig.UPLOADED_ON);
         doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate?:chk.createdOn);
         doc.addField(searchFieldsConfig.REFERENCE, chk.refText);
@@ -210,13 +217,36 @@ class ObservationsSearchService extends AbstractSearchService {
         def docs = [];
         chk.observations.each { row ->
             //addNameToDoc(row, doc)
-            def d = getSolrDocument(Observation.read(row.id));
+            Observation chk_obv = Observation.read(row.id);
+            def d = getSolrDocument(chk_obv);
             if(d) {
                 d[0].addField(searchFieldsConfig.TITLE, chk.title);
                 docs.addAll(d);
+            }
+
+            def r = getResourcesDocs(chk_obv);
+            if(r) {
+                r.each {
+                    it.addField(searchFieldsConfig.CONTAINER, chk_obv.class.simpleName +"_"+chk_obv.id.toString());
+                }
+                docs.addAll(r);
             }
         }
         return docs;
     }
 
+    List getResourcesDocs(Observation obv) {
+        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        List resourcesDocs = [];
+        SolrInputDocument resourceDoc;
+        obv.resource.each { resource ->
+            resourceDoc =  resourceSearchService.getSolrDocument(resource);
+            if(resourceDoc) {
+                resourceDoc.addField(searchFieldsConfig.NAME, obv.fetchSpeciesCall());
+                resourceDoc.addField(searchFieldsConfig.CONTAINER, obv.class.simpleName +"_"+obv.id.toString());
+                resourcesDocs << resourceDoc
+            }
+        }
+        return resourcesDocs;
+    }
 }
