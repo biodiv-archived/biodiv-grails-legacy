@@ -94,7 +94,7 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
-            doc.addField(searchFieldsConfig.TITLE, obv.fetchSpeciesCall());
+            //doc.addField(searchFieldsConfig.TITLE, obv.fetchSpeciesCall());
             //doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
             //doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
             doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name +" ### "+obv.author.email +" "+obv.author.username+" "+obv.author.id.toString());
