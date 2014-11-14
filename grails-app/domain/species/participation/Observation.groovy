@@ -9,6 +9,7 @@ import groovy.sql.Sql;
 import java.text.SimpleDateFormat
 import species.Habitat
 import species.Language;
+import species.License;
 import species.Resource;
 import species.Resource.ResourceType;
 import species.auth.SUser;
@@ -84,10 +85,12 @@ class Observation extends Metadata implements Taggable, Rateable {
     // Language
     Language language;
 
+    License license;
+
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
-
-	static constraints = {
+ 
+ 	static constraints = {
 		notes nullable:true
 		searchText nullable:true
 		maxVotedReco nullable:true
@@ -107,6 +110,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		topology nullable:false
 		fromDate nullable:false
 		placeName blank:false
+        license nullable:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
 	}
@@ -118,7 +122,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
-	}
+	 }
 
 	/**
 	 * TODO: return resources in rating order and choose first

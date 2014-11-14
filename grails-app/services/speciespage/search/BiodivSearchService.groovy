@@ -42,6 +42,9 @@ class BiodivSearchService extends AbstractSearchService {
     //def newsletterSearchService
     @Autowired
     def userGroupSearchService
+    @Autowired
+    def resourceSearchService
+
     //ApplicationContext applicationContext
 /*
     def getObservationsSearchServiceBean() {
@@ -118,18 +121,23 @@ class BiodivSearchService extends AbstractSearchService {
         log.info "=======STARTING======== "
         log.info "Initializing publishing to biodiv search index : ";
 
-        log.info "===INDEXING OBV======== "
-        observationsSearchService.INDEX_DOCS = INDEX_DOCS
-        observationsSearchService.publishSearchIndex();
         log.info "===INDEXING SP========"
         speciesSearchService.INDEX_DOCS = INDEX_DOCS
         speciesSearchService.publishSearchIndex();
-        log.info "===INDEXING DOC========"
+
+
+        log.info "===INDEXING OBV======== "
+        observationsSearchService.INDEX_DOCS = INDEX_DOCS
+        observationsSearchService.publishSearchIndex();
+
+               log.info "===INDEXING DOC========"
         documentSearchService.INDEX_DOCS = INDEX_DOCS
         documentSearchService.publishSearchIndex()
+
         log.info "===INDEXING USER========"
         SUserSearchService.INDEX_DOCS = INDEX_DOCS
         SUserSearchService.publishSearchIndex()
+
         //log.info "===NEWSLETTER========"
         //def f5 = newsletterSearchService.publishSearchIndex(newsletters, commit)
         log.info "=====INDEXING USER GROUP==== "
@@ -198,13 +206,18 @@ class BiodivSearchService extends AbstractSearchService {
         def responseHeader
         long noOfResults = 0;
         def speciesGroupCountList = [];
-        List objectTypes = [], sGroups = [], tags= [], contributors = [];
+        List objectTypes = [], uGroups = [], sGroups = [], tags= [], contributors = [];
 
         if(paramsList) {
             //Facets
             paramsList.add('facet', "true");
             paramsList.add('facet.mincount', "1");
             paramsList.add('facet.field', searchFieldsConfig.OBJECT_TYPE);
+            paramsList.add('facet.field', searchFieldsConfig.USER_GROUP);
+            paramsList.add('f.'+searchFieldsConfig.USER_GROUP+'.facet.limit', max);
+            paramsList.add('f.'+searchFieldsConfig.USER_GROUP+'.facet.offset', 0);
+
+
 //            paramsList.add('facet.field', searchFieldsConfig.SGROUP);
 //            paramsList.add('facet.field', searchFieldsConfig.TAG);
 //            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.limit', max);
@@ -224,6 +237,13 @@ class BiodivSearchService extends AbstractSearchService {
                         //TODO: sort on name
                         objectTypes << [name:it.getName(), count:it.getCount()]
                     }
+
+                    List uGroupFacets = queryResponse.getFacetField(searchFieldsConfig.USER_GROUP)?.getValues()?:[]
+                    uGroupFacets.each {
+                        //TODO: sort on name
+                        uGroups << [name:it.getName(), count:it.getCount()]
+                    }
+
 
     /*                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
                     sGroupFacets.each {
@@ -255,6 +275,20 @@ class BiodivSearchService extends AbstractSearchService {
                     if(clazz) {
                         instance = clazz.read(instanceId);
                     }
+
+                    def containers = doc.getFieldValue(searchFieldsConfig.CONTAINER)
+                    List containerInstances = [];
+                    containers.each { container ->
+                        container = container.split('_')
+                        if(container) {
+                            Long containerId = Long.parseLong(container[1])
+                            className = container[0]
+                            clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+                            if(clazz) {
+                                containerInstances << clazz.read(containerId);
+                            }
+                        }
+                    }
     /*                    switch(doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)) {
                         case Species.simpleName:
                             instance = Species.read(instanceId);
@@ -276,7 +310,7 @@ class BiodivSearchService extends AbstractSearchService {
                     }
     */
                     if(instance) {
-                        instanceList.add(instance);
+                        instanceList.add([instance:instance, containers:containerInstances]);
                     } else {
                         log.error "${doc} has invalid id in search index. May be out of sync from db"
                     }
@@ -285,7 +319,7 @@ class BiodivSearchService extends AbstractSearchService {
             }
         }
 
-        return [responseHeader:responseHeader, instanceList:instanceList, instanceTotal:noOfResults, objectTypes:objectTypes, queryParams:queryParams, activeFilters:activeFilters]
+        return [responseHeader:responseHeader, instanceList:instanceList, instanceTotal:noOfResults, objectTypes:objectTypes, uGroups:uGroups, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 
@@ -380,6 +414,61 @@ class BiodivSearchService extends AbstractSearchService {
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }
 
+        String observedOnStartDate = '';
+        String observedOnEndDate = '';
+        if(params.observedon_start) {
+            Date s = DateUtil.parseDate(params.observedon_start, ['dd/MM/yyyy']);
+            Calendar cal = Calendar.getInstance(); // locale-specific
+            cal.setTime(s)
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.MINUTE, 0);
+            s = new Date(cal.getTimeInMillis())
+            //StringWriter str1 = new StringWriter();
+            observedOnStartDate = dateFormatter.format(s)
+            //DateUtil.formatDate(s, cal, str1)
+            //println str1
+            //lastRevisedStartDate = str1;
+
+        }
+
+        if(params.observedon_end) {
+            Calendar cal = Calendar.getInstance(); // locale-specific
+            Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
+            cal.setTime(e)
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.MINUTE, 59);
+            e = new Date(cal.getTimeInMillis())
+            //			StringWriter str2 = new StringWriter();
+            //			DateUtil.formatDate(e, cal, str2)
+            //			println str2
+            observedOnEndDate = dateFormatter.format(e);
+        }
+
+        if(observedOnStartDate && observedOnEndDate) {
+            if(i > 0) aq += " AND";
+            aq += " "+searchFieldsConfig.OBSERVED_ON+":["+observedOnStartDate+" TO "+observedOnEndDate+"]";
+            queryParams['observedon_start'] = params.observedon_start;
+            queryParams['observedon_end'] = params.observedon_end;
+            activeFilters['observedon_start'] = params.observedon_start;
+            activeFilters['observedon_end'] = params.observedon_end;
+
+        } else if(observedOnStartDate) {
+            if(i > 0) aq += " AND";
+            //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+            aq += " "+searchFieldsConfig.OBSERVED_ON+":["+observedOnStartDate+" TO NOW]";
+            queryParams['observedon_start'] = params.observedon_start;
+            activeFilters['observedon_start'] = params.observedon_end;
+        } else if (observedOnEndDate) {
+            if(i > 0) aq += " AND";
+            //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+            aq += " "+searchFieldsConfig.OBSERVED_ON+":[ * "+observedOnEndDate+"]";
+            queryParams['observedon_end'] = params.observedon_end;
+            activeFilters['observedon_end'] = params.observedon_end;
+        }
+
+
         if(params.query && aq) {
             params.query = params.query + " AND "+aq
         } else if (aq) {
@@ -401,7 +490,7 @@ class BiodivSearchService extends AbstractSearchService {
             paramsList.add('sort', sort);
         }
 
-        paramsList.add('fl', params['fl']?:searchFieldsConfig.ID+","+searchFieldsConfig.OBJECT_TYPE);
+        paramsList.add('fl', params['fl']?:searchFieldsConfig.ID+","+searchFieldsConfig.OBJECT_TYPE+","+searchFieldsConfig.CONTAINER);
         
         //Filters
         if(params.sGroup) {
@@ -466,6 +555,10 @@ class BiodivSearchService extends AbstractSearchService {
                 if(uGroup) {
                     paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
                 }
+                queryParams["uGroup"] = params.uGroup
+                activeFilters["uGroup"] = params.uGroup
+            } else if (params.uGroup && params.uGroup.isLong()) {
+                paramsList.add('fq', searchFieldsConfig.USER_GROUP+":"+params.uGroup);
                 queryParams["uGroup"] = params.uGroup
                 activeFilters["uGroup"] = params.uGroup
             } else {

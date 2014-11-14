@@ -14,8 +14,7 @@ def obvId = observationInstance.id
             </span>
     <div class="figure pull-left observation_story_image" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
-            <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
-            >
+            <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
                     <div style="position:relative;margin:auto;">
                     <g:if
                             test="${imagePath}">

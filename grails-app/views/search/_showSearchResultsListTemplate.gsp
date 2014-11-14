@@ -13,29 +13,32 @@
                 <g:each in="${instanceList}" status="i" var="instance">
                 <li class="thumbnail feedParentContext clearfix">
 
-                <g:set var="className" value="${org.hibernate.Hibernate.getClass(instance).getSimpleName()}"/>
+                <g:set var="className" value="${org.hibernate.Hibernate.getClass(instance.instance).getSimpleName()}"/>
 
                 <g:if test="${className == Species.simpleName}">
-                <s:showSnippet model="['speciesInstance':instance]" />
+                <s:showSnippet model="['speciesInstance':instance.instance]" />
                     </g:if>
                     <g:elseif test="${className == Observation.simpleName || className == Checklists.simpleName}">
-                    <obv:showSnippet model="['observationInstance':instance]"></obv:showSnippet>
+                    <obv:showSnippet model="['observationInstance':instance.instance]"></obv:showSnippet>
                     </g:elseif>
                     <g:elseif test="${className == Document.simpleName}">
-                    <g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':instance, showPDFViewer:false]"/>
+                    <g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':instance.instance, showPDFViewer:false]"/>
                     </g:elseif>
                     <g:elseif test="${className == SUser.simpleName}">
-                    <g:render template="/common/suser/showUserSnippetTemplate" model="['userInstance':instance]"/>
+                    <g:render template="/common/suser/showUserSnippetTemplate" model="['userInstance':instance.instance]"/>
                     </g:elseif>
                     <g:elseif test="${className == UserGroup.simpleName}">
                     <table class="table">
                         <tr class="mainContentList">
-                            <g:render template="/common/userGroup/showUserGroupSnippetTemplate" model="['userGroupInstance':instance, showJoin:false, showLeave:false]"/>
+                            <g:render template="/common/userGroup/showUserGroupSnippetTemplate" model="['userGroupInstance':instance.instance, showJoin:false, showLeave:false]"/>
                         </tr>
                     </table>
                     </g:elseif>
+                    <g:elseif test="${className == Resource.simpleName}">
+                    <g:render template="/resource/showResourceSnippetTemplate" model="['resourceInstance':instance.instance, containers:instance.containers]"/>
+                    </g:elseif>
                     <g:else>
-                    ${instance} ${className}
+                    ${instance.instance} ${className}
                     </g:else>
 
                     </li>

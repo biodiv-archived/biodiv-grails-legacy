@@ -418,6 +418,9 @@ speciesPortal {
         MEMBERS = "members"
         DOC_TYPE = "doc_type"
 		LICENSE = 'license'
+        CONTEXT = 'context'
+        CONTAINER = 'container'
+        RESOURCETYPE = 'resourcetype'
 	}
 
 	nameSearchFields {

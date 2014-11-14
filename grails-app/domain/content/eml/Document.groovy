@@ -119,7 +119,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		author nullable:true
 		notes nullable:true
 		doi nullable:true
-		license nullable:true
+		license nullable:false
     	featureCount nullable:false
 		agreeTerms nullable:true
 		

@@ -28,21 +28,16 @@ class SearchController {
         def model = biodivSearchService.select(params);
 
         if(params.loadMore?.toBoolean()){
-            println "111======================="
             params.remove('isGalleryUpdate');
             render(template:"/search/showSearchResultsListTemplate", model:model);
             return;
         } else if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
             render model as JSON
         } else if(!params.isGalleryUpdate?.toBoolean()){
-            println "222======================="
             params.remove('isGalleryUpdate');
-            println model
-            println "result=================++++"
             render (view:"select", model:model)
             return;
         } else {
-            println "333======================="
             params.remove('isGalleryUpdate');
             model['resultType'] = 'search result'
             def listHtml =  g.render(template:"/search/showSearchResultsListTemplate", model:model);
