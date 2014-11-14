@@ -66,4 +66,25 @@ class SearchController {
         render suggestions as JSON 
     }
 
+    def search() {
+        NamedList paramsList = new NamedList()
+        params.each {key,value ->
+            paramsList.add(key, value);
+        }
+        def result = biodivSearchService.search(paramsList)
+
+        println result;
+        println "++++++++++++++++++++++++++++++++++++++++++"
+        List objectTypeFacets = result.getFacetField(params['facet.field']).getValues()
+        def facetResults = [];
+        objectTypeFacets.each {
+            //TODO: sort on name
+            facetResults <<  [name:it.getName(), count:it.getCount()]
+
+        }
+
+
+        render facetResults as JSON
+    }
+
 }

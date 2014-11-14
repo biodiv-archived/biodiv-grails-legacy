@@ -106,7 +106,7 @@ class ResourceSearchService extends AbstractSearchService {
         }
 
         r.attributors.each { attributor ->
-            doc.addField(searchFieldsConfig.ATTRIBUTION, attributors.name);
+            doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
         }
 
         doc.addField(searchFieldsConfig.UPLOADED_ON, r.uploadTime);
