@@ -130,7 +130,7 @@ class BiodivSearchService extends AbstractSearchService {
         observationsSearchService.INDEX_DOCS = INDEX_DOCS
         observationsSearchService.publishSearchIndex();
 
-               log.info "===INDEXING DOC========"
+        log.info "===INDEXING DOC========"
         documentSearchService.INDEX_DOCS = INDEX_DOCS
         documentSearchService.publishSearchIndex()
 

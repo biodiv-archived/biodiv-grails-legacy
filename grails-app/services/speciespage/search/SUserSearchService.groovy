@@ -74,9 +74,10 @@ class SUserSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.EMAIL, suser.email);
             doc.addField(searchFieldsConfig.ABOUT_ME, suser.aboutMe);
             doc.addField(searchFieldsConfig.LAST_LOGIN, suser.lastLoginDate);
+            doc.addField(searchFieldsConfig.LOCATION, suser.location);
 
             String userInfo = suser.name + " ### " + suser.email +" "+ suser.username +" "+suser.id.toString()
-            doc.addField(searchFieldsConfig.MEMBERS, userInfo);
+            doc.addField(searchFieldsConfig.USER, userInfo);
 
             doc.addField(searchFieldsConfig.UPLOADED_ON, suser.dateCreated);
             doc.addField(searchFieldsConfig.UPDATED_ON, suser.lastLoginDate);

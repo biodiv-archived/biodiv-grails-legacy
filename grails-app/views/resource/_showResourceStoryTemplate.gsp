@@ -59,9 +59,9 @@
         <div class="prop" >
             <span class="name"><i class="icon-info-sign"></i><g:message code="default.belongs.to" /></span>
             <div class="value">
-                <g:each in="containers" var="container">
-                <g:link url="${uGroup.createLink(controller:container.class.simpleName.toLowerCase(), action:'show', id:container.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}" target="_blank">
-                ${raw(container.fetchSpeciesCall())}
+                <g:each in="${containers}" var="containerInstance">
+                <g:link url="${uGroup.createLink(controller:containerInstance.class.simpleName.toLowerCase(), action:'show', id:containerInstance.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}" target="_blank">
+                ${raw(containerInstance.fetchSpeciesCall())}
                 </g:link>
                 </g:each>
             </div>

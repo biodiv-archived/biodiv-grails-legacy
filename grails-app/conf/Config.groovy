@@ -421,6 +421,7 @@ speciesPortal {
         CONTEXT = 'context'
         CONTAINER = 'container'
         RESOURCETYPE = 'resourcetype'
+        USER = 'user'
 	}
 
 	nameSearchFields {

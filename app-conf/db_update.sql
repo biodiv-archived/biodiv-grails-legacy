@@ -231,4 +231,5 @@ select count(*) from document where license_id is null;
 update document set license_id = 822 where license_id is null;
 alter table document alter column license_id set not null;
 
+update solr schema.xml biodiv/conf/schema.xml 
 
