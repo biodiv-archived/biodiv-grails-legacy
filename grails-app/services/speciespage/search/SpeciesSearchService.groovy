@@ -28,6 +28,7 @@ import species.auth.SUser;
 class SpeciesSearchService extends AbstractSearchService {
 	
     def resourceSearchService;
+    static transactional = false
 	
 	/**
 	 * 
@@ -42,18 +43,22 @@ class SpeciesSearchService extends AbstractSearchService {
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Species.count()+1;
 		while(noIndexed < INDEX_DOCS) {
+            Species.withNewTransaction([readOnly:true]) { status ->
+                println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+                println status.isNewTransaction();
 			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
             noIndexed += species.size();
-			if(!species) break;
+			if(!species) return;
 			publishSearchIndex(species);
-			species = null;
 			offset += limit;
 			cleanUpGorm();
+            }
+			if(!species) break;;
+			species = null;
 		}
 		log.info "Time taken to publish search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 	
-	@Transactional(readOnly = true)
 	def listSpecies(id, params) {
 			//return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
 			return Species.findAllByIdGreaterThan(id, params);
@@ -268,7 +273,6 @@ class SpeciesSearchService extends AbstractSearchService {
 		}
 		return parsedNamesMap;
 	}
-	
 
     List getResourcesDocs(Species species) {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
@@ -299,6 +303,5 @@ class SpeciesSearchService extends AbstractSearchService {
         }
         return resourcesDocs;
     }
-
 
 }

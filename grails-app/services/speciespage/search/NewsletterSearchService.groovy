@@ -29,6 +29,8 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class NewsletterSearchService extends AbstractSearchService {
 
+    static transactional = false
+
 	/**
 	 * 
 	 */
@@ -42,15 +44,19 @@ class NewsletterSearchService extends AbstractSearchService {
 		def newsletters;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Newsletter.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			newsletters = Newsletter.list(max:limit, offset:offset);
-            noIndexed += newsletters;
-			if(!newsletters) break;
-			publishSearchIndex(newsletters, true);
-			newsletters.clear();
-			offset += limit;
-		}
-		
+        while(noIndexed < INDEX_DOCS) {
+            Newsletter.withNewTransaction([readOnly:true]) { status ->
+                newsletters = Newsletter.list(max:limit, offset:offset);
+                noIndexed += newsletters;
+                if(!newsletters) return;
+                publishSearchIndex(newsletters, true);
+                //newsletters.clear();
+                offset += limit;
+            }
+
+            if(!newsletters) break;
+            newsletters.clear();
+        }
 		log.info "Time taken to publish newsletter search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 

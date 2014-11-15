@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class BiodivSearchService extends AbstractSearchService {
     
+    static transactional = false
+
     @Autowired
     def observationsSearchService
     @Autowired

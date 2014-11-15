@@ -31,6 +31,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService extends AbstractSearchService {
 
+    static transactional = false
     def resourceSearchService;
 
     /**
@@ -48,13 +49,18 @@ class ObservationsSearchService extends AbstractSearchService {
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Observation.count()+1;
         while(noIndexed < INDEX_DOCS) {
-            observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id']);
-            noIndexed += observations.size()
+            Observation.withNewTransaction([readOnly:true]) { status ->
+                observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id']);
+                noIndexed += observations.size()
+                if(!observations) return;
+                publishSearchIndex(observations, true);
+                //observations.clear();
+                offset += limit;
+                cleanUpGorm()
+            }
+
             if(!observations) break;
-            publishSearchIndex(observations, true);
             observations.clear();
-            offset += limit;
-            cleanUpGorm()
         }
 
         log.info "Time taken to publish observations search index is ${System.currentTimeMillis()-startTime}(msec)";

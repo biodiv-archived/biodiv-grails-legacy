@@ -23,6 +23,8 @@ import species.groups.UserGroup;
 
 class UserGroupSearchService extends AbstractSearchService {
 
+    static transactional = false
+
 	/**
 	 * 
 	 */
@@ -34,17 +36,21 @@ class UserGroupSearchService extends AbstractSearchService {
         int offset = 0, noIndexed = 0;
 		
 		def userGroups;
-		def startTime = System.currentTimeMillis()
+        def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:UserGroup.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			userGroups = UserGroup.list(max:limit, offset:offset);
-            noIndexed += userGroups.size();
-			if(!userGroups) break;
-			publishSearchIndex(userGroups, true);
-			userGroups.clear();
-			offset += limit;
-		}
-		
+        while(noIndexed < INDEX_DOCS) {
+            UserGroup.withNewTransaction([readOnly:true]) { status ->
+                userGroups = UserGroup.list(max:limit, offset:offset);
+                noIndexed += userGroups.size();
+                if(!userGroups) return;
+                publishSearchIndex(userGroups, true);
+                //userGroups.clear();
+                offset += limit;
+            }
+            if(!userGroups) break;
+            userGroups.clear();
+        }
+
 		log.info "Time taken to publish usergroup search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 

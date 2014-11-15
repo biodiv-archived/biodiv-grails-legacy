@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class DocumentSearchService extends AbstractSearchService {
     
+    static transactional = false
 	
     /**
 	 *
@@ -34,15 +35,19 @@ class DocumentSearchService extends AbstractSearchService {
 		def documents;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Document.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			documents = Document.list(max:limit, offset:offset);
-            noIndexed += documents.size();
-			if(!documents) break;
-			publishSearchIndex(documents, true);
-			documents.clear();
-			offset += limit;
-            cleanUpGorm();
-		}
+        while(noIndexed < INDEX_DOCS) {
+            Document.withNewTransaction([readOnly:true]) { status ->
+                documents = Document.list(max:limit, offset:offset);
+                noIndexed += documents.size();
+                if(!documents) return;
+                publishSearchIndex(documents, true);
+                //documents.clear();
+                offset += limit;
+                cleanUpGorm();
+            }
+            if(!documents) break;
+            documents.clear();
+        }
 		
 		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
