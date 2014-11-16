@@ -832,7 +832,7 @@ $(document).ready(function() {
 
     $(".readmore").readmore({
         substr_len : 400,
-        more_link : '<a class="more readmore">&nbsp;More</a>'
+        more_link : '<a class="more readmore">&nbsp;'+window.i8ln.text.more+'</a>'
     });
 
     /*$("#toc").tocify({

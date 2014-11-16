@@ -23,6 +23,8 @@ import species.groups.UserGroup;
 
 class UserGroupSearchService extends AbstractSearchService {
 
+    static transactional = false
+
 	/**
 	 * 
 	 */
@@ -34,17 +36,22 @@ class UserGroupSearchService extends AbstractSearchService {
         int offset = 0, noIndexed = 0;
 		
 		def userGroups;
-		def startTime = System.currentTimeMillis()
-        INDEX_DOCS = UserGroup.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			userGroups = UserGroup.list(max:limit, offset:offset);
-            noIndexed += userGroups.size();
-			if(!userGroups) break;
-			publishSearchIndex(userGroups, true);
-			userGroups.clear();
-			offset += limit;
-		}
-		
+        def startTime = System.currentTimeMillis()
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:UserGroup.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            UserGroup.withNewTransaction([readOnly:true]) { status ->
+                userGroups = UserGroup.list(max:limit, offset:offset);
+                noIndexed += userGroups.size();
+                if(!userGroups) return;
+                publishSearchIndex(userGroups, true);
+                //userGroups.clear();
+                offset += limit;
+            }
+            if(!userGroups) break;
+            userGroups.clear();
+        }
+
 		log.info "Time taken to publish usergroup search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
@@ -67,11 +74,12 @@ class UserGroupSearchService extends AbstractSearchService {
 			log.debug "Reading usergroup : "+ug.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
+                doc.setDocumentBoost(3);
 				doc.addField(searchFieldsConfig.ID, ug.class.simpleName +"_"+ ug.id.toString());
 			    doc.addField(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
 				doc.addField(searchFieldsConfig.TITLE, ug.name);
 				//Location
-                //doc.addField(searchFieldsConfig.UPLOADED_ON, obv.date);
+                doc.addField(searchFieldsConfig.UPLOADED_ON, ug.foundedOn);
 				//Pages
                 def allPages = ""
                 ug.newsletters.each {

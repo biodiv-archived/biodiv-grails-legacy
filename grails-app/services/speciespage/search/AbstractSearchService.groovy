@@ -39,8 +39,8 @@ abstract class AbstractSearchService {
     @Autowired
     SolrServer solrServer;
 	SessionFactory sessionFactory;
-    int BATCH_SIZE = 20;
-    int INDEX_DOCS = 20;
+    int BATCH_SIZE = 10;
+    int INDEX_DOCS = -1;
 
     def getUtilsServiceBean() {
         if(!utilsServiceBean) {
@@ -112,7 +112,7 @@ abstract class AbstractSearchService {
         def params = SolrParams.toSolrParams(query);
         log.info "Running ${this.getClass().getName()} search query : "+params
         println "Running ${this.getClass().getName()} search query : "+params
-        def result;
+        def result = [];
         try {
             result = solrServer.query( params );
         } catch(SolrException e) {
@@ -189,7 +189,7 @@ abstract class AbstractSearchService {
         if(hibSession) {
             log.debug "Flushing and clearing session"
             try {
-                hibSession.flush()
+                //hibSession.flush()
             } catch(e) {
                 e.printStackTrace()
             }

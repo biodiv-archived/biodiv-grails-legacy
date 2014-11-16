@@ -106,7 +106,7 @@
 				<a class="pull-left btn ${prevProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
                                         id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i
-					class="icon-backward"></i><g:message code="buttton.prev" /> </a> <a
+					class="icon-backward"></i><g:message code="button.prev" /> </a> <a
 					class="pull-right  btn ${nextProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
                                         id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><g:message code="button.next" />
