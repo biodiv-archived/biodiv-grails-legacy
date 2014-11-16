@@ -75,16 +75,19 @@ class SearchController {
 
         println result;
         println "++++++++++++++++++++++++++++++++++++++++++"
-        List objectTypeFacets = result.getFacetField(params['facet.field']).getValues()
         def facetResults = [];
+        if(result.getFacetField(params['facet.field'])) {
+        List objectTypeFacets = result.getFacetField(params['facet.field'])?.getValues()
+        if(objectTypeFacets) {
         objectTypeFacets.each {
             //TODO: sort on name
             facetResults <<  [name:it.getName(), count:it.getCount()]
 
         }
+        }
+        }
 
-
-        render facetResults as JSON
+        render result as JSON
     }
 
 }

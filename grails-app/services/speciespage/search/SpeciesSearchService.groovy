@@ -37,7 +37,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to search index"
 		
 		//TODO: change limit
-		int limit=BATCH_SIZE, offset = 0, noIndexed = 0;
+		int limit=5, offset = 0, noIndexed = 0;
 		
 		def species;
 		def startTime = System.currentTimeMillis()
