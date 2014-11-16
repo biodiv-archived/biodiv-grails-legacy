@@ -84,6 +84,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		species.each { s ->
 			log.debug "Reading Species : "+s.id;
 			SolrInputDocument doc = new SolrInputDocument();
+            doc.setDocumentBoost(2);
 			doc.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
 			doc.addField(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
 			doc.addField(searchFieldsConfig.GUID, s.guid);

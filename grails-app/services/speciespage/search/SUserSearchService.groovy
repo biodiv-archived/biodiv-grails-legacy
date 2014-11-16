@@ -73,6 +73,7 @@ class SUserSearchService extends AbstractSearchService {
             suser = SUser.read(suser.id);
             log.debug "Reading User : "+suser.id;
             SolrInputDocument doc = new SolrInputDocument();
+            doc.setDocumentBoost(3);
             String className = org.hibernate.Hibernate.getClass(suser).getSimpleName()  
             doc.addField(searchFieldsConfig.ID, className +"_"+suser.id.toString());
             doc.addField(searchFieldsConfig.OBJECT_TYPE, className);

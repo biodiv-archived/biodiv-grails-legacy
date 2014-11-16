@@ -34,8 +34,8 @@
     <copyField source="name" dest="name_exact" />
     <field name="common_name_exact" type="textExact" indexed="true" multiValued="true" />
     <copyField source="common_name" dest="common_name_exact" />
-    <field name="reference" type="taxonText" indexed="true" stored="true" multiValued="true"/>
-	<field name="source_text" type="taxonText" indexed="true" stored="true" multiValued="true"/>
+    <field name="reference" type="taxonText" indexed="true" multiValued="true"/>
+	<field name="source_text" type="taxonText" indexed="true" multiValued="true"/>
 
     <field name="maxvotedspeciesname" type="taxonText" indexed="true" multiValued="true" />
     <field name="maxvotedspeciesname_exact" type="textExact" indexed="true" multiValued="true" />
@@ -61,40 +61,18 @@
    <!--SHOULD this be ENUM-->
    <field name="doc_type" type="string" indexed="true" multiValued="false" />
    
-   <!-- using stored=true for highlighting...needs to change -->
-   <field name="text" type="text" indexed="true" stored="true" required="true" multiValued="true"  termVectors="true" termPositions="true" termOffsets="true"/>
-   <copyField source="object_type" dest="text" />
-   <copyField source="author" dest="text" />
-   <copyField source="contributor" dest="text" />
-   <copyField source="location" dest="text" />
-   <copyField source="name" dest="text" />
-   <copyField source="common_name" dest="text" />
-   <copyField source="tag" dest="text" />
-   <copyField source="sgroup" dest="text" />
-   <copyField source="habitat" dest="text" />
-   <copyField source="title" dest="text" />
-   <copyField source="attribution" dest="text" />
-   <copyField source="reference" dest="text" />
-   <copyField source="content" dest="text" />
-   <copyField source="members" dest="text" />
-   <copyField source="license" dest="text" />
-   <copyField source="sp_overview" dest="text" />
-   <copyField source="sp_nc" dest="text" />
-   <copyField source="sp_nh" dest="text" />
-   <copyField source="sp_dc" dest="text" />
-   <copyField source="sp_um" dest="text" />
-   <copyField source="sp_il" dest="text" />
-   <copyField source="pages" dest="text" />
-   <copyField source="doc_type" dest="text" />
+   <field name="text" type="text" indexed="true" required="true" multiValued="true"  termVectors="true" termPositions="true" termOffsets="true"/>
+   <copyField source="*" dest="text" />
 
    <field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true"/>
    <copyField source="*_exact" dest="autocomplete" />
+
    <copyField source="tag" dest="autocomplete" />
    <copyField source="sgroup" dest="autocomplete" />
    <copyField source="habitat" dest="autocomplete" />
    <copyField source="members" dest="autocomplete" />
 
-   <field name="user_group" type="long" indexed="true" stored="true"  multiValued="true"/>
+   <field name="user_group" type="long" indexed="true"  multiValued="true"/>
    <field name="user_group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
 
    <dynamicField name="*" type="text" indexed="true" multiValued="true" />

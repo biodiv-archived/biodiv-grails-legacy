@@ -67,6 +67,15 @@
             </div>
         </div>
 
+        <div class="prop" >
+            <span class="name"><i class="icon-info-sign"></i><g:message code="default.contributors.label" /></span>
+            <div class="value">
+                <g:each in="${resourceInstance.contributors}" var="contributor">
+                ${contributor.name},
+                </g:each>
+            </div>
+        </div>
+
         <div class="row observation_footer" style="margin-left:0px;">
 
             <div class="story-footer" style="right:3px;">

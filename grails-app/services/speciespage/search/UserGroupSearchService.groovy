@@ -74,6 +74,7 @@ class UserGroupSearchService extends AbstractSearchService {
 			log.debug "Reading usergroup : "+ug.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
+                doc.setDocumentBoost(3);
 				doc.addField(searchFieldsConfig.ID, ug.class.simpleName +"_"+ ug.id.toString());
 			    doc.addField(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
 				doc.addField(searchFieldsConfig.TITLE, ug.name);
