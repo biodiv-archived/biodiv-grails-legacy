@@ -28,6 +28,7 @@ import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
+import species.UtilsService
 
 class ObservationsSearchService extends AbstractSearchService {
 
@@ -48,9 +49,10 @@ class ObservationsSearchService extends AbstractSearchService {
         def observations;
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Observation.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
             Observation.withNewTransaction([readOnly:true]) { status ->
-                observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id']);
+                observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id',readOnly:true]);
                 noIndexed += observations.size()
                 if(!observations) return;
                 publishSearchIndex(observations, true);
@@ -174,14 +176,21 @@ class ObservationsSearchService extends AbstractSearchService {
     private void addNameToDoc(Observation obv, SolrInputDocument doc) {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
-        def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
-        //distRecoVotes = obv.maxVotedReco;
-        distRecoVotes.each { vote ->
-            doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
-            if(vote.recommendation.taxonConcept)
-                doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
+
+        def recoVotes = obv.recommendationVote
+        def distRecoVotes;
+        if(recoVotes) {
+            //distRecoVotes = recoVotes.unique { it.recommendation };
+                distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
+            //distRecoVotes = obv.maxVotedReco;
+            distRecoVotes.each { vote ->
+                doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
+                doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
+                if(vote.recommendation.taxonConcept)
+                    doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
+            }
         }
+        
     }
 
     /**

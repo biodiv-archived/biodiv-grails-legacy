@@ -35,6 +35,7 @@ class ProjectSearchService extends AbstractSearchService {
         def projects;
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Project.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
             Project.withNewTransaction([readOnly:true]) { status ->
                 projects = Project.list(max:limit, offset:offset);

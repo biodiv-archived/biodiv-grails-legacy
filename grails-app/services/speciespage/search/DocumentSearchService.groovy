@@ -35,6 +35,7 @@ class DocumentSearchService extends AbstractSearchService {
 		def documents;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Document.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
             Document.withNewTransaction([readOnly:true]) { status ->
                 documents = Document.list(max:limit, offset:offset);

@@ -42,6 +42,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		def species;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Species.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
 		while(noIndexed < INDEX_DOCS) {
             Species.withNewTransaction([readOnly:true]) { status ->
                 println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"

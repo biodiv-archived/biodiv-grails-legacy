@@ -189,7 +189,7 @@ abstract class AbstractSearchService {
         if(hibSession) {
             log.debug "Flushing and clearing session"
             try {
-                hibSession.flush()
+                //hibSession.flush()
             } catch(e) {
                 e.printStackTrace()
             }

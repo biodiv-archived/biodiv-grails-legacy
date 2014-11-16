@@ -38,6 +38,7 @@ class UserGroupSearchService extends AbstractSearchService {
 		def userGroups;
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:UserGroup.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
             UserGroup.withNewTransaction([readOnly:true]) { status ->
                 userGroups = UserGroup.list(max:limit, offset:offset);
