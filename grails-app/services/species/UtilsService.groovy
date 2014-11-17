@@ -12,6 +12,7 @@ import species.participation.ActivityFeedService
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import species.participation.Checklists;
 import species.participation.Observation;
+import species.participation.Follow;
 import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
