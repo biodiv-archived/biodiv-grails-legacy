@@ -452,7 +452,7 @@ speciesPortal {
 		driver   = "org.postgresql.Driver"
 	}
 
-    localeLanguages = [['name':'English','code':'en']]
+    localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
 
 }

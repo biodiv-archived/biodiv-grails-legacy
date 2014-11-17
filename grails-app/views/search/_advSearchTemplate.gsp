@@ -7,7 +7,7 @@
 <div  class="block-tagadelic">
 
     <form id="advSearchForm" method="get"  title="${g.message(code:'button.advanced.search')}"
-        action="${uGroup.createLink(controller:'search', action:'select') }"
+        action="${uGroup.createLink(controller:'search', action:'select', userGroup:userGroupInstance) }"
         class="searchbox form-horizontal">
 
         <div class="control-group">
@@ -100,7 +100,7 @@
             <div class="controls">
                 <select name="aq.license" multiple="multiple" class="multiselect licenseFilter input-block-level">
                     <g:each in="${LicenseType.toList()}" var="license">
-                    <option value="${license.value()}"> ${g.message(error:license)} </option>
+                    <option value="${license.name()}"> ${g.message(error:license)} </option>
                     </g:each>
                 </select>
 
@@ -124,8 +124,12 @@
                 <label class="radio inline"> 
                     <input type="radio" id="uGroup_ALL" name="uGroup" 
                     value="ALL"> ${g.message(code:'default.search.in.all.groups')} </label> <label
-                    class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-                    value="THIS_GROUP"> ${g.message(code:'default.search.within.this.group')} </label>
+                    class="radio inline"> 
+                   
+
+                    <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
+                    value="${userGroupInstance?.id}"> ${g.message(code:'default.search.within.this.group')} </label>
+
             </div>
         </div>
 

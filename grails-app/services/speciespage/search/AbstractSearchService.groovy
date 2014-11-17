@@ -168,7 +168,7 @@ abstract class AbstractSearchService {
         .set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
         .set(TermsParams.TERMS_LIMIT, limit)
         .set(TermsParams.TERMS_RAW, true);
-        log.info "Running observation search query : "+q
+        log.info "Running observation terms query : "+q
         def result;
         try{
             result = solrServer.query( q );

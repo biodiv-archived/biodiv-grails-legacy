@@ -532,7 +532,7 @@ function getSelectedFilters($ele) {
         }
         selected.push(name);
     });
-    return selected.join(' or ');
+    return selected.join(' OR ');
 } 
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
@@ -719,7 +719,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     if(uGroup) {
         params['uGroup'] = uGroup
     } else {
-        delete params['uGroup']
+        //delete params['uGroup']
     }
 
     var sGroup = getSelectedFilters($("input.sGroupFilter.active:checked"))

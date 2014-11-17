@@ -38,7 +38,7 @@
                 <g:if test="${resourceInstance?.language?.id != userLanguage?.id}">
                 <%  
                 styleVar = "none"
-                clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+resourceInstance?.language?.name+'</a>';
+                clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+resourceInstance?.language?.threeLetterCode.toUpperCase()+'</a>';
                 %>
                 </g:if>
 
@@ -76,13 +76,21 @@
             </div>
         </div>
 
-        <div class="row observation_footer" style="margin-left:0px;">
+        <g:if test="${resourceInstance?.licenses}">
+        <div class="prop">
+            <span class="name"><i class='icon-ok-sign'></i><g:message code="default.licenses.label" /></span>
 
-            <div class="story-footer" style="right:3px;">
-                <sUser:showUserTemplate
-                model="['userInstance':resourceInstance.uploader]" />
+            <div class="value">
+                <g:each in="${resourceInstance?.licenses}" var="licenseInstance">
+                <img
+                src="${resource(dir:'images/license',file:licenseInstance.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+                title="${licenseInstance.name}" />
+                </g:each>
             </div>
         </div>
+        </g:if>
+
+
     </div>
 </div>
 
