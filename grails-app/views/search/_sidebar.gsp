@@ -14,9 +14,9 @@
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
         <h5> ${g.message(code:'button.user.groups')} </h5>
         <g:each in="${uGroups}" var="uGroup">
-        <label class="radio">
+        <label class="checkbox">
             <g:set var="userGroupInstance" value="${UserGroup.read(Long.parseLong(uGroup.name))}"/>
-            <input class="searchFilter uGroupFilter ${activeFilters?.uGroup?.contains(userGroupInstance.name)?'active':''} " type="radio" name="module" value="${userGroupInstance.id}"  ${activeFilters?.uGroup?.contains(uGroup.name)?'checked':''} >${userGroupInstance.name} (${uGroup.count})
+            <input class="searchFilter uGroupFilter ${activeFilters?.uGroup?.contains(userGroupInstance.name)?'active':''} " type="checkbox" name="uGroup" value="${userGroupInstance.id}"  ${activeFilters?.uGroup?.contains(uGroup.name)?'checked':''} >${userGroupInstance.name} (${uGroup.count})
         </label>
         </g:each>
     </div>

@@ -843,7 +843,7 @@
        <str name="df">text</str>
        <str name="defType">dismax</str>
        <str name="qf">
-           text^0.5 name^1.2 id^10.0 title^10.0 contributor^2.0
+           text^0.5 name^1.2 id^10.0 title^10.0 contributor^2.0 sgroup^1.0 habitat^1.0
 
        </str>
 

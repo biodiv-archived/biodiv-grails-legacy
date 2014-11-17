@@ -110,8 +110,7 @@ abstract class AbstractSearchService {
      */
     def search(query) {
         def params = SolrParams.toSolrParams(query);
-        log.info "Running ${this.getClass().getName()} search query : "+params
-        println "Running ${this.getClass().getName()} search query : "+params
+        log.info "######Running ${this.getClass().getName()} search query : "+params
         def result = [];
         try {
             result = solrServer.query( params );

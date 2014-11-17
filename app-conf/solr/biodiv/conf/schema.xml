@@ -78,8 +78,8 @@
    <copyField source="habitat" dest="autocomplete" />
    <copyField source="members" dest="autocomplete" />
 
-   <field name="user_group" type="long" indexed="true"  multiValued="true"/>
-   <field name="user_group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="group" type="long" indexed="true"  multiValued="true"/>
+   <field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
 
    <dynamicField name="*" type="text" indexed="true" multiValued="true" />
 

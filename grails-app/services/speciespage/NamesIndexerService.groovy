@@ -56,7 +56,7 @@ class NamesIndexerService {
 		while(true){
 			def recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
 			recos.each { reco ->
-				if(add(reco, analyzer, lookup1)) {
+				if(addRecoWithAnalyzer(reco, analyzer, lookup1)) {
 					noOfRecosAdded++;
 				}
 			}
