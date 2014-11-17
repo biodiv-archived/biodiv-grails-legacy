@@ -2462,7 +2462,7 @@ div.noOfRatings {
     left:35%;
 }
 .table-striped tbody>tr:nth-child(odd)>td.nameColumn, .nameColumn {
-    background-color : lightyellow;
+    background-color : rgb(186, 214, 209);
 }
 .incorrectName {
     background-color : #FA8072;
@@ -2586,31 +2586,6 @@ small {
     margin-bottom:-1px;
 }
 
-#home #species_entry {
-    background-image: url('../images/species.png');
-}
-#home #IDAOTool {
-	background-image: url('../images/IDAO.png');
-}
-#home #explore {
-    background-image: url('../images/maps.png');
-}
-#home #documents {
-    background-image: url('../images/documents.png');
-}
-#home #checklists {
-	background-image: url('../images/checklists.png');
-}
-
-#home #observations {
-    background-image: url('../images/observations.png');
-}
-#home #groups_entry {
-    background-image: url('../images/groups.png');
-}
-#home #dashboard {
-    background-image: url('../images/dashboard.png');
-}   
 
 #home .entry:hover {
     background-position: -135px 0;
@@ -2627,7 +2602,20 @@ small {
     background-repeat: no-repeat;
     box-shadow: -3px -1px 21px #777777;
     background-size:200% 100%;
+    position:relative;
 }
+
+#home .content {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: whitesmoke;
+    position:absolute;
+    bottom: 9px;
+    left: 0px;
+    right: 0px;
+}
+
 .navblock {
     display: inline-block;
     float: left;
@@ -2904,3 +2892,10 @@ small {
 {
     width:25px; float:left; margin-right:6px
 }
+#advSearchForm .control-label {
+    width:120px;
+}
+#advSearchForm .controls {
+    margin-left:140px;
+}
+

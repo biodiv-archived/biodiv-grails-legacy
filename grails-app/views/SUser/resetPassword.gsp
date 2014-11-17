@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<g:set var="title" value="Reset Password"/>
+<g:set var="title" value="${g.message(code:'register.value.reset')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="auth" />
 <style type="text/css">
@@ -23,8 +23,7 @@
 		<div>
 			<fieldset>
 				<legend style="margin-bottom:0px;border-bottom:0px;">
-					<g:message code="spring.security.ui.resetPassword.header"
-						default="Reset password" />
+					<g:message code="spring.security.ui.resetPassword.header" />
 				</legend>
 				<form
 					action='${uGroup.createLink(controller:'SUser', action:'resetPassword', id:params.id, userGroupWebaddress:params.webaddress)}'
@@ -38,11 +37,11 @@
 						<div
 						class="control-group ${hasErrors(bean: command, field: 'currentPassword', 'error')}">
 						<label class="control-label" for="currentPassword"><g:message
-								code='user.currentPassword.label' default='Current Password *' /> </label>
+								code='user.currentPassword.label' /> </label>
 						<div class="controls">
 							<input class="input-xlarge" id="currentPassword" type="password"
 								value="${command.currentPassword}" name="currentPassword"
-								placeholder="Enter your current password...">
+								placeholder="${g.message(code:'placeholder.enter.current.password')}">
 
 							<g:hasErrors bean="${command}" field="currentPassword">
 								<div class="help-inline">
@@ -54,11 +53,11 @@
 					<div
 						class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 						<label class="control-label" for="password"><g:message
-								code='user.password.label' default='Password *' /> </label>
+								code='register.password.label' /> </label>
 						<div class="controls">
 							<input class="input-xlarge" id="password" type="password"
 								value="${command.password}" name="password"
-								placeholder="Enter your new password...">
+								placeholder="${g.message(code:'placeholder.enter.new.password')}">
 
 							<g:hasErrors bean="${command}" field="password">
 								<div class="help-inline">
@@ -70,11 +69,11 @@
 					<div
 						class="control-group ${hasErrors(bean: command, field: 'password2', 'error')}">
 						<label class="control-label" for="password2"><g:message
-								code='user.password2.label' default='Password (again)*' /> </label>
+								code='register.password.again.label'  /> </label>
 						<div class="controls">
 							<input class="input-xlarge" id="password2" type="password"
 								value="${command.password2}" name="password2"
-								placeholder="Enter your new password again...">
+								placeholder="${g.message(code:'placeholder.enter.new.again')}">
 
 							<g:hasErrors bean="${command}" field="password2">
 								<div class="help-inline">

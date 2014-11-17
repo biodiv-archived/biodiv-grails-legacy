@@ -6,8 +6,8 @@ function editCommentActivity(targetComp, commentId){
 
 	var output  = '<div class="editCommentWrapper" id='+commentId+'><textarea name="commentBody" class="comment-textbox" placeholder="Write comment" style="display: none;"></textarea>';
 		output += '<div class="commentContainer"><div class="contentbox" contenteditable="true">'+commentVal+'</div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />';
-		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right cancelComment" title="Cancel" >Cancel</a>';
-		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right updateComment" title="Update comment" >Update</a>';
+		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right cancelComment" title="'+window.i8ln.species.specie.bcanc+'" >'+window.i8ln.species.specie.bcanc+'</a>';
+		output += '<a href="javascript:void(0);" class="btn btn-mini pull-right updateComment" title="'+window.i8ln.species.specie.bcmnt+'" >'+window.i8ln.species.specie.bupdate+'</a>';
 		output += '</div>';
 	message_body.hide().after(output);
 
@@ -53,7 +53,7 @@ function showComment(that){
 }
 
 function deleteCommentActivity(targetComp, commentId, url){
-	if(confirm('This comment will be deleted. Are you sure ?')){
+    if(confirm(window.i8ln.species.parseUtil.comment)){
 		deleteComment(commentId, url);
 		removeActivity(targetComp);
 	}
@@ -90,7 +90,7 @@ function postComment(postComp, url, newCommentUrl) {
 		$(textComp).next('span').show();
 		return false;
 	}
-	loaderFun(submitButton,true,"Posting",'input');//submitButton.attr('disabled',true).attr('value','posting');
+	loaderFun(submitButton,true,window.i8ln.text.posting,'input');//submitButton.attr('disabled',true).attr('value','posting');
 	computeUserTag(postComp);
 	postAsAjax(postComp, url, newCommentUrl, true);
 	
@@ -143,7 +143,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     				$(postComp).children('textarea[name=commentBody]').val("");
     				$(postComp).children('textarea[name=commentSubject]').val("");
     				var submitButton = $(postComp).children('input[type="submit"]');
-					loaderFun(submitButton,false,"Post",'input'); //	submitButton.attr('disabled',false).attr('value','Post');
+					loaderFun(submitButton,false,window.i8ln.text.post,'input'); //	submitButton.attr('disabled',false).attr('value','Post');
     			}
         	}
     		return false;
@@ -199,7 +199,7 @@ function replyOnComment(comp, parentId, url){
 		$(comp).prev().addClass('comment-textEmpty').next('span').show();
 		return false;
 	}
-	loaderFun($(comp),true,"Posting",'anchor'); //$(comp).attr('disabled',true).attr('value','posting');
+	loaderFun($(comp),true,window.i8ln.text.posting,'anchor'); //$(comp).attr('disabled',true).attr('value','posting');
 	computeUserTag($(comp).parent());
 	params["tagUserId"] = $(comp).siblings(".tagUserId").val();
 
@@ -215,7 +215,7 @@ function replyOnComment(comp, parentId, url){
         		alert(data.msg);
         	}
 			else if(data.success){
-				loaderFun($(comp),false,"Post",'anchor'); //$(comp).attr('disabled',false).attr('value','Post');
+				loaderFun($(comp),false,window.i8ln.text.post,'anchor'); //$(comp).attr('disabled',false).attr('value','Post');
 				$(comp).parent().hide().prev().show();
 				updateFeeds();
 			}

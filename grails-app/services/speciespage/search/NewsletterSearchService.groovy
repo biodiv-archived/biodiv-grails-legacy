@@ -29,6 +29,8 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class NewsletterSearchService extends AbstractSearchService {
 
+    static transactional = false
+
 	/**
 	 * 
 	 */
@@ -36,18 +38,26 @@ class NewsletterSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to newsletters search index"
 		
 		//TODO: change limit
-		int limit = Newsletter.count()+1, offset = 0;
+		int limit = BATCH_SIZE, offset = 0;
+        int noIndexed = 0;
 		
 		def newsletters;
 		def startTime = System.currentTimeMillis()
-		while(true) {
-			newsletters = Newsletter.list(max:limit, offset:offset);
-			if(!newsletters) break;
-			publishSearchIndex(newsletters, true);
-			newsletters.clear();
-			offset += limit;
-		}
-		
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Newsletter.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            Newsletter.withNewTransaction([readOnly:true]) { status ->
+                newsletters = Newsletter.list(max:limit, offset:offset);
+                noIndexed += newsletters;
+                if(!newsletters) return;
+                publishSearchIndex(newsletters, true);
+                //newsletters.clear();
+                offset += limit;
+            }
+
+            if(!newsletters) break;
+            newsletters.clear();
+        }
 		log.info "Time taken to publish newsletter search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
@@ -70,7 +80,10 @@ class NewsletterSearchService extends AbstractSearchService {
 			log.debug "Reading Newsletter : "+obv.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, obv.id.toString());
+                doc.setDocumentBoost(1.5);
+                println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
+				doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+ obv.id.toString());
+			    doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
 				doc.addField(searchFieldsConfig.NAME, obv.title);
 				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.date);
 				doc.addField(searchFieldsConfig.UPDATED_ON, obv.date);

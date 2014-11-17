@@ -43,7 +43,7 @@ function parseCSVData(data, options) {
         trClass: "",
         tdClass: "",
         loadingImage: "",
-        loadingText: "Loading CSV data...",
+        loadingText: window.i8ln.species.parseUtil.csd,
         separator: ",",
         startLine: 0
     };	
@@ -91,7 +91,7 @@ function parseCSVData(data, options) {
                     if(isValidRow(items)) {
                         printedLines++;
                         if (items.length != headerCount) {
-                            error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
+                            error += window.i8ln.species.parseUtil.eol + lineCount +  window.i8ln.species.parseUtil.ic + items.length +  window.i8ln.species.parseUtil.mhc + headerCount + ') \n';
                         }
 
                         var d = (rowData[printedLines-1] = {});
@@ -109,7 +109,7 @@ function parseCSVData(data, options) {
 
     });
     if(rowCount >= rowLimit){
-        alert("Maximum of " + rowLimit + " data rows can be uploaded excluding header row!!");
+        alert(window.i8ln.species.parseUtil.max + rowLimit + window.i8ln.species.parseUtil.head );
     }
     if (error) {
         alert(error);
@@ -182,7 +182,7 @@ function isValidCollection(obj){
 function getMediaColumnOptions() {
     return {
     id: "Media",
-    name: "Media",
+    name: window.i8ln.species.parseUtil.med,
     field:'Media',
     width: 100,
     selectable: false,
@@ -196,11 +196,11 @@ function getHeaderMenuOptions() {
         menu: {
             items: [
             {
-                title: "Scientific Name",
+                title:window.i8ln.species.parseUtil.snm ,
                 command: "sciNameColumn"
             },
             {
-                title: "Common Name",
+                title: window.i8ln.species.parseUtil.cnm,
                 command: "commonNameColumn"
             }
             ,

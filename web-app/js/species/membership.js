@@ -15,7 +15,7 @@ function joinAction(me, joinUsUrl) {
         success: function(data) {
         	if(data.statusComplete) {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
-        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+". Please press <a href='#' onclick='document.location.reload(true);'>reload</a> to load new changes.");
+        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+"."+ window.i8ln.species.specie.reload);
         		//document.location.reload(true);
         	} else {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
@@ -374,10 +374,10 @@ function last_actions() {
 	$(".ellipsis.multiline").trunk8({
 		lines:2,
                 tooltip:false,
-                fill: '&hellip; <a id="read-more" href="#">more</a>'
+                fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
 	});
         $('#read-more').on('click', function (event) {
-              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
+              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
                 
                 return false;
         });

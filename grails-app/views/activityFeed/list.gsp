@@ -2,7 +2,7 @@
 <%@page import="species.groups.UserGroup"%>
 <html>
     <head>
-        <g:set var="title" value="Discussions"/>
+        <g:set var="title" value="${g.message(code:'default.pagetitle.discussions')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="activityfeed,comment"/>
         <style>

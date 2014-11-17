@@ -11,7 +11,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
     </div>
     </g:hasErrors>
 
-   <span class="createdObv label label-success" style="display:none;"><i class="icon-check"></i> Successfully created </span>
+   <span class="createdObv label label-success" style="display:none;"><i class="icon-check"></i><g:message code="miniobvcreate.successfully.created" />  </span>
     <div class="obvTemplate">
         <div class="control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
             <div class="image-resources-msg help-inline control-label">
@@ -26,7 +26,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         <div style="margin:40px 0 0 0px;">
             <div class="help-identify" class="control-label">
                 <label class="checkbox" style="text-align: left;"> <input
-                    type="checkbox" name="help_identify" /> Help identify </label>
+                    type="checkbox" name="help_identify" /> <g:message code="link.help.identify" /> </label>
             </div>
             <reco:create />
         </div>
@@ -42,27 +42,28 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         </div>
         
         <h5 style="margin-top:20px;"><label><i
-                    class="icon-pencil"></i>Notes <small><g:message code="observation.notes.message" default="Description" /></small></label>
+                    class="icon-pencil"></i><g:message code="default.notes.label" /> <small><g:message code="observation.notes.message" default="Description" /></small></label>
         </h5>
         <div class="section-item" style="margin-right: 10px;">
             <textarea name="notes" style="margin: 0px 0px 10px; width:257px;max-width: 257px; height: 40px;">            
             </textarea>
         </div>
         <h5><label>
-                <i class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
+                <i class="icon-tags"></i><g:message code="default.tags.label" /> <small><g:message code="observation.tags.message" default="" /></small></label>
         </h5>
         <div class="create_tags section-item" style="clear: both;">
-            <ul class="obvCreateTags">
+            <ul class="obvCreateTags" rel="${g.message(code:'placeholder.add.tags')}">
                 <g:each in="${obvTags}" var="tag">
                 <li>${tag}</li>
                 </g:each>
             </ul>
         </div>
-        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > User Groups</button> 
+        <button type="button" class="btn toggleGrpsDiv" style="margin-left:11px;" > <g:message code="button.user.groups" /></button> 
         <div class="postToGrpsToggle" style="display:none;">
             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
         </div>
         <input class="resourceListType" type="hidden" name='resourceListType' value= />
+        <input class="agreeTerms" type="checkbox" name='agreeTerms' style ="display:none;"/>
     </div>
 </form>
 <script type="text/javascript">

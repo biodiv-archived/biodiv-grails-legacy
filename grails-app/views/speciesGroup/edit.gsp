@@ -33,7 +33,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="name"><g:message code="speciesGroup.name.label" default="Name" /></label>
+                                  <label for="name"><g:message code="speciesGroup.name.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: speciesGroupInstance, field: 'name', 'errors')}">
                                     <g:textField name="name" value="${speciesGroupInstance?.name}" />
@@ -42,7 +42,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="parentGroup"><g:message code="speciesGroup.parentGroup.label" default="Parent Group" /></label>
+                                  <label for="parentGroup"><g:message code="speciesGroup.parentGroup.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: speciesGroupInstance, field: 'parentGroup', 'errors')}">
                                     <g:select name="parentGroup.id" from="${species.SpeciesGroup.list()}" optionKey="id" value="${speciesGroupInstance?.parentGroup?.id}" noSelection="['null': '']" />
@@ -51,7 +51,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="taxonConcept"><g:message code="speciesGroup.taxonConcept.label" default="Taxon Concept" /></label>
+                                  <label for="taxonConcept"><g:message code="speciesGroup.taxonConcept.label"  /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: speciesGroupInstance, field: 'taxonConcept', 'errors')}">
                                     

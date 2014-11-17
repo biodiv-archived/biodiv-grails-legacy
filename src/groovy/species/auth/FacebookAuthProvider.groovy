@@ -18,22 +18,27 @@ import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import species.auth.FacebookAuthToken;
 
-public class FacebookAuthProvider implements AuthenticationProvider {
+public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.facebook.FacebookAuthProvider {
 
 	private static def log = Logger.getLogger(this)
 
-	FacebookAuthDao facebookAuthDao
-	FacebookAuthUtils facebookAuthUtils
 	UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
 	UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
 
-	boolean createNew = true
-
 	public Authentication authenticate(Authentication authentication) {
+       
 		FacebookAuthToken token = authentication
+        //HACK to accomodate registering new user from facebookCreateAccount
+        if(token.uid > 0) {
+            def user = facebookAuthDao.findUser(token.uid as Long)
+            if (user == null && token.user != null && token.user.accessToken != null) {
+                throw new AuthenticationServiceException("Registering from Facebook ${token.user}");
+            }
+        }
 
+/*
 		def user = facebookAuthDao.findUser(token.uid as Long)
 		if (user == null) {
 			//log.debug "New person $token.uid"
@@ -72,8 +77,20 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 			postAuthenticationChecks.check(userDetails);
 		} else {
 			token.authenticated = false
-		}
+		}*/
 
+        super.authenticate(authentication);
+        token.details = token.principal
+
+        if(token.details) {
+			try {
+				preAuthenticationChecks.check(token.details);
+			} catch (AuthenticationException exception) {
+				throw exception;
+			}
+
+			postAuthenticationChecks.check(token.details);
+        }
 
 		log.debug "returning fb token : $token"
 		return token

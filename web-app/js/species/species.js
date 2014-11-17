@@ -99,9 +99,9 @@ var showOccurence = function(speciesName) {
         };
         var layersOptions = [
     {
-        title : 'Observation',
+        title :window.i8ln.species.specie.obs ,
         layers : 'ibp:observation_locations',
-        styles : '',
+       styles : '',
         cql_filter : "species_name='" + speciesName + "'",
         opacity : 0.7
     }
@@ -357,17 +357,6 @@ function initGalleryTabs() {
 
 $.fn.editable.defaults.mode = 'inline';
 
-$.fn.editableform.buttons = '<button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i>Save</button><button type="button" class="btn editable-cancel"><i class="icon-remove"></i>Cancel</button>'
-
-$.fn.neweditableform_template = '\
-                                <form class="form-horizontal editableform">\
-                                <div class="control-group">\
-                                <div><div class="editable-input"></div><div class="editable-buttons editable-buttons-bottom pull-right">'+$.fn.editableform.buttons+'</div></div>\
-                                <div class="editable-error-block"></div>\
-                                </div> \
-                                </form>';
-
-
 function onEditableSuccess(response, newValue) {
     if(!response) {
         return "Unknown error!";
@@ -390,12 +379,12 @@ function onEditableError(response, newValue) {
     var successHandler = this.success, errorHandler;
     handleError(response, undefined, undefined, function(data){
         $ele.find('.editField').editable('submit');
-        return "Please resubmit the form again";
+        return window.i8ln.species.abstracteditabletype.re;
     }, function(data) {
         if(data && data.status == 401) {
-            return "Please login and resubmit the changes"; 
+            return window.i8ln.species.abstracteditabletype.sub; 
         } else if(response.status === 500) {
-            return 'Service unavailable. Please try later.';
+            return window.i8ln.species.abstracteditabletype.un;
         } else {
             return response.responseText;
         }
@@ -450,8 +439,8 @@ function initEditables($ele) {
         $(this).prev().show().prev().show();
         $(this).parent().parent().find('.synRel.selector, .lang.selector').editable('hide'); 
     });
-
-    $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='Delete'><i class='icon-trash'></i>Delete</a><a class='pull-right editFieldButton btn btn-primary' title='Edit'><i class='icon-edit'></i>Edit</a>");
+    
+    $ele.find(".editField.editable, .ck_desc").before("<a class='pull-right deleteFieldButton btn btn-danger' title='"+window.i8ln.button.delete+"'><i class='icon-trash'></i>"+window.i8ln.button.delete+"</a><a class='pull-right editFieldButton btn btn-primary' title='"+window.i8ln.button.edit+"'><i class='icon-edit'></i>"+window.i8ln.button.edit+"</a>");
     $ele.find('.editFieldButton').click(function(e){    
         e.stopPropagation();
 
@@ -468,7 +457,7 @@ function initEditables($ele) {
     });
 
     $ele.find('.deleteFieldButton').click(function(e) {
-        var c = confirm('You are about to delete some content. Are you sure?')
+        var c = confirm(window.i8ln.species.abstracteditabletype.del)
         if(c == true) {
             var $f =  $(this).nextAll('.editField.editable');
             var $textarea = $(this).nextAll('textarea');
@@ -576,19 +565,19 @@ function onAddableDisplay(value, sourceData, response, context) {
     } else {
         //me.html('Add'); 
     }
-    return 'Successfully added data';
+    return window.i8ln.species.specie.sad;
 }
 
 function onAddableError(response, newValue) {
     var successHandler = this.success, errorHandler;
     handleError(response, undefined, undefined, function(data){
         $ele.find('.addField').editable('submit');
-        return "Please resubmit the form again";
+        return window.i8ln.species.abstracteditabletype.re;
     }, function(data) {
         if(data && data.status == 401) {
-            return "Please login and resubmit the changes"; 
+            return window.i8ln.species.abstracteditabletype.sub; 
         } else if(response.status === 500) {
-            return 'Service unavailable. Please try later.';
+            return window.i8ln.species.abstracteditabletype.un;
         } else {
             return response.responseText;
         }
@@ -619,7 +608,8 @@ function initAddables($ele) {
     })
 
     if($ele.find('.addFieldButton').length == 0)
-        $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='Add'><i class='icon-plus'></i>Add</a>");
+        $ele.find('.ck_desc_add').before("<a class='addFieldButton' title='"+window.i8ln.species.specie.adont+"'><i class='icon-plus'></i>"+window.i8ln.species.specie.adont+"</a>");
+
 
     $ele.find('.addFieldButton').click(function(e){    
         e.stopPropagation();
@@ -694,12 +684,12 @@ var onSelectorError =  function(response, newValue) {
     var successHandler = this.success, errorHandler;
     handleError(response, undefined, undefined, function(data){
         $ele.find('.selector').editable('submit');
-        return "Please resubmit the form again";
+        return window.i8ln.species.abstracteditabletype.re;
     }, function(data) {
         if(data && data.status == 401) {
-            return "Please login and resubmit the changes"; 
+            return window.i8ln.species.abstracteditabletype.sub; 
         } else if(response.status === 500) {
-            return 'Service unavailable. Please try later.';
+            return window.i8ln.species.abstracteditabletype.un;
         } else {
             return response.responseText;
         }
@@ -842,7 +832,7 @@ $(document).ready(function() {
 
     $(".readmore").readmore({
         substr_len : 400,
-        more_link : '<a class="more readmore">&nbsp;More</a>'
+        more_link : '<a class="more readmore">&nbsp;'+window.i8ln.text.more+'</a>'
     });
 
     /*$("#toc").tocify({
@@ -918,7 +908,7 @@ $(document).ready(function() {
 
             $('.emptyField').show();
             //$('.hidePoint').show();
-            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>Exit Edit Mode');
+            $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>'+window.i8ln.species.specie.eem);
             if($e) rate($e.find('.star_rating'));
         }
 
@@ -929,7 +919,7 @@ $(document).ready(function() {
 
         if($('#deleteSpecies').length > 0) {
             $('#deleteSpecies').click (function() {
-                if(confirm('This species will be deleted. Are you sure ?')) {
+                if(confirm(window.i8ln.species.specie.sdel)) {
                     $.ajax({
                         url:window.params.species.deleteUrl,
                         type:'POST',

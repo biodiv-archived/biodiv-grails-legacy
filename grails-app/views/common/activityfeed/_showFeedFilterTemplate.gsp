@@ -6,20 +6,20 @@
 <div class="feedFilterDiv">
 	<div class="btn-group pull-right" style="z-index: 10; clear:both">
 		<button id="feedFilterButton" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
-			data-original-title="Filter by"> All <span class="caret"></span>
+			data-original-title="${g.message(code:'showfeedfilter.filter.by')}"> <g:message code="default.group.label" /> <span class="caret"></span>
 		</button>
 		
 		<ul id="feedFilter" class="dropdown-menu" style="width: auto;">
 			<li class="group_option"><a class=" feed_filter_label"
-				value="All"> All </a></li>
+				value="All"> <g:message code="default.all.label" /> </a></li>
 			<li class="group_option"><a class=" feed_filter_label"
-				value="${Observation.class.getCanonicalName()}"> Observation </a></li>
+				value="${Observation.class.getCanonicalName()}"> <g:message code="default.observation.label" /> </a></li>
 			<li class="group_option"><a class=" feed_filter_label"
-				value="${UserGroup.class.getCanonicalName()}"> Group </a></li>
+				value="${UserGroup.class.getCanonicalName()}"> <g:message code="default.group.label" /> </a></li>
 			<li class="group_option"><a class=" feed_filter_label"
-				value="${Checklists.class.getCanonicalName()}"> Checklist </a></li>
+				value="${Checklists.class.getCanonicalName()}"> <g:message code="default.checklist.label" /> </a></li>
 			<li class="group_option"><a class=" feed_filter_label"
-				value="${Species.class.getCanonicalName()}"> Species </a></li>
+				value="${Species.class.getCanonicalName()}"> <g:message code="default.species.label" /> </a></li>
 		</ul>
 	</div>
 </div>

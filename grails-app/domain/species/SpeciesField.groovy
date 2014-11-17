@@ -3,12 +3,14 @@ package species
 import org.grails.rateable.*
 import species.auth.SUser
 import species.NamesSorucedata;
+import species.Language;
 
+import org.springframework.context.MessageSourceResolvable;
 class SpeciesField extends NamesSorucedata implements Rateable {
 
 	def activityFeedService
 	
-	public enum Status {
+	public enum Status implements org.springframework.context.MessageSourceResolvable{
 		UNDER_CREATION("Under Creation"),
 		PUBLISHED("Published"),
 		UNDER_VALIDATION("Under Validation"),
@@ -32,9 +34,17 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 				VALIDATED 
             ]
 		}
+	Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+
+        String getDefaultMessage() { value() }
 	}
 	
-	public enum AudienceType {
+	public enum AudienceType implements org.springframework.context.MessageSourceResolvable{
 		CHILDREN("Children"), 
 		GENERAL_PUBLIC("General Audience"), 
 		EXPERT_USERS("Expert"),
@@ -56,6 +66,14 @@ class SpeciesField extends NamesSorucedata implements Rateable {
                 EXPERT_USERS
             ]
         }
+	Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+
+        String getDefaultMessage() { value() }
 	}
 	
 	Status status = Status.UNDER_CREATION;
@@ -64,7 +82,9 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	Date dateCreated
 	Date lastUpdated
     List<Contributor> attributors;
-	
+	// Language
+    Language language;
+
 	static hasMany = [licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
@@ -78,6 +98,7 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 	
 	static constraints = {
         description blank:false, nullable:false
+        language nullable:false
 		contributors validator : { val, obj ->
 			if(!val) {
 				//obj.addToContributors(SUser.findByUsername('pearlsravanthi'));

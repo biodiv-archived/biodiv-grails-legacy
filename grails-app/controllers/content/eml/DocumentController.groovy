@@ -16,8 +16,9 @@ class DocumentController extends AbstractObjectController {
 	def userGroupService
 	def SUserService
 	def activityFeedService
-	def observationService
+	def utilsService
 	def documentSearchService
+	//def observationService
 	def index = {
 		redirect(action: "browser", params: params)
 	}
@@ -37,6 +38,7 @@ class DocumentController extends AbstractObjectController {
 		log.debug "params in document save "+ params
 
 		params.author = springSecurityService.currentUser;
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		def documentInstance = documentService.createDocument(params)
 
 		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
@@ -59,7 +61,7 @@ class DocumentController extends AbstractObjectController {
 					documentService.setUserGroups(documentInstance, userGroups);
 				}
 			}
-			observationService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
+			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
 			redirect(action: "show", id: documentInstance.id)
 		}
@@ -76,7 +78,8 @@ class DocumentController extends AbstractObjectController {
 			redirect(action: "browser")
 		}
 		else {
-			[documentInstance: documentInstance]
+			def userLanguage = utilsService.getCurrentLanguage(request);
+			[documentInstance: documentInstance,userLanguage: userLanguage]
 		}
 	}
 
@@ -109,6 +112,7 @@ class DocumentController extends AbstractObjectController {
 					return
 				}
 			}
+			params.locale_language = utilsService.getCurrentLanguage(request);
 			//documentInstance.properties = params
 			documentService.updateDocument(documentInstance, params)
 			if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
@@ -167,6 +171,7 @@ class DocumentController extends AbstractObjectController {
 		log.debug params
 		
 		def model = getDocumentList(params)
+		model.userLanguage = utilsService.getCurrentLanguage(request);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/document/documentListTemplate", model:model);
 			return;

@@ -26,18 +26,21 @@
             <div class="page-header clearfix">
                 <div style="width:100%;">
                     <div class="main_heading" style="margin-left:0px; position:relative">
-                        <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? 'Featured':''}">
+<%
+     def featuredTitle = g.message(code:"title.feature")
+    %>
+                        <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? featuredTitle:''}">
                                             </span>
 
                         <div class="pull-right">
                             <sUser:ifOwns model="['user':checklistInstance.author]">
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'checklist', action:'edit', id:checklistInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                <i class="icon-edit"></i>Edit</a>
+                                <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
                             <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:checklistInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+                                onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
 
                             </sUser:ifOwns>
 
@@ -84,7 +87,7 @@
 <%--                    %>--%>
 <%--                    <g:if test="${annotations?.size() > 0}">--%>
 <%--                    <div class="sidebar_section">--%>
-<%--                        <h5>Annotations</h5>--%>
+<%--                        <h5><g:message code="heading.annotations" /></h5>--%>
 <%--                        <div class="tile" style="clear: both">--%>
 <%--                            <obv:showAnnotation model="[annotations:annotations]" />--%>
 <%--                        </div>--%>

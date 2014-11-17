@@ -49,7 +49,7 @@
 							<a class="btn btn-success pull-right" title="Add CEPF Project"
 								href="${uGroup.createLink(
                                 controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-								<i class="icon-plus"></i>Add CEPF Project
+								<i class="icon-plus"></i><g:message code="button.add.cepf.projects" /> 
 
 							</a>
 
@@ -57,14 +57,14 @@
 							<a class="btn btn-primary pull-right" title="Edit CEPF Project"
 								style="margin-right: 5px;"
 								href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-								<i class="icon-edit"></i>Edit
+								<i class="icon-edit"></i><g:message code="button.edit" />
 
 							</a>
 
 							<a class="btn btn-danger pull-right" href="#"
 								title="Delete CEPF Project" style="margin-right: 5px;"
 								onclick="deleteProject(); return false;"> <i
-								class="icon-trash"></i>Delete
+								class="icon-trash"></i><g:message code="button.delete" />
 							</a>
 
 							<form
@@ -87,10 +87,10 @@
 
 					<s:showHeadingAndSubHeading
 						model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
-					<small>submitted by <a
+					<small><g:message code="text.submitted.by" /> <a
 						href="${uGroup.createLink(controller:'user', action:'show', id:projectInstance.author.id, userGroupWebaddress:params.webaddress)}">
 							${projectInstance.author.name}
-					</a> on <g:formatDate type="datetime"
+					</a> <g:message code="text.on" /> <g:formatDate type="datetime"
 							date="${projectInstance.dateCreated}" style=" MEDIUM" />
 					</small>
 				</div>
@@ -106,15 +106,15 @@
 				<a class="pull-left btn ${prevProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
                                         id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i
-					class="icon-backward"></i>Prev </a> <a
+					class="icon-backward"></i><g:message code="button.prev" /> </a> <a
 					class="pull-right  btn ${nextProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
-                                        id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next
+                                        id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><g:message code="button.next" />
 					<i style="margin-right: 0px; margin-left: 3px;"
 					class="icon-forward"></i>
 				</a> <a class="btn"
 					href="${uGroup.createLink([action:'list', controller:'project'])}"
-					style="text-align: center; display: block; margin: 0 auto;">List</a>
+					style="text-align: center; display: block; margin: 0 auto;"><g:message code="default.list.label" /></a>
 
 			</div>
 
@@ -133,8 +133,7 @@
 				<div id="strategic-direction" class="speciesField collapse in"
 					style="border: 1px solid #735005; padding: 10px; margin-top: 20px; margin-bottom: 20px; border-radius: 5px; background-color: #fff1a8; color: #735005; margin-left: 10px;">
 
-					<h3 style="font-size: 16px; border-bottom: 1px solid #735005;">Strategic
-						Direction</h3>
+					<h3 style="font-size: 16px; border-bottom: 1px solid #735005;"><g:message code="project.show.strategic.direction" /></h3>
 					${projectInstance?.direction?.title.encodeAsHTML()}
 					-
 					${projectInstance?.direction?.strategy.encodeAsHTML()}
@@ -147,14 +146,14 @@
 					<g:if test="${projectInstance?.summary}">
 
 						<div>
-							<h4>Summary</h4>
+							<h4><g:message code="project.show.Summary" /></h4>
 							<p>
 								${raw(projectInstance?.summary)}
 							</p>
 						</div>
 					</g:if>
 					<g:if test="${projectInstance.tags}">
-						<b>Keywords : </b>
+						<b><g:message code="default.keywords.label" /> : </b>
 
 						<g:render template="/project/showTagsList"
 							model="['instance': projectInstance, 'controller': 'project', 'action':'list']" />
@@ -166,13 +165,13 @@
 			<g:if test="${projectInstance.locations.size()}">
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" data-toggle="collapse"
-						href="#locations"><h5>Project Sites</h5></a>
+						href="#locations"><h5><g:message code="link.project.sites" /></h5></a>
 					<div id="locations" class="speciesField collapse in">
 						<table class="table table-hover" style="margin: 0px;">
 							<thead>
 								<tr>
-									<th>Site Name</th>
-									<th>Corridor</th>
+									<th><g:message code="default.site.name.label" /> </th>
+									<th><g:message code="default.corridor.label" /></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -198,7 +197,7 @@
 
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" data-toggle="collapse"
-						href="#grantee-details"><h5>Grantee Details</h5></a>
+						href="#grantee-details"><h5><g:message code="heading.grantee.details" /> </h5></a>
 					<div id="grantee-details" class="speciesField collapse in">
 
 
@@ -213,7 +212,7 @@
 
 							<table>
 								<tr>
-									<td class="prop"><span class=" name">Organization</td>
+									<td class="prop"><span class=" name"><g:message code="default.organization.label" /></td>
 									<td>
 										${raw(projectInstance?.granteeOrganization)}
 									</td>
@@ -225,14 +224,13 @@
 
 			</g:if>
 			<div class="sidebar_section">
-				<a data-toggle="collapse" href="#project-details"><h5>Project
-						Details</h5></a>
+				<a data-toggle="collapse" href="#project-details"><h5><g:message code="heading.project.details" /></h5></a>
 				<div id="project-details" class="speciesField in collapse">
 					<table>
 						<g:if
 							test="${projectInstance.grantFrom || projectInstance.grantTo}">
 							<tr>
-								<td class="prop"><span class=" name">Grant Term&nbsp;</span></td>
+								<td class="prop"><span class=" name"><g:message code="default.grant.term.label" />&nbsp;</span></td>
 								<td>
 									${projectInstance?.grantFrom?.format('dd/MM/yyyy')} - ${projectInstance?.grantTo?.format('dd/MM/yyyy')}
 								</td>
@@ -240,7 +238,7 @@
 						</g:if>
 						<g:if test="${projectInstance.grantedAmount}">
 							<tr>
-								<td class="prop"><span class=" name">Amount</td>
+								<td class="prop"><span class=" name"><g:message code="default.amount.label" /></td>
 								<td>$ ${projectInstance?.grantedAmount}
 								</td>
 							</tr>
@@ -253,8 +251,7 @@
 			<g:if
 				test="${projectInstance?.projectProposal || projectInstance?.proposalFiles}">
 				<div class="sidebar_section">
-					<a data-toggle="collapse" href="#proposal"><h5>Project
-							Proposal</h5></a>
+					<a data-toggle="collapse" href="#proposal"><h5><g:message code="heading.project.proposal" /></h5></a>
 					<div id="proposal" class="speciesField collapse in">
 
 						<g:if test="${projectInstance?.projectProposal}">
@@ -264,7 +261,7 @@
 						</g:if>
 
 						<g:if test="${projectInstance?.proposalFiles}">
-							<b>Files</b>
+							<b><g:message code="project.show.files" /></b>
 
 							<g:each in="${projectInstance?.fetchProposalFiles()}" var="proposalFile">
 
@@ -280,8 +277,8 @@
 				test="${projectInstance?.projectReport || projectInstance?.reportFiles}">
 
 				<div class="sidebar_section">
-					<a data-toggle="collapse" href="#report"><h5>Project
-							Report</h5></a>
+					<a data-toggle="collapse" href="#report"><h5><g:message code="heading.project.report" />
+							</h5></a>
 					<div id="report" class="speciesField collapse in">
 
 						<g:if test="${projectInstance?.projectReport}">
@@ -291,7 +288,7 @@
 						</g:if>
 
 						<g:if test="${projectInstance?.reportFiles}">
-							<b>Files</b>
+							<b><g:message code="project.show.files" /></b>
 
 							<g:each in="${projectInstance?.fetchReportFiles()}" var="reportFile">
 
@@ -306,15 +303,14 @@
 			<g:if test="${projectInstance?.dataLinks}">
 
 				<div class="sidebar_section">
-					<a data-toggle="collapse" href="#data-links"><h5>Data
-							Contribution Links</h5></a>
+					<a data-toggle="collapse" href="#data-links"><h5><g:message code="link.data.contribution.links" /></h5></a>
 
 					<div id="data-links" class="speciesField collapse in">
 
 						<g:each in="${projectInstance?.dataLinks}" var="dataLink">
 							<table>
 								<tr>
-									<td class="prop" style="vertical-align:top;"><span class="name">Description</span></td>
+									<td class="prop" style="vertical-align:top;"><span class="name"><g:message code="default.description.label" /></span></td>
 									<td>
 										${raw(dataLink.description)}
 									</td>
@@ -322,7 +318,7 @@
 								<tr>
 									<td></td>
 									<td class="linktext">
-										<a target="_blank" href="${dataLink.url}">DataLink</a>
+										<a target="_blank" href="${dataLink.url}"><g:message code="link.datalink" /></a>
 									</td>
 								</tr>
 							</table>
@@ -337,7 +333,7 @@
 			<g:if test="${projectInstance?.misc || projectInstance?.miscFiles}">
 
 				<div class="sidebar_section">
-					<a data-toggle="collapse" href="#misc"><h5>Miscellaneous</h5></a>
+					<a data-toggle="collapse" href="#misc"><h5><g:message code="heading.miscellaneous" /></h5></a>
 					<div id="misc" class="speciesField collapse in">
 						<g:if test="${projectInstance?.misc}">
 							<div class="notes_view linktext">
@@ -346,7 +342,7 @@
 						</g:if>
 
 						<g:if test="${projectInstance?.miscFiles}">
-							<b>Files</b>
+							<b><g:message code="project.show.files" /></b>
 
 							<g:each in="${projectInstance?.fetchMiscFiles()}" var="miscFile">
 

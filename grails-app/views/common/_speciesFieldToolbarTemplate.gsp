@@ -34,12 +34,12 @@
 
 			<button type="button" class="btn btn-link pull-right"
 				data-toggle="collapse-next" data-target=".helpContent"
-				title="About field" style="padding: 2px 2px;">
+				title="${g.message(code:'title.species.about.field')}" style="padding: 2px 2px;">
 				<i class="icon-question-sign"></i>
 			</button>
 			<button type="button" class="btn btn-link pull-right"
 				data-toggle="collapse-next" data-target=".attributionContent"
-				title="Show details" style="padding: 2px 2px;">
+				title="${g.message(code:'title.show.details')}" style="padding: 2px 2px;">
 				<i class=" icon-info-sign"></i>
 			</button>
 			

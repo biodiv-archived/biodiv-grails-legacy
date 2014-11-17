@@ -5,9 +5,8 @@
 <%@ page import="species.Classification"%>
 <%@page import="species.utils.Utils"%>
 
-${resourceInstanceList}
 <div class="span4 pull-right">
-    <g:render template="/species/showTaxonBrowserTemplate" model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor]"/>
+    <g:render template="/species/showTaxonBrowserTemplate" model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor, fieldFromName:fieldFromName]"/>
     <g:render template="/species/inviteForContribution" model="['hide':true]"/>
 </div>
 
@@ -26,12 +25,12 @@ ${resourceInstanceList}
         <div id="resourceTabs" style="visibility:hidden;">
             <g:if test="${isSpeciesContributor}">
             <a id="addSpeciesImagesBtn" class="btn btn-success"
-                        style="float: right; margin-right: 5px; margin-top: 5px;"> Add/Edit Media </a>
+                        style="float: right; margin-right: 5px; margin-top: 5px;"> <g:message code="button.add.images" /> </a>
 
             </g:if>
             <ul>
-                <li><a href="#resourceTabs-1">Images</a></li>
-                <li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
+                <li><a href="#resourceTabs-1"><g:message code="button.images" /></a></li>
+                <li><a id="flickrImages" href="#resourceTabs-3"><g:message code="button.flickr.images" /></a></li>
             </ul>
             <div id="resourceTabs-1">
                 <!--a class="myeditable" href="#">Contribute Images</a-->
@@ -50,7 +49,7 @@ ${resourceInstanceList}
                     <% def fileName = speciesInstance.fetchSpeciesGroup().icon(ImageType.LARGE).fileName%>
                     <img class="group_icon galleryImage" 
                              src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
-                             title="Contribute!!!"/>
+                             title="${g.message(code:'title.show.contribute')}"/>
                     </g:else>
 
                 </div>
@@ -58,7 +57,7 @@ ${resourceInstanceList}
                 <div id="resourceTabs-3">						
                     <div id="gallery3"></div>
                     <div id="flickrBranding"></div><br/>
-                    <div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
+                    <div class="message ui-corner-all"><g:message code="showspeciesintro.irrelevant.images" /></div>
                 </div> 
             </div>
         </div>
@@ -90,7 +89,7 @@ ${resourceInstanceList}
                         </g:each>
                     </div>
                     <div class="readmore sidebar_section notes_view">
-                        ${raw(speciesInstance.notes())}
+                        ${raw(speciesInstance.notes(userLanguage))}
                     </div>
                 </div>
             </div>

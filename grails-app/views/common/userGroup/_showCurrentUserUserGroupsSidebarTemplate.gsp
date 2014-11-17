@@ -7,5 +7,5 @@
 		</li>
 	</g:each>
 	<li style="float:right;"><g:link mapping="userGroupGeneric" action="list" absolute='true' params="['user':sUser.renderCurrentUserId()]"
-		style="display:inline;">More ...</g:link></li>
+		style="display:inline;"><g:message code="link.more" /></g:link></li>
 </ul>

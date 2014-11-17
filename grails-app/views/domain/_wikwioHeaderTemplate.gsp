@@ -34,26 +34,28 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
         <div id="contributeMenu" class="collapse" style="border-bottom:0px;">
                         <div class="container">
-    <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Species pages intend to provide detailed information on every species in India." data-trigger="hover"
+    <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.species.detailed.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'species', action:'contribute', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Contribute to Species pages" title="Contribute to Species pages"> <i class="icon-plus"></i>Contribute to Species pages</a>
+                                    controller:'species', action:'contribute', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Contribute to Species pages" title="${g.message(code:'link.contribute.to')}"> <i class="icon-plus"></i>${g.message(code:'link.contribute.to')}</a>
 
-                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="An observation is an individual sighting of a species, submitted as an image or video." data-trigger="hover"
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.observation.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="Add an Observation"> <i class="icon-plus"></i>Add an Observation</a>
-                               
-                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Upload multiple images of species and create multiple observations in a batch mode" data-trigger="hover"
+                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="${g.message(code:'link.add.observation')}"> <i class="icon-plus"></i>${g.message(code:'link.add.observation')}</a>
+
+								<a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.observation.multiple.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="Add Multiple Observations"> <i class="icon-plus"></i>Add Multiple Observations (β*)</a>
-                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="A list is a collection of sightings recorded from an area over a time period submitted with or without supporting media." data-trigger="hover"
+                                    controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="${g.message(code:'title.add.multiple')}"> <i class="icon-plus"></i>${g.message(code:'title.add.multiple')}</a>
+
+
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.list.description')}" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="Add a List"> <i class="icon-plus"></i>Add a List</a>
+                                    controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="${g.message(code:'link.add.list')}"> <i class="icon-plus"></i>${g.message(code:'link.add.list')}</a>
  
-                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Upload biodiversity related reports, presentations, posters etc." data-trigger="hover"
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.document.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                    data-original-title="Add Document" title="Add Document">
-                                    <i class="icon-plus"></i> Add Document
+                                    data-original-title="Add Document" title="${g.message(code:'link.add.document')}">
+                                    <i class="icon-plus"></i> ${g.message(code:'link.add.document')}
                                 </a>
                                 <!--a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="
                                     Suggest feedback on using and improving the portal." data-trigger="hover"

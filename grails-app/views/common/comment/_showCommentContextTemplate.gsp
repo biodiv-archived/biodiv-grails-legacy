@@ -2,7 +2,7 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.SpeciesField"%>
 
-<div class="yj-context ellipsis">Comment on  
+<div class="yj-context ellipsis"><g:message code="default.comment.on.label" />  
 	<g:if test="${commentInstance.commentHolderType ==  Recommendation.class.getName()}" >
 	<%
 		def tmpReco = Recommendation.read(commentInstance.commentHolderId.toLong());
@@ -19,12 +19,12 @@
 		</g:else>
 	</g:if>
 	<g:elseif test="${commentInstance.commentHolderType == Observation.class.getName()}" >
-		observation
+		<g:message code="default.observation.label" />
 	</g:elseif>
 	<g:elseif test="${commentInstance.commentHolderType == SpeciesField.class.getName() || commentInstance.commentHolderType.startsWith('species_')}" >
-		species field
+		<g:message code="default.species.field.label" />
 	</g:elseif>
 	<g:else>
-		media
+		<g:message code="default.media.label" />
 	</g:else>
 </div>

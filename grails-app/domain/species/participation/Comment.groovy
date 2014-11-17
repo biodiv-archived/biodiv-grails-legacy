@@ -2,7 +2,7 @@ package species.participation
 
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
-
+import species.Language;
 import species.auth.SUser
 import species.Resource
 
@@ -30,11 +30,14 @@ class Comment{
 	//to store main comment thread
 	Long mainParentId;
 	
-	
+	 // Language
+    Language language;
+
 	static hasMany = [likes:SUser, attachments:Resource];
 	static belongsTo = [author:SUser];
 
 	static constraints = {
+		language nullable:false
 		body blank:false;
 		parentId nullable:true;
 		mainParentId nullable:true;

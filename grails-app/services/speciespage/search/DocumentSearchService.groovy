@@ -19,25 +19,36 @@ import content.eml.Document;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class DocumentSearchService extends AbstractSearchService {
-	/**
+    
+    static transactional = false
+	
+    /**
 	 *
 	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
-		int limit = Document.count()+1, offset = 0;
+		int limit = BATCH_SIZE;//Document.count()+1, 
+        int offset = 0, noIndexed = 0;
 		
 		def documents;
 		def startTime = System.currentTimeMillis()
-		while(true) {
-			documents = Document.list(max:limit, offset:offset);
-			if(!documents) break;
-			publishSearchIndex(documents, true);
-			documents.clear();
-			offset += limit;
-            cleanUpGorm();
-		}
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Document.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            Document.withNewTransaction([readOnly:true]) { status ->
+                documents = Document.list(max:limit, offset:offset);
+                noIndexed += documents.size();
+                if(!documents) return;
+                publishSearchIndex(documents, true);
+                //documents.clear();
+                offset += limit;
+                cleanUpGorm();
+            }
+            if(!documents) break;
+            documents.clear();
+        }
 		
 		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
@@ -52,40 +63,62 @@ class DocumentSearchService extends AbstractSearchService {
 		if(!documents) return;
 		log.info "Initializing publishing to Documents search index : "+documents.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
+        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 
-		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-		Map names = [:];
-		Map docsMap = [:]
-		documents.each { document ->
-			log.debug "Reading Document : "+document.id;
+        Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+        Map names = [:];
+        Map docsMap = [:]
+        documents.each { document ->
+            log.debug "Reading Document : "+document.id;
 
-				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, document.id.toString());
-				doc.addField(searchFieldsConfig.TITLE, document.title);
-				doc.addField(searchFieldsConfig.DESCRIPTION, document.notes);
-				doc.addField(searchFieldsConfig.TYPE, document.type.value());
-				
-				if(document.attribution){
-					doc.addField(searchFieldsConfig.ATTRIBUTION, document.attribution);
-				}
-				
-				if(document.contributors){
-					doc.addField(searchFieldsConfig.CONTRIBUTOR, document.contributors);
-				}
-				
-				document.tags.each { tag ->
-					doc.addField(searchFieldsConfig.TAG, tag);
-				}
-				
-				document.userGroups.each { userGroup ->
-					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
-				}
-				docs.add(doc);
-			
-		}
+            SolrInputDocument doc = new SolrInputDocument();
+            doc.setDocumentBoost(1.5);
+            doc.addField(searchFieldsConfig.ID,document.class.simpleName +"_"+ document.id.toString());
+            doc.addField(searchFieldsConfig.OBJECT_TYPE, document.class.simpleName);
+            doc.addField(searchFieldsConfig.TITLE, document.title);
+            doc.addField(searchFieldsConfig.DESCRIPTION, document.notes);
+            doc.addField(searchFieldsConfig.TYPE, document.type.value());
+            doc.addField(searchFieldsConfig.UPLOADED_ON, document.createdOn);
+            if(document.license) {
+                doc.addField(searchFieldsConfig.LICENSE, document.license.name.name());
+            }
+
+            if(document.attribution){
+                doc.addField(searchFieldsConfig.ATTRIBUTION, document.attribution);
+            }
+
+            if(document.contributors){
+                document.contributors.each { contributor -> 
+                    /*String userInfo = ""
+                    if(contributor.user) {
+                        userInfo = " ### "+contributor.user.email+" "+contributor.user.username+" "+contributor.user.id.toString()
+                    }*/
+                    doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor);
+                }
+            }
+
+            document.tags.each { tag ->
+                doc.addField(searchFieldsConfig.TAG, tag);
+            }
+
+            document.userGroups.each { userGroup ->
+                doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+                doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+            }
+
+            String memberInfo = ""
+            List allMembers = utilsServiceBean.getParticipants(document)
+            allMembers.each { mem ->
+                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+            }
+
+            doc.addField(searchFieldsConfig.DOC_TYPE, document.type);
+
+            docs.add(doc);
+
+        }
 
 		//log.debug docs;
         return commitDocs(docs, commit);

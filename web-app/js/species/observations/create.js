@@ -99,7 +99,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         grid.addNewColumn = function(newColumnName, options, position){
             columns = grid.getColumns();
             if(newColumnName == undefined)
-                newColumnName = prompt('New Column Name','');
+                newColumnName = prompt(window.i8ln.observation.create.nc,'');
 
             if(newColumnName == null||$.trim(newColumnName)==''){
                 return;
@@ -148,48 +148,48 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             var iconClass = undefined
             menu.items[0].iconCssClass = (args.column.name === $("#sciNameColumn").val())?'icon-check':undefined
             menu.items[1].iconCssClass = (args.column.name === $("#commonNameColumn").val())?'icon-check':undefined
-            menu.items[1].iconCssClass = (args.column.name === $("#latitude").val())?'icon-check':undefined
-            menu.items[1].iconCssClass = (args.column.name === $("#longitude").val())?'icon-check':undefined
-            menu.items[1].iconCssClass = (args.column.name === $("#obvDate").val())?'icon-check':undefined
+            menu.items[2].iconCssClass = (args.column.name === $("#latitude").val())?'icon-check':undefined
+            menu.items[3].iconCssClass = (args.column.name === $("#longitude").val())?'icon-check':undefined
+            menu.items[4].iconCssClass = (args.column.name === $("#obvDate").val())?'icon-check':undefined
         });
         
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
             var name = args.column.name;
+            var cloumnDropdown = ['sciNameColumn','commonNameColumn','latitude','longitude','obvDate'];
             if(args.command === 'sciNameColumn') {
                 if(args.column.name == $('#sciNameColumn').val())
                     name = ''
-                if(args.column.name == $('#commonNameColumn').val())
-                    $('#commonNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name);                                       
                 $('#sciNameColumn').val(name);
             } else if(args.command === 'commonNameColumn') {
                 if(args.column.name == $('#commonNameColumn').val())
                     name = ''
-                if(args.column.name == $('#sciNameColumn').val())
-                    $('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#commonNameColumn').val(name);
             } else if(args.command === 'latitude') {
                 if(args.column.name == $('#latitude').val())
                     name = ''
-                if(args.column.name != $('#latitude').val())
-                    //$('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#latitude').val(name); 
             } else if(args.command === 'longitude') {
                 if(args.column.name == $('#longitude').val())
                     name = ''
-                if(args.column.name != $('#longitude').val())
-                    //$('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#longitude').val(name); 
             } else if(args.command === 'obvDate') {
                 if(args.column.name == $('#obvDate').val())
                     name = ''
-                if(args.column.name != $('#obvDate').val())
-                    //$('#sciNameColumn').val('');
+                clearCloumnSelectIfExist(cloumnDropdown,args.column.name); 
                 $('#obvDate').val(name); 
             }
 
     
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+            selectNameColumn($('#latitude'), null);
+            selectNameColumn($('#longitude'), null);
+            selectNameColumn($('#obvDate'), null);
+
         });
         grid.registerPlugin(headerMenuPlugin);
 
@@ -309,7 +309,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
                         var res = tagMetadatas(data);
                         if(res == true){
                             automaticPropagate();
-                            alert("Your columns have been automatically marked.Please Verify");
+                            alert(window.i8ln.observation.create.mark);
                         }
                     }
                 }
@@ -335,6 +335,17 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         }
     });
 } 
+
+function clearCloumnSelectIfExist(cloumnDropdown,cloumnName){
+
+    $.each(cloumnDropdown,function(key,value){
+
+        if(cloumnName == $('#'+value).val()){
+            $('#'+value).val('');        
+        }
+
+    }); 
+}
 
 function sciNameFormatter(row, cell, value, columnDef, dataContext) {
     if (value == null || value == undefined || !value.length)
@@ -369,7 +380,7 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
             html += "<img class='small_profile_pic' src='"+value[i]['thumbnail']+"'/>";
         }
     }
-    html += "<button class='btn btn-link'  title='Add Media' data-toggle='modal' data-target='#addResources'  onclick='openDetails("+row+","+cell+");return false;'><i class='icon-plus'></i></button>";
+    html += "<button class='btn btn-link'  title=window.i8ln.observation.create.add  data-toggle='modal' data-target='#addResources'  onclick='openDetails("+row+","+cell+");return false;'><i class='icon-plus'></i></button>";
     return html;
 }
 
@@ -417,7 +428,7 @@ function loadTextToGrid(data, columns, res, sciNameColumn, commonNameColumn) {
 
 function requiredFieldValidator(value) {
     if (value == null || value == undefined || !value.length) {
-        return {valid: false, msg: "This is a required field"};
+        return {valid: false, msg: window.i8ln.observation.create.req};
     } else {
         return {valid: true, msg: null};
     }
@@ -563,7 +574,7 @@ $(document).ready(function(){
         }
 
     });
-    $(".recoName").watermark("Suggest a species name");
+    $(".recoName").watermark($(".recoName").attr('rel'));
 
     /**
      */
@@ -584,7 +595,7 @@ $(document).ready(function(){
         var data = $("#checklistData").val();
 
         if(!data || !cols) {
-            alert("Please load the column names and data");
+            alert(window.i8ln.observation.create.ld);
             event.preventDefault();
             return false; 		 		
         }
@@ -639,11 +650,11 @@ $(document).ready(function(){
         var commonNameColumn = $('#commonNameColumn').val();
 
         if(((typeof(sciNameColumn) == 'undefined') || (sciNameColumn == '')) && ((typeof(commonNameColumn) == 'undefined') || (commonNameColumn == ''))) {
-            confirm("Please mark scientific name column or common name column in the list");
+            confirm(window.i8ln.observation.create.sn);
             return;
         }
         if(sciNameColumn === commonNameColumn) {
-            alert('Same column is mentioned as scientific name and common name.');
+            alert(window.i8ln.observation.create.same);
             return;
         }
 
@@ -684,17 +695,17 @@ $(document).ready(function(){
                         } 
                         else {
                             if(sciNameColumn && !data[rowId].parsed ) {
-                                changes[rowId][sciNameColumn.id] = 'incorrectName';
+                                changes[rowId][sciNameColumn.id] =window.i8ln.observation.create.in ;
                                 incorrectNames = true;
                             }
                             if(commonNameColumn && !data[rowId].parsed) {
-                                changes[rowId][commonNameColumn.id] = 'incorrectName';
+                                changes[rowId][commonNameColumn.id] = window.i8ln.observation.create.in;
                                 incorrectNames = true;
                             }
                         }
                     } else {
                         if(!data[rowId].parsed) {
-                            changes[rowId][sciNameColumn.id] = 'incorrectName'
+                            changes[rowId][sciNameColumn.id] = window.i8ln.observation.create.in
                             incorrectNames = true;
                         }
                     }
@@ -708,7 +719,7 @@ $(document).ready(function(){
                 $('#createChecklist').trigger('click');
             },
             error: function(xhr, textStatus, errorThrown) {
-                alert('Error while validating names');
+                alert(window.i8ln.observation.create.valid);
                 console.log(xhr);
             }
         });
@@ -738,7 +749,7 @@ $(document).ready(function(){
      */
     $("#addObservationSubmit").click(function(event){
         if($(this).hasClass('disabled')) {
-            alert("Uploading is in progress. Please submit after it is over.");
+            alert(window.i8ln.observation.bulkObvCreate.up);
             event.preventDefault();
             return false; 		 		
         }
@@ -779,7 +790,7 @@ $(document).ready(function(){
             $(".addObservation").submit();        	
             return false;
         } else {
-            alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
+            alert(window.i8ln.observation.bulkObvCreate.agree) 
         }
     });
 

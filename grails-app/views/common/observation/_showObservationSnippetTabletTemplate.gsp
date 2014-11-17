@@ -10,7 +10,7 @@ def obvId = observationInstance?.id
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>
 <div class="snippet tablet">
-    <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? 'Featured':''}">
+    <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
                 </span>
 
     <div class="figure"
@@ -25,7 +25,7 @@ def obvId = observationInstance?.id
 			<g:else>
 				<img class="img-polaroid"
 					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-					title="You can contribute!!!" />
+					title="${g.message(code:'showobservationsnippet.title.contribute')}" />
 			</g:else>
                         <g:if test="${observationInstance?.isChecklist}">
                         <div class="checklistCount">${observationInstance?.speciesCount}</div>

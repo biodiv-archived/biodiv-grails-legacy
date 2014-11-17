@@ -45,25 +45,30 @@ class NamesIndexerService {
 
 		setDirty(false);
 
-		def a = new StandardAnalyzer(Version.LUCENE_44)
-		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, ' ', true, true, '')
+		def a = new StandardAnalyzer(Version.LUCENE_4_10_0)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, ' ', true, true,'')
 		//analyzer.setOutputUnigrams(true);
 
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
 		
 		int limit = 100, offset = 0, noOfRecosAdded = 0;
+        def recos;
 		while(true){
-			def recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
+            Recommendation.withNewTransaction([readOnly:true]) { status ->
+			recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
 			recos.each { reco ->
-				if(add(reco, analyzer, lookup1)) {
+				if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
 					noOfRecosAdded++;
 				}
 			}
 			
 			offset = offset + limit;
 			log.info "=========== total added recos == $noOfRecosAdded"
+			if(!recos) return; //no more results;
+            }
 			if(!recos) break; //no more results;
+            recos.clear();
 		}
 		
 		synchronized(lookup) {
@@ -75,7 +80,7 @@ class NamesIndexerService {
 
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		store(indexStoreDir);
-
+	
 		
 	}
 
@@ -85,7 +90,7 @@ class NamesIndexerService {
 	 * @return
 	 */
 	boolean add(Recommendation reco) {
-		def a = new StandardAnalyzer(Version.LUCENE_44)
+		def a = new StandardAnalyzer(Version.LUCENE_4_10_0)
 		/* setOutputUnigrams(boolean outputUnigrams) is deprecated....Confgure outputUnigrams during construction as shown below.*/
 		//def analyzer = new ShingleAnalyzerWrapper(Analyzer, minShingleSize, maxShingleSize, tokenSeprator, outputUnigram, outputUnigramsIfNoShingles)
 		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true, '')
@@ -132,6 +137,7 @@ class NamesIndexerService {
 				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id));
 			}
 		}
+        tokenStream.close();
 		return success;
 	}
 

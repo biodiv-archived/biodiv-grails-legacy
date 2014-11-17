@@ -522,6 +522,19 @@ function getSelectedUserGroup() {
     return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
+function getSelectedFilters($ele) {
+    var selected = [];
+    $ele.each(function() {
+        var name = $(this).attr('value');
+        if(name.toLowerCase() == 'all') {
+            selected = ['All']
+            return;
+        }
+        selected.push(name);
+    });
+    return selected.join(' OR ');
+} 
+
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
 
@@ -588,23 +601,66 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         }
     }
 
+    console.log(isRegularSearch);
+
     if(!isRegularSearch) {
-        $("#advSearchForm :input").each(function(index, ele) {
+        $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
-            var query = $( this ).val();
-            if(query){
-                params[field] = query;
-            } else {
-                // removing old tag from url
-                if(params[field] != undefined){
-                    delete params[field];
+            if(field) {
+                var query = $( this ).val();
+                var queryStr = '';
+                if($.isArray(query)) {
+                    for(var i=0; i< query.length; i++) {
+                        queryStr += query[i]
+                        if(i < query.length-1) queryStr += " OR "
+                    }
+                    queryStr += ""
+                } else {
+                    queryStr = query;
                 }
+                if(field == 'aq.object_type' && query == 'All') {
+
+                } 
+                else if(query){
+                    params[field] = queryStr;
+                } else {
+                    // removing old tag from url
+                    if(params[field] != undefined){
+                        delete params[field];
+                    }
+                }
+            }
+        });
+        
+        delete params['daterangepicker_start'];
+        delete params['daterangepicker_end'];
+
+        $.each($(document).find('input[name=daterangepicker_start]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_start'] = $(value).val();
+            } else {
+                params['daterangepicker_start'] = $(value).val();
+            }
+        });
+        $.each($(document).find('input[name=daterangepicker_end]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_end'] = $(value).val();
+            } else {
+                params['daterangepicker_end'] = $(value).val();
             }
         });
         if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
             delete params['daterangepicker_start'];
             delete params['daterangepicker_end'];
         }
+        if((params['observedon_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['observedon_end'] === Date.today().toString('dd/MM/yyyy'))){
+            delete params['observedon_start'];
+            delete params['observedon_end'];
+        }
+
+        delete params['query'];
+        $( "#searchTextField" ).val('');
+
     }
 
     if($("#limit").length != 0) {
@@ -646,11 +702,46 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     var isMapView = $("#isMapView").val()
-        if(isMapView) {
-            params['isMapView'] = isMapView
-        } else {
-            delete params['isMapView']
-        }
+    if(isMapView) {
+        params['isMapView'] = isMapView
+    } else {
+        delete params['isMapView']
+    }
+
+    var object_type = getSelectedFilters($("input.moduleFilter.active:checked"))
+    if(object_type) {
+        params['object_type'] = object_type
+    } else {
+        delete params['object_type']
+    }
+
+    var uGroup = getSelectedFilters($("input.uGroupFilter.active:checked"))
+    if(uGroup) {
+        params['uGroup'] = uGroup
+    } else {
+        //delete params['uGroup']
+    }
+
+    var sGroup = getSelectedFilters($("input.sGroupFilter.active:checked"))
+    if(sGroup) {
+        params['sGroup'] = sGroup
+    } 
+
+    var contributor = getSelectedFilters($("input.contributorFilter.active:checked"))
+    if(contributor) {
+        params['contributor'] = contributor
+    } else {
+        delete params['contributor']
+    }
+
+    var tag = getSelectedFilters($("input.tagFilter.active:checked"))
+    if(tag) {
+        params['tag'] = tag
+    } else {
+        delete params['tag']
+    }
+
+
     return params;
 }	
 
@@ -685,6 +776,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
+        //$('#filterPanel').replaceWith(data.filterPanel);
         //$('.observation_location').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
@@ -917,7 +1009,7 @@ function loadSpeciesGroupCount() {
                             document.getElementById('speciesGroupCountList'));
 
                         columnChart.draw(visualization_data,  {
-                            title:"No of observations per species group",
+                            title:window.i8ln.species.specie.ops,
                             vAxis:{minValue:0, maxValue:5, format: '#'},
                             legend:{position: 'bottom'},
                             chartArea:{width:'80%'}
