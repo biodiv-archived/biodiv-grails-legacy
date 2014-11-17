@@ -1360,6 +1360,10 @@ class ObservationController extends AbstractObjectController {
 	 */
 	def terms = {
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
+        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        if(params.field == searchFieldsConfig.CONTRIBUTOR) {
+            params.field = searchFieldsConfig.USERNAME +"_exact"
+        }
 		
 		List result = observationService.nameTerms(params)
 

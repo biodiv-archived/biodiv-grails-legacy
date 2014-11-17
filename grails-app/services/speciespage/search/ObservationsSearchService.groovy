@@ -114,7 +114,7 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
             doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
             doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
-            doc.addField(searchFieldsConfig.LICENSE, obv.license.name.value());
+            doc.addField(searchFieldsConfig.LICENSE, obv.license.name.name());
             if(obv.notes) {
                 doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
             }
@@ -203,7 +203,7 @@ class ObservationsSearchService extends AbstractSearchService {
             def chk = obv 
 
             doc.addField(searchFieldsConfig.TITLE, chk.title);
-        doc.addField(searchFieldsConfig.LICENSE, chk.license.name.value());
+        doc.addField(searchFieldsConfig.LICENSE, chk.license.name.name());
         doc.removeField(searchFieldsConfig.UPLOADED_ON);
         doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate?:chk.createdOn);
         doc.addField(searchFieldsConfig.REFERENCE, chk.refText);

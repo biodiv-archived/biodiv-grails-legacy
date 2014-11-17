@@ -34,13 +34,15 @@
                 <span class="">${observationInstance.speciesCount}</span>
             </div>
 
-            <div class="footer-item"> 
-                <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
-                title="${observationInstance.license.name}"/>
-            </div>
         </g:if>
-        
+
     </g:if>
+    
+    <div class="footer-item"> 
+        <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
+        title="${observationInstance.license.name}"/>
+    </div>
+
     <g:if test="${!hidePost}">
     	<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
     </g:if>	

@@ -75,7 +75,7 @@ class SearchController {
 
         println result;
         println "++++++++++++++++++++++++++++++++++++++++++"
-        def facetResults = [];
+/*        def facetResults = [];
         if(result.getFacetField(params['facet.field'])) {
         List objectTypeFacets = result.getFacetField(params['facet.field'])?.getValues()
         if(objectTypeFacets) {
@@ -86,7 +86,7 @@ class SearchController {
         }
         }
         }
-
+*/
         render result as JSON
     }
 

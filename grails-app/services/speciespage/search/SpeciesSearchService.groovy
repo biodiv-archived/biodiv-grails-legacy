@@ -126,7 +126,7 @@ class SpeciesSearchService extends AbstractSearchService {
 				String subcategory = field.field.subCategory;
 
                 field.licenses.each { l ->
-    				doc.addField(searchFieldsConfig.LICENSE, l.name.value());
+    				doc.addField(searchFieldsConfig.LICENSE, l.name.name());
                 }
 
 				field.contributors.each { contributor ->
