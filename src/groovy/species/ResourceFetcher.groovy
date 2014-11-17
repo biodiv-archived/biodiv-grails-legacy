@@ -56,7 +56,7 @@ class ResourceFetcher {
 	private computeNext(){
 		def paramsMap = Utils.getQueryMap(filterUrl)
 		//adding group filter parameter for list/search query
-		paramsMap["webaddress"] = this.userGroupWebAddress
+		paramsMap["webaddress"] = this.userGroupWebAddress?:paramsMap["webaddress"]
 		String action = filterUrl.getPath().split("/")[2]
 		switch(rType){
 			case Observation.class.canonicalName:

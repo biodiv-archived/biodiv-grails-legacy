@@ -2462,7 +2462,7 @@ div.noOfRatings {
     left:35%;
 }
 .table-striped tbody>tr:nth-child(odd)>td.nameColumn, .nameColumn {
-    background-color : lightyellow;
+    background-color : rgb(186, 214, 209);
 }
 .incorrectName {
     background-color : #FA8072;
