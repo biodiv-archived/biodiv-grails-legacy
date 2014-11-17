@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class BiodivSearchService extends AbstractSearchService {
     
+    static transactional = false
+
     @Autowired
     def observationsSearchService
     @Autowired
@@ -130,7 +132,7 @@ class BiodivSearchService extends AbstractSearchService {
         observationsSearchService.INDEX_DOCS = INDEX_DOCS
         observationsSearchService.publishSearchIndex();
 
-               log.info "===INDEXING DOC========"
+        log.info "===INDEXING DOC========"
         documentSearchService.INDEX_DOCS = INDEX_DOCS
         documentSearchService.publishSearchIndex()
 
@@ -351,9 +353,9 @@ class BiodivSearchService extends AbstractSearchService {
                 if(key.equalsIgnoreCase(searchFieldsConfig.OBJECT_TYPE) && value.equalsIgnoreCase('All')) {
                 } else if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
                     if(i++ == 0) {
-                        aq = key + ': ('+value+')';
+                        aq = key + ':('+value+')';
                     } else {
-                        aq = aq + " AND " + key + ': ('+value+')';
+                        aq = aq + " AND " + key + ':('+value+')';
                     }
                 }
             }
@@ -557,8 +559,8 @@ class BiodivSearchService extends AbstractSearchService {
                 }
                 queryParams["uGroup"] = params.uGroup
                 activeFilters["uGroup"] = params.uGroup
-            } else if (params.uGroup && params.uGroup.isLong()) {
-                paramsList.add('fq', searchFieldsConfig.USER_GROUP+":"+params.uGroup);
+            } else if (params.uGroup) {
+                paramsList.add('fq', searchFieldsConfig.USER_GROUP+":("+params.uGroup+")");
                 queryParams["uGroup"] = params.uGroup
                 activeFilters["uGroup"] = params.uGroup
             } else {

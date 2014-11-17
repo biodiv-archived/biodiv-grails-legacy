@@ -12,12 +12,14 @@ import species.participation.ActivityFeedService
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import species.participation.Checklists;
 import species.participation.Observation;
+import species.participation.Follow;
 import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
-
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
 
 import java.beans.Introspector;
 class UtilsService {
@@ -804,5 +806,16 @@ class UtilsService {
         def now = System.currentTimeMillis()  
         log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
     }  
+
+    static def logSql(Closure closure) {
+        println "%%%%%%%%%%%% logging sql"  
+        Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
+        Level currentLevel = sqlLogger.level
+        sqlLogger.setLevel(Level.TRACE)
+        def result = closure.call()
+        sqlLogger.setLevel(currentLevel)
+        result
+    }
+
 }
 

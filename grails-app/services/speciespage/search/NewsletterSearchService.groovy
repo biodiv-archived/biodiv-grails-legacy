@@ -29,6 +29,8 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class NewsletterSearchService extends AbstractSearchService {
 
+    static transactional = false
+
 	/**
 	 * 
 	 */
@@ -42,15 +44,20 @@ class NewsletterSearchService extends AbstractSearchService {
 		def newsletters;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Newsletter.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			newsletters = Newsletter.list(max:limit, offset:offset);
-            noIndexed += newsletters;
-			if(!newsletters) break;
-			publishSearchIndex(newsletters, true);
-			newsletters.clear();
-			offset += limit;
-		}
-		
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            Newsletter.withNewTransaction([readOnly:true]) { status ->
+                newsletters = Newsletter.list(max:limit, offset:offset);
+                noIndexed += newsletters;
+                if(!newsletters) return;
+                publishSearchIndex(newsletters, true);
+                //newsletters.clear();
+                offset += limit;
+            }
+
+            if(!newsletters) break;
+            newsletters.clear();
+        }
 		log.info "Time taken to publish newsletter search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
@@ -73,6 +80,7 @@ class NewsletterSearchService extends AbstractSearchService {
 			log.debug "Reading Newsletter : "+obv.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
+                doc.setDocumentBoost(1.5);
                 println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
 				doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+ obv.id.toString());
 			    doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);

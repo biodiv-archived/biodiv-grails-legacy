@@ -15,6 +15,7 @@ import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
+import org.springframework.transaction.annotation.Transactional
 
 import species.CommonNames
 import species.Habitat;
@@ -32,6 +33,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 class ResourceSearchService extends AbstractSearchService {
 
+    static transactional = false
 
     /**
      * 
@@ -47,16 +49,22 @@ class ResourceSearchService extends AbstractSearchService {
         def resources;
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Resource.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
-            resources = Resource.list(max:limit, offset:offset, sort:'id');
-            noIndexed += resources.size()
+            Resource.withNewTransaction([readOnly:true]) { status ->
+                resources = Resource.list(max:limit, offset:offset, sort:'id');
+                noIndexed += resources.size()
+                if(!resources) return;
+                publishSearchIndex(resources, true);
+                //resources.clear();
+                offset += limit;
+                cleanUpGorm()
+            }
             if(!resources) break;
-            publishSearchIndex(resources, true);
-            resources.clear();
-            offset += limit;
-            cleanUpGorm()
-        }
 
+            resources.clear();
+
+        }
         log.info "Time taken to publish resources search index is ${System.currentTimeMillis()-startTime}(msec)";
     }
 

@@ -606,26 +606,28 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     if(!isRegularSearch) {
         $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
-            var query = $( this ).val();
-            var queryStr = '';
-            if($.isArray(query)) {
-                for(var i=0; i< query.length; i++) {
-                    queryStr += query[i]
-                    if(i < query.length-1) queryStr += " OR "
+            if(field) {
+                var query = $( this ).val();
+                var queryStr = '';
+                if($.isArray(query)) {
+                    for(var i=0; i< query.length; i++) {
+                        queryStr += query[i]
+                        if(i < query.length-1) queryStr += " OR "
+                    }
+                    queryStr += ""
+                } else {
+                    queryStr = query;
                 }
-                queryStr += ""
-            } else {
-                queryStr = query;
-            }
-            if(field == 'aq.object_type' && query == 'All') {
+                if(field == 'aq.object_type' && query == 'All') {
 
-            } 
-            else if(query){
-                params[field] = queryStr;
-            } else {
-                // removing old tag from url
-                if(params[field] != undefined){
-                    delete params[field];
+                } 
+                else if(query){
+                    params[field] = queryStr;
+                } else {
+                    // removing old tag from url
+                    if(params[field] != undefined){
+                        delete params[field];
+                    }
                 }
             }
         });

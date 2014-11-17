@@ -116,7 +116,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 
 	static mapping = {
-		version : false;
+		//version false
 		notes type:'text'
 		searchText type:'text'
 		checklistAnnotations type:'text'
