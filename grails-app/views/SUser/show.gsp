@@ -156,7 +156,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                                     <g:if test="${user?.language?.id != userLanguage?.id}">
                                         <%  
                                           styleVar = "none"
-                                          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.twoLetterCode.toUpperCase()+'</a>';
+                                          clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.threeLetterCode.toUpperCase()+'</a>';
                                         %>
                                     </g:if>
 

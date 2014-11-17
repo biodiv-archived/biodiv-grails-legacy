@@ -228,8 +228,8 @@ class UtilsService {
        // println "====================================="+request
         
         String langStr = LCH.getLocale()
-        def (langtwo, lang1) = langStr.tokenize( '_' );
-        def languageInstance = Language.findByTwoLetterCode(langtwo);
+        def (langthree, lang1) = langStr.tokenize( '_' );        
+        def languageInstance = Language.findByThreeLetterCode(langthree);
         return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
     }
 
