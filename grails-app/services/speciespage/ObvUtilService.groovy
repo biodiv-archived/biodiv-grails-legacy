@@ -54,6 +54,13 @@ class ObvUtilService {
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
 	static final String AUTHOR_NAME   = "user name"
+	static final String OBSERVATION_ID   = "id"
+	static final String CREATED_ON   = "created on"
+	static final String UPDATED_ON   = "updated on"
+	static final String OBSERVATION_URL   = "observation url"
+	static final String NUM_IDENTIFICATION_AGREEMENT   = "no. of identification agreements"
+	static final String NUM_IDENTIFICATION_DISAGREEMENT   = "no. of identification disagreements"
+	
 	//task related
 	static final String  SUCCESS = "Success";
 	static final String  FAILED = "Failed";
@@ -84,7 +91,7 @@ class ObvUtilService {
 	
 	def export(params, dl){
 		log.debug(params)
-		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl).getAllResult()
+		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
 		log.debug " Obv total $observationInstanceList.size()" 
 		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}

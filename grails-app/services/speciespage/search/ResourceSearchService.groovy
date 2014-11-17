@@ -119,7 +119,7 @@ class ResourceSearchService extends AbstractSearchService {
 
         doc.addField(searchFieldsConfig.UPLOADED_ON, r.uploadTime);
         r.licenses.each { license ->
-            doc.addField(searchFieldsConfig.LICENSE, license.name.value());
+            doc.addField(searchFieldsConfig.LICENSE, license.name.name());
         }
 
         if(r.description) {
