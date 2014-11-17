@@ -65,7 +65,7 @@
         <g:if test="${documentInstance?.language?.id != userLanguage?.id}">
             <%  
               styleVar = "none"
-              clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+documentInstance?.language?.twoLetterCode.toUpperCase()+'</a>';
+              clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+documentInstance?.language?.threeLetterCode.toUpperCase()+'</a>';
             %>
         </g:if>
                 

@@ -38,7 +38,7 @@
                 <g:if test="${resourceInstance?.language?.id != userLanguage?.id}">
                 <%  
                 styleVar = "none"
-                clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+resourceInstance?.language?.name+'</a>';
+                clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+resourceInstance?.language?.threeLetterCode.toUpperCase()+'</a>';
                 %>
                 </g:if>
 

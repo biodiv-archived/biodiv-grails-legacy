@@ -29,9 +29,9 @@
             <g:each in="${localeLanguages}" var="localeLanguage">
                 <%  
                     def lang_code = RequestContextUtils.getLocale(request); 
-                    def isDisabled = (lang_code.toString() == localeLanguage.code) ? 'disabled' : '' ;
+                    def isDisabled = (lang_code.toString() == localeLanguage.twoletter) ? 'disabled' : '' ;
                 %>
-                <button class="btn btn-mini lang_c ${isDisabled}" rel="${localeLanguage.code}">${localeLanguage.code?.toUpperCase()}</button>
+                <button class="btn btn-mini lang_c ${isDisabled}" rel="${localeLanguage.twoletter}">${localeLanguage.code?.toUpperCase()}</button>
             </g:each>
         </div>
     </li>

@@ -3,11 +3,14 @@
 		def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
 		def speciesLink = " "
+        def see_checklists=g.message(code:"button.see.checklist")
+        def sourcechecklists=g.message(code:"showspeciesnametemp.title.source")
+        def see_species=g.message(code:"button.see.species")
 		if(speciesId && !isHeading){
-			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i><g:message code='button.see.species' />" + "</a>"
+			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_species+"</a>"
 		} 
 		if(observationInstance.id != observationInstance.sourceId && !isHeading){
-			speciesLink += '<a class="species-page-link" title="${g.message(code:"showspeciesnametemp.title.source")}" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i><g:message code='button.see.checklist' />" + "</a>"
+			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_checklists+"</a>"
 		}
 	%>
 	<g:set var="speciesLinkHtml" value="${speciesLink.replaceAll('"','\\\\"').encodeAsRaw()}" />
