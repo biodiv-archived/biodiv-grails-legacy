@@ -410,15 +410,14 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def Map fetchExportableValue(SUser reqUser=null){
 		Map res = [:]
-		
+		res[ObvUtilService.OBSERVATION_ID] = "" + id
+		res[ObvUtilService.OBSERVATION_URL] = utilsService.createHardLink('observation', 'show', this.id)
 		res[ObvUtilService.IMAGE_PATH] = fetchImageUrlList().join(", ")
 		
-		res[ObvUtilService.SPECIES_GROUP] = group.name
-		res[ObvUtilService.HABITAT] = habitat.name
-		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
 		
 		def snName = ""
 		def cnName = ""
+		def totalVotes, maxVotedRecoCount
 		if(maxVotedReco){
 			if(maxVotedReco.isScientificName){
 				snName = maxVotedReco.name
@@ -426,17 +425,29 @@ class Observation extends Metadata implements Taggable, Rateable {
 			}else{
 				cnName = maxVotedReco.name
 			}
+			totalVotes = RecommendationVote.countByObservation(this)
+			maxVotedRecoCount = RecommendationVote.findAllByRecommendationAndObservation(maxVotedReco, this).size()
 		}
-		res[ObvUtilService.CN] =cnName
-		res[ObvUtilService.SN] =snName
 		
-		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
+		res[ObvUtilService.SN] =snName
+		res[ObvUtilService.CN] =cnName
+		res[ObvUtilService.NUM_IDENTIFICATION_AGREEMENT] = maxVotedRecoCount ? "" + maxVotedRecoCount : "0"
+		res[ObvUtilService.NUM_IDENTIFICATION_DISAGREEMENT] = totalVotes ? "" + (totalVotes - maxVotedRecoCount) : "0"
+		res[ObvUtilService.HELP_IDENTIFY] = maxVotedReco ? "NO" : "YES"
+		
+		
+		res[ObvUtilService.SPECIES_GROUP] = group.name
+		res[ObvUtilService.HABITAT] = habitat.name
+		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
+		
+				
 		res[ObvUtilService.LOCATION] = placeName
 		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
 		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
 		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
-		res[ObvUtilService.NOTES] = notes
+		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
 		
+		res[ObvUtilService.NOTES] = notes
 		
 		//XXX: During download of large number of observation some time following exception coming
 		//an assertion failure occured (this may indicate a bug in Hibernate, but is more likely due to unsafe use of the session)
@@ -459,9 +470,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		//def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
 		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-		String base = config.speciesPortal.observations.serverURL
-		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id) 
 		res[ObvUtilService.AUTHOR_NAME] = author.name
+		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id) 
+		
+		res[ObvUtilService.CREATED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(createdOn)
+		res[ObvUtilService.UPDATED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(lastRevised)
+
 		return res 
 	}
 	
