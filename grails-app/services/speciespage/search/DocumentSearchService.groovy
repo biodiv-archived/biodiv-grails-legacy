@@ -81,7 +81,7 @@ class DocumentSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.TYPE, document.type.value());
             doc.addField(searchFieldsConfig.UPLOADED_ON, document.createdOn);
             if(document.license) {
-                doc.addField(searchFieldsConfig.LICENSE, document.license.name.value());
+                doc.addField(searchFieldsConfig.LICENSE, document.license.name.name());
             }
 
             if(document.attribution){

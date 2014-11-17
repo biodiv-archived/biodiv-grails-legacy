@@ -350,7 +350,12 @@ class BiodivSearchService extends AbstractSearchService {
             params.aq.each { key, value ->
                 queryParams["aq."+key] = value;
                 activeFilters["aq."+key] = value;
-                if(key.equalsIgnoreCase(searchFieldsConfig.OBJECT_TYPE) && value.equalsIgnoreCase('All')) {
+                if(key.equalsIgnoreCase(searchFieldsConfig.OBJECT_TYPE)) {
+                    if(!value.equalsIgnoreCase('All')) {
+                        paramsList.add('fq', key+":"+value)
+                    }
+                } else if(key.equalsIgnoreCase(searchFieldsConfig.LICENSE)) {
+                    paramsList.add('fq', key+":("+value+')')
                 } else if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
                     if(i++ == 0) {
                         aq = key + ':('+value+')';
@@ -552,14 +557,7 @@ class BiodivSearchService extends AbstractSearchService {
         }
 
         if(params.uGroup) {
-            if(params.uGroup == "THIS_GROUP") {
-                String uGroup = params.webaddress
-                if(uGroup) {
-                    paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
-                }
-                queryParams["uGroup"] = params.uGroup
-                activeFilters["uGroup"] = params.uGroup
-            } else if (params.uGroup) {
+            if (params.uGroup) {
                 paramsList.add('fq', searchFieldsConfig.USER_GROUP+":("+params.uGroup+")");
                 queryParams["uGroup"] = params.uGroup
                 activeFilters["uGroup"] = params.uGroup
@@ -570,7 +568,7 @@ class BiodivSearchService extends AbstractSearchService {
         }
 
         if(params.object_type && !params.object_type.equalsIgnoreCase('All')){
-            paramsList.add('fq', searchFieldsConfig.OBJECT_TYPE+":"+params.object_type);
+            paramsList.add('fq', searchFieldsConfig.OBJECT_TYPE+":("+params.object_type+")");
             queryParams["object_type"] = params.object_type
             activeFilters["object_type"] = params.object_type
         }

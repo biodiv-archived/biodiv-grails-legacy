@@ -29,9 +29,15 @@
 
     <field name="name" type="taxonText" indexed="true" multiValued="true" />
     <field name="common_name" type="taxonText" indexed="true" multiValued="true" />
-
+    
     <field name="name_exact" type="textExact" indexed="true" multiValued="true" />
     <copyField source="name" dest="name_exact" />
+
+    <field name="username" type="taxonText" indexed="true" multiValued="true" />
+    <field name="username_exact" type="textExact" indexed="true" multiValued="true" />
+    <copyField source="name" dest="username_exact" />
+    <copyField source="username" dest="username_exact" />
+
     <field name="common_name_exact" type="textExact" indexed="true" multiValued="true" />
     <copyField source="common_name" dest="common_name_exact" />
     <field name="reference" type="text" indexed="true" multiValued="true"/>
@@ -67,7 +73,6 @@
 
    <field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true"/>
    <copyField source="*_exact" dest="autocomplete" />
-   <copyField source="contributor" dest="autocomplete" />
    <copyField source="location" dest="autocomplete" />
    <copyField source="attribution" dest="autocomplete" />
    <copyField source="reference" dest="autocomplete" />
@@ -76,7 +81,7 @@
    <copyField source="tag" dest="autocomplete" />
    <copyField source="sgroup" dest="autocomplete" />
    <copyField source="habitat" dest="autocomplete" />
-   <copyField source="members" dest="autocomplete" />
+   <copyField source="username" dest="autocomplete" />
 
    <field name="group" type="long" indexed="true"  multiValued="true"/>
    <field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>

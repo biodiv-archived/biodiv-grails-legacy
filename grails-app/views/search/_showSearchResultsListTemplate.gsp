@@ -40,7 +40,6 @@
                     <g:else>
                     ${instance.instance} ${className}
                     </g:else>
-
                     </li>
                     </g:each>
                 </ul>
