@@ -590,7 +590,7 @@ class UtilsService {
                     try{
                         mailService.sendMail {
                             to toUser.email
-                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("kk")) ) {
+                            if(index == 0 && (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) ) {
                                 bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                             }
                             from grailsApplication.config.grails.mail.default.from
@@ -672,7 +672,7 @@ class UtilsService {
 
     private List getParticipants(observation) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
             def result = getUserForEmail(observation) //Follow.getFollowers(observation)
             result.each { user ->
                 if(user.sendNotification && !participants.contains(user)){
@@ -702,7 +702,7 @@ class UtilsService {
 
     private SUser getOwner(observation) {
         def author = null;
-        if (Environment.getCurrent().getName().equalsIgnoreCase("kk") ) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") ) {
             if(observation.metaClass.hasProperty(observation, 'author') || observation.metaClass.hasProperty(observation, 'contributors')) {
                 author = observation.author;
                 if(!author.sendNotification) {
