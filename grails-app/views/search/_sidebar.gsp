@@ -30,12 +30,12 @@
         </label>
 
 
+        <g:set var="uGroupFilters" value="${activeFilters?.uGroup?.split(' OR ')}"/>
         <g:each in="${uGroups}" var="uGroup">
         <label class="checkbox">
             <g:set var="userGroupInstance" value="${UserGroup.read(Long.parseLong(uGroup.name))}"/>
             <% checked = false;
-            //HACK need to fix
-            if((activeFilters?.uGroup?.contains(userGroupInstance.id.toString()))) {
+            if((uGroupFilters?.contains(userGroupInstance.id.toString()))) {
                 checked = true
             } %>
             <input class="searchFilter uGroupFilter ${checked?'active':''} " type="checkbox" name="uGroup" value="${userGroupInstance.id}"  ${checked?'checked':''}/ >${userGroupInstance.name} (${uGroup.count})
