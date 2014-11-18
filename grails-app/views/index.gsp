@@ -95,7 +95,7 @@
             </div>
             <div class="entry">
                 ${g.message(code:'title.species.id')}
-                <div class="stats_number">189</div>
+                <div class="stats_number">344</div>
             </div>
         </div>
 
