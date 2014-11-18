@@ -15,6 +15,7 @@
         this.options = _options;
         //cache[this.options.nameFilter] = {}
         var appendTo = this.parent().find('.nameSuggestions');
+        console.log(appendTo);
         if(_options.appendTo == undefined && appendTo.length > 0) {
             _options.appendTo = appendTo;
         }

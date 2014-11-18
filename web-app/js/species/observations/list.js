@@ -522,18 +522,19 @@ function getSelectedUserGroup() {
     return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
-function getSelectedFilters($ele) {
+function getSelectedFilters($ele, noneSelected) {
     var selected = [];
     var allSelected = true;
-    var noneSelected = true;
+    var noneSelected = (noneSelected != undefined) ? noneSelected : true;
     $ele.each(function() {
         if($(this).hasClass('active') && $(this).is(':checked')) {
             var name = $(this).attr('value');
             if(name.toLowerCase() == 'all') {
-                selected = ['All']
-                return;
+                //selected = ['All']
+                //return;
+            } else {
+                selected.push(name);
             }
-            selected.push(name);
             noneSelected = false;
         } else {
             allSelected = false;
