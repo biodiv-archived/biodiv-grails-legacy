@@ -301,7 +301,13 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	//XXX: comment this method before checklist migration
 	def beforeUpdate(){
-		if(isDirty() && !isDirty('visitCount')){
+        println "#####################################################################"
+        println isDirty()
+        println isDirty('visitCount')
+        println isDirty('version')
+        println this.dirtyPropertyNames
+        println "#####################################################################"
+		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
 			updateIsShowable()
 			
 			if(isDirty('topology')){
