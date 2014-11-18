@@ -4,7 +4,7 @@
 <div id="filterPanel" class="span4 sidebar" style="margin-left:0px;margin-right:18px;">
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
         <h5 style="position:relative"> ${g.message(code:'heading.modules')} 
-            <span class="pull-right" style="position:absolute;top:0px;right:0px;"><button class="btn btn-link resetFilter">Reset</button></span>
+            <span class="pull-right" style="position:absolute;top:0px;right:0px;"><button class="btn btn-link resetFilter">Select All</button></span>
         </h5>
         <g:each in="${modules}" var="module">
         <label class="checkbox">
@@ -21,13 +21,11 @@
 
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
         <h5 style="position:relative"> ${g.message(code:'button.user.groups')} 
-        <span class="pull-right" style="position:absolute;top:0px;right:0px;"><button class="btn btn-link resetFilter">Reset</button></span>
+        <span class="pull-right" style="position:absolute;top:0px;right:0px;"><button class="btn btn-link resetFilter">Select All</button></span>
         </h5>
         
         <label class="checkbox">
-            <input class="searchFilter uGroupFilter  ${(activeFilters?.uGroup == null)?'active':''}" type="checkbox" name="uGroup" value="all" ${(activeFilters?.uGroup == null)?'checked':''} disabled/>
-                                        ${grailsApplication.config.speciesPortal.app.siteName}
-        </label>
+            <input class="searchFilter uGroupFilter  ${(activeFilters?.uGroup == null)?'active':''}" type="checkbox" name="uGroup" value="all" ${(activeFilters?.uGroup == null)?'checked':''} disabled/>All</label>
 
 
         <g:set var="uGroupFilters" value="${activeFilters?.uGroup?.split(' OR ')}"/>
