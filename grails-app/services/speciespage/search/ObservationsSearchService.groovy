@@ -24,6 +24,7 @@ import species.TaxonomyDefinition
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.participation.Observation;
+import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import com.vividsolutions.jts.geom.Point
@@ -158,7 +159,8 @@ class ObservationsSearchService extends AbstractSearchService {
                 doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
             }
 
-            def checklistObvs = addChecklistData(obv, doc)
+            def checklistObvs;
+            checklistObvs = addChecklistData(obv, doc)
             
             List resourceDocs = getResourcesDocs(obv);
 
@@ -186,7 +188,7 @@ class ObservationsSearchService extends AbstractSearchService {
             //distRecoVotes = obv.maxVotedReco;
             distRecoVotes.each { vote ->
                 doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
-                doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
+                //doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
                 if(vote.recommendation.taxonConcept)
                     doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
             }

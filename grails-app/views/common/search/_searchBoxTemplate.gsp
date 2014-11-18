@@ -1,5 +1,4 @@
 <%@page import="species.utils.Utils"%>
-<%--<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>--%>
 
 <div id='searchToggleBox' class="input-append" style="z-index:1">
 	<form method="get"
@@ -10,7 +9,6 @@
 			value="${((queryParams?.query)?:((queryParams?.q)?:params.query))?.encodeAsHTML()}"
 			class="search-query span3" placeholder="${g.message(code:'default.search')}" />
 		<button id="search" class="btn btn-link" type="button"><i class="icon-search icon-gray"></i></button>
-		<input type="hidden" name="fl" value="id" />
 	</form>
 
 <div id="nameSuggestionsMain" class="dropdown span3" style="left:-20px;">
@@ -231,6 +229,7 @@ $(document).ready(function() {
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 
     $('#advSearchBox.dropdown-menu input, #advSearchBox.dropdown-menu label, #advSearchBox.dropdown-menu select').click(function(e) {
+            console.log('disable advSearch dropdown-menu close action');
             e.stopPropagation();
     });
 });

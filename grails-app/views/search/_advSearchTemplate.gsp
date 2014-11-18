@@ -23,11 +23,13 @@
 
         <div class="control-group">
             <label class="control-label" for="name">${g.message(code:"default.species.label")}</label> 
-            <div class="controls">
+            <div class="controls nameContainer">
                 <input id="aq.name"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.name" value="${queryParams?queryParams['aq.name']?.encodeAsHTML():'' }"
                 placeholder="${g.message(code:'placeholder.search.species.name')}" />
+                    <div class='nameSuggestions' style='display: block;'></div>
+
             </div>
         </div>
 
@@ -208,6 +210,11 @@ $(document).ready(function(){
 
     $('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
         var field = $(this).attr('name');
+        if(field == 'aq.name') {
+        $('#aq.name').autofillNames({
+        });
+ 
+        } else {
         $(this).typeahead({
             source: function (query, process) {
                 return $.get("${uGroup.createLink(action:'terms', controller:'observation') }"+'?field='+field, { term: query }, function (data) {
@@ -215,6 +222,7 @@ $(document).ready(function(){
                 });
             }
         });
+        }
     });
 
     $("#advSearch").click(function() {
