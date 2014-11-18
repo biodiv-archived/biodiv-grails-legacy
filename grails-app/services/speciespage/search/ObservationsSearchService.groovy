@@ -188,7 +188,7 @@ class ObservationsSearchService extends AbstractSearchService {
             //distRecoVotes = obv.maxVotedReco;
             distRecoVotes.each { vote ->
                 doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
-                doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
+                //doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
                 if(vote.recommendation.taxonConcept)
                     doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
             }

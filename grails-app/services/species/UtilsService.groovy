@@ -234,9 +234,7 @@ class UtilsService {
         
         String langStr = LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
-        println "============Language Getting"+twoLetterCode;
         def languageInstance = Language.findByTwoLetterCode(twoLetterCode);
-        println "============languageInstance==========="+languageInstance;
         return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
     }
 
