@@ -25,7 +25,7 @@
         </h5>
         
         <label class="checkbox">
-            <input class="searchFilter uGroupFilter  ${(activeFilters?.uGroup == null)?'active':''}" type="checkbox" name="uGroup" value="all" ${(activeFilters?.uGroup == null)?'checked':''}/>
+            <input class="searchFilter uGroupFilter  ${(activeFilters?.uGroup == null)?'active':''}" type="checkbox" name="uGroup" value="all" ${(activeFilters?.uGroup == null)?'checked':''} disabled/>
                                         ${grailsApplication.config.speciesPortal.app.siteName}
         </label>
 

@@ -25,6 +25,7 @@ $(document).ready(function() {
 function resetSearchFilters($ele) {
     if($ele == undefined) $ele = $('#filterPanel');
     if($ele.find('input[value="all"]').length > 0) {
+        $ele.find('input').removeClass('active').removeAttr('checked');
         $ele.find('input[value="all"]').removeClass('active').removeAttr('checked').addClass('active').prop('checked',true);
     } else {
         $ele.find('input').removeClass('active').removeAttr('checked').addClass('active').prop('checked',true);
