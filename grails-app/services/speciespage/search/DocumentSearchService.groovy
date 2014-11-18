@@ -50,7 +50,7 @@ class DocumentSearchService extends AbstractSearchService {
             documents.clear();
         }
 		
-		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
+		log.info "Time taken to publish documents search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
 	/**

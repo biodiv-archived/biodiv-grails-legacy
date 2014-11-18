@@ -250,9 +250,9 @@ $(document).ready(function(){
         else {
             $( "#searchTextField" ).val('');	
         }
-    removeParam = $(this).attr('data-target').replace('#','');
-    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
-    return false;
+        removeParam = $(this).attr('data-target').replace('#','');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+        return false;
     });
 
     $('select[name="limit"]').on('change', function() {
@@ -609,8 +609,6 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             delete params['query'];
         }
     }
-
-    console.log(isRegularSearch);
 
     if(!isRegularSearch) {
         $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
