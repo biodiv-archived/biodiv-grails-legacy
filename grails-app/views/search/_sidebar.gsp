@@ -25,7 +25,7 @@
         </h5>
         
         <label class="checkbox">
-            <input class="searchFilter active" type="checkbox" name="uGroup" checked='checked' disabled/>
+            <input class="searchFilter uGroupFilter  ${(activeFilters?.uGroup == null)?'active':''}" type="checkbox" name="uGroup" value="all" ${(activeFilters?.uGroup == null)?'checked':''}/>
                                         ${grailsApplication.config.speciesPortal.app.siteName}
         </label>
 
@@ -35,7 +35,7 @@
             <g:set var="userGroupInstance" value="${UserGroup.read(Long.parseLong(uGroup.name))}"/>
             <% checked = false;
             //HACK need to fix
-            if((activeFilters?.uGroup == null) || (activeFilters.uGroup.contains(userGroupInstance.id.toString()))) {
+            if((activeFilters?.uGroup?.contains(userGroupInstance.id.toString()))) {
                 checked = true
             } %>
             <input class="searchFilter uGroupFilter ${checked?'active':''} " type="checkbox" name="uGroup" value="${userGroupInstance.id}"  ${checked?'checked':''}/ >${userGroupInstance.name} (${uGroup.count})
