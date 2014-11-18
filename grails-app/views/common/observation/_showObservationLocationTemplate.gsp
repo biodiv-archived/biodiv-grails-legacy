@@ -142,7 +142,7 @@
             });
 
             if(${observationInstance.geoPrivacy}){
-                icon = (${observationInstance.isChecklist})?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
+                icon = (${observationInstance.isChecklist})?mapLocationPicker.geoPrivacyChecklistIcon:mapLocationPicker.geoPrivacyPointIcon;
             } else {
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
             }

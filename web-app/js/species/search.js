@@ -11,10 +11,14 @@ $(document).ready(function() {
         return false;
     });
 
+    $('.resetFilter').click(function() {
+        resetSearchFilters($(this).parent().parent().parent());
+        updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
+        return false;
+    });
 });
 
-function resetSearchFilters() {
-    $('#filterPanel .active').each (function() {
-        $(this).removeClass('active').removeAttr('checked');
-    });
+function resetSearchFilters($ele) {
+    if($ele == undefined) $ele = $('#filterPanel');
+    $ele.find('input').removeClass('active').removeAttr('checked').addClass('active').prop('checked',true);
 }
