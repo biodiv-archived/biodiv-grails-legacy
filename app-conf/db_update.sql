@@ -219,10 +219,17 @@ alter table facebook_user  add column access_token_expires timestamp without tim
 
 ALTER TABLE observation ADD license_id bigint;
 alter table observation add constraint license_id foreign key (license_id) references license(id) match full;
-update observation set license_id = 2 where licence_id is null;
+
+
+//list of checklist observations 
+update observation set license_id = c.license_id from checklists c where observation.source_id = c.id and  observation.is_checklist = 'f' and observation.id != observation.source_id;
+
+update observation set license_id = 822 where license_id is null and id != source_id;
 alter table observation alter column license_id set not null;
 
-update document set license_id = 2 where license_id is null;
+select count(*) from document where license_id is null;
+update document set license_id = 822 where license_id is null;
 alter table document alter column license_id set not null;
 
+update solr schema.xml biodiv/conf/schema.xml 
 

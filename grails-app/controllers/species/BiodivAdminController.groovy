@@ -22,6 +22,7 @@ class BiodivAdminController {
     def observationsSearchService;
     def SUserSearchService;
     def documentSearchService;
+    def userGroupSearchService;
     def namesLoaderService;
     def namesIndexerService;
     def groupHandlerService;
@@ -158,6 +159,25 @@ class BiodivAdminController {
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], RCU.getLocale(request))
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
+
+    def reloadUserGroupSearchIndex = {
+        try {
+            if(params.deleteIndex)
+                userGroupsSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                userGroupSearchService.INDEX_DOCS = indexDocs
+            }
+ 
+            userGroupSearchService.publishSearchIndex();
+            userGroupSearchService.optimize();
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['user group'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()

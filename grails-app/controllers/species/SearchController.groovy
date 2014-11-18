@@ -19,13 +19,15 @@ class SearchController {
 
     def namesIndexerService;
     def biodivSearchService;
-    def grailsApplication
+    def grailsApplication;
+    def utilsService;
     static defaultAction = "select"
 
     def select () {
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
         def model = biodivSearchService.select(params);
+        model['userLanguage'] = utilsService.getCurrentLanguage(request); 
 
         if(params.loadMore?.toBoolean()){
             params.remove('isGalleryUpdate');
@@ -64,6 +66,30 @@ class SearchController {
         suggestions.addAll(namesLookupResults);
         suggestions.addAll(biodivSearchService.nameTerms(params));
         render suggestions as JSON 
+    }
+
+    def search() {
+        NamedList paramsList = new NamedList()
+        params.each {key,value ->
+            paramsList.add(key, value);
+        }
+        def result = biodivSearchService.search(paramsList)
+
+        println result;
+        println "++++++++++++++++++++++++++++++++++++++++++"
+/*        def facetResults = [];
+        if(result.getFacetField(params['facet.field'])) {
+        List objectTypeFacets = result.getFacetField(params['facet.field'])?.getValues()
+        if(objectTypeFacets) {
+        objectTypeFacets.each {
+            //TODO: sort on name
+            facetResults <<  [name:it.getName(), count:it.getCount()]
+
+        }
+        }
+        }
+*/
+        render result as JSON
     }
 
 }
