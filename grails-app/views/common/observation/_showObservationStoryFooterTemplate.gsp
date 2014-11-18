@@ -33,16 +33,14 @@
                 <i class="icon-screenshot" title="${g.message(code:'showobservationstoryfooter.title.species')}"></i>
                 <span class="">${observationInstance.speciesCount}</span>
             </div>
-
         </g:if>
-
+             <div class="footer-item"> 
+                <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
+                title="${observationInstance.license.name}"/>
+            </div>
+       
     </g:if>
     
-    <div class="footer-item"> 
-        <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
-        title="${observationInstance.license.name}"/>
-    </div>
-
     <g:if test="${!hidePost}">
     	<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
     </g:if>	
