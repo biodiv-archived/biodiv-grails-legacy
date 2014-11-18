@@ -524,15 +524,24 @@ function getSelectedUserGroup() {
 
 function getSelectedFilters($ele) {
     var selected = [];
+    var allSelected = true;
+    var noneSelected = true;
     $ele.each(function() {
-        var name = $(this).attr('value');
-        if(name.toLowerCase() == 'all') {
-            selected = ['All']
-            return;
+        if($(this).hasClass('active') && $(this).is(':checked')) {
+            var name = $(this).attr('value');
+            if(name.toLowerCase() == 'all') {
+                selected = ['All']
+                return;
+            }
+            selected.push(name);
+            noneSelected = false;
+        } else {
+            allSelected = false;
         }
-        selected.push(name);
     });
-    return selected.join(' OR ');
+    console.log(noneSelected);
+    if(noneSelected) resetSearchFilters($ele.parent().parent());
+    if(allSelected == false) return selected.join(' OR ');
 } 
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
@@ -708,33 +717,33 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['isMapView']
     }
 
-    var object_type = getSelectedFilters($("input.moduleFilter.active:checked"))
+    var object_type = getSelectedFilters($("input.moduleFilter"))
     if(object_type) {
         params['object_type'] = object_type
     } else {
         delete params['object_type']
     }
 
-    var uGroup = getSelectedFilters($("input.uGroupFilter.active:checked"))
+    var uGroup = getSelectedFilters($("input.uGroupFilter"))
     if(uGroup) {
         params['uGroup'] = uGroup
     } else {
         //delete params['uGroup']
     }
 
-    var sGroup = getSelectedFilters($("input.sGroupFilter.active:checked"))
+    var sGroup = getSelectedFilters($("input.sGroupFilter"))
     if(sGroup) {
         params['sGroup'] = sGroup
     } 
 
-    var contributor = getSelectedFilters($("input.contributorFilter.active:checked"))
+    var contributor = getSelectedFilters($("input.contributorFilter"))
     if(contributor) {
         params['contributor'] = contributor
     } else {
         delete params['contributor']
     }
 
-    var tag = getSelectedFilters($("input.tagFilter.active:checked"))
+    var tag = getSelectedFilters($("input.tagFilter"))
     if(tag) {
         params['tag'] = tag
     } else {
