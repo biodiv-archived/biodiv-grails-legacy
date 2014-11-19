@@ -245,8 +245,10 @@ $(document).ready(function(){
 
     $(".removeQueryFilter").on('click', function(){
         var removeParam = undefined;
-        if($($(this).attr('data-target').replace('.','\\.')).length != 0)
-        $($(this).attr('data-target').replace('.','\\.')).val('')
+        if($('input[name="'+$(this).attr('data-target')+'"]').length != 0)
+            $('input[name="'+$(this).attr('data-target')+'"]').val('')
+        else if($('select[name="'+$(this).attr('data-target')+'"]').length != 0)
+            $('select[name="'+$(this).attr('data-target')+'"]').val('')
         else {
             $( "#searchTextField" ).val('');	
         }

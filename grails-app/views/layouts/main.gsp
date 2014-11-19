@@ -44,7 +44,7 @@
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showSiteHeader model="['userGroupInstance':userGroupInstance]" />
 
-                <div class="container outer-wrapper">
+            <div class="container outer-wrapper">
 			<div>
 				<div style="padding: 10px 0px; margin-left: -20px">
 					<g:layoutBody />

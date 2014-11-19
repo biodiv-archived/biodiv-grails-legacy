@@ -140,13 +140,13 @@ class ObservationService extends AbstractObjectService {
         if(params.license_0) {
             log.debug "Setting license to ${params.license_0}"
             observation.license = (new XMLConverter()).getLicenseByType(params.license_0, false)
+            println observation.license
         } else if(observation.agreeTerms) {
             println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
             println "SETTING LICENCE TYPE"
             log.debug "Setting license to ${LicenseType.CC_BY}"
             observation.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
         }
-
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         observation.language = params.locale_language;
@@ -211,7 +211,8 @@ class ObservationService extends AbstractObjectService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-
+println "---------------------------------------------------"
+println observationInstance.license
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
                 //flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
                 log.debug "Successfully created observation : "+observationInstance
