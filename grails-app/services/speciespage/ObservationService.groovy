@@ -147,7 +147,6 @@ class ObservationService extends AbstractObjectService {
             log.debug "Setting license to ${LicenseType.CC_BY}"
             observation.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
         }
-
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         observation.language = params.locale_language;

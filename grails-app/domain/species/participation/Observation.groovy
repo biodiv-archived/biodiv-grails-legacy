@@ -318,7 +318,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def beforeInsert(){
-		updateIsShowable()
+        updateIsShowable()
 		updateLatLong()
 	}
 	
