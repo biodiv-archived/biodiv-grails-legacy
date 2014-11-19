@@ -43,10 +43,12 @@
             </li>
             </g:if>
  
-        <% def observationUserGroups = observationInstance.userGroups; 
+        <% def observationUserGroups = observationInstance.userGroups;
+        if(observationInstance.hasProperty('sourceId')){
             if(observationInstance.id != observationInstance.sourceId){
-                observationUserGroups.addAll(Observation.get(observationInstance.sourceId).userGroups);
+                observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
             }
+        }
         %>
 
         <g:each in="${observationUserGroups}" var="userGroup">
@@ -57,7 +59,6 @@
             </g:if>
         </g:each>       
     </ul>
-
 </div>
 
 
