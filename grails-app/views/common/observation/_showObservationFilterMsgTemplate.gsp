@@ -31,7 +31,7 @@
 					</g:if>
 					<g:if test="${checklistCount}">
 						<g:if test="${observationCount}"> <g:message code="text.and" /> </g:if>
-						${checklistCount} checklist<g:if test="${checklistCount>1}"><g:message code="text.s" /></g:if>
+						${checklistCount} <g:message code="text.checklist" /><g:if test="${checklistCount>1}"><g:message code="text.s" /></g:if>
 					</g:if>
 				</g:else> 
 			<g:message code="text.found" /> 
