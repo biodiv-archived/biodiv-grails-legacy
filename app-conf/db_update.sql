@@ -238,3 +238,6 @@ alter table document alter column license_id set not null;
 
 update solr schema.xml biodiv/conf/schema.xml 
 
+//added on 19th nov
+//Dropping license from checklists table
+ALTER TABLE checklists DROP COLUMN license_id;
