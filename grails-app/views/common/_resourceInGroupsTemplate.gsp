@@ -43,12 +43,14 @@
             </li>
             </g:if>
  
-        <% def observationUserGroups = observationInstance.userGroups; 
+        <% def observationUserGroups = observationInstance.userGroups;
+        if(observationInstance.hasProperty('sourceId')){
             if(observationInstance.id != observationInstance.sourceId){
                 observationUserGroups.addAll(Observation.get(observationInstance.sourceId).userGroups);
             }
+        }
         %>
-
+        
         <g:each in="${observationUserGroups}" var="userGroup">
             <g:if test="${!featuredInUserGroups.containsKey(userGroup.id)}">
             <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
@@ -57,7 +59,7 @@
             </g:if>
         </g:each>       
     </ul>
-
+${controller}
 </div>
 
 
