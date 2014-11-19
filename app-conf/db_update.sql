@@ -241,3 +241,54 @@ update solr schema.xml biodiv/conf/schema.xml
 //added on 19th nov
 //Dropping license from checklists table
 ALTER TABLE checklists DROP COLUMN license_id;
+
+
+/* sql for namelist changes added on 19th nov */
+
+ALTER TABLE taxonomy_definition ALTER COLUMN canonical_form SET NOT NULL;
+
+//adding place for super-family rank
+update taxonomy_definition set rank = 9 where rank = 8 ;
+update taxonomy_definition set rank = 8 where rank = 7 ;
+update taxonomy_definition set rank = 7 where rank = 6 ;
+update taxonomy_definition set rank = 6 where rank = 5 ;
+update taxonomy_definition set rank = 5 where rank = 4 ;
+
+//add columns to common name, synonyms and taxon def
+ALTER TABLE common_names ADD COLUMN  transliteration varchar(255);
+ALTER TABLE common_names ADD COLUMN  status varchar(255);
+ALTER TABLE common_names ADD COLUMN  position varchar(255);
+ALTER TABLE common_names ADD COLUMN  author_year varchar(255);
+ALTER TABLE common_names ADD COLUMN  match_database_name varchar(255);
+ALTER TABLE common_names ADD COLUMN  match_id varchar(255);
+ALTER TABLE common_names ADD COLUMN  ibp_source varchar(255);
+ALTER TABLE common_names ADD COLUMN  via_datasource varchar(255);
+
+update common_names set status = 'COMMON';
+update  common_names set position = 'DIRTY';
+
+
+ALTER TABLE taxonomy_definition ADD COLUMN  status varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  position varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  author_year varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  match_database_name varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  match_id varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  ibp_source varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  via_datasource varchar(255);
+
+update  taxonomy_definition set status = 'ACCEPTED';
+update  taxonomy_definition set position = 'DIRTY';
+
+
+ALTER TABLE synonyms ADD COLUMN  status varchar(255);
+ALTER TABLE synonyms ADD COLUMN  position varchar(255);
+ALTER TABLE synonyms ADD COLUMN  author_year varchar(255);
+ALTER TABLE synonyms ADD COLUMN  match_database_name varchar(255);
+ALTER TABLE synonyms ADD COLUMN  match_id varchar(255);
+ALTER TABLE synonyms ADD COLUMN  ibp_source varchar(255);
+ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
+
+update  synonyms set status = 'SYNONYM';
+update  synonyms set position = 'DIRTY';
+
+////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
