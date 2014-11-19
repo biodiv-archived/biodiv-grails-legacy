@@ -27,7 +27,7 @@
 	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; border: 0;">
 	<div class="navbar-inner"
 		style="box-shadow: none; background-color: transparent; background-image: none;height:30px;border:0px;">
-		<div class="container outer-wrapper"
+		<div class="container"
 			style="background-color: transparent; padding-bottom: 0px;text-align:center;height:30px;">
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
 
