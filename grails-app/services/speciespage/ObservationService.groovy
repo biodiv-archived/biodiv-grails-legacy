@@ -21,6 +21,8 @@ import org.apache.commons.io.FileUtils;
 import species.Resource;
 import species.Habitat;
 import species.Language;
+import species.License;
+import species.License.LicenseType;
 import species.TaxonomyDefinition;
 import species.Resource.ResourceType;
 import species.auth.SUser;
@@ -131,6 +133,20 @@ class ObservationService extends AbstractObjectService {
         observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
         observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+            println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            println "1 SETTING LICENCE TYPE"
+            println observation.agreeTerms
+            println params
+        if(params.license_0) {
+            log.debug "Setting license to ${params.license_0}"
+            observation.license = (new XMLConverter()).getLicenseByType(params.license_0, false)
+            println observation.license
+        } else if(observation.agreeTerms) {
+            println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            println "SETTING LICENCE TYPE"
+            log.debug "Setting license to ${LicenseType.CC_BY}"
+            observation.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
+        }
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         observation.language = params.locale_language;
@@ -195,7 +211,8 @@ class ObservationService extends AbstractObjectService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-
+println "---------------------------------------------------"
+println observationInstance.license
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
                 //flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
                 log.debug "Successfully created observation : "+observationInstance
@@ -951,6 +968,13 @@ class ObservationService extends AbstractObjectService {
         if(params.daterangepicker_end){
             queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
         }
+
+        if(params.observedon_start){
+            queryParts.queryParams["observedon_start"] = params.observedon_start
+        }
+        if(params.observedon_end){
+            queryParts.queryParams["observedon_end"] =  params.observedon_end
+        }
         return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
 
@@ -1097,6 +1121,25 @@ class ObservationService extends AbstractObjectService {
 
             activeFilters["daterangepicker_start"] = params.daterangepicker_start
             activeFilters["daterangepicker_end"] =  params.daterangepicker_end
+        }
+
+        if(params.observedon_start && params.observedon_end){
+            def df = new SimpleDateFormat("dd/MM/yyyy")
+            def startDate = df.parse(URLDecoder.decode(params.observedon_start))
+            def endDate = df.parse(URLDecoder.decode(params.observed_end))
+            Calendar cal = Calendar.getInstance(); // locale-specific
+            cal.setTime(endDate)
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.MINUTE, 59);
+            endDate = new Date(cal.getTimeInMillis())
+
+            filterQuery += " and ( observed_on between :daterangepicker_start and :daterangepicker_end) "
+            queryParams["observedon_start"] =  startDate   
+            queryParams["observedon_end"] =  endDate
+
+            activeFilters["observedon_start"] = params.daterangepicker_start
+            activeFilters["observedon_end"] =  params.daterangepicker_end
         }
 
         if(params.bounds) {
@@ -1522,7 +1565,7 @@ class ObservationService extends AbstractObjectService {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPLOADED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -1531,15 +1574,69 @@ class ObservationService extends AbstractObjectService {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPLOADED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPLOADED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
+        }
+
+        String observedOnStartDate = '';
+        String observedOnEndDate = '';
+        if(params.observedon_start) {
+            Date s = DateUtil.parseDate(params.observedon_start, ['dd/MM/yyyy']);
+            Calendar cal = Calendar.getInstance(); // locale-specific
+            cal.setTime(s)
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.MINUTE, 0);
+            s = new Date(cal.getTimeInMillis())
+            //StringWriter str1 = new StringWriter();
+            observedOnStartDate = dateFormatter.format(s)
+            //DateUtil.formatDate(s, cal, str1)
+            //println str1
+            //lastRevisedStartDate = str1;
+
+        }
+
+        if(params.observedon_end) {
+            Calendar cal = Calendar.getInstance(); // locale-specific
+            Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
+            cal.setTime(e)
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.MINUTE, 59);
+            e = new Date(cal.getTimeInMillis())
+            //			StringWriter str2 = new StringWriter();
+            //			DateUtil.formatDate(e, cal, str2)
+            //			println str2
+            observedOnEndDate = dateFormatter.format(e);
+        }
+
+        if(observedOnStartDate && observedOnEndDate) {
+            if(i > 0) aq += " AND";
+            aq += " "+searchFieldsConfig.OBSERVED_ON+":["+observedOnStartDate+" TO "+observedOnEndDate+"]";
+            queryParams['observedon_start'] = params.observedon_start;
+            queryParams['observedon_end'] = params.observedon_end;
+            activeFilters['observedon_start'] = params.observedon_start;
+            activeFilters['observedon_end'] = params.observedon_end;
+
+        } else if(observedOnStartDate) {
+            if(i > 0) aq += " AND";
+            //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+            aq += " "+searchFieldsConfig.OBSERVED_ON+":["+observedOnStartDate+" TO NOW]";
+            queryParams['observedon_start'] = params.observedon_start;
+            activeFilters['observedon_start'] = params.observedon_end;
+        } else if (observedOnEndDate) {
+            if(i > 0) aq += " AND";
+            //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+            aq += " "+searchFieldsConfig.OBSERVED_ON+":[ * "+observedOnEndDate+"]";
+            queryParams['observedon_end'] = params.observedon_end;
+            activeFilters['observedon_end'] = params.observedon_end;
         }
 
         if(params.query && aq) {

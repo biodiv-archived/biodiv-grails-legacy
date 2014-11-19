@@ -645,7 +645,6 @@ class SourceConverter {
     }
     
     String getFieldFromName(String fieldName, int level, Language language) {
-        println "getFieldFromName ${fieldName}"
         Field field = FieldsMapHolder.getFieldsMap().get(fieldName);
         if(field) {
             def t = FieldsMapHolder.getConnectionMap().get(field.connection)

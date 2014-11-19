@@ -168,7 +168,7 @@
                         <g:if test="${observationInstance?.language?.id != userLanguage?.id}">
                                 <%  
                                     styleVar = "none"
-                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+observationInstance?.language?.name+'</a>';
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+observationInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
                                 %>
                             </g:if>
                             

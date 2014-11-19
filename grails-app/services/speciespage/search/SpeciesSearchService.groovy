@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 import species.CommonNames
 import species.NamesParser
 import species.Species
+import species.SpeciesField
 import species.Synonyms
 import species.TaxonomyDefinition
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
@@ -26,6 +27,8 @@ import species.auth.SUser;
 
 class SpeciesSearchService extends AbstractSearchService {
 	
+    def resourceSearchService;
+    static transactional = false
 	
 	/**
 	 * 
@@ -34,24 +37,29 @@ class SpeciesSearchService extends AbstractSearchService {
 		log.info "Initializing publishing to search index"
 		
 		//TODO: change limit
-		int limit=BATCH_SIZE, offset = 0, noIndexed = 0;
+		int limit=5, offset = 0, noIndexed = 0;
 		
 		def species;
 		def startTime = System.currentTimeMillis()
-        INDEX_DOCS = Species.count() + 1;
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Species.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
 		while(noIndexed < INDEX_DOCS) {
+            Species.withNewTransaction([readOnly:true]) { status ->
+                println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+                println status.isNewTransaction();
 			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
             noIndexed += species.size();
-			if(!species) break;
+			if(!species) return;
 			publishSearchIndex(species);
-			species = null;
 			offset += limit;
 			cleanUpGorm();
+            }
+			if(!species) break;;
+			species = null;
 		}
 		log.info "Time taken to publish search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 	
-	@Transactional(readOnly = true)
 	def listSpecies(id, params) {
 			//return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
 			return Species.findAllByIdGreaterThan(id, params);
@@ -76,6 +84,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		species.each { s ->
 			log.debug "Reading Species : "+s.id;
 			SolrInputDocument doc = new SolrInputDocument();
+            doc.setDocumentBoost(2);
 			doc.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
 			doc.addField(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
 			doc.addField(searchFieldsConfig.GUID, s.guid);
@@ -115,6 +124,10 @@ class SpeciesSearchService extends AbstractSearchService {
 				String concept = field.field.concept;
 				String category = field.field.category;
 				String subcategory = field.field.subCategory;
+
+                field.licenses.each { l ->
+    				doc.addField(searchFieldsConfig.LICENSE, l.name.name());
+                }
 
 				field.contributors.each { contributor ->
                     String userInfo = ""
@@ -171,21 +184,23 @@ class SpeciesSearchService extends AbstractSearchService {
 
                 }
 
+                List resourceDocs = getResourcesDocs(field);
+			    docs.addAll(resourceDocs);
 			}
 
-			s.resources.each { resource ->
+			s.resources.each { resource -> 
 
 				doc.addField(resource.type.value().toLowerCase(), resource.description);
 
-                resource.contributors.each { contributor ->
+                resource.contributors.each  { contributor ->
                     String userInfo = ""
-                    if(contributor.user) {
+                    if(contributor.user) { 
                         userInfo = " ### "+contributor.user.email+" "+contributor.user.username+" "+contributor.user.id.toString()
                     }
 					if(contributor.name)
 						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
-				resource.attributors.each { attributor ->
+				resource.attributors.each {  attributor ->
 					if(attributor.name)
 						doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
 				}
@@ -211,7 +226,9 @@ class SpeciesSearchService extends AbstractSearchService {
                 doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
             }
 
+            List resourceDocs = getResourcesDocs(s);
 			docs.add(doc);
+			docs.addAll(resourceDocs);
 		}
 
 		//log.debug docs;
@@ -258,5 +275,35 @@ class SpeciesSearchService extends AbstractSearchService {
 		}
 		return parsedNamesMap;
 	}
-	
+
+    List getResourcesDocs(Species species) {
+        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        List resourcesDocs = [];
+        def resourceDoc;
+        species.resources.each { resource ->
+            resourceDoc =  resourceSearchService.getSolrDocument(resource);
+            if(resourceDoc) {
+                resourceDoc.addField(searchFieldsConfig.NAME, species.fetchSpeciesCall());
+                resourceDoc.addField(searchFieldsConfig.CONTAINER, species.class.simpleName +"_"+species.id.toString());
+                resourcesDocs << resourceDoc
+            }
+        }
+        return resourcesDocs;
+    }
+
+    List getResourcesDocs(SpeciesField speciesField) {
+        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        List resourcesDocs = [];
+        def resourceDoc;
+        speciesField.resources.each { resource ->
+            resourceDoc =  resourceSearchService.getSolrDocument(resource);
+            if(resourceDoc) {
+                resourceDoc.addField(searchFieldsConfig.NAME, speciesField.species.fetchSpeciesCall());
+                resourceDoc.addField(searchFieldsConfig.CONTAINER, speciesField.species.class.simpleName +"_"+speciesField.species.id.toString());
+                resourcesDocs << resourceDoc
+            }
+        }
+        return resourcesDocs;
+    }
+
 }

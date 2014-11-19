@@ -12,12 +12,14 @@ import species.participation.ActivityFeedService
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import species.participation.Checklists;
 import species.participation.Observation;
+import species.participation.Follow;
 import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
-
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
 
 import java.beans.Introspector;
 class UtilsService {
@@ -86,83 +88,86 @@ class UtilsService {
         def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
         String url = "";
 
-        if(attrs.userGroupInstance) attrs.userGroup = attrs.userGroupInstance
-            if(attrs.userGroup && attrs.userGroup.id) {
-                attrs.webaddress = attrs.userGroup.webaddress
-                String base = attrs.remove('base')
-                String controller = attrs.remove('controller')
-                String action = attrs.remove('action');
-                String mappingName = attrs.remove('mapping')?:'userGroupModule';
-                def userGroup = attrs.remove('userGroup');
-                attrs.remove('userGroupWebaddress');
-                boolean absolute = attrs.remove('absolute');
-                if(attrs.params) {
-                    attrs.putAll(attrs.params);
-                    attrs.remove('params');
-                }
-                if(base) {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
-                    String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-                    url = url.replace(onlyGroupUrl, "");
-                } else {
-
-                    if((userGroup?.domainName)) { 
-                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
-                        String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-                        url = url.replace(onlyGroupUrl, "");
-                    } else {
-                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
-                    }
-                }
-
-            } else if(attrs.userGroupWebaddress) {
-                attrs.webaddress = attrs.userGroupWebaddress
-                String base = attrs.remove('base')
-                String controller = attrs.remove('controller')
-                String action = attrs.remove('action');
-                String mappingName = attrs.remove('mapping')?:'userGroupModule';
-                def userGroup = attrs.remove('userGroup');
-                String userGroupWebaddress = attrs.remove('userGroupWebaddress');
-                boolean absolute = attrs.remove('absolute');
-                def userGroupController = new UserGroupController();
-                userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
-                if(attrs.params) {
-                    attrs.putAll(attrs.params);
-                    attrs.remove('params');
-                }
-                if(base) {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
-                    String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
-                    url = url.replace(onlyGroupUrl, "");
-                } else {
-
-                    if((userGroup?.domainName)) { 
-                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
-                        String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
-                        url = url.replace(onlyGroupUrl, "");
-                    } else {
-                        url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
-                    }
-                }
-
+        if(attrs.userGroupInstance){
+			//XXX removing  userGroupInstance from attrs show that it should not come in url in toString form of userGroup
+			attrs.userGroup = attrs.remove('userGroupInstance')
+        }
+        if(attrs.userGroup && attrs.userGroup.id) {
+            attrs.webaddress = attrs.userGroup.webaddress
+            String base = attrs.remove('base')
+            String controller = attrs.remove('controller')
+            String action = attrs.remove('action');
+            String mappingName = attrs.remove('mapping')?:'userGroupModule';
+            def userGroup = attrs.remove('userGroup');
+            attrs.remove('userGroupWebaddress');
+            boolean absolute = attrs.remove('absolute');
+            if(attrs.params) {
+                attrs.putAll(attrs.params);
+                attrs.remove('params');
+            }
+            if(base) {
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
+                String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                url = url.replace(onlyGroupUrl, "");
             } else {
-                String base = attrs.remove('base')
-                String controller = attrs.remove('controller')
-                String action = attrs.remove('action');
-                attrs.remove('userGroup');
-                attrs.remove('userGroupWebaddress');
-                String mappingName = attrs.remove('mapping');
-                boolean absolute = attrs.remove('absolute');
-                if(attrs.params) {
-                    attrs.putAll(attrs.params);
-                    attrs.remove('params');
-                }
-                if(base) {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+
+                if((userGroup?.domainName)) { 
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
+                    String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                    url = url.replace(onlyGroupUrl, "");
                 } else {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
                 }
             }
+
+        } else if(attrs.userGroupWebaddress) {
+            attrs.webaddress = attrs.userGroupWebaddress
+            String base = attrs.remove('base')
+            String controller = attrs.remove('controller')
+            String action = attrs.remove('action');
+            String mappingName = attrs.remove('mapping')?:'userGroupModule';
+            def userGroup = attrs.remove('userGroup');
+            String userGroupWebaddress = attrs.remove('userGroupWebaddress');
+            boolean absolute = attrs.remove('absolute');
+            def userGroupController = new UserGroupController();
+            userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
+            if(attrs.params) {
+                attrs.putAll(attrs.params);
+                attrs.remove('params');
+            }
+            if(base) {
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
+                String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                url = url.replace(onlyGroupUrl, "");
+            } else {
+
+                if((userGroup?.domainName)) { 
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
+                    String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
+                    url = url.replace(onlyGroupUrl, "");
+                } else {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
+                }
+            }
+
+        } else {
+            String base = attrs.remove('base')
+            String controller = attrs.remove('controller')
+            String action = attrs.remove('action');
+            attrs.remove('userGroup');
+            attrs.remove('userGroupWebaddress');
+            String mappingName = attrs.remove('mapping');
+            boolean absolute = attrs.remove('absolute');
+            if(attrs.params) {
+                attrs.putAll(attrs.params);
+                attrs.remove('params');
+            }
+            if(base) {
+                url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+            } else {
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+            }
+        }
         return url;
     }
 
@@ -228,8 +233,8 @@ class UtilsService {
        // println "====================================="+request
         
         String langStr = LCH.getLocale()
-        def (langtwo, lang1) = langStr.tokenize( '_' );
-        def languageInstance = Language.findByTwoLetterCode(langtwo);
+        def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
+        def languageInstance = Language.findByTwoLetterCode(twoLetterCode);
         return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
     }
 
@@ -804,5 +809,16 @@ class UtilsService {
         def now = System.currentTimeMillis()  
         log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
     }  
+
+    static def logSql(Closure closure) {
+        println "%%%%%%%%%%%% logging sql"  
+        Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
+        Level currentLevel = sqlLogger.level
+        sqlLogger.setLevel(Level.TRACE)
+        def result = closure.call()
+        sqlLogger.setLevel(currentLevel)
+        result
+    }
+
 }
 

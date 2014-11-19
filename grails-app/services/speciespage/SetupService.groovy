@@ -115,7 +115,7 @@ class SetupService {
 			}
 
 			if(!field) {
-				field = new Field(concept:concept, category:category, subCategory:subCategory, displayOrder:displayOrder, description:description, urlIdentifier:url_identifier, language:languageInstance);
+				field = new Field(concept:concept, category:category, subCategory:subCategory, displayOrder:displayOrder, description:description, urlIdentifier:url_identifier, language:languageInstance, connection:displayOrder);
 			} else {
 				field.displayOrder = displayOrder;
 				field.description = description;

@@ -34,7 +34,7 @@ class Checklists extends Observation {
 	int speciesCount = 0;
 	
 	//String attribution;
-	License license;
+	//License license;
 	
 	String refText;
 	String sourceText;
@@ -66,7 +66,7 @@ class Checklists extends Observation {
 		title nullable:false, blank:false;
 		speciesCount nullable:false;
 		rawChecklist nullable:true;
-		license  nullable:false, blank:false;
+		//license  nullable:false, blank:false;
 		//make this false after migration
 		columns nullable:false, blank:false;
 		

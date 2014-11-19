@@ -53,17 +53,22 @@ class NamesIndexerService {
 		def startTime = System.currentTimeMillis()
 		
 		int limit = 100, offset = 0, noOfRecosAdded = 0;
+        def recos;
 		while(true){
-			def recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
+            Recommendation.withNewTransaction([readOnly:true]) { status ->
+			recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
 			recos.each { reco ->
-				if(add(reco, analyzer, lookup1)) {
+				if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
 					noOfRecosAdded++;
 				}
 			}
 			
 			offset = offset + limit;
 			log.info "=========== total added recos == $noOfRecosAdded"
+			if(!recos) return; //no more results;
+            }
 			if(!recos) break; //no more results;
+            recos.clear();
 		}
 		
 		synchronized(lookup) {
@@ -132,6 +137,7 @@ class NamesIndexerService {
 				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id));
 			}
 		}
+        tokenStream.close();
 		return success;
 	}
 

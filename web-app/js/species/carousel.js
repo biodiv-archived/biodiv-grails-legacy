@@ -5,7 +5,7 @@ function langwrap(data,dataLanguage){
     if(dataLanguage[0]['id'] == userLanguageId){
         return data;
     }else{
-        result = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataLanguage[0]['twoLetterCode'].toUpperCase()+'</a>';
+        result = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataLanguage[0]['threeLetterCode'].toUpperCase()+'</a>';
         result += '<div class="hide">'+data+'</div>';
         return result;
     }

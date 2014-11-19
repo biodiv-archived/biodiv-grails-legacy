@@ -247,8 +247,8 @@ jQuery(document).ready(function($) {
             action = window.params.IBPDomainUrl+action;
         }
 
-        updateGallery(action, undefined, undefined, undefined, false,undefined,undefined,true);
-        return false;
+        //updateGallery(action, undefined, undefined, undefined, false,undefined,undefined,true);
+        //return false;
     });
 
     $("#searchToggle").click(function() {
