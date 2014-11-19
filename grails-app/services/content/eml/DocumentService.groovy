@@ -21,6 +21,7 @@ import species.participation.Observation;
 import content.eml.Document.DocumentType;
 import species.utils.Utils;
 import species.License
+import species.License.LicenseType
 import content.Project
 
 import species.sourcehandler.XMLConverter
@@ -86,8 +87,12 @@ class DocumentService extends AbstractObjectService {
 			}
 		}
 
-		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
-		//document.license = License.findByName(License.LicenseType(params.licenseName))
+        if(params.licenseName) 
+    		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
+		    //document.license = License.findByName(License.LicenseType(params.licenseName))
+        else {
+		    document.license =  License.findByName(LicenseType.CC_BY)
+        }
 
 		document.notes = params.description? params.description.trim() :null
 		document.contributors = params.contributors? params.contributors.trim() :null
@@ -112,7 +117,7 @@ class DocumentService extends AbstractObjectService {
 		def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  docInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
-			println 'removing document from usergroups'
+			log.debug 'removing document from usergroups'
 			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups, sendMail);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
@@ -515,7 +520,7 @@ class DocumentService extends AbstractObjectService {
 		def resultObv = []
 		int i = 0;
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-			println "================" + m
+			log.debug "================" + m
 			
 			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
 				uploadDoc(fileDir, m, resultObv)
@@ -550,7 +555,7 @@ class DocumentService extends AbstractObjectService {
 				f.size = destinationFile.length()
 				f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")
 				document.uFile = f
-				println "============== " + f.path
+				log.debug "============== " + f.path
 			}catch(e){
 				e.printStackTrace()
 			}
@@ -572,7 +577,11 @@ class DocumentService extends AbstractObjectService {
 		document.author = SUser.findByEmail(m['user email'].trim())
 		document.type = Document.fetchDocumentType(m['type'])
 		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
-		
+	
+        if(!document.license) {
+		    document.license =  License.findByName(LicenseType.CC_BY)
+        }
+
 		document.contributors =  m['contributors']
 		document.attribution =  m['attribution']
 		document.notes =  m['description']
@@ -614,7 +623,6 @@ class DocumentService extends AbstractObjectService {
 			activityFeedService.addActivityFeed(documentInstance, null, documentInstance.author, activityFeedService.DOCUMENT_CREATED);
 			
 			def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
-			println "================ tags " + tags
 			documentInstance.setTags(tags)
 			
 			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
