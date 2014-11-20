@@ -12,10 +12,9 @@
 	</li>
 
     <li>
-        <div class="dropdown" style="display:inline-block;left:-60px; top:8px;z-index:200">
-            <a href="#" class="dropdown-toggle"
-                data-toggle="dropdown"> <b class="caret"></b> </a>
-            <div id="advSearchBox" class="dropdown-menu" style="text-align: left;left:-412px;width:430px;">
+        <div id="advSearchDropdown" class="dropdown" style="display:inline-block;left:-60px; top:8px;z-index:2000">
+            <a href="#"  id="advSearchDropdownA" data-target="#"> <b class="caret"></b> </a>
+            <div id="advSearchBox" class="dropdown-menu" aria-labelledby="advSearchDropdownA" style="text-align: left;left:-412px;width:430px;">
                 <search:advSearch />
 
             </div>
@@ -30,9 +29,9 @@
             <g:each in="${localeLanguages}" var="localeLanguage">
                 <%  
                     def lang_code = RequestContextUtils.getLocale(request); 
-                    def isDisabled = (lang_code.toString() == localeLanguage.code) ? 'disabled' : '' ;
+                    def isDisabled = (lang_code.toString() == localeLanguage.twoletter) ? 'disabled' : '' ;
                 %>
-                <button class="btn btn-mini lang_c ${isDisabled}" rel="${localeLanguage.code}">${localeLanguage.code?.toUpperCase()}</button>
+                <button class="btn btn-mini lang_c ${isDisabled}" rel="${localeLanguage.twoletter}">${localeLanguage.code?.toUpperCase()}</button>
             </g:each>
         </div>
     </li>

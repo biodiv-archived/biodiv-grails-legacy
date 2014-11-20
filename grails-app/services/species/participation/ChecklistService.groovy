@@ -145,6 +145,9 @@ class ChecklistService {
 				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
 
+            println "----------------------------------------------checklist lic"
+            println checklistInstance.license
+            println checklistInstance.observations
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);

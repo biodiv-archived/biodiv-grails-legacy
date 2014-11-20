@@ -250,9 +250,9 @@ $(document).ready(function(){
         else {
             $( "#searchTextField" ).val('');	
         }
-    removeParam = $(this).attr('data-target').replace('#','');
-    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
-    return false;
+        removeParam = $(this).attr('data-target').replace('#','');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+        return false;
     });
 
     $('select[name="limit"]').on('change', function() {
@@ -522,17 +522,27 @@ function getSelectedUserGroup() {
     return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
-function getSelectedFilters($ele) {
+function getSelectedFilters($ele, noneSelected) {
     var selected = [];
+    var allSelected = true;
+    var noneSelected = (noneSelected != undefined) ? noneSelected : true;
     $ele.each(function() {
-        var name = $(this).attr('value');
-        if(name.toLowerCase() == 'all') {
-            selected = ['All']
-            return;
+        if($(this).hasClass('active') && $(this).is(':checked')) {
+            var name = $(this).attr('value');
+            if(name.toLowerCase() == 'all') {
+                //selected = ['All']
+                //return;
+            } else {
+                selected.push(name);
+            }
+            noneSelected = false;
+        } else {
+            allSelected = false;
         }
-        selected.push(name);
     });
-    return selected.join(' or ');
+    console.log(noneSelected);
+    if(noneSelected) resetSearchFilters($ele.parent().parent());
+    if(allSelected == false) return selected.join(' OR ');
 } 
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
@@ -601,26 +611,59 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         }
     }
 
-    console.log(isRegularSearch);
-
     if(!isRegularSearch) {
         $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
-            var query = $( this ).val();
-            if(field == 'aq.object_type' && query == 'All') {
-
-            } else if(query){
-                params[field] = query;
-            } else {
-                // removing old tag from url
-                if(params[field] != undefined){
-                    delete params[field];
+            if(field) {
+                var query = $( this ).val();
+                var queryStr = '';
+                if($.isArray(query)) {
+                    for(var i=0; i< query.length; i++) {
+                        queryStr += query[i]
+                        if(i < query.length-1) queryStr += " OR "
+                    }
+                    queryStr += ""
+                } else {
+                    queryStr = query;
                 }
+                if(field == 'aq.object_type' && query == 'All') {
+
+                } 
+                else if(query){
+                    params[field] = queryStr;
+                } else {
+                    // removing old tag from url
+                    if(params[field] != undefined){
+                        delete params[field];
+                    }
+                }
+            }
+        });
+        
+        delete params['daterangepicker_start'];
+        delete params['daterangepicker_end'];
+
+        $.each($(document).find('input[name=daterangepicker_start]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_start'] = $(value).val();
+            } else {
+                params['daterangepicker_start'] = $(value).val();
+            }
+        });
+        $.each($(document).find('input[name=daterangepicker_end]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_end'] = $(value).val();
+            } else {
+                params['daterangepicker_end'] = $(value).val();
             }
         });
         if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
             delete params['daterangepicker_start'];
             delete params['daterangepicker_end'];
+        }
+        if((params['observedon_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['observedon_end'] === Date.today().toString('dd/MM/yyyy'))){
+            delete params['observedon_start'];
+            delete params['observedon_end'];
         }
 
         delete params['query'];
@@ -673,26 +716,33 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['isMapView']
     }
 
-    var object_type = getSelectedFilters($("input.moduleFilter.active:checked"))
+    var object_type = getSelectedFilters($("input.moduleFilter"))
     if(object_type) {
         params['object_type'] = object_type
     } else {
         delete params['object_type']
     }
 
-    var sGroup = getSelectedFilters($("input.sGroupFilter.active:checked"))
+    var uGroup = getSelectedFilters($("input.uGroupFilter"))
+    if(uGroup) {
+        params['uGroup'] = uGroup
+    } else {
+        //delete params['uGroup']
+    }
+
+    var sGroup = getSelectedFilters($("input.sGroupFilter"))
     if(sGroup) {
         params['sGroup'] = sGroup
     } 
 
-    var contributor = getSelectedFilters($("input.contributorFilter.active:checked"))
+    var contributor = getSelectedFilters($("input.contributorFilter"))
     if(contributor) {
         params['contributor'] = contributor
     } else {
         delete params['contributor']
     }
 
-    var tag = getSelectedFilters($("input.tagFilter.active:checked"))
+    var tag = getSelectedFilters($("input.tagFilter"))
     if(tag) {
         params['tag'] = tag
     } else {

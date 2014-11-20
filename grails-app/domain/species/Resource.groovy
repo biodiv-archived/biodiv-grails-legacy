@@ -29,6 +29,16 @@ class Resource extends Sourcedata implements Rateable {
 			return this.value;
 		}
 
+		static def toList() {
+			return [
+				ICON,
+				IMAGE,
+				AUDIO,
+				VIDEO
+            ]
+		}
+
+
         public iconClass() {
             switch(this) {
                 case ICON : return 'icon-picture'

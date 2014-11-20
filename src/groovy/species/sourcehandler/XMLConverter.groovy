@@ -618,6 +618,7 @@ class XMLConverter extends SourceConverter {
             if(licenseType.startsWith('CC-')) {
                 licenseType = licenseType.replaceFirst('CC-','CC ');
             }
+            println licenseType
             type = License.fetchLicenseType(licenseType)
         }
 
@@ -1444,7 +1445,7 @@ class XMLConverter extends SourceConverter {
             if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
                 def cleanSciName = Utils.cleanSciName(scientificName);
                 name = cleanSciName
-            } else {
+            } else if(name) {
                 name = Utils.cleanSciName(name);
             }
             if(name) {

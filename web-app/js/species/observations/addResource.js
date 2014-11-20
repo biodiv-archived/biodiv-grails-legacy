@@ -231,7 +231,7 @@ function createResources(start, end, w, count) {
                 type : 'text',
                 mode : 'popup',
                 emptytext : '',
-                placement : 'bottom', 
+                placement : 'right', 
                 url : function(params) {
                     var d = new $.Deferred;
                     if(!params.value) {
@@ -472,6 +472,7 @@ function createResources(start, end, w, count) {
                 }
                 me.$ele.find("#addObservationSubmit").removeClass('disabled');                
                 me.$form.find("input[name='resources']").remove();
+                me.$form.find("span.msg").html("");
                 me.$ele.find('.videoUrl').val('');
                 me.$ele.find('.audioUrl').val('');
                 me.$ele.find(".progress").css('z-index',90);
@@ -483,16 +484,16 @@ function createResources(start, end, w, count) {
                 if(response.error){
                     alert(response.error);
                     me.$ele.find(".image-resources-msg").parent(".resources").addClass("error");
-                    me.$ele.find(".image-resources-msg").html(response.error);
+                    //me.$ele.find(".image-resources-msg").html(response.error);
                 }
 
                 var messageNode = me.$ele.find(".message .resources");
-                if(messageNode.length == 0 ) {
+               /* if(messageNode.length == 0 ) {
                     me.$form.prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
                 } else {
                     messageNode.append(response?response.error:"Error");
                 }
-
+                */
             });
         } 
     }

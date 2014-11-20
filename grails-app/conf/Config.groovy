@@ -417,6 +417,11 @@ speciesPortal {
         OBJECT_TYPE = "object_type"
         MEMBERS = "members"
         DOC_TYPE = "doc_type"
+		LICENSE = 'license'
+        CONTEXT = 'context'
+        CONTAINER = 'container'
+        RESOURCETYPE = 'resourcetype'
+        USER = 'user'
 	}
 
 	nameSearchFields {
@@ -446,7 +451,7 @@ speciesPortal {
 		driver   = "org.postgresql.Driver"
 	}
 
-    localeLanguages = [['name':'English','code':'en']]
+    localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
 
 }
