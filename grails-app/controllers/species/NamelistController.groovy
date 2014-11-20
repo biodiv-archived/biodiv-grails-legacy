@@ -75,6 +75,10 @@ class NamelistController {
             case "gbif":
                 res = namelistService.searchGBIF(params.name, 'name');
             break
+
+            case "tnrs":
+                res = namelistService.searchTNRS(params.name, 'name');
+            break
         }
         
         //def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
@@ -100,6 +104,10 @@ class NamelistController {
             case "gbif":
                 res = namelistService.searchGBIF(params.externalId, 'id');
             break
+
+            case "tnrs":
+                //external id not present, name will be used
+                res = namelistService.searchTNRS(params.externalId, 'id')
 
         }
         //def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']

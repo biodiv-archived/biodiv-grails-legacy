@@ -28,6 +28,9 @@ class NamelistService {
     
     private static final String GBIF_SITE = 'http://api.gbif.org'
 	private static final String GBIF_URI = '/v1/species'
+    
+    private static final String TNRS_SITE = 'http://tnrs.iplantc.org'
+    private static final String TNRS_URI = '/tnrsm-svc/matchNames'
 	
 	private static final int BATCH_SIZE = 100
 	private static final log = LogFactory.getLog(this);
@@ -193,13 +196,14 @@ class NamelistService {
         temp['sourceDatabase'] = '';
         temp['group'] = result['kingdom'];
         if(searchBy == 'id') {
+            temp['name'] = result['canonicalName'];
             temp['externalId'] = result['key'];
             temp['kingdom'] = result['kingdom']; 
             temp['phylum'] = result['phylum']; 
             temp['order'] = result['order']; 
             temp['family'] = result['family']; 
             temp['class'] = result['class']; 
-            temp['genus'] = result['kingdom']; 
+            temp['genus'] = result['genus']; 
             temp['species'] = result['species']; 
             temp['nameStatus'] = result['taxonomicStatus']?.toLowerCase();
             temp['sourceDatabase'] = result['accordingTo'];
@@ -500,5 +504,62 @@ class NamelistService {
         taxonConcepts.add(res3.collect {TaxonomyDefinition.read(it.taxon_definition_id.toLong())});
         def speciesCount = Species.findAllByTaxonConceptInList(taxonConcepts).size();
         return speciesCount;
+    }
+
+    List searchTNRS(String input, String searchBy) {
+        //http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=best&names=Mangifera
+
+        def http = new HTTPBuilder()
+        println "========TNRS SITE===== " + TNRS_SITE
+        http.request( TNRS_SITE, GET, TEXT ) { req ->
+            if(searchBy == 'name') {
+                uri.path = TNRS_URI;
+            } else {
+                uri.path = TNRS_URI;
+            }
+            uri.query = [ retrieve:'best', names:input]
+            headers.Accept = '*/*'
+
+            response.success = { resp, reader ->
+                assert resp.statusLine.statusCode == 200
+                println "Got response: ${resp.statusLine}"
+                println "Content-Type: ${resp.headers.'Content-Type'}"
+                def xmlText =  reader.text
+                println "========TNRS RESULT====== " + xmlText
+                return responseFromTNRSAsMap(xmlText, searchBy);
+            }
+            response.'404' = { println 'Not found' }
+        }
+    }
+
+    List responseFromTNRSAsMap(String xmlText , String searchBy) {
+        def allResults = JSON.parse(xmlText).items
+        println "============RESULT=============== " + allResults
+        def finalResult = []
+        allResults.each { result ->
+            Map temp = new HashMap()
+            temp['externalId'] = "" 
+            temp['name'] = result['nameScientific'];
+            if(searchBy == 'name') {
+                temp['name'] = temp['name'] + " " + result['acceptedAuthor'];
+            }
+            temp['rank'] = result['rank']?result['rank'].toLowerCase() : "";
+            temp['nameStatus'] = "";
+            temp['sourceDatabase'] = result['url']? result['url'] : "";
+            temp['group'] = result['kingdom']? result['kingdom']:"";
+            //if(searchBy == 'id') {
+            temp['kingdom'] = result['kingdom']; 
+            temp['phylum'] = result['phylum']; 
+            temp['order'] = result['order']; 
+            temp['family'] = result['family']; 
+            temp['class'] = result['class']; 
+            temp['genus'] = result['genus']; 
+            temp['species'] = result['species']; 
+            temp['authorString'] = result['acceptedAuthor'];
+            //} 
+            finalResult.add(temp);
+        }
+        println "===========PARSED RESULT ======== " + finalResult
+        return finalResult;
     }
 }

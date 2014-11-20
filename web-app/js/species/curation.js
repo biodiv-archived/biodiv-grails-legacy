@@ -322,6 +322,11 @@ function fillPopupTable(data, $ele, dataFrom) {
 function getExternalDbDetails(externalId) {
     var url = window.params.curation.getExternalDbDetailsUrl;
     var dbName = $("#queryDatabase").val();
+    //IN case of TNRS no id comes
+    //so search by name
+    if(externalId == undefined) {
+        externalId = $(".name").val();
+    }
     $.ajax({
         url: url,
         dataType: "json",
