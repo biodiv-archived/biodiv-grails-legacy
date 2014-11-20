@@ -63,10 +63,10 @@
 
 				<g:if test="${activity.text}"> 
 					<g:if test="${activity.text != null && activity.text.length() > 160}">
-						${activity.text[0..160] + '....'} 
+						${raw(activity.text[0..160] + '....')} 
 					</g:if>
 					<g:else>
-						${activity.text?:''}
+						${raw(activity.text?:'')}
 					</g:else>
 	
 				</g:if>
