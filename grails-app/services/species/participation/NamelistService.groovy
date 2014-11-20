@@ -32,7 +32,10 @@ class NamelistService {
     private static final String TNRS_SITE = 'http://tnrs.iplantc.org'
     private static final String TNRS_URI = '/tnrsm-svc/matchNames'
 	
-	private static final int BATCH_SIZE = 100
+    private static final String EOL_SITE = 'http://eol.org'
+    private static final String EOL_URI = '/api/search/1.0.json'
+	
+    private static final int BATCH_SIZE = 100
 	private static final log = LogFactory.getLog(this);
 
 	private static final String ACCEPTED_NAME = "accepted name"
@@ -45,7 +48,7 @@ class NamelistService {
 	def dataSource
     def groupHandlerService
 
-    List searchCOL(String input, String searchBy){
+    List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
         def http = new HTTPBuilder()
@@ -409,7 +412,7 @@ class NamelistService {
 		
 		return result;
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -556,6 +559,60 @@ class NamelistService {
             temp['genus'] = result['genus']; 
             temp['species'] = result['species']; 
             temp['authorString'] = result['acceptedAuthor'];
+            //} 
+            finalResult.add(temp);
+        }
+        println "===========PARSED RESULT ======== " + finalResult
+        return finalResult;
+    }
+
+    List searchEOL(String input, String searchBy) {
+        //http://eol.org/api/search/1.0.json?q=Mangifera+indica&page=1&exact=true
+        
+        def http = new HTTPBuilder()
+        println "========EOL SITE===== " + EOL_SITE
+        http.request( EOL_SITE, GET, TEXT ) { req ->
+            if(searchBy == 'name') {
+                uri.path = EOL_URI;
+            } else {
+                uri.path = EOL_URI;
+            }
+            uri.query = [ exact:'true', q :input]
+            headers.Accept = '*/*'
+
+            response.success = { resp, reader ->
+                assert resp.statusLine.statusCode == 200
+                println "Got response: ${resp.statusLine}"
+                println "Content-Type: ${resp.headers.'Content-Type'}"
+                def xmlText =  reader.text
+                println "========TNRS RESULT====== " + xmlText
+                return responseFromEOLAsMap(xmlText, searchBy);
+            }
+            response.'404' = { println 'Not found' }
+        }
+    }
+
+    List responseFromEOLAsMap(String xmlText , String searchBy) {
+        def allResults = JSON.parse(xmlText).results
+        println "============RESULT=============== " + allResults
+        def finalResult = []
+        allResults.each { result ->
+            Map temp = new HashMap()
+            temp['externalId'] = "" 
+            temp['name'] = result['title'];
+            temp['rank'] = result['rank']?result['rank'].toLowerCase() : "";
+            temp['nameStatus'] = "";
+            temp['sourceDatabase'] = result['link']? result['link'] : "";
+            temp['group'] = result['kingdom']? result['kingdom']:"";
+            //if(searchBy == 'id') {
+            temp['kingdom'] = result['kingdom']; 
+            temp['phylum'] = result['phylum']; 
+            temp['order'] = result['order']; 
+            temp['family'] = result['family']; 
+            temp['class'] = result['class']; 
+            temp['genus'] = result['genus']; 
+            temp['species'] = result['species']; 
+            temp['authorString'] = result['acceptedAuthor']?result['acceptedAuthor']:"" ;
             //} 
             finalResult.add(temp);
         }

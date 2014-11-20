@@ -79,6 +79,11 @@ class NamelistController {
             case "tnrs":
                 res = namelistService.searchTNRS(params.name, 'name');
             break
+
+            case "eol":
+                res = namelistService.searchEOL(params.name, 'name');
+            break
+
         }
         
         //def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
@@ -107,8 +112,13 @@ class NamelistController {
 
             case "tnrs":
                 //external id not present, name will be used
+                //externalId has name inside
                 res = namelistService.searchTNRS(params.externalId, 'id')
+            break
 
+            case "eol":
+                res = namelistService.searchEOL(params.externalId, 'id')
+            break
         }
         //def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
         println "========RES DETAILS====== " + res[0]  
