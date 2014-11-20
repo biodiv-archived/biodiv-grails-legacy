@@ -62,8 +62,8 @@
 			<p class="callout" style="margin: 0;padding: 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; ">
 
 				<g:if test="${activity.text}"> 
-					<g:if test="${activity.text != null && activity.text.length() > 160}">
-						${raw(activity.text[0..160] + '....')} 
+					<g:if test="${activity.text != null && activity.text.length() > 400}">
+						${raw(activity.text[0..400] + '....')} 
 					</g:if>
 					<g:else>
 						${raw(activity.text?:'')}
