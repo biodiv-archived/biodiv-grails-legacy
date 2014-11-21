@@ -1,5 +1,6 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.participation.Featured"%>
+<%@page import="species.participation.Observation"%>
 
 <div class="resource_in_groups">
     <%
@@ -42,13 +43,21 @@
             </li>
             </g:if>
  
-        <g:each in="${observationInstance.userGroups}" var="userGroup">
+        <% def observationUserGroups = observationInstance.userGroups;
+        if(observationInstance.hasProperty('sourceId')){
+            if(observationInstance.id != observationInstance.sourceId){
+                observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
+            }
+        }
+        %>
+
+        <g:each in="${observationUserGroups}" var="userGroup">
             <g:if test="${!featuredInUserGroups.containsKey(userGroup.id)}">
             <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
             <uGroup:showUserGroupSignature model="[ 'userGroup':userGroup, featured:false]" />
             </li>
             </g:if>
-        </g:each>
+        </g:each>       
     </ul>
 </div>
 

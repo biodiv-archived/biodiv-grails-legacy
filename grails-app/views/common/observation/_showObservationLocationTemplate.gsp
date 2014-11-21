@@ -36,9 +36,12 @@
                 longitude = observationInstance.longitude + geoPrivacyAdjustment
 
                 if(observationInstance?.topology){ 
-                areas = Utils.GeometryAsWKT(observationInstance?.topology)
-                } else if(params.areas) {
-                areas = params.areas
+					if(observationInstance.isChecklist)
+	                    areas = Utils.GeometryAsWKT(observationInstance?.topology)
+                    else
+						areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
+			    } else if(params.areas) {
+                	areas = params.areas
                 }
 
                 if(!latitude && params.latitude) latitude = params.latitude

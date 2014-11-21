@@ -105,11 +105,10 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def save() {
         List errors = [];
-        Map result = [errors:errors];
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        Map result = [userLanguage:languageInstance, errors:errors];
+
         if(params.page && params.rank) {
-
-            Language languageInstance = utilsService.getCurrentLanguage(request);
-
             Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
