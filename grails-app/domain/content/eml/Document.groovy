@@ -58,7 +58,6 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 
         String[] getCodes() {
 
-            println "${getClass().name}.${name()}"
             ["${getClass().name}.${name()}"] as String[]
         }   
         String getDefaultMessage() { value() }
