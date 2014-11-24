@@ -274,7 +274,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private boolean isValidSortParam(String sortParam) {
-        if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchField.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
+        if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;
         return false;
     }
