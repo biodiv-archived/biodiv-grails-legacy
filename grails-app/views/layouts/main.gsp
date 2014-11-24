@@ -36,7 +36,7 @@
 </head>
 <body>
 	<div id="loading" class="loading" style="display: none;">
-		<span>Loading ...</span>
+		<span><g:message code="msg.loading" /> </span>
 	</div>
 	<div id="postToUGroup" class="overlay" style="display: none;">
         <i class="icon-plus"></i>
@@ -44,7 +44,7 @@
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showSiteHeader model="['userGroupInstance':userGroupInstance]" />
 
-                <div class="container outer-wrapper">
+            <div class="container outer-wrapper">
 			<div>
 				<div style="padding: 10px 0px; margin-left: -20px">
 					<g:layoutBody />

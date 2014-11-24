@@ -53,6 +53,9 @@ import species.AbstractObjectService;
 import species.TaxonomyRegistry;
 import org.hibernate.FetchMode;
 import grails.converters.JSON;
+import species.participation.ActivityFeedService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -65,13 +68,13 @@ class SpeciesService extends AbstractObjectService  {
     def externalLinksService;
     def speciesSearchService;
     def namesIndexerService;
-    def observationService;
     def speciesPermissionService;
     def taxonService;
     def activityFeedService;
-
+    def messageSource;
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
+    def request;
     //static int noOfFields = Field.count();
 
     def nameTerms(params) {
@@ -147,7 +150,7 @@ class SpeciesService extends AbstractObjectService  {
 
         if(lastRevisedStartDate && lastRevisedEndDate) {
             if(i > 0) aq += " AND";
-            aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_start'] = params.daterangepicker_start;
@@ -155,13 +158,13 @@ class SpeciesService extends AbstractObjectService  {
         } else if(lastRevisedStartDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":["+lastRevisedStartDate+" TO NOW]";
             queryParams['daterangepicker_start'] = params.daterangepicker_start;
             activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
         } else if (lastRevisedEndDate) {
             if(i > 0) aq += " AND";
             //String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-            aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
+            aq += " "+searchFieldsConfig.UPDATED_ON+":[ * "+lastRevisedEndDate+"]";
             queryParams['daterangepicker_end'] = params.daterangepicker_end;
             activeFilters['daterangepicker_end'] = params.daterangepicker_end;
         }
@@ -193,7 +196,7 @@ class SpeciesService extends AbstractObjectService  {
 
         if(params.sGroup) {
             params.sGroup = params.sGroup.toLong()
-            def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+            def groupId = getSpeciesGroupIds(params.sGroup)
             if(!groupId){
                 log.debug("No groups for id " + params.sGroup)
             } else{
@@ -253,7 +256,8 @@ class SpeciesService extends AbstractObjectService  {
             Iterator iter = queryResponse.getResults().listIterator();
             while(iter.hasNext()) {
                 def doc = iter.next();
-                def speciesInstance = Species.get(doc.getFieldValue("id"));
+                Long id = (doc.getFieldValue("id").tokenize("_")[1]).toLong()
+                def speciesInstance = Species.get(id);
                 if(speciesInstance)
                     speciesInstanceList.add(speciesInstance);
             }
@@ -270,7 +274,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private boolean isValidSortParam(String sortParam) {
-        if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase('lastrevised'))
+        if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;
         return false;
     }
@@ -279,8 +283,9 @@ class SpeciesService extends AbstractObjectService  {
     * Add Species Field
     */
     def addSpeciesField(long speciesId, long fieldId, params) {
+        
         if(!fieldId || !speciesId) {
-            return [success:false, msg:"Id or value cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.cannot.empty", null, LCH.getLocale())]
         }
         XMLConverter converter = new XMLConverter();
 
@@ -288,11 +293,11 @@ class SpeciesService extends AbstractObjectService  {
         Field field = Field.read(fieldId);
 
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to add"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.add", null, LCH.getLocale())]
         }
 
         if(!field) {
-            return [success:false, msg:"Invalid field"]
+            return [success:false, msg:messageSource.getMessage("info.invalid.field", null, LCH.getLocale())]
         }
         try {
             SpeciesField speciesFieldInstance = createNewSpeciesField(speciesInstance, field, null);
@@ -306,20 +311,20 @@ class SpeciesService extends AbstractObjectService  {
                 Species.withTransaction {
                     if(!speciesInstance.save()) {
                         speciesInstance.errors.each { errors << it; log.error it }
-                        return [success:false, msg:"Error while adding species field", errors:errors]
+                        return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
                     }
                 }
 
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
                 addMediaInSpField(params, speciesFieldInstance);
-                return [success:true, msg:"Successfully added species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:activityFeedService.SPECIES_FIELD_CREATED]
+                return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
             }
         } catch(Exception e) {
             e.printStackTrace();
-            return [success:false, msg:"Error while adding species field"]
+            return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale())]
         }
-        return [success:false, msg:"Error while adding species field"]
+        return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale())]
     }       
 
     SpeciesField createNewSpeciesField(Species speciesInstance, Field fieldInstance, String value) {
@@ -333,8 +338,9 @@ class SpeciesService extends AbstractObjectService  {
      * Update Species Field
      */
     def updateSpeciesField(SpeciesField speciesField, params) {
+        
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
         try {
@@ -343,21 +349,24 @@ class SpeciesService extends AbstractObjectService  {
                 result = updateSpeciesFieldInstance(speciesField, params); 
                 if(!speciesField.save(flush:true)) {
                     speciesField.errors.each { result.errors << it }
-                    return [success:false, msg:"Error while updating species field", errors:result.errors]
+                    return [success:false, msg:messageSource.getMessage("info.update.speciesfield", null, LCH.getLocale()), errors:result.errors]
                 }
                 addMediaInSpField(params, speciesField);
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:"Successfully updated species field", errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:activityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_UPDATED]
+            return [success:true, msg:messageSource.getMessage("info.success.update", null, LCH.getLocale()), errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:ActivityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_UPDATED]
         } catch(Exception e) {
             e.printStackTrace();
-            return [success:false, msg:"Error while updating species field : ${e.getMessage()}"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+            return [success:false, msg:messageSource.getMessage("info.error.updating", messagesourcearg, LCH.getLocale())]
         }
     }
 
     private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
+        
         if(!params.description) {
-            return [success:false, msg:"Description cant be empty. Please delete the field if you dont want to have any description"]
+            return [success:false, msg:messageSource.getMessage("info.about.description", null, LCH.getLocale())]
         }
 
         List errors = [];
@@ -365,6 +374,9 @@ class SpeciesService extends AbstractObjectService  {
         if(!params.contributor) {
             params.contributor = springSecurityService.currentUser.id+'';
         }
+
+        // Language
+        speciesField.language = params.locale_language;
 
         //contributors
         speciesField.contributors.clear();
@@ -393,7 +405,9 @@ class SpeciesService extends AbstractObjectService  {
             if(l) {
                 Contributor c = (new XMLConverter()).getContributorByName(l.trim(), true);
                 if(!c) {
-                    errors <<  "Error while adding attribution ${l}"
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = l;
+                    errors <<  messageSource.getMessage("info.error.updating.license", messagesourcearg, LCH.getLocale())
                 } else {
                     speciesField.addToAttributors(c);
                 }
@@ -425,7 +439,7 @@ class SpeciesService extends AbstractObjectService  {
             if(l) {
                 License c = (new XMLConverter()).getLicenseByType(l, false);
                 if(!c) { 
-                    errors << "Error while updating license"
+                    errors << messageSource.getMessage("info.error.updating.license", null, LCH.getLocale())
                 } else {
                     speciesField.addToLicenses(c);
                 }
@@ -439,7 +453,7 @@ class SpeciesService extends AbstractObjectService  {
             if(l) {
                 AudienceType c = (new XMLConverter()).getAudienceTypeByType(l);
                 if(!c) {
-                    errors << "Error while updating audience type"
+                    errors << messageSource.getMessage("info.error.updating.audience", null, LCH.getLocale())
                 } else {
                     speciesField.addToAudienceTypes(c);
                 }
@@ -460,8 +474,9 @@ class SpeciesService extends AbstractObjectService  {
     */
     def deleteSpeciesField(long id) {
         SpeciesField speciesField = SpeciesField.get(id);
+        
         if(!speciesField) {
-            return [success:false, msg:"SpeciesField not found"]
+            return [success:false, msg:messageSource.getMessage("info.speciesfield.notfound", null, LCH.getLocale())]
         } else if(speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
             def speciesInstance = speciesField.species;
             def field = speciesField.field;
@@ -474,14 +489,16 @@ class SpeciesService extends AbstractObjectService  {
                 //sortAsPerRating(sameFieldSpeciesFieldInstances);
                 //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                 def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                return [success:true, msg:"Successfully deleted species field", id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:activityFeedService.SPECIES_FIELD_DELETED]
+                return [success:true, msg:messageSource.getMessage("info.speciefield.deleted", null, LCH.getLocale()), id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_DELETED]
             } catch(e) {
                 e.printStackTrace();
                 log.error e.getMessage();
-                return [success:false, msg:"Error while deleting field : ${e.getMessage()}"]
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+                return [success:false, msg:messageSource.getMessage("info.speciesfield.deleting", messagesourcearg, LCH.getLocale())]
             }
         } else {
-            return [success:false, msg:"You don't have persmission to delete this field"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.delete", null, LCH.getLocale())]
         }
     }
 
@@ -489,8 +506,9 @@ class SpeciesService extends AbstractObjectService  {
     * Update methods for individual metadata fields
     */
     def updateContributor(contributorId, long speciesFieldId, def value, String type) {
+        
         if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
         SUser oldContrib;
@@ -498,37 +516,47 @@ class SpeciesService extends AbstractObjectService  {
             oldContrib = SUser.read(contributorId);
 
             if(!oldContrib) {
-                return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+                 def messagesourcearg = new Object[2];
+                messagesourcearg[0] = type.capitalize();
+                messagesourcearg[1] = contributorId;
+                return [success:false, msg:messageSource.getMessage("info.id.not.found", messagesourcearg, LCH.getLocale())]
             } else if(oldContrib.email == value) {
-                return [success:true, msg:"Nothing to change"]
+                return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
             }
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
         SpeciesField.withTransaction { status ->
             SUser c = SUser.findByEmail(value);
             if(!c) {
-                return [success:false, msg:"Error while updating ${type}. No registered user with email ${value} found"]
+                def messagesourcearg = new Object[2];
+                messagesourcearg[0] = type;
+                messagesourcearg[1] = value;
+                return [success:false, msg:messageSource.getMessage("info.error.no.user", messagesourcearg, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
                 if(oldContrib)
                     speciesField.removeFromContributors(oldContrib);
                 speciesField.addToContributors(c);
-                msg = 'Successfully added contributor';
+                msg = messageSource.getMessage("info.success.adding.contributor", null, LCH.getLocale());
                 content = speciesField.contributors;
 
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
-                    return [success:false, msg:"Error while updating ${type}"]
+                    def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = type;
+                    return [success:false, msg:messageSource.getMessage("info.error.while.updating", messagesourcearg, LCH.getLocale())]
                 }
                 return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
             }
@@ -536,8 +564,9 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateAttributor(contributorId, long speciesFieldId, def value, String type) {
+        
         if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
         Contributor oldContrib;
@@ -545,37 +574,47 @@ class SpeciesService extends AbstractObjectService  {
             oldContrib = Contributor.read(contributorId);
 
             if(!oldContrib) {
-                return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+                def messagesourcearg = new Object[2];
+                messagesourcearg[0] = type.capitalize();
+                messagesourcearg[1] = contributorId;
+                return [success:false, msg:messageSource.getMessage("info.id.not.found", messagesourcearg, LCH.getLocale())]
             } else if(oldContrib.name == value) {
-                return [success:true, msg:"Nothing to change"]
+                return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
             }
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
         SpeciesField.withTransaction { status ->
             Contributor c = (new XMLConverter()).getContributorByName(value, true);
             if(!c) {
-                return [success:false, msg:"Error while updating ${type}"]
+                def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = type;
+                return [success:false, msg:messageSource.getMessage("info.error.while.updating", messagesourcearg, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
                    if(oldContrib)
                         speciesField.removeFromAttributors(oldContrib);
                     speciesField.addToAttributors(c);
-                    msg = 'Successfully added attribution';
+                    msg = messageSource.getMessage("info.success.adding.attribution", null, LCH.getLocale());
                     content = speciesField.attributors;
 
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
-                    return [success:false, msg:"Error while updating ${type}"]
+
+                    def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = type;
+                return [success:false, msg:messageSource.getMessage("info.error.while.updating", messagesourcearg, LCH.getLocale())]
                 }
                 return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
             }
@@ -583,8 +622,9 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateReference(referenceId, long speciesFieldId, def value) {
+        
         if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
         Reference oldReference;
@@ -592,7 +632,9 @@ class SpeciesService extends AbstractObjectService  {
             oldReference = Reference.read(referenceId);
 
             if(!oldReference) {
-                return [success:false, msg:"Reference with id ${referenceId} is not found"]
+                 def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = referenceId;
+                return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
             } else if(oldReference.title == value) {
                 return [success:true, msg:"Nothing to change"]
             }
@@ -600,11 +642,13 @@ class SpeciesService extends AbstractObjectService  {
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
 
@@ -614,20 +658,21 @@ class SpeciesService extends AbstractObjectService  {
             if(oldReference)
                 speciesField.removeFromReferences(oldReference);
             speciesField.addToReferences(new Reference(title:value));
-            msg = 'Successfully added reference';
+            msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
             content = speciesField.references;
 
             if(!speciesField.save()) {
                 speciesField.errors.each { log.error it }
-                return [success:false, msg:"Error while updating reference"]
+                return [success:false, msg:messageSource.getMessage("info.error.updating.reference", null, LCH.getLocale())]
             }
             return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
         }
     }
 
-    def addDescription(long speciesId, long fieldId, String value) { 
+    def addDescription(long speciesId, long fieldId, String value) {
+     
         if(!value || !fieldId || !speciesId) {
-            return [success:false, msg:"Id or value cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.cannot.empty", null, LCH.getLocale())]
         }
         XMLConverter converter = new XMLConverter();
 
@@ -635,7 +680,7 @@ class SpeciesService extends AbstractObjectService  {
         Field field = Field.read(fieldId);
 
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to add"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.add", null, LCH.getLocale())]
         }
 
         if(!field) {
@@ -649,39 +694,41 @@ class SpeciesService extends AbstractObjectService  {
                 Species.withTransaction {
                     if(!speciesInstance.save()) {
                         speciesInstance.errors.each { log.error it }
-                        return [success:false, msg:"Error while adding species field"]
+                        return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale())]
                     }
                 }
                 List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                 sortAsPerRating(sameFieldSpeciesFieldInstances);
-                return [success:true, msg:"Successfully updated speciesField", id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
+                return [success:true, msg:messageSource.getMessage("info.success.update", null, LCH.getLocale()), id:field.id, type:'newdescription', content:sameFieldSpeciesFieldInstances, 'speciesInstance':speciesInstance, speciesId:speciesInstance.id]
             }
         } catch(Exception e) {
             e.printStackTrace();
-            return [success:false, msg:"Error while adding species field"]
+            return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale())]
         }
-        return [success:false, msg:"Error while adding species field"]
+        return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale())]
     }
 
     def updateDescription(long id, String value) {
+        
         if(!value || !id) {
-            return [success:false, msg:"Id or value cannot empty"]
+            return [success:false, msg:messageSource.getMessage("info.cannot.empty", null, LCH.getLocale())]
         }
         SpeciesField c = SpeciesField.get(id);
         return updateSpeciesFieldDescription(c, value);
     }
     
     def updateSpeciesFieldDescription(SpeciesField c, String value) {
+        
         if(!c) {
-            return [success:false, msg:"SpeciesField not found"]
+            return [success:false, msg:messageSource.getMessage("info.speciesfield.notfound", null, LCH.getLocale())]
         } else if(!speciesPermissionService.isSpeciesFieldContributor(c, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         } else {
             SpeciesField.withTransaction {
                 c.description = value.trim()
                 if (!c.save()) {
                     c.errors.each { log.error it }
-                    return [success:false, msg:"Error while updating species field name"]
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.field.name", null, LCH.getLocale())]
                 }
             }
             return [success:true, msg:""]
@@ -689,34 +736,37 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateLicense(long speciesFieldId, def value) {
+        
         if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+           def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
         SpeciesField.withTransaction { status ->
             License c = (new XMLConverter()).getLicenseByType(value, false);
             if(!c) {
-                return [success:false, msg:"Error while updating license"]
+                return [success:false, msg:messageSource.getMessage("info.error.updating.license", null, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
                 speciesField.licenses.clear();
                 speciesField.addToLicenses(c);
-                msg = 'Successfully added license';
+                msg = messageSource.getMessage("info.success.adding.license", null, LCH.getLocale());
                 content = speciesField.licenses;
 
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
-                    return [success:false, msg:"Error while updating license"]
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.license", null, LCH.getLocale())]
                 }
                 return [success:true, id:speciesFieldId, msg:msg, content:content]
             }
@@ -724,35 +774,38 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateAudienceType(long speciesFieldId, String value) {
+        
         if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
 
         SpeciesField.withTransaction { status ->
             AudienceType c = (new XMLConverter()).getAudienceTypeByType(value);
             if(!c) {
-                return [success:false, msg:"Error while updating audience type"]
+                return [success:false, msg:messageSource.getMessage("info.error.updating.audience", null, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
                 speciesField.audienceTypes.clear();
                 speciesField.addToAudienceTypes(c);
-                msg = 'Successfully added audience type';
+                msg = messageSource.getMessage("info.success.adding.audience", null, LCH.getLocale());
                 content = speciesField.audienceTypes;
 
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
-                    return [success:false, msg:"Error while updating audience type"]
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.audience", null, LCH.getLocale())]
                 }
                 return [success:true, id:speciesFieldId, msg:msg, content:content]
             }
@@ -760,34 +813,38 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateStatus(long speciesFieldId, String value) {
+        
         if(!value) {
-            return [success:false, msg:"Field content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+            
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
 
         SpeciesField.withTransaction { status ->
             SpeciesField.Status c = getStatus(value);
             if(!c) {
-                return [success:false, msg:"Error while updating status"]
+                return [success:false, msg:messageSource.getMessage("info.error.updating.status", null, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
                 speciesField.status = c;
-                msg = 'Successfully added status';
+                msg = messageSource.getMessage("info.success.adding.status", null, LCH.getLocale());
                 content = speciesField.status;
 
                 if(!speciesField.save()) {
                     speciesField.errors.each { log.error it }
-                    return [success:false, msg:"Error while updating status"]
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.status", null, LCH.getLocale())]
                 }
                 return [success:true, id:speciesFieldId, msg:msg, content:content]
             }
@@ -802,17 +859,20 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateSynonym(def synonymId, def speciesId, String relationship, String value) {
+        
         if(!value || !relationship) {
-            return [success:false, msg:"Synonym value or relationship content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
         }
         Species speciesInstance = Species.get(speciesId);
    
         if(!speciesInstance) {
-            return [success:false, msg:"Species with id ${speciesId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
         Synonyms oldSynonym;
@@ -822,9 +882,9 @@ class SpeciesService extends AbstractObjectService  {
             if(!oldSynonym) {
                 //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
-                return [success:true, msg:"Nothing to change"]
+                return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
             } else if(!oldSynonym.isContributor()) {
-                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
         }
 
@@ -832,7 +892,9 @@ class SpeciesService extends AbstractObjectService  {
             if(oldSynonym) {
                 def result = deleteSynonym(oldSynonym, speciesInstance);
                 if(!result.success) {
-                    return [success:false, msg:"Error while updating synonym. Error: ${result.msg})"]
+                    def messagesourcearg = new Object[1];
+                messagesourcearg[0] = result.msg;
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
                 }
             } 
             XMLConverter converter = new XMLConverter();
@@ -846,19 +908,19 @@ class SpeciesService extends AbstractObjectService  {
             List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
             
             if(!synonyms) {
-                return [success:false, msg:"Error while updating synonym"]
+                return [success:false, msg:messageSource.getMessage("info.error.update.synonym", null, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
-                msg = 'Successfully updated synonym';
+                msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
                 String activityType, mailType;
                 if(oldSynonym) {
-                    activityType = activityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                    mailType = activityFeedService.SPECIES_SYNONYM_UPDATED
+                    activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
                 } else {
-                    activityType = activityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
-                    mailType = activityFeedService.SPECIES_SYNONYM_CREATED
+                    activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
 
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
@@ -867,17 +929,20 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def updateCommonname(def cnId, def speciesId, String language, String value) {
+        
         if(!value || !language) {
-            return [success:false, msg:"Common name or language content cannot be empty"]
+            return [success:false, msg:messageSource.getMessage("info.name.language.no.empty", null, LCH.getLocale())]
         }
         Species speciesInstance = Species.get(speciesId);
    
         if(!speciesInstance) {
-            return [success:false, msg:"Species with id ${speciesId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to update"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
         CommonNames oldCommonname;
@@ -888,9 +953,9 @@ class SpeciesService extends AbstractObjectService  {
             if(!oldCommonname) {
                 //return [success:false, msg:"Commonname with id ${cnId} is not found"]
             } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
-                return [success:true, msg:"Nothing to change"]
+                return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
             } else if(!oldCommonname.isContributor()) {
-                return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
         }
 
@@ -910,19 +975,19 @@ class SpeciesService extends AbstractObjectService  {
             List<CommonNames> commonnames = converter.createCommonNames(cn, speciesInstance.taxonConcept);
             
             if(!commonnames) {
-                return [success:false, msg:"Error while updating common name"]
+                return [success:false, msg:messageSource.getMessage("info.error.updating.commonname", null, LCH.getLocale())]
             } else {
                 String msg = '';
                 def content;
-                msg = 'Successfully updated common name';
+                msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
                 String activityType, mailType;
                 if(oldCommonname) {
-                    activityType = activityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
-                    mailType = activityFeedService.SPECIES_COMMONNAME_UPDATED
+                    activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
+                    mailType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
                 } else {
-                    activityType = activityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
-                    mailType = activityFeedService.SPECIES_COMMONNAME_CREATED
+                    activityType = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+                    mailType = ActivityFeedService.SPECIES_COMMONNAME_CREATED
                 }
 
 
@@ -935,21 +1000,31 @@ class SpeciesService extends AbstractObjectService  {
     * Delete methods for individual metadata fields
     */
     def deleteContributor(contributorId, long speciesFieldId, String type) {
+        
         SUser oldContrib;
         if(contributorId) {
             oldContrib = SUser.read(contributorId);
         }
         if(!oldContrib) {
-            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+             def messagesourcearg = new Object[2];
+                messagesourcearg[0] = type.capitalize();
+                messagesourcearg[1] = contributorId;
+                return [success:false, msg:messageSource.getMessage("info.id.not.found", messagesourcearg, LCH.getLocale())]
+            
         } 
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to delete this ${type}"]
+           def messagesourcearg = new Object[1];
+                messagesourcearg[0] = type;
+            return [success:false, msg:messageSource.getMessage("info.no.permission.to.delete", messagesourcearg, LCH.getLocale())]
+
         }
 
         SpeciesField.withTransaction { status ->
@@ -957,82 +1032,98 @@ class SpeciesService extends AbstractObjectService  {
             def content;
             speciesField.removeFromContributors(oldContrib);
             if(speciesField.contributors.size() == 0) {
-                msg = 'There should be atleast one contributor';
+                msg = messageSource.getMessage("info.atleast.one.contributor", null, LCH.getLocale());
                 return [success:false, msg:msg]
             } else {
-                msg = 'Successfully removed contributor';
+                msg = messageSource.getMessage("info.success.removed.contributor", null, LCH.getLocale());
                 content = speciesField.contributors;
             }
             if(!speciesField.save()) {
                 speciesField.errors.each { log.error it }
-                return [success:false, msg:"Error while updating ${type}"]
+                def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = type;
+                    return [success:false, msg:messageSource.getMessage("info.error.while.updating", messagesourcearg, LCH.getLocale())]
             }
             return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
         }
     }
 
     def deleteAttributor(contributorId, long speciesFieldId, String type) {
+        
         Contributor oldContrib;
         if(contributorId) {
             oldContrib = Contributor.read(contributorId);
         }
         if(!oldContrib) {
-            return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+           def messagesourcearg = new Object[2];
+                messagesourcearg[0] = type.capitalize();
+                messagesourcearg[1] = contributorId;
+                return [success:false, msg:messageSource.getMessage("info.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to delete this ${type}"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = type;
+            return [success:false, msg:messageSource.getMessage("info.no.permission.to.delete", messagesourcearg, LCH.getLocale())]
         }
 
         SpeciesField.withTransaction { status ->
             String msg = '';
             def content;
             speciesField.removeFromAttributors(oldContrib);
-            msg = 'Successfully removed attribution';
+            msg = messageSource.getMessage("info.success.removed.attribution", null, LCH.getLocale());
             content = speciesField.attributors;
 
             if(!speciesField.save()) {
                 speciesField.errors.each { log.error it }
-                return [success:false, msg:"Error while updating ${type}"]
+               def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = type;
+                    return [success:false, msg:messageSource.getMessage("info.error.while.updating", messagesourcearg, LCH.getLocale())]
             }
             return [success:true, id:speciesFieldId, type:type, msg:msg, content:content]
         }
     }
 
     def deleteReference(referenceId, long speciesFieldId) {
-
+        
         Reference oldReference;
         if(referenceId) {
             oldReference = Reference.read(referenceId);
         }
         if(!oldReference) {
-            return [success:false, msg:"Reference with id ${referenceId} is not found"]
+            def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = referenceId;
+                return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
         SpeciesField speciesField = SpeciesField.get(speciesFieldId);
         if(!speciesField) {
-            return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+           def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to delete this reference"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.reference", null, LCH.getLocale())]
         }
 
         SpeciesField.withTransaction { status ->
             String msg = '';
             def content;
             speciesField.removeFromReferences(oldReference);
-            msg = 'Successfully removed reference';
+            msg = messageSource.getMessage("info.success.remove.reference", null, LCH.getLocale());
             content = speciesField.references;
 
             if(!speciesField.save()) {
                 speciesField.errors.each { log.error it }
-                return [success:false, msg:"Error while updating reference"]
+                return [success:false, msg:messageSource.getMessage("info.error.updating.reference", null, LCH.getLocale())]
             }
             return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
         }
@@ -1053,16 +1144,19 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def deleteSynonym(Synonyms oldSynonym, Species speciesInstance) {
+        
         if(!oldSynonym) {
-            return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = synonymId;
+            return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
         if(!oldSynonym.isContributor()) {
-            return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to delete synonym"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
         }
 
         Synonyms.withTransaction { status ->
@@ -1076,17 +1170,19 @@ class SpeciesService extends AbstractObjectService  {
                 } else {
                     if(!oldSynonym.save()) {
                         oldSynonym.errors.each { log.error it }
-                        return [success:false, msg:"Error while deleting synonym"]
+                        return [success:false, msg:messageSource.getMessage("info.error.deleting.synonym", null, LCH.getLocale())]
                     }
                 }
-                msg = 'Successfully removed synonym';
+                msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:activityFeedService.SPECIES_SYNONYM_DELETED]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
                 log.error e.getMessage();
-                return [success:false, msg:"Error while deleting synonym: ${e.getMessage()}"]
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+                return [success:false, msg:messageSource.getMessage("info.error.synonym.deletion", messagesourcearg, LCH.getLocale())]
             }
         }
     }
@@ -1102,16 +1198,19 @@ class SpeciesService extends AbstractObjectService  {
     } 
     
     def deleteCommonname(CommonNames oldCommonname, Species speciesInstance) {
+        
         if(!oldCommonname) {
-            return [success:false, msg:"Common name with id ${cnId} is not found"]
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = cnId;
+            return [success:false, msg:messageSource.getMessage("info.common.name.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
         if(!oldCommonname.isContributor()) {
-            return [success:false, msg:"You don't have permission to update as you are not a contributor."]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
         }
 
         if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:"You don't have permission to delete commonname"]
+            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.commonname", null, LCH.getLocale())]
         }
 
         CommonNames.withTransaction { status ->
@@ -1125,18 +1224,20 @@ class SpeciesService extends AbstractObjectService  {
                 } else {
                     if(!oldCommonname.save()) {
                         oldCommonname.errors.each { log.error it }
-                        return [success:false, msg:"Error while deleting common name"]
+                        return [success:false, msg:messageSource.getMessage("info.error.deleting.commonname", null, LCH.getLocale())]
                     }
                 }
 
-                msg = 'Successfully removed common name';
+                msg = messageSource.getMessage("info.success.remove.commonname", null, LCH.getLocale());
                 content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:activityFeedService.SPECIES_COMMONNAME_DELETED]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
                 log.error e.getMessage();
-                return [success:false, msg:"Error while deleting common name: ${e.getMessage()}"]
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+                return [success:false, msg:messageSource.getMessage("info.error.commonname.deletion", messagesourcearg, LCH.getLocale())]
             }
         }
     }
@@ -1144,7 +1245,8 @@ class SpeciesService extends AbstractObjectService  {
     /**
     * Create Species given species name and atleast one taxon hierarchy
     */
-    def createSpecies(String speciesName, int rank, List taxonRegistryNames) {
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames, Language language) {
+        
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
@@ -1167,18 +1269,18 @@ class SpeciesService extends AbstractObjectService  {
             if(!taxonService.validateHierarchy(taxonRegistryNames)) {
                 if(!speciesInstance.fetchTaxonomyRegistry()) {
                     result['success'] = false;
-                    result['msg'] = 'Mandatory level(s) is/are missing in the hierarchy';
+                    result['msg'] = messageSource.getMessage("info.message.missing", null, LCH.getLocale())
                     return result
                 }
                 result['success'] = false;
-                result['msg'] = 'Mandatory level(s) is/are missing in the hierarchy';
+                result['msg'] = messageSource.getMessage("info.message.missing", null, LCH.getLocale())
                 return result
             }
 
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
+                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
 
                 List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
                 def tD = tR.taxonDefinition
@@ -1192,7 +1294,7 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             //save taxonomy hierarchy
-            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser); 
+            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
             result.taxonRegistry = taxonRegistry;
@@ -1384,7 +1486,7 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         if(params.featureBy == "true" ) {
-            params.userGroup = observationService.getUserGroup(params)
+            params.userGroup = utilsService.getUserGroup(params)
             // def featureQuery = ", Featured feat "
             //query += featureQuery;
             //countQuery += featureQuery
@@ -1638,8 +1740,8 @@ class SpeciesService extends AbstractObjectService  {
             otherParams['resURLs'] = resURLs
             otherParams['spId'] = species.id
             //ADD FEED AND SEND
-            def feedInstance = activityFeedService.addActivityFeed(species, species, springSecurityService.currentUser, activityFeedService.SPECIES_UPDATED);
-            observationService.sendNotificationMail(activityFeedService.SPECIES_UPDATED, species, null, "", feedInstance, otherParams);
+            def feedInstance = activityFeedService.addActivityFeed(species, species, springSecurityService.currentUser, ActivityFeedService.SPECIES_UPDATED);
+            utilsService.sendNotificationMail(ActivityFeedService.SPECIES_UPDATED, species, null, "", feedInstance, otherParams);
         }
         return true
     }

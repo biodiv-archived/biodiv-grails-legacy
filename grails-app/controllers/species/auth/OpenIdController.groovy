@@ -29,6 +29,8 @@ import species.auth.SUser
 import species.auth.SUserRole
 import species.utils.Utils;
 import species.auth.CustomRegisterCommand;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
  * associated with an OpenID and also by associating a new OpenID to an existing account.
@@ -47,7 +49,7 @@ class OpenIdController {
 	def facebookAuthService
 	def SUserService
 	def portResolver
-
+	def messageSource
 	static defaultAction = 'auth'
 
 	def checkauth = { log.debug "inside check auth " + params }
@@ -83,7 +85,8 @@ class OpenIdController {
 					try {
 						targetUrl = URLEncoder.encode(targetUrl, "UTF-8");
 					} catch (UnsupportedEncodingException e) {
-						throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+						def msg = messageSource.getMessage("utf.shouldnt.support", null, RCU.getLocale(request))
+						throw new IllegalStateException(msg);
 					}
 				}
 				//params["spring-security-redirect"] = targetUrl
@@ -118,7 +121,7 @@ class OpenIdController {
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
 
 		if (!openId) {
-			flash.error = 'Sorry, an OpenID was not found'
+			flash.error = messageSource.getMessage("login.errors.openid.found", null, RCU.getLocale(request))
 			return
 		}
 
@@ -134,7 +137,7 @@ class OpenIdController {
 		String email = emailAttribute.values[0];
 
 		if (!email) {
-			flash.error = 'Sorry, an email id is necessary for an account'
+			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, RCU.getLocale(request))
 			return
 		}
 
@@ -168,7 +171,7 @@ class OpenIdController {
 
 		String openId = session[OIAFH.LAST_OPENID_USERNAME]
 		if (!openId) {
-			flash.error = 'Sorry, an OpenID was not found'
+			flash.error = messageSource.getMessage("login.errors.openid.found", null, RCU.getLocale(request))
 			return [command: command]
 		}
 
@@ -186,7 +189,7 @@ class OpenIdController {
 			registerAccountOpenId command.username, command.password, openId
 		}
 		catch (AuthenticationException e) {
-			flash.error = 'Sorry, no user was found with that username and password'
+			flash.error = messageSource.getMessage("login.errors.validate.msg", null, RCU.getLocale(request))
 			return [command: command, openId: openId]
 		}
 
@@ -200,20 +203,20 @@ class OpenIdController {
 		def token = session["LAST_FACEBOOK_USER"]
 
 		if (!token) {
-			flash.error = 'Sorry, problem fetching access token from facebook'
+			flash.error = messageSource.getMessage("login.errors.facebook.fetch.accessToken", null, RCU.getLocale(request))
 			return
 		}
 
 		log.debug "Processing facebook registration in createAccount"
-		FacebookTemplate facebook = new FacebookTemplate(token.accessToken);
-		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken, facebook.getOAuth2Version()));
+		FacebookTemplate facebook = new FacebookTemplate(token.accessToken.accessToken);
+		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
 		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
 
 		//TODO: if there are multiple email accounts available choose among them
 		String email = fbProfile.email;
 
 		if (!email) {
-			flash.error = 'Sorry, an email id is necessary for an account'
+			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, RCU.getLocale(request))
 			return
 		}
 

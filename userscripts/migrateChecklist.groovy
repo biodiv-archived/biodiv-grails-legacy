@@ -61,4 +61,8 @@ def fixSpeciesCount() {
     }
 }
 
-fixSpeciesCount();
+//fixSpeciesCount();
+
+updateLicenseToChecklistObservations() {
+
+}

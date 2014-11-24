@@ -10,7 +10,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils;
 import species.auth.SUser;
 
 import grails.plugin.springsecurity.annotation.Secured;
-
+ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 @Secured(['ROLE_ADMIN'])
 class BiodivAdminController {
 
@@ -22,11 +22,15 @@ class BiodivAdminController {
     def observationsSearchService;
     def SUserSearchService;
     def documentSearchService;
+    def userGroupSearchService;
     def namesLoaderService;
     def namesIndexerService;
     def groupHandlerService;
     def sessionFactory;
     def externalLinksService;
+    def biodivSearchService;
+    def messageSource;
+    def msg;
 
     /**
      * 
@@ -40,7 +44,7 @@ class BiodivAdminController {
     def setup = {
         try {
             setupService.setupDefs();
-            flash.message = "Successfully loaded all definitions"
+            flash.message = messageSource.getMessage("default.success.loaded", null, RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -52,10 +56,10 @@ class BiodivAdminController {
         int noOfInsertions = 0;
         try {
             noOfInsertions = speciesUploadService.loadData();
-            flash.message = "Added ${noOfInsertions} records"
+            flash.message = messageSource.getMessage("default.addNo.records", [noOfInsertions] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
-            flash.message = "Inserted ${noOfInsertions} records. Error while doing so ${e.getMessage()}"
+            flash.message = messageSource.getMessage("default.insert.record.error", [noOfInsertions,e.getMessage()] as Object[], RCU.getLocale(request))
         }
         redirect(action: "index")
     }
@@ -63,10 +67,10 @@ class BiodivAdminController {
     def loadNames = {
         try {
             taxonService.loadTaxon(true);
-            flash.message = "Finished loading names"
+            flash.message = messageSource.getMessage("default.admin.finished.loading", null, RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
-            flash.message = "Error ${e.getMessage()}"
+            flash.message = messageSource.getMessage("default.admin.error", [e.getMessage()] as Object[], RCU.getLocale(request))
         }
 
         redirect (action:"index");
@@ -76,7 +80,7 @@ class BiodivAdminController {
         try {
             log.debug "Syncing names into recommendations"
             namesLoaderService.syncNamesAndRecos(false);
-            flash.message = "Successfully loaded all names into recommendations"
+            flash.message = messageSource.getMessage("default.admin.success.loaded.name", null, RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -87,10 +91,17 @@ class BiodivAdminController {
 
     def reloadSpeciesSearchIndex = {
         try {
-            //speciesSearchService.deleteIndex();
+            if(params.deleteIndex)
+                speciesSearchService.deleteIndex();
+
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                speciesSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             speciesSearchService.publishSearchIndex();
             speciesSearchService.optimize();
-            flash.message = "Successfully created species search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['species'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -100,10 +111,16 @@ class BiodivAdminController {
 
     def reloadObservationsSearchIndex = {
         try {
-            //observationsSearchService.deleteIndex();
+            if(params.deleteIndex)
+                observationsSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                observationsSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             observationsSearchService.publishSearchIndex();
             observationsSearchService.optimize();
-            flash.message = "Successfully created observations search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['observations'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -113,10 +130,16 @@ class BiodivAdminController {
 
     def reloadUsersSearchIndex = {
         try {
-            //SUserSearchService.deleteIndex();
+            if(params.deleteIndex)
+                SUserSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                SUserSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             SUserSearchService.publishSearchIndex();
             SUserSearchService.optimize();
-            flash.message = "Successfully created users search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['users'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -126,10 +149,35 @@ class BiodivAdminController {
 
     def reloadDocumentSearchIndex = {
         try {
-            //documentSearchService.deleteIndex();
+            if(params.deleteIndex)
+                documentSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                documentSearchService.INDEX_DOCS = indexDocs
+            }
+ 
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
-            flash.message = "Successfully created documents search index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], RCU.getLocale(request))
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
+
+    def reloadUserGroupSearchIndex = {
+        try {
+            if(params.deleteIndex)
+                userGroupsSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                userGroupSearchService.INDEX_DOCS = indexDocs
+            }
+ 
+            userGroupSearchService.publishSearchIndex();
+            userGroupSearchService.optimize();
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['user group'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -140,7 +188,7 @@ class BiodivAdminController {
     def reloadNamesIndex = {
         try {
             namesIndexerService.rebuild();
-            flash.message = "Successfully created names index"
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['names'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -152,7 +200,7 @@ class BiodivAdminController {
         int noOfUpdations = 0;
         try {
             noOfUpdations = groupHandlerService.updateGroups();
-            flash.message = "Successfully updated group associations for taxonConcepts ${noOfUpdations}"
+            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -163,7 +211,7 @@ class BiodivAdminController {
     def updateExternalLinks = {
         try {
             int noOfUpdations = externalLinksService.updateExternalLinks();
-            flash.message = "Successfully updated externalLinks for taxonConcepts ${noOfUpdations}"
+            flash.message = messageSource.getMessage("default.admin.success.updated.group", ['externalLinks',noOfUpdations] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -174,7 +222,7 @@ class BiodivAdminController {
     def recomputeInfoRichness = {
         try {
             speciesService.computeInfoRichness();
-            flash.message = "Successfully updated species information richness"
+            flash.message = messageSource.getMessage("default.admin.success.updated.richness", null, RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
@@ -254,5 +302,23 @@ def user = {
     log.debug actionId
     render (template:"/admin/user/$actionId");
 }
+
+    def reloadBiodivSearchIndex = {
+        try {
+            if(params.deleteIndex) 
+                biodivSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                biodivSearchService.INDEX_DOCS = indexDocs
+            }
+            biodivSearchService.publishSearchIndex();
+            biodivSearchService.optimize();
+            flash.message = "Successfully created biodiv search index"
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
 
 }

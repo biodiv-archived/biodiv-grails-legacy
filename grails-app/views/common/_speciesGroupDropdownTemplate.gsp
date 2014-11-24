@@ -4,7 +4,7 @@
 <%@page import="species.Habitat"%>
 <div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}" style="clear:both;">
     <label for="group"><g:message
-        code="observation.group.label" default="Group" />
+        code="observation.group.label" default="${g.message(code:'default.group.label')}" />
     </label> 
 
     <div class="help-inline control-label">
@@ -30,7 +30,7 @@
                         class="group_icon species_groups_sprites active ${SpeciesGroup.findByName('All').iconClass()}"
                     title="${SpeciesGroup.findByName('All').name}"></span>
             <!--img src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/-->
-            <span class="display_value">Select group</span>
+            <span class="display_value"><g:message code="default.select.group.label" /> </span>
             <b class="caret"></b>
         </div>
             <ul class="group_options dropdown-menu">

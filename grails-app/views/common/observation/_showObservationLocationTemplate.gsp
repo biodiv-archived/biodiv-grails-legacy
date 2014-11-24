@@ -1,14 +1,14 @@
 <%@ page import="species.utils.Utils"%>
 
 <div class="sidebar_section">
-    <h5>Species Distribution</h5>
+    <h5><g:message code="default.species.distribution.label" /></h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
-    <h5>Location Information</h5>
+    <h5><g:message code="default.location.info.label" /></h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
             <g:if test="${observationInstance.geoPrivacy}">
-            	Geoprivacy enabled
+            	<g:message code="default.geoprivacy.enabled.label" />
             </g:if>
             <g:else>
                 <g:if test="${observationInstance.placeName != ''}">
@@ -36,9 +36,12 @@
                 longitude = observationInstance.longitude + geoPrivacyAdjustment
 
                 if(observationInstance?.topology){ 
-                areas = Utils.GeometryAsWKT(observationInstance?.topology)
-                } else if(params.areas) {
-                areas = params.areas
+					if(observationInstance.isChecklist)
+	                    areas = Utils.GeometryAsWKT(observationInstance?.topology)
+                    else
+						areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
+			    } else if(params.areas) {
+                	areas = params.areas
                 }
 
                 if(!latitude && params.latitude) latitude = params.latitude
@@ -65,22 +68,22 @@
 
 <g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
     <div class="sidebar_section tile temporalDist">
-        <h5>Temporal Distribution</h5>
+        <h5><g:message code="default.temporal.distribution.label" /></h5>
         <div id="temporalDist" style="height:108px;">
         </div>
         <ul>
-            <li>Jan</li>
-            <li>Feb</li>
-            <li>Mar</li>
-            <li>Apr</li>
-            <li>May</li>
-            <li>Jun</li>
-            <li>Jul</li>
-            <li>Aug</li>
-            <li>Sep</li>
-            <li>Oct</li>
-            <li>Nov</li>
-            <li>Dec</li>
+            <li><g:message code="default.month.jan" /></li>
+            <li><g:message code="default.month.feb" /></li>
+            <li><g:message code="default.month.mar" /></li>
+            <li><g:message code="default.month.apr" /></li>
+            <li><g:message code="default.month.may" /></li>
+            <li><g:message code="default.month.jun" /></li>
+            <li><g:message code="default.month.jul" /></li>
+            <li><g:message code="default.month.aug" /></li>
+            <li><g:message code="default.month.sep" /></li>
+            <li><g:message code="default.month.oct" /></li>
+            <li><g:message code="default.month.nov" /></li>
+            <li><g:message code="default.month.dec" /></li>
         </ul>
     </div>
 </g:if>
@@ -142,7 +145,7 @@
             });
 
             if(${observationInstance.geoPrivacy}){
-                icon = (${observationInstance.isChecklist})?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
+                icon = (${observationInstance.isChecklist})?mapLocationPicker.geoPrivacyChecklistIcon:mapLocationPicker.geoPrivacyPointIcon;
             } else {
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
             }

@@ -3,11 +3,14 @@
 		def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
 		def speciesLink = " "
+        def see_checklists=g.message(code:"button.see.checklist")
+        def sourcechecklists=g.message(code:"showspeciesnametemp.title.source")
+        def see_species=g.message(code:"button.see.species")
 		if(speciesId && !isHeading){
-			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See species page" + "</a>"
+			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_species+"</a>"
 		} 
 		if(observationInstance.id != observationInstance.sourceId && !isHeading){
-			speciesLink += '<a class="species-page-link" title="source checklist" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See checklist" + "</a>"
+			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_checklists+"</a>"
 		}
 	%>
 	<g:set var="speciesLinkHtml" value="${speciesLink.replaceAll('"','\\\\"').encodeAsRaw()}" />
@@ -22,8 +25,8 @@
 	<g:if test="${sName == 'Unknown'}">
 		<div class="sci_name ellipsis" title="${sNameTitle}">
 			${sName} <a
-				href="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress) }">Help
-				identify</a>
+				href="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress) }"><g:message code="link.help.identify" />
+				</a>
 		</div>
 	</g:if>
 	<g:elseif test="${isListView}">

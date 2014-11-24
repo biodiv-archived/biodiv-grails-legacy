@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<g:set var="title" value="Register"/>
+<g:set var="title" value="${g.message(code:'title.value.register')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 </title>
 
@@ -45,7 +45,7 @@
 				<g:else>
 
 					<div class="control-group"
-						style="clear: both; float: left; line-height: 40px;">Using:</div>
+						style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
 					<div class="control_group">
 						<auth:externalAuthProviders
 							model='["openidIdentifier":openidIdentifier]' />
@@ -54,8 +54,8 @@
 						action="${uGroup.createLink(controller:'register', action:'register', userGroupWebaddress:params.webaddress)}"
 						name='registerForm' method="POST" class="form-horizontal">
 						<div class="control-group"
-							style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
-							register here:</div>
+							style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="loginformtemplate.or" />,
+							<g:message code="default.register.here.label" /> </div>
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'email', 'error')}">
 							<label class="control-label" for="email"><g:message
@@ -64,7 +64,7 @@
 								<input
 									class="input-large focused ${(command.openId)?'readonly':''} "
 									id="email" type="text" value="${command.email}" name="email"
-									placeholder="Enter your email id..."
+									placeholder="${g.message(code:'placeholder.enter.emailid')}"
 									${(command.openId)?'readonly':''}>
 
 								<g:hasErrors bean="${command}" field="email">
@@ -80,11 +80,11 @@
 							<div
 								class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 								<label class="control-label" for="password"><g:message
-										code='user.password.label' default='Password *' /> </label>
+										code='user.password.label' default='${g.message(code:"register.password.label")}' /> </label>
 								<div class="controls">
 									<input class="input-large" id="password" type="password"
 										value="${command.password}" name="password"
-										placeholder="Enter your password...">
+										placeholder="${g.message(code:'placeholder.enter.password')}">
 
 									<g:hasErrors bean="${command}" field="password">
 										<div class="help-inline">
@@ -96,11 +96,11 @@
 							<div
 								class="control-group ${hasErrors(bean: command, field: 'password2', 'error')}">
 								<label class="control-label" for="password2"><g:message
-										code='user.password2.label' default='Password (again)*' /> </label>
+										code='user.password2.label' default='${g.message(code:"register.password.again.label")}' /> </label>
 								<div class="controls">
 									<input class="input-large" id="password2" type="password"
 										value="${command.password2}" name="password2"
-										placeholder="Enter your password again...">
+										placeholder="${g.message(code:'register.placeholder.enter.pwdagain')}">
 
 									<g:hasErrors bean="${command}" field="password2">
 										<div class="help-inline">
@@ -116,11 +116,11 @@
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'name', 'error')}">
 							<label class="control-label" for="name"><g:message
-									code='user.name.label' default='Name' /> </label>
+									code='user.name.label' default='${g.message(code:"default.name.label")}' /> </label>
 							<div class="controls">
 								<input class="input-large" id="name" type="text"
 									value="${command.name}" name="name"
-									placeholder="Enter your name...">
+									placeholder="${g.message(code:'register.placeholder.enter.name')}">
 
 								<g:hasErrors bean="${command}" field="name">
 									<div class="help-inline">
@@ -134,11 +134,11 @@
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'location', 'error')}">
 							<label class="control-label" for="location"><g:message
-									code='user.location.label' default='Location' /> </label>
+									code='user.location.label' default='${g.message(code:"default.location.label")}' /> </label>
 							<div class="controls">
 								<input class="input-large" id="location" type="text"
 									value="${command.location}" name="location"
-									placeholder="Enter your location...">
+									placeholder="${g.message(code:'register.placeholder.enter.location')}">
 
 								<g:hasErrors bean="${command}" field="location">
 									<div class="help-inline">
@@ -159,7 +159,7 @@
 
 								<input class="input-large" id="captcha_response" type="text"
 									value="" name="captcha_response"
-									placeholder="Enter words as shown in box...">
+									placeholder="${g.message(code:'register.placeholder.enter.wordshown')}">
 
 								<g:hasErrors bean="${command}" field="captcha_response">
 									<div class="help-inline">
@@ -171,8 +171,8 @@
 						</div>
 
 						<div class="control-group">
-							<span class="policy-text"> By registering you agree to our
-								<a href="/terms">Terms and Conditions</a> on the use of our site
+							<span class="policy-text"> <g:message code="register.index.policy" />
+								<a href="/terms"><g:message code="link.terms.conditions" /></a><g:message code="register.index.use.of.site" /> 
 							</span>
 							<s2ui:submitButton elementId='createButton' form='registerForm'
 								messageCode='spring.security.ui.login.register'

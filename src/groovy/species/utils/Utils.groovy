@@ -40,8 +40,8 @@ class Utils {
 	private static final log = LogFactory.getLog(this);
 	private static final NamesParser namesParser = new NamesParser();
 	private static final Random FILE_NAME_GENEROTR = new Random();
-	private static final MIN_FLOAT = 0.2;
-	private static final MAX_FLOAT = 0.7;
+	private static final MIN_FLOAT = 0.02;
+	private static final MAX_FLOAT = 0.03;
 	
 	static boolean copy(File src, File dst) throws IOException {
 		try {
@@ -111,7 +111,7 @@ class Utils {
 	
 	static float getRandomFloat(){
 		def f = FILE_NAME_GENEROTR.nextFloat()
-		return (f < MIN_FLOAT) ? f + MIN_FLOAT : (f > MAX_FLOAT ? f - MAX_FLOAT + MIN_FLOAT : f)
+		return f*MAX_FLOAT + MIN_FLOAT
 	}
 	  
 	/**

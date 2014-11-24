@@ -1,5 +1,8 @@
 package species
 
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
+import org.springframework.web.servlet.support.RequestContextUtils;
+
 class CommentTagLib {
 	static namespace = "comment"
 	
@@ -25,12 +28,16 @@ class CommentTagLib {
 	
 	def showCommentWithReply = {attrs, body->
 		def model = attrs.model
+
+		def messageSource = grailsAttributes.messageSource
+		def locale = RequestContextUtils.getLocale(request)
 //		def showAlways = (model.showAlways != null)?model.showAlways:false
 //		 
 //		if(showAlways || model.feedInstance.showComment()){
 		model.commentInstance = commentService.getDomainObject( model.feedInstance.activityHolderType, model.feedInstance.activityHolderId)
 		//this is for checklist row and species field comment
-		model.commentContext = activityFeedService.COMMENT_ADDED  + activityFeedService.getCommentContext(model.commentInstance, params)
+		//model.commentContext = activityFeedService.COMMENT_ADDED  + activityFeedService.getCommentContext(model.commentInstance, params)
+		model.commentContext = messageSource.getMessage('added.a.comment', null,locale) + activityFeedService.getCommentContext(model.commentInstance, params)
 		out << render(template:"/common/comment/showCommentWithReplyTemplate", model:attrs.model);
 //		}
 	}

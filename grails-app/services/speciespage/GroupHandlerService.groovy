@@ -19,6 +19,7 @@ class GroupHandlerService {
 
 	def grailsApplication
 	def sessionFactory
+	def utilsService
 
 	static int BATCH_SIZE = 20;
 

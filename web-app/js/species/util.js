@@ -13,9 +13,9 @@ $(function() {
 	$(spt).each(function() {
 		var addr = $(this).text().replace(at, "@").replace(dot, ".");
 		$(this).after(
-				'<a href="mailto:' + addr + '" title="Send an email">' + addr
+				'<a href="mailto:' + addr + '" title=' + window.i8ln.species.util.sem + '>' + addr
 						+ '</a>').hover(function() {
-			window.status = "Send an email!";
+			window.status = window.i8ln.species.util.sem;
 		}, function() {
 			window.status = "";
 		});
@@ -171,3 +171,41 @@ function getParameterByName(name) {
         results = regex.exec(location.search);
     return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+
+
+function setLanguage(language){
+    var s = window.location.search;
+    var lang_key = "lang=";
+    var new_url;
+    s = s.slice(1);
+    if(!s){
+        s = lang_key + language;
+        new_url = window.location.href + "?"+s;
+    }
+    else{
+        var params = s.split("&");
+        var flag, i;
+        if(params) {
+            for(i=0; i<params.length; i++){
+                if(params[i].indexOf(lang_key) == 0){
+                    flag = true;
+                    break;
+                }
+                else{
+                    flag = false;
+                }
+            }
+
+            if(flag){
+                params[i] = lang_key + language;
+                s = params.join("&");
+            }
+            else{
+                s += "&" + lang_key + language;
+            }
+        }
+        new_url = window.location.href.replace(window.location.search, "?"+s);
+    }
+    window.location.href = new_url;
+}
+

@@ -27,7 +27,7 @@
         </g:if>
         <g:else>
             <div class="alert alert-info">
-                No data!! 
+               <g:message code="msg.no.data" />!! 
             </div>
         </g:else>
 		

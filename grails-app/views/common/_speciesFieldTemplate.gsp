@@ -6,7 +6,12 @@
     </g:if>
 </s:isSpeciesFieldContributor>
 
-<div class="speciesField ${speciesFieldInstance.description?'':'dummy hide'}" data-name="speciesField" data-act ="${speciesFieldInstance.description?'edit':'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
+<g:if test="${speciesFieldInstance.language.id != userLanguage?.id}">
+<div class="alert alert-info"><g:message code="default.content.msg" />  <a href="javascript:void(0);" class="clickcontent btn btn-mini" data-target="clickcontent_${speciesFieldInstance.language.id}">${speciesFieldInstance.language.threeLetterCode?.toUpperCase()}</a></div>
+</g:if>
+
+
+<div class="speciesField ${(speciesFieldInstance.description)?'':'dummy hide'} ${speciesFieldInstance.language.id == userLanguage?.id ?:'hide clickcontent_'+speciesFieldInstance.language.id}" data-name="speciesField" data-act ="${speciesFieldInstance.description ? (speciesFieldInstance.language.id == userLanguage.id ? 'edit':''):'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
     <g:if test="${isSpeciesContributor}">
     <!--a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn" onclick='getSpeciesFieldMedia("${speciesInstance?.id}","${speciesFieldInstance.id?:speciesFieldInstance.field.id}", "fromSingleSpeciesField","${createLink(controller:'species',  action:'getSpeciesFieldMedia')}" )'>Add Media</a-->
     </g:if>
@@ -82,36 +87,19 @@
             </g:if>
             <!-- content -->
             <textarea id="description_${speciesFieldInstance.id?speciesFieldInstance.id:'f'+speciesFieldInstance.field.id}" name="description" 
-                class="${isSpeciesFieldContributor?'ck_desc':''}"
+                class="${(isSpeciesFieldContributor && speciesFieldInstance.language.id == userLanguage?.id)?'ck_desc':''}"
                 data-pk="${speciesFieldInstance.id}"
                 data-type="ckeditor"
                 data-url="${uGroup.createLink(controller:'species', action:'update') }"
                 data-name="description" 
                 placeholder="Write a small descripiton about the field." style="display:none;">
-                <g:each in="${speciesFieldInstance?.description?.split('\n')}"
-                var="para">
-                <g:if test="${para}">           
-                <p>
-                ${raw(para.trim())} 
-                </p>
-                </g:if>        
-
-                </g:each>      
+                ${raw(speciesFieldInstance?.description)}
 
             </textarea>        
 
-            <div class="description" >
-    <g:each in="${speciesFieldInstance?.description?.split('\n')}"
-    var="para">
-    <g:if test="${para}">
-    <p>
-    ${raw(para.trim())}
-    </p>
-    </g:if>
-
-    </g:each>
-
-</div>
+            <div class="description">
+                ${raw(speciesFieldInstance?.description)}
+            </div>
 <!-- description -->
 <g:if
 test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Distribution Geographic Entity') && speciesInstance.globalDistributionEntities.size()>0}">

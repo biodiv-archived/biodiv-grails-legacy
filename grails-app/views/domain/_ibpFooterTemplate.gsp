@@ -7,14 +7,14 @@
 				<li
 					class=" nav-header bold${(params.controller == 'species')?' active':''}"><a
 					href="${uGroup.createLink(controller:'species', action:'list')}"
-					title="Species">All Species</a>
+					title="Species"><g:message code="link.all.species" /></a>
 				</li>
 				<li
 					class="nav-header bold ${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
-					href="${ '/map'}" title="Maps">All Maps</a></li>
+					href="${ '/map'}" title="Maps"><g:message code="link.all.maps" /></a></li>
 				<li
 					class=" nav-header bold${(params.controller == 'checklist')?' active':''}"><a
-					href="${uGroup.createLink(controller:'checklist', action:'list')}" title="Checklists">All Checklists</a></li>
+					href="${uGroup.createLink(controller:'checklist', action:'list')}" title="Checklists"><g:message code="link.all.checklists" /> </a></li>
 				<!-- li
 					class="nav-header bold ${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
 					href="${ uGroup.createLink(controller:"userGroup", "action":"list")}"
@@ -25,46 +25,46 @@
 		</div>
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/theportal'>The Portal</a></li>
-				<li><a href="${ '/biodiversity_in_india'}">Biodiversity in India</a>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/theportal'><g:message code="link.the.portal" /></a></li>
+				<li><a href="${ '/biodiversity_in_india'}"><g:message code="link.biodiversity.india" /></a>
 				</li>
-				<li><a href="${ '/about/whats-new'}">What's new?</a></li>
-				<li><a href="${ '/about/technology'}">Technology</a></li>
-				<li><a href="${ '/help/faqs'}">FAQ</a></li>
+				<li><a href="${ '/about/whats-new'}"><g:message code="link.what.new" /></a></li>
+				<li><a href="${ '/about/technology'}"><g:message code="link.technology" /></a></li>
+				<li><a href="${ '/help/faqs'}"><g:message code="link.faq" /></a></li>
 
 			</ul>
 		</div>
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/people'>People</a></li>
-				<li><a href="${ '/people/partners'}">Partners</a></li>
-				<li><a href="${ '/people/donors'}">Donors</a></li>
-				<li><a href="${ '/people/fraternity'}">Fraternity</a></li>
-				<li><a href="${ '/people/team'}">Team</a></li>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/people'><g:message code="link.people" /></a></li>
+				<li><a href="${ '/people/partners'}"><g:message code="link.partners" /></a></li>
+				<li><a href="${ '/people/donors'}"><g:message code="link.donors" /></a></li>
+				<li><a href="${ '/people/fraternity'}"><g:message code="link.fraternity" /></a></li>
+				<li><a href="${ '/people/team'}"><g:message code="link.team" /></a></li>
 			</ul>
 		</div>
 
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/policy'>Policy</a>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/policy'><g:message code="link.policy" /></a>
 				</li>
-				<li><a href="${ '/policy/data_sharing'}">Data Sharing</a>
+				<li><a href="${ '/policy/data_sharing'}"><g:message code="link.data.sharing" /></a>
 				</li>
-				<li><a href="${ '/licenses'}">Licenses</a>
+				<li><a href="${ '/licenses'}"><g:message code="default.licenses.label" /></a>
 				</li>
-				<li><a href="${ '/terms'}">Terms & Conditions</a>
+				<li><a href="${ '/terms'}"><g:message code="link.terms.conditions" /></a>
 				</li>
 
 			</ul>
 		</div>
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;">Others</li>
-				<li><a href="${ '/sitemap'}">Sitemap</a>
+				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
+				<li><a href="${ '/sitemap'}"><g:message code="link.sitemap" /></a>
 				</li>
-				<li><a href="${ '/feedback_form'}">Feedback</a>
+				<li><a href="${ '/feedback_form'}"><g:message code="link.feedbak" /></a>
 				</li>
-				<li><a href="${ '/contact'}">Contact Us</a>
+				<li><a href="${ '/contact'}"><g:message code="link.contact.us" /></a>
 				</li>
 
 			</ul>
@@ -75,8 +75,10 @@
             </div>
 <div class="powered" style="text-align:center;">
 	<p> <a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}"><img src="${resource(dir:'images',file:'facebook.png', absolute:true)}"></a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}"><img src="${resource(dir:'images',file:'twitter.png', absolute:true)}"></a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}"><img src="${resource(dir:'images',file:'google_plus.png', absolute:true)}"></a><br />
-Best supported on Google Chrome, Firefox 3.0+, Internet Explorer 8.0+, Safari 4.0+, Opera 10+.<br />
-Powered by the open source <a href="https://github.com/strandls/biodiv" target="_blank">Biodiversity Informatics Platform.</a></p>
+<g:message code="text.supported.on" /><br />
+<g:message code="text.powered.by" /> <a href="https://github.com/strandls/biodiv" target="_blank"><g:message code="link.informatics.platform" /></a>
+<g:message code="text.technology.partner" /> <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
+</p>
 	</div>
 </div>
 <r:script>
@@ -149,7 +151,7 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                                                         });
                                                 } else{
                                                         var redirectTarget = "${targetUrl?'spring-security-redirect='+targetUrl:''}";
-                                                        window.location = "${uGroup.createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
+                                                        window.location = "${uGroup.createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+'&'+redirectTarget
                                                 }
                                         } else {
                                                 alert("Failed to connect to Facebook");

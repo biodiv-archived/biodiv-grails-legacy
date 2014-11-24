@@ -9,6 +9,7 @@ import groovy.sql.Sql;
 import java.text.SimpleDateFormat
 import species.Habitat
 import species.Language;
+import species.License;
 import species.Resource;
 import species.Resource.ResourceType;
 import species.auth.SUser;
@@ -27,6 +28,7 @@ import species.Species;
 class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
+    def utilsService;
 	def commentService;
 	def springSecurityService;
     def resourceService;
@@ -80,10 +82,15 @@ class Observation extends Metadata implements Taggable, Rateable {
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
     
+    // Language
+    Language language;
+
+    License license;
+
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
-
-	static constraints = {
+ 
+ 	static constraints = {
 		notes nullable:true
 		searchText nullable:true
 		maxVotedReco nullable:true
@@ -96,24 +103,26 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
+		language nullable:false
         featureCount nullable:false
 		latitude nullable: false
 		longitude nullable:false
 		topology nullable:false
 		fromDate nullable:false
 		placeName blank:false
+        license nullable:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
 	}
 
 	static mapping = {
-		version : false;
+		//version false
 		notes type:'text'
 		searchText type:'text'
 		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
-	}
+	 }
 
 	/**
 	 * TODO: return resources in rating order and choose first
@@ -292,7 +301,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	//XXX: comment this method before checklist migration
 	def beforeUpdate(){
-		if(isDirty() && !isDirty('visitCount')){
+		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
 			updateIsShowable()
 			
 			if(isDirty('topology')){
@@ -303,7 +312,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def beforeInsert(){
-		updateIsShowable()
+        updateIsShowable()
 		updateLatLong()
 	}
 	
@@ -401,15 +410,14 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def Map fetchExportableValue(SUser reqUser=null){
 		Map res = [:]
-		
+		res[ObvUtilService.OBSERVATION_ID] = "" + id
+		res[ObvUtilService.OBSERVATION_URL] = utilsService.createHardLink('observation', 'show', this.id)
 		res[ObvUtilService.IMAGE_PATH] = fetchImageUrlList().join(", ")
 		
-		res[ObvUtilService.SPECIES_GROUP] = group.name
-		res[ObvUtilService.HABITAT] = habitat.name
-		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
 		
 		def snName = ""
 		def cnName = ""
+		def totalVotes, maxVotedRecoCount
 		if(maxVotedReco){
 			if(maxVotedReco.isScientificName){
 				snName = maxVotedReco.name
@@ -417,17 +425,29 @@ class Observation extends Metadata implements Taggable, Rateable {
 			}else{
 				cnName = maxVotedReco.name
 			}
+			totalVotes = RecommendationVote.countByObservation(this)
+			maxVotedRecoCount = RecommendationVote.findAllByRecommendationAndObservation(maxVotedReco, this).size()
 		}
-		res[ObvUtilService.CN] =cnName
-		res[ObvUtilService.SN] =snName
 		
-		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
+		res[ObvUtilService.SN] =snName
+		res[ObvUtilService.CN] =cnName
+		res[ObvUtilService.NUM_IDENTIFICATION_AGREEMENT] = maxVotedRecoCount ? "" + maxVotedRecoCount : "0"
+		res[ObvUtilService.NUM_IDENTIFICATION_DISAGREEMENT] = totalVotes ? "" + (totalVotes - maxVotedRecoCount) : "0"
+		res[ObvUtilService.HELP_IDENTIFY] = maxVotedReco ? "NO" : "YES"
+		
+		
+		res[ObvUtilService.SPECIES_GROUP] = group.name
+		res[ObvUtilService.HABITAT] = habitat.name
+		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
+		
+				
 		res[ObvUtilService.LOCATION] = placeName
 		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
 		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
 		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
-		res[ObvUtilService.NOTES] = notes
+		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
 		
+		res[ObvUtilService.NOTES] = notes
 		
 		//XXX: During download of large number of observation some time following exception coming
 		//an assertion failure occured (this may indicate a bug in Hibernate, but is more likely due to unsafe use of the session)
@@ -450,9 +470,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		//def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
 		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-		String base = config.speciesPortal.observations.serverURL
-		res[ObvUtilService.AUTHOR_URL] = ObvUtilService.createHardLink('user', 'show', author.id) 
 		res[ObvUtilService.AUTHOR_NAME] = author.name
+		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id) 
+		
+		res[ObvUtilService.CREATED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(createdOn)
+		res[ObvUtilService.UPDATED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(lastRevised)
+
 		return res 
 	}
 	
@@ -585,6 +608,13 @@ class Observation extends Metadata implements Taggable, Rateable {
             if(!sp.save(flush:true)){
                 sp.errors.allErrors.each { log.error it } 
             }
+        }
+    }
+
+    private deleteFromChecklist() {
+        if(id != sourceId) {
+            def ckl = Checklists.get(sourceId)
+            ckl.deleteObservation(this)
         }
     }
 }

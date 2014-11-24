@@ -5,7 +5,7 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<g:set var="title" value="Settings"/>
+<g:set var="title" value="${g.message(code:'ugroup.value.settings')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="userGroups_show" />
@@ -20,11 +20,11 @@
 		
 			<div class="super-section"><a 
 				href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}"> <i
-				class="icon-edit"></i>Edit Group </a></div>
+				class="icon-edit"></i><g:message code="button.edit.group" /> </a></div>
 			<div class="super-section" style="clear: both;">
 			
 				<div class="section" style="position: relative; overflow: visible;">
-					<h3>Display Settings</h3>
+					<h3><g:message code="usergroup.display.settings" /></h3>
 					<form class="form-horizontal"
 						action="${uGroup.createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"
 						id='groupSettingForm' name='groupSettingForm' method="POST">
@@ -33,7 +33,7 @@
 						<uGroup:showGeneralSettings model="['userGroupInstance':userGroupInstance]" />
 						
 						<div class="" style="margin-top: 20px; margin-bottom: 40px;">
-							<input type="submit" value="Update"
+							<input type="submit" value="${g.message(code:'suser.edit.update')}"
 								class="btn btn-primary" 
 								style="clear: both; float:right; border-radius: 5px" />
 							</div>

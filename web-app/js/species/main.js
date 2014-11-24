@@ -247,8 +247,8 @@ jQuery(document).ready(function($) {
             action = window.params.IBPDomainUrl+action;
         }
 
-        updateGallery(action, undefined, undefined, undefined, false,undefined,undefined,true);
-        return false;
+        //updateGallery(action, undefined, undefined, undefined, false,undefined,undefined,true);
+        //return false;
     });
 
     $("#searchToggle").click(function() {
@@ -256,4 +256,8 @@ jQuery(document).ready(function($) {
         $('#searchToggleBox').slideToggle();
     });
 
+    $('.clickcontent').click(function() {
+        var target = $(this).data('target');
+        $(this).parent().siblings('.'+target).toggle();
+    });
 });

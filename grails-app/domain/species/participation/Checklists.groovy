@@ -28,12 +28,13 @@ class Checklists extends Observation {
 	
 	def activityFeedService;
 	def obvUtilService;
+	def utilsService;
 	
 	String title;
 	int speciesCount = 0;
 	
 	//String attribution;
-	License license;
+	//License license;
 	
 	String refText;
 	String sourceText;
@@ -65,7 +66,7 @@ class Checklists extends Observation {
 		title nullable:false, blank:false;
 		speciesCount nullable:false;
 		rawChecklist nullable:true;
-		license  nullable:false, blank:false;
+		//license  nullable:false, blank:false;
 		//make this false after migration
 		columns nullable:false, blank:false;
 		
@@ -160,7 +161,7 @@ class Checklists extends Observation {
 		cl.userGroups.collect{ ug.add(it.name)}
 		metaDataList.add([keyPrefix + "userGroups" + SEPARATOR,  ug.join(", ")])
 		
-		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_URL + SEPARATOR, obvUtilService.createHardLink('user', 'show', cl.author.id)])
+		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_URL + SEPARATOR, utilsService.createHardLink('user', 'show', cl.author.id)])
 		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_NAME + SEPARATOR, cl.author.name])
 		
 		res[META_DATA] = metaDataList
@@ -216,5 +217,13 @@ class Checklists extends Observation {
         }
         return results
     }	
-   	
+   
+    def deleteObservation(obv) {
+        this.removeFromObservations(obv);
+        this.speciesCount -= 1;
+        if(!this.save(flush:true)){
+            this.errors.allErrors.each { log.error it } 
+        }
+        return
+    }
 }

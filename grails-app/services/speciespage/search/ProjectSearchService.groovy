@@ -21,27 +21,37 @@ import content.Project
 
 class ProjectSearchService extends AbstractSearchService {
 
+    static transactional = false
 	/**
 	 *
-	 */
-	def publishSearchIndex() {
-		log.info "Initializing publishing to projects search index"
-		
-		//TODO: change limit
-		int limit = Project.count()+1, offset = 0;
-		
-		def projects;
-		def startTime = System.currentTimeMillis()
-		while(true) {
-			projects = Project.list(max:limit, offset:offset);
-			if(!projects) break;
-			publishSearchIndex(projects, true);
-			projects.clear();
-			offset += limit;
-		}
-		
-		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
-	}
+     */
+    def publishSearchIndex() {
+        log.info "Initializing publishing to projects search index"
+
+        //TODO: change limit
+        int limit = BATCH_SIZE, offset = 0;
+        int noIndexed = 0;
+
+        def projects;
+        def startTime = System.currentTimeMillis()
+        INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Project.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            Project.withNewTransaction([readOnly:true]) { status ->
+                projects = Project.list(max:limit, offset:offset);
+                noIndexed += projects.size()
+                if(!projects) return;
+                publishSearchIndex(projects, true);
+                //projects.clear();
+                offset += limit;
+            }
+            if(!projects) return;
+            projects.clear();
+
+        }
+
+        log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
+    }
 
 	/**
 	 * 
@@ -66,6 +76,10 @@ class ProjectSearchService extends AbstractSearchService {
 				doc.addField(searchFieldsConfig.ID, proj.id.toString());
 				doc.addField(searchFieldsConfig.TITLE, proj.title);
 				doc.addField(searchFieldsConfig.GRANTEE_ORGANIZATION, proj.granteeOrganization);
+
+                doc.addField(searchFieldsConfig.UPLOADED_ON, proj.dateCreated);
+                doc.addField(searchFieldsConfig.UPDATED_ON, proj.lastUpdated);
+
 				
 				proj.locations.each { location ->
 					doc.addField(searchFieldsConfig.SITENAME, location.siteName);				

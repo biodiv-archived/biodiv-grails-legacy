@@ -7,6 +7,7 @@ import species.groups.UserGroup;
 
 import grails.converters.JSON;
 import java.util.concurrent.atomic.AtomicLong
+import org.springframework.context.i18n.LocaleContextHolder as LCH 
 
 class SecurityFilters {
 
@@ -25,6 +26,10 @@ class SecurityFilters {
 
                 grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
                 //println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
+
+                if(grailsApplication.config.speciesPortal.hideLanguages){
+                    LCH.setLocale(new Locale("en"))
+                }    
 
                 def appName = grailsApplication.metadata['app.name']
                 /*                if(params.ajax_login_error == "1") {
@@ -45,7 +50,7 @@ class SecurityFilters {
 
             after = { model ->
                 //setting user group and permission for view
-                if(model){
+                if(model!=null){
                     def userGroupInstance = model.userGroupInstance
                     def userGroup = model.userGroup
                     if(!userGroupInstance) {
@@ -71,6 +76,9 @@ class SecurityFilters {
                         def user = springSecurityService.getCurrentUser();
                         model.isExpertOrFounder = (user && (userGroupInstance.isExpert(user) || userGroupInstance.isFounder(user)))
                     }
+                    //passing locale Languages
+                    model.localeLanguages = grailsApplication.config.speciesPortal.localeLanguages
+                    model.hideLanguages = grailsApplication.config.speciesPortal.hideLanguages
                 }
                 log.debug "after rendering"
             }
@@ -102,7 +110,7 @@ class SecurityFilters {
                     "'$request.forwardURI', " +
                     " 'at ${new Date()}', 'Ajax: $request.xhr', 'controller: $controllerName', " +
                     "'action: $actionName', 'params: ${params}', " +
-                    "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"'"
+                    "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"',"+
                     "'${end - start}ms'"
 
                     if (log.traceEnabled) {
@@ -125,7 +133,7 @@ class SecurityFilters {
                         log.error "$msg \n\texception: $e.message", e
                     }
                     else {
-                        //log.info msg
+                        log.info msg
                     }
             }
 

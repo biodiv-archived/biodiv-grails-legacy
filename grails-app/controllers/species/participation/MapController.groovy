@@ -7,13 +7,13 @@ import java.util.List;
 class MapController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	def mapService;
 
     def index = {
         redirect(action: "show", params: params)
     }
 
     def show = {
-        render (view:'show');
     }
 /*
     def getLinkTableEntries = {
@@ -287,4 +287,41 @@ function GetTableColsOfType($tablename, $table_type, $col_type, $layer_id=NULL) 
     return $table_info;
 }
 */
+
+
+public def getLayerColumns(){
+    render mapService.getLayerColumns(params, response);
+}
+
+
+public def getSummaryColumns(){
+    render mapService.getSummaryColumns(params, response);
+}
+
+public def getLayersAccessStatus(){
+    render mapService.getLayersAccessStatus(params, response);    
+}
+
+
+public def getLayerLinkTables(){
+    render mapService.getLayerLinkTables(params, response);    
+}
+
+
+public def getLayersByTheme(){
+    render mapService.getLayersByTheme(params, response);    
+}
+
+public def getLayerSummary(){
+    render mapService.getLayerSummary(params, response);    
+}
+
+public def getLayerDetails(){
+    render mapService.getLayerDetails(params, response);    
+}
+
+public def getLayerAttribution(){
+    render mapService.getLayerAttribution(params, response);
+}
+
 }

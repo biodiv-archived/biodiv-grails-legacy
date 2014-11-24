@@ -10,7 +10,7 @@ import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.util.NamedList;
 import species.utils.Utils;
-
+import species.AbstractObjectService;
 
 
 import content.eml.Document;
@@ -18,7 +18,7 @@ import content.eml.UFile;
 import content.eml.DocumentService;
 
 
-class ProjectService {
+class ProjectService extends AbstractObjectService {
 
 	static transactional = false
 	def grailsApplication;

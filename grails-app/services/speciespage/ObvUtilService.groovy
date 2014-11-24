@@ -54,6 +54,13 @@ class ObvUtilService {
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
 	static final String AUTHOR_NAME   = "user name"
+	static final String OBSERVATION_ID   = "id"
+	static final String CREATED_ON   = "created on"
+	static final String UPDATED_ON   = "updated on"
+	static final String OBSERVATION_URL   = "observation url"
+	static final String NUM_IDENTIFICATION_AGREEMENT   = "no. of identification agreements"
+	static final String NUM_IDENTIFICATION_DISAGREEMENT   = "no. of identification disagreements"
+	
 	//task related
 	static final String  SUCCESS = "Success";
 	static final String  FAILED = "Failed";
@@ -61,14 +68,14 @@ class ObvUtilService {
 	static final String  EXECUTING = "Executing";
 	
 	private static final int BATCH_SIZE = 50
-	
+
+    def utilsService
 	def userGroupService
 	def observationService
 	def springSecurityService
 	def grailsApplication
 	def activityFeedService
 	def observationsSearchService
-	def checklistUtilService
 	
 	
 	///////////////////////////////////////////////////////////////////////
@@ -84,7 +91,7 @@ class ObvUtilService {
 	
 	def export(params, dl){
 		log.debug(params)
-		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl).getAllResult()
+		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
 		log.debug " Obv total $observationInstanceList.size()" 
 		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}
@@ -210,7 +217,7 @@ class ObvUtilService {
 //							}
 							ExtendedData() {
 								Data(name:'Observation') {
-									value("${createHardLink('observation', 'show', obv.id)}")
+									value("${utilsService.createHardLink('observation', 'show', obv.id)}")
 									//value("${userGroupService.userGroupBasedLink(controller:'observation', action:'show', id:obv.id, 'userGroupWebaddress':params.webaddress, absolute:true) }")
 								}
 								Data(name:'Image') {
@@ -251,7 +258,7 @@ class ObvUtilService {
 									value(obv.author.name)
 								}
 								Data(name:'AuthorProfile') {
-									value("${createHardLink('user', 'show', obv.author.id)}")
+									value("${utilsService.createHardLink('user', 'show', obv.author.id)}")
 									//value("${userGroupService.userGroupBasedLink('controller':'SUser', action:'show', id:obv.author.id,  'userGroupWebaddress':params.webaddress, absolute:true)}")
 								}
 								Data(name:'UserGroups') {
@@ -294,10 +301,6 @@ class ObvUtilService {
 		File kmlFile = new File(downloadDir, "obv_" + new Date().getTime() + ".kml")
 		kmlFile <<  XmlUtil.serialize(books)
 		return kmlFile
-	}
-	
-	public static createHardLink(controller, action, id){
-		return "" + Utils.getIBPServerDomain() + "/" + controller + "/" + action + "/" + id 
 	}
 
 	////////////////////////////////// End export//////////////////////////////
@@ -346,7 +349,7 @@ class ObvUtilService {
 				uploadObservation(imageDir, m,resultObv)
 				i++
 				if(i > BATCH_SIZE){
-					checklistUtilService.cleanUpGorm(true)
+					utilsService.cleanUpGorm(true)
 					def obvs = resultObv.collect { Observation.read(it) }
 					try{
 						observationsSearchService.publishSearchIndex(obvs, true);
@@ -514,7 +517,7 @@ class ObvUtilService {
 						obvDir.mkdir();
 					}
 
-					File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.getName()));
+					File file = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.getName()));
 					file << f.bytes
 					ImageUtils.createScaledImages(file, obvDir);
 					resourcesInfo.put("file_" + index, file.getAbsolutePath().replace(rootDir, ""))
