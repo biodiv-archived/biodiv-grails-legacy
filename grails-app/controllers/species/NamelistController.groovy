@@ -84,6 +84,14 @@ class NamelistController {
                 res = namelistService.searchEOL(params.name, 'name');
             break
 
+            case "worms":
+                res = namelistService.searchWORMS(params.name, 'name'); 
+            break
+
+            default:
+                log.debug "INVALID EXTERNAL DATABASE"
+            break
+
         }
         
         //def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]

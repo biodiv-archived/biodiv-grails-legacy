@@ -34,7 +34,10 @@ class NamelistService {
 	
     private static final String EOL_SITE = 'http://eol.org'
     private static final String EOL_URI = '/api/search/1.0.json'
-	
+    
+    private static final String WORMS_SITE = 'http://www.marinespecies.org/'
+    private static final String WORMS_URI = 'aphia.php'
+
     private static final int BATCH_SIZE = 100
 	private static final log = LogFactory.getLog(this);
 
@@ -618,5 +621,32 @@ class NamelistService {
         }
         println "===========PARSED RESULT ======== " + finalResult
         return finalResult;
+    }
+
+
+    List searchWORMS(String input, String searchBy) {
+        //http://www.marinespecies.org/aphia.php?p=taxlist&tName=Solea solea
+        
+        def http = new HTTPBuilder()
+        println "========WORMS SITE===== " + WORMS_SITE
+        http.request( WORMS_SITE, GET, TEXT ) { req ->
+            if(searchBy == 'name') {
+                uri.path = WORMS_URI;
+            } else {
+                uri.path = WORMS_URI;
+            }
+            uri.query = [ p:'taxlist', tName:input]
+            headers.Accept = '*/*'
+
+            response.success = { resp, reader ->
+                assert resp.statusLine.statusCode == 200
+                println "Got response: ${resp.statusLine}"
+                println "Content-Type: ${resp.headers.'Content-Type'}"
+                def xmlText =  reader.text
+                println "========WORMS RESULT====== " + xmlText
+                //return responseFromEOLAsMap(xmlText, searchBy);
+            }
+            response.'404' = { println 'Not found' }
+        }
     }
 }
