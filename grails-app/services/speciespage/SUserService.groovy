@@ -221,8 +221,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
                 messagesourcearg[0] = domain;
 				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailSubject", messagesourcearg, LCH.getLocale())
 				def msgsourcearg = new Object[2];
-                msgsourcearg[1] = email;
-                msgsourcearg[2] = domain;
+                msgsourcearg[0] = user.email;
+                msgsourcearg[1] = domain;
 				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, LCH.getLocale())
 				if (bodyContent.contains('$')) {
 					bodyContent = evaluate(bodyContent, templateMap)
