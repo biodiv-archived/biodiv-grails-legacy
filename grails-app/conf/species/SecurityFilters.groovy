@@ -7,7 +7,8 @@ import species.groups.UserGroup;
 
 import grails.converters.JSON;
 import java.util.concurrent.atomic.AtomicLong
-import org.springframework.context.i18n.LocaleContextHolder as LCH 
+import org.springframework.context.i18n.LocaleContextHolder as LCH
+import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 
 class SecurityFilters {
 
@@ -26,9 +27,18 @@ class SecurityFilters {
 
                 grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
                 //println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
-
-                if(grailsApplication.config.speciesPortal.hideLanguages){
-                    LCH.setLocale(new Locale("en"))
+                def appectedLanguage = false;    
+                for ( localeLanguage in grailsApplication.config.speciesPortal.localeLanguages ) {                    
+                        if(localeLanguage.twoletter == LCH.getLocale().toString()){
+                           appectedLanguage = true;
+                        }
+                    }
+                    
+                if(grailsApplication.config.speciesPortal.hideLanguages || !appectedLanguage){
+                    Locale locale = new Locale("en");
+                    LCH.setLocale(locale);                        
+                    def localeResolver = RCU.getLocaleResolver(request); // returns a SessionLocaleResolver                   
+                    localeResolver.setLocale(request, response, locale); // set the locale, bound to the HttpSession                    
                 }    
 
                 def appName = grailsApplication.metadata['app.name']
@@ -79,6 +89,22 @@ class SecurityFilters {
                     //passing locale Languages
                     model.localeLanguages = grailsApplication.config.speciesPortal.localeLanguages
                     model.hideLanguages = grailsApplication.config.speciesPortal.hideLanguages
+
+                    // 
+                    def appectedLanguage = false;    
+                    for ( localeLanguage in grailsApplication.config.speciesPortal.localeLanguages ) {
+                        if(localeLanguage.twoletter == LCH.getLocale().toString()){
+                           appectedLanguage = true;
+                        }
+                    }                   
+                    if(grailsApplication.config.speciesPortal.hideLanguages || !appectedLanguage){
+                        Locale locale = new Locale("en");
+                        LCH.setLocale(locale)                        
+                        def localeResolver = RCU.getLocaleResolver(request); // returns a SessionLocaleResolver                        
+                        localeResolver.setLocale(request, response, locale); // set the locale, bound to the HttpSession                        
+                    }    
+
+
                 }
                 log.debug "after rendering"
             }
