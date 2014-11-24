@@ -197,7 +197,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					try {
 						mailService.sendMail {
 							to user.email
-				            if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+				            if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 	                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                             }
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
@@ -231,7 +231,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 					try {
 						mailService.sendMail {
 
-				            if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+				            if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
 	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
 				            }

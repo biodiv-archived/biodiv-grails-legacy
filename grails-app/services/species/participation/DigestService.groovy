@@ -344,7 +344,7 @@ log.debug resultSet
 
     def List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
-        if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+        if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
 
             result.each { user ->
