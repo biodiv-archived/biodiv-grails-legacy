@@ -33,7 +33,7 @@ class UtilsService {
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
-    static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+    //static final String SPECIES_AGREED_ON = "speciesAgreedOn";
     static final String SPECIES_NEW_COMMENT = "speciesNewComment";
     static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
     static final String OBSERVATION_FLAGGED = "observationFlagged";
@@ -367,7 +367,7 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-                case SPECIES_AGREED_ON:
+                case ActivityFeedService.SPECIES_AGREED_ON:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 mailSubject = messageSource.getMessage("mail.name.suggest", null, LCH.getLocale())
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
