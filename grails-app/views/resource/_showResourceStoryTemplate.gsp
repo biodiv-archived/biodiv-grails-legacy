@@ -38,7 +38,7 @@
                 <g:if test="${resourceInstance?.language?.id != userLanguage?.id}">
                 <%  
                 styleVar = "none"
-                clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+resourceInstance?.language?.name+'</a>';
+                clickcontentVar = '<a href="javascript:void(0);" class="clickcontent">Click to see the content of '+resourceInstance?.language?.threeLetterCode.toUpperCase()+'</a>';
                 %>
                 </g:if>
 
@@ -59,21 +59,38 @@
         <div class="prop" >
             <span class="name"><i class="icon-info-sign"></i><g:message code="default.belongs.to" /></span>
             <div class="value">
-                <g:each in="containers" var="container">
-                <g:link url="${uGroup.createLink(controller:container.class.simpleName.toLowerCase(), action:'show', id:container.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}" target="_blank">
-                ${raw(container.fetchSpeciesCall())}
+                <g:each in="${containers}" var="containerInstance">
+                <g:link url="${uGroup.createLink(controller:containerInstance.class.simpleName.toLowerCase(), action:'show', id:containerInstance.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}" target="_blank">
+                ${raw(containerInstance.fetchSpeciesCall())}
                 </g:link>
                 </g:each>
             </div>
         </div>
 
-        <div class="row observation_footer" style="margin-left:0px;">
-
-            <div class="story-footer" style="right:3px;">
-                <sUser:showUserTemplate
-                model="['userInstance':resourceInstance.uploader]" />
+        <div class="prop" >
+            <span class="name"><i class="icon-info-sign"></i><g:message code="default.contributors.label" /></span>
+            <div class="value">
+                <g:each in="${resourceInstance.contributors}" var="contributor">
+                ${contributor.name},
+                </g:each>
             </div>
         </div>
+
+        <g:if test="${resourceInstance?.licenses}">
+        <div class="prop">
+            <span class="name"><i class='icon-ok-sign'></i><g:message code="default.licenses.label" /></span>
+
+            <div class="value">
+                <g:each in="${resourceInstance?.licenses}" var="licenseInstance">
+                <img
+                src="${resource(dir:'images/license',file:licenseInstance.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+                title="${licenseInstance.name}" />
+                </g:each>
+            </div>
+        </div>
+        </g:if>
+
+
     </div>
 </div>
 

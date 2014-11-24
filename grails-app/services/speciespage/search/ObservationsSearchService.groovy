@@ -24,13 +24,16 @@ import species.TaxonomyDefinition
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.participation.Observation;
+import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
+import species.UtilsService
 
 class ObservationsSearchService extends AbstractSearchService {
 
+    static transactional = false
     def resourceSearchService;
 
     /**
@@ -47,14 +50,20 @@ class ObservationsSearchService extends AbstractSearchService {
         def observations;
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Observation.count()+1;
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
-            observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id']);
-            noIndexed += observations.size()
+            Observation.withNewTransaction([readOnly:true]) { status ->
+                observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id',readOnly:true]);
+                noIndexed += observations.size()
+                if(!observations) return;
+                publishSearchIndex(observations, true);
+                //observations.clear();
+                offset += limit;
+                cleanUpGorm()
+            }
+
             if(!observations) break;
-            publishSearchIndex(observations, true);
             observations.clear();
-            offset += limit;
-            cleanUpGorm()
         }
 
         log.info "Time taken to publish observations search index is ${System.currentTimeMillis()-startTime}(msec)";
@@ -90,11 +99,12 @@ class ObservationsSearchService extends AbstractSearchService {
         List docs = [];
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
+            doc.setDocumentBoost(1.5);
             doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+obv.id.toString());
             doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
             addNameToDoc(obv, doc);
 
-            doc.addField(searchFieldsConfig.TITLE, obv.fetchSpeciesCall());
+            //doc.addField(searchFieldsConfig.TITLE, obv.fetchSpeciesCall());
             //doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
             //doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
             doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name +" ### "+obv.author.email +" "+obv.author.username+" "+obv.author.id.toString());
@@ -105,7 +115,7 @@ class ObservationsSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
             doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
             doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
-            doc.addField(searchFieldsConfig.LICENSE, obv.license.name.value());
+            doc.addField(searchFieldsConfig.LICENSE, obv.license.name.name());
             if(obv.notes) {
                 doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
             }
@@ -149,7 +159,8 @@ class ObservationsSearchService extends AbstractSearchService {
                 doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
             }
 
-            def checklistObvs = addChecklistData(obv, doc)
+            def checklistObvs;
+            checklistObvs = addChecklistData(obv, doc)
             
             List resourceDocs = getResourcesDocs(obv);
 
@@ -168,14 +179,21 @@ class ObservationsSearchService extends AbstractSearchService {
     private void addNameToDoc(Observation obv, SolrInputDocument doc) {
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
-        def distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
-        //distRecoVotes = obv.maxVotedReco;
-        distRecoVotes.each { vote ->
-            doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
-            doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
-            if(vote.recommendation.taxonConcept)
-                doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
+
+        def recoVotes = obv.recommendationVote
+        def distRecoVotes;
+        if(recoVotes) {
+            //distRecoVotes = recoVotes.unique { it.recommendation };
+                distRecoVotes = obv.recommendationVote?.unique { it.recommendation };
+            //distRecoVotes = obv.maxVotedReco;
+            distRecoVotes.each { vote ->
+                doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
+                //doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name +" ### "+vote.author.email +" "+vote.author.username+" "+vote.author.id.toString());
+                if(vote.recommendation.taxonConcept)
+                    doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
+            }
         }
+        
     }
 
     /**
@@ -187,7 +205,7 @@ class ObservationsSearchService extends AbstractSearchService {
             def chk = obv 
 
             doc.addField(searchFieldsConfig.TITLE, chk.title);
-        doc.addField(searchFieldsConfig.LICENSE, chk.license.name.value());
+        doc.addField(searchFieldsConfig.LICENSE, chk.license.name.name());
         doc.removeField(searchFieldsConfig.UPLOADED_ON);
         doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate?:chk.createdOn);
         doc.addField(searchFieldsConfig.REFERENCE, chk.refText);

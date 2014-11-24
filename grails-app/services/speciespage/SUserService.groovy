@@ -195,6 +195,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				}
 
 					try {
+						def userLanguage = utilsService.getCurrentLanguage();
 						mailService.sendMail {
 							to user.email
 				            if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
@@ -203,7 +204,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
 							from grailsApplication.config.grails.mail.default.from
 							subject mailSubject
-							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+							body(view:"/emailtemplates/"+userLanguage.threeLetterCode+"/welcomeEmail", model:templateMap)
 						}
 						log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 					}catch(all)  {

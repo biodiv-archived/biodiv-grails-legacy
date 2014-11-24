@@ -14,7 +14,7 @@
                 <li class="thumbnail feedParentContext clearfix">
 
                 <g:set var="className" value="${org.hibernate.Hibernate.getClass(instance.instance).getSimpleName()}"/>
-
+                <b>${className}</b>
                 <g:if test="${className == Species.simpleName}">
                 <s:showSnippet model="['speciesInstance':instance.instance]" />
                     </g:if>
@@ -40,7 +40,6 @@
                     <g:else>
                     ${instance.instance} ${className}
                     </g:else>
-
                     </li>
                     </g:each>
                 </ul>

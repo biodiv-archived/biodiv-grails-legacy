@@ -21,30 +21,37 @@ import content.Project
 
 class ProjectSearchService extends AbstractSearchService {
 
+    static transactional = false
 	/**
 	 *
-	 */
-	def publishSearchIndex() {
-		log.info "Initializing publishing to projects search index"
-		
-		//TODO: change limit
-		int limit = BATCH_SIZE, offset = 0;
+     */
+    def publishSearchIndex() {
+        log.info "Initializing publishing to projects search index"
+
+        //TODO: change limit
+        int limit = BATCH_SIZE, offset = 0;
         int noIndexed = 0;
-		
-		def projects;
-		def startTime = System.currentTimeMillis()
+
+        def projects;
+        def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Project.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			projects = Project.list(max:limit, offset:offset);
-            noIndexed += projects.size()
-			if(!projects) break;
-			publishSearchIndex(projects, true);
-			projects.clear();
-			offset += limit;
-		}
-		
-		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
-	}
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            Project.withNewTransaction([readOnly:true]) { status ->
+                projects = Project.list(max:limit, offset:offset);
+                noIndexed += projects.size()
+                if(!projects) return;
+                publishSearchIndex(projects, true);
+                //projects.clear();
+                offset += limit;
+            }
+            if(!projects) return;
+            projects.clear();
+
+        }
+
+        log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
+    }
 
 	/**
 	 * 

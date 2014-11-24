@@ -421,6 +421,7 @@ speciesPortal {
         CONTEXT = 'context'
         CONTAINER = 'container'
         RESOURCETYPE = 'resourcetype'
+        USER = 'user'
 	}
 
 	nameSearchFields {
@@ -450,7 +451,7 @@ speciesPortal {
 		driver   = "org.postgresql.Driver"
 	}
 
-    localeLanguages = [['name':'English','code':'en']]
+    localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
 
 }

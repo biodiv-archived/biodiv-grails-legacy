@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class DocumentSearchService extends AbstractSearchService {
     
+    static transactional = false
 	
     /**
 	 *
@@ -34,17 +35,22 @@ class DocumentSearchService extends AbstractSearchService {
 		def documents;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Document.count()+1;
-		while(noIndexed < INDEX_DOCS) {
-			documents = Document.list(max:limit, offset:offset);
-            noIndexed += documents.size();
-			if(!documents) break;
-			publishSearchIndex(documents, true);
-			documents.clear();
-			offset += limit;
-            cleanUpGorm();
-		}
+        if(limit > INDEX_DOCS) limit = INDEX_DOCS
+        while(noIndexed < INDEX_DOCS) {
+            Document.withNewTransaction([readOnly:true]) { status ->
+                documents = Document.list(max:limit, offset:offset);
+                noIndexed += documents.size();
+                if(!documents) return;
+                publishSearchIndex(documents, true);
+                //documents.clear();
+                offset += limit;
+                cleanUpGorm();
+            }
+            if(!documents) break;
+            documents.clear();
+        }
 		
-		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
+		log.info "Time taken to publish documents search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
 	/**
@@ -67,6 +73,7 @@ class DocumentSearchService extends AbstractSearchService {
             log.debug "Reading Document : "+document.id;
 
             SolrInputDocument doc = new SolrInputDocument();
+            doc.setDocumentBoost(1.5);
             doc.addField(searchFieldsConfig.ID,document.class.simpleName +"_"+ document.id.toString());
             doc.addField(searchFieldsConfig.OBJECT_TYPE, document.class.simpleName);
             doc.addField(searchFieldsConfig.TITLE, document.title);
@@ -74,7 +81,7 @@ class DocumentSearchService extends AbstractSearchService {
             doc.addField(searchFieldsConfig.TYPE, document.type.value());
             doc.addField(searchFieldsConfig.UPLOADED_ON, document.createdOn);
             if(document.license) {
-                doc.addField(searchFieldsConfig.LICENSE, document.license.name.value());
+                doc.addField(searchFieldsConfig.LICENSE, document.license.name.name());
             }
 
             if(document.attribution){

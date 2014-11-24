@@ -7,7 +7,7 @@
 <div  class="block-tagadelic">
 
     <form id="advSearchForm" method="get"  title="${g.message(code:'button.advanced.search')}"
-        action="${uGroup.createLink(controller:'search', action:'select') }"
+        action="${uGroup.createLink(controller:'search', action:'select', userGroup:userGroupInstance) }"
         class="searchbox form-horizontal">
 
         <div class="control-group">
@@ -23,11 +23,13 @@
 
         <div class="control-group">
             <label class="control-label" for="name">${g.message(code:"default.species.label")}</label> 
-            <div class="controls">
+            <div class="controls nameContainer" style="position:relative;">
                 <input id="aq.name"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.name" value="${queryParams?queryParams['aq.name']?.encodeAsHTML():'' }"
                 placeholder="${g.message(code:'placeholder.search.species.name')}" />
+                    <div class='nameSuggestions' style='display: block;z-index:5000'></div>
+
             </div>
         </div>
 
@@ -100,7 +102,7 @@
             <div class="controls">
                 <select name="aq.license" multiple="multiple" class="multiselect licenseFilter input-block-level">
                     <g:each in="${LicenseType.toList()}" var="license">
-                    <option value="${license.value()}"> ${g.message(error:license)} </option>
+                    <option value="${license.name()}"> ${g.message(error:license)} </option>
                     </g:each>
                 </select>
 
@@ -124,8 +126,12 @@
                 <label class="radio inline"> 
                     <input type="radio" id="uGroup_ALL" name="uGroup" 
                     value="ALL"> ${g.message(code:'default.search.in.all.groups')} </label> <label
-                    class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
-                    value="THIS_GROUP"> ${g.message(code:'default.search.within.this.group')} </label>
+                    class="radio inline"> 
+                   
+
+                    <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
+                    value="${userGroupInstance?.id}"> ${g.message(code:'default.search.within.this.group')} </label>
+
             </div>
         </div>
 
@@ -135,6 +141,9 @@
         <g:each in="${modules}" var="module">
         <g:if test="${!module.name.equalsIgnoreCase('All')}">
         <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.name)?'':'hide' }">
+            <br>
+            <b>${module.displayName} specific search options</b>
+            <br>
             <g:render template="/${module.template}/advSearchTemplate"/>
         </div>
         </g:if>
@@ -143,7 +152,7 @@
         <g:render template="/search/advSearchCommonFooterOptionsTemplate"/>
 
     <div class="form-action">
-        <button type="submit" id="advSearch"
+        <button id="advSearch"
             class="btn btn-primary pull-right" style="margin-top:10px;">${g.message(code:"default.search")}</button>
     </div>
     </form>
@@ -201,7 +210,7 @@ $(document).ready(function(){
 
     $('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
         var field = $(this).attr('name');
-        $(this).typeahead({
+       $(this).typeahead({
             source: function (query, process) {
                 return $.get("${uGroup.createLink(action:'terms', controller:'observation') }"+'?field='+field, { term: query }, function (data) {
                     return process(data);
@@ -211,6 +220,7 @@ $(document).ready(function(){
     });
 
     $("#advSearch").click(function() {
+    console.log('advSearch click submit');
         $( "#advSearchForm" ).submit();
     });
 
@@ -242,7 +252,7 @@ $(document).ready(function(){
         if(val == 'Observation') {
             $('input[name="aq.attribution"]').val('').parent().parent().hide();
         } else if (val == 'SUser') {
-            $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.tag"]').val('').parent().parent().hide();
+            $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.members"],input[name="aq.tag"]').val('').parent().parent().hide();
             $('select.multiselect').multiselect('deselectAll',false).multiselect('updateButtonText').parent().parent().hide()
         } else if (val == 'UserGroup') {
             $('input[name="aq.name"],input[name="aq.contributor"],input[name="aq.attribution"],input[name="aq.license"],input[name="aq.text"],input[name="aq.tag"],input[name="aq.uGroup"]').val('').parent().parent().hide();
@@ -268,7 +278,8 @@ $(document).ready(function(){
     });
 
     $('.daterangepicker').parent().width('230%');
-    
+    $('button.multiselect').css('text-align','left'); 
+
     $('#advSearchDropdownA').on('click', function (event) {
         $(this).parent().toggleClass("open");
     });

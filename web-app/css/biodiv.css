@@ -466,7 +466,7 @@ div.errors {
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
-	width: 200px;
+	width: 170px;
 	height: 65px;
 	cursor: pointer;
 }

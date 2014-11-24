@@ -1,6 +1,6 @@
 
 <g:if test="${domainInstance?.language?.id != userLanguage?.id}">
-<a href="javascript:void(0);" class="clickcontent btn btn-mini">${domainInstance?.language?.twoLetterCode?.toUpperCase()}</a>
+<a href="javascript:void(0);" class="clickcontent btn btn-mini">${domainInstance?.language?.threeLetterCode?.toUpperCase()}</a>
 </g:if>
 
 <div class="${(domainInstance?.language?.id != userLanguage?.id) ? 'hide' : ''}">
