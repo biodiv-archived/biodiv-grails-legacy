@@ -1015,6 +1015,12 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
+        if(!params.speciesId) {
+            log.error "NO SPECIES ID TO FETCH RELATED OBV";
+            def result = [addPhotoHtml: '', relatedObvCount: 0]
+            render result as JSON
+        }
+        params.offset = (params.offset)?params.offset:0
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
