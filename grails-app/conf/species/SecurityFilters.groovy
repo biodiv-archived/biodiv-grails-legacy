@@ -7,6 +7,7 @@ import species.groups.UserGroup;
 
 import grails.converters.JSON;
 import java.util.concurrent.atomic.AtomicLong
+import org.springframework.context.i18n.LocaleContextHolder as LCH 
 
 class SecurityFilters {
 
@@ -25,6 +26,10 @@ class SecurityFilters {
 
                 grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
                 //println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
+
+                if(grailsApplication.config.speciesPortal.hideLanguages){
+                    LCH.setLocale(new Locale("en"))
+                }    
 
                 def appName = grailsApplication.metadata['app.name']
                 /*                if(params.ajax_login_error == "1") {
