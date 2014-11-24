@@ -34,6 +34,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def speciesPermissionService
     def messageSource;
     def request;
+    def utilsService;
     private ApplicationTagLib g
 	ApplicationContext applicationContext
 
