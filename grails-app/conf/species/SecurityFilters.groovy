@@ -29,7 +29,7 @@ class SecurityFilters {
                 //println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
                 def appectedLanguage = false;    
                 for ( localeLanguage in grailsApplication.config.speciesPortal.localeLanguages ) {                    
-                        if(localeLanguage.twoletter == LCH.getLocale().toString()){
+                        if(localeLanguage.twoletter.equals(LCH.getLocale().toString())){
                            appectedLanguage = true;
                         }
                     }
@@ -93,7 +93,7 @@ class SecurityFilters {
                     // 
                     def appectedLanguage = false;    
                     for ( localeLanguage in grailsApplication.config.speciesPortal.localeLanguages ) {
-                        if(localeLanguage.twoletter == LCH.getLocale().toString()){
+                        if(localeLanguage.twoletter.equals(LCH.getLocale().toString())){
                            appectedLanguage = true;
                         }
                     }                   
