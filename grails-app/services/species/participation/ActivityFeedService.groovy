@@ -262,13 +262,11 @@ class ActivityFeedService {
 	}
 
 	def getContextInfo(ActivityFeed feedInstance, params=null){
-		
 		def activityType = feedInstance.activityType
 		def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
 		def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
 		def text = null
 		def activityTitle = null
-		
 		//log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
 		switch (activityType) {
 			case COMMENT_ADDED:
