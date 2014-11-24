@@ -6,6 +6,8 @@ import species.participation.Follow
 import species.auth.SUser
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
+import  org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
+
 
 class ActivityFeedController {
 	
@@ -16,6 +18,7 @@ class ActivityFeedController {
 	def messageSource;
 	def observationService;
 	def utilsService;
+	def checklistUtilService;
 	
 	def getFeeds(){
 		//log.debug params;
@@ -94,5 +97,23 @@ class ActivityFeedController {
 		ActivityFeed.withTransaction(){
 			activityFeedService.addFeedOnGroupResoucePull(resList, wgpGroup, author, true, false, true, true)
 		}
+	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def addUserRegistrationFeed(){
+		def m = new GrailsDomainBinder().getMapping(ActivityFeed.class)
+		m.autoTimestamp = false
+		
+		SUser.withTransaction(){
+			SUser.list().each { user ->
+				println "checking feed for " + user
+				def feed = ActivityFeed.findByActivityTypeAndAuthor(ActivityFeedService.USER_REGISTERED, user);
+				if(!feed){
+					println "adding feed for user " + user
+					checklistUtilService.addActivityFeed(user, user, user, ActivityFeedService.USER_REGISTERED, user.dateCreated);
+				}
+			}
+		}
+		m.autoTimestamp = true
 	}
 }

@@ -24,7 +24,7 @@ import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
-;
+
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
@@ -35,6 +35,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def speciesPermissionService
     def messageSource;
     def request;
+    def utilsService;
     private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -221,8 +222,8 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
                 messagesourcearg[0] = domain;
 				mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailSubject", messagesourcearg, LCH.getLocale())
 				def msgsourcearg = new Object[2];
-                msgsourcearg[1] = email;
-                msgsourcearg[2] = domain;
+                msgsourcearg[0] = user.email;
+                msgsourcearg[1] = domain;
 				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, LCH.getLocale())
 				if (bodyContent.contains('$')) {
 					bodyContent = evaluate(bodyContent, templateMap)
