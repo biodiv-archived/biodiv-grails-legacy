@@ -23,7 +23,7 @@ import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
-;
+
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
@@ -34,6 +34,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	def speciesPermissionService
     def messageSource;
     def request;
+    def utilsService;
     private ApplicationTagLib g
 	ApplicationContext applicationContext
 

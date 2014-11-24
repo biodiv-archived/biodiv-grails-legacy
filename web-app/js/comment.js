@@ -85,7 +85,7 @@ function deleteComment(commentId, url){
 function postComment(postComp, url, newCommentUrl) {
 	var submitButton = $(postComp).children('input[type="submit"]');
 	var textComp = $(postComp).children('textarea[name="commentBody"]');
-	if($.trim(textComp.val()) === ""){
+	if($.trim(textComp.text()) === ""){
 		$(textComp).addClass('comment-textEmpty');
 		$(textComp).next('span').show();
 		return false;

@@ -85,7 +85,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
-
+    //String scientificNames;
 	//XXX uncmment it before migration
 	//Coverage coverage //<== extending metadata now	//Coverage Information
 	
