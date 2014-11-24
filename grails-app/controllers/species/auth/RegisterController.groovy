@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import species.auth.SUser;
 import species.participation.Observation;
 import species.utils.Utils;
+import species.Language;
 import org.springframework.security.web.WebAttributes;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -33,6 +34,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	def messageSource;
 	//def recaptchaService;	
     //def grailsApplication
+    def utilsService;
 
 	static allowedMethods = [user:"POST", register:"POST", 'forgotPasswordMobile':'POST']
 
@@ -101,7 +103,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			return
 		}
 
-		def user = SUserService.create(command.properties);
+		def userLanguage = utilsService.getCurrentLanguage(request); 
+		def user = SUserService.create(command.properties, userLanguage);
 		
 		if(command.openId) {
 			log.debug("Is an openId registration");
@@ -191,7 +194,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
         if(!command.username) command.username = command.name;
 
-		def user = SUserService.create(command.properties);
+		def userLanguage = utilsService.getCurrentLanguage(request); 
+		def user = SUserService.create(command.properties, userLanguage);
 		
 			log.debug("Is an local account registration");
 			user.accountLocked = true;
@@ -454,8 +458,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 		def conf = SpringSecurityUtils.securityConfig
 		def msgsourcearg = new Object[2];
-            msgsourcearg[1] = username;
-            msgsourcearg[2] = url;
+            msgsourcearg[0] = username;
+            msgsourcearg[1] = url;
 		def body = messageSource.getMessage("grails.plugin.springsecurity.ui.register.emailBody", msgsourcearg, RCU.getLocale(request))
 		if (body.contains('$')) {
 			body = evaluate(body, [username: username.capitalize(), url: url])

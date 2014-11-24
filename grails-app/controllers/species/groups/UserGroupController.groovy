@@ -519,7 +519,7 @@ class UserGroupController {
 				if(userGroupInstance.addMember(user)) {
 					msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request))
 					flash.message = msg;
-					render ([success:true, 'statusComplete':true, 'shortMsg':${messageSource.getMessage("info.joined", null, RCU.getLocale(request))}, 'msg':msg]as JSON);
+					render ([success:true, 'statusComplete':true, 'shortMsg':messageSource.getMessage("info.joined", null, RCU.getLocale(request)), 'msg':msg]as JSON);
 					return;
 				}
 			}
@@ -623,8 +623,9 @@ class UserGroupController {
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
+				def userLanguage = utilsService.getCurrentLanguage();
 				emailConfirmationService.sendConfirmation(founder.email,
-						msg ,  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
+						msg ,  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestMembership'], userToken.token);
 			}
 			msg = messageSource.getMessage("default.sent.request.admin", null, RCU.getLocale(request))
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
@@ -662,8 +663,9 @@ class UserGroupController {
 				log.debug "Sending email to  founder or expert ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
 				userToken.save(flush: true)
+				def userLanguage = utilsService.getCurrentLanguage();
 				emailConfirmationService.sendConfirmation(founder.email,
-						msg,  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestModeratorship'], userToken.token);
+						msg,  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestModeratorship'], userToken.token);
 			}
 			msg = messageSource.getMessage("default.sent.request.admin", null, RCU.getLocale(request))
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
