@@ -34,7 +34,7 @@ public class SpreadsheetWriter {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
             writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
-            writeHeadersInFormat(wb, headerMarkers);
+            writeHeadersInFormat(wb, headerMarkers, orderedArray);
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
             out.close();
@@ -142,7 +142,7 @@ public class SpreadsheetWriter {
         return;
     }
     
-    public static void writeHeadersInFormat(Workbook wb, JSONElement headerMarkers1) {
+    public static void writeHeadersInFormat(Workbook wb, JSONElement headerMarkers1, JSONArray orderedArray) {
     	JSONObject headerMarkers = (JSONObject) headerMarkers1;
         //System.out.println("=CLASS===="+headerMarkers.getClass());
         Object o = headerMarkers.remove("undefined");
@@ -392,6 +392,28 @@ public class SpreadsheetWriter {
             arr[10] = m2.get("license");
             arr[11] = m2.get("audience");
             arr[12] = m2.get("language");
+            
+
+            //Rewriting fieldnames according to columns in sheet 1
+
+            String[] tokens = arr[3].split(FIELD_SEP);
+            String finalKeysOrdered = "";
+            int orderedArraySize = orderedArray.length();
+            for (int k = 0; k< orderedArraySize; k++){
+                String kkk = orderedArray.getString(k);
+                for (String token : tokens)
+                {
+                    if(token.equals(kkk)) {
+                        if(finalKeysOrdered == "") {
+                            finalKeysOrdered = token;
+                        } else {
+                            finalKeysOrdered = finalKeysOrdered + FIELD_SEP + token;
+                        }
+                    }
+                }
+            }
+            arr[3] = finalKeysOrdered;
+            /////////
 
             row = sheet.createRow(rownum++);
             for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
