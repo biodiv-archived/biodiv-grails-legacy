@@ -684,8 +684,9 @@ class UserGroupService {
 
 				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
 				userToken.save(flush: true)
+				def userLanguage = utilsService.getCurrentLanguage();
 				emailConfirmationService.sendConfirmation(founderEmail,
-						"Invitation to join as founder for group",  [name:name, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
+						"Invitation to join as founder for group",  [name:name, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/founderInvitation'], userToken.token);
 			}
 		}
 	}
@@ -735,8 +736,9 @@ class UserGroupService {
 
 				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
 				userToken.save(flush: true)
+				def userLanguage = utilsService.getCurrentLanguage();
 				emailConfirmationService.sendConfirmation(expertEmail,
-						"Invitation to join as moderator for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/expertInvitation'], userToken.token);
+						"Invitation to join as moderator for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/expertInvitation'], userToken.token);
 			}
 		}
 	}
@@ -764,8 +766,9 @@ class UserGroupService {
 			}
 			def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 			userToken.save(flush: true)
+			def userLanguage = utilsService.getCurrentLanguage();
 			emailConfirmationService.sendConfirmation(memberEmail,
-					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, memberMsg:message, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, memberMsg:message, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/memberInvitation'], userToken.token);
 		}
 	}
 

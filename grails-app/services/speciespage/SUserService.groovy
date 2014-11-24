@@ -17,6 +17,7 @@ import org.apache.solr.common.util.NamedList
 import species.auth.SUser;
 import species.participation.Observation;
 import species.utils.Utils;
+import species.Language;
 import species.utils.ImageType
 import speciespage.search.SUserSearchService;
 import species.SpeciesPermission;
@@ -44,7 +45,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	/**
 	 * 
 	 */
-	SUser create(propsMap) {
+	SUser create(propsMap, Language userLanguage) {
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
 
@@ -64,6 +65,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		}
 
 		def user = UserDomainClass.newInstance(propsMap);
+        user.language = userLanguage;
 		user.enabled = true;
 		return user;
 	}
@@ -182,6 +184,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 		def mailSubject = ""
 		def bodyContent = ""
+        String domain = Utils.getDomainName(request)
 
 		def replyTo = conf.ui.notification.emailReplyTo;
 		switch ( notificationType ) {
@@ -195,6 +198,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				}
 
 					try {
+						def userLanguage = utilsService.getCurrentLanguage();
 						mailService.sendMail {
 							to user.email
 				            if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
@@ -203,7 +207,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
 							from grailsApplication.config.grails.mail.default.from
 							subject mailSubject
-							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+							body(view:"/emailtemplates/"+userLanguage.threeLetterCode+"/welcomeEmail", model:templateMap)
 						}
 						log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 					}catch(all)  {
