@@ -2460,7 +2460,7 @@ function closeLayerPane(layer, selected_layer_div, selected_layers_div) {
     var layers = map.getQueryableLayers();
    
     if (layers.length == 0){
-	var html = '<p><span class="info_msg">No layers selected</span></p>';
+	var html = '<p><span class="info_msg">'+window.i8ln.observation.maps.noselect+'</span></p>';
     	document.getElementById(selected_layers_div).innerHTML = html;
     }
 
@@ -2586,7 +2586,7 @@ function updateSelectedLayersPanel(selected_layers_div) {
     }
 
     if (map.getQueryableLayers().length == 0){
-	html = '<p><span class="info_msg">No layers selected</span></p>';
+	html = '<p><span class="info_msg">'+window.i8ln.observation.maps.noselect+'</span></p>';
     }
 
     document.getElementById(selected_layers_div).innerHTML = html;

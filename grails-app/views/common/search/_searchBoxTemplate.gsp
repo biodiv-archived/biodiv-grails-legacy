@@ -225,13 +225,14 @@ $(document).ready(function() {
                 "allayer" :"${g.message(code:'maps.all.layers')}",
                 "bytheme" :"${g.message(code:'maps.by.theme')}",
                 "listtheme" :"${g.message(code:'maps.list.themes')}",
-                "show"  :"${g.message(code:'maps.show.layers')}",
-                "madd"  :"${g.message(code:'maps.add')}",
-                "mremove"  :"${g.message(code:'maps.remove')}",
-                "mzoom"  :"${g.message(code:'maps.zoom')}",
-                "mrecord"  :"${g.message(code:'maps.all.records')}",
+                "show"    :"${g.message(code:'maps.show.layers')}",
+                "madd"    :"${g.message(code:'maps.add')}",
+                "mremove" :"${g.message(code:'maps.remove')}",
+                "mzoom"   :"${g.message(code:'maps.zoom')}",
+                "mrecord" :"${g.message(code:'maps.all.records')}",
                 "moccur"  :"${g.message(code:'maps.occurence.records')}",
-                "msearch"  :"${g.message(code:'default.search')}"
+                "msearch" :"${g.message(code:'default.search')}",
+                "noselect":"${g.message(code:'maps.no.selected')}"
             }      
 
 
