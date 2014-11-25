@@ -27,7 +27,7 @@
 				</g:elseif>
 				<g:else>
 					<g:if test="${observationCount}">
-						${observationCount} observation<g:if test="${observationCount>1}"><g:message code="text.s" /></g:if>
+						<g:message code="text.observation" args="${observationCount}" /><g:if test="${observationCount>1}"><g:message code="text.s" /></g:if>
 					</g:if>
 					<g:if test="${checklistCount}">
 						<g:if test="${observationCount}"> <g:message code="text.and" /> </g:if>
