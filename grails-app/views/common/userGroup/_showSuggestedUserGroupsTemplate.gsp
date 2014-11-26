@@ -6,5 +6,10 @@
 			<i class="icon-group-gray"></i> <g:message code="default.groups.label" /> <b class="caret"></b>
 	</a>
 	<ul class="dropdown-menu" style="max-height:300px;overflow-x:hidden;overflow-y:auto;">
-	</ul>
+	<li style="float:right;overflow-x:hidden; overflow-y:auto;">
+	    <g:link mapping="userGroupGeneric" action="list" absolute='true'>See All</g:link>
+	</li>
+	</ul>	
 </li>
+
+
