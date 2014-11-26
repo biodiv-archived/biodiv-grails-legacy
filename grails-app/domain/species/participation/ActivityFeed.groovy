@@ -96,7 +96,8 @@ class ActivityFeed {
 		String selectClause  = isCountQuery? "select count(*) as c " :"select af.id as id, af.last_updated as updatetime "
 		String fromClause = " from activity_feed af "
 		String whereClause = " where af.root_holder_type != '" + SUser.class.getCanonicalName() + "' "
-		String orderClause = isCountQuery?"":" order by af.last_updated desc limit " + params.max 
+		String orderClause = isCountQuery?"":" order by af.last_updated desc "
+		orderClause +=  params.max ? (" limit " + params.max ): "" 
 		
 		if(params.isShowableOnly){
 			whereClause += " and af.is_showable = :isShowable "
@@ -115,11 +116,11 @@ class ActivityFeed {
 		
 		
 		if(params.timeLine == ActivityFeedService.OLDER){
-			whereClause += " and af.last_updated < :lastUpdated "
+			whereClause += " and af.last_updated < '" + refTime + "'"
 		}else{
-			whereClause += " and af.last_updated > :lastUpdated "
+			whereClause += " and af.last_updated > '" + refTime + "'"
 		}
-		map['lastUpdated'] = refTime
+		//map['lastUpdated'] = refTime
 		
 		List queryList
 		
@@ -170,7 +171,7 @@ class ActivityFeed {
 		def sql =  Sql.newInstance(dataSource)
 		queryList.each { q ->
 			//println "================= Query =========== " 
-			//println q
+			//println q 
 			//println m
 			//println "================= Query =========== "
 			result.addAll(sql.rows(q, m))
@@ -188,14 +189,14 @@ class ActivityFeed {
 		
 		Collections.sort(result , new Comparator(){
 			public int compare(s1, s2){
-				s2.updatetime - s1.updatetime
+				s2.updatetime.getTime() - s1.updatetime.getTime()
 			}});
 		
 		
 		def limitedResult = []
 		int i = 0;
 		result.each {
-			if(++i <= max){
+			if(!max || ++i <= max){
 				limitedResult << ActivityFeed.read(it.id)
 			}
 		}
@@ -261,7 +262,6 @@ class ActivityFeed {
 		
 		params.timeLine = params.timeLine?:ActivityFeedService.OLDER
 		params.refTime = params.refTime?:((params.timeLine == ActivityFeedService.OLDER) ?  new Date().time.toString(): new Date().previous().time.toString())
-		
 		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 5 : 5)  :null)
 		
 		return true
@@ -326,7 +326,7 @@ class ActivityFeed {
 		}
 		
 		try{
-			return new java.sql.Date(timeIn.toLong())
+			return new java.sql.Timestamp(timeIn.toLong())
 		}catch (Exception e) {
 			e.printStackTrace()
 		}
