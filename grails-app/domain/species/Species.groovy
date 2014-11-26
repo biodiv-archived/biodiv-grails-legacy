@@ -74,6 +74,7 @@ class Species implements Rateable {
 	static mapping = {
 		id generator:'species.utils.PrefillableUUIDHexGenerator'
 		fields sort : 'field'
+		autoTimestamp false
 	}
 	
 	//used for debugging
@@ -273,6 +274,10 @@ class Species implements Rateable {
             e.printStackTrace()
         }*/
         this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
+        
+		if(isDirty() && !isDirty('version')){
+			lastUpdated = new Date();
+        }
     }
 
     def afterInsert() {
