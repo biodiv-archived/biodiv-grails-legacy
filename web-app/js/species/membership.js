@@ -423,17 +423,29 @@ function last_actions() {
     updateGroupPostSelection();
 }
 
-function loadSuggestedGroups(targetComp, url){
-	var res = $(targetComp).children('li');
-	if(res.length > 0){
+function loadSuggestedGroups(targetComp, url,offset){
+	var res = $(targetComp).children('li');	
+	var countUGL = $('.usergrouplist').size();
+	if(typeof offset == "undefined"){ offset = 0; }else{offset = countUGL }
+	if((res.length > 0) && (offset == 0) && (countUGL != 0)){
 		return 
 	}
 	$.ajax({
  		url: url,
  		type: 'POST',
 		dataType: "json",
+		data: {"offset":offset},
 		success: function(data) {
-			$(targetComp).append($(data.suggestedGroupsHtml));
+			//console.log($(data.suggestedGroupsHtml))
+			if(res > 1){				
+				$(targetComp).children('li:last').remove();
+			}			
+			if(countUGL == 0){
+				$(targetComp).append($(data.suggestedGroupsHtml));
+			}else{
+				$(targetComp).append($(data.suggestedGroupsHtml));
+			}
+			
 			$(targetComp).show(1000);
 			return false;
 		}, error: function(xhr, status, error) {
@@ -441,3 +453,10 @@ function loadSuggestedGroups(targetComp, url){
 	   	}
 	});
 }
+
+$('.dropdown-menu').bind('scroll', function() {
+        if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {
+            $(".load_more_usergroup").trigger('click');
+            console.log("trigger");
+        }
+});
