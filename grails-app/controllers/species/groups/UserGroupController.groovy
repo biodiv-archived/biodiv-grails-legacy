@@ -1138,8 +1138,8 @@ class UserGroupController {
    }
    
    def suggestedGroups() {
-	   log.debug params;
-	   def gList = userGroupService.getSuggestedUserGroups(null)
+	   log.debug params;	   
+	   def gList = userGroupService.getSuggestedUserGroups(null,params?.offset)
 	   def res =[suggestedGroupsHtml: g.render(template:"/common/userGroup/showSuggestedUserGroupsListTemplate", model:['userGroups':gList])];
 	   render res as JSON
    }
