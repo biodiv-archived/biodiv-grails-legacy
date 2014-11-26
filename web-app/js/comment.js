@@ -85,16 +85,10 @@ function deleteComment(commentId, url){
 function postComment(postComp, url, newCommentUrl) {
 	var submitButton = $(postComp).children('input[type="submit"]');
 	var textComp = $(postComp).children('textarea[name="commentBody"]');
-<<<<<<< HEAD
-	if($.trim(textComp.text()) === ""){
-		$(textComp).addClass('comment-textEmpty');
-		$(textComp).next('span').show();
-=======
 	var contentbox = $(textComp).next().find('.contentbox');
 	if($.trim(textComp.text()) === ""){
 		contentbox.addClass('comment-textEmpty');
 		//$(textComp).next('span').show();
->>>>>>> df569b4198513814a49d1e645b8328f5d153c60e
 		return false;
 	}
 	loaderFun(submitButton,true,window.i8ln.text.posting,'input');//submitButton.attr('disabled',true).attr('value','posting');
