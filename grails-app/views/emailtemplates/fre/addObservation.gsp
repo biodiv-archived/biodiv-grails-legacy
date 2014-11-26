@@ -104,7 +104,7 @@
                                     <b>Message</b> : ${commentInstance.body} <br/>
                                     <b>Groupe</b> :
                                     <span style="height: 30px; width: 186px; position: relative; background-color: #D4ECE3;  margin:2px 6px; " >
-                                        <a href="${baseUrl}/group/${group.webaddress}"> 
+                                        <a href="${uGroup.createLink(controller:'userGroup', action:'show', absolute:true, 'userGroup':group)}"> 
                                             <img src="${group.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
 
 
@@ -206,7 +206,7 @@
 					<a style="padding:0 2px">L'observation ci-dessus fait partie des groupes suivants: <a/><br />
 						<g:each in="${groups}">
 							<div style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
-							    <a href="${baseUrl}/group/${it.webaddress}" style="text-decoration: none; color: #222222;"> 
+							    <a href="${uGroup.createLink(controller:'userGroup', action:'show', absolute:true, 'userGroup':it)}" style="text-decoration: none; color: #222222;"> 
 								<img src="${it.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
 
 									<g:set var="groupName" value="${it.name}"></g:set>

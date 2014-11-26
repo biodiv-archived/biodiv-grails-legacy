@@ -28,6 +28,7 @@ class ChartService {
 	static transactional = false
 
 	private static final Date PORTAL_START_DATE = new Date(111, 7, 8)
+	private static final int MAX_STAT_DAYS = 365 // 1 year
 
 	static final String ACTIVE_USER_STATS = "Active user stats"
 	static final String OBSERVATION_STATS = "Observation stats"
@@ -353,16 +354,14 @@ def messageSource;
 	
 	def getPortalActivityStatsByDay(params){
 		UserGroup userGroupInstance
-		def typeToIdFilterMap
 
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
-			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroupInstance])
 		}
 
 		int days = getPassedDays(params, userGroupInstance) 
 		log.debug "passed days $days"
-		days = (days > 365) ? 365 : days
+		days = (days > MAX_STAT_DAYS) ? MAX_STAT_DAYS : days
 		
 		def result = []
 		Date currentDate = new Date()
@@ -376,15 +375,15 @@ def messageSource;
 			
 			def userCount
 			if(userGroupInstance){
-				userCount = getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.MEMBER_JOINED)
+				userCount = ActivityFeed.getActivityCount(startDate, endDate, userGroupInstance, ActivityFeedService.MEMBER_JOINED)
 			}else{
 				userCount = getRegisterUserCount(startDate, endDate)
 			}
 			
 			result.add([
 				startDate,
-				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance),
-				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
+				ActivityFeed.getActivityCount(startDate, endDate, userGroupInstance),
+				ActivityFeed.getActivityCount(startDate, endDate, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
 				userCount
 			])
 		}
@@ -396,33 +395,6 @@ def messageSource;
 				['number', 'Users']
 				]
 			]
-	}
-
-	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, feedType=null){
-		return ActivityFeed.createCriteria().count{
-			and{
-				eq('isShowable', true)
-				if(startDate && endDate){
-					between('lastUpdated', startDate, endDate)
-				}
-				if(feedType){
-					eq('activityType', feedType)
-				}
-				//filter by usergroup
-				if(userGroupInstance){
-					or{
-						typeToIdFilterMap.each{key, value ->
-							if(!value.isEmpty()){
-								and{
-									eq('rootHolderType', key)
-									'in'('rootHolderId', value)
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	private int getRegisterUserCount(startDate, endDate){
@@ -657,14 +629,12 @@ def messageSource;
 
 	
 	def long getActivityFeedCount(params){
-		def userGroup, typeToIdFilterMap
+		def userGroup 
 		if(params.webaddress) {
 			userGroup = userGroupService.get(params.webaddress)
-			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroup])
-			
 		}
 		
-		return getActivityCount(null, null, typeToIdFilterMap, userGroup)
+		return ActivityFeed.getActivityCount(null, null, userGroup)
 	}
 
     def activeUserStatsAuthorAndCount(max, userGroupInstance , startDate){ 

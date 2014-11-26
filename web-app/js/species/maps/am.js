@@ -161,7 +161,7 @@ function getThemeNames(theme_type) {
 
     //currently  no way to filter the theme names by domains ibp/wgp, 
     //hence, commented above code and using  hardcoded theme names below
-    var by_themes = 'Biogeography///Abiotic///Demography///Species///Administrative Units///Land Use Land Cover///Conservation///Threats';
+    var by_themes = window.i8ln.observation.maps.listtheme;
 
     var by_geography = 'India///Uttaranchal///Nilgiri Biosphere Reserve///Papagni, Andhra Pradesh///Western Ghats///BR Hills, Karnataka///Vembanad, Kerala///Satkoshia, Orissa///North East Area///Agar, Madhya Pradesh///Mandla, Madhya Pradesh///Pench, Madhya Pradesh///Bandipur, Karnataka///Kanakapura';
 
@@ -1956,7 +1956,7 @@ function generateHTMLForLayersAsList(layers, hasMap) {
     //html = html + allKeywordsLinks;
     html = html + layerExplorerLinks;
 
-    html = html + '<div class="info_box">Showing <span id="layers_as_list_panel_title">all</span> layers</div>';
+    html = html + '<div class="info_box">'+window.i8ln.observation.maps.show+'</div>';
 
     html = html + '<div id="layers_as_list_panel">';
     html = html + '<ul>';
@@ -1990,21 +1990,21 @@ function generateHTMLForLayersAsList(layers, hasMap) {
         html = html + '<ul class="layer_options layer_actions" style="text-align:right;">';
         //if map component is present add links to add/remove layers
         if (hasMap) { 
-            html = html + '<li id=\'' + layers[i].name + '_zoom_to_extent\' class="first zoom_to_extent" onclick="zoomToLayerExtent(\'' + layers[i].name + '\');">zoom to extent</li>';
+            html = html + '<li id=\'' + layers[i].name + '_zoom_to_extent\' class="first zoom_to_extent" onclick="zoomToLayerExtent(\'' + layers[i].name + '\');">'+window.i8ln.observation.maps.mzoom+'</li>';
             html = html + 
                 "<li class='add_to_map' id='" +
                 layers[i].name +
                 "_a_add' href='#' onclick=\"addLayer('" +
                 layers[i].name + "', '" +
                 layers[i].title +
-                "');\">add to map</li>";
+                "');\">"+window.i8ln.observation.maps.madd+"</li>";
 
             html = html +
                 "<li class='remove_from_map' id='" +
                 layers[i].name +
                 "_a_remove' href='#' onclick=\"removeLayer('" +
                 layers[i].name +
-                "');\">remove from map</li>";
+                "');\">"+window.i8ln.observation.maps.mremove+"</li>";
 
 
         }
@@ -2467,7 +2467,7 @@ function closeLayerPane(layer, selected_layer_div, selected_layers_div) {
     var layers = map.getQueryableLayers();
    
     if (layers.length == 0){
-	var html = '<p><span class="info_msg">No layers selected</span></p>';
+	var html = '<p><span class="info_msg">'+window.i8ln.observation.maps.noselect+'</span></p>';
     	document.getElementById(selected_layers_div).innerHTML = html;
     }
 
@@ -2593,7 +2593,7 @@ function updateSelectedLayersPanel(selected_layers_div) {
     }
 
     if (map.getQueryableLayers().length == 0){
-	html = '<p><span class="info_msg">No layers selected</span></p>';
+	html = '<p><span class="info_msg">'+window.i8ln.observation.maps.noselect+'</span></p>';
     }
 
     document.getElementById(selected_layers_div).innerHTML = html;

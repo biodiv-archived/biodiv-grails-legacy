@@ -240,7 +240,7 @@ class UserGroupController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def update() {
 		log.debug params;
 		params.locale_language = utilsService.getCurrentLanguage(request);
@@ -1138,8 +1138,8 @@ class UserGroupController {
    }
    
    def suggestedGroups() {
-	   log.debug params;
-	   def gList = userGroupService.getSuggestedUserGroups(null)
+	   log.debug params;	   
+	   def gList = userGroupService.getSuggestedUserGroups(null,params?.offset)
 	   def res =[suggestedGroupsHtml: g.render(template:"/common/userGroup/showSuggestedUserGroupsListTemplate", model:['userGroups':gList])];
 	   render res as JSON
    }
@@ -1401,6 +1401,11 @@ class UserGroupController {
         println "========== CREATED Digest instance ============="
     }
 
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def addSpecialFounder() {
+        userGroupService.addSpecialFounder()
+        render "=== done "
+    }
 
 
 }

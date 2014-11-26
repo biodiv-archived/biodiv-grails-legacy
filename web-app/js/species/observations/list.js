@@ -10,7 +10,6 @@ $(document).ready(function(){
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
 
-    console.log('updated gallery trigger');
     $('.list').trigger('updatedGallery');
 
     $('#speciesNameFilter').button();
@@ -284,7 +283,6 @@ $(document).ready(function(){
    
 
     $('.observation').on("click", ".loadMore", function() {
-        console.log('loadmore');
         $.autopager({
 
             autoLoad : false,
@@ -542,7 +540,6 @@ function getSelectedFilters($ele, noneSelected) {
             allSelected = false;
         }
     });
-    console.log(noneSelected);
     if(noneSelected) resetSearchFilters($ele.parent().parent());
     if(allSelected == false) return selected.join(' OR ');
 } 
@@ -795,7 +792,7 @@ function updateListPage(activeTag) {
         last_actions();
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
-    console.log('updated gallery trigger');
+        console.log('triggering updatedGallery');
         $('.list').trigger('updatedGallery');
     }
 }
@@ -866,27 +863,32 @@ function updateMapView (params, callback) {
 //        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
 //    }
     var p = jQuery.extend({}, params);
-    delete p.bounds;
-    delete oldParams.bounds;
-    //console.log(JSON.stringify(oldParams));
-    //console.log(JSON.stringify(p));
+    //delete p.bounds;
+    //delete oldParams.bounds;
     var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker'); 
     if(mapLocationPicker == undefined) {
         loadGoogleMapsAPI(function() {
             mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             mapLocationPicker.initialize();
+           
             $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
             refreshMapBounds(mapLocationPicker);
             oldParams = params;
-	    $('#big_map_canvas').trigger('maploaded');
+	        $('#big_map_canvas').trigger('maploaded');
+            mapLocationPicker.map.on('zoomend', function() {
+                var bounds = mapLocationPicker.getSelectedBounds()
+                $("#bounds").val(bounds);
+                showMapView();
+            });
         })
 
     } else {
         //TODO:remove bounds before comparision
         //order of params is important for this test to pass
-        if(JSON.stringify(oldParams) != JSON.stringify(p))
+        if(JSON.stringify(oldParams) != JSON.stringify(p)) {
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
+        }
         refreshMapBounds(mapLocationPicker);
         oldParams = params;
     }

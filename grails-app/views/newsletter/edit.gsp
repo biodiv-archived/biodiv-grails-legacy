@@ -59,8 +59,7 @@
 
 								<g:checkBox style="margin-left:0px;" name="sticky"
 									checked="${newsletterInstance.sticky}" /> <g:message
-									code="newsletter.sticky"
-									default="Check this option to make this page available in sidebar?" />
+									code="newsletter.sticky" />
 							</td>
 						</tr>
 						<g:if test="${newsletterInstance.userGroup}">

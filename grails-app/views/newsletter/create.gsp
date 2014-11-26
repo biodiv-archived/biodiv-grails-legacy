@@ -3,8 +3,8 @@
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
-<g:set var="title" value="Page"/>
-<title>Create Newsletter</title>
+<g:set var="title" value="${g.message(code:'default.pages.label')}"/>
+<title>${g.message(code:'link.create.newsletter')}</title>
 <style>
 .body {
 	padding: 10px;
@@ -33,8 +33,7 @@
 			<div class="dialog">
 				<div
 					class="control-group ${hasErrors(bean: newsletterInstance, field: 'title', 'errors')}">
-					<label for="title"><g:message code="newsletter.title.label"
-							default="Title" /> </label>
+					<label for="title"><g:message code="default.title.label" /> </label>
 					<div class="controls">
 						<g:textField name="title" value="${newsletterInstance?.title}" />
 
@@ -47,8 +46,7 @@
 				</div>
 				<div
 					class="control-group ${hasErrors(bean: newsletterInstance, field: 'date', 'errors')}">
-					<label for="date"><g:message code="newsletter.date.label"
-							default="Date" /> </label>
+					<label for="date"><g:message code="default.date.label" /> </label>
 					<div class="controls">
 						<g:datePicker name="date" precision="day"
 							value="${newsletterInstance?.date}" />
@@ -84,8 +82,7 @@
 					<label class="checkbox" style="text-align: left;"> <g:checkBox
 							style="margin-left:0px;" name="sticky"
 							checked="${newsletterInstance.sticky}" /> <g:message
-							code="newsletter.sticky"
-							default="Check this option to make this page available in sidebar?" />
+							code="newsletter.sticky" />
 					</label>
 				</div>
 
@@ -98,7 +95,7 @@
 			<div class="buttons">
 				<span class="button">
 				<input class="btn btn-primary"
-					style="float: right; margin-right: 5px;" type="submit" value="Create" />
+					style="float: right; margin-right: 5px;" type="submit" value="${g.message(code:'default.button.create.label')}" />
 				
 				</span>
 			</div>
