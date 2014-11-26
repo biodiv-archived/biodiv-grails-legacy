@@ -747,7 +747,7 @@ class SpeciesController extends AbstractObjectController {
 	/**
 	 *
 	 */
-	def search() {
+	/*def search() {
 		def model = speciesService.getSpeciesList(params, 'search')
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		model['isSearch'] = true;
@@ -774,7 +774,7 @@ class SpeciesController extends AbstractObjectController {
 			render (result as JSON)
 			return;
 		}
-	}
+	}*/
 
 
 

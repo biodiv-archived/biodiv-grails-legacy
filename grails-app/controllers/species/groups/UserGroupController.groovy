@@ -240,7 +240,7 @@ class UserGroupController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def update() {
 		log.debug params;
 		params.locale_language = utilsService.getCurrentLanguage(request);
@@ -1401,6 +1401,11 @@ class UserGroupController {
         println "========== CREATED Digest instance ============="
     }
 
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def addSpecialFounder() {
+        userGroupService.addSpecialFounder()
+        render "=== done "
+    }
 
 
 }

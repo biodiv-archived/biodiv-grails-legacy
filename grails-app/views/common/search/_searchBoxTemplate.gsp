@@ -91,6 +91,11 @@ $(document).ready(function() {
                         'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
                         'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
                     }
+                },
+                'userGroup': {
+                    'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",
+		            'leaveUrl' : "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }",
+                    'requestMembershipUrl' : "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }"
                 }
                 
 	}
