@@ -85,7 +85,7 @@
 }
 
 .comment-textEmpty {
-	border-color: #B94A48;
+	border-color: #B94A48 !important;
 	border-width: 1px;
 }
 .post-comment {

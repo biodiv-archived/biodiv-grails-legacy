@@ -304,9 +304,9 @@ function addSearchBox(search_box_div) {
     var last_query = eatCookie("last_search_query")||'';
 
     html = html + '<input id="map_search_text_field" type="text" name="q" size="35" value="' + last_query + '"/>';
-    html = html + '<input type="submit" value="Search" /><br>';
-    html = html + '<input type="radio" name="g" value="all" checked>All records';
-    html = html + '<input type="radio" name="g" value="occurrence">Species occurrence records';
+    html = html + '<input type="submit" value="'+window.i8ln.observation.maps.msearch+'" /><br>';
+    html = html + '<input type="radio" name="g" value="all" checked>'+window.i8ln.observation.maps.mrecord+'';
+    html = html + '<input type="radio" name="g" value="occurrence">'+window.i8ln.observation.maps.moccur+'';
  
     html = html + '</form>';
     html = html + '</div>';

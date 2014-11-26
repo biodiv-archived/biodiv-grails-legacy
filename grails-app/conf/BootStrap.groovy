@@ -1,6 +1,7 @@
 import org.apache.commons.logging.LogFactory;
 
 import species.Field;
+import species.Language;
 import species.UserGroupTagLib;
 import species.Synonyms;
 import species.CommonNames;
@@ -87,7 +88,8 @@ class BootStrap {
 		def user = SUser.findByEmail(email) ?: new SUser(
 				email: email,
 				password: password,
-				enabled: true).save(failOnError: true)
+				enabled: true,
+                language:Language.getLanguage(Language.DEFAULT_LANGUAGE)).save(failOnError: true)
 
 		if (!user.authorities.contains(userRole)) {
 			SUserRole.create user, userRole

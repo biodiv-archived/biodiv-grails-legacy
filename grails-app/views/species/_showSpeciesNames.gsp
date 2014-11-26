@@ -1,7 +1,7 @@
 <%@ page import="species.Synonyms"%>
 <%@ page import="species.CommonNames"%>
 <%@page import="species.participation.ActivityFeedService"%>
-<%def nameRecords = fields.get(converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage))?.get(converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage)).collect{if(it.value && !it.key.equals('hasContent') &&  !it.key.equals('isContributor') && it.value.containsKey('speciesFieldInstance')){ return it.value.speciesFieldInstance[0]}} %>
+<%def nameRecords = fields.get(fieldFromName.nc)?.get(fieldFromName.trn).collect{if(it.value && !it.key.equals('hasContent') &&  !it.key.equals('isContributor') && it.value.containsKey('speciesFieldInstance')){ return it.value.speciesFieldInstance[0]}} %>
 <g:if test="${nameRecords}">
 <div class="sidebar_section" style="clear:both;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
@@ -11,19 +11,19 @@
     <div id="taxonRecordName" class="speciesField collapse in">
         <table>
             <tr class="prop">
-                <td><span class="grid_3 name">${converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage) }</span></td><td> ${raw(speciesInstance.taxonConcept.italicisedForm)}</td>
+                <td><span class="grid_3 name">${fieldFromName.sn }</span></td><td> ${raw(speciesInstance.taxonConcept.italicisedForm)}</td>
             </tr>
             <g:each in="${nameRecords}">
             <g:if test="${it}">
             <tr class="prop">
 
-                <g:if test="${it?.field?.subCategory?.equalsIgnoreCase(converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage))}">
+                <g:if test="${it?.field?.subCategory?.equalsIgnoreCase(fieldFromName.references)}">
                 <td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td class="linktext">${raw(it?.description)}</td>
                 </g:if> 
-                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME,3,userLanguage))}">
+                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(fieldFromName.gsn3)}">
 
                 </g:elseif> 
-                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,3,userLanguage))}">
+                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(fieldFromName.sn3)}">
 
                 </g:elseif> 
                 <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase('year')}">
