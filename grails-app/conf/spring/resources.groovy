@@ -91,18 +91,20 @@ beans = {
         //File f = new File( home, "solr.xml" );
         CoreContainer container = new CoreContainer("${configRoot.speciesPortal.app.rootDir}/solr");
         container.load() 
-
-        speciesSolrServer(EmbeddedSolrServer, container, "species" )
-        observationsSolrServer(EmbeddedSolrServer, container, "observations" );
-        newsletterSolrServer(EmbeddedSolrServer, container, "newsletters" );
-        projectSolrServer(EmbeddedSolrServer, container, "projects" );
+            
+        
+//        speciesSolrServer(EmbeddedSolrServer, container, "biodiv" )
+//        observationsSolrServer(EmbeddedSolrServer, container, "biodiv" );
+//        newsletterSolrServer(EmbeddedSolrServer, container, "biodiv" );
+//        projectSolrServer(EmbeddedSolrServer, container, "biodiv" );
         //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
-        documentSolrServer(EmbeddedSolrServer, container, "documents" );
-        usersSolrServer(EmbeddedSolrServer, container, "users" );
+//        documentSolrServer(EmbeddedSolrServer, container, "biodiv" );
+//        usersSolrServer(EmbeddedSolrServer, container, "biodiv" );
+//        userGroupSolrServer(EmbeddedSolrServer, container, "biodiv" );
+        biodivSolrServer(EmbeddedSolrServer, container, "biodiv" );
 
     } else {
-        //TODO: use ConcurrentUpdateSolrServer for updates and HttpSolrServer for query interface
-        speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
+/*        speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -114,7 +116,7 @@ beans = {
             println "Initialized search server to "+config.serverURL+"/species"
         }
 
-        observationsSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
+        observationsSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -126,7 +128,7 @@ beans = {
             println "Initialized search server to "+config.serverURL+"/observations"
         }
 
-        newsletterSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
+        newsletterSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -138,7 +140,7 @@ beans = {
             println "Initialized search server to "+config.serverURL+"/newsletters"
         }
 
-        /*checklistSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
+        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -148,21 +150,9 @@ beans = {
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/checklists"
-        }*/
-
-        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/projects"
         }
 
-        documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
+        documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -174,7 +164,7 @@ beans = {
             println "Initialized search server to "+config.serverURL+"/documents"
          }
         
-	usersSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/users", config.queueSize, config.threadCount ) {
+        userGroupSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -183,36 +173,70 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/users"
+            log.debug "Initialized user groups search server to "+config.serverURL+"/biodiv"
+        }
+*/
+        biodivSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            println "Initialized search server to "+config.serverURL+"/biodiv"
          }
     }//end of initializing solr Server
+    
+    resourceSearchService(speciespage.search.ResourceSearchService) {
+        solrServer = ref('biodivSolrServer');
+		sessionFactory = ref("sessionFactory");
+    }
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
-        solrServer = ref('speciesSolrServer');
+        solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+        resourceSearchService = ref('resourceSearchService');
     }
     observationsSearchService(speciespage.search.ObservationsSearchService) {
-        solrServer = ref('observationsSolrServer');
+        solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
-    }
+        resourceSearchService = ref('resourceSearchService');
+     }
     //checklistSearchService(speciespage.search.ChecklistSearchService) {
     //    solrServer = ref('checklistSolrServer');
     //}
     newsletterSearchService(speciespage.search.NewsletterSearchService) {
-        solrServer = ref('newsletterSolrServer');
+        solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
-        solrServer = ref('projectSolrServer');
+        solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
-        solrServer = ref('documentSolrServer');
+        solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
     }
     SUserSearchService(speciespage.search.SUserSearchService) {
-        solrServer = ref('usersSolrServer');
+        solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+    }
+    userGroupSearchService(speciespage.search.UserGroupSearchService) {
+        solrServer = ref('biodivSolrServer');
+		sessionFactory = ref("sessionFactory");
+    }
+
+    biodivSearchService(speciespage.search.BiodivSearchService) {
+        solrServer = ref('biodivSolrServer');
+		sessionFactory = ref("sessionFactory");
+        grailsApplication = ref('grailsApplication');
+        observationsSearchService = ref('observationsSearchService');
+        speciesSearchService = ref('speciesSearchService');
+        documentSearchService = ref('documentSearchService');
+        SUserSearchService = ref('SUserSearchService');
+        userGroupSearchService = ref('userGroupSearchService');
     }
 
     preAuthenticationChecks(DefaultPreAuthenticationChecks)
@@ -229,24 +253,25 @@ beans = {
         appUserConnectionPropertyName = dbConf.facebook.domain.appUserConnectionPropertyName
         userDomainClassName = dbConf.userLookup.userDomainClassName
         rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
-        //coreUserDetailsService = ref('userDetailsService')
-        //defaultRoleNames = ['ROLE_USER']
+        coreUserDetailsService = ref('userDetailsService')
+        defaultRoleNames = ['ROLE_USER']
 
     }
-    //   }
 
     facebookAuthUtils(FacebookAuthUtils) { 
         grailsApplication = ref('grailsApplication') 
-    }
-     /*   apiKey = conf.facebook.apiKey
+        apiKey = conf.facebook.apiKey
         secret = conf.facebook.secret
         applicationId = conf.facebook.appId
         filterTypes = ['cookie', 'transparent']
         requiredPermissions = ['email']
 
-    }*/
+    }
 
-    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
+    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { 
+        facebookAuthUtils = ref('facebookAuthUtils') 
+        facebookAuthDao = ref('facebookAuthDao')
+    }
     SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
 
     fbAuthenticationFailureHandler(AjaxAwareAuthenticationFailureHandler) {
@@ -270,6 +295,7 @@ beans = {
     facebookAuthService(FacebookAuthService) {
         grailsApplication = ref('grailsApplication')
         userDomainClassName = conf.userLookup.userDomainClassName
+        facebookAuthDao = ref('facebookAuthDao')
     }
 
 

@@ -19,24 +19,29 @@ import species.participation.Checklists;
 import content.eml.Document;
 import species.participation.RecommendationVote;
 import groovy.sql.Sql;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
+;
 
 class ChartService {
 
 	static transactional = false
 
 	private static final Date PORTAL_START_DATE = new Date(111, 7, 8)
+	private static final int MAX_STAT_DAYS = 365 // 1 year
 
 	static final String ACTIVE_USER_STATS = "Active user stats"
 	static final String OBSERVATION_STATS = "Observation stats"
 	static final String SPECIES_STATS = "Species stats"
 	static final String USER_OBSERVATION_BY_SPECIESGROUP = "User observation by species group"
 	
-	
+def messageSource;
+    def utilsService
 	def userGroupService
-	def observationService
     def dataSource
-	
+	def request;
 	def getObservationStats(params, SUser author, request){
+		
 		UserGroup userGroupInstance
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
@@ -50,9 +55,9 @@ class ChartService {
 
 		mergeResult(allResult, unidentifiedResult)
     	allResult.columns = [
-			['string', 'Species Group'],
-			['number', 'All'],
-			['number', 'UnIdentified']
+			['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
+			['number', messageSource.getMessage("default.all.label", null, LCH.getLocale())],
+			['number', messageSource.getMessage("button.unidentified", null, LCH.getLocale())]
 		]
 
 		addHtmlResultForObv(allResult, request)
@@ -69,7 +74,7 @@ class ChartService {
         mergeResult(allObvResult, allRecoResult)
     	allObvResult.columns = [
 			['string', 'Species Group'],
-			['number', 'Observations'],
+			['number', ''],
 			['number', 'Identifications']
 		]
 
@@ -211,7 +216,7 @@ class ChartService {
 			}
 		}
 		filterParamsForHyperLink.sGroup = SpeciesGroup.findByName(speciesGroup).id
-		def link = observationService.generateLink((isObv)?"observation":"species", "list", filterParamsForHyperLink, null)
+		def link = utilsService.generateLink((isObv)?"observation":"species", "list", filterParamsForHyperLink, null)
 		return "" + '<a href="' +  link +'">' + count + "</a>"
 	}
 	
@@ -226,7 +231,7 @@ class ChartService {
 			fitlerParams.sGroup = speciesGroup.id
 		}
 		fitlerParams.user = userId
-		def link = observationService.generateLink("observation", "list", fitlerParams, request)
+		def link = utilsService.generateLink("observation", "list", fitlerParams, request)
 		return "" + '<a  href="' +  link +'">' + count + "</a>"
 	}
 	
@@ -241,6 +246,7 @@ class ChartService {
 
 
 	def getSpeciesPageStats(params, request){
+		
 		def totalCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id order by count(*) desc";
 		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id order by count(*) desc";
 
@@ -258,15 +264,16 @@ class ChartService {
 		}
 
 		def res = [data : finalResult, columns : [
-				['string', 'Species Group'],
-				['number', 'Content'],
-				['number', 'Stubs']
+				['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
+				['number', messageSource.getMessage("default.content.label", null, LCH.getLocale())],
+				['number', messageSource.getMessage("table.stubs", null, LCH.getLocale())]
 			]]
 		addHtmlResultForSpecies(res, , request)
 		return res
 	}
 
 	private addHtmlResultForSpecies(Map res, request){
+		
 		List htmlData = []
 		res.data.each{ r ->
 			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, false), r[1], r[2]])
@@ -275,9 +282,9 @@ class ChartService {
 		res.htmlData = htmlData
 		res.htmlColumns = [
 			['string', ''],
-			['string', 'Species Group'],
-			['number', 'Content'],
-			['number', 'Stubs']
+			['string', messageSource.getMessage("table.species.group", null, LCH.getLocale())],
+			['number', messageSource.getMessage("default.content.label", null, LCH.getLocale())],
+			['number', messageSource.getMessage("table.stubs", null, LCH.getLocale())]
 		]
 	}
 	
@@ -289,6 +296,7 @@ class ChartService {
 	} 
 	
 	def activeUserStats(params, request){
+		
 		int days = params.days ? params.days.toInteger() : 7
 		int max = params.max ? params.max.toInteger() : 10
 
@@ -322,20 +330,20 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			def link = utilsService.generateLink("SUser", "show", ["id": r[0].id], request)
 			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
 			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, startDate, r[1], request)])
 			r[0] = r[0].name
 		}
 		
 		return [obvCount:obvCount, data : result, htmlData:finalResult, columns : [
-					['string', 'User'],
-					['number', 'Observations']
+					['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
+					['number', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
 				],
 				htmlColumns : [
 					['string', ''],
-					['string', 'User'],
-					['string', 'Observations']
+					['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
+					['string', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
 				]
 			]
 	}
@@ -346,16 +354,14 @@ class ChartService {
 	
 	def getPortalActivityStatsByDay(params){
 		UserGroup userGroupInstance
-		def typeToIdFilterMap
 
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
-			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroupInstance])
 		}
 
 		int days = getPassedDays(params, userGroupInstance) 
 		log.debug "passed days $days"
-		days = (days > 365) ? 365 : days
+		days = (days > MAX_STAT_DAYS) ? MAX_STAT_DAYS : days
 		
 		def result = []
 		Date currentDate = new Date()
@@ -369,15 +375,15 @@ class ChartService {
 			
 			def userCount
 			if(userGroupInstance){
-				userCount = getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.MEMBER_JOINED)
+				userCount = ActivityFeed.getActivityCount(startDate, endDate, userGroupInstance, ActivityFeedService.MEMBER_JOINED)
 			}else{
 				userCount = getRegisterUserCount(startDate, endDate)
 			}
 			
 			result.add([
 				startDate,
-				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance),
-				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
+				ActivityFeed.getActivityCount(startDate, endDate, userGroupInstance),
+				ActivityFeed.getActivityCount(startDate, endDate, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
 				userCount
 			])
 		}
@@ -389,33 +395,6 @@ class ChartService {
 				['number', 'Users']
 				]
 			]
-	}
-
-	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, feedType=null){
-		return ActivityFeed.createCriteria().count{
-			and{
-				eq('isShowable', true)
-				if(startDate && endDate){
-					between('lastUpdated', startDate, endDate)
-				}
-				if(feedType){
-					eq('activityType', feedType)
-				}
-				//filter by usergroup
-				if(userGroupInstance){
-					or{
-						typeToIdFilterMap.each{key, value ->
-							if(!value.isEmpty()){
-								and{
-									eq('rootHolderType', key)
-									'in'('rootHolderId', value)
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	private int getRegisterUserCount(startDate, endDate){
@@ -502,7 +481,7 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			def link = utilsService.generateLink("SUser", "show", ["id": r[0].id], request)
 			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
 			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, null, r[1], request, sGroup)])
 			r[0] = r[0].name
@@ -650,14 +629,12 @@ class ChartService {
 
 	
 	def long getActivityFeedCount(params){
-		def userGroup, typeToIdFilterMap
+		def userGroup 
 		if(params.webaddress) {
 			userGroup = userGroupService.get(params.webaddress)
-			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroup])
-			
 		}
 		
-		return getActivityCount(null, null, typeToIdFilterMap, userGroup)
+		return ActivityFeed.getActivityCount(null, null, userGroup)
 	}
 
     def activeUserStatsAuthorAndCount(max, userGroupInstance , startDate){ 

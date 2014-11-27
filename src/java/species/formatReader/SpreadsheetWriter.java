@@ -34,7 +34,7 @@ public class SpreadsheetWriter {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
             writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
-            writeHeadersInFormat(wb, headerMarkers);
+            writeHeadersInFormat(wb, headerMarkers, orderedArray);
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
             out.close();
@@ -142,7 +142,7 @@ public class SpreadsheetWriter {
         return;
     }
     
-    public static void writeHeadersInFormat(Workbook wb, JSONElement headerMarkers1) {
+    public static void writeHeadersInFormat(Workbook wb, JSONElement headerMarkers1, JSONArray orderedArray) {
     	JSONObject headerMarkers = (JSONObject) headerMarkers1;
         //System.out.println("=CLASS===="+headerMarkers.getClass());
         Object o = headerMarkers.remove("undefined");
@@ -170,7 +170,7 @@ public class SpreadsheetWriter {
             //System.out.println("==========NEW FUNC==============");
             //System.out.println(headerName);
             //System.out.println("---------" + entry.getValue() + entry.getValue().getClass());
-            //System.out.println("-------==============" + headerValues + headerValues.getClass());
+            System.out.println("-------==============" + headerValues + headerValues.getClass());
             String dataColumns = "";
             if(headerValues.get("dataColumns") != null){
                 dataColumns = headerValues.get("dataColumns");
@@ -236,6 +236,12 @@ public class SpreadsheetWriter {
             if(headerValues.get("audience") != null){
                 audience = headerValues.get("audience");
                 audience = audience.trim();
+            }
+
+            String language = "";
+            if(headerValues.get("language") != null){
+                language = headerValues.get("language");
+                language = language.trim();
             }
 
             //System.out.println("=======" + dataColumns);
@@ -321,6 +327,16 @@ public class SpreadsheetWriter {
                         else {
                             m.put("audience",  headerName + KEYVALUE_SEP + audience);
                         }
+            
+                        String languageCol = m.get("language");
+                        if(languageCol != "") {
+                            languageCol = language;
+                            m.put("language", languageCol);
+                        }
+                        else {
+                            m.put("language",  language);
+                        }
+
 
                     }else {
                         Map<String, String> m1 = new HashMap();
@@ -333,6 +349,7 @@ public class SpreadsheetWriter {
                         m1.put("references",  headerName + KEYVALUE_SEP + references);
                         m1.put("license",  headerName + KEYVALUE_SEP + license);
                         m1.put("audience",  headerName + KEYVALUE_SEP + audience);
+                        m1.put("language",  language);
 
 
                         reverseMarkers.put(nextVal, m1);
@@ -344,7 +361,7 @@ public class SpreadsheetWriter {
 
         Row row = sheet.createRow(rownum++);
         
-        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT", "IMAGES", "CONTRIBUTOR", "ATTRIBUTIONS", "REFERENCES", "LICENSE","AUDIENCE"};
+        String[] headerRowValues = {"CONCEPT", "CATEGORY", "SUBCATEGORY", "FIELD NAME(S)", "CONTENT DELIMITER", "CONTENT FORMAT", "IMAGES", "CONTRIBUTOR", "ATTRIBUTIONS", "REFERENCES", "LICENSE","AUDIENCE", "LANGUAGE"};
         int numOfColumns = headerRowValues.length;
         for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){
             Cell cell = row.createCell(cellNum);
@@ -374,6 +391,29 @@ public class SpreadsheetWriter {
             arr[9] = m2.get("references");
             arr[10] = m2.get("license");
             arr[11] = m2.get("audience");
+            arr[12] = m2.get("language");
+            
+
+            //Rewriting fieldnames according to columns in sheet 1
+
+            String[] tokens = arr[3].split(FIELD_SEP);
+            String finalKeysOrdered = "";
+            int orderedArraySize = orderedArray.length();
+            for (int k = 0; k< orderedArraySize; k++){
+                String kkk = orderedArray.getString(k);
+                for (String token : tokens)
+                {
+                    if(token.equals(kkk)) {
+                        if(finalKeysOrdered == "") {
+                            finalKeysOrdered = token;
+                        } else {
+                            finalKeysOrdered = finalKeysOrdered + FIELD_SEP + token;
+                        }
+                    }
+                }
+            }
+            arr[3] = finalKeysOrdered;
+            /////////
 
             row = sheet.createRow(rownum++);
             for (int cellNum = 0; cellNum < numOfColumns; cellNum++ ){

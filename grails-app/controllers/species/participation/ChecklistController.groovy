@@ -17,6 +17,7 @@ class ChecklistController {
 	def observationService
 	def SUserService
 	def chartService
+    def utilsService;
 	
 	def index = {
 		redirect(action:'list', params: params)
@@ -41,6 +42,7 @@ class ChecklistController {
 				}
 				//refetching checklist and  all observation in one query
 				//checklistInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false, [fetch: [observations: 'join']])
+				def userLanguage = utilsService.getCurrentLanguage(request);
 				checklistInstance.incrementPageVisit()
 				def userGroupInstance;
 				params.max = params.max?params.max.toInteger():50 
@@ -53,12 +55,12 @@ class ChecklistController {
 					def prevNext = obsController.getPrevNextObservations(pos, params.webaddress);
 					//def prevNext = getPrevNextChecklists(pos, params.webaddress);
 					if(prevNext) {
-						[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+						[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,userLanguage:userLanguage]
 					} else {
-						[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
+						[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress,userLanguage:userLanguage]
 					}
 				} else {
-					[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
+					[checklistInstance: checklistInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress,userLanguage:userLanguage]
 				}
 			}
 		} else {
@@ -109,8 +111,8 @@ class ChecklistController {
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
-                flash.error = result.msg;//"${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn, latitude:params.latitude, longitude:params.longitude])
+                //flash.error = result.msg;//"${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns.encodeAsJSON(), sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn, latitude:params.latitude, longitude:params.longitude])
             }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
@@ -119,6 +121,7 @@ class ChecklistController {
 	}
 
 	private saveAndRender(params, sendMail=true){
+		params.locale_language = utilsService.getCurrentLanguage(request);
 		updateParams(params)
 		return checklistService.saveChecklist(params, sendMail=true)
 	}

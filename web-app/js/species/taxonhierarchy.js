@@ -98,8 +98,9 @@
                 loadError : function(xhr, status, error) {
                     if(xhr.status == 401) {
                         show_login_dialog();
-                    } else {	    
-                        alert(error);
+                    } else {	 
+                        console.log(error);   
+                       // alert(error);
                     }
                 },
                 beforeSelectRow: function (rowid, e) {
@@ -184,7 +185,7 @@
         onDelete : function(e){    
             e.stopPropagation();
             e.preventDefault();
-            var c = confirm('You are about to delete some content. Are you sure?');
+            var c = confirm(window.i8ln.species.abstracteditabletype.del);
             if(c == true) {
                 var $sf = this; 
                 var $form = $(e.currentTarget);
@@ -276,7 +277,7 @@
             var $errorBlock = $sf.$element.find('.editable-error-block');
 
             if(data.errors && data.errors.length > 0) {
-                data.msg += "<div class='alert-error'>Please fix following errors</div><ul class='alert-error'>";
+                data.msg += "<div class='alert-error'>"+ window.i8ln.species.abstracteditabletype.er +"</div><ul class='alert-error'>";
                 $.each(data.errors, function(i, v) {
                     data.msg += "<li>"+v+"</li>"
                 });

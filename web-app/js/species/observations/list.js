@@ -10,7 +10,6 @@ $(document).ready(function(){
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
 
-    console.log('updated gallery trigger');
     $('.list').trigger('updatedGallery');
 
     $('#speciesNameFilter').button();
@@ -245,14 +244,16 @@ $(document).ready(function(){
 
     $(".removeQueryFilter").on('click', function(){
         var removeParam = undefined;
-        if($($(this).attr('data-target').replace('.','\\.')).length != 0)
-        $($(this).attr('data-target').replace('.','\\.')).val('')
+        if($('input[name="'+$(this).attr('data-target')+'"]').length != 0)
+            $('input[name="'+$(this).attr('data-target')+'"]').val('')
+        else if($('select[name="'+$(this).attr('data-target')+'"]').length != 0)
+            $('select[name="'+$(this).attr('data-target')+'"]').val('')
         else {
             $( "#searchTextField" ).val('');	
         }
-    removeParam = $(this).attr('data-target').replace('#','');
-    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
-    return false;
+        removeParam = $(this).attr('data-target').replace('#','');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+        return false;
     });
 
     $('select[name="limit"]').on('change', function() {
@@ -282,7 +283,6 @@ $(document).ready(function(){
    
 
     $('.observation').on("click", ".loadMore", function() {
-        console.log('loadmore');
         $.autopager({
 
             autoLoad : false,
@@ -522,6 +522,28 @@ function getSelectedUserGroup() {
     return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
+function getSelectedFilters($ele, noneSelected) {
+    var selected = [];
+    var allSelected = true;
+    var noneSelected = (noneSelected != undefined) ? noneSelected : true;
+    $ele.each(function() {
+        if($(this).hasClass('active') && $(this).is(':checked')) {
+            var name = $(this).attr('value');
+            if(name.toLowerCase() == 'all') {
+                //selected = ['All']
+                //return;
+            } else {
+                selected.push(name);
+            }
+            noneSelected = false;
+        } else {
+            allSelected = false;
+        }
+    });
+    if(noneSelected) resetSearchFilters($ele.parent().parent());
+    if(allSelected == false) return selected.join(' OR ');
+} 
+
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
 
@@ -589,22 +611,63 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     if(!isRegularSearch) {
-        $("#advSearchForm :input").each(function(index, ele) {
+        $("#advSearchForm :input, #advSearchForm select").each(function(index, ele) {
             var field = $(this).attr('name');
-            var query = $( this ).val();
-            if(query){
-                params[field] = query;
-            } else {
-                // removing old tag from url
-                if(params[field] != undefined){
-                    delete params[field];
+            if(field) {
+                var query = $( this ).val();
+                var queryStr = '';
+                if($.isArray(query)) {
+                    for(var i=0; i< query.length; i++) {
+                        queryStr += query[i]
+                        if(i < query.length-1) queryStr += " OR "
+                    }
+                    queryStr += ""
+                } else {
+                    queryStr = query;
                 }
+                if(field == 'aq.object_type' && query == 'All') {
+
+                } 
+                else if(query){
+                    params[field] = queryStr;
+                } else {
+                    // removing old tag from url
+                    if(params[field] != undefined){
+                        delete params[field];
+                    }
+                }
+            }
+        });
+        
+        delete params['daterangepicker_start'];
+        delete params['daterangepicker_end'];
+
+        $.each($(document).find('input[name=daterangepicker_start]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_start'] = $(value).val();
+            } else {
+                params['daterangepicker_start'] = $(value).val();
+            }
+        });
+        $.each($(document).find('input[name=daterangepicker_end]'), function(index, value) {
+            if($(value).closest('#observedOnDatePicker').length > 0) {
+                params['observedon_end'] = $(value).val();
+            } else {
+                params['daterangepicker_end'] = $(value).val();
             }
         });
         if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
             delete params['daterangepicker_start'];
             delete params['daterangepicker_end'];
         }
+        if((params['observedon_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['observedon_end'] === Date.today().toString('dd/MM/yyyy'))){
+            delete params['observedon_start'];
+            delete params['observedon_end'];
+        }
+
+        delete params['query'];
+        $( "#searchTextField" ).val('');
+
     }
 
     if($("#limit").length != 0) {
@@ -646,11 +709,46 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     var isMapView = $("#isMapView").val()
-        if(isMapView) {
-            params['isMapView'] = isMapView
-        } else {
-            delete params['isMapView']
-        }
+    if(isMapView) {
+        params['isMapView'] = isMapView
+    } else {
+        delete params['isMapView']
+    }
+
+    var object_type = getSelectedFilters($("input.moduleFilter"))
+    if(object_type) {
+        params['object_type'] = object_type
+    } else {
+        delete params['object_type']
+    }
+
+    var uGroup = getSelectedFilters($("input.uGroupFilter"))
+    if(uGroup) {
+        params['uGroup'] = uGroup
+    } else {
+        //delete params['uGroup']
+    }
+
+    var sGroup = getSelectedFilters($("input.sGroupFilter"))
+    if(sGroup) {
+        params['sGroup'] = sGroup
+    } 
+
+    var contributor = getSelectedFilters($("input.contributorFilter"))
+    if(contributor) {
+        params['contributor'] = contributor
+    } else {
+        delete params['contributor']
+    }
+
+    var tag = getSelectedFilters($("input.tagFilter"))
+    if(tag) {
+        params['tag'] = tag
+    } else {
+        delete params['tag']
+    }
+
+
     return params;
 }	
 
@@ -685,6 +783,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
+        //$('#filterPanel').replaceWith(data.filterPanel);
         //$('.observation_location').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
@@ -693,7 +792,7 @@ function updateListPage(activeTag) {
         last_actions();
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
-    console.log('updated gallery trigger');
+        console.log('triggering updatedGallery');
         $('.list').trigger('updatedGallery');
     }
 }
@@ -764,27 +863,32 @@ function updateMapView (params, callback) {
 //        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
 //    }
     var p = jQuery.extend({}, params);
-    delete p.bounds;
-    delete oldParams.bounds;
-    //console.log(JSON.stringify(oldParams));
-    //console.log(JSON.stringify(p));
+    //delete p.bounds;
+    //delete oldParams.bounds;
     var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker'); 
     if(mapLocationPicker == undefined) {
         loadGoogleMapsAPI(function() {
             mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             mapLocationPicker.initialize();
+           
             $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
             refreshMapBounds(mapLocationPicker);
             oldParams = params;
-	    $('#big_map_canvas').trigger('maploaded');
+	        $('#big_map_canvas').trigger('maploaded');
+            mapLocationPicker.map.on('zoomend', function() {
+                var bounds = mapLocationPicker.getSelectedBounds()
+                $("#bounds").val(bounds);
+                showMapView();
+            });
         })
 
     } else {
         //TODO:remove bounds before comparision
         //order of params is important for this test to pass
-        if(JSON.stringify(oldParams) != JSON.stringify(p))
+        if(JSON.stringify(oldParams) != JSON.stringify(p)) {
             refreshMarkers(p, undefined, undefined, mapLocationPicker);
+        }
         refreshMapBounds(mapLocationPicker);
         oldParams = params;
     }
@@ -917,7 +1021,7 @@ function loadSpeciesGroupCount() {
                             document.getElementById('speciesGroupCountList'));
 
                         columnChart.draw(visualization_data,  {
-                            title:"No of observations per species group",
+                            title:window.i8ln.species.specie.ops,
                             vAxis:{minValue:0, maxValue:5, format: '#'},
                             legend:{position: 'bottom'},
                             chartArea:{width:'80%'}

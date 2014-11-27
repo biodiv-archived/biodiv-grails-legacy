@@ -69,12 +69,12 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
-        compile ('org.apache.solr:solr-solrj:4.4.0') {
+        compile ('org.apache.solr:solr-solrj:4.10.0') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
 
         if (Environment.current == Environment.DEVELOPMENT) {
-            compile ('org.apache.solr:solr-core:4.4.0') {
+            compile ('org.apache.solr:solr-core:4.10.0') {
                 excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec', 'hadoop-hdfs', 'hadoop-auth', 'hadoop-annotations', 'hadoop-common'
             }
         }
@@ -176,7 +176,7 @@ grails.project.dependency.resolution = {
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
-        //        compile ":grails-melody:1.47.2"
+        compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.2.1"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"

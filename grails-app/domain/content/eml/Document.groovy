@@ -14,7 +14,8 @@ import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Follow;
 import species.participation.Featured;
-
+import species.Language;
+import org.springframework.context.MessageSourceResolvable;
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -26,24 +27,43 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	def springSecurityService;
 	def SUserService;
 	def documentService
-	
-	public enum DocumentType {
-		Report("Report"),
-		Poster("Poster"),
-		Proposal("Proposal"),
-		Miscellaneous("Miscellaneous"),
 
-		private String value;
-		
+    public enum DocumentType implements org.springframework.context.MessageSourceResolvable{
+        Report("Report"),
+        Poster("Poster"),
+        Proposal("Proposal"),
+        Miscellaneous("Miscellaneous"),
 
-		DocumentType(String value) {
-			this.value = value;
+        private String value;
+
+
+        DocumentType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+                Report,
+                Poster,
+                Proposal,
+                Miscellaneous
+			]
 		}
 
-		public String value() {
-			return this.value;
-		}
-	}
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    }
 
 	DocumentType type
     int flagCount = 0;
@@ -64,12 +84,15 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
-
+    //String scientificNames;
 	//XXX uncmment it before migration
 	//Coverage coverage //<== extending metadata now	//Coverage Information
 	
 	//Date createdOn  <=== dateCreated
 	//Date lastRevised <=== lastUpdated
+
+	// Language
+    Language language;
 	
 	boolean deleted
 	
@@ -87,6 +110,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		uri validator : {val, obj -> 
 			val || obj.uFile
 		},nullable:true
+		language nullable:false
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true
@@ -94,7 +118,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		author nullable:true
 		notes nullable:true
 		doi nullable:true
-		license nullable:true
+		license nullable:false
     	featureCount nullable:false
 		agreeTerms nullable:true
 		

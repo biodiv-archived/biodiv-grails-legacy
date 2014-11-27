@@ -27,55 +27,56 @@
 					<div id="map_view_bttn" class="btn-group" style="display:none;">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 							href="#">
-							Map view <span class="caret"></span> </a>
+							<g:message code="button.map.view" /> <span class="caret"></span> </a>
 					</div>
 				</g:if>
 				<div class="btn-group pull-left" style="z-index: 10">
 					<button id="selected_sort" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
-						data-original-title="Sort by">
+						data-original-title="${g.message(code:'showobservationlistwrapertemp.sort')}">
 
 						<g:if test="${params.sort == 'visitCount'}">
-                                               Most Viewed
+                                             <g:message code="button.most.viewed" />  
                                             </g:if>
 						<g:elseif test="${params.sort == 'createdOn'}">
-                                                Latest
+                                                <g:message code="button.latest" />
                                             </g:elseif>
 						<g:elseif test="${params.sort == 'score'}">
-                                                Relevancy
+                                               <g:message code="button.relevancy" /> 
                                             </g:elseif>
 						<g:else>
-                                                Last Updated
+                                               <g:message code="button.last.updated" />
                                             </g:else>
 						<span class="caret"></span>
 					</button>
 					<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" sort_filter_label"
-							value="createdOn"> Latest </a></li>
+							value="createdOn"> <g:message code="button.latest" /> </a></li>
 						<li class="group_option"><a class=" sort_filter_label"
-							value="lastRevised"> Last Updated </a></li>
+							value="lastRevised"> <g:message code="button.last.updated" /> </a></li>
 						<g:if test="${isSearch}">
 							<li class="group_option"><a class=" sort_filter_label"
-								value="score"> Relevancy </a></li>
+								value="score"> <g:message code="button.relevancy" /> </a></li>
 						</g:if>
 						<g:else>
 							<li class="group_option"><a class=" sort_filter_label"
-								value="visitCount"> Most Viewed </a></li>
+								value="visitCount"> <g:message code="button.most.viewed" /> </a></li>
 						</g:else>
 					</ul>
 
 
 				</div>
+
 				
 				<obv:identificationByEmail
-					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:'Share']" />
+					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:g.message(code:'button.share')]" />
 				
 				<obv:download
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
 
 			</div>
                         <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
-                            <obv:showObservationsList/>
+                            <obv:showObservationsList />
                         </div>
                         <div class="span4" style="position:relative;top:20px">
                  
@@ -84,20 +85,24 @@
                         
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
-                                    <h5>Species Distribution</h5>
-					<obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
-					</obv:showObservationsLocation>
-                                        <a id="refreshListForBounds" data-toggle="dropdown"
-                                            href="#"><i class="icon-refresh"></i>
-							Refresh list to map bounds</a>
+                                    <h5><g:message code="default.species.distribution.label" /></h5>
+                                    <obv:showObservationsLocation
+                                    model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
+                                    </obv:showObservationsLocation>
+                                    <a id="refreshListForBounds" data-toggle="dropdown"
+                                        href="#"><i class="icon-refresh"></i>
+                                        <g:message code="button.refresh.list" /></a>
+                                    <a id="resetMap" data-toggle="dropdown"
+                                        href="#"><i class="icon-refresh"></i>
+                                        <g:message code="button.reset" /></a>
 
+                                    <div><i class="icon-info"></i><g:message code="map.limit.info" /></div>
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
 				</div>
                                 <div class="sidebar_section" style="clear:both;overflow:hidden;">
-                                    <h5> Species Groups </h5>
+                                    <h5> <g:message code="default.species.groups.label" /> </h5>
                                     <div id="speciesGroupCountList"></div>
                                 </div>
                                 <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
@@ -129,6 +134,13 @@ $(document).ready(function() {
     $("#refreshListForBounds").click(function() {
         var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker');
         refreshList(mapLocationPicker.getSelectedBounds());
+    });
+
+    $("#resetMap").click(function() {
+        var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker');
+        //refreshList(mapLocationPicker.getSelectedBounds());
+        $("#bounds").val('');
+        refreshMapBounds(mapLocationPicker);
     });
 
     $('.list').on('updatedGallery', function() {

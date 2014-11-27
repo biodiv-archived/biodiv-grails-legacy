@@ -43,7 +43,7 @@ function getWFS() {
 }
 
 function getSummaryColumns(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getSummaryColumns';
     
     var params = {
         request:'getSummaryColumns',
@@ -81,7 +81,7 @@ function getSummaryColumns(layer) {
 }
 
 function getColumnTitle(layer, columnName) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getColumnTitle';
     
     var params = {
         request:'getColumnTitle',
@@ -155,7 +155,7 @@ function getThemeNames(theme_type) {
 
     //currently  no way to filter the theme names by domains ibp/wgp, 
     //hence, commented above code and using  hardcoded theme names below
-    var by_themes = 'Biogeography///Abiotic///Demography///Species///Administrative Units///Land Use Land Cover///Conservation///Threats';
+    var by_themes = window.i8ln.observation.maps.listtheme;
 
     var by_geography = 'India///Uttaranchal///Nilgiri Biosphere Reserve///Papagni, Andhra Pradesh///Western Ghats///BR Hills, Karnataka///Vembanad, Kerala///Satkoshia, Orissa///North East Area///Agar, Madhya Pradesh///Mandla, Madhya Pradesh///Pench, Madhya Pradesh///Bandipur, Karnataka///Kanakapura';
 
@@ -171,7 +171,7 @@ function getThemeNames(theme_type) {
 }
 
 function getLayersByTheme(theme) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayersByTheme';
     
     var params = {
         request:'getLayersByTheme',
@@ -206,7 +206,7 @@ function getLayersByTheme(theme) {
 }
 
 function getLayerColumns(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerColumns';
     
     var params = {
         request:'getLayerColumns',
@@ -241,7 +241,7 @@ function getLayerColumns(layer) {
 }
 
 function getLayerAttribution(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerAttribution';
     
     var params = {
         request:'getLayerAttribution',
@@ -276,7 +276,7 @@ function getLayerAttribution(layer) {
 }
 
 function getLayerSummary(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerSummary';
     
     var params = {
         request:'getLayerSummary',
@@ -311,7 +311,7 @@ function getLayerSummary(layer) {
 }
 
 function getLayerDetails(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerDetails';
     
     var params = {
         request:'getLayerDetails',
@@ -345,7 +345,7 @@ function getLayerDetails(layer) {
 }
 
 function getLayerLinkTables(layer) {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayerLinkTables';
     
     var params = {
         request:'getLayerLinkTables',
@@ -379,7 +379,7 @@ function getLayerLinkTables(layer) {
 }
 
 function getLayersAccessStatus() {
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'http://' + getGeoserverHost() + '/map/getLayersAccessStatus';
     
     var params = {
         request:'getLayersAccessStatus',
@@ -1855,10 +1855,9 @@ function createLayerExplorerLinks(layers) {
     var html = '';
     html = html + '<div id="layer_explorer_sidebar">';
     html = html + '<ul class="layer_explorer_sidebar_items">';
-
-    html = html + '<li><a href="#" onClick="updateLayersList(\'new\')" style="font-weight:normal; text-decoration:underline; font-style: italic; ">New layers</a></li>';
-    html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">All layers</a></li>';
-    html = html + '<li><div class="collapsible_box"><a class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_theme\', \'fade\'); hideDiv(\'layers_by_geography\', \'fade\', 1);">By theme</a>';
+    html = html + '<li><a href="#" onClick="updateLayersList(\'new\')" style="font-weight:normal; text-decoration:underline; font-style: italic; ">'+window.i8ln.observation.maps.newlayer+'</a></li>';
+    html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">'+window.i8ln.observation.maps.allayer+'</a></li>';
+    html = html + '<li><div class="collapsible_box"><a class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_theme\', \'fade\'); hideDiv(\'layers_by_geography\', \'fade\', 1);">'+window.i8ln.observation.maps.bytheme+'</a>';
     html = html + '<div id="layers_by_theme">';
     html = html + '<ul class="layer_explorer_sidebar_subitems">';
     var themes = getThemeNames(1);
@@ -1950,7 +1949,7 @@ function generateHTMLForLayersAsList(layers, hasMap) {
     //html = html + allKeywordsLinks;
     html = html + layerExplorerLinks;
 
-    html = html + '<div class="info_box">Showing <span id="layers_as_list_panel_title">all</span> layers</div>';
+    html = html + '<div class="info_box">'+window.i8ln.observation.maps.show+'</div>';
 
     html = html + '<div id="layers_as_list_panel">';
     html = html + '<ul>';
@@ -1984,21 +1983,21 @@ function generateHTMLForLayersAsList(layers, hasMap) {
         html = html + '<ul class="layer_options layer_actions" style="text-align:right;">';
         //if map component is present add links to add/remove layers
         if (hasMap) { 
-            html = html + '<li id=\'' + layers[i].name + '_zoom_to_extent\' class="first zoom_to_extent" onclick="zoomToLayerExtent(\'' + layers[i].name + '\');">zoom to extent</li>';
+            html = html + '<li id=\'' + layers[i].name + '_zoom_to_extent\' class="first zoom_to_extent" onclick="zoomToLayerExtent(\'' + layers[i].name + '\');">'+window.i8ln.observation.maps.mzoom+'</li>';
             html = html + 
                 "<li class='add_to_map' id='" +
                 layers[i].name +
                 "_a_add' href='#' onclick=\"addLayer('" +
                 layers[i].name + "', '" +
                 layers[i].title +
-                "');\">add to map</li>";
+                "');\">"+window.i8ln.observation.maps.madd+"</li>";
 
             html = html +
                 "<li class='remove_from_map' id='" +
                 layers[i].name +
                 "_a_remove' href='#' onclick=\"removeLayer('" +
                 layers[i].name +
-                "');\">remove from map</li>";
+                "');\">"+window.i8ln.observation.maps.mremove+"</li>";
 
 
         }
@@ -2461,7 +2460,7 @@ function closeLayerPane(layer, selected_layer_div, selected_layers_div) {
     var layers = map.getQueryableLayers();
    
     if (layers.length == 0){
-	var html = '<p><span class="info_msg">No layers selected</span></p>';
+	var html = '<p><span class="info_msg">'+window.i8ln.observation.maps.noselect+'</span></p>';
     	document.getElementById(selected_layers_div).innerHTML = html;
     }
 
@@ -2587,7 +2586,7 @@ function updateSelectedLayersPanel(selected_layers_div) {
     }
 
     if (map.getQueryableLayers().length == 0){
-	html = '<p><span class="info_msg">No layers selected</span></p>';
+	html = '<p><span class="info_msg">'+window.i8ln.observation.maps.noselect+'</span></p>';
     }
 
     document.getElementById(selected_layers_div).innerHTML = html;

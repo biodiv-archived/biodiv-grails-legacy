@@ -1,29 +1,29 @@
 <%@ page import="species.Synonyms"%>
 <%@ page import="species.CommonNames"%>
 <%@page import="species.participation.ActivityFeedService"%>
-<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{if(it.value && !it.key.equals('hasContent') &&  !it.key.equals('isContributor') && it.value.containsKey('speciesFieldInstance')){ return it.value.speciesFieldInstance[0]}} %>
+<%def nameRecords = fields.get(fieldFromName.nc)?.get(fieldFromName.trn).collect{if(it.value && !it.key.equals('hasContent') &&  !it.key.equals('isContributor') && it.value.containsKey('speciesFieldInstance')){ return it.value.speciesFieldInstance[0]}} %>
 <g:if test="${nameRecords}">
 <div class="sidebar_section" style="clear:both;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
-        <h5>Taxon Record Name</h5>
+        <h5><g:message code="showspeciesnames.taxon.record.name" /></h5>
     </a>
 
     <div id="taxonRecordName" class="speciesField collapse in">
         <table>
             <tr class="prop">
-                <td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${raw(speciesInstance.taxonConcept.italicisedForm)}</td>
+                <td><span class="grid_3 name">${fieldFromName.sn }</span></td><td> ${raw(speciesInstance.taxonConcept.italicisedForm)}</td>
             </tr>
             <g:each in="${nameRecords}">
             <g:if test="${it}">
             <tr class="prop">
 
-                <g:if test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
+                <g:if test="${it?.field?.subCategory?.equalsIgnoreCase(fieldFromName.references)}">
                 <td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td class="linktext">${raw(it?.description)}</td>
                 </g:if> 
-                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME)}">
+                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(fieldFromName.gsn3)}">
 
                 </g:elseif> 
-                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME)}">
+                <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(fieldFromName.sn3)}">
 
                 </g:elseif> 
                 <g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase('year')}">
@@ -48,7 +48,7 @@
 <g:if test="${synonyms}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
-        <h5>Synonyms</h5>
+        <h5><g:message code="showspeciesnames.synonyms" /></h5>
     </a> 
     <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;padding:0px;">
             <g:each in="${synonyms}" var="synonym">
@@ -58,7 +58,7 @@
                     ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
-                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="Click to edit">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
+                <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="${g.message(code:'title.click.edit')}">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
             </div>    
             </li>
             </g:each>
@@ -68,7 +68,7 @@
                 <span class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></span>
             </div>
             <div class="span8">
-                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></span>
+                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="${g.message(code:'placeholder.add.synonym')}"></span>
             </div>
             </li>
             </g:if>
@@ -81,7 +81,7 @@
 <g:elseif test="${isSpeciesContributor}">
 <div class="sidebar_section emptyField" style="display:none;">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
-        <h5>Synonyms</h5>
+        <h5><g:message code="showspeciesnames.synonyms" /></h5>
     </a> 
     <ul id="synonyms" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
            <li>
@@ -89,7 +89,7 @@
                 <span class="synRel add_selector ${isSpeciesContributor?'selector':''}" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship"></span>
             </div>
             <div class="span8">
-                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="Add Synonym"></span>
+                <span class="addField"  data-pk="${speciesInstance.id}" data-type="text"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Add Synonym" data-placeholder="${g.message(code:'placeholder.add.synonym')}"></span>
             </div>
             </li>
 
@@ -121,7 +121,7 @@ list.sort();
 %>
 <g:if test="${names}">
 <div class="sidebar_section">
-    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
+    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> <g:message code="showspeciesnames.common.names" /></h5></a> 
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;padding:0px;">
         <g:each in="${names}">
         <li>
@@ -133,7 +133,7 @@ list.sort();
         <div class="span8" style="display:table;">
             <g:each in="${it.value}"  status="i" var ="n">
                 <div class="entry pull-left" style="display:table-row;"> 
-                <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="Click to edit">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
+                <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="${g.message(code:'title.click.edit')}">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
                 </div>
             </g:each>
         </div>
@@ -148,7 +148,7 @@ list.sort();
                 </div> 
                 <div class="span8" style="display:table;">
                     <div style="display:table-row;"> 
-                        <span class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
+                        <span class="common_name ${isSpeciesContributor?'addField':''}" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="${g.message(code:'placeholder.add.common')}">  
                             </span>
                     </div>
                 </div>
@@ -161,7 +161,7 @@ list.sort();
 </g:if>
 <g:elseif test="${isSpeciesContributor}">
 <div class="sidebar_section emptyField" style="display:none;">
-    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
+    <a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> <g:message code="showspeciesnames.common.names" /></h5></a> 
     <ul id="commonNames" class="speciesField collapse in" style="list-style:none;overflow:hidden;margin-left:0px;">
         <li>
         <div class="span3">
@@ -170,7 +170,7 @@ list.sort();
         </div> 
         <div class="span8" style="display:table;">
             <div style="display:table-row;"> 
-                <span class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="Add Common Name">  
+                <span class="addField" data-type="text" data-pk="${speciesInstance.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Add Common Name" data-placeholder="${g.message(code:'placeholder.add.common')}">  
                     </span>
             </div>
         </div>

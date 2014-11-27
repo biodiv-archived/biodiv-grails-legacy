@@ -35,7 +35,7 @@
                 <g:if test="${r.type == ResourceType.AUDIO}"> 
                     <% audioTextNum += 1 %>               	                                     
                     <li class="active" style="display: inline;">
-                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  >Audio ${audioTextNum}</a>
+                        <a href="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" class="btn btn-small btn-success" rel="${tempVar}"  ><g:message code="species.audio.arg" args= "${ [audioTextNum] }" /></a>
                     </li>
                 </g:if>
             </g:each>
@@ -49,7 +49,7 @@
             
                 <audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;">                                              
                   <source src="${createLinkTo(file: r.fileName, base:resourcesServerURL)}" type="audio/mpeg">
-                    Your browser does not support the audio element.
+                   <g:message code="error.doesnot.support.audio" /> 
                 </audio>            	             
         </g:if>
     		<% audioResource += 1; %>

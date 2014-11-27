@@ -4,11 +4,11 @@
 <table class="table table-hover tablesorter">
 	<thead>
 		<tr>
-			<th title="${message(code: 'Dcoument.title.label', default: 'Title')}">${message(code: 'Dcoument.title.label', default: 'Title')}</th>
-			<th title="${message(code: 'Dcoument.type.label', default: 'Document Type')}">${message(code: 'Dcoument.type.label', default: 'Document Type')}</th>
-			<th title="${message(code: 'Dcoument.description.label', default: 'Description')}">${message(code: 'Dcoument.description.label', default: 'Description')}</th>
+			<th title="${message(code:'Dcoument.title.label')}">${message(code: 'Dcoument.title.label')}</th>
+			<th title="${message(code: 'Dcoument.type.label')}">${message(code: 'Dcoument.type.label')}</th>
+			<th title="${message(code: 'Dcoument.description.label')}">${message(code: 'Dcoument.description.label')}</th>
 			<g:if test="${canPullResource}">		
-				<th title="${message(code: 'Dcoument.pullToGroup.label', default: 'Post on Group')}">${message(code: 'Dcoument.pullToGroup.label', default: 'Post')}</th>
+				<th title="${message(code: 'Dcoument.pullToGroup.label')}">${message(code: 'Dcoument.pullToGroup.label')}</th>
 			</g:if>
 		</tr>
 	</thead>
@@ -23,7 +23,7 @@
                                 </g:if>
 
 
-                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;" title="${(featureCount>0) ? 'Featured':''}" >
+                                <span class="badge ${(featureCount>0) ? 'featured':''}" style="position:relative;" title="${(featureCount>0) ? g.message(code:'text.featured'):''}" >
                                 </span>
 
 
@@ -35,8 +35,12 @@
 				<td>
 					${documentInstance?.type?.value }
 				</td>
+				<%
+					def docNotes = documentInstance.notes?.replaceAll("<(.|\n)*?>", '')
+					docNotes = docNotes?.replaceAll("&nbsp;", '')
+				%>
 				<td class="ellipsis multiline" style="max-width:220px;">
-					${raw(documentInstance.notes)}
+					${docNotes}
 				</td>
 				<g:if test="${canPullResource}">
 					<td>

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <solr persistent="true">
-  <cores adminPath="/admin/cores">
-  	<core name="species" instanceDir="species" />
-        <core name="observations" instanceDir="observations" />
-	<core name="newsletters" instanceDir="newsletters" />
-	<core name="checklists" instanceDir="checklists" />
-	<core name="projects" instanceDir="projects" />
-	<core name="documents" instanceDir="documents" />
-	<core name="users" instanceDir="users" />
-</cores>
+    <cores adminPath="/admin/cores">
+        <core config="solrconfig.xml" name="biodiv" instanceDir="biodiv" schema="schema.xml" dataDir="data"/>
+    </cores>
 </solr>
+

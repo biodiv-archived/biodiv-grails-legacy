@@ -2,11 +2,11 @@
 <%@page import="species.utils.ImageType"%>
 <html>
     <head>
-        <g:set var="title" value="${params?.title?:'Map'}"/>
+        <g:set var="title" value="${params?.title?:g.message(code:"button.maps") }"/>
         <g:render template="/common/titleTemplate"/>
         <r:require modules="maps" />
         <style>
-            .container {
+            div.container.outer-wrapper{
                 width:100%;
             }
         </style>
@@ -22,11 +22,11 @@
                     <div id="panel">
                         <div id="top_bar">
                             <ul id="top_bar_links">
-                                <li><a href="#" id="explore_bttn">Explore</a></li>
-                                <li><a href="#" id="search_bttn">Search</a></li>
+                                <li><a href="#" id="explore_bttn"><g:message code="link.explore" /> </a></li>
+                                <li><a href="#" id="search_bttn"><g:message code="default.search" /></a></li>
                                 <!--li><a href="#" id="share_bttn">Share</a></li-->
-                                <li><a href="#" id="selected_layers_bttn">Selected layers</a></li>
-                                <li><a href="#" id="selected_features_bttn">Selected features</a></li>
+                                <li><a href="#" id="selected_layers_bttn"><g:message code="link.selected.layers" /></a></li>
+                                <li><a href="#" id="selected_features_bttn"><g:message code="link.selected.features" /></a></li>
                             </ul>
 
 

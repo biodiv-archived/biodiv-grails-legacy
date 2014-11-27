@@ -64,21 +64,21 @@
 	<div id="species_main_wrapper">
 		<div id='s2ui_header_body'>
 
-			<div id='s2ui_header_title'>Biodiv Management Console
+			<div id='s2ui_header_title'><g:message code="layouts.admin.biodiv.management" />
 			</div>
 
 			<span id='s2ui_login_link_container'> <nobr>
 					<div id='loginLinkContainer'>
 						<sec:ifLoggedIn>
-				Logged in as <sec:username /> (<g:link controller='logout'>Logout</g:link>)
+				<g:message code="layouts.admin.logged.as" /> <sec:username /> (<g:link controller='logout'><g:message code="button.logout" /></g:link>)
 				</sec:ifLoggedIn>
 						<sec:ifNotLoggedIn>
-							<a href='#' id='loginLink'>Login</a>
+							<a href='#' id='loginLink'><g:message code="button.login" /></a>
 						</sec:ifNotLoggedIn>
 
 						<sec:ifSwitched>
 							<a href='${request.contextPath}/j_spring_security_exit_user'>
-								Resume as <sec:switchedUserOriginalUsername /> </a>
+								<g:message code="layouts.admin.resume.as" /> <sec:switchedUserOriginalUsername /> </a>
 						</sec:ifSwitched>
 					</div>
 				</nobr> </span>
@@ -103,30 +103,21 @@
 				<div>
 
 					<ul class="jd_menu jd_menu_slate">
-						<li><a class="accessible">Data </a>
+						<li><a class="accessible"><g:message code="button.data" /> </a>
 							<ul>
-								<li><a href="${createLink(action:'loadData')}">Load
-										sample data</a></li>
-								<li><a href="${createLink(action:'loadNames')}">Load
-										sample names</a></li>
+								<li><a href="${createLink(action:'loadData')}"><g:message code="button.load.sample.data" /></a></li>
+								<li><a href="${createLink(action:'loadNames')}"><g:message code="button.load.sample.names" /></a></li>
 								<br />
-								<li><a href="${createLink(action:'updateGroups')}">Update
-										groups for taxon concepts</a></li>
-								<li><a href="${createLink(action:'updateExternalLinks')}">Update
-										external links for taxon concepts</a></li>
-								<li><a href="${createLink(action:'reloadNames')}">Sync
-										names and recommendations</a></li>
+								<li><a href="${createLink(action:'updateGroups')}"><g:message code="button.update.groups" /></a></li>
+								<li><a href="${createLink(action:'updateExternalLinks')}"><g:message code="button.update.external.taxon" /></a></li>
+								<li><a href="${createLink(action:'reloadNames')}"><g:message code="button.sync.names" /></a></li>
 								<br />
-								<li><a href="${createLink(action:'reloadNamesIndex')}">Recreate
-										names index</a>
+								<li><a href="${createLink(action:'reloadNamesIndex')}"><g:message code="button.recreate.names.index" /></a>
 								<li><a
-									href="${createLink(action:'reloadSpeciesSearchIndex')}">Recreate
-										species search index</a>
+									href="${createLink(action:'reloadSpeciesSearchIndex')}"><g:message code="button.Recreate.species" /></a>
 								<li><a
-									href="${createLink(action:'reloadObservationsSearchIndex')}">Recreate
-										observations search index</a> <br />
-								<li><a href="${createLink(action:'recomputeInfoRichness')}">Recompute
-										information richness</a></li>
+									href="${createLink(action:'reloadObservationsSearchIndex')}"><g:message code="button.recreate.observations" /></a> <br />
+								<li><a href="${createLink(action:'recomputeInfoRichness')}"><g:message code="button.recompute.information" /></a></li>
 							</ul></li>
 						<li><a class="accessible"><g:message
 									code="spring.security.ui.menu.users" /> </a>

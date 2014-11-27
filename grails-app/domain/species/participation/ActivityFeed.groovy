@@ -1,5 +1,7 @@
 package species.participation
 
+import groovy.sql.Sql;
+
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
 
@@ -12,6 +14,7 @@ import species.participation.ActivityFeedService
 
 class ActivityFeed {
 	def activityFeedService;
+	def dataSource
 	
 	//activity basic info
 	Date dateCreated;
@@ -66,150 +69,142 @@ class ActivityFeed {
 
 	static fetchFeeds(params){
 		if(validateParams(params)){
-			return fetchRequiredFeeds(params)
+			return execuateQuery(params, false)
 		}
 		return Collections.EMPTY_LIST
 	}
 	
-	static fetchRequiredFeeds(params){
-        //println params;
-        //println params.user
-		def feedType = params.feedType
-		
-		def refTime = getDate(params.refTime)
-		if(!refTime){
-			return Collections.EMPTY_LIST
-		}
-		
-		return ActivityFeed.withCriteria(){
-	 		and{
-				//removing all feeds of user as a root holder... user specific feeds captured by author condition.
-				//Can show user template as parent context and its activity on 2nd level but in that case all other activity 
-				// performed by user will not be aggregated and looks odd in UI
-				ne('rootHolderType', SUser.class.getCanonicalName())
-				 
-				if(params.isShowableOnly){
-					eq('isShowable', true)
-				}
-				 
-	 			if(params.isCommentThread){
-					eq('subRootHolderType', params.subRootHolderType)
-					eq('subRootHolderId', params.subRootHolderId)
-				}else{
-					switch (feedType) {
-						case ActivityFeedService.GENERIC:
-							eq('rootHolderType', params.rootHolderType)
-							break
-						case ActivityFeedService.SPECIFIC:
-							eq('rootHolderType', params.rootHolderType)
-							eq('rootHolderId', params.rootHolderId.toLong())
-							break
-						case [ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
-							or{
-								params.typeToIdFilterMap.each{key, value ->
-									if(!value.isEmpty()){ 
-										and{
-											eq('rootHolderType', key)
-											'in'('rootHolderId', value)
-										}
-									}
-								}
-								if(params.showUserFeed){
-									and{
-										eq('author', params.author)
-										eq('rootHolderType', Observation.class.getCanonicalName())
-									}
-								}
-							}
-							break
-						case ActivityFeedService.USER:
-                            and{
-                                eq('author', SUser.read(params.user.toLong()))
-                                or{
-                                    params.typeToIdFilterMap.each{key, value ->
-                                        if(!value.isEmpty()){ 
-                                            or{
-                                                and{
-                                                    eq('rootHolderType', key)
-                                                    'in'('rootHolderId', value)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            break
-						default:
-							break
-					}
-				}
-				if(params.feedCategory && params.feedCategory.trim() != ActivityFeedService.ALL){
-					eq('rootHolderType', params.feedCategory)
-	 			}
-				if(params.feedClass){
-					eq('activityHolderType', params.feedClass)
-	 			}
-				(params.timeLine == ActivityFeedService.OLDER) ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
-	 		}
-			if(params.max){
-				maxResults params.max
-	 		}
-			order 'lastUpdated', 'desc'
-	 	}
-	} 
-	
 	//XXX: right now its only usable for specific type. Needs to handle it for aggregate(i.e generic, all) type
 	static int fetchCount(params){
-		def feedType = params.feedType
+		if(validateParams(params)){
+			return execuateQuery(params, true)
+		}
+		return 0
+	}
+
+	
+	static execuateQuery(params, boolean isCountQuery){
+ 		def feedType = params.feedType
 		
 		def refTime = getDate(params.refTime)
 		if(!refTime){
-			return 0
+			return isCountQuery?0:Collections.EMPTY_LIST
 		}
-		return ActivityFeed.createCriteria().count{
-			and{
-				ne('rootHolderType', SUser.class.getCanonicalName())
-				
-				if(params.isShowableOnly){
-					eq('isShowable', true)
-				}
-				
-				if(params.isCommentThread != null && params.isCommentThread.toBoolean()){
-					eq('subRootHolderType', params.subRootHolderType)
-					eq('subRootHolderId', params.subRootHolderId)
-				}else{
-					switch (feedType) {
-						case ActivityFeedService.GENERIC:
-							eq('rootHolderType', params.rootHolderType)
-							break
-						case [ActivityFeedService.SPECIFIC, ActivityFeedService.GROUP_SPECIFIC]:
-							eq('rootHolderType', params.rootHolderType)
-							eq('rootHolderId', params.rootHolderId.toLong())
-							break
-                        case ActivityFeedService.USER:
-                            eq('author', SUser.read(params.user.toLong()))
-                            or{
-                                params.typeToIdFilterMap.each{key, value ->
-                                    if(!value.isEmpty()){ 
-                                        or{
-                                            and{
-                                                eq('rootHolderType', key)
-                                                'in'('rootHolderId', value)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-						break
-
-						default:
-							break
+		
+		
+		def map = [:]
+		String selectClause  = isCountQuery? "select count(*) as c " :"select af.id as id, af.last_updated as updatetime "
+		String fromClause = " from activity_feed af "
+		String whereClause = " where af.root_holder_type != '" + SUser.class.getCanonicalName() + "' "
+		String orderClause = isCountQuery?"":" order by af.last_updated desc "
+		orderClause +=  params.max ? (" limit " + params.max ): "" 
+		
+		if(params.isShowableOnly){
+			whereClause += " and af.is_showable = :isShowable "
+			map['isShowable'] = params.isShowableOnly
+		}
+		
+		if(params.feedCategory && params.feedCategory.trim() != ActivityFeedService.ALL){
+			whereClause += " and af.root_holder_type = :rootHolderType "
+			map['rootHolderType'] = params.feedCategory
+		}
+		
+		if(params.feedClass){
+			whereClause += " and af.activity_holder_type = :activityHolderType "
+			map['activityHolderType'] = params.feedClass
+		}
+		
+		
+		if(params.timeLine == ActivityFeedService.OLDER){
+			whereClause += " and af.last_updated < '" + refTime + "'"
+		}else{
+			whereClause += " and af.last_updated > '" + refTime + "'"
+		}
+		//map['lastUpdated'] = refTime
+		
+		List queryList
+		
+		if(params.isCommentThread){
+			whereClause += " and af.sub_root_holder_type = :subRootHolderType "
+			whereClause += " and af.sub_root_holder_id = :subRootHolderId "
+			map['subRootHolderType'] = params.subRootHolderType
+			map['subRootHolderId'] = params.subRootHolderId
+		}else{
+			switch (feedType) {
+				case ActivityFeedService.GENERIC:
+					whereClause += " and af.root_holder_type = :rootHolderType "
+					map['rootHolderType'] = params.rootHolderType
+					break
+				case ActivityFeedService.SPECIFIC:
+					whereClause += " and af.root_holder_type = :rootHolderType "
+					whereClause += " and af.root_holder_id = :rootHolderId "
+					map['rootHolderType'] = params.rootHolderType
+					map['rootHolderId'] = params.rootHolderId.toLong()
+					break
+				case [ActivityFeedService.USER, ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
+					if(feedType == ActivityFeedService.USER){
+						whereClause += " and af.author_id = :authorId "
+						map['authorId'] = params.user.toLong()
 					}
-				}
-				(params.timeLine == ActivityFeedService.OLDER) ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
+					if(params.userGroupList){
+						queryList = getUserGroupFeedQuery(params.userGroupList, selectClause, fromClause, whereClause, orderClause)
+					}
+					break
+		
+				default:
+					break
 			}
 		}
+		
+		//if query without group 
+		queryList = queryList?:[selectClause + fromClause + whereClause + orderClause]
+		
+		def result =  new ActivityFeed().getResult(queryList, map, isCountQuery, params.max)
+		println "=============== final reustls ===================================" 
+		println result
+		println "=============== final reustls ==================================="
+		return result 
+	} 
+	
+	private getResult(List queryList, Map m,  boolean isCountQuery, max){
+		def result = []
+		def sql =  Sql.newInstance(dataSource)
+		queryList.each { q ->
+			//println "================= Query =========== " 
+			//println q 
+			//println m
+			//println "================= Query =========== "
+			result.addAll(sql.rows(q, m))
+		}
+		
+		//println "====== raw result  = " + result
+		
+		if(isCountQuery){
+			int c = 0
+			result.each { r ->
+ 				c += r.c
+			}
+			return c
+		}
+		
+		Collections.sort(result , new Comparator(){
+			public int compare(s1, s2){
+				s2.updatetime.getTime() - s1.updatetime.getTime()
+			}});
+		
+		
+		def limitedResult = []
+		int i = 0;
+		result.each {
+			if(!max || ++i <= max){
+				limitedResult << ActivityFeed.read(it.id)
+			}
+		}
+			
+		return limitedResult
 	}
+	
+	
 
 	private static validateParams(params){
 		params.feedType = params.feedType ?: ActivityFeedService.ALL
@@ -242,22 +237,20 @@ class ActivityFeed {
 				if(!params.rootHolderType || params.rootHolderType.trim() != UserGroup.class.getCanonicalName()){ 
 					return false
 				}
-				def groups = [UserGroup.read(params.rootHolderId.toLong())]
-				params.typeToIdFilterMap = getGroupAndObsevations(groups)
+				params.userGroupList = [UserGroup.read(params.rootHolderId.toLong())]
 				break
 			
 			case ActivityFeedService.MY_FEEDS:
 				if(!params.author){
 					return false
 				}
-				def groups = params.author.getUserGroups()
+				params.userGroupList = params.author.getUserGroups()
 				params.showUserFeed = true
-				params.typeToIdFilterMap = getGroupAndObsevations(groups)
 				break
+				
             case ActivityFeedService.USER:
                 if(params.userGroupFromUserProfile){
-                    def groups = [UserGroup.read(params.userGroupFromUserProfile.toLong())]
-                    params.typeToIdFilterMap = getGroupAndObsevations(groups)
+                    params.userGroupList = [UserGroup.read(params.userGroupFromUserProfile.toLong())]
                 }
                 if(!params.user){
 					return false
@@ -269,7 +262,6 @@ class ActivityFeed {
 		
 		params.timeLine = params.timeLine?:ActivityFeedService.OLDER
 		params.refTime = params.refTime?:((params.timeLine == ActivityFeedService.OLDER) ?  new Date().time.toString(): new Date().previous().time.toString())
-		
 		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 5 : 5)  :null)
 		
 		return true
@@ -294,7 +286,7 @@ class ActivityFeed {
 		return null
 	}
 	
-	public static getGroupAndObsevations(groups){
+	private static getGroupAndObsevations(groups){
 		def m = [:]
 		m[Observation.class.getCanonicalName()] = getObvIds(groups)
 		m[UserGroup.class.getCanonicalName()] = groups.collect{ it.id}
@@ -334,7 +326,7 @@ class ActivityFeed {
 		}
 		
 		try{
-			return new Date(timeIn.toLong())
+			return new java.sql.Timestamp(timeIn.toLong())
 		}catch (Exception e) {
 			e.printStackTrace()
 		}
@@ -415,5 +407,60 @@ class ActivityFeed {
 			}
 		}
 	}
+
+    def contextInfo(params=null) {
+        return activityFeedService.getContextInfo(this,params);
+    }
 	
+	private static List getUserGroupFeedQuery(List ugs, String selectClause, String  fromClause, String whereClause, String orderClause){
+		List queryList = []
+		ugs.each { ug ->
+			getUserGroupFeedQuery(ug, fromClause, whereClause).each { query ->
+				queryList.add(selectClause + query + orderClause)
+			}
+		}
+		return queryList
+	}
+	
+	private static List getUserGroupFeedQuery(UserGroup ug, String fromClause, String whereClause ){
+		//def uid = ug.id
+		String obvQuery = " ${fromClause}, user_group_observations ugo ${whereClause} and ((ugo.user_group_id = ${ug.id} and af.root_holder_type = 'species.participation.Observation' and af.root_holder_id = ugo.observation_id))" 
+		String spQuery = " ${fromClause}, user_group_species ugs ${whereClause} and ((ugs.user_group_id = ${ug.id} and af.root_holder_type = 'species.Species' and af.root_holder_id = ugs.species_id)) "
+		String docQuery = " ${fromClause}, user_group_documents ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'content.eml.Document' and af.root_holder_id = ugd.document_id))"
+		String groupQuery = " ${fromClause} ${whereClause} and ((af.root_holder_type = 'species.groups.UserGroup' and af.root_holder_id = ${ug.id})) "
+
+		return [spQuery, obvQuery,docQuery, groupQuery]
+	}
+	
+	public static int getActivityCount(Date startDate, Date endDate, UserGroup ug, feedType=null){
+		
+		def map = [:]
+		String selectClause  = "select count(*) as c "
+		String fromClause = " from activity_feed af "
+		String whereClause = " where af.is_showable = :isShowable "
+		map['isShowable'] = true
+		
+		if(feedType){
+			whereClause += " and af.activity_type = :activityType "
+			map['activityType'] = feedType
+		}
+		
+		
+		if(startDate && endDate){
+			whereClause += " and af.last_updated between :startDate and :endDate "
+		}
+		map['startDate'] = new java.sql.Date(startDate.getTime())
+		map['endDate'] = new java.sql.Date(endDate.getTime())
+		
+		
+		List queryList
+		if(ug){
+			queryList = getUserGroupFeedQuery(ug, fromClause, whereClause).collect { selectClause + it }
+		}else{
+			queryList = [selectClause + fromClause + whereClause]
+		}
+		
+		return new ActivityFeed().getResult(queryList, map, true, null)
+	}
+
 }

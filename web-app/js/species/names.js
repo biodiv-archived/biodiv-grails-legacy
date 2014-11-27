@@ -15,6 +15,7 @@
         this.options = _options;
         //cache[this.options.nameFilter] = {}
         var appendTo = this.parent().find('.nameSuggestions');
+        console.log(appendTo);
         if(_options.appendTo == undefined && appendTo.length > 0) {
             _options.appendTo = appendTo;
         }
@@ -101,7 +102,7 @@ function initializeNameSuggestion() {
     $('.commonName').autofillNames({
         'nameFilter':'commonNames',
         focus: function( event, ui ) {
-            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+            //$(this).val( ui.item.label.replace(/<.*?>/g,"") );
             //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         }, select: function( event, ui ) {
@@ -124,7 +125,7 @@ function initializeNameSuggestion() {
         'nameFilter':'scientificNames',
         focus: function( event, ui ) {
             $(this).closest(".sciNameDiv").find(".canName").val("");
-            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+            //$(this).val( ui.item.label.replace(/<.*?>/g,"") );
             //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         },

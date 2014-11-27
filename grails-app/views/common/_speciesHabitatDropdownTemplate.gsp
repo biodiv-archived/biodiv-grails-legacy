@@ -4,7 +4,7 @@
 <%@page import="species.Habitat"%>
 <div class ="control-group ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
 
-    <label>Habitat</label>
+    <label><g:message code="default.habitats.label" /></label>
     <div class="help-inline control-label">
         <g:hasErrors bean="${observationInstance}" field="habitat">
         <g:message code="observation.habitat.not_selected" />
@@ -37,7 +37,7 @@
                     class="habitat_icon group_icon habitats_sprites active ${Habitat.findByName('All').iconClass()}"
                     title="${Habitat.findByName('All').name}"></span>
                 <!--img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/-->
-                <span class="display_value">Select habitat</span>
+                <span class="display_value"><g:message code="default.select.habitat.label" /> </span>
             <b class="caret"></b>
             </div>
             <ul class="habitat_options dropdown-menu">                                       

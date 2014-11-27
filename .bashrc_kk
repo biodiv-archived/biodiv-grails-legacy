@@ -2,6 +2,7 @@ export JAVA_HOME=/apps/jdk1.7.0_51
 export JRE_HOME=/apps/jdk1.7.0_51/jre
 export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/apps/biodiv/solr  -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
 export CATALINA_OPTS="-Xms2048M -Xmx16384M"
+
 export CATALINA_OPTS="$CATALINA_OPTS	\ 
 		  -Dcom.sun.management.jmxremote=true \
                   -Dcom.sun.management.jmxremote.port=8086 \

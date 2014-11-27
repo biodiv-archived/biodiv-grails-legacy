@@ -17,11 +17,12 @@
 <%@page import="species.License"%>
 <%@page import="species.SpeciesField"%>
 
+
 <html>
     <head>
         <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, base:Utils.getIBPServerDomain()])}"/>
         <g:set var="title" value="${speciesInstance.taxonConcept.name}"/>
-        <g:set var="description" value="${Utils.stripHTML(speciesInstance.notes()?:'')}" />
+        <g:set var="description" value="${Utils.stripHTML(speciesInstance.notes(userLanguage)?:'')}" />
         <%
         def r = speciesInstance.mainImage();
         def imagePath = '';
@@ -128,8 +129,7 @@
         <ckeditor:resources />
         <script type="text/javascript" src="ckEditorConfig.js" />
 
-        <script type="text/javascript"
-            src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
+        
         <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
         -->
         <script type="text/javascript">
@@ -152,13 +152,9 @@
 
         $(document).ready(function(){
             if(${sparse}) {
-                if(occurrenceCount > 0) {
+                
                 showOccurence('${speciesName}');
-                //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
-                } else {
-                $("#map").next('.alert').html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.").css('height','auto');
-                $('#map').hide();
-                }
+                
             } else {
                 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
                 showSpeciesField($(".defaultSpeciesField").attr("id"))
@@ -181,7 +177,7 @@
                     { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
                     { name: 'insert', items: ['Table'] }
                     ],
-                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/biodivofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/${grailsApplication.metadata['app.name']}ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
                     //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                     height: '300px',
@@ -196,24 +192,26 @@
     </head>
 
     <body>
-    <link rel="stylesheet" href="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.css">
-    <script src="/biodiv/js/galleria/1.3.5/galleria-1.3.5.js"></script>
-    <script src="/biodiv/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
-    <script src="/biodiv/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
+
+    
+    <link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.css">
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/galleria-1.3.5.js"></script>
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
         <s:isSpeciesContributor model="['speciesInstance':speciesInstance]">
         <g:set var="isSpeciesContributor" value="${Boolean.TRUE}"/>
         </s:isSpeciesContributor>
- 
+        
         <div class="span12">
             <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor]"/>
 
                 <g:if test="${!speciesInstance.percentOfInfo}">
                 <div class="poor_species_content alert">
                     <i class="icon-info"></i>
-                    No information yet.
+                   <g:message code="showspeciesstorytablet.no.information" />
 
                 </div>
                 </g:if>
@@ -223,20 +221,20 @@
                     model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
                 </div>
 
-                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
+                <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
                 <div class="span12" style="margin-left:0px">
 
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
 
-                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor]"/>
+                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">
                         <s:hasContent model="['map':concept.value]">
                         <g:if
-                        test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.META_DATA)}">
+                        test="${concept.key.equalsIgnoreCase(fieldFromName.tri) || concept.key.equalsIgnoreCase(fieldFromName.gui) || concept.key.equalsIgnoreCase(fieldFromName.nc) || concept.key.equalsIgnoreCase(fieldFromName.md)}">
                         </g:if>
                         <g:else>
 
@@ -246,7 +244,7 @@
                         <g:else>
                         <li class="nav ui-state-default">
                         </g:else>
-                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor]" />
+                        <g:showSpeciesConcept model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress, newSpeciesFieldInstance:newSpeciesFieldInstance, 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage, fieldFromName:fieldFromName]" />
                         </li>
                         <%conceptCounter++%>
                         </g:else>
@@ -254,7 +252,6 @@
                         </g:each>
                     </ul>
                 </div>			
-
                 <g:if test="${!sparse}">
                 <div id="speciesFieldContainer" class="grid_12"></div>
                 </g:if>
@@ -264,10 +261,8 @@
                     <!--div id="tocContainer" class="sidebar_section">
                     <div id="toc" class="tile"></div>
                     </div-->
-
-
                     <!--div id="map" class="sidebar_section">
-                    <h5>Occurrence Map</h5>
+                    <h5>${g.message(code:'heading.occurence.map')}</h5>
                     <div id="mapSpinner" class="spinner">
                         <center>
                             <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
@@ -280,26 +275,24 @@
                         style="height: 350px; width: 100%"></div>
                     <div class="alert alert-info">
                         <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
-                        The current map showing distribution of species is only indicative.
+                        ${g.message(code:'info.about.map.species')}
                     </div>
 
-                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
+                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	
 
                     </div-->
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
-                        <h5> Activity </h5>
+                        <h5> <g:message code="button.activity" /> </h5>
                         <div class="union-comment">
                             <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false]" />
+                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                         </div>
                     </div>
 
                 </div>
                 
-
-
             </div>	 
             <script type="text/javascript">
            var licenseSelectorOptions = [];
@@ -328,7 +321,7 @@
 
             var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
-            taxonRanks.push({value:"${t.ordinal()}", text:"${t.value()}"});
+            taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
 
             </script>	

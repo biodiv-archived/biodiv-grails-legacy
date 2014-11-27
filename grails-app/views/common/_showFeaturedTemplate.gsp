@@ -6,7 +6,7 @@
     <g:set var="featuredInGroups" value="${Featured.isFeaturedIn(observationInstance)}">
     </g:set>
     <g:if test="${featuredInGroups}">
-        <h5>Featured in Groups</h5>
+        <h5><g:message code="showfeaturedtemplate.featured.group" /> </h5>
         <div class="featured-groups-name">
             <ul class="tile" style="list-style: none;background:transparent; ">
                 <g:each in="${featuredInGroups}" var="groupInfo">

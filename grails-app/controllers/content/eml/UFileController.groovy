@@ -40,18 +40,18 @@ import species.utils.Utils
 import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
-
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-	def observationService
+	def utilsService
     def springSecurityService;
     def grailsApplication
     def speciesUploadService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-
+    def messageSource
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
@@ -101,7 +101,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = observationService.createFile(originalFilename, params.uploadDir,contentRootDir)
+			File uploaded = utilsService.createFile(originalFilename, params.uploadDir,contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
@@ -165,7 +165,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = observationService.createFile(originalFilename, params.uploadDir, contentRootDir)
+			File uploaded = utilsService.createFile(originalFilename, params.uploadDir, contentRootDir)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 
@@ -234,7 +234,7 @@ class UFileController {
 
         UFile ufile = UFile.get(params.id)
         if (!ufile) {
-            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.nofile", [params.id] as Object[], RCU.getLocale(request))
             log.debug msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -251,7 +251,7 @@ class UFileController {
             response.outputStream << file.readBytes()
             return
         } else {
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -280,7 +280,7 @@ class UFileController {
             return render(text: [success:true] as JSON, contentType:'text/html')
         } else {
             println "in else================"
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], request.locale)
+            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
             log.error msg
             flash.message = msg
             redirect controller: params.errorController, action: params.errorAction
@@ -547,7 +547,7 @@ class UFileController {
     private Map convertExcelToCSV(File uploaded, params ) {
         def compContent
         def spread
-        File outCSVFile = observationService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
+        File outCSVFile = utilsService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
         boolean isSimpleSheet = detectSheetType(uploaded)
         FileWriter fw = new FileWriter(outCSVFile.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);

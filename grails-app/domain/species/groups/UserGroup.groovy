@@ -17,6 +17,7 @@ import species.utils.ImageUtils;
 import content.eml.Document;
 import content.Project;
 import species.Species
+import species.Language;
 
 import utils.Newsletter;
 
@@ -51,6 +52,8 @@ class UserGroup implements Taggable {
 	def gormUserDetailsService;
 	def springSecurityService;
 	def userGroupService;
+	// Language
+    Language language;
 
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species]
 
@@ -71,6 +74,7 @@ class UserGroup implements Taggable {
 		homePage nullable:true
 		theme nullable:true
 		domainName nullable:true
+		language nullable:false
 	}
 
 	static mapping = {
@@ -194,10 +198,7 @@ class UserGroup implements Taggable {
 		log.debug "Removing as founders ${groupFounders}"
 		if(founders) {
 			founders.each { founder ->
-				userGroupService.addMember(this,founder, founderRole, [
-					BasePermission.ADMINISTRATION,
-					BasePermission.WRITE
-				]);
+                addFounder(founder);
 			}
 		}
 
@@ -208,12 +209,19 @@ class UserGroup implements Taggable {
 		}
 	}
 
-	void addFounder(SUser founder) {
-		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-		userGroupService.addMember(this,founder, founderRole, [
-			BasePermission.ADMINISTRATION,
-			BasePermission.WRITE
-		]);
+	boolean addFounder(SUser founder) {
+		if(founder) {
+            boolean success = true;
+			if(isMember(founder)){
+				success = deleteMember(founder)	
+			}
+            if(success) {
+			    def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+			    return userGroupService.addMember(this, founder, founderRole, [BasePermission.ADMINISTRATION,BasePermission.WRITE]);
+            }
+		}
+		return false;
+
 	}
 
 	def getMembers(int max, long offset, String sortBy) {
@@ -250,11 +258,14 @@ class UserGroup implements Taggable {
 	
 	boolean addExpert(SUser member) {
 		if(member) {
+            boolean success = true;
 			if(isMember(member)){
-				deleteMember(member)	
+				success = deleteMember(member)	
 			}
-			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
-			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+            if(success) {
+			    def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+			    return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+            }
 		}
 		return false;
 	}

@@ -20,6 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import species.BlockedMails;
+import species.SpeciesPermission;
 import species.participation.RecommendationVote;
 import species.participation.Observation;
 
@@ -29,9 +30,11 @@ import species.utils.ImageUtils;
 import species.Habitat;
 import species.groups.SpeciesGroup;
 import species.participation.Follow;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class SUserController extends UserController {
 
+    def utilsService;
 	def springSecurityService
 	def namesIndexerService;
 	def observationService;
@@ -43,7 +46,7 @@ class SUserController extends UserController {
     def SUserSearchService;
     def messageSource;
     def speciesPermissionService;
-
+    
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST", resetPassword: "POST"]
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
@@ -122,6 +125,7 @@ class SUserController extends UserController {
 	}
 
 	def show() {
+		def msg
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
         }
@@ -131,13 +135,16 @@ class SUserController extends UserController {
         }
         def SUserInstance = SUser.get(params.long("id"))
 
+        def userLanguage =utilsService.getCurrentLanguage(request);
         if(request.getHeader('X-Auth-Token')) {
             if(!params.id) {
-                render (['success':false, 'msg':"Id is required"] as JSON)
+            	msg = messageSource.getMessage("id.required", ['Id'] as Object[], RCU.getLocale(request))
+                render (['success':false, 'msg':msg] as JSON)
                 return
             } else {
                 if (!SUserInstance) {
-                    render (['success':false, 'msg':"Coudn't find user with id ${params.id}"] as JSON)
+                	msg = messageSource.getMessage("default.not.find.by.id", ['user',params.id] as Object[], RCU.getLocale(request))
+                    render (['success':false, 'msg':msg] as JSON)
                     return
                 } else {
                     def result = [:];
@@ -151,6 +158,7 @@ class SUserController extends UserController {
                         }                    
                     }
                     result['stat'] = chartService.getUserStats(SUserInstance, userGroupInstance);
+                    result['userLanguage'] = userLanguage;
                     render result as JSON
                     return;
                 }
@@ -167,7 +175,8 @@ class SUserController extends UserController {
     //            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
     //            result.put('totalObservationInstanceList', totalObservationInstanceList); 
                 result['currentUser'] = springSecurityService.currentUser;
-                result['currentUserProfile'] = result['currentUser']?observationService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                result['currentUserProfile'] = result['currentUser']?utilsService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                result['userLanguage'] = userLanguage;
                 return result
             }
         }
@@ -226,6 +235,8 @@ class SUserController extends UserController {
 
 			user.website = (params.website.trim() != "") ? params.website.trim().split(",").join(", ") : null
 
+			user.language = utilsService.getCurrentLanguage(request);
+
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)
 				return
@@ -280,9 +291,10 @@ class SUserController extends UserController {
 				FacebookUser.removeAll user;
 				lookupUserRoleClass().removeAll user
                 Follow.deleteAll user;
+                SpeciesPermission.removeAll user;
 
+				user.delete(failOnError:true);
 				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
-				user.delete();
 
 			}
 			//updating SpeciesName
@@ -420,7 +432,7 @@ class SUserController extends UserController {
 			if (params.sort == 'lastLoginDate') {
 				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
 			} else {
-				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'}"
+				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
 			}
 
 
@@ -540,14 +552,14 @@ class SUserController extends UserController {
 				if(BlockedMails.findByEmail(candidateEmail)){
 					log.debug "Email $candidateEmail is unsubscribed for identification mail."
 				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+					result[candidateEmail] = utilsService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
 				}
 			}else{
 				//its user id
 				SUser user = SUser.get(candidateEmail.toLong());
 				candidateEmail = user.email.trim();
 				if(user.allowIdentifactionMail){
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+					result[candidateEmail] = utilsService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
 				}else{
 					log.debug "User $user.id has unsubscribed for identification mail."
 				}
@@ -764,7 +776,7 @@ class SUserController extends UserController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
+						File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, usersDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);
@@ -818,7 +830,8 @@ class SUserController extends UserController {
                         def formattedMessage = messageSource.getMessage(it, null);
                         errors << [field: it.field, message: formattedMessage]
                     }
-                    render (['success' : false, 'msg':'Failed to reset password', 'errors':errors] as JSON); 
+                    msg = messageSource.getMessage("reset.password.fail", null, RCU.getLocale(request))
+                    render (['success' : false, 'msg':msg, 'errors':errors] as JSON); 
                     return
                 } else {
     				return [command: command2]
@@ -830,10 +843,10 @@ class SUserController extends UserController {
 				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
 				user.password = command2.password
 				if(!user.save()) {
-					msg = "Error saving password"
+					msg = msg = messageSource.getMessage("password.errors.save", null, RCU.getLocale(request))
 				} else {
                     success = true;
-					msg = "Successfully updated password"
+					msg = messageSource.getMessage("password.update.success", null, RCU.getLocale(request))
                 }
 			}
 

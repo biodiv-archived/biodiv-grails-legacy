@@ -9,7 +9,7 @@
                             <a class="btn btn-success pull-right" title="Add CEPF Project"
                                 href="${uGroup.createLink(
                                 controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                > <i class="icon-plus"></i>Add CEPF Project</a>
+                                > <i class="icon-plus"></i><g:message code="heading.project.tags" /> <g:message code="button.add.cepf.projects" /> </a>
                             </sUser:isCEPFAdmin>
 
                         </div>
