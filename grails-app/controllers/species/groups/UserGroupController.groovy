@@ -1401,13 +1401,6 @@ class UserGroupController {
         println "========== CREATED Digest instance ============="
     }
 
-    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-    def addSpecialFounder() {
-        userGroupService.addSpecialFounder()
-        render "=== done "
-    }
-
-
 }
 
 
