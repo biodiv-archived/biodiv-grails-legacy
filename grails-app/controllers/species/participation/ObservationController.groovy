@@ -197,6 +197,16 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	protected def getObservationList(params) {
+        try { 
+            params.max = Integer.parseInt(params.max); 
+        } catch(NumberFormatException e) { 
+            params.max = 24 
+        }
+        try { 
+            params.offset = Integer.parseInt(params.offset); 
+        } catch(NumberFormatException e) { 
+            params.offset = 0 
+        }
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)

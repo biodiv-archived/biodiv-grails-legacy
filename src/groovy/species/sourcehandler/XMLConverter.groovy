@@ -615,6 +615,7 @@ class XMLConverter extends SourceConverter {
             if(licenseType.startsWith('CC-')) {
                 licenseType = licenseType.replaceFirst('CC-','CC ');
             }
+            println licenseType
             type = License.fetchLicenseType(licenseType)
         }
 

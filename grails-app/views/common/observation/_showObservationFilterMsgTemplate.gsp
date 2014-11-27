@@ -140,7 +140,7 @@
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
 					action:params.action, params:[(queryParam.key): queryParam.value])}">
-						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="#${queryParam.key}"
+						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>
 

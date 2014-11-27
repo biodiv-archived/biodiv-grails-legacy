@@ -371,56 +371,73 @@ function rating() {
 }
 
 function last_actions() {
-	$(".ellipsis.multiline").trunk8({
-		lines:2,
-                tooltip:false,
-                fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
-	});
-        $('#read-more').on('click', function (event) {
-              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
-                
-                return false;
-        });
+    $(".ellipsis.multiline").trunk8({
+        lines:2,
+    tooltip:false,
+    fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
+    });
+    $('#read-more').on('click', function (event) {
+        $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
 
-        $('#read-less').on('click', function (event) {
-              $(this).parent().trunk8();
-                
-                return false;
-        });
-	
-	$(".ellipsis:not(.multiline)").trunk8();
-	
-	$('.collapse').on({
-	    shown: function(){
-	        $(this).css('overflow','visible');
-	    },
-	    hide: function(){
-	        $(this).css('overflow','hidden');
-	    }
-	});
-	
-        $('#contributeMenu.collapse').on({
-	    shown: function(){
-		$.cookie("contribute", "show", {path    : '/'});
-	    },
-	    hide: function(){
-		$.cookie("contribute", "hide", {path    : '/'});
-	    }
-	});
-	
-        if ($.cookie("contribute") == "show" ) {
-            $('#contributeMenu.collapse').collapse('show');
+        return false;
+    });
+
+    $('#read-less').on('click', function (event) {
+        $(this).parent().trunk8();
+
+        return false;
+    });
+
+    $(".ellipsis:not(.multiline)").trunk8();
+
+    $('.collapse').on({
+        shown: function(){
+            $(this).css('overflow','visible');
+        },
+        hide: function(){
+            $(this).css('overflow','hidden');
         }
+    });
 
-	$('.yj-message-body').linkify();
-	$('.linktext').linkify(); 
-	//applying table sorting
-	$("table.tablesorter").tablesorter();
+    $('#contributeMenu.collapse').on({
+        shown: function(){
+            $.cookie("contribute", "show", {path    : '/'});
+        },
+        hide: function(){
+            $.cookie("contribute", "hide", {path    : '/'});
+        }
+    });
+
+    if ($.cookie("contribute") == "show" ) {
+        $('#contributeMenu.collapse').collapse('show');
+    }
+
+    $('.yj-message-body').linkify();
+    $('.linktext').linkify(); 
+    //applying table sorting
+    $("table.tablesorter").tablesorter();
     rating();
 
     $("#contributeMenu .btn").popover();
-    
+
     updateGroupPostSelection();
+
+	$(".mainContentList").unbind('click').on('click', '.joinUs', function() {
+		var joinUsUrl = window.params.userGroup.joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";
+		joinAction($(this), joinUsUrl);
+	});
+	
+	$(".requestMembership").unbind('click').on('click', function() {
+		var requestMembershipUrl = window.params.userGroup.requestMembershipUrl+"/?id="+$(this).attr('data-group-id')//+"/requestMembership";
+		requestMembershipAction($(this), requestMembershipUrl);
+	});
+	
+	$(".leaveUs").unbind('click').on('click', function() {
+		var leaveUrl = window.params.userGroup.leaveUrl //+"/"+$(this).attr('data-group-id')+"/leaveUs";
+		$("#leave").attr('data-group-id', $(this).attr('data-group-id'))
+		$("#leave").attr('data-leaveUrl', leaveUrl)
+		$('#leaveUsModalDialog').modal('show');
+	});
 }
 
 function loadSuggestedGroups(targetComp, url,offset){	

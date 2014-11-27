@@ -274,7 +274,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private boolean isValidSortParam(String sortParam) {
-        if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchField.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
+        if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;
         return false;
     }
@@ -1280,7 +1280,7 @@ class SpeciesService extends AbstractObjectService  {
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser);
+                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
 
                 List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
                 def tD = tR.taxonDefinition
@@ -1786,6 +1786,8 @@ class SpeciesService extends AbstractObjectService  {
                 String value = paramsForUploadSpField.get(key);
                 p2.put(key, value);
             }
+            p1.locale_language = params.locale_language
+            p2.locale_language = params.locale_language
             def out2 = updateSpecies(p2, speciesField)
             def out1 = updateSpecies(p1, speciesField)
         }

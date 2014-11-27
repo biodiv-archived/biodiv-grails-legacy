@@ -441,7 +441,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         if(params.observedon_end) {
             Calendar cal = Calendar.getInstance(); // locale-specific
-            Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
+            Date e = DateUtil.parseDate(params.observedon_end, ['dd/MM/yyyy']);
             cal.setTime(e)
             cal.set(Calendar.HOUR_OF_DAY, 23);
             cal.set(Calendar.MINUTE, 59);

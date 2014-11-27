@@ -105,11 +105,10 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def save() {
         List errors = [];
-        Map result = [errors:errors];
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        Map result = [userLanguage:languageInstance, errors:errors];
+
         if(params.page && params.rank) {
-
-            Language languageInstance = utilsService.getCurrentLanguage(request);
-
             Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
@@ -337,6 +336,10 @@ class SpeciesController extends AbstractObjectController {
             Language lang;
             //concept
            // println "species fields ============"+sField.language;
+            println sField.field.concept
+            println sField.field.connection
+            println map.containsKey(sField.field.concept)
+            println fieldsConnectionArray[sField.field.connection]
 			if(map.containsKey(sField.field.concept) || fieldsConnectionArray[sField.field.connection]) {
 
 				finalLoc = map.get(sField.field.concept)?:fieldsConnectionArray[sField.field.connection];
@@ -383,7 +386,7 @@ class SpeciesController extends AbstractObjectController {
 				}
                 finalLoc.put("lang", sField.language);
 			}
-			if(finalLoc.containsKey('field')) { 
+			if(finalLoc && finalLoc.containsKey('field')) { 
 				def t = finalLoc.get('speciesFieldInstance');
 				if(!t) {
 					t = [];
@@ -765,7 +768,7 @@ class SpeciesController extends AbstractObjectController {
 	/**
 	 *
 	 */
-	def search() {
+	/*def search() {
 		def model = speciesService.getSpeciesList(params, 'search')
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		model['isSearch'] = true;
@@ -792,7 +795,7 @@ class SpeciesController extends AbstractObjectController {
 			render (result as JSON)
 			return;
 		}
-	}
+	}*/
 
 
 
@@ -923,7 +926,7 @@ class SpeciesController extends AbstractObjectController {
                 flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))            
             }
         }else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [params.userId, params.invitetype, params.taxonConcept] as Object[], RCU.getLocale(request))           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -1033,6 +1036,12 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
+        if(!params.speciesId) {
+            log.error "NO SPECIES ID TO FETCH RELATED OBV";
+            def result = [addPhotoHtml: '', relatedObvCount: 0]
+            render result as JSON
+        }
+        params.offset = (params.offset)?params.offset:0
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
@@ -1201,6 +1210,8 @@ class SpeciesController extends AbstractObjectController {
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage; 
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
@@ -1214,6 +1225,8 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def uploadMediaInSpField(){
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result

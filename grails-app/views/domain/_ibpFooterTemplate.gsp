@@ -175,6 +175,7 @@ window.fbAsyncInit = function() {
                     cookie : true,
                     xfbml: true,
                     oauth  : true,
+                    version: 'v2.2',
                     logging : true
         });
         window.facebookInitialized = true;
@@ -204,7 +205,7 @@ window.fbEnsure = function(callback) {
                 return;
         js = d.createElement(s);
         js.id = id;
-        js.src = "//connect.facebook.net/en_US/all.js";//#xfbml=1&appId=${fbAppId}
+        js.src = "//connect.facebook.net/en_US/sdk.js";//#xfbml=1&appId=${fbAppId}
 
         fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));

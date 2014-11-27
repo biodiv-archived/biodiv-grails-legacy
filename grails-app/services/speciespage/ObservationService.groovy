@@ -140,13 +140,13 @@ class ObservationService extends AbstractObjectService {
         if(params.license_0) {
             log.debug "Setting license to ${params.license_0}"
             observation.license = (new XMLConverter()).getLicenseByType(params.license_0, false)
+            println observation.license
         } else if(observation.agreeTerms) {
             println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
             println "SETTING LICENCE TYPE"
             log.debug "Setting license to ${LicenseType.CC_BY}"
             observation.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
         }
-
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         observation.language = params.locale_language;
@@ -211,7 +211,8 @@ class ObservationService extends AbstractObjectService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-
+println "---------------------------------------------------"
+println observationInstance.license
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
                 //flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
                 log.debug "Successfully created observation : "+observationInstance
@@ -1125,7 +1126,7 @@ class ObservationService extends AbstractObjectService {
         if(params.observedon_start && params.observedon_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
             def startDate = df.parse(URLDecoder.decode(params.observedon_start))
-            def endDate = df.parse(URLDecoder.decode(params.observed_end))
+            def endDate = df.parse(URLDecoder.decode(params.observedon_end))
             Calendar cal = Calendar.getInstance(); // locale-specific
             cal.setTime(endDate)
             cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -1137,8 +1138,8 @@ class ObservationService extends AbstractObjectService {
             queryParams["observedon_start"] =  startDate   
             queryParams["observedon_end"] =  endDate
 
-            activeFilters["observedon_start"] = params.daterangepicker_start
-            activeFilters["observedon_end"] =  params.daterangepicker_end
+            activeFilters["observedon_start"] = startDate       //params.daterangepicker_start
+            activeFilters["observedon_end"] =  endDate          //params.daterangepicker_end
         }
 
         if(params.bounds) {

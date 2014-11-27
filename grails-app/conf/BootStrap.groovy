@@ -1,6 +1,7 @@
 import org.apache.commons.logging.LogFactory;
 
 import species.Field;
+import species.Language;
 import species.UserGroupTagLib;
 import species.Synonyms;
 import species.CommonNames;
@@ -87,7 +88,8 @@ class BootStrap {
 		def user = SUser.findByEmail(email) ?: new SUser(
 				email: email,
 				password: password,
-				enabled: true).save(failOnError: true)
+				enabled: true,
+                language:Language.getLanguage(Language.DEFAULT_LANGUAGE)).save(failOnError: true)
 
 		if (!user.authorities.contains(userRole)) {
 			SUserRole.create user, userRole
@@ -142,8 +144,9 @@ class BootStrap {
 			log.info("User with id $uid has confirmed their email address $email")
             def userToken = UserToken.findByToken(uid);
 			if(userToken) {
-				userToken.params.tokenId = userToken.id.toString();
-				userToken.params.confirmationToken = confirmationToken;
+                Map p = new HashMap(userToken.params);
+				p.tokenId = userToken.id.toString();
+				p.confirmationToken = confirmationToken;
 				def userGroupController = new UserGroupController();
 				def userGroup = null
                 if(userToken.params.userGroupInstanceId){
@@ -151,9 +154,9 @@ class BootStrap {
                 }
                 def url
                 if(userToken.controller == "userGroup" || userToken.controller == "userGroupGeneric"){
-                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
                 }else{
-                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
 
                 }
                 return [url: url]

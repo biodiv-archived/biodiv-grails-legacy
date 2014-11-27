@@ -301,7 +301,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	//XXX: comment this method before checklist migration
 	def beforeUpdate(){
-		if(isDirty() && !isDirty('visitCount')){
+		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
 			updateIsShowable()
 			
 			if(isDirty('topology')){
@@ -312,7 +312,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def beforeInsert(){
-		updateIsShowable()
+        updateIsShowable()
 		updateLatLong()
 	}
 	

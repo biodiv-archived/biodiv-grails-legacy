@@ -240,7 +240,7 @@ class UserGroupController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def update() {
 		log.debug params;
 		params.locale_language = utilsService.getCurrentLanguage(request);
@@ -618,7 +618,7 @@ class UserGroupController {
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount() as int, 0L);
             founders.addAll(userGroupInstance.getExperts(userGroupInstance.getExpertsCount() as int, 0L));
-            msg = messageSource.getMessage("default.confirm.membership", null, RCU.getLocale(request))
+            msg = messageSource.getMessage("default.confirm.membership",['membership'] as Object[], RCU.getLocale(request))
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
@@ -1400,8 +1400,6 @@ class UserGroupController {
         }
         println "========== CREATED Digest instance ============="
     }
-
-
 
 }
 

@@ -2,7 +2,7 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <%@page import="species.License.LicenseType"%>
 
-<g:set var="modules"  value="[[name:'All',displayName:g.message(code:'default.all.label') ], [name:'Species', template:'species',displayName:g.message(code:'default.species.label')], [name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], [name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], [name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], [name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], [name:'Resource', template:'resource',displayName:g.message(code:'resource.label')]]"/>
+<g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')]]"/>
 
 <div  class="block-tagadelic">
 
@@ -15,7 +15,7 @@
             <div class="controls">
                 <select class="searchFilter moduleFilter btn" name="aq.object_type" style="width:100%">
                     <g:each in="${modules}" var="module">
-                   <option value="${module.name}">${module.displayName}</option>
+                   <option value="${module.value.name}">${module.value.displayName}</option>
                     </g:each>
                 </select>
             </div>
@@ -139,12 +139,12 @@
 
 
         <g:each in="${modules}" var="module">
-        <g:if test="${!module.name.equalsIgnoreCase('All')}">
-        <div class="aq_modules ${module.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.name)?'':'hide' }">
+        <g:if test="${!module.value.name.equalsIgnoreCase('All')}">
+        <div class="aq_modules ${module.value.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.value.name)?'':'hide' }">
             <br>
-            <b>${module.displayName} specific search options</b>
+            <b>${module.value.displayName} specific search options</b>
             <br>
-            <g:render template="/${module.template}/advSearchTemplate"/>
+            <g:render template="/${module.value.template}/advSearchTemplate"/>
         </div>
         </g:if>
         </g:each>

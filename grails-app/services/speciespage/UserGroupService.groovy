@@ -218,7 +218,7 @@ class UserGroupService {
 
 	}
 
-	@PreAuthorize("hasPermission(#userGroup, admin)")
+	@PreAuthorize("hasPermission(#userGroup, write) or hasPermission(#userGroup, admin)")
 	private void deletePermission(UserGroup userGroup, SUser user, Permission permission) {
 		aclUtilService.deletePermission(userGroup, user.email, permission);
 	}
@@ -963,8 +963,8 @@ class UserGroupService {
 	}
 
 	def addSpecialFounder(){
-		UserGroup wgpGroup = UserGroup.read(1)
-		wgpGroup.addFounder(SUser.read(797))
+		UserGroup wgpGroup = UserGroup.read(36)
+		wgpGroup.addFounder(SUser.read(4105))
 		log.debug "founder added "
 	}
 
