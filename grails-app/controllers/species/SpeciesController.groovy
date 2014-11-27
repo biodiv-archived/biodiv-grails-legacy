@@ -1210,6 +1210,8 @@ class SpeciesController extends AbstractObjectController {
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage; 
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
@@ -1223,6 +1225,8 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def uploadMediaInSpField(){
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
