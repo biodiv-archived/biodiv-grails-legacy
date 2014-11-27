@@ -53,8 +53,25 @@
 							<a href="${actorProfileUrl}"> ${currentUser?.name} </a>
 					</g:else>
 				</g:else>
-				${raw(message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1))}
-
+                ${raw(message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1))}
+                <g:if test="${spFDes}">
+                    <p style="margin-left:35px;">
+                        ${spFDes}
+                    </p>
+                </g:if>
+                <g:if test="${resURLs}">
+                    <table>
+                        <tr align="left">
+                            <g:each in="${resURLs.size() < 8 ? resURLs : resURLs.subList(0, 8)}" var="ru">
+                            <td height="50" width="50" style=" border: 1px solid lightblue; text-align: left;">
+                                <a href="${uGroup.createLink(action:'show', controller:'species', 'id': obvId , absolute:true)}">
+                                    <img src="${ru}" title="" style="border: 0px solid ; max-height: 50px; width:50px;" />
+                                </a>
+                            </td>
+                            </g:each>
+                        </tr>
+                    </table>
+                </g:if>
 
 				<g:if test="${activity?.text }">
 

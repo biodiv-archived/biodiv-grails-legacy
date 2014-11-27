@@ -507,9 +507,9 @@ class UtilsService {
                 
                 case [ActivityFeedService.SPECIES_CREATED, ActivityFeedService.SPECIES_UPDATED]:
                 mailSubject = notificationType;
-                    if(otherParams['resURLs']){
-                        templateMap['resURLs'] = otherParams['resURLs']
-                    }
+                if(otherParams['resURLs']){
+                    templateMap['resURLs'] = otherParams['resURLs']
+                }
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 if(notificationType == ActivityFeedService.SPECIES_CREATED){
                     templateMap["message"] = messageSource.getMessage("mail.added.species", null, LCH.getLocale())
@@ -546,6 +546,7 @@ class UtilsService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes'];
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
