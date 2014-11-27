@@ -144,8 +144,9 @@ class BootStrap {
 			log.info("User with id $uid has confirmed their email address $email")
             def userToken = UserToken.findByToken(uid);
 			if(userToken) {
-				userToken.params.tokenId = userToken.id.toString();
-				userToken.params.confirmationToken = confirmationToken;
+                Map p = new HashMap(userToken.params);
+				p.tokenId = userToken.id.toString();
+				p.confirmationToken = confirmationToken;
 				def userGroupController = new UserGroupController();
 				def userGroup = null
                 if(userToken.params.userGroupInstanceId){
@@ -153,9 +154,9 @@ class BootStrap {
                 }
                 def url
                 if(userToken.controller == "userGroup" || userToken.controller == "userGroupGeneric"){
-                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
                 }else{
-                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
 
                 }
                 return [url: url]

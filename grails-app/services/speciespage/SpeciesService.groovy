@@ -1786,6 +1786,8 @@ class SpeciesService extends AbstractObjectService  {
                 String value = paramsForUploadSpField.get(key);
                 p2.put(key, value);
             }
+            p1.locale_language = params.locale_language
+            p2.locale_language = params.locale_language
             def out2 = updateSpecies(p2, speciesField)
             def out1 = updateSpecies(p1, speciesField)
         }

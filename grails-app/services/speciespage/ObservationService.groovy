@@ -1369,7 +1369,7 @@ println observationInstance.license
              messagesourcearg[0] = currentUserProfileLink;
              messagesourcearg[1] = currentUser;
              messagesourcearg[2] = templateMap["domain"];
-             messagesourcearg[3] = activitySource != null ? 'about <a href="'+templateMap["activitySourceUrl"]+'">'+activitySource+'</a>':'';
+             messagesourcearg[3] = activitySource != null ? '<a href="'+templateMap["activitySourceUrl"]+'">'+messageSource.getMessage('text.user',null,LCH.getLocale())+'</a>':'';
              messagesourcearg[4] = templateMap["userMessage"];
              messagesourcearg[5] = templateMap["unsubscribeUrl"];
              

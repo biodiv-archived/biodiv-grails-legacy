@@ -929,7 +929,7 @@ class SpeciesController extends AbstractObjectController {
                 flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))            
             }
         }else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [params.userId, params.invitetype, params.taxonConcept] as Object[], RCU.getLocale(request))           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -1213,6 +1213,8 @@ class SpeciesController extends AbstractObjectController {
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage; 
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
@@ -1226,6 +1228,8 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def uploadMediaInSpField(){
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
