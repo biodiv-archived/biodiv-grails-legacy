@@ -423,30 +423,33 @@ function last_actions() {
     updateGroupPostSelection();
 }
 
-function loadSuggestedGroups(targetComp, url,offset){
+function loadSuggestedGroups(targetComp, url,offset){	
+	if($(targetComp).parent().hasClass('open')){
+			$(targetComp).hide();	
+	}else{
+		$(targetComp).show();
+	}
 	var res = $(targetComp).children('li');	
 	var countUGL = $('.usergrouplist').size();
 	if(typeof offset == "undefined"){ offset = 0; }else{offset = countUGL }
 	if((res.length > 0) && (offset == 0) && (countUGL != 0)){
 		return 
 	}
+	$(targetComp).show();
 	$.ajax({
  		url: url,
  		type: 'POST',
 		dataType: "json",
 		data: {"offset":offset},
 		success: function(data) {
-			//console.log($(data.suggestedGroupsHtml))
+			//console.log($(data.suggestedGroupsHtml))			
 			if(res > 1){				
 				$(targetComp).children('li:last').remove();
 			}			
-			if(countUGL == 0){
+				$(targetComp).find('.group_load').remove();
 				$(targetComp).append($(data.suggestedGroupsHtml));
-			}else{
-				$(targetComp).append($(data.suggestedGroupsHtml));
-			}
 			
-			$(targetComp).show(1000);
+			$(targetComp).show();
 			return false;
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
