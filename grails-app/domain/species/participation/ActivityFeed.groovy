@@ -160,9 +160,9 @@ class ActivityFeed {
 		queryList = queryList?:[selectClause + fromClause + whereClause + orderClause]
 		
 		def result =  new ActivityFeed().getResult(queryList, map, isCountQuery, params.max)
-		println "=============== final reustls ===================================" 
-		println result
-		println "=============== final reustls ==================================="
+		//println "=============== final reustls ===================================" 
+		//println result
+		//println "=============== final reustls ==================================="
 		return result 
 	} 
 	
@@ -412,7 +412,7 @@ class ActivityFeed {
         return activityFeedService.getContextInfo(this,params);
     }
 	
-	private static List getUserGroupFeedQuery(List ugs, String selectClause, String  fromClause, String whereClause, String orderClause){
+	private static List getUserGroupFeedQuery(Collection ugs, String selectClause, String  fromClause, String whereClause, String orderClause){
 		List queryList = []
 		ugs.each { ug ->
 			getUserGroupFeedQuery(ug, fromClause, whereClause).each { query ->
