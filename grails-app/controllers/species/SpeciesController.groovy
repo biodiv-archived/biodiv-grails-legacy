@@ -1165,6 +1165,9 @@ class SpeciesController extends AbstractObjectController {
         Language userLanguage = utilsService.getCurrentLanguage(request);
         params.locale_language = userLanguage;
         File file = speciesUploadService.saveModifiedSpeciesFile(params);
+        if(!file) {    
+            return render(text: [success:false, downloadFile: ""] as JSON, contentType:'text/html')
+        }
         return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
         /*
         if (f.exists()) {
