@@ -198,12 +198,12 @@ class ObservationController extends AbstractObjectController {
 
 	protected def getObservationList(params) {
         try { 
-            params.max = Integer.parseInt(params.max); 
+            params.max = params.max?Integer.parseInt(params.max.toString()):24 
         } catch(NumberFormatException e) { 
             params.max = 24 
         }
         try { 
-            params.offset = Integer.parseInt(params.offset); 
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
