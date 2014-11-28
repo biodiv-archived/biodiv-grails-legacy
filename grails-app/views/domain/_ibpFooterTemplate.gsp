@@ -73,7 +73,8 @@
 
 
             </div>
-<div class="powered" style="text-align:center;">
+    <div class="powered" style="text-align:center;">
+    <p title="India Biodiversity Portal Mobile App"><a href="https://play.google.com/store/apps/details?id=com.mobisys.android.ibp&hl=en"><img src="${resource(dir:'images',file:'googleplayicon1.png', absolute:true)}"></a></p>
 	<p> <a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}"><img src="${resource(dir:'images',file:'facebook.png', absolute:true)}"></a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}"><img src="${resource(dir:'images',file:'twitter.png', absolute:true)}"></a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}"><img src="${resource(dir:'images',file:'google_plus.png', absolute:true)}"></a><br />
 <g:message code="text.supported.on" /><br />
 <g:message code="text.powered.by" /> <a href="https://github.com/strandls/biodiv" target="_blank"><g:message code="link.informatics.platform" /></a>
