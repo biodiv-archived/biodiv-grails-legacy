@@ -284,7 +284,7 @@ destination.html(destination.html().replace(/&lt;\/?([a]+)[^>]*&gt;/gi, function
   //console.log(destination.html());
 }   
 
-function appendCommentWrapper(that){
+function appendCommentWrapper(that){	
 	that.after('<div class="commentContainer"><div class="contentbox" contenteditable="true"></div><div class="display"></div><div class="msgbox"></div></div><input type="hidden" name="tagUserId" class="tagUserId" value="" />');
 	that.hide();
 	that.next().find('.contentbox').focus();
@@ -318,10 +318,11 @@ function placeCaretAtEnd(el) {
 
 $(document).on('focus','.comment-textbox',function(){
 	appendCommentWrapper($(this));
-})
+});
+
 $(document).ready(function()
 {
-    appendCommentWrapper($('.comment-textbox'));    
+    //appendCommentWrapper($('.comment-textbox'));    
     var start=/@/ig;
     var word=/@(\w+)/ig ;
     var word2=/@(\w+\s\w+)/ig ;
