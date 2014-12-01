@@ -160,9 +160,9 @@ class ActivityFeed {
 		queryList = queryList?:[selectClause + fromClause + whereClause + orderClause]
 		
 		def result =  new ActivityFeed().getResult(queryList, map, isCountQuery, params.max)
-		//println "=============== final reustls ===================================" 
-		//println result
-		//println "=============== final reustls ==================================="
+//		println "=============== final reustls ===================================" 
+//		println result
+//		println "=============== final reustls ==================================="
 		return result 
 	} 
 	
@@ -170,14 +170,14 @@ class ActivityFeed {
 		def result = []
 		def sql =  Sql.newInstance(dataSource)
 		queryList.each { q ->
-			//println "================= Query =========== " 
-			//println q 
-			//println m
-			//println "================= Query =========== "
+//			println "================= Query =========== " 
+//			println q 
+//			println m
+//			println "================= Query =========== "
 			result.addAll(sql.rows(q, m))
 		}
 		
-		//println "====== raw result  = " + result
+//		println "====== raw result  = " + result
 		
 		if(isCountQuery){
 			int c = 0
@@ -189,7 +189,7 @@ class ActivityFeed {
 		
 		Collections.sort(result , new Comparator(){
 			public int compare(s1, s2){
-				s2.updatetime.getTime() - s1.updatetime.getTime()
+				s2.updatetime.compareTo(s1.updatetime)
 			}});
 		
 		
@@ -259,7 +259,6 @@ class ActivityFeed {
 			default:
 				break
 		}
-		
 		params.timeLine = params.timeLine?:ActivityFeedService.OLDER
 		params.refTime = params.refTime?:((params.timeLine == ActivityFeedService.OLDER) ?  new Date().time.toString(): new Date().previous().time.toString())
 		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 5 : 5)  :null)
