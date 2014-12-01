@@ -39,6 +39,7 @@ class  DefaultOauthUserDetailsService extends DefaultOauthUserDetailsService {
             userProp['location']=userProfile.getLocation();
             userProp['accountLocked']=false;
             userProp['enabled']=true;
+            println userProp;
             def user = userService.create(userProp);
             userService.save(user);
 		
