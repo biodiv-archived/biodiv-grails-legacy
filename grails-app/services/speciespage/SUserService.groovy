@@ -46,7 +46,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	/**
 	 * 
 	 */
-	SUser create(propsMap, Language userLanguage) {
+	SUser create(propsMap, Language userLanguage=null) {
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
 
@@ -66,6 +66,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		}
 
 		def user = UserDomainClass.newInstance(propsMap);
+        if(!userLanguage) userLanguage = utilsService.getCurrentLanguage();
         user.language = userLanguage;
 		user.enabled = true;
 		return user;
