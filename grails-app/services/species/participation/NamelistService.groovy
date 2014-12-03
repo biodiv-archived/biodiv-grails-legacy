@@ -20,6 +20,7 @@ import static groovyx.net.http.ContentType.XML
 import groovy.sql.Sql
 import groovy.util.XmlParser
 import grails.converters.JSON;
+import wslite.soap.*
 
 class NamelistService {
    
@@ -626,27 +627,15 @@ class NamelistService {
 
     List searchWORMS(String input, String searchBy) {
         //http://www.marinespecies.org/aphia.php?p=taxlist&tName=Solea solea
-        
-        def http = new HTTPBuilder()
-        println "========WORMS SITE===== " + WORMS_SITE
-        http.request( WORMS_SITE, GET, TEXT ) { req ->
-            if(searchBy == 'name') {
-                uri.path = WORMS_URI;
-            } else {
-                uri.path = WORMS_URI;
-            }
-            uri.query = [ p:'taxlist', tName:input]
-            headers.Accept = '*/*'
 
-            response.success = { resp, reader ->
-                assert resp.statusLine.statusCode == 200
-                println "Got response: ${resp.statusLine}"
-                println "Content-Type: ${resp.headers.'Content-Type'}"
-                def xmlText =  reader.text
-                println "========WORMS RESULT====== " + xmlText
-                //return responseFromEOLAsMap(xmlText, searchBy);
+        def soapClient = new SOAPClient("http://www.marinespecies.org/aphia.php?p=soap");
+        def response = soapClient.send(SOAPAction:"matchAphiaRecordsByNames") {
+            body {
+                matchAphiaRecordsByNames(xmlns:"http://www.marinespecies.org") {
+                    scientificnames("Solea solea")
+                }
             }
-            response.'404' = { println 'Not found' }
         }
+        println "======RESPONSE======== " + response
     }
 }

@@ -11,8 +11,8 @@
             <input type="text" class="nameInputs span12" name="value">
   </div>  
   <div class="span2">
-        <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
-        <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
+        <button class="btn btn-mini btn-primary" onClick='modifyContent(this, "${type}");' rel="add"><i class="icon-ok icon-white"></i></button>
+        <button class="btn btn-mini" onClick='modifyContent(this, "${type}");' rel='delete'><i class="icon-remove"></i></button>
   </div>
  </form> 
 </div>

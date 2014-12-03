@@ -389,13 +389,8 @@
                                     </div>                                    
                                     {{if typeClass == "cid"}}
                                         <div class="span2">
-                                              <select class="span12 tab_select">
-                                                      <option>English</option>
-                                                      <option>Tamil</option>
-                                                      <option>Hindi</option>
-                                                      <option>Telugu</option>
-                                              </select>
-                                          </div>
+                                            <s:chooseLanguage />
+                                        </div>
                                           <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
                                           <div class="span2"><input type="text" class="nameInputs span12" name="contributor"></div> 
                                     {{else}}
@@ -483,7 +478,7 @@
                 expandAll:false,
                 showCheckBox:false
             });	
-            
+            //initializeLanguage();
         });
         </r:script>
 </script>

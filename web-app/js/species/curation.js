@@ -460,7 +460,25 @@ function changeEditingMode(mode) {
 
 
 //====================== SYNONYM RELATED ===============================
-function modifySynonym(ele) {
+function modifyContent(ele, type) {
+    var typeName = '';
+    var relationship = '';
+    alert (type);
+    if(type == 'a') {
+        typeName = 'accepted';
+        relationship = 'accepted';
+    } else if( type == 's') {
+        typeName = 'synonym';
+        relationship = 'synonym';
+        alert(typeName);
+        alert(relationship);
+    } else if( type == 'c') {
+        typeName = 'common';
+        relationship = 'common';
+    } else {
+        typeName = 'reference';
+        relationship = 'reference';
+    }
     event.preventDefault();
     console.log("========UPDATE SY=========");
     var that = $(ele);
@@ -496,9 +514,9 @@ function modifySynonym(ele) {
     for (var i = 0; i < form_value.length; i++) {
         p[form_value[i].name] = form_value[i].value;        
     }
-    p['name']  = "synonym";
+    p['name']  = typeName;
     p['act'] = modifyType;    
-    p['relationship'] = 'synonym';
+    p['relationship'] = relationship;
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
     otherParams['taxonId'] = $(".taxonId").val();  //272991;

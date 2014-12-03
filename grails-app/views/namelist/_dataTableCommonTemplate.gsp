@@ -15,18 +15,13 @@
             <input type="text" class="nameInputs span12" name="value">
   </div>
   <div class="span2">
-      <select class="span12 tab_select">
-              <option>English</option>
-              <option>Tamil</option>
-              <option>Hindi</option>
-              <option>Telugu</option>
-      </select>
+    <s:chooseLanguage />
   </div>  
   <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
   <div class="span2"><input type="text" class="nameInputs span12" name="contributor"></div>
   <div class="span2">
-        <button class="btn btn-mini btn-primary" onClick='modifySynonym(this);' rel="add"><i class="icon-ok icon-white"></i></button>
-        <button class="btn btn-mini" onClick='modifySynonym(this);' rel='delete'><i class="icon-remove"></i></button>
+        <button class="btn btn-mini btn-primary" onClick='modifyContent(this, "${type}");' rel="add"><i class="icon-ok icon-white"></i></button>
+        <button class="btn btn-mini" onClick='modifyContent(this, "${type}");' rel='delete'><i class="icon-remove"></i></button>
   </div>
  </form> 
 </div>
