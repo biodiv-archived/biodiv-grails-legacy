@@ -336,10 +336,6 @@ class SpeciesController extends AbstractObjectController {
             Language lang;
             //concept
            // println "species fields ============"+sField.language;
-            println sField.field.concept
-            println sField.field.connection
-            println map.containsKey(sField.field.concept)
-            println fieldsConnectionArray[sField.field.connection]
 			if(map.containsKey(sField.field.concept) || fieldsConnectionArray[sField.field.connection]) {
 
 				finalLoc = map.get(sField.field.concept)?:fieldsConnectionArray[sField.field.connection];
