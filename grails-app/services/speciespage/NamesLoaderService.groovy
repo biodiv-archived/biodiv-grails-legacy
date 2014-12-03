@@ -30,7 +30,7 @@ class NamesLoaderService {
     int syncNamesAndRecos(boolean cleanAndUpdate) {
         log.info "Synching names and recommendations"
         int noOfNames = 0;
-        noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
+//        noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
         noOfNames += syncSynonyms();
         noOfNames += syncCommonNames();
 
@@ -197,11 +197,13 @@ class NamesLoaderService {
             conn.close();
         }
         while(true) {
+            def synonyms
             try {
+                conn = new Sql(dataSource);
+                synonyms = conn.rows("select canonical_form, taxonConcept from " + tmpTableName + " order by taxonConcept limit " + limit + " offset " + offset);
+
                 Recommendation.withNewTransaction {
-                    conn = new Sql(dataSource);
-                    def synonyms = conn.rows("select canonical_form, taxonConcept from " + tmpTableName + " order by taxonConcept limit " + limit + " offset " + offset);
-                    //def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);
+                   //def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);
 
                     synonyms.each { synonym ->
                         recos.add(new Recommendation(name:synonym.canonical_form, taxonConcept:TaxonomyDefinition.read(synonym.taxonconcept)));
@@ -255,10 +257,12 @@ class NamesLoaderService {
         }
 
         while(true) {
+            def commonNames
             try {
+                conn = new Sql(dataSource);
+                commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by taxonConcept limit "+limit+" offset "+offset)
+
                 Recommendation.withNewTransaction {
-                    conn = new Sql(dataSource);
-                    def commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by taxonConcept limit "+limit+" offset "+offset)
                     commonNames.each { cName ->
                         recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:TaxonomyDefinition.read(cName.taxonconcept)));
                         noOfNames++
