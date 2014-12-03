@@ -554,14 +554,14 @@ environments {
 
             info    'grails.app.filters.species'
             fatal    'jdbc.sqltiming'
-            info    'jdbc.connection'
+            debug    'jdbc.connection'
             fatal   'jdbc.sqlonly'
             fatal   'jdbc.audit'
             fatal   'jdbc.resultset'
             fatal   'jdbc.resultsettable'
-//            debug 'org.hibernate.SQL'
+            debug 'org.hibernate.SQL'
 //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            /*debug 'org.springframework.security.acls'
+            //debug 'org.springframework.security.acls'
             debug 'org.hibernate.jdbc'
             debug 'org.hibernate.persister.entity'
             debug 'org.hibernate.action.EntityUpdateAction'
@@ -570,7 +570,7 @@ environments {
             debug 'org.hibernate.transaction'
             debug 'org.springframework.transaction'
             info    'org.hibernate.jdbc.ConnectionManager'
-            */
+            
             trace   'com.grailsrocks.emailconfirmation'
        }
     }
