@@ -29,8 +29,8 @@ class Species implements Rateable {
     Date updatedOn;
     int featureCount = 0;
 	Date createdOn = new Date();
-	Date dateCreated;
-	Date lastUpdated;
+	Date dateCreated = new Date();
+	Date lastUpdated = dateCreated;
 	Habitat habitat;
 	StringBuilder sLog;
 	

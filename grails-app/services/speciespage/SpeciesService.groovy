@@ -1649,7 +1649,7 @@ class SpeciesService extends AbstractObjectService  {
                 if(key.startsWith('file_')) {
                     if(!resourcesFileName.contains(params.get(key))){
                         def res = Resource.findByFileNameAndType(params.get(key), ResourceType.IMAGE);
-                        res.refresh()
+                        res?.refresh()
                         if(res && !resources.contains(res)){
                             resources.add(res)
                         }

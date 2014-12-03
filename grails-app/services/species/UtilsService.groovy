@@ -537,6 +537,7 @@ class UtilsService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes']; 
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break

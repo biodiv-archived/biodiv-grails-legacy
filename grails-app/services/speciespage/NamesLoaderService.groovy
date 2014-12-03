@@ -56,8 +56,15 @@ class NamesLoaderService {
 		def recos = new ArrayList<Recommendation>();
 		def conn = new Sql(dataSource)
 		def tmpTableName = "tmp_taxon_concept"
-		conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
+        try {
+		    conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
+        } finally {
+            conn.close();
+        }
+
 		while(true) {
+            try {
+		    conn = new Sql(dataSource)
 			def taxonConcepts = conn.rows("select name, canonicalForm, normalizedForm, binomialForm, id from " + tmpTableName + " order by id limit " + limit + " offset " + offset);
 			//def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport])
 			//def taxonConcepts = TaxonomyDefinition.findAllByRankGreaterThanEquals(minRankToImport);
@@ -80,10 +87,18 @@ class NamesLoaderService {
 			recommendationService.save(recos);
 			recos.clear();
 			offset = offset + limit;
-			
+            } finally {
+                conn.close();
+            }
 			if(!taxonConcepts) break; //no more results;
 		}
-		conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);	
+
+        conn = new Sql(dataSource);
+        try {
+		    conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);	
+        } finally {
+            conn.close();
+        }
 		return noOfNames;
 	}
 	
@@ -104,11 +119,14 @@ class NamesLoaderService {
 			int offset = 0
 			def recos = new ArrayList<Recommendation>();
 			def conn = new Sql(dataSource)
+			def conn1;
 			def tmpTableName = "tmp_table_update_taxonconcept"
 			try {
 				conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + query);
+                conn.close();
 				while(true) {
-					def recommendationList = conn.rows("select recoid, taxonid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
+			        conn1 = new Sql(dataSource)
+					def recommendationList = conn1.rows("select recoid, taxonid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
 					recommendationList.each { r ->
 						Recommendation rec = Recommendation.get(r.recoid);
 						rec.taxonConcept = TaxonomyDefinition.read(r.taxonid);
@@ -125,7 +143,10 @@ class NamesLoaderService {
 				// TODO: handle exception
 				e.printStackTrace();
 			}finally{
+			    conn = new Sql(dataSource)
 				conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+                conn.close()
+                conn1.close();
 			}	
 		}
 		log.info "Total updated recommencation is $noOfNames"
@@ -144,9 +165,14 @@ class NamesLoaderService {
 		def conn = new Sql(dataSource)
 		
 		def tmpTableName = "tmp_synonyms"
+        try {
 		conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxon_concept_id order by n.taxon_concept_id");
-		
+        } finally {
+            conn.close();
+        }
 		while(true) {
+            try {
+            conn = new Sql(dataSource);
 			def synonyms = conn.rows("select canonical_form, taxonConcept from " + tmpTableName + " order by taxonConcept limit " + limit + " offset " + offset);
 			//def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);
 			
@@ -158,10 +184,17 @@ class NamesLoaderService {
 			offset = offset + limit;		
 			recommendationService.save(recos);
 			recos.clear();
+            } finally {
+                conn.close();
+            }
 			if(!synonyms) break;
 		}
-		
-		conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+		conn = new Sql(dataSource);
+        try {
+		    conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+        } finally {
+            conn.close();
+        }
 		log.info "Imported synonyms into recommendations : "+noOfNames
 		return noOfNames;
 	}
@@ -184,9 +217,15 @@ class NamesLoaderService {
 		where r.name is null 
 		group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id
 		"""
-		conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + selectQuery );
+        try {
+		    conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + selectQuery );
+        } finally {
+            conn.close();
+        }
 		
 		while(true) {
+            try {
+                conn = new Sql(dataSource);
 			def commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by taxonConcept limit "+limit+" offset "+offset)
 			commonNames.each { cName ->
 				recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:TaxonomyDefinition.get(cName.taxonconcept)));
@@ -195,10 +234,17 @@ class NamesLoaderService {
 			recommendationService.save(recos);
 			recos.clear();
 			offset =  offset + commonNames.size();
+            } finally {
+                conn.close();
+            }
 			if(!commonNames) break;
 		}
 		recommendationService.save(recos);
-		conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+        try {
+		    conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+        } finally {
+            conn.close();
+        }
 		log.info "Imported common names into recommendations : "+noOfNames
 		return noOfNames
 	}
