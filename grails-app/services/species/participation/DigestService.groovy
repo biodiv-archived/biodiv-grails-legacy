@@ -17,6 +17,7 @@ class DigestService {
     def activityFeedService;
     def chartService;
     def dataSource;
+    def springSecurityService;
 
     public static final MAX_DIGEST_OBJECTS = 5
     static transactional = false

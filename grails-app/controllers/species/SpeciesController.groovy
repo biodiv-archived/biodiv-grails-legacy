@@ -336,10 +336,6 @@ class SpeciesController extends AbstractObjectController {
             Language lang;
             //concept
            // println "species fields ============"+sField.language;
-            println sField.field.concept
-            println sField.field.connection
-            println map.containsKey(sField.field.concept)
-            println fieldsConnectionArray[sField.field.connection]
 			if(map.containsKey(sField.field.concept) || fieldsConnectionArray[sField.field.connection]) {
 
 				finalLoc = map.get(sField.field.concept)?:fieldsConnectionArray[sField.field.connection];
@@ -974,7 +970,6 @@ class SpeciesController extends AbstractObjectController {
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
 
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))
                 utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
             } else{
@@ -1165,6 +1160,9 @@ class SpeciesController extends AbstractObjectController {
         Language userLanguage = utilsService.getCurrentLanguage(request);
         params.locale_language = userLanguage;
         File file = speciesUploadService.saveModifiedSpeciesFile(params);
+        if(!file) {    
+            return render(text: [success:false, downloadFile: ""] as JSON, contentType:'text/html')
+        }
         return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
         /*
         if (f.exists()) {
