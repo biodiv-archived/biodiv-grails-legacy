@@ -404,6 +404,10 @@ class ObvUtilService {
 		obvParams['geoPrivacy'] = m["geoprivacy"]
 
         obvParams['resourceListType'] = "ofObv"
+
+		obvParams['agreeTerms'] = "on"
+        
+        obvParams['locale_language'] = utilsService.getCurrentLanguage();
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(obvParams.latitude && obvParams.longitude) {
