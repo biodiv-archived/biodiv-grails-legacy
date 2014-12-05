@@ -275,7 +275,7 @@ class RecommendationService {
 		return null;
 	}
 	
-	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
+	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept){
         if(!name) return;
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {
