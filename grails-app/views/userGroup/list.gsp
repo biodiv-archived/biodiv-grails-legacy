@@ -8,6 +8,12 @@
 <r:require modules="userGroups_list" />
 </head>
 <body>
+<style type="text/css">
+.observations_list{
+	overflow-y:scroll;
+	height:600px;
+}
+</style>
 	<div class="span12">
     <%
     def group=g.message(code:'default.groups.label')
@@ -33,6 +39,16 @@
 			//updateGallery(target, ${queryParams.max}, 0, undefined, false);
         	return false;
 		});*/
+
+$('.observations_list').bind('scroll', function() {
+        if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {
+        	if($(".loadMore").is(":visible")){
+	            $(".loadMore").trigger('click');
+	            console.log("trigger");
+        	}
+        }
+});
+
 	</r:script>
 
 </body>

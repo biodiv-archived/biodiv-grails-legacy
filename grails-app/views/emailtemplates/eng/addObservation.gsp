@@ -55,8 +55,26 @@
 				</g:else>
 				${raw(message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1))}
 
+                <g:if test="${spFDes}">
+                    <p style="margin-left:35px;">
+                        ${spFDes}
+                    </p>
+                </g:if>
+                <g:if test="${resURLs}">
+                    <table>
+                        <tr align="left">
+                            <g:each in="${resURLs.size() < 8 ? resURLs : resURLs.subList(0, 8)}" var="ru">
+                            <td height="50" width="50" style=" border: 1px solid lightblue; text-align: left;">
+                                <a href="${uGroup.createLink(action:'show', controller:'species', 'id': obvId , absolute:true)}">
+                                    <img src="${ru}" title="" style="border: 0px solid ; max-height: 50px; width:50px;" />
+                                </a>
+                            </td>
+                            </g:each>
+                        </tr>
+                    </table>
+                </g:if>
 
-				<g:if test="${activity?.text }">
+                <g:if test="${activity?.text }">
 
 			<!-- Callout Panel -->
 			<p class="callout" style="margin: 0;padding: 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; ">
@@ -104,7 +122,7 @@
                                     <b>Message</b> : ${commentInstance.body} <br/>
                                     <b>Group</b> :
                                     <span style="height: 30px; width: 186px; position: relative; background-color: #D4ECE3;  margin:2px 6px; " >
-                                        <a href="${baseUrl}/group/${group.webaddress}"> 
+                                        <a href="${uGroup.createLink(controller:'userGroup', action:'show', absolute:true, 'userGroup':group)}"> 
                                             <img src="${group.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
 
 
@@ -206,7 +224,7 @@
 					<a style="padding:0 2px">The above observation is a member of the following groups: <a/><br />
 						<g:each in="${groups}">
 							<div style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
-							    <a href="${baseUrl}/group/${it.webaddress}" style="text-decoration: none; color: #222222;"> 
+							    <a href="${uGroup.createLink(controller:'userGroup', action:'show', absolute:true, 'userGroup':it)}" style="text-decoration: none; color: #222222;"> 
 								<img src="${it.icon(ImageType.SMALL).fileName}" style="width: 30px; height: 30px; align: left; vertical-align:middle;"/>
 
 									<g:set var="groupName" value="${it.name}"></g:set>

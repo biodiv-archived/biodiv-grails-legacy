@@ -215,10 +215,9 @@
                 </form>
                 
                 <g:render template="/checklist/addPhoto" model="['observationInstance':observationInstance, 'resourceListType':'ofChecklist']"/>
-                <form id="upload_resource" 
+                <form class="upload_resource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" 
                     title="${g.message(code:'title.checklist.create')}"
-                    method="post"
-                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+                    method="post">
 
                     <span class="msg" style="float: right"></span>
                     <input id="videoUrl" type="hidden" name='videoUrl'value="" />

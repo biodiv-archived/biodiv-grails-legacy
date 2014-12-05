@@ -4,7 +4,7 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
 
     p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
     p['max'] = -1;
-    delete p['bounds']
+    //delete p['bounds']
     
     if(!url) url = window.params.observation.occurrencesUrl+'?'+decodeURIComponent($.param(p));
     else url = url+'?'+decodeURIComponent($.param(p));
@@ -13,7 +13,6 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
         mapLocationPicker.markers.clearLayers();
     } else 
         mapLocationPicker.markers = new mapLocationPicker.M.MarkerClusterGroup({maxClusterRadius:50});
-
     $.ajax({
         url: url,
         dataType: "json",

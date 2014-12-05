@@ -72,4 +72,7 @@ function loadUserGroupStats(url){
 	}
 }
 
+$(document).ready(function(){
+	
+});
 

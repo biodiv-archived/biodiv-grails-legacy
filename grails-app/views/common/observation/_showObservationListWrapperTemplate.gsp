@@ -86,13 +86,17 @@
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
                                     <h5><g:message code="default.species.distribution.label" /></h5>
-					<obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
-					</obv:showObservationsLocation>
-                                        <a id="refreshListForBounds" data-toggle="dropdown"
-                                            href="#"><i class="icon-refresh"></i>
-							<g:message code="button.refresh.list" /></a>
+                                    <obv:showObservationsLocation
+                                    model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
+                                    </obv:showObservationsLocation>
+                                    <a id="refreshListForBounds" data-toggle="dropdown"
+                                        href="#"><i class="icon-refresh"></i>
+                                        <g:message code="button.refresh.list" /></a>
+                                    <a id="resetMap" data-toggle="dropdown"
+                                        href="#"><i class="icon-refresh"></i>
+                                        <g:message code="button.reset" /></a>
 
+                                    <div><i class="icon-info"></i><g:message code="map.limit.info" /></div>
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
@@ -130,6 +134,13 @@ $(document).ready(function() {
     $("#refreshListForBounds").click(function() {
         var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker');
         refreshList(mapLocationPicker.getSelectedBounds());
+    });
+
+    $("#resetMap").click(function() {
+        var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker');
+        //refreshList(mapLocationPicker.getSelectedBounds());
+        $("#bounds").val('');
+        refreshMapBounds(mapLocationPicker);
     });
 
     $('.list').on('updatedGallery', function() {

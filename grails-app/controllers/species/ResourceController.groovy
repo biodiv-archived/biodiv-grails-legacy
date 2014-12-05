@@ -153,6 +153,7 @@ class ResourceController {
         }
     }
     
+    @Secured("ROLE_USER")
     def createResource(){
         def user = springSecurityService.currentUser;
          params.locale_language = utilsService.getCurrentLanguage(request);
@@ -164,6 +165,7 @@ class ResourceController {
         render res as JSON
     }
     
+    @Secured("ROLE_USER")
     def deleteUsersResourceById(){
         def res
         if(!params.resId && params.fileName) {
@@ -179,12 +181,14 @@ class ResourceController {
         render res as JSON
     } 
 
+    @Secured("ROLE_USER")
     def bulkUploadResources() {
 		def model = getBulkUploadResourcesList(params);
         render (view:"list", model:model)
 		return;
     }
 
+    @Secured("ROLE_USER")
     def getBulkUploadResourcesList(params) {
         def result = resourcesService.getBulkUploadResourcesList(params);
         return [resourceInstanceList: result.resourceInstanceList, userCountList: result.userCountList ]

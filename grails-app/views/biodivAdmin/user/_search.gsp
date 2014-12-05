@@ -12,7 +12,7 @@
 			<tbody>
 
 			<tr>
-				<td><g:message code='user.username.label' default='Username'/>:</td>
+				<td><g:message code='suser.username.label' />:</td>
 				<td colspan='3'><g:textField name='username' size='50' maxlength='255' autocomplete='off' value='${username}'/></td>
 			</tr>
 			<tr>
@@ -22,25 +22,25 @@
 				<td><g:message code='spring.security.ui.search.either'/></td>
 			</tr>
 			<tr>
-				<td><g:message code='user.enabled.label' default='Enabled'/>:</td>
+				<td><g:message code='user.enabled.label' />:</td>
 				<g:radioGroup name='enabled' labels="['','','']" values="[1,-1,0]" value='${enabled}'>
 				<td><%=it.radio%></td>
 				</g:radioGroup>
 			</tr>
 			<tr>
-				<td><g:message code='user.accountExpired.label' default='Account Expired'/>:</td>
+				<td><g:message code='user.accountExpired.label' />:</td>
 				<g:radioGroup name='accountExpired' labels="['','','']" values="[1,-1,0]" value='${accountExpired}'>
 				<td><%=it.radio%></td>
 				</g:radioGroup>
 			</tr>
 			<tr>
-				<td><g:message code='user.accountLocked.label' default='Account Locked'/>:</td>
+				<td><g:message code='user.accountLocked.label' />:</td>
 				<g:radioGroup name='accountLocked' labels="['','','']" values="[1,-1,0]" value='${accountLocked}'>
 				<td><%=it.radio%></td>
 				</g:radioGroup>
 			</tr>
 			<tr>
-				<td><g:message code='user.passwordExpired.label' default='Password Expired'/>:</td>
+				<td><g:message code='user.passwordExpired.label' />:</td>
 				<g:radioGroup name='passwordExpired' labels="['','','']" values="[1,-1,0]" value='${passwordExpired}'>
 				<td><%=it.radio%></td>
 				</g:radioGroup>

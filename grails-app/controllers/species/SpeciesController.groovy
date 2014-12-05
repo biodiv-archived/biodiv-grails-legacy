@@ -105,11 +105,10 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def save() {
         List errors = [];
-        Map result = [errors:errors];
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        Map result = [userLanguage:languageInstance, errors:errors];
+
         if(params.page && params.rank) {
-
-            Language languageInstance = utilsService.getCurrentLanguage(request);
-
             Map list = params.taxonRegistry?:[:];
             List t = [];
             String speciesName;
@@ -231,9 +230,30 @@ class SpeciesController extends AbstractObjectController {
             utilsService.benchmark('getTreeMap') {
                 map = getTreeMap(speciesInstance, fields, userLanguage);
             }
+            def converter = new XMLConverter()
+            Map fieldFromName = [                
+                summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
+                occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
+                references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
+                brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
+                gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
+                gege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage) ,
+                idge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage), 
+                iege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage),
+                tri  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXONRECORDID,1,userLanguage),
+                gui  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER,1,userLanguage),
+                nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
+                md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
+                overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
+                acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,
+                trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
+                sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
+                sn3: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,3,userLanguage),
+                gsn3:converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME,3,userLanguage)
+            ]
 
             utilsService.benchmark('mapSpeciesInstanceFields') {
-			    map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray);
+			    map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray,fieldFromName);
             }
 
            
@@ -241,7 +261,7 @@ class SpeciesController extends AbstractObjectController {
 			//def observationInstanceList = relatedObservations?.observations?.observation
 			//def instanceTotal = relatedObservations?relatedObservations.count:0
 			
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage]
+			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName]
 
              if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
@@ -305,9 +325,9 @@ class SpeciesController extends AbstractObjectController {
 		return [map:map, fieldsConnectionArray:fieldsConnectionArray];
 	}
 
-	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsConnectionArray) {
+	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsConnectionArray,Map config) {
 		
-		def config = grailsApplication.config.speciesPortal.fields
+		//def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
         utilsService.benchmark('grouping sFields') {
@@ -316,6 +336,10 @@ class SpeciesController extends AbstractObjectController {
             Language lang;
             //concept
            // println "species fields ============"+sField.language;
+            println sField.field.concept
+            println sField.field.connection
+            println map.containsKey(sField.field.concept)
+            println fieldsConnectionArray[sField.field.connection]
 			if(map.containsKey(sField.field.concept) || fieldsConnectionArray[sField.field.connection]) {
 
 				finalLoc = map.get(sField.field.concept)?:fieldsConnectionArray[sField.field.connection];
@@ -362,7 +386,7 @@ class SpeciesController extends AbstractObjectController {
 				}
                 finalLoc.put("lang", sField.language);
 			}
-			if(finalLoc.containsKey('field')) { 
+			if(finalLoc && finalLoc.containsKey('field')) { 
 				def t = finalLoc.get('speciesFieldInstance');
 				if(!t) {
 					t = [];
@@ -386,9 +410,9 @@ class SpeciesController extends AbstractObjectController {
 			for(category in concept.value.clone()) {
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
+				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) ) {
 					boolean show = false;
-					if(category.key.equals(config.REFERENCES)) {
+					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
 							if(f.references) {
 								show = true;
@@ -420,10 +444,10 @@ class SpeciesController extends AbstractObjectController {
 				for(subCategory in category.value.clone()) {
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor") || subCategory.key.equals("lang") ) continue;
 
-					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
-					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||
-					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
-					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)) {
+					if((subCategory.key.equals(config.gdge) && speciesInstance.globalDistributionEntities.size()>0)  ||
+					(subCategory.key.equals(config.gege) && speciesInstance.globalEndemicityEntities.size()>0)||
+					(subCategory.key.equals(config.idge) && speciesInstance.indianDistributionEntities.size()>0) ||
+					(subCategory.key.equals(config.iege) && speciesInstance.indianEndemicityEntities.size()>0)) {
 
                         if(subCategory.value.get('speciesFieldInstance')) {
                             speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get(subCategory.key).get('speciesFieldInstance'));
@@ -744,7 +768,7 @@ class SpeciesController extends AbstractObjectController {
 	/**
 	 *
 	 */
-	def search() {
+	/*def search() {
 		def model = speciesService.getSpeciesList(params, 'search')
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		model['isSearch'] = true;
@@ -771,7 +795,7 @@ class SpeciesController extends AbstractObjectController {
 			render (result as JSON)
 			return;
 		}
-	}
+	}*/
 
 
 
@@ -902,7 +926,7 @@ class SpeciesController extends AbstractObjectController {
                 flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))            
             }
         }else{
-            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))           
+            flash.error=messageSource.getMessage("default.species.error.added.userInviteTaxon", [params.userId, params.invitetype, params.taxonConcept] as Object[], RCU.getLocale(request))           
         }
         def url = uGroup.createLink(controller:"species", action:"taxonBrowser");
         redirect url: url
@@ -1012,6 +1036,12 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
+        if(!params.speciesId) {
+            log.error "NO SPECIES ID TO FETCH RELATED OBV";
+            def result = [addPhotoHtml: '', relatedObvCount: 0]
+            render result as JSON
+        }
+        params.offset = (params.offset)?params.offset:0
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
         def relatedObv = relatedObvMap.resList
@@ -1180,6 +1210,8 @@ class SpeciesController extends AbstractObjectController {
     def pullObvMediaInSpField(){
         log.debug params  
         //pass that same species
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage; 
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result
@@ -1193,6 +1225,8 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def uploadMediaInSpField(){
+        Language userLanguage = utilsService.getCurrentLanguage(request);
+        params.locale_language = userLanguage;
         def speciesField = SpeciesField.get(params.speciesFieldId.toLong())
         def out = speciesService.updateSpecies(params, speciesField)
         def result

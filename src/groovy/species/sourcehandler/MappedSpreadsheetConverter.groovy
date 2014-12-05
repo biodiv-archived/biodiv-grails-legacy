@@ -88,9 +88,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
                     //TODO: remove hardcodings for field names
 					if (mappedField.get("category")?.equalsIgnoreCase("images")) {
-						Node images = getImages(imagesMetaData, fieldName, 'images', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir, mappedField.get("language"));
+						Node images = getImages(imagesMetaData, fieldName, 'images', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir, language);
 					} else if (category.text().equalsIgnoreCase("icons")) {
-						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir,  mappedField.get("language"));
+						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir,  language);
 					} else if (category.text().equalsIgnoreCase("audio")) {
 						//						Node images = getAudio(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, audio);
