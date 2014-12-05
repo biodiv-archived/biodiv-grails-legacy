@@ -465,6 +465,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			body = evaluate(body, [username: username.capitalize(), url: url])
 		}
 		def messagesourcearg = new Object[1];
+		String domain = Utils.getDomainName(request)
                 messagesourcearg[0] = domain;
 		def sub = messageSource.getMessage("grails.plugin.springsecurity.ui.register.emailSubject", messagesourcearg, RCU.getLocale(request))
 		
