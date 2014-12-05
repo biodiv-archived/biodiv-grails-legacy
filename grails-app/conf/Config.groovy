@@ -455,8 +455,6 @@ speciesPortal {
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
 
-     wikwio.domain = "portal.wikwio.org"
-
 }
 
 speciesPortal.validCrossDomainOrigins = [
