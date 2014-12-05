@@ -22,7 +22,7 @@ class RecommendationService {
 	def namesIndexerService;
 
 	static transactional = false
-	static int BATCH_SIZE = 20
+	static int BATCH_SIZE = 50
 
 	/**
 	 * TODO:Bind this call to recommendation domain object save

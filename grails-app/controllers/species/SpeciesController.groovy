@@ -973,7 +973,6 @@ class SpeciesController extends AbstractObjectController {
                     UserToken.get(params.tokenId.toLong())?.delete();
                 }
 
-                observationService.sendNotificationMail(observationService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
                 flash.message=messageSource.getMessage("default.species.success.added.userInviteTaxon", [user,invitetype,taxonConcept.name] as Object[], RCU.getLocale(request))
                 utilsService.sendNotificationMail(utilsService.NEW_SPECIES_PERMISSION, taxonConcept, null, null, null, ['permissionType':invitetype, 'taxonConcept':taxonConcept, 'user':user]);
             } else{

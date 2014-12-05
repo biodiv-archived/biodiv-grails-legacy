@@ -103,7 +103,7 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(SUser) {
-            return ['id':it.id, 'name':it.name, 'email': it.email, 'icon':it.profilePicture()]
+            return ['id':it.id, 'name':it.name, 'icon':it.profilePicture()]
         }
  
         JSON.registerObjectMarshaller(Recommendation) {

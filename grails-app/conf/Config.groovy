@@ -572,6 +572,7 @@ environments {
             debug 'org.springframework.transaction'
             info    'org.hibernate.jdbc.ConnectionManager'
             */
+            trace   'com.grailsrocks.emailconfirmation'
        }
     }
 	test {
