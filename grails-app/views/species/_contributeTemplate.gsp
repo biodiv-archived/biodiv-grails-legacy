@@ -4,10 +4,14 @@ String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
 	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
-} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
+} else if(domain.equals(grailsApplication.config.speciesPortal.wikwio.domain)){
+	supportEmail = grailsApplication.config.speciesPortal.wikwio.supportEmail;
+}else{ //if(domain.equals(grailsApplication.config.ibp.domain)) {
 	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
 }
 %>
+
+${domain}
 		<div class="">
 				<div class="section">
                     <p>

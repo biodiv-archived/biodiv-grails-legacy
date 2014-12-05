@@ -183,7 +183,7 @@ speciesPortal {
     app.logo = "logo/wikwio.png"
     app.favicon = "logo/favicon.png"
    
-    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com"]
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com","projectwikwio@gmail.com"]
 
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
@@ -454,6 +454,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
+
+     wikwio.domain = "portal.wikwio.org"
 
 }
 
@@ -1181,7 +1183,7 @@ grails.plugin.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}
 grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
 //grails.plugin.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
+grails.plugin.springsecurity.ui.notification.emailReplyTo = "projectwikwio@gmail.com";
 
 grails.plugin.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 //grails.plugin.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
