@@ -40,7 +40,7 @@ class DataController {
 		def parentId = params.nodeid  ?: null
 		def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
 		def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
-		long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
+		Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
 		Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
 		combinedHierarchy.merge();

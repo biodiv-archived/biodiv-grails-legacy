@@ -98,6 +98,11 @@ $(document).ready(function() {
                         'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
                         'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
                     }
+                },
+                'userGroup': {
+                    'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",
+		            'leaveUrl' : "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }",
+                    'requestMembershipUrl' : "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }"
                 }
                 
 	}
@@ -225,6 +230,21 @@ $(document).ready(function() {
                 "again":"${g.message(code:'other.try.again')}",                       
                 "statu":"${g.message(code:'upload.progres.visit')}",                       
                 "lic":"${g.message(code:'provide.license')}"
+            },
+            "maps" :{
+
+                "newlayer":"${g.message(code:'maps.new.layers')}",
+                "allayer" :"${g.message(code:'maps.all.layers')}",
+                "bytheme" :"${g.message(code:'maps.by.theme')}",
+                "listtheme" :"${g.message(code:'maps.list.themes')}",
+                "show"    :'${g.message(code:'maps.show.layers')}',
+                "madd"    :"${g.message(code:'maps.add')}",
+                "mremove" :"${g.message(code:'maps.remove')}",
+                "mzoom"   :"${g.message(code:'maps.zoom')}",
+                "mrecord" :"${g.message(code:'maps.all.records')}",
+                "moccur"  :"${g.message(code:'maps.occurence.records')}",
+                "msearch" :"${g.message(code:'default.search')}",
+                "noselect":"${g.message(code:'maps.no.selected')}"
             }      
 
 

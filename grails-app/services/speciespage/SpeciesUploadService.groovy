@@ -79,7 +79,6 @@ class SpeciesUploadService {
 	def sessionFactory;
 	def externalLinksService;
 	def speciesSearchService;
-	def namesIndexerService;
 	def springSecurityService
 	def speciesPermissionService;
 	def SUserService;
@@ -407,16 +406,16 @@ class SpeciesUploadService {
 			speciesSearchService.publishSearchIndex(species);
 		} catch(e) {
 			e.printStackTrace()
-		}
+	 	}
 		return noOfInsertions;
-	}
+	} 
 	
 	
 	private int saveSpeciesToDB(List<Species> species) {
 		int noOfInsertions = 0;
 		long startTime = System.currentTimeMillis();
 		
-		Species.withTransaction { status ->		
+		Species.withNewTransaction { status ->		
 			noOfInsertions += saveSpeciesBatch(species);			
 		}
 		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"

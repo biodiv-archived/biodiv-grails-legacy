@@ -27,11 +27,11 @@
 				</g:elseif>
 				<g:else>
 					<g:if test="${observationCount}">
-						${observationCount} observation<g:if test="${observationCount>1}"><g:message code="text.s" /></g:if>
+						<g:message code="text.observation" args="${observationCount}" /><g:if test="${observationCount>1}"><g:message code="text.s" /></g:if>
 					</g:if>
 					<g:if test="${checklistCount}">
 						<g:if test="${observationCount}"> <g:message code="text.and" /> </g:if>
-						${checklistCount} checklist<g:if test="${checklistCount>1}"><g:message code="text.s" /></g:if>
+						<g:message code="text.checklists" args="${checklistCount}" /><g:if test="${checklistCount>1}"><g:message code="text.s" /></g:if>
 					</g:if>
 				</g:else> 
 			<g:message code="text.found" /> 
@@ -140,7 +140,7 @@
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
 					action:params.action, params:[(queryParam.key): queryParam.value])}">
-						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="#${queryParam.key}"
+						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>
 

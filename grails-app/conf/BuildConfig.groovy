@@ -189,7 +189,7 @@ grails.project.dependency.resolution = {
         compile ":taggable:1.0.1"
         runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
-        compile ":wslite:0.7.2.0"
+        //compile ":wslite:0.7.2.0"
     } 
 
     grails.war.resources = { stagingDir ->

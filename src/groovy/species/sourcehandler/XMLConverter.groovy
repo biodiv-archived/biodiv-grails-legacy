@@ -1202,6 +1202,7 @@ class XMLConverter extends SourceConverter {
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
+                sfield.status = NameStatus.COMMON;
                 if(lang)
                     sfield.language = lang;
                 else {

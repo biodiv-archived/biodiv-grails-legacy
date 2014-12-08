@@ -58,7 +58,6 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 
         String[] getCodes() {
 
-            println "${getClass().name}.${name()}"
             ["${getClass().name}.${name()}"] as String[]
         }   
         String getDefaultMessage() { value() }
@@ -85,7 +84,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
-
+    //String scientificNames;
 	//XXX uncmment it before migration
 	//Coverage coverage //<== extending metadata now	//Coverage Information
 	

@@ -44,9 +44,11 @@
 			<div class="tab-content">
 				<div id="list" class="tab-pane active">
 						<s:speciesFilter></s:speciesFilter>
-						<sUser:isAdmin>
+						<% /*
+                        <sUser:isAdmin>
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
 						</sUser:isAdmin>
+                        */%>
 						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
 						<div class="list" style="top: 0px;">
 							<s:showSpeciesList/>

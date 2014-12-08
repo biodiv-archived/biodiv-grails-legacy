@@ -205,27 +205,7 @@
         <s:isSpeciesContributor model="['speciesInstance':speciesInstance]">
         <g:set var="isSpeciesContributor" value="${Boolean.TRUE}"/>
         </s:isSpeciesContributor>
- 
-        <%def converter = new XMLConverter()%>
-        <% 
-        Map fieldFromName = [
-            summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
-            occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
-            references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
-            brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
-            gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
-            gege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage) ,
-            idge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage), 
-            iege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage),
-            tri  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXONRECORDID,1,userLanguage),
-            gui  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER,1,userLanguage),
-            nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
-            md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
-            overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
-            acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY
-            ]
-        %>
-
+        
         <div class="span12">
             <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor]"/>
 
@@ -249,7 +229,7 @@
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
 
-                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor, converter:converter, userLanguage:userLanguage]"/>
+                    <g:render template="/species/showSpeciesNames" model="['speciesInstance':speciesInstance, 'fields':fields, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
 
                     <ul style="list-style: none;margin:0px;">
                         <g:each in="${fields}" var="concept">

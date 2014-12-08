@@ -171,7 +171,7 @@ class CommentService {
         recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
         if(recoComment){
             def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
-                commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName()]
+                commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName(),locale_language:utilsService.getCurrentLanguage()]
                 addComment(m);
         }
     }

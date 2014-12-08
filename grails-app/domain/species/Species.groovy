@@ -29,8 +29,8 @@ class Species implements Rateable {
     Date updatedOn;
     int featureCount = 0;
 	Date createdOn = new Date();
-	Date dateCreated;
-	Date lastUpdated;
+	Date dateCreated = new Date();
+	Date lastUpdated = dateCreated;
 	Habitat habitat;
 	StringBuilder sLog;
 	
@@ -74,6 +74,7 @@ class Species implements Rateable {
 	static mapping = {
 		id generator:'species.utils.PrefillableUUIDHexGenerator'
 		fields sort : 'field'
+		autoTimestamp false
 	}
 	
 	//used for debugging
@@ -273,6 +274,10 @@ class Species implements Rateable {
             e.printStackTrace()
         }*/
         this.percentOfInfo = speciesUploadService.calculatePercentOfInfo(this);
+        
+		if(isDirty() && !isDirty('version')){
+			lastUpdated = new Date();
+        }
     }
 
     def afterInsert() {

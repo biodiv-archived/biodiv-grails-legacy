@@ -35,7 +35,7 @@ class UtilsService {
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
-    static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+    //static final String SPECIES_AGREED_ON = "speciesAgreedOn";
     static final String SPECIES_NEW_COMMENT = "speciesNewComment";
     static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
     static final String OBSERVATION_FLAGGED = "observationFlagged";
@@ -372,7 +372,7 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-                case SPECIES_AGREED_ON:
+                case ActivityFeedService.SPECIES_AGREED_ON:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 mailSubject = messageSource.getMessage("mail.name.suggest", null, LCH.getLocale())
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -507,9 +507,9 @@ class UtilsService {
                 
                 case [ActivityFeedService.SPECIES_CREATED, ActivityFeedService.SPECIES_UPDATED]:
                 mailSubject = notificationType;
-                    if(otherParams['resURLs']){
-                        templateMap['resURLs'] = otherParams['resURLs']
-                    }
+                if(otherParams['resURLs']){
+                    templateMap['resURLs'] = otherParams['resURLs']
+                }
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 if(notificationType == ActivityFeedService.SPECIES_CREATED){
                     templateMap["message"] = messageSource.getMessage("mail.added.species", null, LCH.getLocale())
@@ -537,6 +537,7 @@ class UtilsService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes']; 
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -546,6 +547,7 @@ class UtilsService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes'];
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break

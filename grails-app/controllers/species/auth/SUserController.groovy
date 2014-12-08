@@ -20,6 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import species.BlockedMails;
+import species.SpeciesPermission;
 import species.participation.RecommendationVote;
 import species.participation.Observation;
 
@@ -290,9 +291,10 @@ class SUserController extends UserController {
 				FacebookUser.removeAll user;
 				lookupUserRoleClass().removeAll user
                 Follow.deleteAll user;
+                SpeciesPermission.removeAll user;
 
+				user.delete(failOnError:true);
 				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
-				user.delete();
 
 			}
 			//updating SpeciesName

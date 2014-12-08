@@ -39,6 +39,7 @@ import species.participation.Featured
 import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.ScientificName.TaxonomyRank;
+import species.participation.ActivityFeedService;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -196,6 +197,16 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	protected def getObservationList(params) {
+        try { 
+            params.max = params.max?Integer.parseInt(params.max.toString()):24 
+        } catch(NumberFormatException e) { 
+            params.max = 24 
+        }
+        try { 
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
+        } catch(NumberFormatException e) { 
+            params.offset = 0 
+        }
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
@@ -889,11 +900,11 @@ class ObservationController extends AbstractObjectController {
 				} else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, utilsService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					utilsService.sendNotificationMail(utilsService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+					utilsService.sendNotificationMail(ActivityFeedService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',

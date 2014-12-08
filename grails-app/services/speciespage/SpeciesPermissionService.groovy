@@ -16,6 +16,7 @@ import species.auth.SUserRole;
 import species.participation.UserToken;
 import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
+import grails.util.Environment;
 
 class SpeciesPermissionService {
 
@@ -23,7 +24,7 @@ class SpeciesPermissionService {
 
     def emailConfirmationService;
     def utilsService;
-
+    def springSecurityService;
 
     List<SUser> getCurators(Species speciesInstance) {
         def result = getUsers(speciesInstance, PermissionType.ROLE_CURATOR) 
@@ -268,7 +269,8 @@ println res;
                 rankLevel = rankArray[sn.rank]
                 def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
                 userToken.save(flush: true)
-                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/invitePermission', message:message], userToken.token);
+                def userLanguage = utilsService.getCurrentLanguage();
+                emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/invitePermission', message:message], userToken.token);
 
                 msg += " Successfully sent invitation to ${mem.name} for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
             }
@@ -288,6 +290,7 @@ println res;
         String msg = ""
         String usernameFieldName = 'name'
         def selNodes = selectedNodes.split(",")
+
         members.each { mem ->
             def hadPermissionFor;
             if(invitetype == 'curator')
@@ -310,9 +313,15 @@ println res;
                 def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
                 userToken.save(flush: true)
 
-                List<SUser> speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
+                List<SUser> speciesAdmins;
+                if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+                    speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
+                } else {
+                    speciesAdmins = [springSecurityService.currentUser];
+                }
                 speciesAdmins.each {
-                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:utilsService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/requestPermission', 'message':message], userToken.token);
+                    def userLanguage = utilsService.getCurrentLanguage();
+                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:utilsService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestPermission', 'message':message], userToken.token);
                 }
 
                 msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        

@@ -1126,7 +1126,7 @@ println observationInstance.license
         if(params.observedon_start && params.observedon_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
             def startDate = df.parse(URLDecoder.decode(params.observedon_start))
-            def endDate = df.parse(URLDecoder.decode(params.observed_end))
+            def endDate = df.parse(URLDecoder.decode(params.observedon_end))
             Calendar cal = Calendar.getInstance(); // locale-specific
             cal.setTime(endDate)
             cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -1138,8 +1138,8 @@ println observationInstance.license
             queryParams["observedon_start"] =  startDate   
             queryParams["observedon_end"] =  endDate
 
-            activeFilters["observedon_start"] = params.daterangepicker_start
-            activeFilters["observedon_end"] =  params.daterangepicker_end
+            activeFilters["observedon_start"] = startDate       //params.daterangepicker_start
+            activeFilters["observedon_end"] =  endDate          //params.daterangepicker_end
         }
 
         if(params.bounds) {
@@ -1369,7 +1369,7 @@ println observationInstance.license
              messagesourcearg[0] = currentUserProfileLink;
              messagesourcearg[1] = currentUser;
              messagesourcearg[2] = templateMap["domain"];
-             messagesourcearg[3] = activitySource != null ? 'about <a href="'+templateMap["activitySourceUrl"]+'">'+activitySource+'</a>':'';
+             messagesourcearg[3] = activitySource != null ? '<a href="'+templateMap["activitySourceUrl"]+'">'+messageSource.getMessage('text.user',null,LCH.getLocale())+'</a>':'';
              messagesourcearg[4] = templateMap["userMessage"];
              messagesourcearg[5] = templateMap["unsubscribeUrl"];
              

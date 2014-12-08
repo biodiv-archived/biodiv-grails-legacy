@@ -226,7 +226,7 @@ class UserGroupService {
 
 	}
 
-	@PreAuthorize("hasPermission(#userGroup, admin)")
+	@PreAuthorize("hasPermission(#userGroup, write) or hasPermission(#userGroup, admin)")
 	private void deletePermission(UserGroup userGroup, SUser user, Permission permission) {
 		aclUtilService.deletePermission(userGroup, user.email, permission);
 	}
@@ -237,7 +237,7 @@ class UserGroupService {
 	}
 
 	@Transactional
-	def getSuggestedUserGroups(SUser userInstance) {
+	def getSuggestedUserGroups(SUser userInstance,offset = 0) {
 
 		def conn = new Sql(sessionFactory.currentSession.connection())
 
@@ -268,10 +268,9 @@ class UserGroupService {
 			query += '''select user_group_id, count(distinct(s_user_id)) as c
 						from user_group_member_role '''
 			query += 	''' group by user_group_id
-						order by c desc limit 20''';
+						order by c desc limit 20 offset '''+offset;
 //			query = '''select distinct s.user_group_id, max(s.count) as maxCount from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, (select observation_id, count(*) from user_group_observations group by observation_id) u2 where u1.observation_id=u2.observation_id) union (select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1, (select species_group_id, count(*) from user_group_species_group group by species_group_id) u2 where u1.species_group_id=u2.species_group_id) union (select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1, (select habitat_id, count(*) from user_group_habitat group by habitat_id) u2 where u1.habitat_id=u2.habitat_id)) s group by s.user_group_id order by maxCount desc;'''
-		}
-		
+		}		
 		//log.debug "Suggested usergroup query ${query}"
 		conn.eachRow(query,
 				{ row ->
@@ -692,8 +691,9 @@ class UserGroupService {
 
 				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
 				userToken.save(flush: true)
+				def userLanguage = utilsService.getCurrentLanguage();
 				emailConfirmationService.sendConfirmation(founderEmail,
-						"Invitation to join as founder for group",  [name:name, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
+						"Invitation to join as founder for group",  [name:name, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/founderInvitation'], userToken.token);
 			}
 		}
 	}
@@ -743,8 +743,9 @@ class UserGroupService {
 
 				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()]);
 				userToken.save(flush: true)
+				def userLanguage = utilsService.getCurrentLanguage();
 				emailConfirmationService.sendConfirmation(expertEmail,
-						"Invitation to join as moderator for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/expertInvitation'], userToken.token);
+						"Invitation to join as moderator for group",  [name:name, fromUser:springSecurityService.currentUser, expertsMsg:expertsMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/expertInvitation'], userToken.token);
 			}
 		}
 	}
@@ -772,8 +773,9 @@ class UserGroupService {
 			}
 			def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 			userToken.save(flush: true)
+			def userLanguage = utilsService.getCurrentLanguage();
 			emailConfirmationService.sendConfirmation(memberEmail,
-					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, memberMsg:message, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, memberMsg:message, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/memberInvitation'], userToken.token);
 		}
 	}
 
@@ -969,8 +971,8 @@ class UserGroupService {
 	}
 
 	def addSpecialFounder(){
-		UserGroup wgpGroup = UserGroup.read(1)
-		wgpGroup.addFounder(SUser.read(797))
+		UserGroup wgpGroup = UserGroup.read(36)
+		wgpGroup.addFounder(SUser.read(4105))
 		log.debug "founder added "
 	}
 
