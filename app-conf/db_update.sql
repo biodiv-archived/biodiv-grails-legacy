@@ -1,3 +1,15 @@
+-- Enable PostGIS (includes raster)
+CREATE EXTENSION postgis;
+-- Enable Topology
+CREATE EXTENSION postgis_topology;
+-- fuzzy matching needed for Tiger
+CREATE EXTENSION fuzzystrmatch;
+-- Enable US Tiger Geocoder
+CREATE EXTENSION postgis_tiger_geocoder;
+
+create extension dblink;
+
+
 /*
  *  All the sql commands are specific to Postgres database only 
  */
@@ -241,3 +253,10 @@ update solr schema.xml biodiv/conf/schema.xml
 //added on 19th nov
 //Dropping license from checklists table
 ALTER TABLE checklists DROP COLUMN license_id;
+
+//5th Dec 2014
+//create index taxonomy_definition_canonical_form_idx on taxonomy_definition ((lower(canonical_form)));
+//create index recommendation_name_idx on recommendation ((lower(name)));
+CREATE EXTENSION pg_trgm;
+CREATE INDEX ON recommendation using GIST(name gist_trgm_ops);
+CREATE INDEX ON taxonomy_definition using GIST(canonical_form gist_trgm_ops);

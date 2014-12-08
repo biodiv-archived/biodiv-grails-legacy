@@ -30,10 +30,18 @@ class NamesLoaderService {
     int syncNamesAndRecos(boolean cleanAndUpdate) {
         log.info "Synching names and recommendations"
         int noOfNames = 0;
-        noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
-        noOfNames += syncSynonyms();
-        noOfNames += syncCommonNames();
-
+        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        try {
+            dataSource.setUnreturnedConnectionTimeout(500);
+            noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
+            noOfNames += syncSynonyms();
+            noOfNames += syncCommonNames();
+        } catch(Exception e) {
+            log.error e.printStackTrace();
+        } finally {
+            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+        }
         log.info "No of names synched : "+noOfNames
         return noOfNames;
     }
@@ -50,7 +58,7 @@ class NamesLoaderService {
             //TODO:Handle cascading delete recommendations
             recommendationService.deleteAll();
         }
-        updateTaxOnConceptForReco();
+        updateTaxonConceptForReco();
         
         int limit = BATCH_SIZE, offset = 0, noOfNames = 0;
         def recos = new ArrayList<Recommendation>();
@@ -66,8 +74,8 @@ class NamesLoaderService {
             def taxonConcepts;
             try {
                 try {
-                    conn = new Sql(dataSource)
-                       taxonConcepts = conn.rows("select name, canonicalForm, normalizedForm, binomialForm, id from " + tmpTableName + " order by id limit " + limit + " offset " + offset);
+                    conn = new Sql(dataSource);
+                    taxonConcepts = conn.rows("select name, canonicalForm, normalizedForm, binomialForm, id from " + tmpTableName + " order by id limit " + limit + " offset " + offset);
                 } finally {
                     conn.close();
                 }
@@ -111,7 +119,7 @@ class NamesLoaderService {
         return noOfNames;
     }
 
-    private int updateTaxOnConceptForReco(){
+    private int updateTaxonConceptForReco(){
         String taxonDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name ilike t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true";
         String synonymQuery = "select r.id as recoid, s.taxon_concept_id as taxonid from recommendation as r, synonyms as s where r.name ilike s.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true";
         String commnonNameQuery = """
@@ -127,7 +135,7 @@ class NamesLoaderService {
         queryList.each{ query ->
             int offset = 0
             def recos = new ArrayList<Recommendation>();
-            def conn = new Sql(dataSource)
+            def conn = new Sql(dataSource);
             def conn1;
             def tmpTableName = "tmp_table_update_taxonconcept"
             try {
