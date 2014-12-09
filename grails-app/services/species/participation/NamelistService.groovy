@@ -627,7 +627,7 @@ class NamelistService {
 
     List searchWORMS(String input, String searchBy) {
         //http://www.marinespecies.org/aphia.php?p=taxlist&tName=Solea solea
-
+        /*
         def soapClient = new SOAPClient("http://www.marinespecies.org/aphia.php?p=soap");
         def response = soapClient.send(SOAPAction:"matchAphiaRecordsByNames") {
             body {
@@ -637,5 +637,6 @@ class NamelistService {
             }
         }
         println "======RESPONSE======== " + response
+        */
     }
 }

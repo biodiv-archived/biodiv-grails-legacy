@@ -51,33 +51,41 @@ class Utils {
 			reportFile.delete()
 			reportFile.createNewFile()
 		}
-		writeHeader(reportFile)
+        def sortBy = "rank"
+        if(c == Synonyms.class) {
+            sortBy = 'id'
+        }
+		writeHeader(reportFile, c)
 		
 		long offset = 0
 		int i = 0
 		while(true){
-			List tds = c.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "asc")
+			List tds = c.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
 			if(tds.isEmpty()){
 				break
 			}
 			offset += BATCH_SIZE
 			tds.each {
 				println "===== Analysing name " + it.canonicalForm + "  name id " + it.id + "   index >>>>>> " + (++i)
-				writeStat(taxonSourceDir, reportFile, it)
+				writeStat(taxonSourceDir, reportFile, it, c)
 			}
 		}
 		
 	}
 	
-	private static void writeHeader(File f){
+	private static void writeHeader(File f, Class c){
 		println "writing header  " + f
-		f << "Species Id|IBP varbatim|IBP Canonical Form|IBP rank|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
-	}
+        if(c == Synonyms.class) {
+		    f << "Accepted name Species Id|IBP varbatim|IBP Canonical Form|Accepted name IBP rank|Accepted name Varbatim|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
+        } else {
+		    f << "Species Id|IBP varbatim|IBP Canonical Form|IBP rank|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
+        }
+    }
 
-	private static void writeStat(sourceDir, reportFile, taxon){
+	private static void writeStat(sourceDir, reportFile, taxon, Class c){
 		File f = new File(sourceDir, "" + taxon.id + ".xml" )
 		if(!f.exists()){
-			println "========== File not avalibel for taxon " + taxon.id + "   name " + taxon.canonicalForm
+			println "========== File not available for taxon " + taxon.id + "   name " + taxon.canonicalForm
 			return
 		}
 		
@@ -97,21 +105,27 @@ class Utils {
 		*/
         results.result.each { r ->
             StringBuilder sb = new StringBuilder()
-            def q = Species.findByTaxonConcept(taxon);
-            def t = q?q.id:"No sp id"
-            def rr = TaxonomyRank.getTRFromInt(taxon.rank).value();
+            def q,t,rr;
+            def accNameTaxon;
+            if(c == Synonyms.class) {
+                accNameTaxon = TaxonomyDefinition.read(taxon.taxonConcept?.id)//find accepted name of this synonym
+                q = Species.findByTaxonConcept(accNameTaxon);
+                rr = TaxonomyRank.getTRFromInt(accNameTaxon.rank).value();
+            } else {
+                q = Species.findByTaxonConcept(taxon);
+                rr = TaxonomyRank.getTRFromInt(taxon.rank).value();
+            }
+            t = q?q.id:"No sp id"
             def hasSpPage = q?"True":"False"
             def percInfo = q?q.percentOfInfo:"NAN"
-            def pp = [:]
-            pp['limit']=0
-            pp['offset']=0
-            pp['filterProperty']='taxonConcept'
-            pp['filterPropertyValue']=5275
-            def numOfObv = q?getRelatedObservationByTaxonConcept(taxon.id,0,0L)?.relatedObv?.count:-1 
+            def numOfObv = q?getRelatedObservationByTaxonConcept(taxon.id,0,0L)?.count:"Not a species" 
             sb.append(t + "|") //sp id
             sb.append(taxon.name + "|") //ibp ver
             sb.append(taxon.canonicalForm + "|") //ibp can
             sb.append(rr + "|") // rank
+            if(c == Synonyms.class) {
+                sb.append(accNameTaxon.name + "|")  //add accepted names verbatim
+            }
             sb.append(taxon.authorYear + "|") //author
             sb.append(taxon.status.value() + "|") // status
             sb.append(hasSpPage + "|") // HasSPPage
@@ -123,7 +137,7 @@ class Utils {
             sb.append(r.name.text() + r.author?.text() + "|") //verbatim
             sb.append(r.rank?.text() + "|") //rank
             sb.append(r.id.text() + "|") //ID
-            sb.append(r.name_status?.text()) //Name status
+            sb.append(r.name_status?.text() + "|") //Name status
             sb.append(r.classification?.taxon[0]?.name?.text() + "|") //Group
 
             StringBuilder accName = new StringBuilder()
@@ -192,7 +206,6 @@ class Utils {
         println "=========Synonyms class ==== " + Synonyms.class.simpleName
 
         if(domainClass == Synonyms.class) {
-            println "========INSIDE IF TRUE TRUE=============="
             sortBy = 'id'
         }
 		while(true){ 
@@ -371,11 +384,6 @@ class Utils {
 	}
 
     static void testObv() {
-        def pp = [:]
-        pp['limit']=0
-        pp['offset']=0
-        pp['filterProperty']='taxonConcept'
-        pp['filterPropertyValue']=5275
         def numOfObv = "=============" + getRelatedObservationByTaxonConcept(5275L,0, 0L);    //observationService.related(pp).relatedObv
         println "=========NUM OF======= " + numOfObv
     }
@@ -417,6 +425,7 @@ class Utils {
                 def obv = iter.next();
                 result.add(['observation':obv, 'title':obv.fetchSpeciesCall()]);
             }
+            println "=========COUNT OF RELATED OBV ======== " + count
             return ['observations':result, 'count':count]
         } else {
             return ['observations':[], 'count':0]
