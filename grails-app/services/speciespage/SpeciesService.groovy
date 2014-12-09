@@ -864,7 +864,7 @@ class SpeciesService extends AbstractObjectService  {
         if(!value || !relationship) {
             return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
         }
-        Species speciesInstance; 
+        Species speciesInstance = null; 
         if(!otherParams) {
             speciesInstance = Species.get(speciesId);
 
@@ -933,7 +933,7 @@ class SpeciesService extends AbstractObjectService  {
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
-                if(speciesInstance)content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
                 String activityType, mailType;
                 if(oldSynonym) {
                     activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
@@ -944,27 +944,30 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 if(otherParams) {
                     println "========SYNONYMS========== " + synonyms
-                    return [success:true,/* id:speciesId,*/ msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,synonymInstance:synonyms[0], activityType:activityType, mailType:mailType]  
+                    return [success:true,/* id:speciesId,*/ msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,dataInstance:synonyms[0], activityType:activityType, mailType:mailType]  
                 }
                 return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
             }
         }
     }
 
-    def updateCommonname(def cnId, def speciesId, String language, String value) {
+    def updateCommonname(def cnId, def speciesId, String language, String value, otherParams = null) {
         
         if(!value || !language) {
             return [success:false, msg:messageSource.getMessage("info.name.language.no.empty", null, LCH.getLocale())]
         }
-        Species speciesInstance = Species.get(speciesId);
-   
-        if(!speciesInstance) {
-            def messagesourcearg = new Object[1];
-                messagesourcearg[0] = speciesFieldId;
-            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
-        }
+        Species speciesInstance = null;
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+        if(!otherParams) {
+            speciesInstance = Species.get(speciesId);
+
+            if(!speciesInstance) {
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesId;
+                return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+            }
+        }
+        if(speciesInstance && !speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
@@ -983,6 +986,13 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         Species.withTransaction { status ->
+            TaxonomyDefinition taxonConcept;
+            if(otherParams) {
+                taxonConcept = TaxonomyDefinition.get(otherParams['taxonId'].toLong()); 
+            } else {
+                taxonConcept = speciesInstance.taxonConcept;
+            }
+
             if(oldCommonname) {
                 oldCommonname.delete();
             } 
@@ -995,7 +1005,7 @@ class SpeciesService extends AbstractObjectService  {
             new Node(l, 'name', language);
             new Node(data, "contributor", springSecurityService.currentUser.email);
  
-            List<CommonNames> commonnames = converter.createCommonNames(cn, speciesInstance.taxonConcept);
+            List<CommonNames> commonnames = converter.createCommonNames(cn, taxonConcept);
             
             if(!commonnames) {
                 return [success:false, msg:messageSource.getMessage("info.error.updating.commonname", null, LCH.getLocale())]
@@ -1003,7 +1013,7 @@ class SpeciesService extends AbstractObjectService  {
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
                 String activityType, mailType;
                 if(oldCommonname) {
                     activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
@@ -1012,7 +1022,10 @@ class SpeciesService extends AbstractObjectService  {
                     activityType = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
                     mailType = ActivityFeedService.SPECIES_COMMONNAME_CREATED
                 }
-
+                if(otherParams) {
+                    println "========COMMON NAME========== " + commonnames
+                    return [success:true,/* id:speciesId,*/ msg:msg, type:'commonname', content:content,taxonConcept:taxonConcept,dataInstance:commonnames[0], activityType:activityType, mailType:mailType]  
+                }
 
                 return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType]
             }

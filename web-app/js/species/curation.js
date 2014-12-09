@@ -109,8 +109,10 @@ function getNameDetails(taxonId, classificationId, ele) {
 function populateTabDetails(data) {
     console.log("====TAB DETAILS====");
     console.log(data);
-    $("#names-tab1 .singleRow input").val('');
     //clearing synonyms
+    reinitializeRows($("#names-tab1"));
+    //$("#names-tab1 .singleRow input").val('');
+    //$("#names-tab1 .singleRow input").prop("disabled", false); 
     var synonymsList = data['synonymsList']
     if(synonymsList && synonymsList.length > 0) {
         console.log(synonymsList);
@@ -129,7 +131,9 @@ function populateTabDetails(data) {
         })
     }
     //clearing common names
-    $("#names-tab2 .singleRow input").val('');
+    reinitializeRows($("#names-tab2"));
+    //$("#names-tab2 .singleRow input").val('');
+    //$("#names-tab2 .singleRow input").prop("disabled", false); 
     var commonNamesList = data['commonNamesList']
     if(commonNamesList && commonNamesList.length > 0) {
         console.log(commonNamesList);
@@ -149,7 +153,9 @@ function populateTabDetails(data) {
     }
     
     //clearing accepted names
-    $("#names-tab0 .singleRow input").val('');
+    reinitializeRows($("#names-tab0"));
+    //$("#names-tab0 .singleRow input").val('');
+    //$("#names-tab0 .singleRow input").prop("disabled", false); 
     var acceptedNamesList = data['acceptedNamesList']
     if(acceptedNamesList && acceptedNamesList.length > 0) {
         console.log(acceptedNamesList);
@@ -463,18 +469,15 @@ function changeEditingMode(mode) {
 function modifyContent(ele, type) {
     var typeName = '';
     var relationship = '';
-    alert (type);
-    if(type == 'a') {
+    if(type == 'a' || type == 'aid') {
         typeName = 'accepted';
         relationship = 'accepted';
-    } else if( type == 's') {
+    } else if( type == 's'|| type == 'sid') {
         typeName = 'synonym';
         relationship = 'synonym';
-        alert(typeName);
-        alert(relationship);
-    } else if( type == 'c') {
-        typeName = 'common';
-        relationship = 'common';
+    } else if( type == 'c' || type == 'cid') {
+        typeName = 'commonname';
+        relationship = 'commonname';
     } else {
         typeName = 'reference';
         relationship = 'reference';
@@ -517,6 +520,7 @@ function modifyContent(ele, type) {
     p['name']  = typeName;
     p['act'] = modifyType;    
     p['relationship'] = relationship;
+    p['language'] = "English";
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
     otherParams['taxonId'] = $(".taxonId").val();  //272991;
@@ -530,12 +534,14 @@ function modifyContent(ele, type) {
         url: url,
         type: "POST",
         dataType: "json",
-        data: {synonymData: JSON.stringify(p)},	
+        data: {dataFromCuration: JSON.stringify(p)},	
         success: function(data) {
             //show the popup
             //$("#externalDbResults").modal('hide');
             if(data['success']) {
-                form_var.find(".sid").val(data['synonymId']);
+                console.log("===COMPLETE DATA=========");
+                console.log(data);
+                form_var.find("."+type).val(data['dataId']);
                 that.next().html("<i class='icon-trash'></i>");
                 console.log("======SUCCESS====");
                 console.log(data);  
@@ -565,4 +571,12 @@ $('.add_new_row').click(function(){
 
 function showNewNamePopup() {
     $("#newNamePopup").modal("show");
+}
+
+function reinitializeRows($context) {
+    var numRows = $context.find(".tab_div").length;
+    for(var i = 0; i< 4; i++) {
+        $context.find(".add_new_row").trigger("click");
+    }
+    $context.find(".tab_div:lt("+numRows+")").remove();
 }

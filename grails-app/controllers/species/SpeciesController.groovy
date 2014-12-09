@@ -502,9 +502,9 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def update() {
         println "========PARAMS======== " + params 
-        if(params.synonymData) {
-            params << JSON.parse(params.synonymData)
-            params.remove('synonymData');
+        if(params.dataFromCuration) {
+            params << JSON.parse(params.dataFromCuration)
+            params.remove('dataFromCuration');
         }
         println "========PARAMS======== " + params 
         def msg;
@@ -609,7 +609,13 @@ class SpeciesController extends AbstractObjectController {
                 if(params.act == 'delete') {
                     result = speciesService.deleteCommonname(cid, speciesFieldId);
                 } else {
-                    result = speciesService.updateCommonname(cid, speciesFieldId, language, value);
+                    def otherParams = null
+                    if(params.otherParams) {
+                        otherParams = params.otherParams
+                        otherParams['source'] = params.source;
+                        otherParams['contributor'] = params.contributor;
+                    }
+                    result = speciesService.updateCommonname(cid, speciesFieldId, language, value, otherParams);
                 }
 
                 break;
@@ -647,8 +653,8 @@ class SpeciesController extends AbstractObjectController {
                 def feedInstance;
                 if(result.activityType) {
                     if(result.taxonConcept) {
-                        result['synonymId'] = result.synonymInstance?.id.toString()
-                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.synonymInstance, springSecurityService.currentUser, result.activityType);
+                        result['dataId'] = result.dataInstance?.id.toString()
+                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType);
                     } else {
                         feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
                     }
