@@ -607,7 +607,7 @@ class SpeciesController extends AbstractObjectController {
                 String language = params.language?:null;
 
                 if(params.act == 'delete') {
-                    result = speciesService.deleteCommonname(cid, speciesFieldId);
+                    result = speciesService.deleteCommonname(cid, speciesFieldId, params.otherParams?.taxonId );
                 } else {
                     def otherParams = null
                     if(params.otherParams) {

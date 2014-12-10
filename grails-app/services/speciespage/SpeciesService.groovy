@@ -1222,7 +1222,8 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
     }
-//RELATED TO CURATION INTERFACE
+    
+    //RELATED TO CURATION INTERFACE
     def deleteSynonym(long synonymId, String taxonId) {
         Synonyms oldSynonym;
         if(synonymId) {
@@ -1268,32 +1269,36 @@ class SpeciesService extends AbstractObjectService  {
         }
     }
 
-    def deleteCommonname(def cnId, def speciesId) {
+    //taxonId comes from curation interface only 
+    def deleteCommonname(def cnId, def speciesId, def taxonId = null) {
         CommonNames oldCommonname;
         if(cnId) {
             oldCommonname = CommonNames.read(cnId);
         }
 
-        Species speciesInstance = Species.get(speciesId);
-        return deleteCommonname(oldCommonname, speciesInstance);
-    } 
-    
-    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance) {
-        
+        Species speciesInstance = (speciesId)?Species.get(speciesId):null;
+        TaxonomyDefinition taxonConcept = (taxonId)?TaxonomyDefinition.get(taxonId.toLong()):null;
+        return deleteCommonname(oldCommonname, speciesInstance, taxonConcept);
+    }
+
+    //taxonConcept comes from curation interface only 
+    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance, TaxonomyDefinition taxonConcept = null) {
+        if(!taxonConcept) taxonConcept = speciesInstance?.taxonConcept
         if(!oldCommonname) {
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = cnId;
             return [success:false, msg:messageSource.getMessage("info.common.name.id.not.found", messagesourcearg, LCH.getLocale())]
-        } 
-
-        if(!oldCommonname.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
         }
+        //Permission check only if its from species show page
+        if(speciesInstance) {
+            if(!oldCommonname.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+            }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.commonname", null, LCH.getLocale())]
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.delete.commonname", null, LCH.getLocale())]
+            }
         }
-
         CommonNames.withTransaction { status ->
             String msg = '';
             def content;
@@ -1310,8 +1315,12 @@ class SpeciesService extends AbstractObjectService  {
                 }
 
                 msg = messageSource.getMessage("info.success.remove.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                if(speciesInstance) {
+                    return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                } else {
+                    return [success:true, msg:msg, type:'commonname', content:content,taxonConcept:taxonConcept,activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                }
             } 
             catch(e) {
                 e.printStackTrace();
