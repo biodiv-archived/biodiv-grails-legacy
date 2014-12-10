@@ -162,7 +162,7 @@ def contact_me_text=g.message(code:'button.contact.me')
 
                                     ${raw(clickcontentVar)}
                                     <div style="display:${styleVar}">
-                                        ${user.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
+                                        ${raw(user.aboutMe.replace('\n', '<br/>\n'))}
                                     </div>
                                         
                                     </g:if>

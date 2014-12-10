@@ -593,7 +593,7 @@ println observationInstance.license
         def obvLinkList = []
         if(scientificNameRecos){
             def resIdList = Observation.executeQuery ('''
-                select r.id, obv.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by r.id asc
+                select r.id, obv.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by obv.lastRevised desc
                 ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
 
              /*

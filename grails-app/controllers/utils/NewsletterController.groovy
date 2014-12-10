@@ -21,7 +21,6 @@ class NewsletterController {
 	def SUserService
     def observationService
     def utilsService;
-	
 	public static final boolean COMMIT = true;
 
 	def index = {
@@ -132,7 +131,7 @@ class NewsletterController {
 
 	def show() {
 		log.debug params
-		def userLanguage = utilsService.getCurrentLanguage(request); 
+        def userLanguage = utilsService.getCurrentLanguage(request);
 		def newsletterInstance = Newsletter.get(params.id)
 		if (!newsletterInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"

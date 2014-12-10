@@ -537,6 +537,7 @@ class UtilsService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
+                templateMap['spFDes'] = otherParams['spFDes']; 
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -553,7 +554,7 @@ class UtilsService {
 
                 case [ActivityFeedService.SPECIES_FIELD_DELETED, ActivityFeedService.SPECIES_SYNONYM_DELETED, ActivityFeedService.SPECIES_COMMONNAME_DELETED, ActivityFeedService.SPECIES_HIERARCHY_DELETED] :
                 mailSubject = notificationType;
-                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addobservation"
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))

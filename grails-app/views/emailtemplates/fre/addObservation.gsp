@@ -98,7 +98,7 @@
 				</table>
 			</div>
 			
-				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'species' || domainObjectType == 'usergroup' || domainObjectType == 'newsletter')}">
+				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'usergroup' || domainObjectType == 'newsletter')}">
 				 		<div class="clear" class="content" style="margin: 0 auto;padding: 10px 0px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; background-color:#D4ECE3; align:left; clear: both;">
 							<!-- Callout Panel -->
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
@@ -195,12 +195,14 @@
 								<g:else>
 									<b>Nom Commun:</b> Aide à l'identification <br />
 								</g:else>
-
-								<b>Lieu: </b> ${obvPlace}<br /><b>Observé le:</b>  ${obvDate}<br />
+                                <g:if test = "${obvPlace}">
+                                    <b>Lieu: </b> ${obvPlace}<br />
+                                </g:if>
+                                <g:if test = "${obvPlace}">
+                                    <b>Observé le:</b>  ${obvDate}<br />
+                                </g:if>
 
 								</p>
-
-		
 								
 							</td>
 						</tr>
