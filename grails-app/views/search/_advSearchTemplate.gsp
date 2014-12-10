@@ -2,7 +2,7 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <%@page import="species.License.LicenseType"%>
 
-<g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')]]"/>
+<g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')], Checklists:[name:'Checklists', template:'observation',displayName:g.message(code:'checklists.label')]]"/>
 
 <div  class="block-tagadelic">
 
