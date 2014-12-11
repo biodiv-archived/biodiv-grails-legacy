@@ -155,8 +155,8 @@ class NamesLoaderService {
                         }
 
                         Recommendation.withNewTransaction {
-
-                            recommendationList.each { r ->
+                             recommendationList.each { r ->
+println "${r.recoid} ${r.taxonid}"
                                 Recommendation rec = Recommendation.read(r.recoid);
                                 rec.taxonConcept = TaxonomyDefinition.read(r.taxonid);
                                 recos.add(rec);
@@ -183,6 +183,7 @@ class NamesLoaderService {
                     conn.close()
                 }
             }	
+            log.info "Synched recommendations for query ${query}"
         }
         log.info "Total number of updated recommendations are $noOfNames"
         return noOfNames

@@ -305,20 +305,24 @@ class SpeciesService extends AbstractObjectService  {
                 //updating metadata for the species field
                 def result = updateSpeciesFieldInstance(speciesFieldInstance, params);
                 def errors = result.errors;
-                speciesInstance.addToFields(speciesFieldInstance);
+                if(result.success) {
+                    speciesInstance.addToFields(speciesFieldInstance);
 
-                //TODO:make sure this is run in only one user updates this species at a time
-                Species.withTransaction {
-                    if(!speciesInstance.save()) {
-                        speciesInstance.errors.each { errors << it; log.error it }
-                        return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
+                    //TODO:make sure this is run in only one user updates this species at a time
+                    Species.withTransaction {
+                        if(!speciesInstance.save()) {
+                            speciesInstance.errors.each { errors << it; log.error it }
+                            return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
+                        }
                     }
-                }
 
-                List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
-                sortAsPerRating(sameFieldSpeciesFieldInstances);
-                addMediaInSpField(params, speciesFieldInstance);
-                return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
+                    List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                    sortAsPerRating(sameFieldSpeciesFieldInstances);
+                    addMediaInSpField(params, speciesFieldInstance);
+                    return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
+                } else {
+                    return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -347,7 +351,7 @@ class SpeciesService extends AbstractObjectService  {
             def result;
             SpeciesField.withTransaction { status ->
                 result = updateSpeciesFieldInstance(speciesField, params); 
-                if(!speciesField.save(flush:true)) {
+                if(result.success  == false || !speciesField.save(flush:true)) { 
                     speciesField.errors.each { result.errors << it }
                     return [success:false, msg:messageSource.getMessage("info.update.speciesfield", null, LCH.getLocale()), errors:result.errors]
                 }
@@ -364,12 +368,12 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
-        
+        List errors = [];
+
         if(!params.description) {
-            return [success:false, msg:messageSource.getMessage("info.about.description", null, LCH.getLocale())]
+            return [success:false, msg:messageSource.getMessage("info.about.description", null, LCH.getLocale()), errors:[messageSource.getMessage("info.about.description", null, LCH.getLocale())]]
         }
 
-        List errors = [];
         String msg;
         if(!params.contributor) {
             params.contributor = springSecurityService.currentUser.id+'';
@@ -465,7 +469,7 @@ class SpeciesService extends AbstractObjectService  {
         
         
         log.warn errors
-        return [errors:errors]
+        return [success:true, errors:errors]
     }
 
 

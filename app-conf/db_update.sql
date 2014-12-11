@@ -260,3 +260,19 @@ ALTER TABLE checklists DROP COLUMN license_id;
 CREATE EXTENSION pg_trgm;
 CREATE INDEX ON recommendation using GIST(name gist_trgm_ops);
 CREATE INDEX ON taxonomy_definition using GIST(canonical_form gist_trgm_ops);
+
+
+delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id where lower(r.name) in (select lower(r.name) from recommendation as r, taxonomy_definition as t where r.name ilike t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true) and r.taxon_concept_id is not null and rv.id is  null);
+
+delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id where lower(r.name) in (select lower(r.name) from recommendation as r, synonyms as s where r.name ilike s.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true) and r.taxon_concept_id is not null and rv.id is  null);
+
+CREATE TABLE tmp_table_update_taxonconcept as ( select r.id as recoid,  t.id as taxonid, r.name as name, r.language_id as rl, c.language_id as c_lang from recommendation as r, taxonomy_definition as t, common_names as c where 
+            r.name ilike c.name and 
+                    ((r.language_id is null and c.language_id is null) or (r.language_id is not null and c.language_id is not null and r.language_id = c.language_id ) or (r.language_id = c.language_id )) and 
+                            c.taxon_concept_id = t.id and c.taxon_concept_id is not null and
+                                    r.taxon_concept_id is null and r.is_scientific_name = false);
+
+update recommendation_vote set common_name_reco_id = 316619 where common_name_reco_id = 366025;
+
+delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id or r.id=rv.common_name_reco_id where r.id in (select r.id from recommendation r , tmp_table_update_taxonconcept t where lower(r.name)=lower(t.name) and ((r.language_id is not null and t.c_lang is not null and r.language_id = t.c_lang) or (r.language_id is null and t.language_id is null)) and r.is_scientific_name = false and r.taxon_concept_id = t.taxonid ));
+
