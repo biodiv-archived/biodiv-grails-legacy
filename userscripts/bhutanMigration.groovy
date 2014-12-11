@@ -14,37 +14,21 @@ def addMetadataField(){
 	f.save(flush:true)
 }
 
-
-def getContNotPresent(){
-    def allCont = []
-    def contList = Contributor.list()
-    contList.each { cl->
-        allCont.add(cl.name)
-    }
-    
-    println "==ALL CONT ======= " + allCont
-
-    def suList = SUser.findAllByUsernameInList(allCont)
-    def contPresent = []
-    suList.each{ su-> 
-        contPresent.add(su.username)
-    }
-    println "======CONT PRESENT ==== " + contPresent
-    def contNotPresent = allCont - contPresent
-
-    println "======CONT NOT PRESNET ====== " + contNotPresent
-    File file = new File("/home/rahulk/Documents/new.tsv")
-    contNotPresent.each {
-        file << ("${it}\n")
-    } 
-}
-
 def makeFieldGeneric(){
 	def fList = Field.findAllBySubCategory('Indian Distribution Geographic Entity')
 	Field.withTransaction { 
 		fList.each {
 			println 'changing for field ' + it 
 			it.subCategory = 'Local Distribution Geographic Entity'
+			it.save(flush:true)
+		}
+	}
+	
+	fList = Field.findAllBySubCategory('Indian Endemicity Geographic Entity')
+	Field.withTransaction {
+		fList.each {
+			println 'changing for field ' + it
+			it.subCategory = 'Local Endemicity Geographic Entity'
 			it.save(flush:true)
 		}
 	}
@@ -71,21 +55,33 @@ def populateUserInContributor(){
 				mySave(cont)
 			}
 		}
+		
+		//populating based on email id
+		Map emailToIdMap = [:]
+		SUser.list().each { SUser u ->
+			String emailPrefix = u.email.split("@")[0].toLowerCase()
+			emailToIdMap.put(emailPrefix, u.id)
+		}
+		
+		Contributor.list(sort:'id', order:'asc').each { cont ->
+			if(emailToIdMap.containsKey(cont.name.toLowerCase())){
+				cont.user = SUser.read(emailToIdMap.get(cont.name.toLowerCase()))
+				mySave(cont)
+			}
+		}
 	}
-	//populateUserInContributor1()
 }
 
 def populateUserInContributor1(){
 	def m = [:]
 	def dMap = [:]
 	Contributor.withTransaction {
-		new File("/home/sandeept/git/biodiv/contributormap.csv").splitEachLine(",") {
-			println "data   " + it
-			def fields = it;
+		new File("/home/sandeept/bhutan/contributormap.csv").splitEachLine(";") {fields ->
+			fields = fields.collect {it.trim()}
+			println "data   " + fields
 			def contId = fields[0].trim().toLong()
-			def userIds = fields[1].trim().split("\\|").collect{it.trim().toLong()}
+			def userIds = fields[2].trim().split("\\|").collect{it.trim().toLong()}
 			m.put(contId, userIds)
-		
 			def cont = 	Contributor.get(contId)
 			if(userIds.size() == 1){
 				cont.user = SUser.read(userIds[0])
@@ -105,20 +101,17 @@ def populateUserInContributor1(){
 		}
 		
 	}
-	//println dMap
-	//populateSfieldContributor(dMap)
-	
 }
  
 
 //3. populate sField to contributor table
 def populateSfieldContributor(){
 	def dMap = [:]
-	new File("/home/sandeept/git/biodiv/contributormap.csv").splitEachLine(",") {
-		println "data   " + it
-		def fields = it;
+	new File("/home/sandeept/bhutan/contributormap.csv").splitEachLine(";") {fields ->
+		fields = fields.collect {it.trim()}
+		println "data   " + fields
 		def contId = fields[0].trim().toLong()
-		def userIds = fields[1].trim().split("\\|").collect{it.trim().toLong()}
+		def userIds = fields[2].trim().split("\\|").collect{it.trim().toLong()}
 		if(userIds.size() > 1){
 			dMap.put(contId, userIds)
 		}
@@ -148,13 +141,6 @@ def populateSfieldContributor(){
 //4. delete redudant rows
 //delete from species_field_contributor where species_field_contributors_id is not null; { later...
 
-//5 change code in species upload + resource crate + checklist attribution { by sra
-
-//6 change code in species show done
-
-
-
-//---------------------------
 
 def updateObservationResource(){
 	int i = 0
@@ -166,8 +152,6 @@ def updateObservationResource(){
 		sql.executeUpdate( 'UPDATE resource set uploader_id = ?, upload_time = ?  where id = ?',  [it.aid, it.cdate, it.rid])
 	 }
 }
-
-
 
 def updateNameContributor(){
 	int i = 0
@@ -182,14 +166,19 @@ def updateNameContributor(){
 	}
 }
 
-
+//bulk upload field related
 makeFieldGeneric()
 addMetadataField()
 addNewField()
 
-//populateUserInContributor()
-//populateUserInContributor1()
-//populateSfieldContributor()
+//contributer related
+populateUserInContributor()
+populateUserInContributor1()
+populateSfieldContributor()
+
+//name and resource
+updateNameContributor()
+updateObservationResource()
 
 
 /*
@@ -201,20 +190,18 @@ drop table species_taxonomy_registry ;
 
 
 //adding soure info
+/*
 //updateObservationResource()
-//update species_field set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
-//update resource set uploader_id = 1, upload_time = '1970-01-01 00:00:00' where uploader_id is null;
-
-
+update species_field set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+update resource set uploader_id = 1, upload_time = '1970-01-01 00:00:00' where uploader_id is null;
+*/
 
 //adding namessourceinfo {have to add contributors}
-//update synonyms set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
-//update taxonomy_definition set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
-//update common_names set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
-//update taxonomy_registry set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+/*
+update synonyms set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+update taxonomy_definition set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+update common_names set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
+update taxonomy_registry set uploader_id = 1, upload_time = '1970-01-01 00:00:00';
 //updateNameContributor()
+*/
 
-
-//speciesbulkupload drop constrain
-//ALTER TABLE  species_bulk_upload  ALTER COLUMN file_path drop not NULL;
-//ALTER TABLE  species_bulk_upload  ALTER COLUMN end_date drop not NULL;

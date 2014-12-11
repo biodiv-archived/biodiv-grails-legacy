@@ -21,7 +21,6 @@ class NewsletterController {
 	def SUserService
     def observationService
     def utilsService;
-
 	public static final boolean COMMIT = true;
 
 	def index = {
@@ -143,7 +142,7 @@ class NewsletterController {
 				['userGroupInstance':newsletterInstance.userGroup, 'newsletterInstance': newsletterInstance, 'userLanguage':userLanguage]
 			}
 			else {
-				[newsletterInstance: newsletterInstance, 'userLanguage':userLanguage]
+				[newsletterInstance: newsletterInstance, userLanguage:userLanguage]
 			}
 		}
 	}
