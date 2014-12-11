@@ -277,6 +277,10 @@ class ChecklistController {
 	
 	
 	def observationData = {
+        if(!params.id) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
+            redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
+        }
 		def observations = checklistService.getObservationData(params.id, params)
 		def model =[observations:observations, checklistInstance:Checklists.read(params.id.toLong())]
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);

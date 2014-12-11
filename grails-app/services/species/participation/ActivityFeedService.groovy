@@ -344,7 +344,7 @@ class ActivityFeedService {
                     activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
                 }
                 else {
-                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + messageSource.getMessage("info.in", null, LCH.getLocale()) + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) +" "+ messageSource.getMessage("info.in", null, LCH.getLocale()) +" "+ "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
                 }
                 text = feedInstance.activityDescrption
                 break

@@ -30,10 +30,18 @@ class NamesLoaderService {
     int syncNamesAndRecos(boolean cleanAndUpdate) {
         log.info "Synching names and recommendations"
         int noOfNames = 0;
-//        noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
-        noOfNames += syncSynonyms();
-        noOfNames += syncCommonNames();
-
+        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        try {
+            dataSource.setUnreturnedConnectionTimeout(500);
+            noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
+            noOfNames += syncSynonyms();
+            noOfNames += syncCommonNames();
+        } catch(Exception e) {
+            log.error e.printStackTrace();
+        } finally {
+            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+        }
         log.info "No of names synched : "+noOfNames
         return noOfNames;
     }
@@ -50,14 +58,14 @@ class NamesLoaderService {
             //TODO:Handle cascading delete recommendations
             recommendationService.deleteAll();
         }
-        updateTaxOnConceptForReco();
-
+        updateTaxonConceptForReco();
+        
         int limit = BATCH_SIZE, offset = 0, noOfNames = 0;
         def recos = new ArrayList<Recommendation>();
         def conn = new Sql(dataSource)
         def tmpTableName = "tmp_taxon_concept"
         try {
-            conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
+            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
         } finally {
             conn.close();
         }
@@ -66,7 +74,7 @@ class NamesLoaderService {
             def taxonConcepts;
             try {
                 try {
-                    conn = new Sql(dataSource)
+                    conn = new Sql(dataSource);
                     taxonConcepts = conn.rows("select name, canonicalForm, normalizedForm, binomialForm, id from " + tmpTableName + " order by id limit " + limit + " offset " + offset);
                 } finally {
                     conn.close();
@@ -88,10 +96,10 @@ class NamesLoaderService {
                             //					if(taxonConcept.binomialform && !taxonConcept.binomialform.equals(taxonConcept.canonicalform))
                             //						recos.add(new Recommendation(name:taxonConcept.binomialform, taxonConcept:taxonObj));
                             // TODO giving species subspecies options to parent taxonEntries
-                            noOfNames++;
+                            //noOfNames++;
                         }
                     }
-                    recommendationService.save(recos);
+                    noOfNames += recommendationService.save(recos);
                     recos.clear();
                     offset = offset + limit;
                 }
@@ -104,35 +112,35 @@ class NamesLoaderService {
 
         conn = new Sql(dataSource);
         try {
-            conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);	
+            conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);	
         } finally {
             conn.close();
         }
         return noOfNames;
     }
 
-    private int updateTaxOnConceptForReco(){
-        String taxOnDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true";
-        String synonymQuery = "select r.id as recoid, s.taxon_concept_id as taxonid from recommendation as r, synonyms as s where r.name = s.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true";
+    private int updateTaxonConceptForReco(){
+        String taxonDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name ilike t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true";
+        String synonymQuery = "select r.id as recoid, s.taxon_concept_id as taxonid from recommendation as r, synonyms as s where r.name ilike s.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true";
         String commnonNameQuery = """
         select r.id as recoid,  t.id as taxonid, r.language_id as rl, c.language_id as c_lang from recommendation as r, taxonomy_definition as t, common_names as c where 
-        r.name like c.name and 
+        r.name ilike c.name and 
         ((r.language_id is null and c.language_id is null) or (r.language_id is not null and c.language_id is not null and r.language_id = c.language_id ) or (r.language_id = c.language_id )) and 
         c.taxon_concept_id = t.id and c.taxon_concept_id is not null and
         r.taxon_concept_id is null and r.is_scientific_name = false;
         """;
-        def queryList = [taxOnDefQuery, synonymQuery, commnonNameQuery]
+        def queryList = [taxonDefQuery, synonymQuery, commnonNameQuery]
         int limit = BATCH_SIZE, noOfNames = 0
 
         queryList.each{ query ->
             int offset = 0
             def recos = new ArrayList<Recommendation>();
-            def conn = new Sql(dataSource)
+            def conn = new Sql(dataSource);
             def conn1;
             def tmpTableName = "tmp_table_update_taxonconcept"
             try {
                 try {
-                    conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + query);
+                    conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
                 } finally {
                     conn.close();
                 }
@@ -140,11 +148,9 @@ class NamesLoaderService {
                     try {
                         def recommendationList;
                         try {
-                            println "creating new conn ++++++++++++++++++++++++++++++++++++++++++++"
                             conn1 = new Sql(dataSource)
                             recommendationList = conn1.rows("select recoid, taxonid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
                         } finally {
-                            println 'closing conn +++++++++++++++++++++++++++++++++++++++++++'
                             conn1.close();
                         }
 
@@ -154,9 +160,9 @@ class NamesLoaderService {
                                 Recommendation rec = Recommendation.read(r.recoid);
                                 rec.taxonConcept = TaxonomyDefinition.read(r.taxonid);
                                 recos.add(rec);
-                                noOfNames++;
+                                //noOfNames++;
                             }
-                            recommendationService.save(recos);
+                            noOfNames += recommendationService.save(recos);
                             recos.clear();
                             offset = offset + limit;
                         }
@@ -171,8 +177,11 @@ class NamesLoaderService {
                 e.printStackTrace();
             } finally{
                 conn = new Sql(dataSource)
-                conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
-                conn.close()
+                try {
+                conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
+                } finally {
+                    conn.close()
+                }
             }	
         }
         log.info "Total number of updated recommendations are $noOfNames"
@@ -192,7 +201,8 @@ class NamesLoaderService {
 
         def tmpTableName = "tmp_synonyms"
         try {
-            conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxon_concept_id order by n.taxon_concept_id");
+            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxon_concept_id order by n.taxon_concept_id");
+            conn.executeUpdate("ALTER TABLE " + tmpTableName +  " ADD COLUMN id SERIAL PRIMARY KEY");
         } finally {
             conn.close();
         }
@@ -200,18 +210,18 @@ class NamesLoaderService {
             def synonyms
             try {
                 conn = new Sql(dataSource);
-                synonyms = conn.rows("select canonical_form, taxonConcept from " + tmpTableName + " order by taxonConcept limit " + limit + " offset " + offset);
+                synonyms = conn.rows("select canonical_form, taxonConcept from " + tmpTableName + " order by id limit " + limit + " offset " + offset);
 
                 Recommendation.withNewTransaction {
                    //def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);
 
                     synonyms.each { synonym ->
                         recos.add(new Recommendation(name:synonym.canonical_form, taxonConcept:TaxonomyDefinition.read(synonym.taxonconcept)));
-                        noOfNames++
+                        //noOfNames++
                     }
 
                     offset = offset + limit;		
-                    recommendationService.save(recos);
+                    noOfNames += recommendationService.save(recos);
                     recos.clear();
                 }
             } catch(Exception e) {
@@ -224,7 +234,7 @@ class NamesLoaderService {
         }
         conn = new Sql(dataSource);
         try {
-            conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+            conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
         } finally {
             conn.close();
         }
@@ -244,14 +254,15 @@ class NamesLoaderService {
         def tmpTableName = "tmp_common_names"
         def selectQuery = """
         select n.name as name, n.taxon_concept_id as taxonConcept, n.language_id as language from common_names n left outer join recommendation r on 
-        n.name = r.name and 
+        n.name ilike r.name and 
         ((n.taxon_concept_id is null and r.taxon_concept_id is null) or (n.taxon_concept_id is not null and r.taxon_concept_id is not null and n.taxon_concept_id = r.taxon_concept_id) or (n.taxon_concept_id = r.taxon_concept_id)) and
         ((r.language_id is null and n.language_id is null) or (r.language_id is not null and n.language_id is not null and r.language_id = n.language_id ) or (r.language_id = n.language_id ))
         where r.name is null 
         group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id
         """
         try {
-            conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + selectQuery );
+            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + selectQuery );
+            conn.executeUpdate("ALTER TABLE " + tmpTableName +  " ADD COLUMN id SERIAL PRIMARY KEY");
         } finally {
             conn.close();
         }
@@ -260,14 +271,14 @@ class NamesLoaderService {
             def commonNames
             try {
                 conn = new Sql(dataSource);
-                commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by taxonConcept limit "+limit+" offset "+offset)
+                commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by id limit "+limit+" offset "+offset)
 
                 Recommendation.withNewTransaction {
                     commonNames.each { cName ->
                         recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:TaxonomyDefinition.read(cName.taxonconcept)));
-                        noOfNames++
+                        //noOfNames++
                     }
-                    recommendationService.save(recos);
+                    noOfNames += recommendationService.save(recos);
                     recos.clear();
                     offset =  offset + commonNames.size();
                 }
@@ -281,7 +292,7 @@ class NamesLoaderService {
         }
         //recommendationService.save(recos);
         try {
-            conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
+            conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
         } finally {
             conn.close();
         }
