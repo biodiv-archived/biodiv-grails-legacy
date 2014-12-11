@@ -194,15 +194,11 @@ $(document).ready(function(){
     $('#uploadedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' + endDate.toString('dd/MM/yyyy'));
 
     $('#uploadedOn').on('apply.daterangepicker', function(ev, picker) {
-        console.log(picker.startDate.format('YYYY-MM-DD'));
-        console.log(picker.endDate.format('YYYY-MM-DD'));
         ev.stopPropagation();
         ev.preventDefault();
     });
 
     $('#uploadedOn').on('hide.daterangepicker', function(ev, picker) {
-        console.log(picker.startDate.format('YYYY-MM-DD'));
-        console.log(picker.endDate.format('YYYY-MM-DD'));
         ev.stopPropagation();
         ev.preventDefault();
     });
@@ -220,7 +216,6 @@ $(document).ready(function(){
     });
 
     $("#advSearch").click(function() {
-    console.log('advSearch click submit');
         $( "#advSearchForm" ).submit();
     });
 
