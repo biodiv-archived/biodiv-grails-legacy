@@ -106,17 +106,20 @@ def populateUserInContributor1(){
 
 //3. populate sField to contributor table
 def populateSfieldContributor(){
+	
+	println "  populateSfieldContributor >>>>>>>>>>>>>>>>>>>>>>>>>>>> "
+	
 	def dMap = [:]
 	new File("/home/sandeept/bhutan/contributormap.csv").splitEachLine(";") {fields ->
 		fields = fields.collect {it.trim()}
-		println "data   " + fields
+		//println "data   " + fields
 		def contId = fields[0].trim().toLong()
 		def userIds = fields[2].trim().split("\\|").collect{it.trim().toLong()}
 		if(userIds.size() > 1){
 			dMap.put(contId, userIds)
 		}
 	}
-	println dMap
+	//println dMap
 	def ds = ctx.getBean("dataSource")
 	def sql =  Sql.newInstance(ds);
 	
@@ -143,6 +146,9 @@ def populateSfieldContributor(){
 
 
 def updateObservationResource(){
+	
+	println "  updateObservationResource >>>>>>>>>>>>>>>>>>>>>>>>>>>> "
+	
 	int i = 0
 	def ds = ctx.getBean("dataSource")
 	def sql =  Sql.newInstance(ds);
@@ -154,6 +160,8 @@ def updateObservationResource(){
 }
 
 def updateNameContributor(){
+	println "  updateNameContributor >>>>>>>>>>>>>>>>>>>>>>>>>>>> "
+	
 	int i = 0
 	def ds = ctx.getBean("dataSource")
 	def sql =  Sql.newInstance(ds);
