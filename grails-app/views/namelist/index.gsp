@@ -388,8 +388,10 @@
                                         <input type="text" class="nameInputs span12" name="value">
                                     </div>                                    
                                     {{if typeClass == "cid"}}
+                                        <div class="nameContainer textbox" style="position:relative;">
                                         <div class="span2">
                                             <s:chooseLanguage />
+                                            </div>
                                         </div>
                                           <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
                                           <div class="span2"><input type="text" class="nameInputs span12" name="contributor"></div> 
@@ -478,7 +480,7 @@
                 expandAll:false,
                 showCheckBox:false
             });	
-            //initializeLanguage();
+            initializeLanguage();
         });
         </r:script>
 </script>
