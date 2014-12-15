@@ -1313,7 +1313,6 @@ println observationInstance.license
     }
 
     Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
-        
         def source = m.source;
         def mailSubject = ""
         def activitySource = ""
@@ -1351,11 +1350,12 @@ println observationInstance.license
         def currentUser = springSecurityService.currentUser?:""
         def currentUserProfileLink = currentUser?utilsService.generateLink("SUser", "show", ["id": currentUser.id], null):'';
         def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
+
         def conf = SpringSecurityUtils.securityConfig
         def messagesourcearg1 = new Object[3];
-             messagesourcearg1[0] = currentUser;
-             messagesourcearg1[1] = activitySource;
-             messagesourcearg1[2] = templateMap["domain"];
+        messagesourcearg1[0] = currentUser;
+        messagesourcearg1[1] = activitySource;
+        messagesourcearg1[2] = templateMap["domain"];
         def staticMessage = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.staticMessage", messagesourcearg1, LCH.getLocale())
         if (staticMessage.contains('$')) {
             staticMessage = evaluate(staticMessage, templateMap)
@@ -1365,13 +1365,14 @@ println observationInstance.license
         templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
         templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
         templateMap["userMessage"] = m.userMessage?: ""
-        def messagesourcearg = new Object[6];
-             messagesourcearg[0] = currentUserProfileLink;
-             messagesourcearg[1] = currentUser;
-             messagesourcearg[2] = templateMap["domain"];
-             messagesourcearg[3] = activitySource != null ? '<a href="'+templateMap["activitySourceUrl"]+'">'+messageSource.getMessage('text.user',null,LCH.getLocale())+'</a>':'';
-             messagesourcearg[4] = templateMap["userMessage"];
-             messagesourcearg[5] = templateMap["unsubscribeUrl"];
+        def messagesourcearg = new Object[7];
+        messagesourcearg[0] = currentUserProfileLink;
+        messagesourcearg[1] = currentUser;
+        messagesourcearg[2] = templateMap["domain"];
+        messagesourcearg[3] = activitySource != null ? activitySource:'';
+        messagesourcearg[4] = templateMap["userMessage"];
+        messagesourcearg[5] = templateMap["unsubscribeUrl"];
+        messagesourcearg[6] = templateMap["activitySourceUrl"];
              
         def body = messageSource.getMessage("grails.plugin.springsecurity.ui.askIdentification.emailBody", messagesourcearg, LCH.getLocale())
 
