@@ -1889,7 +1889,7 @@ println observationInstance.license
         def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         String query = ""
         if(springSecurityService.currentUser){
-            query += searchFieldsConfig.AUTHOR_ID+":"+springSecurityService.currentUser.id.toLong()+" AND "
+            query += searchFieldsConfig.CONTRIBUTOR+":"+springSecurityService.currentUser.name+" AND "
         } else {
             //query += "*:*";
         }
@@ -1899,8 +1899,9 @@ println observationInstance.license
         paramsList.add("fl", searchFieldsConfig.LOCATION_EXACT+','+searchFieldsConfig.LATLONG+','+searchFieldsConfig.TOPOLOGY);
         paramsList.add("start", 0);
         paramsList.add("rows", 20);
-        paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc,'+searchFieldsConfig.SCORE + " desc ");
-
+        //paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc,'+searchFieldsConfig.SCORE + " desc ");
+        paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc');                                                                                
+        paramsList.add("sort", searchFieldsConfig.SCORE + " desc ");
         def results = [];
         Map temp = [:]
         if(paramsList) {
