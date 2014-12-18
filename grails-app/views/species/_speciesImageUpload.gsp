@@ -1,28 +1,32 @@
 <div class="tabbable speciesImage-wrapper " style="display:none;">
     <ul class="nav nav-tabs" id="speciesImage-tabs" style="margin:0px;background-color:transparent;">
         <g:if test="${isSpeciesContributor}">
-            <li id="speciesImage-li0" class="active"><a href="#speciesImage-tab0" class="btn" data-toggle="tab"><g:message code="speciesimageupload.add.observation.images" /></a></li>
-            <li id="speciesImage-li1"><a href="#speciesImage-tab1" class="btn" data-toggle="tab"><g:message code="speciesimageupload.upload.edit.images" /></a></li>
+            <li id="speciesImage-li0"><a href="#speciesImage-tab0" class="btn" data-toggle="tab"><g:message code="speciesimageupload.add.observation.images" /></a></li>
+            <li id="speciesImage-li1" class="active"><a href="#speciesImage-tab1" class="btn" data-toggle="tab"><g:message code="speciesimageupload.upload.edit.images" /></a></li>
             <li id="speciesImage-li2"><a href="#speciesImage-tab2" class="btn" data-toggle="tab"><g:message code="speciesimageupload.species.field.images" /></a></li>   
         </g:if>
     </ul>
     <div class="sidebar_section" style="clear:both;overflow:hidden;">
         <div class="tab-content" id="speciesImage-tab-content">
             <g:if test="${isSpeciesContributor}">
-            <div class="tab-pane active" id="speciesImage-tab0" style="max-height:410px;overflow-y:scroll;">
+            <div class="tab-pane" id="speciesImage-tab0" >
                 
                 <form id="pullObvImagesForm" action="${uGroup.createLink(action:'pullImageForSpecies', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
-                    <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
-                    <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromRelatedObv']"></obv:addPhotoWrapper>
+                    <div style="max-height:410px;overflow-y:scroll;overflow-x:hidden;" >
+                        <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
+                        <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromRelatedObv']"></obv:addPhotoWrapper>
+                    </div>
                     <a id="pullObvImagesBtn" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"><g:message code="speciesimageupload.pull.images" />  </a>
                 </form>
                    
             </div>
-            <div class="tab-pane" id="speciesImage-tab1" style="max-height:410px;overflow-y:scroll;">
+            <div class="tab-pane active" id="speciesImage-tab1" >
                 <form id="uploadSpeciesImagesForm" action="${uGroup.createLink(action:'pullImageForSpecies', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
-                    <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
-                    <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
+                    <div style="max-height:410px;overflow-y:scroll;overflow-x:hidden;" >
+                        <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
+                        <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType': 'ofSpecies']"></obv:addPhotoWrapper>
+                    </div>
                     <a id="uploadSpeciesImagesBtn" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> <g:message code="button.save" /> </a>
 
@@ -42,10 +46,12 @@
                 </form>
 
             </div>
-            <div class="tab-pane" id="speciesImage-tab2" style="max-height:410px;overflow-y:scroll;">
+            <div class="tab-pane" id="speciesImage-tab2">
                 <form id="pullSpeciesFieldImagesForm" action="${uGroup.createLink(action:'pullImageForSpecies', controller:'species','userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
-                    <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
-                    <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromSpeciesField']"></obv:addPhotoWrapper>
+                    <div style="max-height:410px;overflow-y:scroll;overflow-x:hidden;" >
+                        <input type="hidden" name='speciesId' value="${speciesInstance.id}" />
+                        <obv:addPhotoWrapper model="['observationInstance':speciesInstance, 'resourceListType':'fromSpeciesField']"></obv:addPhotoWrapper>
+                    </div>
                     <a id="pullSpeciesFieldImagesBtn" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> <g:message code="speciesimageupload.pull.images" /> </a>
                 </form>
