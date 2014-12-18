@@ -47,46 +47,48 @@
             width:940px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-item-horizontal .snippet.tablet .figure {
             width:210px;
             height:150px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-item-horizontal  .thumbnail .figure a {
             max-width:210px;
             max-height:150px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-item-horizontal  .thumbnail .img-polaroid {
             max-width:210px;
             max-height:140px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-item {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-item-horizontal {
             width:210px;
             height:250px;
             margin-right:3px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-item-horizontal .snippet.tablet {
             width:210px;
             height:250px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
             height:250px;
             padding:0px 1px;
             }
 
-            .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
+            .speciesField .jcarousel-skin-ie7 .jcarousel-item-horizontal .snippet.tablet .caption {
             height:75px;
             padding:16px 0px;
             background-color : #fff;
             }
+
             .resources .addedResource {
             height: 315px !important;
             max-height:315px !important;
             }
+
             .add_file_container {
                 padding: 55px 10px !important;
             }    

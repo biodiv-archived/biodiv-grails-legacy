@@ -22,7 +22,7 @@ class RecommendationService {
 	def namesIndexerService;
 
 	static transactional = false
-	static int BATCH_SIZE = 20
+	static int BATCH_SIZE = 50
 
 	/**
 	 * TODO:Bind this call to recommendation domain object save
@@ -275,7 +275,7 @@ class RecommendationService {
 		return null;
 	}
 	
-	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
+	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept){
         if(!name) return;
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {
