@@ -134,7 +134,9 @@ function populateTabDetails(data) {
     reinitializeRows($("#names-tab2"));
     //$("#names-tab2 .singleRow input").val('');
     //$("#names-tab2 .singleRow input").prop("disabled", false); 
-    var commonNamesList = data['commonNamesList']
+    var commonNamesList = data['commonNamesList'];
+    console.log("===%%%%%%%%%%%%%%%%%%=====")
+    console.log(commonNamesList);
     if(commonNamesList && commonNamesList.length > 0) {
         console.log(commonNamesList);
         var e = $("#names-tab2 .singleRow").first().clone();
@@ -149,6 +151,7 @@ function populateTabDetails(data) {
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
+            setOption($(ele).find(".languageDropDown")[0], value["language"]);
         })
     }
     
@@ -520,7 +523,7 @@ function modifyContent(ele, type) {
     p['name']  = typeName;
     p['act'] = modifyType;    
     p['relationship'] = relationship;
-    p['language'] = "English";
+    p['language'] = that.parents(".tab_div").find('.languageDropDown').val();
     var otherParams = {};
     otherParams['atAnyLevel'] = true;
     otherParams['taxonId'] = $(".taxonId").val();  //272991;

@@ -1004,7 +1004,9 @@ class SpeciesService extends AbstractObjectService  {
             Node l = new Node(data, "language");
             new Node(l, 'name', language);
             new Node(data, "contributor", springSecurityService.currentUser.email);
- 
+            if(otherParams) {
+                new Node(data, "viaDatasource", otherParams['source']);
+            }
             List<CommonNames> commonnames = converter.createCommonNames(cn, taxonConcept);
             
             if(!commonnames) {

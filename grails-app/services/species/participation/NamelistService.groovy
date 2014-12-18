@@ -452,6 +452,7 @@ class NamelistService {
             temp['id'] = it.id.toString();
             temp['name'] = it.name;
             temp['source'] = it.viaDatasource;
+            temp['language'] = it.language.name;
             String contri = '';
             it.contributors.each {
                 contri += it.name + ", "

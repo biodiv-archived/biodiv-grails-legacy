@@ -1203,6 +1203,7 @@ class XMLConverter extends SourceConverter {
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
                 sfield.status = NameStatus.COMMON;
+                sfield.viaDatasource = n.viaDatasource?.text() 
                 if(lang)
                     sfield.language = lang;
                 else {

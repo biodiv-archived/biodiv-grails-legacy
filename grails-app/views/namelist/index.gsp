@@ -1,4 +1,5 @@
 <%@page import="species.ScientificName.TaxonomyRank"%>
+<%@page import="species.Language"%>
 <%@page import="species.NamesMetadata.NameStatus"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
@@ -375,7 +376,7 @@
 
 
                         <script id="newRowTmpl" type="text/x-jquery-tmpl">
-                            <div class="row-fluid tab_div new">
+                            <div class="row-fluid tab_div singleRow new">
                                 <form>
                                {{if typeClass == "rid"}}
                                     <div class="span10">
@@ -388,11 +389,18 @@
                                         <input type="text" class="nameInputs span12" name="value">
                                     </div>                                    
                                     {{if typeClass == "cid"}}
-                                        <div class="nameContainer textbox" style="position:relative;">
-                                        <div class="span2">
-                                            <s:chooseLanguage />
-                                            </div>
-                                        </div>
+                                    <div class="span2">
+                                        <select class="languageDropDown span9" >
+                                            <g:each in="${Language.list(sort: 'name', order: 'asc')}" var="lang">
+                                            <g:if test="${lang.name == 'English'}">
+                                                <option value="${lang.name}" selected>${lang.name}</option>
+                                            </g:if>
+                                            <g:else>
+                                                <option value="${lang.name}">${lang.name}</option>
+                                            </g:else> 
+                                            </g:each>
+                                        </select>
+                                    </div>
                                           <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
                                           <div class="span2"><input type="text" class="nameInputs span12" name="contributor"></div> 
                                     {{else}}
@@ -480,7 +488,7 @@
                 expandAll:false,
                 showCheckBox:false
             });	
-            initializeLanguage();
+            //initializeLanguage();
         });
         </r:script>
 </script>
