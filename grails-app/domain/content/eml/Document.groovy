@@ -16,6 +16,7 @@ import species.participation.Follow;
 import species.participation.Featured;
 import species.Language;
 import org.springframework.context.MessageSourceResolvable;
+import species.participation.DocSciName;
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -214,4 +215,16 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	int compareTo(obj) {
 		createdOn.compareTo(obj.createdOn)
 	}
+	Map fetchSciNames(){
+		Map nameValue = [:]
+		List docSciNames = DocSciName.findAllByDocument(this)
+		docSciNames.each{ dsn ->
+		String sciName = dsn.scientificName
+		int freq = dsn.frequency
+		nameValue.put(sciName,freq)
+		}
+		return nameValue;
+
+	}
+
 }

@@ -6,6 +6,12 @@ import grails.converters.JSON
 import org.grails.taggable.*
 import species.AbstractObjectController;
 import speciespage.search.DocumentSearchService;
+import species.participation.DocumentTokenUrl;
+import species.participation.DocSciName;
+import static groovyx.net.http.Method.*;
+import static groovyx.net.http.ContentType.*
+import groovyx.net.http.*
+
 
 class DocumentController extends AbstractObjectController {
 
@@ -61,6 +67,7 @@ class DocumentController extends AbstractObjectController {
 					documentService.setUserGroups(documentInstance, userGroups);
 				}
 			}
+			DocumentTokenUrl.createLog(documentInstance,params.tokenUrl)
 			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
 			redirect(action: "show", id: documentInstance.id)
@@ -111,6 +118,13 @@ class DocumentController extends AbstractObjectController {
 					render(view: "create", model: [documentInstance: documentInstance])
 					return
 				}
+			}
+			if(params.tokenUrl != '') {
+				List docSciNames = DocSciName.findAllByDocument(documentInstance);
+				docSciNames.each{ 
+	 				it.delete(flush: true)
+		  		}
+				DocumentTokenUrl.createLog(documentInstance, params.tokenUrl)
 			}
 			params.locale_language = utilsService.getCurrentLanguage(request);
 			//documentInstance.properties = params
@@ -224,7 +238,7 @@ class DocumentController extends AbstractObjectController {
 	//// SEARCH //////
 	/**
 	 * 	
-//	 */
+	 */
 //	def search = {
 //		log.debug params;
 //		def model = documentService.search(params)
@@ -266,5 +280,11 @@ class DocumentController extends AbstractObjectController {
 		documentService.processBatch(params)
 		render " done "
 	}
+
+	def testFunc() {
+			
+			documentService.testFunc();
+		}
+	
 
 }

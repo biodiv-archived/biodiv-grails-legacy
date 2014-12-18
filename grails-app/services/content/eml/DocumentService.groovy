@@ -43,6 +43,16 @@ import species.groups.UserGroup;
 import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
 
+import groovyx.net.http.*
+import static groovyx.net.http.ContentType.*
+import static groovyx.net.http.Method.*
+import speciespage.ObvUtilService;
+
+import java.net.URL;
+import java.lang.Boolean;
+import species.participation.DocumentTokenUrl;
+
+
 class DocumentService extends AbstractObjectService {
 
 	static transactional = false
@@ -634,4 +644,124 @@ class DocumentService extends AbstractObjectService {
 		}
 	}
 
+	Map getGnrdScientificNames(String tokenUrl){
+			//	println "=====token==="+tokenUrl
+			URL url = new URL(tokenUrl)
+			def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+			//println "===hostName==="+hostName
+			def path = url.getPath()
+			//println "===path==="+path
+			def query=url.getQuery()
+			//println "===query==="+query
+
+		HTTPBuilder http = new HTTPBuilder(hostName)
+		Map names = [:];
+		Map offset = [:];
+		String status = '';
+       http.request( GET, JSON ) {  
+       
+			
+			 //def q1 = query.split('=')[0];
+			def q = query.split('=')[1];
+
+        	 uri.path = path
+ 			 uri.query = [ token:q ]     	
+
+  			headers.Accept = '*/*'
+           	response.success = { resp, reader ->
+      			//println "================ resp ==" + response
+    			//println "================ reader ==" + reader
+      			//println "=====STATUS CODE==== " + reader.status
+      			names = countScientificNames(reader.names);
+      			offset = getOffsetValues(reader.names);
+      			//println "=====offset===" +offset
+      			int statusCode = reader.status
+      			if(statusCode == 303){
+      				status = ObvUtilService.SCHEDULED
+      			} else if(statusCode == 404){
+      				status = ObvUtilService.FAILED
+      			} else if(statusCode == 200){
+      				status = ObvUtilService.SUCCESS
+      			}
+         	}
+            response.'404' = { status = ObvUtilService.FAILED }
+
+        }
+        return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset]
+	}
+
+
+	private Map countScientificNames(List names) {
+		Map clearNameset = [:]
+		names.each { name ->
+		 if(clearNameset[name.scientificName]) {//adding count to map
+
+              clearNameset[name.scientificName] = clearNameset[name.scientificName] + 1
+
+          } else {
+
+                 clearNameset[name.scientificName] = 1
+
+            }
+        }
+        return clearNameset.sort { a, b -> b.value <=> a.value }
+	}
+
+	private Map getOffsetValues(List names){
+			Map offsetMap = [:]
+			names.each { name ->
+				List countArray = []
+					countArray[0] = name.offsetStart
+					countArray[1] = name.offsetEnd
+					if(!offsetMap[name.scientificName]){
+						offsetMap[name.scientificName] = []
+						offsetMap[name.scientificName].add(countArray)
+					}else{
+						
+						offsetMap[name.scientificName].add(countArray)
+					}
+			}
+		return offsetMap;	
+
+	}
+
+	def testFunc() {
+
+		List documentInstanceList = Document.list(max:10);
+		def url = '';
+		def tokenUrl = '';
+
+
+		documentInstanceList.each { 
+			printf"=================it.id====="+it.id
+			def p = DocumentTokenUrl.findByDoc(it)
+			if( !p ) {
+				if(it?.uFile != null){
+					url = grailsApplication.config.speciesPortal.content.serverURL
+    		    	url = url+it?.uFile?.path 
+    		    						printf"=================url===="+url
+
+				} else {
+					url=it.uri;
+				}
+					printf"=================url===="+url
+				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+				HTTPBuilder http = new HTTPBuilder(hostName)
+       			http.request( GET, JSON ) {
+        			uri.path = "/name_finder.json"
+ 					uri.query = [ url:url ]     	
+  					headers.Accept = '*/*'
+	           		response.success = { resp,  reader ->
+        	   			//println "========reader====="+reader;
+           				//println "========reader====="+reader.token_url;
+           				tokenUrl = reader.token_url;
+      				}
+      				response.'404' = { status = ObvUtilService.FAILED }
+        		}
+        	    	println "========tokenurl===lllll=="+tokenUrl;
+	        	DocumentTokenUrl.createLog(it, tokenUrl)
+          
+			}//IF
+		}//each
+	}
 }
