@@ -17,6 +17,14 @@
     {
         min-height:22px !important;
     }
+    .languageDropDown {
+        height:20px;
+        padding:0px;
+    }
+    .add_new_row {
+        float: right;
+        margin-right: 26px;
+    }
     .nav-tabs>li>a {
         padding:5px 10px !important;
         line-height:10px !important;
@@ -390,7 +398,7 @@
                                     </div>                                    
                                     {{if typeClass == "cid"}}
                                     <div class="span2">
-                                        <select class="languageDropDown span9" >
+                                        <select class="languageDropDown span12" >
                                             <g:each in="${Language.list(sort: 'name', order: 'asc')}" var="lang">
                                             <g:if test="${lang.name == 'English'}">
                                                 <option value="${lang.name}" selected>${lang.name}</option>
