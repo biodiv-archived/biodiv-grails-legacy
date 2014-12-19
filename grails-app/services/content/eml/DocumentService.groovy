@@ -51,6 +51,7 @@ import speciespage.ObvUtilService;
 import java.net.URL;
 import java.lang.Boolean;
 import species.participation.DocumentTokenUrl;
+import species.participation.DocSciName;
 
 
 class DocumentService extends AbstractObjectService {
@@ -682,6 +683,8 @@ class DocumentService extends AbstractObjectService {
       				status = ObvUtilService.FAILED
       			} else if(statusCode == 200){
       				status = ObvUtilService.SUCCESS
+      			} else {
+      				status = ObvUtilService.FAILED
       			}
          	}
             response.'404' = { status = ObvUtilService.FAILED }
@@ -725,43 +728,56 @@ class DocumentService extends AbstractObjectService {
 
 	}
 
-	def testFunc() {
+    def testFunc() {
+        List documentInstanceList = Document.list();
+        def url = '';
+        def tokenUrl = '';
+        int i = 0;
+        def numOfDocs = documentInstanceList.size()
+        while(i < numOfDocs) {
+            DocumentTokenUrl.withNewTransaction { 
+                def instance = documentInstanceList.get(i)
+                i++;
+                println "=================instance.id====="+instance.id
+                def p = DocumentTokenUrl.findByDoc(instance)
+                if(!p) {
+                    if(instance?.uFile != null){
+                        url = grailsApplication.config.speciesPortal.content.serverURL
+                        url = url+instance?.uFile?.path 
+                        printf"=================url===="+url
 
-		List documentInstanceList = Document.list(max:10);
-		def url = '';
-		def tokenUrl = '';
+                    } else {
+                        url=instance.uri;
+                    }
+                    println "=================url===="+url
+                    def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+                    HTTPBuilder http = new HTTPBuilder(hostName)
+                    http.request( GET, JSON ) {
+                        uri.path = "/name_finder.json"
+                        uri.query = [ url:url ]     	
+                        headers.Accept = '*/*'
+                        response.success = { resp,  reader ->
+                            //println "========reader====="+reader;
+                            //println "========reader====="+reader.token_url;
+                            tokenUrl = reader.token_url;
+                        }
+                        response.'404' = { status = ObvUtilService.FAILED }
+                    }
+                    println "========tokenurl===lllll=="+tokenUrl;
+                    DocumentTokenUrl.createLog(instance, tokenUrl);
+                }//IF
+            }
+        }//each
+    }
+     def documentDelete(docInstance){
+    	def  a =DocumentTokenUrl.findByDoc(docInstance)
+    	a.delete(flush: true, failOnError:true);
+    	List b = DocSciName.findAllByDocument(docInstance)
+    		 b.each {
+    			it.delete(flush: true, failOnError:true);
+    			}
+    	println"========Documentdelete=========="
+    }
 
-
-		documentInstanceList.each { 
-			printf"=================it.id====="+it.id
-			def p = DocumentTokenUrl.findByDoc(it)
-			if( !p ) {
-				if(it?.uFile != null){
-					url = grailsApplication.config.speciesPortal.content.serverURL
-    		    	url = url+it?.uFile?.path 
-    		    						printf"=================url===="+url
-
-				} else {
-					url=it.uri;
-				}
-					printf"=================url===="+url
-				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
-				HTTPBuilder http = new HTTPBuilder(hostName)
-       			http.request( GET, JSON ) {
-        			uri.path = "/name_finder.json"
- 					uri.query = [ url:url ]     	
-  					headers.Accept = '*/*'
-	           		response.success = { resp,  reader ->
-        	   			//println "========reader====="+reader;
-           				//println "========reader====="+reader.token_url;
-           				tokenUrl = reader.token_url;
-      				}
-      				response.'404' = { status = ObvUtilService.FAILED }
-        		}
-        	    	println "========tokenurl===lllll=="+tokenUrl;
-	        	DocumentTokenUrl.createLog(it, tokenUrl)
-          
-			}//IF
-		}//each
-	}
 }
+

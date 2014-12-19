@@ -30,6 +30,7 @@ class DocumentTokelUrlJob {
                 setStatus(tu,gnrdNames.status)
                 List ids = DocSciName.findAllByDocument(tu.doc)
                 ids.each { docId ->
+                    println "=======+++++++=docid=========----------="+docId
                 	docId.delete(flush: true);
                 }
                 Map offsetReturnedValues = gnrdNames.offsetMap

@@ -164,6 +164,7 @@ class DocumentController extends AbstractObjectController {
 		if (documentInstance) {
 			try {
 				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+				documentService.documentDelete(documentInstance)
 				documentInstance.delete(flush: true, failOnError:true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 				redirect(action: "browser")
