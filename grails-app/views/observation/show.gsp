@@ -111,7 +111,7 @@ if(r) {
                                
                                <div class="span12" style="margin-left:0px">
                                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true]" />
+                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress, 'userGroup':userGroupInstance]" />
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
