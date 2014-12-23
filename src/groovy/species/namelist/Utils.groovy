@@ -76,7 +76,7 @@ class Utils {
 	private static void writeHeader(File f, Class c){
 		println "writing header  " + f
         if(c == Synonyms.class) {
-		    f << "Accepted name Species Id|IBP varbatim|IBP Canonical Form|Accepted name IBP rank|Accepted name Varbatim|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
+		    f << "Accepted name Species Id|IBP varbatim|IBP Canonical Form|Accepted name IBP rank|Accepted name Varbatim|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Synonym for accepted name|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
         } else {
 		    f << "Species Id|IBP varbatim|IBP Canonical Form|IBP rank|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
         }
@@ -139,7 +139,17 @@ class Utils {
             sb.append(r.id.text() + "|") //ID
             sb.append(r.name_status?.text() + "|") //Name status
             sb.append(r.classification?.taxon[0]?.name?.text() + "|") //Group
-
+            if(c == Synonyms.class) {
+                def accNamesSTR = '';
+                if(r.name_status?.text() == 'synonym') {
+                    r.accepted_name.each {
+                        accNamesSTR += "<i>" +it.name_html.i.text()+"</i> "+ it.name_html.text()+' *** '
+                    }
+                } else {
+                    accNamesSTR = 'N.A.'    
+                }
+                sb.append(accNamesSTR + "|")  //add accepted names verbatim
+            }
             StringBuilder accName = new StringBuilder()
             StringBuilder synonyms = new StringBuilder()
             StringBuilder provAccName = new StringBuilder()
