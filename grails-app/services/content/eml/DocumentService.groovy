@@ -144,6 +144,8 @@ class DocumentService extends AbstractObjectService {
 
 		for(docId in docsList) {
 			def documentInstance = Document.get(docId)
+            //TODO - UI sending null id
+            if(!documentInstance)continue;
 
 			if(params."${docId}.title") {
 				documentInstance.title = params."${docId}.title"
