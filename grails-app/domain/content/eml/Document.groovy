@@ -188,6 +188,12 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
         return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
 
+ 	Resource mainDocImage() {  
+		String reprImage = "Document_th2.png"
+	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
+        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
+ 	}
+
 	def beforeUpdate(){
 		if(isDirty() && isDirty('topology')){
 			updateLatLong()
