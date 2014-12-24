@@ -96,7 +96,7 @@ beans = {
 //        speciesSolrServer(EmbeddedSolrServer, container, "biodiv" )
 //        observationsSolrServer(EmbeddedSolrServer, container, "biodiv" );
 //        newsletterSolrServer(EmbeddedSolrServer, container, "biodiv" );
-//        projectSolrServer(EmbeddedSolrServer, container, "biodiv" );
+            projectSolrServer(EmbeddedSolrServer, container, "projects" );
         //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
 //        documentSolrServer(EmbeddedSolrServer, container, "biodiv" );
 //        usersSolrServer(EmbeddedSolrServer, container, "biodiv" );
@@ -139,8 +139,8 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/newsletters"
         }
-
-        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/biodiv", config.queueSize, config.threadCount ) {
+*/
+        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -149,9 +149,9 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/checklists"
+            println "Initialized search server to "+config.serverURL+"/projects"
         }
-
+/*
         documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -212,7 +212,7 @@ beans = {
 		sessionFactory = ref("sessionFactory");
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
-        solrServer = ref('biodivSolrServer');
+        solrServer = ref('projectSolrServer');
 		sessionFactory = ref("sessionFactory");
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
