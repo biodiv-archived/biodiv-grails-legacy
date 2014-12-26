@@ -5,13 +5,15 @@
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.UserGroupTagLib"%>
-<%@ page import="species.participation.DocumentTokenUrl"%>
+<%@ page import="content.eml.DocumentTokenUrl"%>
 
 
 <%
-    Map sciNames=documentInstance.fetchSciNames();
+    Map sciNames = documentInstance.fetchSciNames();
+    Map nameValue =  sciNames.nameValues
+    Map nameParseValues = sciNames.nameparseValue
     def docId = DocumentTokenUrl.findByDoc(documentInstance)
-    String status=docId.status
+    String status = docId.status
 %>
 
 <div  class="span4">
@@ -28,12 +30,12 @@
     <g:else>
 
       <tbody >
-        <g:each in="${sciNames}" var="sciName">
+        <g:each in="${nameValue}" var="sciName">
           <tr>
        	      <td>
                 <%
-                  def taxaObj = TaxonomyDefinition.findByCanonicalForm(sciName.key)
-                  def speciesObjId = Species.findByTaxonConcept(taxaObj)?.id;
+                  def taxaObj = nameParseValues[sciName.key]?TaxonomyDefinition.findByCanonicalForm(nameParseValues[sciName.key]):null
+                  def speciesObjId = taxaObj?Species.findByTaxonConcept(taxaObj)?.id:null;
                   def link = ""
                   if(speciesObjId) {
                       link = uGroup.createLink(controller:'species', action:'show', id:speciesObjId, 'userGroupWebaddress':webaddress, absolute:true)

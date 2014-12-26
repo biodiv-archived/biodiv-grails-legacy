@@ -16,7 +16,7 @@ import species.participation.Follow;
 import species.participation.Featured;
 import species.Language;
 import org.springframework.context.MessageSourceResolvable;
-import species.participation.DocSciName;
+import content.eml.DocSciName;
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -188,11 +188,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
         return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
 
- 	Resource mainDocImage() {  
-		String reprImage = "Document_th2.png"
-	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
-        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
- 	}
+ 	
 
 	def beforeUpdate(){
 		if(isDirty() && isDirty('topology')){
@@ -223,13 +219,13 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	}
 	Map fetchSciNames(){
 		Map nameValue = [:]
+		Map nameParseValues = [:]
 		List docSciNames = DocSciName.findAllByDocument(this)
 		docSciNames.each{ dsn ->
-		String sciName = dsn.scientificName
-		int freq = dsn.frequency
-		nameValue.put(sciName,freq)
+		nameValue.put(dsn.scientificName,dsn.frequency)
+		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
 		}
-		return nameValue;
+		return [nameValues:nameValue, nameparseValue:nameParseValues]
 
 	}
 

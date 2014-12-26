@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import species.NamesParser
 import org.hibernate.FetchMode;
 import species.SpeciesPermission.PermissionType;
-import species.participation.DocSciName;
+import content.eml.DocSciName;
 
 import species.utils.Utils;
 import grails.plugin.springsecurity.annotation.Secured

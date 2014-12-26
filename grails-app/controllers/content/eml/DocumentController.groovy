@@ -6,8 +6,6 @@ import grails.converters.JSON
 import org.grails.taggable.*
 import species.AbstractObjectController;
 import speciespage.search.DocumentSearchService;
-import species.participation.DocumentTokenUrl;
-import species.participation.DocSciName;
 import static groovyx.net.http.Method.*;
 import static groovyx.net.http.ContentType.*
 import groovyx.net.http.*
@@ -67,7 +65,9 @@ class DocumentController extends AbstractObjectController {
 					documentService.setUserGroups(documentInstance, userGroups);
 				}
 			}
-			DocumentTokenUrl.createLog(documentInstance,params.tokenUrl)
+			if (params.tokenUrl != '') {
+				DocumentTokenUrl.createLog(documentInstance,params.tokenUrl)
+			}
 			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
 			redirect(action: "show", id: documentInstance.id)
@@ -160,7 +160,7 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])	
 	def delete() {
-		def documentInstance = Document.get(params.id)
+		Document documentInstance = Document.get(params.id)
 		if (documentInstance) {
 			try {
 				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
@@ -282,9 +282,9 @@ class DocumentController extends AbstractObjectController {
 		render " done "
 	}
 
-	def testFunc() {
+	def runAllDocuments() {
 			
-			documentService.testFunc();
+			documentService.runAllDocuments();
 		}
 	
 

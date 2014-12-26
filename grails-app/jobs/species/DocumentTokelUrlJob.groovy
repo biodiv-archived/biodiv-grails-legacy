@@ -6,9 +6,9 @@ import species.utils.ImageType;
 import species.utils.ImageUtils
 import species.utils.Utils;
 import speciespage.ObvUtilService;
-import species.participation.DocumentTokenUrl;
+import content.eml.DocumentTokenUrl;
 import content.eml.DocumentService;
-import species.participation.DocSciName;
+import content.eml.DocSciName;
 
 class DocumentTokelUrlJob {
     static triggers = {
@@ -28,12 +28,13 @@ class DocumentTokelUrlJob {
                 println "===========PROCESSING ============== " + tu
                 Map gnrdNames = documentService.getGnrdScientificNames(tu.tokenUrl);
                 setStatus(tu,gnrdNames.status)
-                List ids = DocSciName.findAllByDocument(tu.doc)
-                ids.each { docId ->
-                    println "=======+++++++=docid=========----------="+docId
-                	docId.delete(flush: true);
+                List docSciNameId = DocSciName.findAllByDocument(tu.doc)
+                docSciNameId.each { 
+                	it.delete();
                 }
+                docSciNameId.clear();
                 Map offsetReturnedValues = gnrdNames.offsetMap
+                Map parsedNameSetValues = gnrdNames.parsedNameSetMap
                 gnrdNames.names.each { sciName, freq ->
                 	def docSciNameInstance = new DocSciName()
                 	docSciNameInstance.document = tu.doc
@@ -41,6 +42,7 @@ class DocumentTokelUrlJob {
                 	docSciNameInstance.frequency = freq
                 	def stringOffsets = offsetReturnedValues[sciName].join(",")
                 	docSciNameInstance.offsetValues = stringOffsets
+                    docSciNameInstance.canonicalForm = parsedNameSetValues[sciName]
                 	if (!docSciNameInstance.save(flush: true)) {
    					    docSciNameInstance.errors.each {
      					   println "=======it========"+it

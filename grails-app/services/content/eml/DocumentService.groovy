@@ -43,15 +43,15 @@ import species.groups.UserGroup;
 import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
 
-import groovyx.net.http.*
-import static groovyx.net.http.ContentType.*
-import static groovyx.net.http.Method.*
+import groovyx.net.http.HTTPBuilder
+import static groovyx.net.http.ContentType.JSON
+import static groovyx.net.http.ContentType.XML
+import static groovyx.net.http.Method.GET
 import speciespage.ObvUtilService;
 
 import java.net.URL;
 import java.lang.Boolean;
-import species.participation.DocumentTokenUrl;
-import species.participation.DocSciName;
+import species.NamesParser;
 
 
 class DocumentService extends AbstractObjectService {
@@ -658,6 +658,7 @@ class DocumentService extends AbstractObjectService {
 		HTTPBuilder http = new HTTPBuilder(hostName)
 		Map names = [:];
 		Map offset = [:];
+		Map parsedNameSet = [:];
 		String status = '';
        http.request( GET, JSON ) {  
        
@@ -675,7 +676,10 @@ class DocumentService extends AbstractObjectService {
       			//println "=====STATUS CODE==== " + reader.status
       			names = countScientificNames(reader.names);
       			offset = getOffsetValues(reader.names);
-      			//println "=====offset===" +offset
+      			List nameSetKeys = names.keySet().toList();
+      			parsedNameSet = gnrdNameParsing(nameSetKeys);
+
+      			//println "=====names===" +names
       			int statusCode = reader.status
       			if(statusCode == 303){
       				status = ObvUtilService.SCHEDULED
@@ -690,7 +694,7 @@ class DocumentService extends AbstractObjectService {
             response.'404' = { status = ObvUtilService.FAILED }
 
         }
-        return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset]
+        return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset, parsedNameSetMap:parsedNameSet]
 	}
 
 
@@ -708,6 +712,15 @@ class DocumentService extends AbstractObjectService {
             }
         }
         return clearNameset.sort { a, b -> b.value <=> a.value }
+	}
+
+	private Map gnrdNameParsing(List names) {
+		NamesParser nameParser = new NamesParser();
+		Map parsedNameSetMap = [:]
+		names.each { name ->
+			parsedNameSetMap[name] = nameParser.parse([name])[0].canonicalForm
+		}
+		return parsedNameSetMap
 	}
 
 	private Map getOffsetValues(List names){
@@ -728,7 +741,7 @@ class DocumentService extends AbstractObjectService {
 
 	}
 
-    def testFunc() {
+    def runAllDocuments() {
         List documentInstanceList = Document.list();
         def url = '';
         def tokenUrl = '';
@@ -738,18 +751,15 @@ class DocumentService extends AbstractObjectService {
             DocumentTokenUrl.withNewTransaction { 
                 def instance = documentInstanceList.get(i)
                 i++;
-                println "=================instance.id====="+instance.id
                 def p = DocumentTokenUrl.findByDoc(instance)
                 if(!p) {
                     if(instance?.uFile != null){
                         url = grailsApplication.config.speciesPortal.content.serverURL
                         url = url+instance?.uFile?.path 
-                        printf"=================url===="+url
 
                     } else {
                         url=instance.uri;
                     }
-                    println "=================url===="+url
                     def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                     HTTPBuilder http = new HTTPBuilder(hostName)
                     http.request( GET, JSON ) {
@@ -763,20 +773,18 @@ class DocumentService extends AbstractObjectService {
                         }
                         response.'404' = { status = ObvUtilService.FAILED }
                     }
-                    println "========tokenurl===lllll=="+tokenUrl;
                     DocumentTokenUrl.createLog(instance, tokenUrl);
                 }//IF
             }
         }//each
     }
-     def documentDelete(docInstance){
-    	def  a =DocumentTokenUrl.findByDoc(docInstance)
-    	a.delete(flush: true, failOnError:true);
-    	List b = DocSciName.findAllByDocument(docInstance)
-    		 b.each {
-    			it.delete(flush: true, failOnError:true);
+     def documentDelete(Document docInstance){
+    	def  docTokenId =DocumentTokenUrl.findByDoc(docInstance)
+    		 docTokenId.delete();
+    	List docSciNameId = DocSciName.findAllByDocument(docInstance)
+    		 docSciNameId.each {
+    			it.delete();
     			}
-    	println"========Documentdelete=========="
     }
 
 }

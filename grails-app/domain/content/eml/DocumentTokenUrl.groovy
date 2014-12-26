@@ -1,9 +1,8 @@
-package species.participation
+package content.eml
 
 import java.util.Date;
 import grails.converters.JSON;
 
-import content.eml.Document;
 import speciespage.ObvUtilService;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
@@ -20,7 +19,7 @@ class DocumentTokenUrl {
     static constraints = {
     }
 
-    static createLog( documentInstance, String tokenUrl) {
+    static  DocumentTokenUrl createLog( Document documentInstance, String tokenUrl) {
 	    DocumentTokenUrl tu = new DocumentTokenUrl (createdOn: new Date(), doc:documentInstance, tokenUrl:tokenUrl, status:ObvUtilService.SCHEDULED)
 		if(!tu.save(flush:true)){
 			tu.errors.allErrors.each { println it }

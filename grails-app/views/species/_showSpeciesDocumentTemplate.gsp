@@ -6,7 +6,7 @@
    def userInstance = documentInstance.author;
    
    %>
-<g:set var="mainImage" value="${documentInstance.mainDocImage()}" />
+<g:set var="mainImage" value="${documentInstance.mainImage()}" />
 <%
    def imagePath = mainImage?mainImage.thumbnailUrl(null, null): null;
    def obvId = documentInstance.id
