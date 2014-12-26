@@ -41,6 +41,8 @@ import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.License
+import species.License.LicenseType
 
 class UFileController {
 
@@ -181,8 +183,12 @@ class UFileController {
 
 			Document documentInstance = new Document()
 			documentInstance.title  = uploaded.getName()
+            documentInstance.language = utilsService.getCurrentLanguage(request);
+            //For creating document using default license
+            //this will be overwritten later.
+			documentInstance.license =  License.findByName(LicenseType.CC_BY);
 
-			if(params.type) {
+            if(params.type) {
 				switch(params.type) {
 					case "Proposal":
 						documentInstance.type = DocumentType.Proposal
@@ -205,9 +211,9 @@ class UFileController {
 
 			documentInstance.uFile = uFileInstance
 
-
-			documentInstance.save(flush:true)
-
+			if(!documentInstance.save(flush:true)) {
+                documentInstance.errors.allErrors.each { log.error it }
+            }
 
 			log.debug " parameters to projectDoc block >>>> Path - "+ uFileInstance.path + " ,  Id: "+ documentInstance.id + ", fileSize:"+uFileInstance.size+", docName:"+documentInstance.title
 
