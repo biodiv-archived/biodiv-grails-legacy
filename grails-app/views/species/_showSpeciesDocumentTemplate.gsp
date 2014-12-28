@@ -55,7 +55,6 @@
             def descPrint = desc[0..98]
             %>
             ${descPrint}...
-            ${descPrint.length()}         
          </g:if>
          <g:else>
             ${desc}
