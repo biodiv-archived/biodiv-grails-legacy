@@ -1012,9 +1012,10 @@ class SpeciesController extends AbstractObjectController {
         render '';
         return;
     }
-
+    
+    //ADDS/EDITS/DELETES media in species
     @Secured(['ROLE_USER'])
-    def pullImageForSpecies() {
+    def setResources() {
         log.debug params
         //pass that same species
         Language userLanguage = utilsService.getCurrentLanguage(request);
