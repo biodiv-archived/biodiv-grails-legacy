@@ -32,8 +32,8 @@ class ActivityFeed {
 	Long activityHolderId; 
 	String activityHolderType;
 	
-	//subroot : this is to support aggregation on commnet(ie. thread) on group or obv
-	//it will be null for all except the commnet activity where is will store main comment thread
+	//subroot : this is to support aggregation on comment(ie. thread) on group or obv
+	//it will be null for all except the comment activity where is will store main comment thread
 	Long subRootHolderId;
 	String subRootHolderType;
 	
