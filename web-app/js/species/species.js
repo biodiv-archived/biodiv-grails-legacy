@@ -32,6 +32,15 @@ function showSpeciesConcept(fieldId) {
                 }
 }
 
+function show_speciesRefField(){    
+    $('.add_ref').show();
+    $('.references li').each(function(){
+        var that = $(this);
+          that.find('.ed_de').show();      
+      });
+
+}
+
 var addReference = function(childCount, id) {
     sid = id + "_" + (childCount - 1)
         var clone = $("#reference" + sid).clone()
@@ -890,6 +899,7 @@ $(document).ready(function() {
         var initEditableFields = function(e) {
             if($(document).find('.editFieldButton').length == 0) {
                 refreshEditables($('body'));
+                show_speciesRefField();
                 //$("#requestPermission").show();
                 //$("#inviteCurators").show();
                 //$("#inviteContributors").show();

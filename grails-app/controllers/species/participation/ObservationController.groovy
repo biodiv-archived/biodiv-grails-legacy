@@ -58,6 +58,7 @@ class ObservationController extends AbstractObjectController {
     def messageSource;
     def commentService;
     def utilsService;
+    def speciesService;
     def setupService;
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -1652,6 +1653,8 @@ class ObservationController extends AbstractObjectController {
     }
 
     def testy(){
-	    setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    //setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    println speciesService.checking();
+    	return false;
     }
 }

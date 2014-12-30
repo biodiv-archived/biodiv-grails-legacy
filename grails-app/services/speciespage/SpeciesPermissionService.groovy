@@ -25,6 +25,7 @@ class SpeciesPermissionService {
     def emailConfirmationService;
     def utilsService;
     def springSecurityService;
+    def SUserService;
 
     List<SUser> getCurators(Species speciesInstance) {
         def result = getUsers(speciesInstance, PermissionType.ROLE_CURATOR) 
@@ -152,7 +153,7 @@ println res;
         if(!user) return false;
         boolean flag = false;
         speciesFieldInstance.contributors.each { c ->
-            if(c.id == user.id) {
+            if((c.id == user.id) || (SUserService.ifOwns(user))) {
                 flag = true;
                 return
             }
