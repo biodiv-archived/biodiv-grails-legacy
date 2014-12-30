@@ -14,7 +14,7 @@ class Comment{
 	String body;
 	Date dateCreated;
 	Date lastUpdated;
-	//main comment thread may have subject (i.e will be shown in group discussion foram)
+	//main comment thread may have subject (i.e will be shown in group discussion forum)
 	String subject; 
 
 	//comment holder (i.e recoVote, image)
