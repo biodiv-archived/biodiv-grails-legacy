@@ -2,6 +2,19 @@
 <%
 //def references = speciesInstance.fields.collect{it.references};
 
+def sfInstance 	  = category.value.get('speciesFieldInstance');
+def fieldInstance = sfInstance[0]?.field;
+//references = refs.values();
+//printing only if references are not available.. using description
+
+if(sfInstance && sfInstance[0]?.description && sfInstance[0]?.description != 'dummy') { %>
+	<s:updatereference model="['referenceId': '','speciesId':speciesInstance.id,'speciesFieldId':sfInstance[0].id,
+					'fieldId':fieldInstance.id,'value':sfInstance[0]?.description]" />
+<%		
+	sfInstance[0]?.description = 'dummy';
+	sfInstance[0].save();
+}
+
 def criteria = SpeciesField.createCriteria();
 def results = criteria.list {
      groupProperty('field')
@@ -16,32 +29,8 @@ def references = [];
   	references	<< result.references
   }
 
-Map refs = new LinkedHashMap();
-/*references.each(){
-if(it) {
-it.each() {
-refs.put(it?.url?.trim()?:it?.title, it)
-}
-}
-};
-*/
 
-def sfInstance 	  = category.value.get('speciesFieldInstance');
-def fieldInstance = sfInstance[0]?.field;
 
-//printing only if references are not available.. using description
-if(sfInstance && sfInstance[0]?.description && !sfInstance[0]?.references && sfInstance[0]?.description != 'dummy') {
-	sfInstance[0]?.description?.replaceAll(/<.*?>/, '\n').split('\n').each() {
-		if(it) {
-			if(it.startsWith("http://")) {
-			refs.put(it, new Reference(url:it));
-			} else {
-			refs.put(it, new Reference(title:it));
-			}
-		}
-	}
-}
-//references = refs.values();
 %>
 
 <ol class="references" style="list-style:disc;list-style-type:decimal">

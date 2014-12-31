@@ -153,7 +153,7 @@ println res;
         if(!user) return false;
         boolean flag = false;
         speciesFieldInstance.contributors.each { c ->
-            if((c.id == user.id) || (SUserService.ifOwns(user))) {
+            if((c.id == user.id) || (SUserService.isAdmin(user))) {
                 flag = true;
                 return
             }

@@ -642,22 +642,18 @@ private def updateSpeciesReference(referenceId, long speciesId, long fieldId, de
     def content;
     def count_chk = ['success_count' : 0 ,'failure_count' : 0];
     SpeciesField speciesField,speciesFields;
-    println "=================passed Here =================";
     Species speciesInstance = Species.get(speciesId);
-    if(speciesId && !referenceId){
-        println "==================speciesId==================="+speciesId;        
+    if(speciesId && !referenceId){               
         if(!speciesInstance){
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = referenceId;
              return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
         }
 
-        Field field = Field.read(fieldId);
-        println "=========================field================="
-        println field
+        Field field = Field.read(fieldId);       
         speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
         if(!speciesField){
-            speciesField = createNewSpeciesField(speciesInstance, field, "Empty");
+            speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
         }
         def references = [];        
         value?.split("\\r?\\n").each { l ->
@@ -665,7 +661,12 @@ private def updateSpeciesReference(referenceId, long speciesId, long fieldId, de
            if(l && l.trim()) {                 
                 def chk = is_exist_reference(speciesInstance, l);
                if(chk){
-                    Reference reference = new Reference(title:l); 
+                    Reference reference;
+                    if(l.startsWith("http://")) {
+                        reference = new Reference(url:l); 
+                     }else{
+                        reference = new Reference(title:l); 
+                     }   
                     speciesField.addToReferences(reference);
                     references.push(reference);
                     count_chk.success_count =  count_chk.success_count +1;
@@ -692,10 +693,13 @@ private def updateSpeciesReference(referenceId, long speciesId, long fieldId, de
             return [success:false, msg:messageSource.getMessage("info.reference.id.duplicate.found", null, LCH.getLocale())]
 
         }
-            Reference reference = Reference.get(referenceId);
-            println "=================reference=================="+reference;
+            Reference reference = Reference.get(referenceId);            
             speciesField = reference.speciesField;
-            reference.title= value;
+            if(value.startsWith("http://")) {
+                  reference.url= value;
+                }else{
+                  reference.title= value;
+                }
 
         if(!reference.save(flush:true)){
                 reference.errors.allErrors.each { log.error it }
