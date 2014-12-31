@@ -93,6 +93,10 @@ update observation set is_locked = false;
 
 update species_field_contributor set attributors_idx = 0;
 update taxonomy_registry_suser set contributors_idx = 0;
+update species_field_suser set contributors_idx = 0;
+update taxonomy_definition_suser set contributors_idx = 0;
+update synonyms_suser set contributors_idx = 0;
+update common_names_suser set contributors_idx = 0;
 
 UPDATE resource set context = 'OBSERVATION' where id in (select resource_id from observation_resource);
 UPDATE resource set context = 'SPECIES' where id in (select resource_id from species_resource);
