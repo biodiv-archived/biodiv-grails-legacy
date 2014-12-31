@@ -501,7 +501,7 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
     def update() {
-    	def msg;
+        def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
@@ -511,9 +511,10 @@ class SpeciesController extends AbstractObjectController {
             render ([success:false, msg:msg] as JSON)
             return;
         }
+        
         try {
             def result;
-            long speciesFieldId = params.pk ? params.long('pk'):null;
+            Long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
@@ -567,11 +568,13 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.updateStatus(speciesFieldId, value);
                 break;
                 case "reference":
-                long cid = params.cid?params.long('cid'):null;
+                Long cid = params.cid?params.long('cid'):null;
                 if(params.act == 'delete') {
                     result = speciesService.deleteReference(cid, speciesFieldId);
                 } else {
-                    result = speciesService.updateReference(cid, speciesFieldId, value);
+                    Long speciesId = params.speciesid? params.long('speciesid') : null;
+                    Long fieldId   = params.fieldId? params.long('fieldId') : null;                    
+                    result = speciesService.updateReference(cid, speciesId,fieldId,speciesFieldId, value);
                 }
                 break;
                 case 'synonym':
