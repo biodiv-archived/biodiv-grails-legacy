@@ -633,7 +633,16 @@ class UtilsService {
             templateMap["obvCName"] =  values[ObvUtilService.CN]
             templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
             templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
-            templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
+            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            def mainImage = obv.mainImage()
+            def imagePath;
+
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else {
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
+            }
+            templateMap["obvImage"] = imagePath;
             //get All the UserGroups an observation is part of
             templateMap["groups"] = obv.userGroups
         }

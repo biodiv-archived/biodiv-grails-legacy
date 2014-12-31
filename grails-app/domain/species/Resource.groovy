@@ -108,7 +108,7 @@ class Resource extends Sourcedata implements Rateable {
 	static transients = ['baseUrl']
 	
 	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
-		String thumbnailUrl = '';
+        String thumbnailUrl = '';
         def basePath = '';
         if(this?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()) {
             basePath = grailsApplication.config.speciesPortal.observations.serverURL
