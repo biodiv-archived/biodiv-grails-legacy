@@ -276,3 +276,5 @@ update recommendation_vote set common_name_reco_id = 316619 where common_name_re
 
 delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id or r.id=rv.common_name_reco_id where r.id in (select r.id from recommendation r , tmp_table_update_taxonconcept t where lower(r.name)=lower(t.name) and ((r.language_id is not null and t.c_lang is not null and r.language_id = t.c_lang) or (r.language_id is null and t.language_id is null)) and r.is_scientific_name = false and r.taxon_concept_id = t.taxonid ));
 
+#added by sathish for add references
+update species_field SET description = 'dummy' where field_id = 81 and description = '';
