@@ -631,12 +631,9 @@ class SpeciesUploadService {
         //storing current locale language information
         //this will be available in mappingConfig for each field
         if(headerMarkers) {
-            println headerMarkers.class;
             def newHeaders = new JSONObject();
             headerMarkers.each {
-                println it.class
                 it.value.language = params.locale_language.id.toString();
-                println it
                 newHeaders.put(it.key, it.value);
             }
             headerMarkers = newHeaders;
@@ -784,7 +781,8 @@ class SpeciesUploadService {
 		return sList.unique() 
 	}
  
- 	private void unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+ 	boolean unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+        println "++++++++++++++++++++++"
  		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
 		List sFieldToDelete = specificSFields.intersect(sFields)
 		
@@ -792,15 +790,18 @@ class SpeciesUploadService {
 			and{
 				eq('taxonDefinition', s.taxonConcept)
 				eq('uploader', user)
-				between("uploadTime", sbu.startDate, sbu.endDate)
+				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
-
+        println specificSFields
+        println sFieldToDelete
+        println taxonReg
+        println  TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept)
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			try{
 				Featured.deleteFeatureOnObv(s, user)
-				if(s.userGroups){
+				if(s.userGroups) {
 					List ugIds = s.userGroups.collect {it.id}
 					ugIds.each { ugId ->
 						def ug = UserGroup.get(ugId) 
@@ -809,9 +810,11 @@ class SpeciesUploadService {
 						ug.save(flush:true, failOnError:true)
 					}
 				}
-				if(!s.save(flush:true)){
+				if(!s.save(flush:true)) {
 					s.errors.allErrors.each { log.error it }
+                    return false
 				}
+                return true;
 			}
 			catch (Exception e) {
 				log.error "Error in unposting from usergroup"
@@ -819,6 +822,8 @@ class SpeciesUploadService {
 				throw e
 			}
 		}
+        log.debug "Can't delete species"
+        return false
  	}
 	
 	private void rollBackSpeciesUpdate(Species s, List sFields, List resources, SUser user, SpeciesBulkUpload sbu) throws Exception {

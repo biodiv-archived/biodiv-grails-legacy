@@ -149,10 +149,21 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		return Follow.fetchIsFollowing(this, user)
 	}
 
+    String title() {
+        return this.title;
+    }
+
     String fetchSpeciesCall(){
 		return this.title;
 	}
 
+    String notes(Language userLanguage = null) {
+        return this.notes?:'';
+    }
+
+    String summary(Language userLanguage = null) {
+        return this.notes?:'';
+    }
 
 	def getOwner() {
 		return author;
@@ -176,10 +187,6 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-
-    String notes() {
-        return this.notes;
-    }
     
     Resource mainImage() {  
 		String reprImage = "Document.png"

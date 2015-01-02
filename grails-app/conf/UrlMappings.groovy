@@ -32,7 +32,11 @@ class UrlMappings {
 
 
 		"/user/$action?/$id?" { controller = 'SUser' }
-		"/api/user/$action?/$id?" { controller = 'SUser' }
+		"/api/user/$action?/$id?" { 
+            controller = 'SUser' 
+            resultType = 'json'
+        
+        }
 
 		"/" {
             controller='home'
@@ -47,13 +51,16 @@ class UrlMappings {
         }
 
         "/api/login" {
+            resultType = 'json'
             
         }
 
         "/api/validate" {
+            resultType = 'json'
         }
 
         "/api/logout" {
+            resultType = 'json'
         }
 
         name oauth: "/api/oauth/${action}/${provider}"(controller: 'oauth')
@@ -61,9 +68,11 @@ class UrlMappings {
         "/api/register/forgotPassword" {
             controller = 'register'
             action = 'forgotPasswordMobile'
+            resultType = 'json'
         }
 
         "/api/$controller/$action?/$id?"{ 
+            resultType = 'json'
         }
 
 		"/static/$path"(controller:"species", action:"staticContent")

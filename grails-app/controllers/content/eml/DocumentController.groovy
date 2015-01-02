@@ -72,14 +72,27 @@ class DocumentController extends AbstractObjectController {
 	}
 
 	def show() {
-		def documentInstance = Document.get(params.id)
-		if (!documentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "browser")
+		//cache "content"
+        params.id = params.long('id');
+
+		def documentInstance = params.id ? Document.get(params.id):null;
+		if (!params.id || !documentInstance) {
+            if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
+                render (['success':false, 'msg':"Coudn't find document with id ${params.id}"] as JSON)
+                return
+            } else {
+			    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+			    redirect(action: "browser")
+            }
 		}
 		else {
+             if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
+                render documentInstance as JSON;
+                return;
+            } 
+
 			def userLanguage = utilsService.getCurrentLanguage(request);
-			[documentInstance: documentInstance,userLanguage: userLanguage]
+			return [documentInstance: documentInstance, userLanguage: userLanguage]
 		}
 	}
 

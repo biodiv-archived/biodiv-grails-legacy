@@ -388,7 +388,8 @@ beans = {
 
         marshallers = [
             new ObservationMarshaller(),
-            new SpeciesMarshaller()
+            new SpeciesMarshaller(),
+            new DocumentMarshaller()
         ]
     }
 

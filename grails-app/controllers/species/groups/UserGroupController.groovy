@@ -1157,7 +1157,6 @@ class UserGroupController {
    }
    
    def bulkPost() {
-	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
        def resObj = r.remove('resourceObj')
 	   if(params.pullType == 'single'){

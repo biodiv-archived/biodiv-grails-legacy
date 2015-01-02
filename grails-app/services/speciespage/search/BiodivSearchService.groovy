@@ -312,7 +312,11 @@ class BiodivSearchService extends AbstractSearchService {
                     }
     */
                     if(instance) {
-                        instanceList.add([instance:instance, containers:containerInstances]);
+                        if(params.resultType?.equalsIgnoreCase("json")) {
+                            instanceList.add([id:instanceId, object_type:className, title:instance.title(), summary:instance.summary(params.userLanguage), containers:containerInstances]);
+                        } else {
+                            instanceList.add([id:instanceId, object_type:className, instance:instance, containers:containerInstances]);
+                        }
                     } else {
                         log.error "${doc} has invalid id in search index. May be out of sync from db"
                     }
@@ -321,7 +325,7 @@ class BiodivSearchService extends AbstractSearchService {
             }
         }
 
-        return [responseHeader:responseHeader, instanceList:instanceList, instanceTotal:noOfResults, objectTypes:objectTypes, uGroups:uGroups, queryParams:queryParams, activeFilters:activeFilters]
+        return [responseHeader:responseHeader, queryParams:queryParams, activeFilters:activeFilters, instanceTotal:noOfResults, instanceList:instanceList, objectTypes:objectTypes, uGroups:uGroups]
 
     }
 
@@ -568,7 +572,7 @@ class BiodivSearchService extends AbstractSearchService {
         }
 
         if(params.object_type && !params.object_type.equalsIgnoreCase('All')){
-            paramsList.add('fq', searchFieldsConfig.OBJECT_TYPE+":("+params.object_type+")");
+            paramsList.add('fq', searchFieldsConfig.OBJECT_TYPE+":("+params.object_type.capitalize()+")");
             queryParams["object_type"] = params.object_type
             activeFilters["object_type"] = params.object_type
         }

@@ -58,6 +58,12 @@ class SpeciesController extends AbstractObjectController {
 
 	def list() {
 		def model = speciesService.getSpeciesList(params, 'list');
+
+        if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
+            render model as JSON;
+            return
+        }
+
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
 		params.action="list"
@@ -185,7 +191,7 @@ class SpeciesController extends AbstractObjectController {
 
 		def speciesInstance = params.id ? Species.get(params.id):null;
 		if (!params.id || !speciesInstance) {
-            if(request.getHeader('X-Auth-Token')) {
+            if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
                 render (['success':false, 'msg':"Coudn't find species with id ${params.id}"] as JSON)
                 return
             } else {
@@ -199,7 +205,7 @@ class SpeciesController extends AbstractObjectController {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                    // flash.message = "Sorry, you don't have permission to contribute to this species ${}. Please request for permission below."
-                    if(request.getHeader('X-Auth-Token')) {
+                    if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
                         render (['success':false, 'msg':flash.message] as JSON)
                         return
                     } else {
@@ -210,7 +216,7 @@ class SpeciesController extends AbstractObjectController {
                 }
             }
             
-            if(request.getHeader('X-Auth-Token')) {
+            if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
                 render speciesInstance as JSON;
                 return;
             } 
@@ -613,8 +619,6 @@ class SpeciesController extends AbstractObjectController {
                 }
                 result['act'] = params.act;
                 List html = [];
-                println ")))))))"
-                println result.content
                 result.content.each {sf ->
                     boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
                     html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor,'userLanguage':userLanguage]);
@@ -727,17 +731,42 @@ class SpeciesController extends AbstractObjectController {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
-				speciesInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], springSecurityService.currentUser, null);
+                if(success) {
+				    speciesInstance.delete(flush: true)
+				    speciesSearchService.delete(speciesInstance.id);
+				    flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    if(request.getHeader('X-Auth-Token')) {
+                        render (['success':true, msg:flash.message]) as JSON;
+                        return;
+                    }
+                } else {
+				    flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    if(request.getHeader('X-Auth-Token')) {
+                        render (['success':false, msg:flash.message]) as JSON;
+                        return;
+                    }
+                }
+
 				redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                if(request.getHeader('X-Auth-Token')) {
+                    render (['success':false, msg:flash.message, 'errors':[e.getMessage()]]) as JSON;
+                    return;
+                }
+
+
 				redirect(action: "show", id: params.id)
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+            if(request.getHeader('X-Auth-Token')) {
+                render (['success':false, msg:flash.message]) as JSON;
+                return;
+            }
 			redirect(action: "list")
 		}
 	}
@@ -1015,7 +1044,6 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def pullImageForSpecies() {
-        log.debug params
         //pass that same species
         Language userLanguage = utilsService.getCurrentLanguage(request);
         params.locale_language = userLanguage;

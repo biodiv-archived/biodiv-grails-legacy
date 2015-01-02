@@ -314,7 +314,7 @@ class ObservationController extends AbstractObjectController {
 	def show() {
         params.id = params.long('id');
         def msg;
-        if(request.getHeader('X-Auth-Token')) {
+        if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
             
             if(params.id) {
     			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)

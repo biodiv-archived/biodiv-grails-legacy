@@ -538,6 +538,22 @@ http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=s
 }
 {code}
 
+h4. requestExport
+
+* *Path* : /api/observation/requestExport
+* *Parameters* :
+** filterUrl : filterUrl as in list call
+** downloadType
+** notes
+** source
+** *REST Method* : GET | POST
+** Permission : admin
+** Notes : the download will be scheduled and a link to download will be send to the requester email.
+* *Request* :
+{code}
+
+{code}
+
 
 
 
