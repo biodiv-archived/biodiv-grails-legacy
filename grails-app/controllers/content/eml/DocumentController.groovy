@@ -9,7 +9,7 @@ import speciespage.search.DocumentSearchService;
 import static groovyx.net.http.Method.*;
 import static groovyx.net.http.ContentType.*
 import groovyx.net.http.*
-
+import content.eml.DocSciName;
 
 class DocumentController extends AbstractObjectController {
 
@@ -235,6 +235,71 @@ class DocumentController extends AbstractObjectController {
 
 	
 	def tagcloud = { render (view:"tagcloud") }
+
+	private void swapDisplayOrder(docSciIns1, docSciIns2){
+	 	def temp = docSciIns1.displayOrder
+       	docSciIns1.displayOrder = docSciIns2.displayOrder
+       	docSciIns2.displayOrder = temp;
+        return
+    }
+
+	def fetchDocSciName(params){
+		def docSciNameInstance = DocSciName.get(params.instanceId.toLong())
+        def disOrder = docSciNameInstance.displayOrder;
+        def docIns = Document.read(params.parentInsId.toLong())
+        def resNL = DocSciName.withCriteria{
+        	eq('document',docIns)
+                if(params.typeOfChange == "up"){
+                    gt('displayOrder', disOrder)
+                }
+                else{
+                    lt('displayOrder', disOrder)
+                }
+            
+            maxResults(1)
+            if(params.typeOfChange == "up"){
+                order("displayOrder", "asc")
+            }
+            else{
+                order("displayOrder", "desc")
+            }
+        }
+        if(resNL.size() != 0){
+            return resNL.get(0)
+        }
+        else{
+            return null
+        }
+    }
+
+	def changeDisplayOrder = {
+		def docSciNameInstance = DocSciName.get(params.instanceId.toLong())
+        def disOrder = docSciNameInstance.displayOrder;
+        //println "========DIS ORDER===== " + disOrder;
+        def otherDocSciName = fetchDocSciName(params);
+        //println "========otherDocSciName ===== " + otherDocSciName;
+        def msg
+        def success
+        if(otherDocSciName){
+            swapDisplayOrder(docSciNameInstance, otherDocSciName);
+            if(!docSciNameInstance.save(flush:true)){
+                docSciNameInstance.errors.each { log.error it }        
+            }
+            if(!otherDocSciName.save(flush:true)){
+                otherDocSciName.errors.each { log.error it }        
+            }
+            success = true
+            msg = "order changed"
+        }
+        else{
+            msg = "Its already at the extreme"
+            success = false
+        }
+                def result = [success:success, msg:msg]
+        render result as JSON
+    }
+
+	
 
 	//// SEARCH //////
 	/**

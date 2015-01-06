@@ -220,12 +220,19 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	Map fetchSciNames(){
 		Map nameValue = [:]
 		Map nameParseValues = [:]
-		List docSciNames = DocSciName.findAllByDocument(this)
+		Map nameId = [:]
+		def c = DocSciName.createCriteria()
+			def results = c.list {
+			eq("document", this)
+		    order("displayOrder", "desc")
+			}
+		def docSciNames = results ;//DocSciName.findAllByDocument(this)
 		docSciNames.each{ dsn ->
 		nameValue.put(dsn.scientificName,dsn.frequency)
 		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
+		nameId.put(dsn.scientificName,dsn.id)
 		}
-		return [nameValues:nameValue, nameparseValue:nameParseValues]
+		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId]
 
 	}
 

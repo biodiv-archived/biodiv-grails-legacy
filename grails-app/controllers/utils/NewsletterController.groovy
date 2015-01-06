@@ -322,7 +322,7 @@ class NewsletterController {
     }
 
     def fetchNewsLetter(params){
-        def nlIns = Newsletter.get(params.pageId.toLong())
+        def nlIns = Newsletter.get(params.instanceId.toLong())
         def disOrder = nlIns.displayOrder;
         def newDisOrder = (params.typeOfChange == "up")?(disOrder+1):(disOrder-1)
         def ug = observationService.getUserGroup(params)
@@ -360,7 +360,7 @@ class NewsletterController {
     }
 
     def changeDisplayOrder = {
-        def nlIns = Newsletter.get(params.pageId.toLong())
+        def nlIns = Newsletter.get(params.instanceId.toLong())
         def disOrder = nlIns.displayOrder;
         def otherNewsLetter = fetchNewsLetter(params); //how to fetch its group specific
         def msg

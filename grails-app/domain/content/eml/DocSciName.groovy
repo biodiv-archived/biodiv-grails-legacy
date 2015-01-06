@@ -10,6 +10,7 @@ class DocSciName {
 	int frequency;
 	String offsetValues;
 	String canonicalForm;
+	int displayOrder;
 
 	static constraints = {
 		offsetValues (size:0..2000)
