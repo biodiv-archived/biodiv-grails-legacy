@@ -58,7 +58,9 @@ class ObservationController extends AbstractObjectController {
     def messageSource;
     def commentService;
     def utilsService;
+    def speciesService;
     def setupService;
+    def springSecurityFilterChain
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -266,7 +268,7 @@ class ObservationController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
 	def flagDeleted() {
 		def result = observationService.delete(params)
-        if(request.getHeader('X-Auth-Token')) {
+        if(params.format?.equalsIgnoreCase("json")) {
             result.remove('url')
             render result as JSON;
             return;
@@ -289,19 +291,18 @@ class ObservationController extends AbstractObjectController {
 	private saveAndRender(params, sendMail=true){
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
-        /*if(request.getHeader('X-Auth-Token')) {
+        /*if(params.format?.equalsIgnoreCase("json")) {
             if(!result.success) result.remove('observationInstance');
             render result as JSON;
             return
 
         }*/
 		if(result.success){
-            if(request.getHeader('X-Auth-Token')) 
+            if(params.format?.equalsIgnoreCase("json")) 
                 params.isMobileApp = true;
-                println "==========================="+params
 			forward (action: 'addRecommendationVote', params:params);
 		} else{
-            if(request.getHeader('X-Auth-Token')) {
+            if(params.format?.equalsIgnoreCase("json")) {
                 result.remove('observationInstance');
                 render result as JSON
             } else {
@@ -314,7 +315,7 @@ class ObservationController extends AbstractObjectController {
 	def show() {
         params.id = params.long('id');
         def msg;
-        if(request.getHeader('X-Auth-Token')) {
+        if(params.format?.equalsIgnoreCase("json")) {
             
             if(params.id) {
     			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
@@ -652,7 +653,7 @@ class ObservationController extends AbstractObjectController {
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
-                    if(request.getHeader('X-Auth-Token')) {
+                    if(params.format?.equalsIgnoreCase("json")) {
                         def resourcesList = [];
                         for(r in resourcesInfo) {
                             def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
@@ -711,7 +712,7 @@ class ObservationController extends AbstractObjectController {
 			params.action = 'addRecommendationVote'
 		}*/
 		params.author = springSecurityService.currentUser;
-        boolean isMobileApp = request.getHeader('X-Auth-Token') || params.isMobileApp; 
+        boolean isMobileApp = params.format?.equalsIgnoreCase("json") || params.isMobileApp; 
         
         try {
             params.obvId = params.obvId?.toLong();
@@ -916,7 +917,7 @@ class ObservationController extends AbstractObjectController {
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-                    if(request.getHeader('X-Auth-Token')) {
+                    if( params.format?.equalsIgnoreCase("json")) {
                         def errors = [];
                         recommendationVoteInstance.errors.allErrors .each {
                             def formattedMessage = messageSource.getMessage(it, null);
@@ -928,7 +929,7 @@ class ObservationController extends AbstractObjectController {
 				}
 			} catch(e) {
 				e.printStackTrace();
-                if(request.getHeader('X-Auth-Token')){
+                if( params.format?.equalsIgnoreCase("json")){
                 	msg = messageSource.getMessage("default.error.adding.vote", [e.getMessage()] as Object[], RCU.getLocale(request))
                     render (['status':'error', 'success':'false', 'msg':msg] as JSON);
                 } else{
@@ -939,7 +940,7 @@ class ObservationController extends AbstractObjectController {
 		} else {
 		    flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
 			log.error flash.message;
-            if(request.getHeader('X-Auth-Token')){
+            if( params.format?.equalsIgnoreCase("json")){
                 render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
             } else{
                 //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -991,7 +992,7 @@ class ObservationController extends AbstractObjectController {
 			   return
 		   } catch(e) {
 			   e.printStackTrace();
-               if(request.getHeader('X-Auth-Token')){
+               if( params.format?.equalsIgnoreCase("json")){
                    render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
                } else{
                    //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -1000,7 +1001,7 @@ class ObservationController extends AbstractObjectController {
 	   } else {
            flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
            log.error flash.message;
-           if(request.getHeader('X-Auth-Token')){
+           if( params.format?.equalsIgnoreCase("json")){
                render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
            } else{
                //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -1044,7 +1045,7 @@ class ObservationController extends AbstractObjectController {
                 speciesName:observationInstance.fetchSpeciesCall()?:'']
 
                 if(results?.recoVotes.size() > 0) {
-                    if(request.getHeader('X-Auth-Token')) {
+                    if( params.format?.equalsIgnoreCase("json")) {
                         result = results;
                         result.success = true;
                     } 
@@ -1652,6 +1653,9 @@ class ObservationController extends AbstractObjectController {
     }
 
     def testy(){
-	    setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    //setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    //println speciesService.checking();
+    	//return false;
+        render springSecurityFilterChain
     }
 }

@@ -1,0 +1,562 @@
+h3. UserGroup
+
+h4. show 
+
+* *Path* : /api/group/show/id 
+* *Parameters* : id long format
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/show/3
+{code}
+* *Response* :
+** Successful response
+{code}
+
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Valid id is required"
+}
+{code}
+
+h4. list 
+
+* *Path* : /api/userGroup/list 
+* *Parameters* : 
+** sGroup : filter by species group. Default is ALL
+** habitat : filter by habitat. Default is ALL
+** featureBy : true|false. default false
+** tag : tag name
+** name : query by group name string
+** user : filter by groups having user as member
+** observation : filter by groups by observation
+
+** max: limit of number of results. default 24
+** offset : offset in to the result set. default 0
+** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
+
+* *REST method* : GET
+* *Requests* :
+** __Documents with a tag__
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/list
+{code}
+
+* *Response* :
+{code}
+{
+    "totalUserGroupInstanceList": [ ... ],
+        "instanceTotal": 34,
+        "queryParams": {
+            "isDeleted": false,
+            "max": 24,
+            "offset": 0
+        },
+        "activeFilters": {
+            "append": true
+        },
+        "resultType": "user group"
+}
+
+{code}
+
+h4. user 
+
+* *Path* : /api/userGroup/user 
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+** max : integer. Default 12 and max 100
+** offset : integer. Default 0
+** sort : sort users on any of user properties
+** onlyMembers : true | false. return only members of the group. Default false returns all members including founders and moderators
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/user
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "result": [
+    {
+        "id": 6465,
+            "name": "Sachin M H",
+            "icon": "http://localhost/biodiv/users/user_large.png"
+    },
+    {
+        "id": 6463,
+        "name": "Deepika",
+        "icon": "http://localhost/biodiv/users/user_large.png"
+    }
+    ]
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+h4. founders
+
+* *Path* : /api/userGroup/founders
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+** max : integer. Default 12 and max 100
+** offset : integer. Default 0
+** sort : sort users on any of user properties
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/founders
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "result": [
+    {
+        "id": 6465,
+            "name": "Sachin M H",
+            "icon": "http://localhost/biodiv/users/user_large.png"
+    },
+    {
+        "id": 6463,
+        "name": "Deepika",
+        "icon": "http://localhost/biodiv/users/user_large.png"
+    }
+    ]
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+h4. moderators 
+
+* *Path* : /api/userGroup/moderators
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+** max : integer. Default 12 and max 100
+** offset : integer. Default 0
+** sort : sort users on any of user properties
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/moderators
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "result": [
+    {
+        "id": 6465,
+            "name": "Sachin M H",
+            "icon": "http://localhost/biodiv/users/user_large.png"
+    },
+    {
+        "id": 6463,
+        "name": "Deepika",
+        "icon": "http://localhost/biodiv/users/user_large.png"
+    }
+    ]
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+h4. joinUs 
+
+* *Path* : /api/apiKey/userGroup/joinUs
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+* *REST method* : GET
+* *Permissions* : logged in user
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/joinUs
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "statusComplete": false,
+        "shortMsg": "Already a member.",
+        "msg": "Already a member."
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+h4. leaveUs 
+
+* *Path* : /api/apiKey/userGroup/leaveUs
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+* *REST method* : GET
+* *Permissions* : logged in user
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/leaveUs
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "statusComplete": false,
+        "shortMsg": "Thank you",
+        "msg": "Thank you for being with us"
+}
+{code}
+
+
+h4. inviteMembers 
+
+* *Path* : /api/apiKey/userGroup/inviteMembers
+* *Parameters*
+** memberUserIds : csv of userIds
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+* *REST method* : GET
+* *Permissions* : logged in user
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/inviteMembers
+id:1
+memberUserIds:2,3
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "statusComplete": true,
+        "shortMsg": "Sent request",
+        "msg": "Successfully sent invitation message to 2 member(s)"
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+h4. inviteExperts 
+
+* *Path* : /api/apiKey/userGroup/inviteExperts
+* *Parameters*
+** memberUserIds : csv of userIds
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+* *REST method* : GET
+* *Permissions* : logged in user
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/inviteExperts
+id:1
+memberUserIds:2,3
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "statusComplete": true,
+        "shortMsg": "Sent request",
+        "msg": "Successfully sent invitation message to 2 member(s)"
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+h4. requestMembership 
+
+* *Path* : /api/apiKey/userGroup/requestMembership
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+* *REST method* : GET
+* *Permissions* : logged in user
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/requestMembership
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "statusComplete": true,
+        "shortMsg": "Sent request",
+        "msg": "Successfully sent invitation message to founders"
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+h4. requestModeratorship 
+
+* *Path* : /api/apiKey/userGroup/requestModeratorship
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+* *REST method* : GET
+* *Permissions* : logged in user
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/requestModeratorship
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "statusComplete": true,
+        "shortMsg": "Sent request",
+        "msg": "Successfully sent invitation message to founders"
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+
+
+
+h4. bulkPost
+
+* *Path* : /api/userGroup/bulkPost
+* *Parameters* :
+** userGroups  : csv's of usergroup ids
+** objectIds : csv's of object ids
+** objectType : object class name. Species|Observation|Document|Checklist
+** filterUrl : any filter parameters url applied on list api call 
+** webaddress : the usergroup webaddress to which these objects belong
+** pullType : single | bulk
+** selectionType : selectAll | 
+** sumbitType : post | remove
+** author : user id who has permission to post this object. default : current logged in user
+** *REST Method* : GET
+** Permissions : 
+* *Request* :
+{code}
+{code}
+* *Response* :
+** on success
+{code}
+{code}
+** in case of error 
+{code}
+{code}
+
+h4. observation
+
+* *Path* : /api/userGroup/observation
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+** max : integer. Default 12 and max 100
+** offset : integer. Default 0
+
+** sGroup : speciesGroupId. default all
+** habitat : habitat id. default all
+** user : observation author id
+** type : nearBy|...
+** lat : latitude value in decimal
+** long: longitude value in float
+** daterangepicker_start , daterangepicker_end 
+** bounds : swLat, swLong, neLat, neLon 
+
+** isFlagged : true| false. default false
+** featureBy : true|false. default false
+** isChecklistOnly : true| false. default false
+
+** tag : tag name
+** webaddress : to filter observations with group with this webaddress
+** speciesName:'Unknown' to get all unidentified observations
+
+** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/observation
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "observationInstanceList": [ ... ],
+        "allObservationCount": 14530,
+        "checklistCount": 116,
+        "speciesGroupCountList": [],
+        "queryParams": {
+            "isDeleted": false,
+            "userGroupId": 1,
+            "userGroup": 1,
+            "max": 1,
+            "offset": 0
+        },
+        "activeFilters": {},
+        "instanceTotal": 14530,
+        "observationCount": 14414
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+h4. getFeaturedObservations
+
+* *Path* : /api/userGroup/getFeaturedObservations
+* *Parameters*
+** id : usergroup id
+** webaddress : usergroup webaddress. Either id or webaddress is required
+** limit : integer. Default 9 and max 100
+** offset : integer. Default 0
+
+** sGroup : speciesGroupId. default all
+** habitat : habitat id. default all
+** user : observation author id
+** type : nearBy|...
+** lat : latitude value in decimal
+** long: longitude value in float
+** daterangepicker_start , daterangepicker_end 
+** bounds : swLat, swLong, neLat, neLon 
+
+** isFlagged : true| false. default false
+** isChecklistOnly : true| false. default false
+
+** tag : tag name
+** webaddress : to filter observations with group with this webaddress
+** speciesName:'Unknown' to get all unidentified observations
+
+** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/getFeaturedObservations
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "observations": [
+    {
+        "id": 269251,
+            "sGroup": "Plants",
+            "habitat": "Rocky Outcrops",
+            "imageLink": "http://indiabiodiversity.localhost.org/biodiv/observations//bb7b01a2-39a8-4c7d-86b7-626fdcdc6706/IMG_2294_th1.jpg",
+            "notes": "<p>\r\n\tWas collected from laterite hillucks surrounding the wetland.</p>\r\n",
+            "summary": "Observed by <b><a href='/user/show/3034'>Aditi Lele</a></b> at <b>'Thazhinchira Wetland'</b> on <b>September 15, 2012</b>.",
+            "lat": 10.170826,
+            "lng": 76.26917,
+            "observedOn": 1347647400000,
+            "url": "/observation/show/269251",
+            "title": "Senganthal Malar Or Karthigai Malar Or Kalappaikkilangu",
+            "type": "observation"
+    }
+    ],
+        "count": null
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+
+h4. getUserUserGroups
+
+* *Path* : /api/userGroup/getUserUserGroups
+* *Parameters*
+** id : user id
+** limit : integer. Default 9 and max 100
+** offset : integer. Default 0
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/userGroup/getUserUserGroups?id=1184
+{code}
+* *Response* :
+** Successful response
+{code}
+
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "msg": "UserGroup not found with id null"
+}
+{code}
+
+

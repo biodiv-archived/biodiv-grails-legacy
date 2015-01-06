@@ -271,16 +271,27 @@
 									</div>
 								</div>
 							</div>
-						</div>
-						<div class="super-section" style="clear: both;">
-							<h5>
-								<i class="icon-cog"></i><g:message code="suser.edit.actions" />
-							</h5>
-                                                        <ul>
-                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
-                                                        </ul>
+                        </div>
+                        <div class="super-section" style="clear: both;">
+                            <h5>
+                                <i class="icon-cog"></i><g:message code="suser.edit.actions" />
+                            </h5>
+                            <ul>
+                                <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
 
-                                                </div>
+                                <sUser:isAdmin model="['user':user]">
+                                <li>
+                                    <a id="generateAppKey"><g:message code="button.generate.appKey" /></a>
+                                    <div id="appKey" class="text-info" style="display:none;">
+                                        
+                                    </div>
+                                </li>
+                                </sUser:isAdmin>
+
+
+                            </ul>
+
+                        </div>
 
 						<sUser:isAdmin model="['user':user]">
 							<div class="super-section" style="clear: both;">
@@ -542,6 +553,31 @@
 					});
            		} 
      		});
+
+
+            $('#generateAppKey').click(function() {
+                $.ajax({
+                    url:'${g.createLink(controller:'SUser', action:'generateAppKey')}',
+                    dataType: 'json',
+                    type: 'GET',
+                    
+                    success: function(response, statusText, xhr, form) {
+                        if(response.success == true) {
+                            $('#appKey').removeClass('text-error').html("Generated app key is : "+response.appKey+"<br/>"+response.msg).show();
+                        } else {
+                            $('#appKey').removeClass('text-info').addClass('text-error').html(response.msg+" "+response.errors).show();
+                        }
+                    }, error:function (xhr, ajaxOptions, thrownError){
+                        handleError(xhr, ajaxOptions, thrownError, this.success, function() {
+                            var response = $.parseJSON(xhr.responseText);
+                            if(response.status == false){
+                                $('#appKey').removeClass('text-info').addClass('text-error').html(response.msg+" "+response.errors).show();
+                            }
+
+                        });
+                    } 
+                });
+            });
 		});
 	</r:script>
 

@@ -23,17 +23,23 @@ class SearchController {
     def utilsService;
     static defaultAction = "select"
 
+    /**
+    *
+    */
     def select () {
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
-
+        params['userLangauge'] = utilsService.getCurrentLanguage(request); 
+       
         def model = biodivSearchService.select(params);
-        model['userLanguage'] = utilsService.getCurrentLanguage(request); 
-
+        model['userLanguage'] = params.userLanguage;
         if(params.loadMore?.toBoolean()){
             params.remove('isGalleryUpdate');
             render(template:"/search/showSearchResultsListTemplate", model:model);
             return;
-        } else if(request.getHeader('X-Auth-Token') || params.resultType?.equalsIgnoreCase("json")) {
+        } else if(params.format?.equalsIgnoreCase("json")) {
+            model.remove('userLanguage');
+            model.remove('responseHeader');
+
             render model as JSON
         } else if(!params.isGalleryUpdate?.toBoolean()){
             params.remove('isGalleryUpdate');
@@ -68,6 +74,9 @@ class SearchController {
         render suggestions as JSON 
     }
 
+    /**
+    *
+    */
     def search() {
         NamedList paramsList = new NamedList()
         params.each {key,value ->

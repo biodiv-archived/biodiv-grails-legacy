@@ -21,6 +21,7 @@ import species.auth.FacebookAuthUtils;
 import species.auth.OpenIDAuthenticationFilter;
 import species.auth.OpenIDAuthenticationProvider;
 import species.auth.OpenIdAuthenticationFailureHandler;
+import species.auth.AppKeyFilter;
 
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
@@ -388,7 +389,8 @@ beans = {
 
         marshallers = [
             new ObservationMarshaller(),
-            new SpeciesMarshaller()
+            new SpeciesMarshaller(),
+            new DocumentMarshaller()
         ]
     }
 
@@ -402,7 +404,7 @@ beans = {
     }
 
     /* restAuthenticationFilter */
-    restAuthenticationFilter(species.auth.RestAuthenticationFilter) {
+/*    restAuthenticationFilter(RestAuthenticationFilter) {
         authenticationManager = ref('authenticationManager')
         authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
@@ -412,5 +414,8 @@ beans = {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
+*/
 
 }
+
+

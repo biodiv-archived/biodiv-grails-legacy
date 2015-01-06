@@ -12,6 +12,7 @@ class CommentController {
 
 	@Secured(['ROLE_USER'])
 	def addComment() {
+        println "++++++++++*************************************"
 		params.author = springSecurityService.currentUser;
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		
@@ -56,7 +57,7 @@ class CommentController {
 		def olderTimeRef = (comments) ? (comments.last().lastUpdated.time.toString()) : null
 		def remainingCommentCount = (comments) ? getRemainingCommentCount(comments.last().lastUpdated.time.toString(), params) : 0
 		def result = [olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
-		if(request.getHeader('X-Auth-Token')) {
+		if(params.format?.equalsIgnoreCase("json")) {
 			result['commentList'] = comments	
 		}else{
 			result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
@@ -84,7 +85,7 @@ class CommentController {
 		def comments = _getAllNewerComments(params);
 		if(!comments.isEmpty()){
 			result.putAll([newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
-			if(request.getHeader('X-Auth-Token')) {
+			if(params.format?.equalsIgnoreCase("json")) {
 				result['commentList'] = comments
 			}else{
 				def userLanguage = utilsService.getCurrentLanguage(request);

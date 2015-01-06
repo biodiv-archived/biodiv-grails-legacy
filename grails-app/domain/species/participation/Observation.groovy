@@ -389,11 +389,11 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return title;
 	}
 
-    String notes() {
+    String notes(Language userLanguage=null) {
         return this.notes
     }
 
-    String summary() {
+    String summary(Language userLanguage=null) {
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
 		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
         desc += " at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";

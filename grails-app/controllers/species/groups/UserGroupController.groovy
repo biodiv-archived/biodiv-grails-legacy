@@ -48,7 +48,6 @@ class UserGroupController {
 	}
 
 	def activity = {
-		log.debug params
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			[userGroupInstance: userGroupInstance]
@@ -57,6 +56,12 @@ class UserGroupController {
 	
 	def list() {
 		def model = getUserGroupList(params);
+        if(params.format?.equalsIgnoreCase("json")) {
+            model.remove('totalUserGroupInstanceList')
+            render model as JSON;
+            return
+        }
+
 		if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
 		} else{
@@ -119,8 +124,6 @@ class UserGroupController {
 	}
 
 	def listRelated = {
-		log.debug params
-
 		switch(params.filterProperty) {
 			case 'featuredObservations':
 				redirect  url: uGroup.createLink(mapping: 'userGroup', action:'observation', params:['webaddress':params.webaddress]);
@@ -143,7 +146,6 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		log.debug params
 		def userGroupInstance = new UserGroup()
 		userGroupInstance.properties = params
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
@@ -151,7 +153,6 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def save() {
-		log.debug params;
 		params.domain = Utils.getDomainName(request)
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def userGroupInstance = userGroupService.create(params);
@@ -171,19 +172,29 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
+            if(params.format?.equalsIgnoreCase("json")) {
+                render userGroupInstance as JSON
+                return
+            }
+
 			def userLanguage = utilsService.getCurrentLanguage(request);
 			if(params.pos) {
 				int pos = params.int('pos');
 				def prevNext = getPrevNextUserGroups(pos);
 				if(prevNext) {
-					return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams,userLanguage:userLanguage]
+					return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams, userLanguage:userLanguage]
 				} else {
-					return [userGroupInstance: userGroupInstance,userLanguage:userLanguage]
+					return [userGroupInstance: userGroupInstance, userLanguage:userLanguage]
 				}
 			} else {
-				return [userGroupInstance: userGroupInstance,userLanguage:userLanguage]
+				return [userGroupInstance: userGroupInstance, userLanguage:userLanguage]
 			}
-		}
+		} else if(params.format?.equalsIgnoreCase("json")) {
+        	msg = messageSource.getMessage("id.required", ['Valid id'] as Object[], RCU.getLocale(request))
+                render (['success':false, 'msg':msg] as JSON)
+                return
+        }
+
 	}
 
 	/**
@@ -311,17 +322,21 @@ class UserGroupController {
 			userGroup = UserGroup.findByWebaddress(webaddress)
 		}
 		
-		if (!userGroup && redirectToList) {
-			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
-			redirect url: uGroup.createLink(controller:'userGroup', action:'list')
+		if (!userGroup) {
+			flash.message = "${message(code: 'default.not.found.message', args: ['UserGroup', id?:webaddress])}"
+            if(redirectToList) {
+			    redirect url: uGroup.createLink(controller:'usergroup', action:'list')
+                return;
+            } else {
+                render ([success:false, msg:flash.message] as JSON)
+                return;
+            }
 		}
 		userGroup
 	}
 
 	def user = {
-		println "user"
-		log.debug params
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -334,7 +349,7 @@ class UserGroupController {
 			allMembers = userGroupInstance.getAllMembers(params.max, params.offset, params.sort);
 		}
 		
-		if(params.isAjaxLoad?.toBoolean()) {
+		if(params.isAjaxLoad?.toBoolean() || params.format?.equalsIgnoreCase('json')) {
 			def membersJSON = []
 			for(m in allMembers) {
 				membersJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
@@ -373,7 +388,7 @@ class UserGroupController {
 	}
 	
 	def founders = {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -381,7 +396,7 @@ class UserGroupController {
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
 
-		if(params.isAjaxLoad?.toBoolean()) {
+		if(params.isAjaxLoad?.toBoolean() || params.format?.equalsIgnoreCase('json')) {
 			def foundersJSON = []
 			for(m in founders) {
 				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
@@ -395,7 +410,7 @@ class UserGroupController {
 	}
 
 	def moderators = {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -403,7 +418,7 @@ class UserGroupController {
 
 		def experts = userGroupInstance.getExperts(params.max, params.offset);
 
-		if(params.isAjaxLoad?.toBoolean()) {
+		if(params.isAjaxLoad?.toBoolean() || params.format?.equalsIgnoreCase('json')) {
 			def expertsJSON = []
 			for(m in experts) {
 				expertsJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
@@ -417,8 +432,14 @@ class UserGroupController {
 	}
 
 	def observation = {
-		log.debug params;
 		def model = getUserGroupObservationsList(params);
+        if(params.format?.equalsIgnoreCase('json')) {
+            model.remove('userGroupId');
+            model.remove('userGroupInstance');
+            render model as JSON
+            return;
+        }
+
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
@@ -443,7 +464,7 @@ class UserGroupController {
 	}
 	
 	def getUserGroupObservationsList(params) {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -502,7 +523,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def joinUs() {
 		def msg
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) {
 			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
 			render (['success':true,'statusComplete':false, 'msg':msg] as JSON);
@@ -536,7 +557,7 @@ class UserGroupController {
 		log.debug members;
 
 		if(members) {
-			def userGroupInstance = findInstance(params.id, params.webaddress)
+			def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
@@ -561,7 +582,6 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def inviteExperts() {
 		List members = Utils.getUsersList(params.expertUserIds);
-		log.debug members;
 		def msg
 
 		if(members) {
@@ -598,11 +618,10 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def requestMembership() {
-		log.debug params;
 		def user = springSecurityService.currentUser;
 		def msg;
 		if(user) {
-			def userGroupInstance = findInstance(params.id, params.webaddress)
+			def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
@@ -638,11 +657,10 @@ class UserGroupController {
 	
 	@Secured(['ROLE_USER'])
 	def requestModeratorship() {
-		log.debug params;
 		def user = springSecurityService.currentUser;
 		def msg;
 		if(user) {
-			def userGroupInstance = findInstance(params.id, params.webaddress)
+			def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
 				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
@@ -805,7 +823,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def leaveUs() {
 		def msg;
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) {
 			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
 			flash.error = msg
@@ -835,7 +853,6 @@ class UserGroupController {
 	}
 
 	def getRelatedUserGroups() {
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -862,7 +879,6 @@ class UserGroupController {
 	}
 
 	def getFeaturedUserGroups() {
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -980,10 +996,9 @@ class UserGroupController {
 	}
 
 	def getFeaturedObservations() {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return;
 
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 		params.sort = "visitCount";
@@ -1002,10 +1017,9 @@ class UserGroupController {
 	}
 
 	def getFeaturedMembers() {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return;
 
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -1026,23 +1040,24 @@ class UserGroupController {
 	}
 
 	def getUserUserGroups() {
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
-		if(!params.id) return;
-
 		def userInstance = SUser.get(params.long('id'))
 		if (!userInstance) {
-			flash.message = messageSource.getMessage("default.Not.Founded", ['SUser',params.id] as Object[], RCU.getLocale(request))
+			flash.message = messageSource.getMessage("default.not.found", ['SUser',params.id] as Object[], RCU.getLocale(request))
+            if(params.format?.equalsIgnoreCase('json')) {
+                render ([success:false, msg:flash.message] as JSON)
+            }
 			return;
 		}
 
 		def userGroups = userGroupService.getUserUserGroups(userInstance, max, offset);
-
 		def result = [];
-		userGroups.each {
-			result.add(['observation':it, 'title':it.name]);
+		userGroups.each {key, value ->
+            value.each {
+			    result.add(['observation':it.userGroup, 'title':it.userGroup.name]);
+            }
 		}
 
 		def r = ["observations":result, "count":userGroupService.getNoOfUserUserGroups(userInstance)]
@@ -1060,7 +1075,6 @@ class UserGroupController {
 	}
 
 	def pages() {
-		log.debug params
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
@@ -1068,14 +1082,12 @@ class UserGroupController {
 	} 
 	
 	def page() {
-		log.debug params;
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.id])
 	} 
 	
 	def pageCreate() {
-		log.debug params;
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		render (view:'pageCreate', model:['userGroupInstance':userGroupInstance])
@@ -1089,8 +1101,6 @@ class UserGroupController {
 	 *
 	 */
 	def search() {
-		log.debug params;
-		
 		def model = getUserGroupList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"search", model:model)
@@ -1124,15 +1134,13 @@ class UserGroupController {
    }
       
    def allGroups() {
-	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'allGroups', model:['userGroupInstance':userGroupInstance])
    }
    
    def myGroups() {
-	   log.debug params;
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
@@ -1157,7 +1165,6 @@ class UserGroupController {
    }
    
    def bulkPost() {
-	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
        def resObj = r.remove('resourceObj')
 	   if(params.pullType == 'single'){

@@ -3,7 +3,7 @@ h3. Comment
 
 h4. addComment
 
-* *Path* : /api/comment/addComment
+* *Path* : /api/apiKey/comment/addComment
 * *Parameters* :
 ** commentBody : comment text
 ** commentHolderId :Id of object holding comment 
@@ -15,9 +15,10 @@ h4. addComment
 ** subject: subject
 ** newerTimeRef : current time in milliseconds
 * *REST method* : POST
+* *Permissions* : logged in user. needs X-Auth-Token header
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/comment/addComment?commentHolderId=268292&rootHolderId=268292&rootHolderType=species.participation.Observation&commentHolderType=species.participation.Observation&newerTimeRef=1403071938526&commentBody=test comment
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/comment/addComment?commentHolderId=268292&rootHolderId=268292&rootHolderType=species.participation.Observation&commentHolderType=species.participation.Observation&newerTimeRef=1403071938526&commentBody=test comment
 {code}
 For example
 {code}
@@ -30,6 +31,7 @@ parentId:
 mainParentId:
 subject:test subject
 newerTimeRef:1403071938526
+{code}
 
 * *Response* :
 ** Successful response :
@@ -81,17 +83,19 @@ newerTimeRef:1403071938526
 {code}
 
 h4. removeComment
-* *Path* : /api/comment/removeComment
+* *Path* : /api/apiKey/comment/removeComment
 * *Parameters* :
 ** commentId : Id of comment object
 * *REST method* : GET
+* *Permissions* : logged in user. needs X-Auth-Token header
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/comment/removeComment?commentId=12375
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/comment/removeComment?commentId=12375
 {code}
 For example
 {code}
 commentId:12375
+{code}
 
 * *Response* :
 ** Successful response :
@@ -133,6 +137,7 @@ parentId:
 max:3
 refTime:1403071938526
 timeLine:older
+{code}
 
 * *Response* :
 {code}

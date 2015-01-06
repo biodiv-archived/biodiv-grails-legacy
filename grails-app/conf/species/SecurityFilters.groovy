@@ -4,12 +4,13 @@ import grails.util.Environment;
 
 import species.utils.Utils;
 import species.groups.UserGroup;
+import species.auth.AppKey;
 
 import grails.converters.JSON;
 import java.util.concurrent.atomic.AtomicLong
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
-
+import javax.servlet.http.HttpServletResponse;
 class SecurityFilters {
 
     def grailsApplication;
@@ -23,7 +24,7 @@ class SecurityFilters {
         all(controller:'*', action:'*') {
 
             before = {
-                //log.info "^Request ${request.getRequestURL()} with params: ${params}"
+                log.info "^Request ${request.getRequestURL()} with params: ${params}"
 
                 grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
                 //println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
@@ -56,6 +57,19 @@ class SecurityFilters {
                 //					  println name+":"+value;
                 //				   }
 
+                //verify appkey if present
+                if(params.appKey) {
+                    log.debug "Verifying app key ${params.appKey}"
+                    AppKey appKey = AppKey.findByKey(params.appKey);
+                    if(appKey) {
+                        log.debug "Found valid appkey. Continuing"
+                    } else {
+                        //sending 401 status
+                        render ([success:false, error:'Invalid app key in the url'])
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return false;
+                    }
+                }
             }
 
             after = { model ->

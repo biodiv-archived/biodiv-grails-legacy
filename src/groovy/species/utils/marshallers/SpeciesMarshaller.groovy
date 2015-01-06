@@ -1,6 +1,8 @@
 package species.utils.marshallers;
 
 import species.Species;
+import species.Synonyms;
+import species.CommonNames;
 import species.Classification;
 import species.TaxonomyDefinition;
 import species.TaxonomyRegistry;
@@ -19,6 +21,8 @@ class SpeciesMarshaller {
                 taxonRegistryFormattedMap << ['clasification':classification, 'hierarchies':taxonRegistries]
             }
 
+            def synonyms =  Synonyms.findAllByTaxonConcept(species.taxonConcept);
+            def common_names = CommonNames.findAllByTaxonConcept(species.taxonConcept);
 
             Map result = [
                 id : species.id,
@@ -26,6 +30,9 @@ class SpeciesMarshaller {
 
                 taxonConcept : species.taxonConcept,
                 taxonRegistry : taxonRegistryFormattedMap,
+                
+                synonyms : synonyms,
+                common_names : common_names,
 
                 group : species.fetchSpeciesGroup(),
                 habitat : species.habitat,
@@ -37,6 +44,7 @@ class SpeciesMarshaller {
                 notes : species.notes(),
                 summary : species.summary(),
 
+                fields:species.fields,
                 resource : species.listResourcesByRating(),
                 userGroups : species.userGroups,
                 

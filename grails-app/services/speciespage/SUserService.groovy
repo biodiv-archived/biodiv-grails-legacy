@@ -41,6 +41,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 	public static final String NEW_USER = "newUser";
 	public static final String USER_DELETED = "deleteUser";
+	public static final String APP_KEY = "app_key";
 
 
 	/**
@@ -175,7 +176,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
 	}
 
-	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
+	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl, Map otherParams=null){
 		 
 		def conf = SpringSecurityUtils.securityConfig
 		g = applicationContext.getBean(ApplicationTagLib)
@@ -214,6 +215,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 						log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 					}catch(all)  {
 					    log.error all.getMessage()
+                        all.printStackTrace();
 					}
 				
 
@@ -225,6 +227,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				def msgsourcearg = new Object[2];
                 msgsourcearg[0] = user.email;
                 msgsourcearg[1] = domain;
+
 				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, LCH.getLocale())
 				if (bodyContent.contains('$')) {
 					bodyContent = evaluate(bodyContent, templateMap)
@@ -233,25 +236,66 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				if (mailSubject.contains('$')) {
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
+                
+                try {
+                    if(bodyContent && mailSubject) {
+                        mailService.sendMail {
 
-					try {
-						mailService.sendMail {
+                            if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+                                bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+                                    //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+                            }
+                            subject mailSubject
+                            html bodyContent.toString()
+                        }
+                    }
+                }catch(all)  {
+                    log.error all.getMessage()
+                    all.printStackTrace();
+                }
 
-				            if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
-				            }
-							from conf.ui.notification.emailFrom
-							subject mailSubject
-							html bodyContent.toString()
-						}
-					}catch(all)  {
-					    log.error all.getMessage()
-					}
+
+				return;
+			case APP_KEY:
+				def messagesourcearg = new Object[1];
+                messagesourcearg[0] = domain;
+				mailSubject = messageSource.getMessage("app.key.emailSubject", messagesourcearg, LCH.getLocale())
+				def msgsourcearg = new Object[3];
+                msgsourcearg[0] = user.name;
+                msgsourcearg[1] = domain;
+                msgsourcearg[2] = otherParams.appKey;
+				bodyContent = messageSource.getMessage("app.key.emailBody", msgsourcearg, LCH.getLocale())
+				if (bodyContent.contains('$')) {
+					bodyContent = evaluate(bodyContent, templateMap)
+				}
+
+				if (mailSubject.contains('$')) {
+					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+				}
+
 				break
+
 			default:
 				log.debug "invalid notification type"
 		}
+
+        try {
+            if(bodyContent && mailSubject) {
+                mailService.sendMail {
+
+					to user.email
+                    if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+                        bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+                            //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+                    }
+                        subject mailSubject
+                        html bodyContent.toString()
+                }
+            }
+        }catch(all)  {
+            log.error all.getMessage()
+            all.printStackTrace();
+        }
 
 	}
 

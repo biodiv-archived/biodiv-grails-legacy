@@ -1,6 +1,6 @@
 package species.auth;
 
-import com.odobo.grails.plugin.springsecurity.rest.OauthService;
+import com.odobo.grails.plugin.springsecurity.rest.RestOauthService;
 import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUser
 import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUserDetailsService
 import com.odobo.grails.plugin.springsecurity.rest.token.generation.TokenGenerator
@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.scribe.model.Token;
 import org.pac4j.oauth.client.exception.OAuthCredentialsException;
 
-class MyOauthService extends OauthService {
+class MyOauthService extends RestOauthService {
 
     @Override
     String storeAuthentication(String provider, WebContext context) {

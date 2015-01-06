@@ -88,18 +88,15 @@ class UFileController {
 
 	@Secured(['ROLE_USER'])
 	def fileUpload() {
-		log.debug params
 		try {
 
 			//IE handling: for IE qqfile sends the whole file
 			String originalFilename = ""
 			if (params.qqfile instanceof org.springframework.web.multipart.commons.CommonsMultipartFile){
-				log.debug "Multipart"
 				//content = params.qqfile.getBytes()
 				originalFilename = params.qqfile.originalFilename
 			}
 			else{
-				log.debug "normal"
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
@@ -136,7 +133,7 @@ class UFileController {
                     }
                 }
             }
-            println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
+            log.debug "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
             //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {

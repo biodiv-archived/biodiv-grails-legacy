@@ -19,11 +19,11 @@ class DocumentController extends AbstractObjectController {
 	def utilsService
 	def documentSearchService
 	//def observationService
+    def messageSource
+
 	def index = {
 		redirect(action: "browser", params: params)
 	}
-
-
 
 	@Secured(['ROLE_USER'])
 	def create() {
@@ -63,23 +63,54 @@ class DocumentController extends AbstractObjectController {
 			}
 			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
-			redirect(action: "show", id: documentInstance.id)
+
+            if(params.format?.equalsIgnoreCase("json")) {
+                render ([success:true, 'documentInstance':documentInstance] as JSON)
+                return;
+            } else {
+			    redirect(action: "show", id: documentInstance.id)
+            }
 		}
 		else {
-			documentInstance.errors.allErrors.each { log.error it }
-			render(view: "create", model: [documentInstance: documentInstance])
+            if(params.format?.equalsIgnoreCase("json")) {
+                def errors = [];
+
+                documentInstance.errors.allErrors .each {
+                    def formattedMessage = messageSource.getMessage(it, null);
+                    errors << [field: it.field, message: formattedMessage]
+                }
+
+                render (['success' : false, 'msg':'Failed to save document', 'errors':errors] as JSON)
+                return;
+            } else {
+			    documentInstance.errors.allErrors.each { log.error it }
+			    render(view: "create", model: [documentInstance: documentInstance])
+            }
 		}
 	}
 
 	def show() {
-		def documentInstance = Document.get(params.id)
-		if (!documentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "browser")
+		//cache "content"
+        params.id = params.long('id');
+
+		def documentInstance = params.id ? Document.get(params.id):null;
+		if (!params.id || !documentInstance) {
+            if(params.format?.equalsIgnoreCase("json")) {
+                render (['success':false, 'msg':"Coudn't find document with id ${params.id}"] as JSON)
+                return
+            } else {
+			    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+			    redirect(action: "browser")
+            }
 		}
 		else {
+             if(params.format?.equalsIgnoreCase("json")) {
+                render documentInstance as JSON;
+                return;
+            } 
+
 			def userLanguage = utilsService.getCurrentLanguage(request);
-			[documentInstance: documentInstance,userLanguage: userLanguage]
+			return [documentInstance: documentInstance, userLanguage: userLanguage]
 		}
 	}
 
@@ -132,45 +163,109 @@ class DocumentController extends AbstractObjectController {
 				}
 				documentSearchService.publishSearchIndex(documentInstance, true) 
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
-				redirect(action: "show", id: documentInstance.id)
+
+                if(params.format?.equalsIgnoreCase("json")) {
+                    render ([success:true, 'documentInstance':documentInstance] as JSON)
+                    return;
+                } else {
+				    redirect(action: "show", id: documentInstance.id)
+                }
 			}
-			else {
-				render(view: "create", model: [documentInstance: documentInstance])
-			}
+            else {
+                if(params.format?.equalsIgnoreCase("json")) {
+                    def errors = [];
+
+                    documentInstance.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                    }
+
+                    render (['success' : false, 'msg':'Failed to save document', 'errors':errors] as JSON)
+                    return;
+                } else {
+
+                    render(view: "create", model: [documentInstance: documentInstance])
+                }
+            }
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+
+            if(params.format?.equalsIgnoreCase("json")) {
+                render (['success' : false, 'msg':flash.message, 'errors':errors] as JSON)
+                return;
+            }
+
 			redirect(action: "browser")
 		}
 	}
 
-	@Secured(['ROLE_USER'])	
-	def delete() {
-		def documentInstance = Document.get(params.id)
-		if (documentInstance) {
-			try {
-				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
-				documentInstance.delete(flush: true, failOnError:true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-				redirect(action: "browser")
-			}
-			catch (Exception e) {
-				log.debug e.printStackTrace()
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-				redirect(action: "show", id: params.id)
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "browser")
-		}
-	}
+    @Secured(['ROLE_USER'])	
+    def delete() {
 
+        if(!params.id) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+            if(params.format?.equalsIgnoreCase("json")) {
+                render ([success:false, msg:flash.message] as JSON);
+                return;
+            }
+
+
+            redirect(action: "browser")
+
+        } else {
+            try {
+                def documentInstance = Document.get(params.long('id'))
+                if (documentInstance) {
+                    userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+                    documentInstance.delete(flush: true, failOnError:true)
+
+                    flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+                    if(params.format?.equalsIgnoreCase("json")) {
+                        render ([success:true, msg:flash.message] as JSON);
+                        return;
+                    }
+
+                    redirect(action: "browser")
+                }
+                else {
+                    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+                    if(params.format?.equalsIgnoreCase("json")) {
+                        render ([success:false, msg:flash.message] as JSON);
+                        return;
+                    }
+
+
+                    redirect(action: "browser")
+                }
+            }
+            catch (Exception e) {
+                log.debug e.printStackTrace()
+                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+                if(params.format?.equalsIgnoreCase("json")) {
+                    render ([success:false, msg:flash.message, errors:e.getMessage()] as JSON);
+                    return;
+                }
+
+
+                redirect(action: "show", id: params.id)
+            }
+
+        }
+    }
+
+    def list() {
+		redirect(action: "browser", params: params)
+    }
 	
-	def browser = {
-		log.debug params
-		
+	def browser() {
 		def model = getDocumentList(params)
+        if(params.format?.equalsIgnoreCase("json")) {
+            render model as JSON;
+            return
+        }
+
+
 		model.userLanguage = utilsService.getCurrentLanguage(request);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/document/documentListTemplate", model:model);
@@ -212,9 +307,7 @@ class DocumentController extends AbstractObjectController {
 
 	}
 
-
 	def tags = {
-		log.debug params;
 		render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
 	}
 

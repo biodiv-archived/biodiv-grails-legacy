@@ -2,6 +2,8 @@ package species
 
 import java.sql.ResultSet;
 
+import grails.web.Action;
+
 import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
@@ -58,6 +60,12 @@ class SpeciesController extends AbstractObjectController {
 
 	def list() {
 		def model = speciesService.getSpeciesList(params, 'list');
+
+        if(params.format?.equalsIgnoreCase("json")) {
+            render model as JSON;
+            return
+        }
+
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
 		params.action="list"
@@ -185,7 +193,7 @@ class SpeciesController extends AbstractObjectController {
 
 		def speciesInstance = params.id ? Species.get(params.id):null;
 		if (!params.id || !speciesInstance) {
-            if(request.getHeader('X-Auth-Token')) {
+            if(params.format?.equalsIgnoreCase("json")) {
                 render (['success':false, 'msg':"Coudn't find species with id ${params.id}"] as JSON)
                 return
             } else {
@@ -199,7 +207,7 @@ class SpeciesController extends AbstractObjectController {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                    // flash.message = "Sorry, you don't have permission to contribute to this species ${}. Please request for permission below."
-                    if(request.getHeader('X-Auth-Token')) {
+                    if(params.format?.equalsIgnoreCase("json")) {
                         render (['success':false, 'msg':flash.message] as JSON)
                         return
                     } else {
@@ -210,7 +218,7 @@ class SpeciesController extends AbstractObjectController {
                 }
             }
             
-            if(request.getHeader('X-Auth-Token')) {
+            if(params.format?.equalsIgnoreCase("json")) {
                 render speciesInstance as JSON;
                 return;
             } 
@@ -501,7 +509,7 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
     def update() {
-    	def msg;
+        def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
@@ -511,9 +519,10 @@ class SpeciesController extends AbstractObjectController {
             render ([success:false, msg:msg] as JSON)
             return;
         }
+        
         try {
             def result;
-            long speciesFieldId = params.pk ? params.long('pk'):null;
+            Long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
@@ -567,11 +576,13 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.updateStatus(speciesFieldId, value);
                 break;
                 case "reference":
-                long cid = params.cid?params.long('cid'):null;
+                Long cid = params.cid?params.long('cid'):null;
                 if(params.act == 'delete') {
                     result = speciesService.deleteReference(cid, speciesFieldId);
                 } else {
-                    result = speciesService.updateReference(cid, speciesFieldId, value);
+                    Long speciesId = params.speciesid? params.long('speciesid') : null;
+                    Long fieldId   = params.fieldId? params.long('fieldId') : null;                    
+                    result = speciesService.updateReference(cid, speciesId,fieldId,speciesFieldId, value);
                 }
                 break;
                 case 'synonym':
@@ -613,8 +624,6 @@ class SpeciesController extends AbstractObjectController {
                 }
                 result['act'] = params.act;
                 List html = [];
-                println ")))))))"
-                println result.content
                 result.content.each {sf ->
                     boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
                     html << g.render(template:'/common/speciesFieldTemplate', model:['speciesInstance':sf.species, 'speciesFieldInstance':sf, 'speciesId':sf.species.id, 'fieldInstance':sf.field, 'isSpeciesFieldContributor':isSpeciesFieldContributor,'userLanguage':userLanguage]);
@@ -727,17 +736,42 @@ class SpeciesController extends AbstractObjectController {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
-				speciesInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], springSecurityService.currentUser, null);
+                if(success) {
+				    speciesInstance.delete(flush: true)
+				    speciesSearchService.delete(speciesInstance.id);
+				    flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    if(params.format?.equalsIgnoreCase("json")) {
+                        render (['success':true, msg:flash.message]) as JSON;
+                        return;
+                    }
+                } else {
+				    flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    if(params.format?.equalsIgnoreCase("json")) {
+                        render (['success':false, msg:flash.message]) as JSON;
+                        return;
+                    }
+                }
+
 				redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                if(params.format?.equalsIgnoreCase("json")) {
+                    render (['success':false, msg:flash.message, 'errors':[e.getMessage()]]) as JSON;
+                    return;
+                }
+
+
 				redirect(action: "show", id: params.id)
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+            if(params.format?.equalsIgnoreCase("json")) {
+                render (['success':false, msg:flash.message]) as JSON;
+                return;
+            }
 			redirect(action: "list")
 		}
 	}
@@ -1032,7 +1066,6 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
-    @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
         if(!params.speciesId) {
             log.error "NO SPECIES ID TO FETCH RELATED OBV";
@@ -1239,4 +1272,5 @@ class SpeciesController extends AbstractObjectController {
         }    
 
     }
+
 }

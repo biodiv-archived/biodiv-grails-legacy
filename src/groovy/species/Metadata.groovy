@@ -12,6 +12,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import speciespage.ObservationService;
 import species.participation.Featured;
 import species.utils.Utils;
+import species.Language;
 
 abstract class Metadata {
 	
@@ -75,11 +76,15 @@ abstract class Metadata {
         }
     }
 
-    String notes(){
+    String title(){
         return ""
     }
 
-    String summary() {
+    String notes(Language userLanguage = null){
+        return ""
+    }
+
+    String summary(Language userLanguage = null) {
         return "";
     }
 

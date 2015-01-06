@@ -178,4 +178,9 @@ class SpeciesTagLib {
             out << body();
         }
     }
+
+    def updatereference = {attrs, body->
+    	def result = speciesService.updateReference(attrs.model.referenceId, attrs.model.speciesId, attrs.model.fieldId, attrs.model.speciesFieldId, attrs.model.value);
+		out << body();
+	}
 }

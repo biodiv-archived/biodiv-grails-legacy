@@ -1,4 +1,5 @@
 import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class UrlMappings {
 
@@ -32,7 +33,11 @@ class UrlMappings {
 
 
 		"/user/$action?/$id?" { controller = 'SUser' }
-		"/api/user/$action?/$id?" { controller = 'SUser' }
+		"/api/user/$action?/$id?" { 
+            controller = 'SUser' 
+            format = 'json'
+        
+        }
 
 		"/" {
             controller='home'
@@ -47,13 +52,16 @@ class UrlMappings {
         }
 
         "/api/login" {
+            format = 'json'
             
         }
 
         "/api/validate" {
+            format = 'json'
         }
 
         "/api/logout" {
+            format = 'json'
         }
 
         name oauth: "/api/oauth/${action}/${provider}"(controller: 'oauth')
@@ -61,9 +69,34 @@ class UrlMappings {
         "/api/register/forgotPassword" {
             controller = 'register'
             action = 'forgotPasswordMobile'
+            format = 'json'
+        }
+
+        for( cc in ApplicationHolder.application.controllerClasses) {
+            for (m in cc.clazz.methods) {
+                def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
+                if (ann) {
+                    String con = cc.logicalPropertyName
+                    String act = m.name
+                    "/api/$appKey/${con}/${act}/$id?" {
+                        format = 'json'
+                        controller = con
+                        action = act
+                    }
+                    "/api/${con}/${act}/$id?" {
+                        format = 'json'
+                        appKey = "###" //invalid apikey so tht if any req to abv controller action matches because of no apikey then if shd not respond.
+                        controller = con
+                        action = act
+
+                    }
+
+                }
+            }
         }
 
         "/api/$controller/$action?/$id?"{ 
+            format = 'json'
         }
 
 		"/static/$path"(controller:"species", action:"staticContent")

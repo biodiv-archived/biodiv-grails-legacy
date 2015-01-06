@@ -197,7 +197,11 @@ class Species implements Rateable {
 		}
 		return icons;
 	}
-	
+
+    String title() {
+        return fetchSpeciesCall();
+    }
+
 	String notes(Language userLanguage = null) {
         if(!userLanguage) {
             userLanguage = utilsService.getCurrentLanguage();
@@ -217,11 +221,11 @@ class Species implements Rateable {
                 field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(brief)
             }
         }
-		return f?.description;
+		return f?.description?:'';
 	}
 
-    String summary() {
-        return "";
+    String summary(Language userLanguage = null) {
+        return notes(userLanguage);
     }
 
 	SpeciesGroup fetchSpeciesGroup() {
