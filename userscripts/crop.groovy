@@ -15,27 +15,45 @@ def geUserResoruceId(){
       }
 
 def _doCrop(resourceList, relativePath){
-
-	println "==============Resource List Size==================" + resourceList.size()
+    def resSize = resourceList.size()
+    def counter = 0;
+    def missingCount = 0; 
+	println "==============Resource List Size==================" + resSize
 	//HashMap hm = new HashMap();
 	resourceList.each { res->
-		println "------------------------------------------------------------------ " + res.id
+		counter = counter + 1
+        if((counter%100) == 0) {
+            println "=======COUNTER==== " + counter
+        }
+        println "------------------------------------------------------------------ " + res.id
 		String fileName = relativePath + "/" + res.fileName;
 		File file = new File(fileName);
 
 		String name = file.getName();
 		String parent = file.getParent();
 		String inName = name;
+        String ext = ".jpg"
 		int lastIndex = name.lastIndexOf('.');
 		if(lastIndex != -1) {
 			inName = name.substring(0, lastIndex);
+            ext = name.substring(lastIndex, name.size());
 		}
 
-		String outName = inName + "_th1.jpg"
-		println file;
+		String outName = inName + "_th1" + ext;
+		
+        println file;
 		File dir = new File(parent);
 		File outImg = new File(dir,outName);
 		println outImg;
+        
+        //_th1 image already exists so return;
+        if(outImg.exists()) {
+            //println "=======TH1 exists======"
+            return;
+        }
+        missingCount = missingCount + 1;
+        println "========NOT FOUND TH1 -- CREATING ====="
+
 		try{
 			ImageUtils.doResize(file, outImg, 200, 200);
 		}catch (Exception e) {
@@ -43,6 +61,7 @@ def _doCrop(resourceList, relativePath){
 			//hm.put(file , e.getMessage());
 		}
 	}
+    println "=============MISSING COUNT ============= " + missingCount
 	//println "===================ERROR COUNT============= " + hm.size()
 	//println hm
 	//println "====================ERROR END========================"
@@ -68,7 +87,7 @@ def doCrop(){
 
 	def sql =  Sql.newInstance(dataSoruce);
 	def query, result
-/*
+
 	//gettting all resource for species
 	query = "select distinct(resource_id) as id from species_resource order by resource_id";
 	result = getResoruceId(query, sql)
@@ -78,21 +97,26 @@ def doCrop(){
 
 	println "----------------DONE SPECIES-------------------------------------------------- "
 
-	query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
+    //getting all resources for observations 
+	//query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
+	query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
 	result = getResoruceId(query, sql)
 	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
 	println "----------------DONE OBSERVATION-------------------------------------------------- "
-	result = geUserResoruceId()
-	_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
-	println "----------------DONE USERS-------------------------------------------------- "
+	
+    //getting all resources for users
+    //result = geUserResoruceId()
+	//_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
 
-	
-	result = Resource.findAllByType(Resource.ResourceType.ICON)
-	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
-	println "----------------DONE ICONS-------------------------------------------------- " + result.size()
+	//println "----------------DONE USERS-------------------------------------------------- "
+
+/*	
+	//result = Resource.findAllByType(Resource.ResourceType.ICON)
+	//_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
+	//println "----------------DONE ICONS-------------------------------------------------- " + result.size()
 */
-	
+/*	
 	//PNG format
 	//species
 	query = "select resource_id from species_resource where resource_id in (select id from resource where file_name like '%png')";
@@ -107,13 +131,13 @@ def doCrop(){
 	query = "select r.id from resource as r , observation_resource as obr  where file_name like '%png'  and r.id = obr.resource_id";
 	result = getResoruceId(query, sql)
 	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
-	
+*/	
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 }
 
-//doCrop();
+doCrop();
 
-ImageUtils.createScaledImages(new File('/home/rahulk/Desktop/5_Kaggli-like_leaf.tif'), new File('/home/rahulk/Desktop') )
+//ImageUtils.createScaledImages(new File('/home/rahulk/Desktop/5_Kaggli-like_leaf.tif'), new File('/home/rahulk/Desktop') )
 println "=========== DONE!!";
 
 /*
