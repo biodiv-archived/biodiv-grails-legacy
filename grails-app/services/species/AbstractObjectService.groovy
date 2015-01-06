@@ -73,7 +73,7 @@ class AbstractObjectService {
             def sGroup = obv.fetchSpeciesGroup()
             if(sGroup)
 			    item.sGroup = sGroup.name
-            if(obv.habitat)
+            if(obv.hasProperty('habitat') && obv.habitat)
 			    item.habitat = obv.habitat?.name
 			
             Resource image = obv.mainImage()

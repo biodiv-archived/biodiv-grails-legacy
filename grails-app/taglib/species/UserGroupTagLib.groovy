@@ -270,6 +270,7 @@ class UserGroupTagLib {
         }
         return result;
     } 
+
 	def getCurrentUserUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
 		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);

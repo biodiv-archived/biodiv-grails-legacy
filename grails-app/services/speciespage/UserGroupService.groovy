@@ -633,6 +633,7 @@ class UserGroupService {
 	def getUserUserGroups(SUser user, int max, long offset) {
 		if(max==-1 && offset==-1)
 			return  UserGroupMemberRole.findAllBySUser(user).groupBy{ it.role };
+
 		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).groupBy{ it.role };
 	}
 

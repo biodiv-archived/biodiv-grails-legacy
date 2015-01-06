@@ -36,7 +36,6 @@ abstract class AbstractSearchService {
     
     protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     
-    @Autowired
     SolrServer solrServer;
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 10;

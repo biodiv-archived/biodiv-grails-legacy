@@ -16,38 +16,45 @@ class DocumentMarshaller {
                 title: document.title,
                 type: document.type,
                 author: document.author,
-
-                placeName : document.placeName,
-                reverseGeocodedName : document.reverseGeocodedName,
-                geoPrivacy : document.geoPrivacy,
-                locationAccuracy : document.locationAccuracy,
-                topology : document.topology,
-                group : document.group,
-                habitat : document.habitat,
-                
-                fromDate : document.fromDate,
-                toDate : document.toDate,
                 createdOn : document.createdOn,
                 lastRevised : document.lastRevised,
-               
-                contributors: document.contributors,
-                attribution: document.attribution,
-                license : document.license,
-                doi: document.doi,
-                thumbnail : document.mainImage()?.thumbnailUrl(null, null),
-                notes : document.notes,
-                summary : document.summary(null),
-
-                language: document.language,
-                userGroups : document.userGroups,
-                
-                deleted : document.deleted,
-
-//                visitCount : document.visitCount,
-                flagCount : document.flagCount,
-                featureCount : document.featureCount,
-//                rating : document.rating
+                license : document.license
             ]
+            if(document.placeName)
+                result['placeName'] = document.placeName
+            if(document.reverseGeocodedName)
+                result['reverseGeocodedName'] = document.reverseGeocodedName
+            if(document.geoPrivacy)
+                result['geoPrivacy'] = document.geoPrivacy
+            if(document.locationAccuracy)
+                result['locationAccuracy'] = document.locationAccuracy
+            if(document.topology)
+                result['topology'] = document.topology
+            if(document.group)
+                result['group'] = document.group
+            if(document.habitat)
+                result['habitat'] = document.habitat
+                
+              
+            if(document.contributors)
+                result['contributors'] = document.contributors
+            if(document.attribution)
+                result['attribution'] = document.attribution
+            if(document.doi)
+                result['doi'] = document.doi
+                result['thumbnail'] = document.mainImage()?.thumbnailUrl(null, null)
+            if(document.notes)
+                result['notes'] = document.notes
+                result['summary'] = document.summary(null)
+
+                result['language'] = document.language
+            if(document.userGroups)
+                result['userGroups'] = document.userGroups
+                
+//                visitCount : document.visitCount,
+                result['flagCount'] = document.flagCount
+                result['featureCount'] = document.featureCount
+//                rating : document.rating
 
             if(document.uFile && !document.uFile.deleted) {
                 result['uFile'] = document.uFile

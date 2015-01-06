@@ -41,6 +41,8 @@ import content.eml.Document
 import content.eml.Document.DocumentType
 import content.eml.UFile;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.License
+import species.License.LicenseType
 
 class UFileController {
 
@@ -86,18 +88,15 @@ class UFileController {
 
 	@Secured(['ROLE_USER'])
 	def fileUpload() {
-		log.debug params
 		try {
 
 			//IE handling: for IE qqfile sends the whole file
 			String originalFilename = ""
 			if (params.qqfile instanceof org.springframework.web.multipart.commons.CommonsMultipartFile){
-				log.debug "Multipart"
 				//content = params.qqfile.getBytes()
 				originalFilename = params.qqfile.originalFilename
 			}
 			else{
-				log.debug "normal"
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
@@ -134,7 +133,7 @@ class UFileController {
                     }
                 }
             }
-            println "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
+            log.debug "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
             //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
@@ -181,8 +180,12 @@ class UFileController {
 
 			Document documentInstance = new Document()
 			documentInstance.title  = uploaded.getName()
+            documentInstance.language = utilsService.getCurrentLanguage(request);
+            //For creating document using default license
+            //this will be overwritten later.
+			documentInstance.license =  License.findByName(LicenseType.CC_BY);
 
-			if(params.type) {
+            if(params.type) {
 				switch(params.type) {
 					case "Proposal":
 						documentInstance.type = DocumentType.Proposal
@@ -205,9 +208,9 @@ class UFileController {
 
 			documentInstance.uFile = uFileInstance
 
-
-			documentInstance.save(flush:true)
-
+			if(!documentInstance.save(flush:true)) {
+                documentInstance.errors.allErrors.each { log.error it }
+            }
 
 			log.debug " parameters to projectDoc block >>>> Path - "+ uFileInstance.path + " ,  Id: "+ documentInstance.id + ", fileSize:"+uFileInstance.size+", docName:"+documentInstance.title
 

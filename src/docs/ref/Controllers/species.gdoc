@@ -7,7 +7,9 @@ h4. show
 * *Parameters* : id
 * *REST method* : GET
 * *Request* : 
+{code}
 http://indiabiodiversity.saturn.strandls.com/api/species/show/1
+{code}
 * *Response* :
 ** Successful response
 {code}
@@ -42,7 +44,7 @@ h4. list
 * *Requests* :
 ** __With species group and habitat filter__
 {code}
-http://indiabiodiversity.org/species/list?sGroup=837&habitat=267835&resultType=json
+http://indiabiodiversity.org/api/species/list?sGroup=837&habitat=267835
 {code}
 
 * *Response* :
@@ -80,14 +82,14 @@ http://indiabiodiversity.org/species/related?limit=10&offset=0&filterProperty=fe
 
 h4. delete
 
-* *Path* : /api/species/delete
+* *Path* : /api/apiKey/species/delete
 * *Parameters* :
 ** id : species id
 ** *REST Method* : POST
 ** Permission : Need admin permission to delete
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/species/delete?id=234
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/delete?id=234
 {code}
 * *Response* :
 ** on success
@@ -119,7 +121,7 @@ http://indiabiodiversity.localhost.org/api/species/delete?id=234
 
 h4. update
 
-* *Path* : /api/species/update
+* *Path* : /api/apiKey/pecies/update
 * *Parameters* :
 ** name : contributor | attribution | description | newdescription | license | audienceType | status | reference | synonym | commonname | speciesField
 ** pk : species field id
@@ -136,7 +138,7 @@ h4. update
 ** Requests 
 * __ Adding synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/species/update
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
 name:synonym
 value:Test indica
 pk:275594
@@ -145,7 +147,7 @@ relationship:Synonym
 
 * __ Editing synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/species/update
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
 name:synonym
 value:Test indicatwo
 pk:275594
@@ -155,7 +157,7 @@ sid:221654
 
 * __ Deleting synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/species/update
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
 name:synonym
 pk:275594
 act:delete
@@ -164,7 +166,7 @@ sid:221655
 
 * __ Adding speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/species/update
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
 description:<p>desc</p>
 attribution:a1
 contributor:1
@@ -180,7 +182,7 @@ runForImages:false
 
 * __ Editing speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/species/update
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
 description:<p>desc2</p>
 attribution:a1
 contributor:1
@@ -196,16 +198,16 @@ runForImages:false
 
 * __ Deleting speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/species/update
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
 pk:501520
 speciesid:275594
 act:delete
 name:speciesField
 {code}
 
-h4. pullImageForSpecies
+h4. setResources
 
-* *Path* : /api/species/pullImageForSpecies
+* *Path* : /api/apiKey/species/setResources
 * *Parameters* :
 ** id : species id
 ** resourceListType: ofSpecies | fromSingleSpeciesField | ofObv | null | usersResource
@@ -221,7 +223,7 @@ h4. pullImageForSpecies
 ** Notes : use index format as in _ for all keys such as title, license, url etc., to give multiple resources in same call. Existing resources of the species will be deleted and all mentioned in this call are set for the species. 
 * *Request* :
 {code}
-url : http://indiabiodiversity.localhost.org/species/pullImageForSpecies
+url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/setResources
 speciesId:275594
 file_1:/8378307e-55ad-4e95-8600-7c8beb5e09ba/861.JPG
 url_1:
@@ -250,7 +252,7 @@ resourceListType:fromRelatedObv
 {code}
 
 {code}
-url : http://indiabiodiversity.localhost.org/species/pullImageForSpecies
+url : http://indiabiodiversity.localhost.org/api/species/setResources
 speciesId:275594
 file_2:v
 url_2:http://www.youtube.com/watch?v=v8HVWDrGr6o
@@ -271,7 +273,7 @@ h4. count
 
 h4. requestExport
 
-* *Path* : /api/species/requestExport
+* *Path* : /api/apiKey/species/requestExport
 * *Parameters* :
 ** filterUrl : filterUrl as in list call
 ** downloadType
@@ -287,7 +289,7 @@ h4. requestExport
 
 h4. upload
 
-* *Path* : /api/species/upload
+* *Path* : /api/apiKey/species/upload
 * *Parameters* :
 ** xlsxFileUrl : xls file in mentioned format is required
 ** imagesDir : path to images dir relative to appln data dir where images are present. 
@@ -300,7 +302,7 @@ h4. upload
 
 h4. requestPermission
 
-* *Path* : /api/species/requestPermission
+* *Path* : /api/apiKey/species/requestPermission
 * *Parameters* :
 ** selectedNodes : csv of taxonConcept ids
 ** inviteType : contributor | curator . Default:contributor 
@@ -310,7 +312,7 @@ h4. requestPermission
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/species/requestPermission
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/requestPermission
 invitetype:contributor
 message:test
 selectedNodes:94899
@@ -319,7 +321,7 @@ selectedNodes:94899
 
 h4. invite
 
-* *Path* : /api/species/invite
+* *Path* : /api/apiKey/species/invite
 * *Parameters* :
 ** userIds : csv of user ids
 ** inviteType : curator | contributor. Default contributor 
@@ -328,13 +330,13 @@ h4. invite
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/species/invite
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/invite
 {code}
 
 
 h4. searchPermission
 
-* *Path* : /api/species/searchPermission
+* *Path* : /api/apiKey/species/searchPermission
 * *Parameters* :
 ** rank : sci name rank number
 ** page : scientific name 
@@ -359,29 +361,4 @@ h4. getRelatedObvForSpecies
 {code}
 http://indiabiodiversity.localhost.org/api/species/getRelatedObvForSpecies?speciesId=275594
 {code}
-
-
-h4. pullObvMediaInSpField
-
-* *Path* : /api/species/
-* *Parameters* :
-** *REST Method* : 
-** Permission : species admin
-** Notes :  
-* *Request* :
-{code}
-{code}
-
-
-h4. uploadMediaInSpField
-
-* *Path* : /api/species/
-* *Parameters* :
-** *REST Method* : 
-** Permission : species admin
-** Notes :  
-* *Request* :
-{code}
-{code}
-
 

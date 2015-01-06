@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">202</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">206</div>
                 </div>
                 <div class="entry">
                     <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>

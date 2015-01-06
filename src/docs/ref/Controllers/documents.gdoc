@@ -1,0 +1,243 @@
+h3. Document
+
+h4. Save
+
+* *Path* : /api/apiKey/document/save
+* *Parameters* :
+** type : Report | Poster | Proposal | Miscellaneous
+** title : String
+** uFile.path : path of uploaded path
+** uFile.size : integer
+** uri : String
+** doi : String
+** contributors : String
+** attribution : String
+** licenseName : CC License
+** description : document notes
+** tags:[tag1,tag2...]
+** speciesGroup : csv of species group id's
+** habitat : csv of habitat id's
+** placeName : String 
+** locationAccuracy : Accurate|Approximate
+** geoPrivacy : true|false
+** agreeTerms : on|off
+** areas : WKT representation of topology of location. e.g., POINT(77.60492180000006 17.6740832)
+** userGroupsList: csv of all user group id's
+* *REST method* : POST
+* *Permissions* : logged in user. needs X-Auth-Token header
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/document/save
+
+type:Report
+title:My title
+uFile.path:/documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92/234.pdf
+uFile.size:
+uri:www.strandls.com
+contributors:Sravanthi
+attribution:Strand IFP
+licenseName:CC BY
+description:<p>&nbsp;My description</p>
+tags:tag1
+tags:tag2
+tags:tag3
+placeName:Hyderabad
+areas:POINT(78.31878662109375 17.391992568969727)
+latitude:17.391992568969727
+latitude_deg:17
+latitude_min:23
+latitude_sec:31.173248291015625
+latitude_direction:N
+longitude:78.31878662109375
+longitude_deg:78
+longitude_min:19
+longitude_sec:7.6318359375
+longitude_direction:E
+location_accuracy:Approximate
+userGroupsList:1
+agreeTerms:on
+speciesGroup.0:841
+speciesGroup.1:839
+habitat.0:267836
+habitat.1:267839
+
+{code}
+* *Response* :
+** Successful response :
+{code}
+{
+    "success": true,
+        "documentInstance": {
+            "id": 674,
+            "title": "My title",
+            "type": {
+                "enumType": "content.eml.Document$DocumentType",
+                "name": "Report"
+            },
+            "author": {
+                "id": 1184,
+                "name": "Sravanthi Mutyala",
+                "icon": "http://graph.facebook.com/581308415/picture?type=large"
+            },
+            "createdOn": "2015-01-05T11:10:48Z",
+            "lastRevised": "2015-01-05T11:10:48Z",
+            "license": {
+                "name": "CC BY",
+                "url": {
+                    "enumType": "species.License$LicenseType",
+                    "name": "CC_BY"
+                }
+            },
+            "thumbnail": "http://localhost/biodiv/content/documents/Document_th1.jpg",
+            "summary": ""
+            ...
+        }
+}
+{code}
+** in case of error : 
+{code}
+{
+    "success": false,
+        "msg": "Failed to save document",
+        "errors": [
+        {
+            "field": "title",
+            "message": "Property [title] of class [class content.eml.Document] cannot be null"
+        },
+        {
+            "field": "uFile",
+            "message": "Either a file or a url is required"
+        },
+        {
+            "field": "uri",
+            "message": "Property [uri] of class [class content.eml.Document] with value [null] does not pass custom validation"
+        },
+        {
+            "field": "type",
+            "message": "Property [type] of class [class content.eml.Document] cannot be null"
+        }
+    ]
+}
+{code}
+
+http://indiabiodiversity.localhost.org/UFile/fileUpload?uploadDir=documents%2Fdocument-9501a16f-6470-4ec1-aa3b-051af9cc6b92&qqfile=_.+BITS+FD+Admission+-+2013_+Net+banking+Receipt+.pdf
+
+uploadDir:documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92
+qqfile:_. BITS FD Admission - 2013_ Net banking Receipt .pdf
+
+{"success":true,"filePath":"/documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92/234.pdf","fileURL":"http://localhost/biodiv/content/documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92/234.pdf","fileSize":"72 KB","xlsxFileUrl":null,"headerMetadata":null,"isSimpleSheet":null}
+
+
+h4. show 
+
+* *Path* : /api/document/show/id 
+* *Parameters* : id long format
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/document/show/670
+{code}
+* *Response* :
+** Successful response
+{code}
+"documentInstance": {
+    "id": 674,
+        "title": "My title",
+        "type": {
+            "enumType": "content.eml.Document$DocumentType",
+            "name": "Report"
+        },
+        "author": {
+            "id": 1184,
+            "name": "Sravanthi Mutyala",
+            "icon": "http://graph.facebook.com/581308415/picture?type=large"
+        },
+        "createdOn": "2015-01-05T11:10:48Z",
+        "lastRevised": "2015-01-05T11:10:48Z",
+        "license": {
+            "name": "CC BY",
+            "url": {
+                "enumType": "species.License$LicenseType",
+                "name": "CC_BY"
+            }
+        },
+        "thumbnail": "http://localhost/biodiv/content/documents/Document_th1.jpg",
+        "summary": ""
+            ...
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Valid id is required"
+}
+{code}
+
+h4. list 
+
+* *Path* : /api/document/list 
+* *Parameters* : 
+** featureBy : true|false. default false
+** tag : tag name
+** webaddress : to filter observations with group with this webaddress
+
+** max: limit of number of results. default 24
+** offset : offset in to the result set. default 0
+** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
+
+* *REST method* : GET
+* *Requests* :
+** __Documents with a tag__
+{code}
+http://indiabiodiversity.localhost.org/api/document/list?tag=india
+{code}
+
+* *Response* :
+{code}
+{
+    "documentInstanceList": [ ... ],
+
+        "instanceTotal": 3,
+        "queryParams": {
+            "tag": "india",
+            "tagType": "document",
+            "max": 12,
+            "offset": 0
+        },
+        "activeFilters": {
+            "tag": "india"
+        },
+        "resultType": "document",
+        "canPullResource": true
+}
+{code}
+
+h4. delete
+
+* *Path* : /api/apiKey/document/delete
+* *Parameters* :
+** id : id
+* *REST Method* : POST
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/document?id=234
+{code}
+* *Response* :
+** on success
+{code}
+{
+    "success": true,
+    "msg": "Document 234 deleted",
+}
+{code}
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Document not found with id 234sdf",
+}
+{code}
+
+

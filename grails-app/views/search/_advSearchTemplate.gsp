@@ -2,7 +2,7 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <%@page import="species.License.LicenseType"%>
 
-<g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')], Checklists:[name:'Checklists', template:'observation',displayName:g.message(code:'checklists.label')]]"/>
+<g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')], Checklists:[name:'Checklists', template:'observation',displayName:g.message(code:'checklists.label')], Newsletter:[name:'Newsletter', template:'newsletter',displayName:g.message(code:'title.value.newsletter')], Pages:[name:'Pages', template:'pages',displayName:g.message(code:'default.pages.label')]]"/>
 
 <div  class="block-tagadelic">
 
@@ -139,7 +139,7 @@
 
 
         <g:each in="${modules}" var="module">
-        <g:if test="${!module.value.name.equalsIgnoreCase('All')}">
+        <g:if test="${!module.value.name.equalsIgnoreCase('All') && !module.value.name.equalsIgnoreCase('Newsletter') && !module.value.name.equalsIgnoreCase('Pages') }">
         <div class="aq_modules ${module.value.name.toLowerCase()}_aq_filters ${activeFilters && activeFilters['aq.object_type']?.equalsIgnoreCase(module.value.name)?'':'hide' }">
             <br>
             <b>${module.value.displayName} specific search options</b>

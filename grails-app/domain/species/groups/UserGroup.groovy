@@ -170,6 +170,10 @@ class UserGroup implements Taggable {
         return this.description;
     }
 
+    SpeciesGroup fetchSpeciesGroup() {
+        return null;
+    }
+
 	def incrementPageVisit(){
 		visitCount++;
 

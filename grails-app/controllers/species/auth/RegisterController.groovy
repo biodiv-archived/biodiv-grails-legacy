@@ -285,7 +285,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		String username = params.username?:params.email
 		if (!username) {
             flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+            if(params.format?.equalsIgnoreCase("json") || params.isMobileApp) {
                 render (['success':false, 'msg':flash.error] as JSON);
                 return;
             } else {
@@ -298,7 +298,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+            if(params.format?.equalsIgnoreCase("json") || params.isMobileApp) {
                 render (['success':false, 'msg':flash.error] as JSON);
                 return;
             } else {
@@ -329,7 +329,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 				subject messageSource.getMessage("grails.plugin.springsecurity.ui.forgotPassword.emailSubject", null, RCU.getLocale(request))
 				html body.toString()
 			}
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+            if(params.format?.equalsIgnoreCase("json") || params.isMobileApp) {
             	msg = messageSource.getMessage("register.success.email.nofity", [user.email] as Object[], RCU.getLocale(request))
                 render (['success':true, 'msg':msg] as JSON);
                 return;
@@ -338,7 +338,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             }
 		} catch(all)  {
             all.printStackTrace();
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
+            if(params.format?.equalsIgnoreCase("json") || params.isMobileApp) {
 		        log.error all.getMessage()
 		        msg = messageSource.getMessage("register.generating.token",[all.getMessage()]as Object[], RCU.getLocale(request))
                 render (['success':false, 'msg':msg] as JSON);

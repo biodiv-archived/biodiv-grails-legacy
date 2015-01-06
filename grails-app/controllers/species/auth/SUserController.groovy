@@ -31,6 +31,7 @@ import species.Habitat;
 import species.groups.SpeciesGroup;
 import species.participation.Follow;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.auth.AppKey;
 
 class SUserController extends UserController {
 
@@ -136,7 +137,7 @@ class SUserController extends UserController {
         def SUserInstance = SUser.get(params.long("id"))
 
         def userLanguage =utilsService.getCurrentLanguage(request);
-        if(request.getHeader('X-Auth-Token')) {
+        if(params.format?.equalsIgnoreCase("json")) {
             if(!params.id) {
             	msg = messageSource.getMessage("id.required", ['Id'] as Object[], RCU.getLocale(request))
                 render (['success':false, 'msg':msg] as JSON)
@@ -824,7 +825,7 @@ class SUserController extends UserController {
 ,saltSource:saltSource);
 			command2.validate()
 			if (command2.hasErrors()) {
-                if(request.getHeader('X-Auth-Token')) {
+                if(params.format?.equalsIgnoreCase("json")) {
                     def errors = [];
                     command2.errors.allErrors .each {
                         def formattedMessage = messageSource.getMessage(it, null);
@@ -850,7 +851,7 @@ class SUserController extends UserController {
                 }
 			}
 
-            if(request.getHeader('X-Auth-Token')) {
+            if(params.format?.equalsIgnoreCase("json")) {
                 render (['success' : success, 'msg':msg] as JSON); 
                 return
             } else {
@@ -859,7 +860,7 @@ class SUserController extends UserController {
             }
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}";
-            if(request.getHeader('X-Auth-Token')) {
+            if(params.format?.equalsIgnoreCase("json")) {
                 render (['success' : false, 'msg':flash.message] as JSON); 
                 return
             } else {
@@ -959,9 +960,33 @@ class SUserController extends UserController {
 		return ['springSecurityService':springSecurityService, 'userInstance':author] 
     }
 
+    @Secured(['ROLE_ADMIN'])
+	def generateAppKey() {
+        def author = springSecurityService.currentUser;
+        AppKey appKey = AppKey.findByEmail(author.email);
+        if(appKey) {
+            appKey.key = UUID.randomUUID().toString()
+        } else {
+            appKey = new AppKey(key:UUID.randomUUID().toString(), email:author.email);
+        }
+
+        if(!appKey.save(flush:true)) {
+            def errors = [];
+		    appKey.errors?.allErrors.each { 
+
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+                log.error it 
+            }
+            render ([success:false, msg:'Error in creating/updating app key', 'errors':errors] as JSON)
+        }
+
+		SUserService.sendNotificationMail(SUserService.APP_KEY, author, request, "",[appKey:appKey.key]);
+        render ([success:true, 'appKey':appKey.key, 'msg':'This app key is also sent in an email to your account'] as JSON)
+
+    }
 
 }
-
 class ResetPasswordCommand {
 	String username
 	String currentPassword

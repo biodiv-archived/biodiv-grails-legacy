@@ -572,6 +572,7 @@ environments {
             info    'org.hibernate.jdbc.ConnectionManager'
             */
             trace   'com.grailsrocks.emailconfirmation'
+            debug   'com.odobo.grails.plugin.springsecurity.rest'
        }
     }
 	test {
@@ -1607,15 +1608,17 @@ grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
 
 //REST
 //grails.plugin.springsecurity.rest.login.useJsonCredentials = true
-grails.plugin.springsecurity.rest.login.useRequestParamsCredentials=true
 grails.plugin.springsecurity.rest.token.storage.useGorm=true
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName='species.auth.AuthenticationToken'
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenValuePropertyName='tokenValue'
 grails.plugin.springsecurity.rest.token.storage.gorm.usernamePropertyName='email'
+grails.plugin.springsecurity.rest.login.useRequestParamsCredentials=true
 grails.plugin.springsecurity.rest.login.endpointUrl='/api/login'
 grails.plugin.springsecurity.rest.login.failureStatusCode=401
 grails.plugin.springsecurity.rest.logout.endpointUrl='/api/logout'
 grails.plugin.springsecurity.rest.token.validation.headerName='X-Auth-Token'
+grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
+grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
 
 //APPINFO
 
@@ -1651,6 +1654,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
     '/**/css/**':'exceptionTranslationFilter',
     '/**/images/**':'exceptionTranslationFilter',
     '/**/img/**':'exceptionTranslationFilter',
-    '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',  // Stateless chain
+    '/api/guest/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+    '/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
     '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]

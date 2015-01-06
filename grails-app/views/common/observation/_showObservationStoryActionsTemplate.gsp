@@ -55,7 +55,7 @@
                 def prevId, nextId;
                 def clazz = instance.class
                 def obj = instance
-                def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+                def userGroupInstance = userGroup?userGroup:UserGroup.findByWebaddress(params.webaddress);
                 if(pos>=0 && (prevObservationId || nextObservationId)) {
                     prevId = prevObservationId;
                     nextId = nextObservationId

@@ -183,12 +183,7 @@ class SUser {
 				}
 			}.collect {it.userGroup}
 		}else{
-            println "*************************************"
-            println this
-            println  UserGroupMemberRole.findAllBySUser(this)
-            println "*************************************"
 			uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
-            println uGroups
 		}
 		uGroups.each {
             try{

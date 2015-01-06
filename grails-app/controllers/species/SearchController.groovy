@@ -29,18 +29,14 @@ class SearchController {
     def select () {
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
         params['userLangauge'] = utilsService.getCurrentLanguage(request); 
-        
-        if(request.getHeader('X-Auth-Token')) {
-            params['resultType'] = 'json';
-        }
-
+       
         def model = biodivSearchService.select(params);
         model['userLanguage'] = params.userLanguage;
         if(params.loadMore?.toBoolean()){
             params.remove('isGalleryUpdate');
             render(template:"/search/showSearchResultsListTemplate", model:model);
             return;
-        } else if(params.resultType?.equalsIgnoreCase("json")) {
+        } else if(params.format?.equalsIgnoreCase("json")) {
             model.remove('userLanguage');
             model.remove('responseHeader');
 

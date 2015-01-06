@@ -353,7 +353,6 @@ class ActivityFeedService {
                 break
 
 			default:
-			println "====================activity====================="+activityType
 				activityTitle = getLocalizedMessage(activityType)
 				break
 		}

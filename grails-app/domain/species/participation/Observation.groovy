@@ -617,4 +617,8 @@ class Observation extends Metadata implements Taggable, Rateable {
             ckl.deleteObservation(this)
         }
     }
+
+    SpeciesGroup fetchSpeciesGroup() {
+        return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
 }

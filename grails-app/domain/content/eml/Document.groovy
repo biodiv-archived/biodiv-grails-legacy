@@ -169,10 +169,6 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		return author;
 	}
 	
-	String toString() {
-		return title;
-	}
-	
 	def setSource(parent) {
 		this.sourceHolderId = parent.id
 		this.sourceHolderType = parent.class.getCanonicalName()
