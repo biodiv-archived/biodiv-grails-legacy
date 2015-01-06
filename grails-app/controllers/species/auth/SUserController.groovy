@@ -192,8 +192,8 @@ class SUserController extends UserController {
 			if (!user) user = findById()
 			if (!user) return
 			def model = buildUserModel(user);
-            def contributorForTaxonConcepts = speciesPermissionService.contributorFor(springSecurityService.currentUser);
-            model['contributorForTaxonConcepts'] = contributorForTaxonConcepts;
+//            def contributorForTaxonConcepts = speciesPermissionService.contributorFor(springSecurityService.currentUser);
+//            model['contributorForTaxonConcepts'] = contributorForTaxonConcepts;
             return model; 
 		}
 		flash.message = "${message(code: 'edit.denied.message')}";

@@ -21,7 +21,6 @@ import species.auth.FacebookAuthUtils;
 import species.auth.OpenIDAuthenticationFilter;
 import species.auth.OpenIDAuthenticationProvider;
 import species.auth.OpenIdAuthenticationFailureHandler;
-import species.auth.AppKeyFilter;
 
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;

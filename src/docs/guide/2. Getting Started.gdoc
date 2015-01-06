@@ -1,3 +1,24 @@
-Sample Application
+h4. Brief Description
+
+Quick Reference panel on the right hand side of the page gives access to api modules. 
+
+Basically API's are divided into modules depending on the type of object they are dealing with. A brief description about them is as follows.
+
+{table}
+*Module*|*Description*
+register | API 
+login | 
+comment | API to add, remove and get comments on various objects present in the portal 
+documents | API to manage documents uploaded on to the portal
+logout
+observations
+search
+species
+speciesGroup
+user
+usergroup
+{table}
+
+h4. Examples
 
 
