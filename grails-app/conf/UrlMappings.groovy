@@ -94,6 +94,10 @@ class UrlMappings {
                 }
             }
         }
+        
+        "/api/$apiKey/$controller/$action?/$id?"{ 
+            format = 'json'
+        }
 
         "/api/$controller/$action?/$id?"{ 
             format = 'json'
