@@ -77,7 +77,7 @@ h4. Related Species
 ** 
 * __ Featured Species__
 {code}
-http://indiabiodiversity.org/species/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
+http://indiabiodiversity.org/api/species/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
 {code}
 
 h4. delete

@@ -308,7 +308,8 @@ class DocumentController extends AbstractObjectController {
 	}
 
 	def tags = {
-		render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
+		//render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
+		render documentService.getFilteredTagsByUserGroup(params.webaddress, 'document') as JSON
 	}
 
 	
