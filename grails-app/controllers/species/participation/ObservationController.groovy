@@ -1570,18 +1570,23 @@ class ObservationController extends AbstractObjectController {
         def obv = Observation.get(params.id.toLong());
         def reco = Recommendation.get(params.recoId.toLong());
         def currentUser = springSecurityService.currentUser;
+        def mailType = '';
+        def activityFeed;
         if(params.lockType == "Lock"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
-            if(recVo && reco != recVo.recommendation){
-                recVo.delete(flush: true, failOnError:true)
-                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+            def newRecVo;
+            if(recVo){
+                if(reco != recVo.recommendation) {
+                    recVo.delete(flush: true, failOnError:true)
+                }
+                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
                 if(!newRecVo.save(flush:true)){
                     newRecVo.errors.allErrors.each { log.error it } 
                 }
             }
             if(!recVo){
-                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
                 if(!newRecVo.save(flush:true)){
                     newRecVo.errors.allErrors.each { log.error it } 
                 }
@@ -1589,16 +1594,22 @@ class ObservationController extends AbstractObjectController {
             obv.maxVotedReco = reco; 
             obv.isLocked = true;
             msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
-            
+            mailType = utilsService.OBV_LOCKED;
+            activityFeed = activityFeedService.addActivityFeed(obv, newRecVo, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(newRecVo.recommendation, null));
         }else{
             obv.removeResourcesFromSpecies()
             obv.isLocked = false;
             obv.calculateMaxVotedSpeciesName()
             msg = messageSource.getMessage("default.observation.unlocked", null, RCU.getLocale(request))
+            mailType = utilsService.OBV_UNLOCKED;
+            def recommendationVoteInstance =  RecommendationVote.findWhere(recommendation: reco, observation:obv, author: currentUser)
+            activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
         }
         if(!obv.save(flush:true)){
             obv.errors.allErrors.each { log.error it } 
         }
+		utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
+
         def result = ['msg': msg]
         render result as JSON
     }
