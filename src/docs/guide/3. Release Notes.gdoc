@@ -1,38 +1,17 @@
 
-h3. Status
-
-as on Jul 1st 2014
-
-* *Completed :* 
-** login -> basic, oauth(facebook, google)
-** register -> register, resend verification code, forgotPassword
-** observations -> create, show, list, related, flagDeleted, getRecommendationVotes, addRecommendationVote, removeRecommendationVote, upload_resource
-** users -> show, resetPassword, upload_resource
-** comments -> add, get, remove
-** logout 
-
-* New API Collection for testing is available as JSON at : https://www.getpostman.com/collections/293677305aa08bd5296e can be imported in Chrome postman extension which is available at https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm?hl=en
-
-as on June 18th 2014
-
-* *Completed :*
-** login -> basic, oauth
-** register -> register, resend verification code
-** observations -> create, show, list, related
-** users -> show, resetPassword
-** logout 
-
-* *In progress :*
-** login -> google 
-** register -> forgot password
-** observations -> add recommendation (optional), delete (optional)
-** users -> settings
-
-* *under testing :*
-** comments -> add, remove, list
-
-
 h3. Release Notes
+
+*Jan 7th 2015*
+
+* species
+* document
+* usergroup
+* search
+* stat
+* apikey authentication
+* versioning API
+* Getting started : Examples
+
 
 *July 4th 2014*
 
