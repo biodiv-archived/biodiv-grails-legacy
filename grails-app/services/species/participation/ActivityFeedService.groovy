@@ -279,6 +279,10 @@ class ActivityFeedService {
 			case SPECIES_AGREED_ON:
 				activityTitle =  getLocalizedMessage(SPECIES_AGREED_ON) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
+            case [utilsService.OBV_LOCKED, utilsService.OBV_UNLOCKED]:
+				activityTitle =  getLocalizedMessage(activityType) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				break
+
 			case OBSERVATION_FLAGGED:
 			     def messagesourcearg = new Object[1];
                  messagesourcearg[0] =utilsService.getResType(activityRootObj).capitalize();

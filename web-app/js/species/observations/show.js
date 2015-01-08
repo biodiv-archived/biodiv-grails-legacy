@@ -39,6 +39,7 @@ function lockObv(url, lockType, recoId, obvId, ele) {
                 $(".lockObvId").hide();
                 showUpdateStatus(data.msg, 'success');
             }
+            updateFeeds();
         }
     });
 }

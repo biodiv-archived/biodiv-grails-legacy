@@ -51,6 +51,9 @@ class UtilsService {
 
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
+    
+    static final String OBV_LOCKED = "obv locked";
+    static final String OBV_UNLOCKED = "obv unlocked";
 
     private void cleanUpGorm() {
         cleanUpGorm(true)
@@ -379,6 +382,16 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
+                case [OBV_LOCKED,OBV_UNLOCKED] :
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                //message on type
+                def messageKey = Arrays.asList(notificationType.split(":"));
+                messageKey = messageKey[0].trim().toLowerCase().replaceAll(' ','.')
+                mailSubject = messageSource.getMessage(messageKey, null, LCH.getLocale())
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(getParticipants(obv))
+                break
+
                 case ActivityFeedService.RECOMMENDATION_REMOVED:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -562,13 +575,12 @@ class UtilsService {
 
                 case NEW_SPECIES_PERMISSION : 
                 mailSubject = notificationType
-                    bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/grantedPermission"
-                    def user = otherParams['user'];
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/grantedPermission"
+                def user = otherParams['user'];
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
-
-
+                
                 default:
                 log.debug "invalid notification type"
             }
