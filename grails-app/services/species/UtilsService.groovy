@@ -168,7 +168,7 @@ class UtilsService {
                 url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
-        return url;
+        return url.replace('/api/', '/');
     }
 
 

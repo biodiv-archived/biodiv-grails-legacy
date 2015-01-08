@@ -1,10 +1,9 @@
-h4. Brief Description
+h4. Api Modules
 
 Quick Reference panel on the right hand side of the page gives access to api modules. 
 
 Basically API's are divided into modules depending on the type of object they are dealing with. A brief description about them is as follows.
 
-*API Modules*
 {table}
 *Module*|*Description*
 [species|Controllers] | API to create, update and manage species pages on the portal
@@ -21,7 +20,7 @@ Basically API's are divided into modules depending on the type of object they ar
 [logout|Controllers] | API to logout from the portal
 {table}
 
-*Request Formats*
+h4. Request Format
 
 All requests except for the login and register apis should be authenticated. Only a logged in user can access them. Using login api you can generate a authentication token and it should be present in the header of every request by the name *X-Auth-Token*
 
@@ -37,7 +36,7 @@ All write requests are of the format
 http://indiabiodiversity.org/api/$apiKey/$controller/$action
 {code}
 
-*Response Format*
+h4. Response Format
 
 All responses are in JSON format.
 Any successful response will have success:true. If success = false then there is corresponding msg and errors fields detailing the king of the error.
@@ -46,7 +45,21 @@ A successful api request wil get 200 OK http status and any unauthenticated requ
 
 Few sample applications detailing the usage of the api are shown in below section.
 
-h4. Examples
+h4. Sample Applications
+
+*IBP Android App*
+
+[IBP Android App on Google play|https://play.google.com/store/apps/details?id=com.mobisys.android.ibp&hl=en]
+
+*IBP Observation Fetcher - Chrome Extension*
+
+# [Chrome Extension using below rss feed | https://chrome.google.com/webstore/detail/ibp-observation-fetcher/lbnofgogaoinpcehjnjkcmniejmehmje?utm_source=chrome-app-launcher-info-dialog]
+# [RSS Feed | http://pipes.yahoo.com/pipes/pipe.run?_id=2d8316f2aa63f3cf6610fb98501e79d8&_render=rss]
+# [Yahoo Pipes Info|http://pipes.yahoo.com/pipes/pipe.info?_id=2d8316f2aa63f3cf6610fb98501e79d8]
+
+*IBP Moderator Mode App - by Rohit*
+
+[Curate Observations|http://projectmoths.web44.net/ibp_group_moderator/view_observations.php]
 
 *Simple login, logout and reading My observations*
 
@@ -118,6 +131,3 @@ $.getScript( "http://indiabiodiversity.org/biodiv/js/species/relatedStory.js", f
 
 This code snippet uses jquery [jcarousel|http://plugins.jquery.com/jcarousel] plugin
 
-*IBP Android App*
-
-[IBP Android App on Google play|https://play.google.com/store/apps/details?id=com.mobisys.android.ibp&hl=en]

@@ -90,12 +90,11 @@ class UrlMappings {
                         action = act
 
                     }
-
                 }
             }
         }
         
-        "/api/$apiKey/$controller/$action?/$id?"{ 
+        "/api/$appKey/$controller/$action?/$id?"{ 
             format = 'json'
         }
 
