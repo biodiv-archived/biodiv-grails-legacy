@@ -1789,7 +1789,7 @@ println observationInstance.license
                 if (observationInstance) {
                     observationInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
-                    if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
+                    if(isFeatureDeleted && utilsService.ifOwns(observationInstance.author)) {
                         def mailType = observationInstance.instanceOf(Checklists) ? utilsService.CHECKLIST_DELETED : utilsService.OBSERVATION_DELETED
                         try {
                             observationInstance.isDeleted = true;

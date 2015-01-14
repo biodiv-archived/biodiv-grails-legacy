@@ -7,6 +7,7 @@ class SUserTagLib {
 
 	def springSecurityService
 	def SUserService;
+    def utilsService;
 
 	/**
 	 * 
@@ -36,7 +37,7 @@ class SUserTagLib {
 	 * Renders the body if the authenticated user owns this page.
 	 */
  	def ifOwns = { attrs, body ->
-		if (SUserService.ifOwns(attrs.model.user)) {
+		if (utilsService.ifOwns(attrs.model.user)) {
 			out << body()
 		}
 	}
@@ -54,7 +55,7 @@ class SUserTagLib {
     *
     */
     def permToReorderPages = { attrs, body ->
-        if(SUserService.permToReorderPages(attrs.model.userGroupInstance)){
+        if(utilsService.permToReorderPages(attrs.model.userGroupInstance)){
             out<<body()
         }
     
@@ -63,7 +64,7 @@ class SUserTagLib {
 	 * 
 	 */
 	def ifOwnsOrIsPublic = { attrs, body ->
-		if (SUserService.ifOwns(attrs.model.user) || attrs.model.isPublic) {
+		if (utilsService.ifOwns(attrs.model.user) || attrs.model.isPublic) {
 			out << body()
 		}
 	}
@@ -154,7 +155,7 @@ class SUserTagLib {
 	def isAdmin = { attrs, body ->
 		def user = attrs.model ? attrs.model.user : null;
 		user = user?:springSecurityService.getCurrentUser()
-		if (SUserService.isAdmin(user?.id)) {
+		if (utilsService.isAdmin(user?.id)) {
 			out << body()
 		}
 	}
@@ -170,7 +171,7 @@ class SUserTagLib {
 	def isCEPFAdmin = { attrs, body ->
 		def user = attrs.model ? attrs.model.user : null;
 		user = user?:springSecurityService.getCurrentUser()
-		if (SUserService.isCEPFAdmin(user?.id)) {
+		if (utilsService.isCEPFAdmin(user?.id)) {
 			out << body()
 		}
 	}

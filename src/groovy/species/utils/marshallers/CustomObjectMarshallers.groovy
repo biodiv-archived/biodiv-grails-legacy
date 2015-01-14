@@ -37,6 +37,10 @@ import content.eml.UFile;
 
 import grails.converters.JSON
 import species.participation.Observation
+import org.codehaus.groovy.grails.web.converters.marshaller.xml.MapMarshaller;
+import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException;
+import java.util.Map;
+import grails.converters.XML;
 
 class CustomObjectMarshallers {
     
@@ -188,5 +192,19 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(UFile) {
             return ['path': grailsApplication.config.speciesPortal.content.serverURL + it.path, 'size':it.size, 'mimetype':it.mimetype]
         }
+
+        XML.registerObjectMarshaller(new MapMarshaller() {
+            public String getElementName(Object o) {
+                return "response";
+            }
+            public void marshalObject(Object o, XML xml) throws ConverterException {
+                Map<Object,Object> map = (Map<Object,Object>) o;
+                for (Map.Entry<Object,Object> entry : map.entrySet()) {
+                    xml.startNode(entry.getKey().toString());
+                    xml.convertAnother(entry.getValue());
+                    xml.end();
+                }
+            }
+        })
     }
 }

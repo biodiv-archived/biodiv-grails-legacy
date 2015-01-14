@@ -7,14 +7,19 @@ import species.groups.UserGroup;
 import species.auth.AppKey;
 
 import grails.converters.JSON;
+import grails.converters.XML;
 import java.util.concurrent.atomic.AtomicLong
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 import javax.servlet.http.HttpServletResponse;
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import static org.springframework.http.HttpStatus.*;
+
 class SecurityFilters {
 
     def grailsApplication;
     def springSecurityService;
+    def utilsService;
 
     private static final AtomicLong REQUEST_NUMBER_COUNTER = new AtomicLong()
     private static final String START_TIME_ATTRIBUTE = 'Controller__START_TIME__'
@@ -30,11 +35,11 @@ class SecurityFilters {
                 //println "Setting domain to : "+grailsApplication.config.speciesPortal.domain;
                 def appectedLanguage = false;    
                 for ( localeLanguage in grailsApplication.config.speciesPortal.localeLanguages ) {                    
-                        if(localeLanguage.twoletter.equals(LCH.getLocale().toString())){
-                           appectedLanguage = true;
-                        }
+                    if(localeLanguage.twoletter.equals(LCH.getLocale().toString())){
+                        appectedLanguage = true;
                     }
-                    
+                }
+
                 if(grailsApplication.config.speciesPortal.hideLanguages || !appectedLanguage){
                     Locale locale = new Locale("en");
                     LCH.setLocale(locale);                        
@@ -43,32 +48,45 @@ class SecurityFilters {
                 }    
 
                 def appName = grailsApplication.metadata['app.name']
-                /*                if(params.ajax_login_error == "1") {
-                                  render ([status:401, error:'Please login to continue'] as JSON)
-                                  return;
-                } 
-                 */ 
-                //				println params;
-                //				request.cookies.each{println it.name+" : "+it.value}
-                //				def enames = request.getHeaderNames();
-                //				   while (enames.hasMoreElements()) {
-                //					  String name = (String) enames.nextElement();
-                //					  String value = request.getHeader(name);
-                //					  println name+":"+value;
-                //				   }
-
+                
                 //verify appkey if present
-                if(params.appKey) {
-                    log.debug "Verifying app key ${params.appKey}"
-                    AppKey appKey = AppKey.findByKey(params.appKey);
-                    if(appKey) {
-                        log.debug "Found valid appkey. Continuing"
-                    } else {
-                        //sending 401 status
-                        render ([success:false, error:'Invalid app key in the url'])
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        return false;
-                    }
+                String appKeyHeader = request.getHeader('X-AppKey');
+                println "------------------------------------------------)"
+                println appKeyHeader
+                println request.requestURI
+                println request.forwardURI
+                println "------------------------------------------------)"
+                if(request.forwardURI.startsWith("/${appName}/api/")) {
+                    if (!params.action) params.action = 'index'
+                        println "MATCHED--------${params.controller}------${params.action}-----------------)"
+                        for( cc in ApplicationHolder.application.controllerClasses) {
+                            for (m in cc.clazz.methods) {
+                                def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
+                                if (ann) {
+                                    String con = cc.logicalPropertyName
+                                    String act = m.name
+                                    if(params.controller.equalsIgnoreCase(con) && params.action.equalsIgnoreCase(act)) {
+                                        boolean isUnauthorized = false;
+                                        if(appKeyHeader) {
+                                            log.debug "Verifying app key ${appKeyHeader}"
+                                            AppKey appKey = AppKey.findByKey(appKeyHeader);
+                                            if(appKey) {
+                                                log.debug "Found valid appkey. Continuing"
+                                            } else isUnauthorized = true
+                                        } else {
+                                            isUnauthorized = true;
+                                        }
+                                        if(isUnauthorized) {
+                                            //sending 401 status
+                                            def model = utilsService.getErrorModel('Invalid app key in the header', null, UNAUTHORIZED.value())
+                                            render model as JSON;
+                                            return false;
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
                 }
             }
 
@@ -108,7 +126,7 @@ class SecurityFilters {
                     def appectedLanguage = false;    
                     for ( localeLanguage in grailsApplication.config.speciesPortal.localeLanguages ) {
                         if(localeLanguage.twoletter.equals(LCH.getLocale().toString())){
-                           appectedLanguage = true;
+                            appectedLanguage = true;
                         }
                     }                   
                     if(grailsApplication.config.speciesPortal.hideLanguages || !appectedLanguage){
@@ -132,49 +150,49 @@ class SecurityFilters {
         logFilter(controller: '*', action: '*') {
 
             before = {
-                    long start = System.currentTimeMillis()
-                    long currentRequestNumber = REQUEST_NUMBER_COUNTER.incrementAndGet()
+                long start = System.currentTimeMillis()
+                long currentRequestNumber = REQUEST_NUMBER_COUNTER.incrementAndGet()
 
-                    request[START_TIME_ATTRIBUTE] = start
-                    request[REQUEST_NUMBER_ATTRIBUTE] = currentRequestNumber
-                    return true
+                request[START_TIME_ATTRIBUTE] = start
+                request[REQUEST_NUMBER_ATTRIBUTE] = currentRequestNumber
+                return true
             }
 
             after = { Map model ->
 
-                    long start = request[START_TIME_ATTRIBUTE]
-                    long end = System.currentTimeMillis()
-                    long currentRequestNumber = request[REQUEST_NUMBER_ATTRIBUTE]
+                long start = request[START_TIME_ATTRIBUTE]
+                long end = System.currentTimeMillis()
+                long currentRequestNumber = request[REQUEST_NUMBER_ATTRIBUTE]
 
-                    def msg = "^^Request #$currentRequestNumber : " +
-                    "'$request.forwardURI', " +
-                    " 'at ${new Date()}', 'Ajax: $request.xhr', 'controller: $controllerName', " +
-                    "'action: $actionName', 'params: ${params}', " +
-                    "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"',"+
-                    "'${end - start}ms'"
+                def msg = "^^Request #$currentRequestNumber : " +
+                "'$request.forwardURI', " +
+                " 'at ${new Date()}', 'Ajax: $request.xhr', 'controller: $controllerName', " +
+                "'action: $actionName', 'params: ${params}', " +
+                "from '$request.remoteHost ($request.remoteAddr)', '"+ request.getHeader('User-Agent')+"',"+
+                "'${end - start}ms'"
 
-                    if (log.traceEnabled) {
-                        log.trace msg + "; model: $model"
-                    }
-                    else {
-                        log.info msg
-                    }
+                if (log.traceEnabled) {
+                    log.trace msg + "; model: $model"
+                }
+                else {
+                    log.info msg
+                }
             }
 
             afterView = { Exception e ->
 
-                    long start = request[START_TIME_ATTRIBUTE]
-                    long end = System.currentTimeMillis()
-                    long requestNumber = request[REQUEST_NUMBER_ATTRIBUTE]
+                long start = request[START_TIME_ATTRIBUTE]
+                long end = System.currentTimeMillis()
+                long requestNumber = request[REQUEST_NUMBER_ATTRIBUTE]
 
-                    def msg = "afterCompletion request #$requestNumber: " +
-                    "end ${new Date()}, total time ${end - start}ms"
-                    if (e) {
-                        log.error "$msg \n\texception: $e.message", e
-                    }
-                    else {
-                        log.info msg
-                    }
+                def msg = "afterCompletion request #$requestNumber: " +
+                "end ${new Date()}, total time ${end - start}ms"
+                if (e) {
+                    log.error "$msg \n\texception: $e.message", e
+                }
+                else {
+                    log.info msg
+                }
             }
 
         }

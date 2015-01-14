@@ -36,8 +36,9 @@ class UrlMappings {
 		"/api/user/$action?/$id?" { 
             controller = 'SUser' 
             format = 'json'
-        
+            constraints { id matches: /\d+/ }
         }
+//		"/api/user"(resources:'SUser')
 
 		"/" {
             controller='home'
@@ -46,9 +47,8 @@ class UrlMappings {
 		"/logout/$action?"(controller: "logout")
 
         //DONOT REMOVE
-		"/$controller/$action?/$id?"{ 
-            constraints { // apply constraints here
-			} 
+		"/$controller/$action?/$id?(.${format})?"{ 
+            constraints { id matches: /\d+/ }
         }
 
         "/api/login" {
@@ -72,7 +72,7 @@ class UrlMappings {
             format = 'json'
         }
 
-        for( cc in ApplicationHolder.application.controllerClasses) {
+/*        for( cc in ApplicationHolder.application.controllerClasses) {
             for (m in cc.clazz.methods) {
                 def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
                 if (ann) {
@@ -97,9 +97,10 @@ class UrlMappings {
         "/api/$appKey/$controller/$action?/$id?"{ 
             format = 'json'
         }
-
+*/
         "/api/$controller/$action?/$id?"{ 
             format = 'json'
+            constraints { id matches: /\d+/ }
         }
 
 		"/static/$path"(controller:"species", action:"staticContent")

@@ -20,7 +20,7 @@ import species.CommonNames;
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
-
+import org.codehaus.groovy.grails.web.util.WebUtils;
 import java.beans.Introspector;
 class UtilsService {
 
@@ -75,6 +75,8 @@ class UtilsService {
             }
         }
     }
+
+    ///////////////////////LINKS/////////////////////////////////
 
     public String generateLink( String controller, String action, linkParams, request=null) {
         request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
@@ -174,7 +176,6 @@ class UtilsService {
         return url.replace('/api/', '/');
     }
 
-
     File getUniqueFile(File root, String fileName){
         File imageFile = new File(root, fileName);
 
@@ -232,6 +233,7 @@ class UtilsService {
 
         return null;
     }
+
     Language getCurrentLanguage(request = null){
        // println "====================================="+request
         
@@ -241,8 +243,8 @@ class UtilsService {
         return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
     }
 
-    /**
-     */
+    ///////////////////////////MAIL RELATED///////////////////////
+
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
         def conf = SpringSecurityUtils.securityConfig
         log.debug "Sending email"
@@ -826,6 +828,8 @@ class UtilsService {
         return groupId
     }
 
+    //////////////////////TIME LOGGING/////////////////////
+
     def benchmark(String blockName, Closure closure) {
         def start = System.currentTimeMillis()  
         closure.call()  
@@ -841,6 +845,64 @@ class UtilsService {
         def result = closure.call()
         sqlLogger.setLevel(currentLevel)
         result
+    }
+
+    ///////////////////////PERMISSIONS//////////////////////
+
+    boolean permToReorderPages(uGroup){
+        if(uGroup){
+            return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || uGroup.isFounder(springSecurityService.currentUser))
+        }
+        else{
+            return  springSecurityService.isLoggedIn() && SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        }
+    }
+
+	boolean ifOwns(SUser user) {
+        if(!user) return false
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean ifOwns(Long id) {
+        if(!id) return false
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean ifOwnsByEmail(String email) {
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean isAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+	}
+	
+	boolean isCEPFAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
+	}
+
+    ////////////////////////RESPONSE FORMATS//////////////////
+
+    Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
+        if(!errors) errors = [];
+        if(domainObject) {
+            domainObject.errors.allErrors.each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+            }
+        }
+
+        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        return [success:false, status:status, msg:msg, errors:errors]
+    }
+
+    Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
+        def result = [success:true, status: status, msg:msg]
+        if(domainObject) result['instance'] = domainObject;
+        if(model) result['model'] = model;
+        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        return result;
     }
 
 }

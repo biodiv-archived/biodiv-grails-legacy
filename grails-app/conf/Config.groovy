@@ -516,10 +516,10 @@ environments {
             }
             error stdout:"StackTrace"
             error   'net.sf.ehcache.hibernate'
-            error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
+            error    'org.codehaus.groovy.grails.web.pages' //  GSP
+            error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
+            debug    'org.codehaus.groovy.grails.web.mapping' // URL mapping
+            error   'org.codehaus.groovy.grails.commons', // core / classloading
                     'org.codehaus.groovy.grails.plugins', // plugins
                     'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
                     'grails.app.tagLib.org.grails.plugin.resource',
@@ -1658,3 +1658,8 @@ grails.plugin.springsecurity.filterChain.chainMap = [
     '/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
     '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]
+
+//http://mrhaki.blogspot.in/2014/07/grails-goodness-enable-accept-header.html
+grails.mime.use.accept.header = true // Default value is true.
+grails.mime.disable.accept.header.userAgents = []
+

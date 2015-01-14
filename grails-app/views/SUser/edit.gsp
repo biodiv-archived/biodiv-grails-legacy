@@ -500,64 +500,62 @@
         }
 		
 		$('#attachFile').change(function(e){
-  			$('.upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+  			$('.upload_resource').find("span.msg").html("Uploading... Please wait...");
+            var onUploadResourceSuccess =  function(responseXML, statusText, xhr, form) {
+                if($(responseXML).find('success').text() == 'true') {
+                    $(form).find("span.msg").html("");
+                    var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
+                    var dir = $(responseXML).find('dir').text();
+                    var dirInput = $('.upload_resource input[name="dir"]');
+                    if(!dirInput.val()){
+                        $(dirInput).val(dir);
+                    }
+                    
+                    $(responseXML).find('resources').find('image').each(function() {
+                        var file = dir + "/" + $(this).attr('fileName');
+                        var thumbnail = rootDir + file.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+                        $("#icon").val(file);
+                        $("#thumbnail").attr("src", thumbnail);
+                    });
+                    $("#image-resources-msg").parent(".resources").removeClass("error");
+                    $("#image-resources-msg").html("");
+                } else {
+                    onUploadResourceError(xhr);
+                }
+            }
+
+            var onUploadResourceError = function (xhr, ajaxOptions, thrownError){
+                    //successHandler is used when ajax login succedes
+                    var successHandler = onUploadResourceSuccess, errorHandler;
+                    handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+                        var response = $(xhr.responseXML).find('msg').text();
+                        if(response){
+                            $("#image-resources-msg").parent(".resources").addClass("error");
+                            $("#image-resources-msg").html(response);
+                        }
+                        
+                        var messageNode = $(".message .resources");
+                        if(messageNode.length == 0 ) {
+                            $(".upload_resource").prepend('<div class="message">'+(response?response:"Error")+'</div>');
+                        } else {
+                            messageNode.append(response?response:"Error");
+                        }
+                    });
+                } 
+            $('.upload_resource').ajaxSubmit({ 
+                url:'${g.createLink(controller:'user', action:'upload_resource')}',
+                dataType : 'xml',
+                clearForm: true,
+                resetForm: true,
+                type: 'POST',
+                success:onUploadResourceSuccess, 
+                error:onUploadResourceError
+            });
 		});
-
-     	$('.upload_resource').ajaxForm({ 
-			url:'${g.createLink(controller:'SUser', action:'upload_resource')}',
-			dataType: 'xml',//could not parse json wih this form plugin 
-			clearForm: true,
-			resetForm: true,
-			type: 'POST',
-			 
-			beforeSubmit: function(formData, jqForm, options) {
-				return true;
-			}, 
-                        xhr: function() {  // custom xhr
-                            myXhr = $.ajaxSettings.xhr();
-                            return myXhr;
-                        },
-                        success: function(responseXML, statusText, xhr, form) {
-				$(form).find("span.msg").html("");
-				var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
-				var dir = $(responseXML).find('dir').text();
-				var dirInput = $('.upload_resource input[name="dir"]');
-				if(!dirInput.val()){
-					$(dirInput).val(dir);
-				}
-				
-				$(responseXML).find('resources').find('image').each(function() {
-					var file = dir + "/" + $(this).attr('fileName');
-					var thumbnail = rootDir + file.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
-					$("#icon").val(file);
-					$("#thumbnail").attr("src", thumbnail);
-				});
-				$("#image-resources-msg").parent(".resources").removeClass("error");
-                                $("#image-resources-msg").html("");
-			}, error:function (xhr, ajaxOptions, thrownError){
-					//successHandler is used when ajax login succedes
-                                        var successHandler = this.success, errorHandler;
-                                        handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
-						var response = $.parseJSON(xhr.responseText);
-						if(response.error){
-							$("#image-resources-msg").parent(".resources").addClass("error");
-							$("#image-resources-msg").html(response.error);
-						}
-						
-						var messageNode = $(".message .resources");
-						if(messageNode.length == 0 ) {
-							$(".upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-						} else {
-							messageNode.append(response?response.error:"Error");
-						}
-					});
-           		} 
-     		});
-
 
             $('#generateAppKey').click(function() {
                 $.ajax({
-                    url:'${g.createLink(controller:'SUser', action:'generateAppKey')}',
+                    url:'${g.createLink(controller:'user', action:'generateAppKey')}',
                     dataType: 'json',
                     type: 'GET',
                     

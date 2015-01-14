@@ -134,49 +134,13 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		}
 	}
 
-	/**
-	 * 
-	 * @param user
-	 * @return
-	 */
-	boolean ifOwns(SUser user) {
-		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
-	}
-    
     boolean hasObvLockPerm(obvId) {
         def observationInstance = Observation.get(obvId.toLong());
         def taxCon = observationInstance.maxVotedReco?.taxonConcept 
         return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
     }
 
-    boolean permToReorderPages(uGroup){
-        if(uGroup){
-            return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || uGroup.isFounder(springSecurityService.currentUser))
-        }
-        else{
-            return  springSecurityService.isLoggedIn() && SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
-        }
-    }
-
-	boolean ifOwns(Long id) {
-		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
-	}
-
-	boolean ifOwnsByEmail(String email) {
-		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
-	}
-
-	boolean isAdmin(id) {
-		if(!id) return false
-		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
-	}
-	
-	boolean isCEPFAdmin(id) {
-		if(!id) return false
-		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
-	}
-
-	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl, Map otherParams=null){
+    public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl, Map otherParams=null){
 		 
 		def conf = SpringSecurityUtils.securityConfig
 		g = applicationContext.getBean(ApplicationTagLib)
@@ -227,7 +191,6 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				def msgsourcearg = new Object[2];
                 msgsourcearg[0] = user.email;
                 msgsourcearg[1] = domain;
-
 				bodyContent = messageSource.getMessage("grails.plugin.springsecurity.ui.userdeleted.emailBody", msgsourcearg, LCH.getLocale())
 				if (bodyContent.contains('$')) {
 					bodyContent = evaluate(bodyContent, templateMap)
@@ -244,12 +207,14 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
                             if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
                                 bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
                                     //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+                            } else {
+                                bcc 'sravanthi@strandls.com'                                
                             }
                             subject mailSubject
                             html bodyContent.toString()
                         }
                     }
-                }catch(all)  {
+                } catch(all)  {
                     log.error all.getMessage()
                     all.printStackTrace();
                 }

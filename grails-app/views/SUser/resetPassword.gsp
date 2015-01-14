@@ -26,7 +26,7 @@
 					<g:message code="spring.security.ui.resetPassword.header" />
 				</legend>
 				<form
-					action='${uGroup.createLink(controller:'SUser', action:'resetPassword', id:params.id, userGroupWebaddress:params.webaddress)}'
+					action="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:params.id, userGroupWebaddress:params.webaddress)}"
 					name='resetPasswordForm' autocomplete='off' method="POST"
 					class="form-horizontal">
 					

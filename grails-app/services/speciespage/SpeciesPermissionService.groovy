@@ -25,7 +25,6 @@ class SpeciesPermissionService {
     def emailConfirmationService;
     def utilsService;
     def springSecurityService;
-    def SUserService;
 
     List<SUser> getCurators(Species speciesInstance) {
         def result = getUsers(speciesInstance, PermissionType.ROLE_CURATOR) 
@@ -114,8 +113,6 @@ class SpeciesPermissionService {
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        //println "IS SPECIES CONTRIBUTOR -----------------"
-        //println speciesInstance.taxonConcept;
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
@@ -128,8 +125,6 @@ class SpeciesPermissionService {
     }
 
     boolean isTaxonContributor(List<TaxonomyDefinition> parentTaxons, SUser user, List<PermissionType> permissionTypes = [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        println "PARENT TAXONS-----------------------"
-        println parentTaxons
         if(!parentTaxons || !user || !permissionTypes) return false;
         def permissions = permissionTypes.collect {it.value()};
         def res = SpeciesPermission.withCriteria {
@@ -137,14 +132,9 @@ class SpeciesPermissionService {
             inList('permissionType', permissions)
             inList('taxonConcept',  parentTaxons)
         }
-        println "^^^^^^^^^^^^^^^++++++++++++++++"
-println res;
-        println "^^^^^^^^^^^^^^^++++++++++++++++"
         if(res && res.size() > 0) {
-            println true
             return true
         } else {
-            println false
             return false
         }
     }
@@ -153,7 +143,7 @@ println res;
         if(!user) return false;
         boolean flag = false;
         speciesFieldInstance.contributors.each { c ->
-            if((c.id == user.id) || (SUserService.isAdmin(user))) {
+            if((c.id == user.id) || (utilsService.isAdmin(user))) {
                 flag = true;
                 return
             }

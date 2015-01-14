@@ -15,7 +15,6 @@ class ChecklistController {
 	def grailsApplication
 	def checklistUtilService
 	def observationService
-	def SUserService
 	def chartService
     def utilsService;
 	
@@ -189,7 +188,7 @@ class ChecklistController {
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-		} else if(SUserService.ifOwns(observationInstance.author)) {
+		} else if(utilsService.ifOwns(observationInstance.author)) {
             def checklist = getChecklistData(params.id.toLong());
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, sciNameColumn:observationInstance.sciNameColumn, commonNameColumn:observationInstance.commonNameColumn])
 		} else {

@@ -36,8 +36,9 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 
+import static org.springframework.http.HttpStatus.*;
 
-class AbstractObjectController {
+abstract class AbstractObjectController {
     
     def utilsService;
     def observationService;
@@ -51,7 +52,11 @@ class AbstractObjectController {
             } else {
                 log.debug "no related observations"
             }
-            render relatedObv as JSON
+            def model = utilsService.getSuccessModel("", null, OK.value(), relatedObv)
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         } else {
             def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
             List urlList = []
@@ -75,7 +80,11 @@ class AbstractObjectController {
                 urlList << item;
             }
             relatedObv.observations = urlList
-            render relatedObv as JSON
+            def model = utilsService.getSuccessModel("", null, OK.value(), relatedObv)
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
     }
 
