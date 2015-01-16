@@ -269,7 +269,8 @@ class SpeciesController extends AbstractObjectController {
 			//def observationInstanceList = relatedObservations?.observations?.observation
 			//def instanceTotal = relatedObservations?relatedObservations.count:0
 			
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName]
+		    def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 
              if(springSecurityService.currentUser) {
                 SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');

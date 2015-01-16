@@ -140,10 +140,12 @@ class ChecklistService {
                     break;
                 }
             }
-            if(!validObvPresent) {
-                def request = RequestContextHolder.currentRequestAttributes().request
+            if(!validObvPresent && params.action == "save") {
+                //def request = RequestContextHolder.currentRequestAttributes().request
 				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
+            
+            if(params.checklistData.size() == 0 && params.action != 'save') validObvPresent = true;
 
             println "----------------------------------------------checklist lic"
             println checklistInstance.license

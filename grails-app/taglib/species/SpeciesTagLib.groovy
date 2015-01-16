@@ -180,6 +180,8 @@ class SpeciesTagLib {
     }
 
     def updatereference = {attrs, body->
+        println "--------------------------------"
+        println attrs.model
     	def result = speciesService.updateReference(attrs.model.referenceId, attrs.model.speciesId, attrs.model.fieldId, attrs.model.speciesFieldId, attrs.model.value);
 		out << body();
 	}

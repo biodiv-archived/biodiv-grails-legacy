@@ -192,7 +192,7 @@ http://indiabiodiversity.localhost.org/api/userGroup/moderators
 
 h4. joinUs 
 
-* *Path* : /api/apiKey/userGroup/joinUs
+* *Path* : /api/userGroup/joinUs
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -200,7 +200,7 @@ h4. joinUs
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/joinUs
+http://indiabiodiversity.localhost.org/api/userGroup/joinUs
 {code}
 * *Response* :
 ** Successful response
@@ -223,7 +223,7 @@ http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/
 
 h4. leaveUs 
 
-* *Path* : /api/apiKey/userGroup/leaveUs
+* *Path* : /api/userGroup/leaveUs
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -231,7 +231,7 @@ h4. leaveUs
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/leaveUs
+http://indiabiodiversity.localhost.org/api/userGroup/leaveUs
 {code}
 * *Response* :
 ** Successful response
@@ -247,7 +247,7 @@ http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/
 
 h4. inviteMembers 
 
-* *Path* : /api/apiKey/userGroup/inviteMembers
+* *Path* : /api/userGroup/inviteMembers
 * *Parameters*
 ** memberUserIds : csv of userIds
 ** id : usergroup id
@@ -256,7 +256,7 @@ h4. inviteMembers
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/inviteMembers
+http://indiabiodiversity.localhost.org/api/userGroup/inviteMembers
 id:1
 memberUserIds:2,3
 {code}
@@ -282,7 +282,7 @@ memberUserIds:2,3
 
 h4. inviteExperts 
 
-* *Path* : /api/apiKey/userGroup/inviteExperts
+* *Path* : /api/userGroup/inviteExperts
 * *Parameters*
 ** memberUserIds : csv of userIds
 ** id : usergroup id
@@ -291,7 +291,7 @@ h4. inviteExperts
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/inviteExperts
+http://indiabiodiversity.localhost.org/api/userGroup/inviteExperts
 id:1
 memberUserIds:2,3
 {code}
@@ -317,7 +317,7 @@ memberUserIds:2,3
 
 h4. requestMembership 
 
-* *Path* : /api/apiKey/userGroup/requestMembership
+* *Path* : /api/userGroup/requestMembership
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -325,7 +325,7 @@ h4. requestMembership
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/requestMembership
+http://indiabiodiversity.localhost.org/api/userGroup/requestMembership
 {code}
 * *Response* :
 ** Successful response
@@ -349,7 +349,7 @@ http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/
 
 h4. requestModeratorship 
 
-* *Path* : /api/apiKey/userGroup/requestModeratorship
+* *Path* : /api/userGroup/requestModeratorship
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -357,7 +357,7 @@ h4. requestModeratorship
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/userGroup/requestModeratorship
+http://indiabiodiversity.localhost.org/api/userGroup/requestModeratorship
 {code}
 * *Response* :
 ** Successful response

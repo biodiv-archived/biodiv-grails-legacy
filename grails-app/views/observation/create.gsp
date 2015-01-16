@@ -131,7 +131,9 @@
 
 $(document).ready(function(){
     var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
-     <%
+    uploadResource.POLICY = "${policy}";
+    uploadResource.SIGNATURE = "${signature}";
+    <%
            if(observationInstance?.group) {
            out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
            }

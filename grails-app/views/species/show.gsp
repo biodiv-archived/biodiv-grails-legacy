@@ -295,9 +295,12 @@
 
                 </div>
                 
-            </div>	 
-            <script type="text/javascript">
-           var licenseSelectorOptions = [];
+            </div>
+            <input type="hidden" name="policy" value="${policy}"/>
+            <input type="hidden" name="signature" value="${signature}"/>
+
+        <script type="text/javascript">
+            var licenseSelectorOptions = [];
             <g:each in="${License.LicenseType.toList()}" var="l">
             licenseSelectorOptions.push({value:"${l.value()}", text:"${l.value()}"});
             </g:each>
@@ -329,7 +332,7 @@
             </script>	
             <r:script>
             $(document).ready(function() {
-                var uploadResource 
+                var uploadResource; 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
             });

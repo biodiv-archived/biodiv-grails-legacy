@@ -24,7 +24,7 @@ class Species implements Rateable {
  	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
-	Resource reprImage;
+	//Resource reprImage;
 	Float percentOfInfo;  
     Date updatedOn;
     int featureCount = 0;
@@ -64,7 +64,7 @@ class Species implements Rateable {
 
 	static constraints = {
 		guid(blank: false, unique: true);
-		reprImage(nullable:true);
+		//reprImage(nullable:true);
 		percentOfInfo(nullable:true);
 		updatedOn(nullable:true);
         featureCount nullable:false;

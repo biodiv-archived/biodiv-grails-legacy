@@ -1,28 +1,29 @@
 <%@page import="species.SpeciesField"%>
 <%
 //def references = speciesInstance.fields.collect{it.references};
-
+def results = [];
 def sfInstance 	  = category.value.get('speciesFieldInstance');
-def fieldInstance = sfInstance[0]?.field;
-//references = refs.values();
-//printing only if references are not available.. using description
+if(sfInstance) {
+    def fieldInstance = sfInstance[0]?.field;
+    //references = refs.values();
+    //printing only if references are not available.. using description
 
-if(sfInstance && sfInstance[0]?.description && sfInstance[0]?.description != 'dummy') { %>
-	<s:updatereference model="['referenceId': '','speciesId':speciesInstance.id,'speciesFieldId':sfInstance[0].id,
-					'fieldId':fieldInstance.id,'value':sfInstance[0]?.description]" />
-<%		
-	sfInstance[0]?.description = 'dummy';
-	sfInstance[0].save();
+    if(sfInstance && sfInstance[0]?.description && sfInstance[0]?.description != 'dummy') { %>
+        <s:updatereference model="['referenceId': '','speciesId':speciesInstance.id,'speciesFieldId':sfInstance[0].id,
+                        'fieldId':fieldInstance.id,'value':sfInstance[0]?.description]" />
+    <%		
+        sfInstance[0]?.description = 'dummy';
+        sfInstance[0].save();
+    }
+
+    def criteria = SpeciesField.createCriteria();
+    results = criteria.list {
+        groupProperty('field')
+        eq('species', speciesInstance)
+        eq('language', userLanguage)
+        order("field", "asc")
+    }
 }
-
-def criteria = SpeciesField.createCriteria();
-def results = criteria.list {
-     groupProperty('field')
-    eq('species', speciesInstance)
-    eq('language', userLanguage)
-    order("field", "asc")
-}
-
 def references = [];
 
   results.each{result->  	
@@ -81,7 +82,7 @@ def references = [];
 	</div>
 </div>
 
-<script type="text/javascript">
+<r:script type="text/javascript">
 
 function save_reference(that,action,speciesid,fieldId,pk,cid,text_val){
 	var act = '';
@@ -218,5 +219,5 @@ function save_reference(that,action,speciesid,fieldId,pk,cid,text_val){
 
 	});
 
-</script>
+</r:script>
 

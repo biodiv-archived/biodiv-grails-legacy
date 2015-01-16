@@ -14,7 +14,6 @@ class DocumentController extends AbstractObjectController {
 	def documentService
 	def springSecurityService
 	def userGroupService
-	def SUserService
 	def activityFeedService
 	def utilsService
 	def documentSearchService
@@ -120,7 +119,7 @@ class DocumentController extends AbstractObjectController {
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 			redirect(action: "browser")
-		} else if(SUserService.ifOwns(documentInstance.author)) {
+		} else if(utilsService.ifOwns(documentInstance.author)) {
 			render(view: "create", model: [documentInstance: documentInstance])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"

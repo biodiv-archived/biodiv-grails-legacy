@@ -313,8 +313,13 @@ modules = {
 		resource url:'/js/chart.js'
 	}
 
+    ajaxfileuploader {
+        resource url:[plugin: 'ajax-uploader-1.1', dir: 'js', file: 'fileuploader.js']
+        resource url:[plugin: 'ajax-uploader-1.1', dir: 'css', file: 'uploader.css']
+    }
+
 	add_file {
-		dependsOn 'core, tagit, list_utils, fileuploader'
+		dependsOn 'core, tagit, list_utils, ajaxfileuploader'
 		
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'

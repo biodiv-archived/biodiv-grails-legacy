@@ -18,7 +18,6 @@ class NewsletterController {
 	def newsletterService
 	def aclUtilService
 	def springSecurityService
-	def SUserService
     def observationService
     def utilsService;
 	public static final boolean COMMIT = true;
@@ -39,7 +38,7 @@ class NewsletterController {
 		if(params.webaddress||params.userGroup) { 
 			def userGroupInstance = (params.userGroup)?params.userGroup:UserGroup.findByWebaddress(params.webaddress);
 			params.userGroup = userGroupInstance;
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
 				permitted = true
 			} else {
 				flash.message = "${message(code: 'default.not.permitted.message', args: ['add new', message(code: 'page.label', default: 'page'), ''])}"
@@ -47,7 +46,7 @@ class NewsletterController {
 				return;			
 			}
 		} else {
-			if(SUserService.isAdmin(springSecurityService.currentUser)) {
+			if(utilsService.isAdmin(springSecurityService.currentUser)) {
 				permitted = true;
 			} else {
 				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
@@ -71,7 +70,7 @@ class NewsletterController {
 		if(params.userGroup) {
 			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			params.userGroup = userGroupInstance;
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
 				newsletterInstance = new Newsletter(params)
 				userGroupInstance.addToNewsletters(newsletterInstance);
 	
@@ -90,7 +89,7 @@ class NewsletterController {
 				redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", userGroup:userGroupInstance)
 			}
 		} else {
-			if(SUserService.isAdmin(springSecurityService.currentUser)) {
+			if(utilsService.isAdmin(springSecurityService.currentUser)) {
 				newsletterInstance = new Newsletter(params)
 				if (newsletterInstance.save(flush: true)) {
 					postProcessNewsletter(newsletterInstance);
@@ -156,14 +155,14 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
 					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
 				} else {
 					flash.message = "${message(code: 'edit.denied.message')}"
 					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':newsletterInstance.userGroup, params:['newsletterId':newsletterInstance.id])
 				}
 			}
-			else if(SUserService.isAdmin(springSecurityService.currentUser)) {
+			else if(utilsService.isAdmin(springSecurityService.currentUser)) {
 				[newsletterInstance: newsletterInstance]
 			} else {
 				flash.message = "${message(code: 'edit.denied.message')}"
@@ -194,7 +193,7 @@ class NewsletterController {
 			newsletterInstance.properties = validMap
 			if(params.userGroup) {
 				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
 					userGroupInstance.addToNewsletters(newsletterInstance);
 					if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 						postProcessNewsletter(newsletterInstance);
@@ -208,7 +207,7 @@ class NewsletterController {
 					render(view: "edit", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 				}
 			} else {
-				if(SUserService.isAdmin(springSecurityService.currentUser)) {
+				if(utilsService.isAdmin(springSecurityService.currentUser)) {
 					if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 						postProcessNewsletter(newsletterInstance);
 						flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
@@ -235,7 +234,7 @@ class NewsletterController {
 		if (newsletterInstance) {
 			boolean permitted = false;
 			if(newsletterInstance.userGroup) {
-				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || SUserService.isAdmin(springSecurityService.currentUser)) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
 					permitted = true;
 				} else {
 					flash.message = "${message(code: 'default.not.permitted.message', args: ['delete', message(code: 'page.label', default: 'page'), ''])}"
@@ -243,7 +242,7 @@ class NewsletterController {
 				}
 			}
 			else {
-				if(SUserService.isAdmin(springSecurityService.currentUser)) {
+				if(utilsService.isAdmin(springSecurityService.currentUser)) {
 					permitted = true;	
 				} else {
 					flash.message = "${message(code: 'default.not.permitted.message', args: ['delete', message(code: 'page.label', default: 'page'), ''])}"

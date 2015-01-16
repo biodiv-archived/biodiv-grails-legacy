@@ -82,14 +82,14 @@ http://indiabiodiversity.org/api/species/related?limit=10&offset=0&filterPropert
 
 h4. delete
 
-* *Path* : /api/apiKey/species/delete
+* *Path* : /api/species/delete
 * *Parameters* :
 ** id : species id
 ** *REST Method* : POST
 ** Permission : Need admin permission to delete
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/delete?id=234
+http://indiabiodiversity.localhost.org/api/species/delete?id=234
 {code}
 * *Response* :
 ** on success
@@ -121,7 +121,7 @@ http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/
 
 h4. update
 
-* *Path* : /api/apiKey/pecies/update
+* *Path* : /api/pecies/update
 * *Parameters* :
 ** name : contributor | attribution | description | newdescription | license | audienceType | status | reference | synonym | commonname | speciesField
 ** pk : species field id
@@ -138,7 +138,7 @@ h4. update
 ** Requests 
 * __ Adding synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
+url : http://indiabiodiversity.localhost.org/api/species/update
 name:synonym
 value:Test indica
 pk:275594
@@ -147,7 +147,7 @@ relationship:Synonym
 
 * __ Editing synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
+url : http://indiabiodiversity.localhost.org/api/species/update
 name:synonym
 value:Test indicatwo
 pk:275594
@@ -157,7 +157,7 @@ sid:221654
 
 * __ Deleting synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
+url : http://indiabiodiversity.localhost.org/api/species/update
 name:synonym
 pk:275594
 act:delete
@@ -166,7 +166,7 @@ sid:221655
 
 * __ Adding speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
+url : http://indiabiodiversity.localhost.org/api/species/update
 description:<p>desc</p>
 attribution:a1
 contributor:1
@@ -182,7 +182,7 @@ runForImages:false
 
 * __ Editing speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
+url : http://indiabiodiversity.localhost.org/api/species/update
 description:<p>desc2</p>
 attribution:a1
 contributor:1
@@ -198,7 +198,7 @@ runForImages:false
 
 * __ Deleting speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/update
+url : http://indiabiodiversity.localhost.org/api/species/update
 pk:501520
 speciesid:275594
 act:delete
@@ -207,7 +207,7 @@ name:speciesField
 
 h4. setResources
 
-* *Path* : /api/apiKey/species/setResources
+* *Path* : /api/species/setResources
 * *Parameters* :
 ** id : species id
 ** resourceListType: ofSpecies | fromSingleSpeciesField | ofObv | null | usersResource
@@ -223,7 +223,7 @@ h4. setResources
 ** Notes : use index format as in _ for all keys such as title, license, url etc., to give multiple resources in same call. Existing resources of the species will be deleted and all mentioned in this call are set for the species. 
 * *Request* :
 {code}
-url : http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/setResources
+url : http://indiabiodiversity.localhost.org/api/species/setResources
 speciesId:275594
 file_1:/8378307e-55ad-4e95-8600-7c8beb5e09ba/861.JPG
 url_1:
@@ -273,7 +273,7 @@ h4. count
 
 h4. requestExport
 
-* *Path* : /api/apiKey/species/requestExport
+* *Path* : /api/species/requestExport
 * *Parameters* :
 ** filterUrl : filterUrl as in list call
 ** downloadType
@@ -289,7 +289,7 @@ h4. requestExport
 
 h4. upload
 
-* *Path* : /api/apiKey/species/upload
+* *Path* : /api/species/upload
 * *Parameters* :
 ** xlsxFileUrl : xls file in mentioned format is required
 ** imagesDir : path to images dir relative to appln data dir where images are present. 
@@ -302,7 +302,7 @@ h4. upload
 
 h4. requestPermission
 
-* *Path* : /api/apiKey/species/requestPermission
+* *Path* : /api/species/requestPermission
 * *Parameters* :
 ** selectedNodes : csv of taxonConcept ids
 ** inviteType : contributor | curator . Default:contributor 
@@ -312,7 +312,7 @@ h4. requestPermission
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/requestPermission
+http://indiabiodiversity.localhost.org/api/species/requestPermission
 invitetype:contributor
 message:test
 selectedNodes:94899
@@ -321,7 +321,7 @@ selectedNodes:94899
 
 h4. invite
 
-* *Path* : /api/apiKey/species/invite
+* *Path* : /api/species/invite
 * *Parameters* :
 ** userIds : csv of user ids
 ** inviteType : curator | contributor. Default contributor 
@@ -330,13 +330,13 @@ h4. invite
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/species/invite
+http://indiabiodiversity.localhost.org/api/species/invite
 {code}
 
 
 h4. searchPermission
 
-* *Path* : /api/apiKey/species/searchPermission
+* *Path* : /api/species/searchPermission
 * *Parameters* :
 ** rank : sci name rank number
 ** page : scientific name 

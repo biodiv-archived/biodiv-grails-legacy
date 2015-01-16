@@ -26,14 +26,13 @@ All requests except for the login and register apis should be authenticated. Onl
 
 APIs reading data from the portal just need this authentication token, but any api writing content in to the portal also needs an appKey. This is to identify the app and discourage putting in junk data into the portal using scripts. App Key can be generated from user profile page. 
 
-All read requests are of the format 
+All requests are of the format 
 {code}
-http://indiabiodiversity.org/api/$controller/$action
-{code}
+http://indiabiodiversity.org/api/$controller/$action/$id?
 
-All write requests are of the format
-{code}
-http://indiabiodiversity.org/api/$apiKey/$controller/$action
+X-Auth-Token is the header key for providing authentication key and 
+X-AppKey id the header key to provide app key for all write requests
+Accept header with values application/json, text/json can be provided to mention response format
 {code}
 
 h4. Response Format

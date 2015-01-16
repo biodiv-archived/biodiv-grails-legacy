@@ -631,97 +631,96 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         if(speciesId && fieldId){
-            updateSpeciesReference(referenceId, speciesId, fieldId, value);
+            return updateSpeciesReference(referenceId, speciesId, fieldId, value);
         }
-       
     }
 
 
-private def updateSpeciesReference(referenceId, long speciesId, long fieldId, def value) {
-    String msg = '';
-    def content;
-    def count_chk = ['success_count' : 0 ,'failure_count' : 0];
-    SpeciesField speciesField,speciesFields;
-    Species speciesInstance = Species.get(speciesId);
-    if(speciesId && !referenceId){               
-        if(!speciesInstance){
-            def messagesourcearg = new Object[1];
+    private def updateSpeciesReference(referenceId, long speciesId, long fieldId, def value) {
+        String msg = '';
+        def content;
+        def count_chk = ['success_count' : 0 ,'failure_count' : 0];
+        SpeciesField speciesField,speciesFields;
+        Species speciesInstance = Species.get(speciesId);
+        if(speciesId && !referenceId){               
+            if(!speciesInstance){
+                def messagesourcearg = new Object[1];
                 messagesourcearg[0] = referenceId;
-             return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
-        }
+                return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
+            }
 
-        Field field = Field.read(fieldId);       
-        speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
-        if(!speciesField){
-            speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
-        }
-        def references = [];        
-        value?.split("\\r?\\n").each { l ->
-            l = l.trim(); 
-           if(l && l.trim()) {                 
-                def chk = is_exist_reference(speciesInstance, l);
-               if(chk){
-                    Reference reference;
-                    if(l.startsWith("http://")) {
-                        reference = new Reference(url:l); 
-                     }else{
-                        reference = new Reference(title:l); 
-                     }   
-                    speciesField.addToReferences(reference);
-                    references.push(reference);
-                    count_chk.success_count =  count_chk.success_count +1;
-                }else{
-                     count_chk.failure_count =  count_chk.failure_count +1;
-                }    
+            Field field = Field.read(fieldId);       
+            speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
+            if(!speciesField){
+                speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
+            }
+            def references = [];        
+            value?.split("\\r?\\n").each { l ->
+                l = l.trim(); 
+                if(l && l.trim()) {                 
+                    def chk = is_exist_reference(speciesInstance, l);
+                    if(chk){
+                        Reference reference;
+                        if(l.startsWith("http://")) {
+                            reference = new Reference(url:l); 
+                        }else{
+                            reference = new Reference(title:l); 
+                        }   
+                        speciesField.addToReferences(reference);
+                        references.push(reference);
+                        count_chk.success_count =  count_chk.success_count +1;
+                    }else{
+                        count_chk.failure_count =  count_chk.failure_count +1;
+                    }    
+
+                }
+            }
+
+            if(!speciesField.save(flush:true)){
+                speciesField.errors.allErrors.each { log.error it }
+            }
+            msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
+            content = references;
+        }else{
+            if(!referenceId) {
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = referenceId;
+                return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
+            }
+            def chk = is_exist_reference(speciesInstance, value); 
+            if(!chk){
+                return [success:false, msg:messageSource.getMessage("info.reference.id.duplicate.found", null, LCH.getLocale())]
 
             }
-        }
-       
-        if(!speciesField.save(flush:true)){
-                speciesField.errors.allErrors.each { log.error it }
-        }
-        msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
-        content = references;
-    }else{
-        if(!referenceId) {
-             def messagesourcearg = new Object[1];
-                messagesourcearg[0] = referenceId;
-            return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
-        }
-        def chk = is_exist_reference(speciesInstance, value); 
-        if(!chk){
-            return [success:false, msg:messageSource.getMessage("info.reference.id.duplicate.found", null, LCH.getLocale())]
-
-        }
             Reference reference = Reference.get(referenceId);            
             speciesField = reference.speciesField;
             if(value.startsWith("http://")) {
-                  reference.url= value;
-                }else{
-                  reference.title= value;
-                }
+                reference.url= value;
+            }else{
+                reference.title= value;
+            }
 
-        if(!reference.save(flush:true)){
+            if(!reference.save(flush:true)){
                 reference.errors.allErrors.each { log.error it }
+            }
+            content = reference;
+            msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
         }
-        content = reference;
-        msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
+
+        return [success:true, id:speciesField.id, type:'reference', msg:msg, content:content, count_chk:count_chk]
     }
 
-return [success:true, id:speciesField.id, type:'reference', msg:msg, content:content, count_chk:count_chk]
-}
-
-private def is_exist_reference(Species speciesInstance, def title){
-    SpeciesField speciesFields = SpeciesField.findBySpecies(speciesInstance); 
-    def rf_chk;
-       for( sf in speciesFields){
-           rf_chk = Reference.findAllBySpeciesFieldAndTitle(sf,title);
-           if(rf_chk){
+    private def is_exist_reference(Species speciesInstance, def title){
+        SpeciesField speciesFields = SpeciesField.findBySpecies(speciesInstance); 
+        def rf_chk;
+        for( sf in speciesFields){
+            rf_chk = Reference.findAllBySpeciesFieldAndTitle(sf,title);
+            if(rf_chk){
                 return false;                
-           }
-       }  
-    return true;   
-}
+            }
+        }  
+        return true;   
+    }
 
     def addDescription(long speciesId, long fieldId, String value) {
      

@@ -81,7 +81,6 @@ class SpeciesUploadService {
 	def speciesSearchService;
 	def springSecurityService
 	def speciesPermissionService;
-	def SUserService;
 	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -670,7 +669,7 @@ class SpeciesUploadService {
 	def String abortBulkUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+		if((sbu.author != springSecurityService.currentUser) && (!utilsService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
 			return "Authentication failed for user. Please login."
 		}
@@ -688,7 +687,7 @@ class SpeciesUploadService {
 	def String rollBackUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+		if((sbu.author != springSecurityService.currentUser) && (!utilsService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
 			return "Authentication failed for user. Please login."
 		}

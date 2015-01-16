@@ -5,6 +5,7 @@ import groovy.sql.Sql;
 import java.util.Date;
 import species.utils.ImageUtils;
 import java.util.*;
+import java.io.*;
 
 def geUserResoruceId(){
               def result = []
@@ -14,19 +15,21 @@ def geUserResoruceId(){
               return result
       }
 
-def _doCrop(resourceList, relativePath){
+def _doCrop(resourceList, relativePath, sql, dataSoruce){
     def resSize = resourceList.size()
     def counter = 0;
     def missingCount = 0; 
+    def fails = 0;
+    def resIds = []
 	println "==============Resource List Size==================" + resSize
 	//HashMap hm = new HashMap();
 	resourceList.each { res->
 		counter = counter + 1
         if((counter%100) == 0) {
-            println "=======COUNTER==== " + counter
+            //println "=======COUNTER==== " + counter
         }
-        println "------------------------------------------------------------------ " + res.id
-		String fileName = relativePath + "/" + res.fileName;
+        //println "------------------------------------------------------------------ " + res.id
+        String fileName = relativePath + "/" + res.fileName;
 		File file = new File(fileName);
 
 		String name = file.getName();
@@ -37,14 +40,19 @@ def _doCrop(resourceList, relativePath){
 		if(lastIndex != -1) {
 			inName = name.substring(0, lastIndex);
             ext = name.substring(lastIndex, name.size());
+            if(ext == '.tif' || ext == '.tiff') {
+                println "=======TIF FILES===== " + file
+                println "------------------------------------------------------------------ " + res.id
+                ext = '.jpg'
+            }
 		}
 
 		String outName = inName + "_th1" + ext;
-		
-        println file;
+	    if(!file.exists()) return;	
+        //println file;
 		File dir = new File(parent);
 		File outImg = new File(dir,outName);
-		println outImg;
+		//println outImg;
         
         //_th1 image already exists so return;
         if(outImg.exists()) {
@@ -52,23 +60,31 @@ def _doCrop(resourceList, relativePath){
             return;
         }
         missingCount = missingCount + 1;
-        println "========NOT FOUND TH1 -- CREATING ====="
-
+        //println "========NOT FOUND TH1 -- CREATING ====="
+        //println "======THIS IMAGE ==== " + outImg
 		try{
 			ImageUtils.doResize(file, outImg, 200, 200);
 		}catch (Exception e) {
-			println "==============RahulImageException===== " + e.getMessage()
-			//hm.put(file , e.getMessage());
+            fails += 1;
+			//println "==============RahulImageException===== " + e.getMessage()
+		    resIds.add(res.id.toLong());
+            println "===DELETING THIS FILE === " + file +"======RES ID==== " + res.id
+            sql.executeUpdate('DELETE from species_resource where resource_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from species_field_resources where resource_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from resource_license where resource_licenses_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from resource_contributor where resource_contributors_id = ? or resource_attributors_id = ?', [res.id.toLong(), res.id.toLong()]);
+            sql.executeUpdate('DELETE from observation_resource where resource_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from resource where id = ?', [res.id.toLong()]);
+            file.delete();            
 		}
 	}
     println "=============MISSING COUNT ============= " + missingCount
-	//println "===================ERROR COUNT============= " + hm.size()
-	//println hm
-	//println "====================ERROR END========================"
+    println "=============FAILS ============= " + fails
+    //println "==========RES IDS ===== " + resIds
 }
 
 def getResoruceId(query, sql){
-	def result = []
+	def result = [] as Set
 	sql.rows(query).each{
 		def res = Resource.read(it.getProperty("id"));
 		if(res.type == Resource.ResourceType.IMAGE){
@@ -93,17 +109,17 @@ def doCrop(){
 	result = getResoruceId(query, sql)
 	query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
 	result.addAll(getResoruceId(query, sql))
-	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
+	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir, sql, dataSoruce)
 
 	println "----------------DONE SPECIES-------------------------------------------------- "
 
     //getting all resources for observations 
 	//query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
-	query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
-	result = getResoruceId(query, sql)
-	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
+	//query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
+	//result = getResoruceId(query, sql)
+	//_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
-	println "----------------DONE OBSERVATION-------------------------------------------------- "
+	//println "----------------DONE OBSERVATION-------------------------------------------------- "
 	
     //getting all resources for users
     //result = geUserResoruceId()
@@ -137,7 +153,7 @@ def doCrop(){
 
 doCrop();
 
-//ImageUtils.createScaledImages(new File('/home/rahulk/Desktop/5_Kaggli-like_leaf.tif'), new File('/home/rahulk/Desktop') )
+//ImageUtils.createScaledImages(new File('/home/rahulk/Indirana_brachytarsus_(S_D_Biju).tif'), new File('/home/rahulk/') )
 println "=========== DONE!!";
 
 /*

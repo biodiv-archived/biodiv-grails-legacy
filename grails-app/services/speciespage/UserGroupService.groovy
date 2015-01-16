@@ -72,7 +72,6 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	def SUserService;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -1264,7 +1263,7 @@ class UserGroupService {
 		
 		SUser currUser = springSecurityService.currentUser;
 		//returning true for user with admin role
-		if(SUserService.isAdmin(currUser?.id)){
+		if(utilsService.isAdmin(currUser?.id)){
 			return true
 		}
 		
@@ -1357,7 +1356,7 @@ class UserGroupService {
 		private List getFeatureSafeList(ug, obvs){
 			SUser currUser = springSecurityService.currentUser;
 			//if admin or founder or expert then can un post any featured resource
-			if(SUserService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
+			if(utilsService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
 				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
 				return obvs
 			}

@@ -52,12 +52,10 @@ class ObservationController extends AbstractObjectController {
 	def namesIndexerService;
 	def userGroupService;
 	def activityFeedService;
-	def SUserService;
 	def obvUtilService;
     def chartService;
     def messageSource;
     def commentService;
-    def utilsService;
     def speciesService;
     def setupService;
     def springSecurityFilterChain
@@ -252,7 +250,8 @@ class ObservationController extends AbstractObjectController {
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
-		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService]
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+        return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
 
 	@Secured(['ROLE_USER'])
@@ -437,7 +436,7 @@ class ObservationController extends AbstractObjectController {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
-		} else if(SUserService.ifOwns(observationInstance.author)) {
+		} else if(utilsService.ifOwns(observationInstance.author)) {
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
@@ -1629,7 +1628,8 @@ class ObservationController extends AbstractObjectController {
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
-		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author] 
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature] 
     }
 
     @Secured(['ROLE_USER'])
@@ -1665,8 +1665,12 @@ class ObservationController extends AbstractObjectController {
 
     def testy(){
 	    //setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
-	    //println speciesService.checking();
+	    println speciesService.checking();
     	//return false;
-        render springSecurityFilterChain
+        //render springSecurityFilterChain
+    }
+
+    def filePickerSecurityCodes() {
+        utilsService.filePickerSecurityCodes();
     }
 }

@@ -91,6 +91,8 @@ class ObservationService extends AbstractObjectService {
     def messageSource;
     def resourcesService;
     def request;
+    def speciesPermissionService;
+
     /**
      * 
      * @param params
@@ -1789,7 +1791,7 @@ println observationInstance.license
                 if (observationInstance) {
                     observationInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(observationInstance, springSecurityService.currentUser, getUserGroup(params))
-                    if(isFeatureDeleted && SUserService.ifOwns(observationInstance.author)) {
+                    if(isFeatureDeleted && utilsService.ifOwns(observationInstance.author)) {
                         def mailType = observationInstance.instanceOf(Checklists) ? utilsService.CHECKLIST_DELETED : utilsService.OBSERVATION_DELETED
                         try {
                             observationInstance.isDeleted = true;
@@ -2246,4 +2248,9 @@ println observationInstance.license
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 
+    boolean hasObvLockPerm(obvId) {
+        def observationInstance = Observation.get(obvId.toLong());
+        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+    }
 }

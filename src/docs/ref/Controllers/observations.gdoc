@@ -3,7 +3,7 @@ h3. Observations
 
 h4. Save
 
-* *Path* : /api/apiKey/observation/save
+* *Path* : /api/observation/save
 * *Parameters* :
 ** group : species group id
 ** habitat : habitat id
@@ -24,7 +24,7 @@ h4. Save
 * *REST method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/observation/save?url_1=http://www.youtube.com/watch?v=v8HVWDrGr6o&type_1=VIDEO&rating_1=2&resourceListType=ofObv&fromDate=01/06/2014&placeName=Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India&areas=POINT(76.42376839999997 9.6297152)&location_accuracy=Approximate&notes=    Found this bird on my trip to&nbsp;Kumarakom Bird Sanctuary</p>&tags=parrot, bird&agreeTerms=on&group_id=829&habitat_id=267838"
+http://indiabiodiversity.localhost.org/api/observation/save?url_1=http://www.youtube.com/watch?v=v8HVWDrGr6o&type_1=VIDEO&rating_1=2&resourceListType=ofObv&fromDate=01/06/2014&placeName=Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India&areas=POINT(76.42376839999997 9.6297152)&location_accuracy=Approximate&notes=    Found this bird on my trip to&nbsp;Kumarakom Bird Sanctuary</p>&tags=parrot, bird&agreeTerms=on&group_id=829&habitat_id=267838"
 {code}
 For example
 {code}
@@ -339,13 +339,13 @@ http://indiabiodiversity.org/api/observation/distinctReco?sGroup=829&habitat=267
 
 h4. flagDelete
 
-* *Path* : /api/apiKey/observation/flagDeleted
+* *Path* : /api/observation/flagDeleted
 * *Parameters* :
 ** id : observation id
 * *REST Method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/observation/flagDeleted?id=234
+http://indiabiodiversity.localhost.org/api/observation/flagDeleted?id=234
 {code}
 * *Response* :
 ** on success
@@ -434,7 +434,7 @@ http://indiabiodiversity.localhost.org/api/observation/getRecommendationVotes?id
 
 h4. addRecommendationVote
 
-* *Path* : /api/apiKey/observation/getRecommendationVotes
+* *Path* : /api/observation/getRecommendationVotes
 * *Parameters* :
 ** obvId: observation id
 ** recoName: scientific name
@@ -444,7 +444,7 @@ h4. addRecommendationVote
 * *REST Method* : GET
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/observation/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
+http://indiabiodiversity.localhost.org/api/observation/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
 {code}
 * *Response* :
 ** on success
@@ -492,7 +492,7 @@ http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/
 
 h4. removeRecommendationVote
 
-* *Path* : /api/apiKey/observation/removeRecommendationVote
+* *Path* : /api/observation/removeRecommendationVote
 * *Parameters* :
 ** obvId : obsevrationId
 ** recoId : recommendationId
@@ -512,7 +512,7 @@ h4. removeRecommendationVote
 
 h4. Upload Resource
 
-* *Path* : /api/apiKey/observation/upload_resource
+* *Path* : /api/observation/upload_resource
 * *Parameters* : 
 ** resources : file attachment (MAX_IMAGE_SIZE = 104857600)
 ** obvDir : directory into which the resource should be put into. If null, a new folder is created.
@@ -520,7 +520,7 @@ h4. Upload Resource
 * *REST method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/observation/upload_resource?resType=species.participation.Observation
+http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=species.participation.Observation
 {code}
 * *Response* : 
 ** Successfull response
@@ -542,7 +542,7 @@ http://indiabiodiversity.localhost.org/api/730e8868-adee-4d01-906d-af51750f4a7a/
 
 h4. requestExport
 
-* *Path* : /api/apiKey/observation/requestExport
+* *Path* : /api/observation/requestExport
 * *Parameters* :
 ** filterUrl : filterUrl as in list call
 ** downloadType
