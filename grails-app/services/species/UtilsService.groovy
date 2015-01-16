@@ -20,8 +20,12 @@ import species.CommonNames;
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
-
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
 import java.beans.Introspector;
+import org.codehaus.groovy.grails.web.json.JSONObject;
+
 class UtilsService {
 
     def grailsApplication;
@@ -843,5 +847,37 @@ class UtilsService {
         result
     }
 
+    /*
+    def filePickerSecurityCodes() {
+        def codes = [:]
+        Integer expiry = (System.currentTimeMillis()/1000).toInteger() + 60 * 60
+        def jsonPolicy = new JSONObject();
+        jsonPolicy.put('expiry', expiry)
+        println "===============JSON POLICY=== " + jsonPolicy
+        jsonPolicy = jsonPolicy.toString();
+        println "===============JSON POLICY=== " + jsonPolicy
+        println "======BYTES======== " + jsonPolicy.bytes
+        //URL SAFE
+        String policy = jsonPolicy.bytes.encodeBase64().toString().replaceAll('\\+', '-').replaceAll('\\/','_');
+        println "=========POLICY======= " + policy
+        codes['policy'] = policy
+        String secretKey = grailsApplication.config.speciesPortal.observations.filePicker.secret
+        println "=======SECRET KEY ========= " + secretKey
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+            mac.init(secretKeySpec);
+            println "========SECRET KEY SPEC ====== " + secretKeySpec;
+            byte[] digest = mac.doFinal(policy.getBytes());
+            String signature = digest.encodeBase64().toString();
+            println "=======digest ======= " + signature;
+            codes['signature'] = signature;
+            println "=======codes ======= " + codes;
+            return codes
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException("Invalid key exception while converting to HMac SHA256")
+        }
+    }
+    */
 }
 
