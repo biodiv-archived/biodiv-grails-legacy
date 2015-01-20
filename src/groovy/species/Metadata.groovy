@@ -41,7 +41,8 @@ abstract class Metadata {
     def grailsApplication
 	def activityFeedService
     def observationService
-
+	def utilsService
+	
     //TODO: Contributions and Attributions
 
     static constraints = {
@@ -134,11 +135,11 @@ abstract class Metadata {
 	}
 	
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
-		if(!geoPrivacy || SUserService.ifOwns(author)){
+		if(!geoPrivacy || utilsService.ifOwns(author)){
 			return 0
 		}
 		//for backend thred e.g download request reqUser will be passed as argument
-		if(reqUser && (reqUser.id == author.id || SUserService.isAdmin(reqUser.id))){
+		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser.id))){
 			return 0
 		}
 		return Utils.getRandomFloat()

@@ -28,12 +28,10 @@ import species.Species;
 class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
-    def utilsService;
 	def commentService;
 	def springSecurityService;
     def resourceService;
 	def observationsSearchService;
-	def SUserService;
     def observationService;
     def userGroupService;
 
