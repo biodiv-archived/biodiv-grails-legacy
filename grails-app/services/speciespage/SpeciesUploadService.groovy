@@ -130,7 +130,10 @@ class SpeciesUploadService {
 		errorFile.write(mylog)
 		
 		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
-		sBulkUploadEntry.save()
+		
+		if(!sBulkUploadEntry.save(flush:true)){
+			sBulkUploadEntry.errors.allErrors.each { log.error it }
+		}
 		
 		//Every thing is fine then sending mail
 		String link
@@ -288,25 +291,25 @@ class SpeciesUploadService {
 			}
 			
 			if(!isAborted){
-				//Species.withNewTransaction { status ->
-					contentSubList.each { speciesContent ->
-						Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir);
-						if(speciesElement){
-							speciesElements.add(speciesElement);
-						}
+				contentSubList.each { speciesContent ->
+					Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir);
+					if(speciesElement){
+						speciesElements.add(speciesElement);
 					}
-					def res = saveSpeciesElementsWrapper(speciesElements)
-					speciesElements.clear()
-					noOfInsertions += res.noOfInsertions;
-					converter.addToSummary(res.summary);
-					converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
-					converter.addToSummary("======================== FINISHED BATCH =============================\n")
-					cleanUpGorm();
-				//}
+				}
+				def res = saveSpeciesElementsWrapper(speciesElements)
+				speciesElements.clear()
+				noOfInsertions += res.noOfInsertions;
+				converter.addToSummary(res.summary);
+				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
+				converter.addToSummary("======================== FINISHED BATCH =============================\n")
+				cleanUpGorm();
 			}
 		}
-			
-		sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
+		
+		Species.withNewTransaction { status ->
+			sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
+		}
 		
 		log.info "================================ LOG ============================="
 		println  converter.getLogs()
@@ -350,20 +353,14 @@ class SpeciesUploadService {
 
 		int noOfInsertions = 0;
 		try {
-			//Species.withTransaction { status ->
-				for(Node speciesElement : speciesElements) {
-					Species.withNewTransaction { status ->
-						Species s = converter.convertSpecies(speciesElement)
-						if(s)
-							species.add(s);
-					}
+			for(Node speciesElement : speciesElements) {
+				Species.withNewTransaction { status ->
+					Species s = converter.convertSpecies(speciesElement)
+					if(s)
+						species.add(s);
 				}
-				noOfInsertions += saveSpecies(species);
-				//addedSpecies = saveSpeciesBatch(species);
-				//noOfInsertions += addedSpecies.size()
-			//}
-				//converter.addToSummary("Saved ${noOfInsertions} species till now")
-
+			}
+			noOfInsertions += saveSpecies(species);
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
