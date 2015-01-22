@@ -238,6 +238,25 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </div>
 </td>
 </tr>
+
+<tr>
+<td class="w580" width="580">
+    <p class="article-title" align="left"><small><big><a style="font-weight: bold;" href="http://www.wikwio.org/idao"><big>IDAO</big></a></big></small></p>
+<table align="right" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+    <td class="w30" height="5" width="15"><a href="http://www.wikwio.org/idao"><img src="${resource(dir:'images', file:'IDAO.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="IDAO" hspace="5"></a></td>
+</tr>
+</tbody>
+</table>
+<div class="article-content" align="left"> 
+    
+    <g:message code="welcomeEmail.idao" />
+</div>
+</td>
+</tr>
+
+
 <tr>
 <td class="w580" height="10" width="580"></td>
 </tr>
