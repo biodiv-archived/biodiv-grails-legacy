@@ -47,8 +47,8 @@ $(document).ready(function() {
                     'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
-                'isLoggedInUrl' : "${createLink(controller:'SUser', action:'isLoggedIn','userGroup':userGroupInstance)}",
-                'userTermsUrl' : "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}",
+                'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
+                'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
                 'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
                 'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
                 'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",

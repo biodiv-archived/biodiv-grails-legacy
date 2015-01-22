@@ -3,7 +3,7 @@
 <%@page import="species.participation.Observation"%>
 <div class="signature clearfix thumbnail">
 		<div class="figure user-icon pull-left" style="display:table;height:32px;">
-			<a href="${uGroup.createLink( 'controller':'SUser', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
+			<a href="${uGroup.createLink( 'controller':'user', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
 				src="${userInstance.profilePicture(ImageType.SMALL)}"
 				class="small_profile_pic pull-left" title="${userInstance.name}" /></a>
 		</div>
@@ -11,7 +11,7 @@
 		<div class="story" style="margin-left:35px">
 
 		<a title="${userInstance.name}"
-			href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
+			href="${uGroup.createLink('controller':'user', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
 			<span class="ellipsis" style="display:block;"> ${userInstance.name}
 		</span>
 			 </a>

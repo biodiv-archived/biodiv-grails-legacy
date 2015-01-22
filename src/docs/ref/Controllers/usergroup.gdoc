@@ -1,31 +1,8 @@
 h3. UserGroup
 
-h4. show 
-
-* *Path* : /api/group/show/id 
-* *Parameters* : id long format
-* *REST method* : GET
-* *Request* : 
-{code}
-http://indiabiodiversity.localhost.org/api/userGroup/show/3
-{code}
-* *Response* :
-** Successful response
-{code}
-
-{code}
-
-** in case of error 
-{code}
-{
-    "success": false,
-    "msg": "Valid id is required"
-}
-{code}
-
 h4. list 
 
-* *Path* : /api/userGroup/list 
+* *Path* : /api/group
 * *Parameters* : 
 ** sGroup : filter by species group. Default is ALL
 ** habitat : filter by habitat. Default is ALL
@@ -40,33 +17,91 @@ h4. list
 ** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
 
 * *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Requests* :
-** __Documents with a tag__
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/list
+http://indiabiodiversity.localhost.org/api/group
 {code}
 
 * *Response* :
 {code}
 {
-    "totalUserGroupInstanceList": [ ... ],
-        "instanceTotal": 34,
-        "queryParams": {
-            "isDeleted": false,
-            "max": 24,
-            "offset": 0
-        },
-        "activeFilters": {
-            "append": true
-        },
-        "resultType": "user group"
+    "success": true,
+        "status": 200,
+        "msg": "Success in executing list of userGroup",
+        "model": {
+            "userGroupInstanceList": [
+            {
+                "id": 1,
+                "name": "The Western Ghats",
+                "description": "<h2 style=\"margin: 10px 0px; font-family: Verdana, Helvetica, sans-serif; font-weight: normal; line-height: 40px; color: rgb(85, 85, 85); text-rendering: optimizelegibility; font-size: 31.5px; padding: 5px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(229, 229, 229);\">\r\n\t<span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghats, a mountainous ridge running parallel to the west coast of India&rsquo;s ancient peninsula, has a rich and intriguing history.&nbsp;</span><span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghat portal seeks to provide a platform for aggregating diverse information on the biodiversity of the Western Ghats. As interested, discerning readers, students and researchers we request you to participate and create an online open collaborative system for sharing biodiversity information.</span></h2>\r\n<p>\r\n\t&nbsp;</p>\r\n",
+                "domainName": "http://thewesternghats.indiabiodiversity.org",
+                "webaddress": "the_western_ghats",
+                "foundedOn": "2012-12-31T12:17:05Z",
+                "icon": "/ca7dc494-eff4-4f49-b340-f69e8d543a75/resources/map-logo.gif"
+            }
+            ],
+                "instanceTotal": 34,
+                "queryParams": {
+                    "isDeleted": false,
+                    "max": 1,
+                    "offset": 0
+                },
+                "activeFilters": {
+                    "append": true
+                },
+                "resultType": "user group"
+        }
 }
 
 {code}
 
+
+h4. show 
+
+* *Path* : /api/group/id 
+* *Parameters* : 
+** id : long format or
+* webaddress : string
+* *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/group/3 or
+http://indiabiodiversity.localhost.org/api/group/birdwatch
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "instance": {
+            "id": 1,
+            "name": "The Western Ghats",
+            "description": "<h2 style=\"margin: 10px 0px; font-family: Verdana, Helvetica, sans-serif; font-weight: normal; line-height: 40px; color: rgb(85, 85, 85); text-rendering: optimizelegibility; font-size: 31.5px; padding: 5px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(229, 229, 229);\">\r\n\t<span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghats, a mountainous ridge running parallel to the west coast of India&rsquo;s ancient peninsula, has a rich and intriguing history.&nbsp;</span><span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghat portal seeks to provide a platform for aggregating diverse information on the biodiversity of the Western Ghats. As interested, discerning readers, students and researchers we request you to participate and create an online open collaborative system for sharing biodiversity information.</span></h2>\r\n<p>\r\n\t&nbsp;</p>\r\n",
+            "domainName": "http://thewesternghats.indiabiodiversity.org",
+            "webaddress": "the_western_ghats",
+            "foundedOn": "2012-12-31T12:17:05Z",
+            "icon": "/ca7dc494-eff4-4f49-b340-f69e8d543a75/resources/map-logo.gif"
+        }
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+        "status": 404,
+        "msg": "Valid id is required",
+        "errors": []
+}
+{code}
+
 h4. user 
 
-* *Path* : /api/userGroup/user 
+* *Path* : /api/group/id/user 
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -75,9 +110,10 @@ h4. user
 ** sort : sort users on any of user properties
 ** onlyMembers : true | false. return only members of the group. Default false returns all members including founders and moderators
 * *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/user
+http://indiabiodiversity.localhost.org/api/group/1/user
 {code}
 * *Response* :
 ** Successful response
@@ -108,7 +144,7 @@ http://indiabiodiversity.localhost.org/api/userGroup/user
 
 h4. founders
 
-* *Path* : /api/userGroup/founders
+* *Path* : /api/group/id/founders
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -116,26 +152,32 @@ h4. founders
 ** offset : integer. Default 0
 ** sort : sort users on any of user properties
 * *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/founders
+http://indiabiodiversity.localhost.org/api/group/1/founders
 {code}
 * *Response* :
 ** Successful response
 {code}
 {
-    "result": [
-    {
-        "id": 6465,
-            "name": "Sachin M H",
+    "userGroupInstance": { ...},
+        "userInstanceList": [
+        {
+            "id": 1117,
+            "name": "R Prabhakar",
+            "icon": "http://localhost/biodiv/users//100000607869577/resources/100000607869577_th1.jpg"
+        },
+        {
+            "id": 797,
+            "name": "ramesh.br",
             "icon": "http://localhost/biodiv/users/user_large.png"
-    },
-    {
-        "id": 6463,
-        "name": "Deepika",
-        "icon": "http://localhost/biodiv/users/user_large.png"
-    }
-    ]
+        }
+    ],
+        "instanceTotal": 2,
+        "foundersTotalCount": 2,
+        "membersTotalCount": 1370,
+        "expertsTotalCount": 4
 }
 {code}
 
@@ -150,7 +192,7 @@ http://indiabiodiversity.localhost.org/api/userGroup/founders
 
 h4. moderators 
 
-* *Path* : /api/userGroup/moderators
+* *Path* : /api/group/id/moderators
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -158,6 +200,7 @@ h4. moderators
 ** offset : integer. Default 0
 ** sort : sort users on any of user properties
 * *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
 http://indiabiodiversity.localhost.org/api/userGroup/moderators
@@ -165,20 +208,6 @@ http://indiabiodiversity.localhost.org/api/userGroup/moderators
 * *Response* :
 ** Successful response
 {code}
-{
-    "result": [
-    {
-        "id": 6465,
-            "name": "Sachin M H",
-            "icon": "http://localhost/biodiv/users/user_large.png"
-    },
-    {
-        "id": 6463,
-        "name": "Deepika",
-        "icon": "http://localhost/biodiv/users/user_large.png"
-    }
-    ]
-}
 {code}
 
 ** in case of error 
@@ -192,38 +221,45 @@ http://indiabiodiversity.localhost.org/api/userGroup/moderators
 
 h4. joinUs 
 
-* *Path* : /api/userGroup/joinUs
+* *Path* : /api/group/id/joinUs
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
 * *REST method* : GET
-* *Permissions* : logged in user
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/joinUs
+http://indiabiodiversity.localhost.org/api/group/1/joinUs
 {code}
 * *Response* :
 ** Successful response
 {code}
 {
     "success": true,
-        "statusComplete": false,
-        "shortMsg": "Already a member.",
-        "msg": "Already a member."
+        "status": 200,
+        "msg": "You have joined SEE-U 2014 Biodiversity Research Team group. We look forward for your contribution."
 }
 {code}
 
 ** in case of error 
+{
+    "success": false,
+        "status": 200,
+        "msg": "Already a member.",
+        "errors": []
+}
 {code}
 {
     "success": false,
-        "msg": "UserGroup not found with id null"
+        "status": 404,
+        "msg": "UserGroup not found with id null",
+        "errors": []
 }
 {code}
 
 h4. leaveUs 
 
-* *Path* : /api/userGroup/leaveUs
+* *Path* : /api/group/id/leaveUs
 * *Parameters*
 ** id : usergroup id
 ** webaddress : usergroup webaddress. Either id or webaddress is required
@@ -231,23 +267,17 @@ h4. leaveUs
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/leaveUs
+http://indiabiodiversity.localhost.org/api/group/1/leaveUs
 {code}
 * *Response* :
 ** Successful response
 {code}
-{
-    "success": true,
-        "statusComplete": false,
-        "shortMsg": "Thank you",
-        "msg": "Thank you for being with us"
-}
 {code}
 
 
 h4. inviteMembers 
 
-* *Path* : /api/userGroup/inviteMembers
+* *Path* : /api/group/id/inviteMembers
 * *Parameters*
 ** memberUserIds : csv of userIds
 ** id : usergroup id
@@ -256,7 +286,7 @@ h4. inviteMembers
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/inviteMembers
+http://indiabiodiversity.localhost.org/api/group/1/inviteMembers
 id:1
 memberUserIds:2,3
 {code}
@@ -407,131 +437,6 @@ h4. bulkPost
 ** in case of error 
 {code}
 {code}
-
-h4. observation
-
-* *Path* : /api/userGroup/observation
-* *Parameters*
-** id : usergroup id
-** webaddress : usergroup webaddress. Either id or webaddress is required
-** max : integer. Default 12 and max 100
-** offset : integer. Default 0
-
-** sGroup : speciesGroupId. default all
-** habitat : habitat id. default all
-** user : observation author id
-** type : nearBy|...
-** lat : latitude value in decimal
-** long: longitude value in float
-** daterangepicker_start , daterangepicker_end 
-** bounds : swLat, swLong, neLat, neLon 
-
-** isFlagged : true| false. default false
-** featureBy : true|false. default false
-** isChecklistOnly : true| false. default false
-
-** tag : tag name
-** webaddress : to filter observations with group with this webaddress
-** speciesName:'Unknown' to get all unidentified observations
-
-** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
-* *REST method* : GET
-* *Request* : 
-{code}
-http://indiabiodiversity.localhost.org/api/userGroup/observation
-{code}
-* *Response* :
-** Successful response
-{code}
-{
-    "observationInstanceList": [ ... ],
-        "allObservationCount": 14530,
-        "checklistCount": 116,
-        "speciesGroupCountList": [],
-        "queryParams": {
-            "isDeleted": false,
-            "userGroupId": 1,
-            "userGroup": 1,
-            "max": 1,
-            "offset": 0
-        },
-        "activeFilters": {},
-        "instanceTotal": 14530,
-        "observationCount": 14414
-}
-{code}
-
-** in case of error 
-{code}
-{
-    "success": false,
-        "msg": "UserGroup not found with id null"
-}
-{code}
-
-h4. getFeaturedObservations
-
-* *Path* : /api/userGroup/getFeaturedObservations
-* *Parameters*
-** id : usergroup id
-** webaddress : usergroup webaddress. Either id or webaddress is required
-** limit : integer. Default 9 and max 100
-** offset : integer. Default 0
-
-** sGroup : speciesGroupId. default all
-** habitat : habitat id. default all
-** user : observation author id
-** type : nearBy|...
-** lat : latitude value in decimal
-** long: longitude value in float
-** daterangepicker_start , daterangepicker_end 
-** bounds : swLat, swLong, neLat, neLon 
-
-** isFlagged : true| false. default false
-** isChecklistOnly : true| false. default false
-
-** tag : tag name
-** webaddress : to filter observations with group with this webaddress
-** speciesName:'Unknown' to get all unidentified observations
-
-** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
-* *REST method* : GET
-* *Request* : 
-{code}
-http://indiabiodiversity.localhost.org/api/userGroup/getFeaturedObservations
-{code}
-* *Response* :
-** Successful response
-{code}
-{
-    "observations": [
-    {
-        "id": 269251,
-            "sGroup": "Plants",
-            "habitat": "Rocky Outcrops",
-            "imageLink": "http://indiabiodiversity.localhost.org/biodiv/observations//bb7b01a2-39a8-4c7d-86b7-626fdcdc6706/IMG_2294_th1.jpg",
-            "notes": "<p>\r\n\tWas collected from laterite hillucks surrounding the wetland.</p>\r\n",
-            "summary": "Observed by <b><a href='/user/show/3034'>Aditi Lele</a></b> at <b>'Thazhinchira Wetland'</b> on <b>September 15, 2012</b>.",
-            "lat": 10.170826,
-            "lng": 76.26917,
-            "observedOn": 1347647400000,
-            "url": "/observation/show/269251",
-            "title": "Senganthal Malar Or Karthigai Malar Or Kalappaikkilangu",
-            "type": "observation"
-    }
-    ],
-        "count": null
-}
-{code}
-
-** in case of error 
-{code}
-{
-    "success": false,
-        "msg": "UserGroup not found with id null"
-}
-{code}
-
 
 h4. getUserUserGroups
 

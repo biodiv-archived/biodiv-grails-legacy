@@ -25,7 +25,6 @@ import org.springframework.context.MessageSourceResolvable;
 class Document extends Metadata implements Comparable, Taggable, Rateable {
 	
 	def springSecurityService;
-	def SUserService;
 	def documentService
 
     public enum DocumentType implements org.springframework.context.MessageSourceResolvable{

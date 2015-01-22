@@ -43,7 +43,7 @@
 		
 						<div style="float: right; margin: 10px 0;">
 							<a class="btn btn-info pull-right"
-								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.view.my.profile" /></a>
+								href="${uGroup.createLink(action:'show', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.view.my.profile" /></a>
 						</div>
 					</div>
 				</div>
@@ -57,8 +57,7 @@
 					<%--<g:renderErrors bean="${user}" as="list" />--%>
 				</g:hasErrors>
 
-				<form class="form-horizontal" action="${uGroup.createLink(action:'update', controller:'SUser', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" id='userEditForm' method="POST">
-					<g:hiddenField name="id" value="${user?.id}" />
+				<form class="form-horizontal" action="${uGroup.createLink(action:'update', controller:'user', 'id':user?.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" id='userEditForm' method="POST">
 					<g:hiddenField name="version" value="${user?.version}" />
 
 					<div style="clear: both;">
@@ -277,11 +276,11 @@
                                 <i class="icon-cog"></i><g:message code="suser.edit.actions" />
                             </h5>
                             <ul>
-                                <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
+                                <li><a href="${uGroup.createLink(controller:'user', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
 
                                 <sUser:isAdmin model="['user':user]">
                                 <li>
-                                    <a id="generateAppKey"><g:message code="button.generate.appKey" /></a>
+                                <a id="generateAppKey" data-id="${user.id}"><g:message code="button.generate.appKey" /></a>
                                     <div id="appKey" class="text-info" style="display:none;">
                                         
                                     </div>
@@ -381,8 +380,7 @@
 				
 				<sUser:isAdmin model="['user':user]">
 					<g:if test='${user}'>
-						<form action="${uGroup.createLink(controller:'SUser', action:'delete')}" method='POST' name='deleteForm'>
-							<input type="hidden" name="id" value="${user.id}" />
+						<form action="${uGroup.createLink(controller:'user', action:'delete', 'id':user.id)}" method='POST' name='deleteForm'>
 						</form>
 						<div id="deleteConfirmDialog" title="Are you sure?"></div>
 
@@ -558,6 +556,7 @@
                     url:'${g.createLink(controller:'user', action:'generateAppKey')}',
                     dataType: 'json',
                     type: 'GET',
+                    data:{id:$(this).data('id')},
                     
                     success: function(response, statusText, xhr, form) {
                         if(response.success == true) {

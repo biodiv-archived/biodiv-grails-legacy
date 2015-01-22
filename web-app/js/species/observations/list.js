@@ -1005,15 +1005,15 @@ function loadSpeciesGroupCount() {
         dataType: "json",
         data:params,
         success: function(data) {
-            if(data.status === 'success') {
-                if(data.speciesGroupCountList) {
+            if(data.success == true) {
+                if(data.model.speciesGroupCountList) {
                     loadGoogleVisualizationAPI(function(){
                         var visualization_data = new google.visualization.DataTable();
-                        $.each(data.speciesGroupCountList.columns, function(index, item) {
+                        $.each(data.model.speciesGroupCountList.columns, function(index, item) {
                             visualization_data.addColumn( item[0], item[1]);
                         });
 
-                        $.each(data.speciesGroupCountList.data, function(index, item) {
+                        $.each(data.model.speciesGroupCountList.data, function(index, item) {
                             visualization_data.addRow(item);
                         });
 

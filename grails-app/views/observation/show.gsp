@@ -385,18 +385,18 @@ $(document).ready(function(){
                     return true;
                 }, 
                 success: function(data, statusText, xhr, form) {
-                    if(data.status == 'success') {
+                    if(data.status == 'success' || data.success == true) {
                         if(data.canMakeSpeciesCall === 'false'){
                             $('#selectedGroupList').modal('show');
                         } else{
-                            showRecos(data, null);
+                            preLoadRecos(3, 0, false);
                             updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
                             updateFeeds();
                             setFollowButton();
-                            showUpdateStatus(data.msg, data.status);
+                            showUpdateStatus(data.msg, data.success?'success':'error');
                         }
                     } else {
-                        showUpdateStatus(data.msg, data.status);
+                        showUpdateStatus(data.msg, data.success?'success':'error');
                     }
                     $("#addRecommendation")[0].reset();
                     $("#canName").val("");

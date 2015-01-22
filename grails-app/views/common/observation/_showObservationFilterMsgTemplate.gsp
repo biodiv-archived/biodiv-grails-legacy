@@ -102,7 +102,7 @@
 				test="${queryParam.key == 'user' && SUser.read(queryParam.value)}">
                                     <g:message code="text.by.user" />  <span class="highlight">
 					<a
-					href="${uGroup.createLink(controller:"SUser", action:"show", id:queryParam.value)}">
+					href="${uGroup.createLink(controller:"user", action:"show", id:queryParam.value)}">
 						${SUser.read(queryParam.value).name.encodeAsHTML()} <a
 						id="removeUserFilter" href="#">[X]</a> </a> </span>
 			</g:if>

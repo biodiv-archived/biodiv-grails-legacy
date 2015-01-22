@@ -75,6 +75,7 @@ import species.AbstractObjectService;
 import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import static org.springframework.http.HttpStatus.*;
 
 
 class ObservationService extends AbstractObjectService {
@@ -211,10 +212,7 @@ class ObservationService extends AbstractObjectService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-println "---------------------------------------------------"
-println observationInstance.license
             if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-                //flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
                 log.debug "Successfully created observation : "+observationInstance
                 params.obvId = observationInstance.id
                 activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
@@ -312,7 +310,7 @@ println observationInstance.license
 
                     }
                 }
-                return ['success' : true, observationInstance:observationInstance]
+                return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
                 def errors = [];
@@ -320,11 +318,12 @@ println observationInstance.license
                     def formattedMessage = messageSource.getMessage(it, null);
                     errors << [field: it.field, message: formattedMessage]
                 }
-                return ['success' : false, 'msg':'Failed to save observation', 'errors':errors, observationInstance:observationInstance]
+                
+                return utilsService.getErrorModel('Failed to save observation', observationInstance, OK.value(), errors)
             }
         } catch(e) {
             e.printStackTrace();
-            return ['success' : false, 'msg':e.getMessage(), observationInstance:observationInstance]
+            return utilsService.getErrorModel('Failed to save observation', observationInstance, OK.value(), [e.getMessage()])
         }
     }
 
@@ -365,7 +364,7 @@ println observationInstance.license
         int offset = params.offset ? params.offset.toInteger() : 0
         def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
-            relatedObv = getRelatedObservationBySpeciesName(params.id.toLong(), max, offset)
+            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "speciesGroup"){
             relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
         } else if(params.filterProperty == "featureBy") {
@@ -374,7 +373,7 @@ println observationInstance.license
         } else if(params.filterProperty == "user"){
             relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort, params.webaddress)
         } else if(params.filterProperty == "nearByRelated"){
-            relatedObv = getNearbyObservationsRelated(params.id, max, offset)
+            relatedObv = getNearbyObservationsRelated(params.id?:params.filterPropertyValue, max, offset)
         } else if(params.filterProperty == "nearBy"){
             float lat = params.lat?params.lat.toFloat():-1;
             float lng = params.long?params.long.toFloat():-1;
