@@ -403,9 +403,8 @@ http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=s
 
 h4. getRecommendationVotes
 
-* *Path* : /api/observation/getRecommendationVotes
+* *Path* : /api/observation/id/getRecommendationVotes
 * *Parameters* :
-** id : observation id
 * *REST Method* : GET
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* :

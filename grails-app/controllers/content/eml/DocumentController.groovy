@@ -18,7 +18,6 @@ class DocumentController extends AbstractObjectController {
 	def springSecurityService
 	def userGroupService
 	def activityFeedService
-	def utilsService
 	def documentSearchService
 	//def observationService
     def messageSource
@@ -284,30 +283,31 @@ class DocumentController extends AbstractObjectController {
 	
 	def browser() {
         def model = getDocumentList(params)
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model['resultType'] = 'document'
+            model['obvListHtml'] =  g.render(template:"/document/documentListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+        }
+
+        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
+
         withFormat {
             html {
-                model.userLanguage = utilsService.getCurrentLanguage(request);
                 if(params.loadMore?.toBoolean()){
-                    render(template:"/document/documentListTemplate", model:model);
+                    render(template:"/document/documentListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
-                    render (view:"browser", model:model)
+                    render (view:"browser", model:model.model)
                     return;
                 } else{
-                    def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
-                    def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-                    def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
+                     /*def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
                     render result as JSON
-                    return;
+                    */return;
                 }
             }
-            json {
-                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as JSON)
-            }
-            xml {
-                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as XML)
-            }
+            json { render model as JSON }
+            xml { render model as XML }
         }
 	}
 
