@@ -20,8 +20,15 @@ import species.CommonNames;
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 import java.beans.Introspector;
+import org.codehaus.groovy.grails.web.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+
 class UtilsService {
 
     def grailsApplication;
@@ -849,6 +856,31 @@ class UtilsService {
         result
     }
 
+    ///////////// FILE PICKER SECURITY /////////////////////
+
+    
+    def filePickerSecurityCodes() {
+        def codes = [:]
+        Integer expiry = (System.currentTimeMillis()/1000).toInteger() + 60*60*2;  //expiry = 2 hours
+        def jsonPolicy = new JSONObject();
+        jsonPolicy.put('expiry', expiry)
+        jsonPolicy = jsonPolicy.toString();
+        String policy = Base64.encodeBase64URLSafeString(jsonPolicy.bytes);       //URL SAFE
+        codes['policy'] = policy
+        String secretKey = grailsApplication.config.speciesPortal.observations.filePicker.secret
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+            mac.init(secretKeySpec);
+            byte[] digest = mac.doFinal(policy.getBytes());
+            String signature = Hex.encodeHexString(digest);
+            codes['signature'] = signature;
+            return codes
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException("Invalid key exception while converting to HMac SHA256")
+        }
+    }
+    
     ///////////////////////PERMISSIONS//////////////////////
 
     boolean permToReorderPages(uGroup){

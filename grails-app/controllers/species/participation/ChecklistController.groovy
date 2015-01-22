@@ -100,7 +100,8 @@ class ChecklistController {
 	def create() {
 		def checklistInstance = new Checklists(license:License.findByName(License.LicenseType.CC_BY))
 		checklistInstance.properties = params;
-		return [observationInstance: checklistInstance]
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+		return [observationInstance: checklistInstance, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
 	
 	@Secured(['ROLE_USER'])

@@ -42,7 +42,6 @@ abstract class Metadata {
 	def activityFeedService
     def observationService
     def utilsService;
-
     //TODO: Contributions and Attributions
 
     static constraints = {
@@ -135,8 +134,6 @@ abstract class Metadata {
 	}
 	
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
-        println "------------------------------------------------"
-        println utilsService
 		if(!geoPrivacy || utilsService.ifOwns(author)){
 			return 0
 		}

@@ -92,6 +92,8 @@ class ObservationService extends AbstractObjectService {
     def messageSource;
     def resourcesService;
     def request;
+    def speciesPermissionService;
+
     /**
      * 
      * @param params
@@ -2245,4 +2247,9 @@ class ObservationService extends AbstractObjectService {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 
+    boolean hasObvLockPerm(obvId) {
+        def observationInstance = Observation.get(obvId.toLong());
+        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+    }
 }

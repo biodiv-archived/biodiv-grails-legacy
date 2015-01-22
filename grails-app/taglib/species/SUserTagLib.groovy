@@ -8,6 +8,7 @@ class SUserTagLib {
 	def springSecurityService
 	def SUserService;
     def utilsService;
+    def observationService
 
 	/**
 	 * 
@@ -46,7 +47,7 @@ class SUserTagLib {
     *checks the permission for lock/unlock of observation
     */
     def hasObvLockPerm = { attrs, body ->
-        if(SUserService.hasObvLockPerm(attrs.model.obvId)) {
+        if(observationService.hasObvLockPerm(attrs.model.obvId)) {
             out << body()
         } 
     }

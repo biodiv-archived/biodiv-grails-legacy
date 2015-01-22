@@ -204,7 +204,8 @@ class ObservationController extends AbstractObjectController {
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
-		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService]
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+        return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
 
 	@Secured(['ROLE_USER'])
@@ -1705,7 +1706,8 @@ class ObservationController extends AbstractObjectController {
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
-		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author] 
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature] 
     }
 
     @Secured(['ROLE_USER'])
@@ -1744,5 +1746,9 @@ class ObservationController extends AbstractObjectController {
 	    println speciesService.checking();
     	//return false;
         //render springSecurityFilterChain
+    }
+
+    def filePickerSecurityCodes() {
+        utilsService.filePickerSecurityCodes();
     }
 }

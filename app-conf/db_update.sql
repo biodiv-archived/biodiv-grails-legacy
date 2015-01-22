@@ -276,3 +276,31 @@ update recommendation_vote set common_name_reco_id = 316619 where common_name_re
 
 delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id or r.id=rv.common_name_reco_id where r.id in (select r.id from recommendation r , tmp_table_update_taxonconcept t where lower(r.name)=lower(t.name) and ((r.language_id is not null and t.c_lang is not null and r.language_id = t.c_lang) or (r.language_id is null and t.language_id is null)) and r.is_scientific_name = false and r.taxon_concept_id = t.taxonid ));
 
+
+/** 9th Jan 2015
+    After restoring and th1 creation, removing invalid images and resource mappings and row entries
+    Dropping reprImage column in species. No longer used.
+ **/
+ALTER TABLE species DROP COLUMN repr_image_id ;
+ALTER TABLE species DROP constraint fk8849413c32f2eca9 ;
+
+/** Then run script crop.groovy **/
+
+/** 16th Jan 2015
+    FilePicker security
+    1. switch on security for biodiv account on filepicker
+    2. generate secret key
+    3. put it in additional-config file like this - 
+    -----------------
+    speciesPortal {
+        observations {
+            filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
+            filePicker.secret = '4UCJGK6GLVDTRDAHETOCHGPGIY'
+        }
+    }
+    ----------------
+**/
+// added on 19th jan 2015
+ALTER TABLE comment ADD visit_count bigint;
+update comment set visit_count = 0;
+

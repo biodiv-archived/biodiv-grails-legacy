@@ -134,12 +134,6 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		}
 	}
 
-    boolean hasObvLockPerm(obvId) {
-        def observationInstance = Observation.get(obvId.toLong());
-        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
-        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
-    }
-
     public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl, Map otherParams=null){
 		 
 		def conf = SpringSecurityUtils.securityConfig

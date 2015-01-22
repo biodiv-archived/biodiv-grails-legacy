@@ -1055,7 +1055,8 @@ class SUserController extends UserController {
     @Secured(['ROLE_USER'])
     def myuploads(){
         def author = springSecurityService.currentUser;
-		return ['springSecurityService':springSecurityService, 'userInstance':author] 
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+		return ['springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature] 
     }
 
     @Secured(['ROLE_ADMIN'])
