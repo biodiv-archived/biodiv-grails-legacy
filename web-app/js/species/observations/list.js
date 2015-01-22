@@ -546,7 +546,7 @@ function getSelectedFilters($ele, noneSelected) {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-
+    console.log(params);
     if(removeParam) {
         delete params[removeParam]
     }

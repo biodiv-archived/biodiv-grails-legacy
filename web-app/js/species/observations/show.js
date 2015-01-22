@@ -175,7 +175,7 @@ function showObservationMapView(obvId, observedOn, mapLocationPicker) {
     //var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
     refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
         google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
-            data.observations.push({'observedOn':observedOn});
+            data.model.observations.push({'observedOn':observedOn});
             drawVisualization(data.observations);
         }});
     }, mapLocationPicker);

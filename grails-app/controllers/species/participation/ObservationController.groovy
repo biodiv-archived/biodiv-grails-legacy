@@ -207,6 +207,9 @@ class ObservationController extends AbstractObjectController {
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
+        println "=========ID ID ================ " + params.id?.toLong()
+        params['parentId'] = params.parentId?.toLong()
+        params['maxNearByRadius'] = 200;
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
@@ -768,8 +771,11 @@ class ObservationController extends AbstractObjectController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+		            
+                    //just updates species time stamp on recommendation
+                    recommendationVoteInstance.updateSpeciesTimeStamp();			
 					
-					//sending email
+                    //sending email
 					if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
 						mailType = utilsService.OBSERVATION_ADDED;
 					} else {
@@ -902,7 +908,10 @@ class ObservationController extends AbstractObjectController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					
+				
+                    //just updates species time stamp on recommendation
+                    recommendationVoteInstance.updateSpeciesTimeStamp();			
+
 					//sending mail to user
 					utilsService.sendNotificationMail(ActivityFeedService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
@@ -981,7 +990,11 @@ class ObservationController extends AbstractObjectController {
 			   observationInstance.calculateMaxVotedSpeciesName();
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			   //sending mail to user
+		
+                //just updates species time stamp on recommendation
+                recommendationVoteInstance.updateSpeciesTimeStamp();				
+	
+               //sending mail to user
 			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
 			   def r = [
 				   status : 'success',
@@ -1090,7 +1103,7 @@ class ObservationController extends AbstractObjectController {
 
 	def listRelated = {
     	log.debug params;
-
+println "================LIST RELATED CALLED========="
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 

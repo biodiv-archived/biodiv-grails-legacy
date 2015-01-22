@@ -9,6 +9,7 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
     if(!url) url = window.params.observation.occurrencesUrl+'?'+decodeURIComponent($.param(p));
     else url = url+'?'+decodeURIComponent($.param(p));
 
+    alert(url);
     if(mapLocationPicker.markers) {
         mapLocationPicker.markers.clearLayers();
     } else 
@@ -18,8 +19,10 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
         dataType: "json",
         success: function(data) {
             var m = [];
-            for(var i=0; i<data.observations.length; i++) {
-                var obv = data.observations[i];
+            console.log("====HELLO========");
+            console.log(data);
+            for(var i=0; i<data.model.observations.length; i++) {
+                var obv = data.model.observations[i];
                 var latitude = obv.lat?obv.lat:obv[1];
             	var longitude = obv.lng?obv.lng:obv[2];
             	var icon;
