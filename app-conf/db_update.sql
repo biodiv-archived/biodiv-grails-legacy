@@ -300,3 +300,7 @@ ALTER TABLE species DROP constraint fk8849413c32f2eca9 ;
     }
     ----------------
 **/
+// added on 19th jan 2015
+ALTER TABLE comment ADD visit_count bigint;
+update comment set visit_count = 0;
+

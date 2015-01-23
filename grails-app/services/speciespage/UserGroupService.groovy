@@ -1286,6 +1286,7 @@ class UserGroupService {
 	}
 	
 	private class ResourceUpdate {
+		private static final int POST_BATCH_SIZE = 50
 		private static final log = LogFactory.getLog(this);
 		
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
@@ -1316,30 +1317,38 @@ class UserGroupService {
 		
 		
 		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
-			UserGroup.withTransaction(){  status ->
+			
+			UserGroup.withNewTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
 					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
 					obvs = getFeatureSafeList(ug, obvs)
 				}
-				if(obvs.isEmpty()){
-					log.debug "Nothing to update because of permissoin or not part of group"
-					return false
+			}
+			
+			if(obvs.isEmpty()){
+				log.debug "Nothing to update because of permissoin or not part of group"
+				return false
+			}
+			//XXX: to avoid connection time out posting in batches
+			List resSubLists = obvs.collate(POST_BATCH_SIZE)
+			resSubLists.each { resList ->
+				UserGroup.withNewTransaction(){  status ->
+					log.debug submitType + " for group " + ug + "  resources size " +  resList.size()
+					ug = ug.merge()
+					resList.each { obv ->
+						obv = obv.merge()
+						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+					}
+					try{
+						ug.save(flush:true, failOnError:true)
+					}catch(Exception e){
+						ug.errors.allErrors.each { log.debug it }
+						status.setRollbackOnly()
+						e.printStackTrace()
+					} 
 				}
-				log.debug submitType + " for group " + ug + "  resources size " +  obvs.size()
-				ug = ug.merge()
-				obvs.each { obv ->
-					obv = obv.merge()
-					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
-				}
-				try{
-					ug.save(flush:true, failOnError:true)
-				}catch(Exception e){
-					ug.errors.allErrors.each { log.debug it }
-					status.setRollbackOnly()
-					e.printStackTrace()
-				} 
 			}
 			return !ug.hasErrors()
 		}

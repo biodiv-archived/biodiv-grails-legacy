@@ -100,6 +100,8 @@ class UtilsService {
         def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
         String url = "";
 
+        if(attrs.controller == 'SUser') attrs.controller = 'user';
+
         if(attrs.userGroupInstance){
 			//XXX removing  userGroupInstance from attrs show that it should not come in url in toString form of userGroup
 			attrs.userGroup = attrs.remove('userGroupInstance')
@@ -180,7 +182,7 @@ class UtilsService {
                 url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
-        return url.replace('/api/', '/');
+        return url;//.replace('/api/', '/');
     }
 
     File getUniqueFile(File root, String fileName){

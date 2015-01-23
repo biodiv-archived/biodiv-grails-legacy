@@ -1,5 +1,102 @@
 h3. Document
 
+h4. list 
+
+* *Path* : /api/document 
+* *Parameters* : 
+** featureBy : true|false. default false
+** tag : tag name
+** webaddress : to filter observations with group with this webaddress
+
+** max: limit of number of results. default 24
+** offset : offset in to the result set. default 0
+** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
+
+* *REST method* : GET
+* *Requests* :
+** __Documents with a tag__
+{code}
+http://indiabiodiversity.localhost.org/api/document?tag=india
+{code}
+
+* *Response* :
+{code}
+{
+    "success": true,
+        "status": 200,
+        "msg": "Success in executing browser of document",
+        "model": {
+
+            "documentInstanceList": [ ... ],
+
+            "instanceTotal": 3,
+            "queryParams": {
+                "tag": "india",
+                "tagType": "document",
+                "max": 12,
+                "offset": 0
+            },
+            "activeFilters": {
+                "tag": "india"
+            },
+            "resultType": "document",
+            "canPullResource": true
+        }
+}
+{code}
+
+h4. show 
+
+* *Path* : /api/document/id 
+* *Parameters* : id long format
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.localhost.org/api/document/670
+{code}
+* *Response* :
+** Successful response
+{code}
+{
+    "success": true,
+        "status": 200,
+        "msg": "Document 676 created",
+        "instance": {
+            "id": 674,
+            "title": "My title",
+            "type": {
+                "enumType": "content.eml.Document$DocumentType",
+                "name": "Report"
+            },
+            "author": {
+                "id": 1184,
+                "name": "Sravanthi Mutyala",
+                "icon": "http://graph.facebook.com/581308415/picture?type=large"
+            },
+            "createdOn": "2015-01-05T11:10:48Z",
+            "lastRevised": "2015-01-05T11:10:48Z",
+            "license": {
+                "name": "CC BY",
+                "url": {
+                    "enumType": "species.License$LicenseType",
+                    "name": "CC_BY"
+                }
+            },
+            "thumbnail": "http://localhost/biodiv/content/documents/Document_th1.jpg",
+            "summary": ""
+                ...
+        }
+}
+{code}
+
+** in case of error 
+{code}
+{
+    "success": false,
+    "msg": "Valid id is required"
+}
+{code}
+
 h4. Save
 
 * *Path* : /api/document/save
@@ -67,7 +164,10 @@ habitat.1:267839
 {code}
 {
     "success": true,
-        "documentInstance": {
+        "status": 200,
+        "msg": "Document 680 created",
+        "instance": {
+
             "id": 674,
             "title": "My title",
             "type": {
@@ -90,7 +190,7 @@ habitat.1:267839
             },
             "thumbnail": "http://localhost/biodiv/content/documents/Document_th1.jpg",
             "summary": ""
-            ...
+                ...
         }
 }
 {code}
@@ -98,19 +198,12 @@ habitat.1:267839
 {code}
 {
     "success": false,
+        "status": 200,
         "msg": "Failed to save document",
         "errors": [
         {
-            "field": "title",
-            "message": "Property [title] of class [class content.eml.Document] cannot be null"
-        },
-        {
-            "field": "uFile",
-            "message": "Either a file or a url is required"
-        },
-        {
-            "field": "uri",
-            "message": "Property [uri] of class [class content.eml.Document] with value [null] does not pass custom validation"
+            "field": "type",
+            "message": "Property [type] of class [class content.eml.Document] cannot be null"
         },
         {
             "field": "type",
@@ -127,116 +220,62 @@ qqfile:_. BITS FD Admission - 2013_ Net banking Receipt .pdf
 
 {"success":true,"filePath":"/documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92/234.pdf","fileURL":"http://localhost/biodiv/content/documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92/234.pdf","fileSize":"72 KB","xlsxFileUrl":null,"headerMetadata":null,"isSimpleSheet":null}
 
+h4. update 
 
-h4. show 
-
-* *Path* : /api/document/show/id 
-* *Parameters* : id long format
-* *REST method* : GET
-* *Request* : 
+* *Path* : /api/document/id
+* *Parameters* : 
+* *REST method* : PUT
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
+* *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/document/show/670
+http://indiabiodiversity.localhost.org/api/document/1
 {code}
-* *Response* :
+* *Response* : 
 ** Successful response
 {code}
-"documentInstance": {
-    "id": 674,
-        "title": "My title",
-        "type": {
-            "enumType": "content.eml.Document$DocumentType",
-            "name": "Report"
-        },
-        "author": {
-            "id": 1184,
-            "name": "Sravanthi Mutyala",
-            "icon": "http://graph.facebook.com/581308415/picture?type=large"
-        },
-        "createdOn": "2015-01-05T11:10:48Z",
-        "lastRevised": "2015-01-05T11:10:48Z",
-        "license": {
-            "name": "CC BY",
-            "url": {
-                "enumType": "species.License$LicenseType",
-                "name": "CC_BY"
-            }
-        },
-        "thumbnail": "http://localhost/biodiv/content/documents/Document_th1.jpg",
-        "summary": ""
-            ...
+{
+    "success": true,
+        "status": 200,
+        "msg": "Document 681 updated",
+        "instance": {... }
 }
 {code}
-
 ** in case of error 
 {code}
 {
     "success": false,
-    "msg": "Valid id is required"
-}
-{code}
-
-h4. list 
-
-* *Path* : /api/document/list 
-* *Parameters* : 
-** featureBy : true|false. default false
-** tag : tag name
-** webaddress : to filter observations with group with this webaddress
-
-** max: limit of number of results. default 24
-** offset : offset in to the result set. default 0
-** sort: lastRevised|createsOn|visitCount. default lastRevised desc, id asc
-
-* *REST method* : GET
-* *Requests* :
-** __Documents with a tag__
-{code}
-http://indiabiodiversity.localhost.org/api/document/list?tag=india
-{code}
-
-* *Response* :
-{code}
-{
-    "documentInstanceList": [ ... ],
-
-        "instanceTotal": 3,
-        "queryParams": {
-            "tag": "india",
-            "tagType": "document",
-            "max": 12,
-            "offset": 0
-        },
-        "activeFilters": {
-            "tag": "india"
-        },
-        "resultType": "document",
-        "canPullResource": true
+        "status": 200,
+        "msg": "Document not found with id 680",
+        "errors": []
 }
 {code}
 
 h4. delete
 
-* *Path* : /api/document/delete
+* *Path* : /api/document/id/delete
 * *Parameters* :
 ** id : id
-* *REST Method* : POST
+* *REST Method* : DELETE
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/document?id=234
+http://indiabiodiversity.localhost.org/api/document/234/delete
 {code}
 * *Response* :
 ** on success
 {code}
 {
     "success": true,
-    "msg": "Document 234 deleted",
+        "status": 200,
+        "msg": "Document 680 deleted"
 }
 {code}
 ** in case of error 
 {code}
 {
     "success": false,
-    "msg": "Document not found with id 234sdf",
+        "status": 200,
+        "msg": "Document not found with id 670",
+        "errors": []
 }
 {code}
 

@@ -28,7 +28,6 @@ class Checklists extends Observation {
 	
 	def activityFeedService;
 	def obvUtilService;
-	def utilsService;
 	
 	String title;
 	int speciesCount = 0;

@@ -444,21 +444,28 @@ class ActivityFeedService {
 		log.debug "Adding feed for resources " + resources.size()
 		def activityType = isPost ? RESOURCE_POSTED_ON_GROUP : RESOURCE_REMOVED_FROM_GROUP
 		Map resCountMap = [:]
-		def af 
-		resources.each { r->
-			def description = getDescriptionForResourcePull(r, isPost)
-			af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
-			int oldCount = resCountMap.get(r.class.canonicalName)?:0
-			resCountMap.put(r.class.canonicalName, ++oldCount)
-			if(!isBulkPull && sendMail){
-				utilsService.sendNotificationMail(activityType, r, null, null, af)
+		def af
+		List resSubLists = resources.collate(50)
+		resSubLists.each { resList ->
+			ActivityFeed.withNewTransaction { status ->
+				resList.each { r->
+					def description = getDescriptionForResourcePull(r, isPost)
+					af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
+					int oldCount = resCountMap.get(r.class.canonicalName)?:0
+					resCountMap.put(r.class.canonicalName, ++oldCount)
+					if(!isBulkPull && sendMail){
+						utilsService.sendNotificationMail(activityType, r, null, null, af)
+					}
+				}
 			}
 		}
 		if(isBulkPull){
-			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
-			af = addActivityFeed(ug, ug, author, activityType, description, true)
-            if(sendMail)
-			    utilsService.sendNotificationMail(activityType, ug, null, null, af)
+			ActivityFeed.withNewTransaction { status ->
+				def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
+				af = addActivityFeed(ug, ug, author, activityType, description, true)
+	            if(sendMail)
+				    utilsService.sendNotificationMail(activityType, ug, null, null, af)
+			}
 		} 
 		return af
 	}

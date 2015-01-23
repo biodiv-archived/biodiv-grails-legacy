@@ -34,6 +34,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 import species.participation.UserToken;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import static org.springframework.http.HttpStatus.*;
 
 class SpeciesController extends AbstractObjectController {
 

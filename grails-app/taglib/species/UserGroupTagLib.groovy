@@ -336,7 +336,7 @@ class UserGroupTagLib {
 	def isUserGroupMember = { attrs, body->
 		def user = springSecurityService.getCurrentUser();
 		//TODO:optimize count
-		if(user.getUserGroups().size() > 0) {
+		if(user && user.getUserGroups().size() > 0) {
 			out<< body();
 		}
 	}

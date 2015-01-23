@@ -131,7 +131,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
-            def r = [id:it.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
+            def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
             };
