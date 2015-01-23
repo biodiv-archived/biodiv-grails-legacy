@@ -55,9 +55,11 @@ class UrlMappings {
             "/api/user(.(*))?"(controller: 'user', action: 'update', method: 'PUT')
             "/api/user(.(*))?"(controller: 'user', action: 'save', method: 'POST')
 */
+            "/observation"(controller : 'observation', action : 'flagDeleted', method:'DELETE')
             "/user"( controller : 'SUser', action:'index', method:'GET')
+            "/user"( controller:'SUser', action:'save', method:'POST')
             "/user/$id"(controller:"SUser") {
-                action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
+                action = [GET:"show", PUT:"update", DELETE:"delete"]
                 constraints { id matches: /\d+/ }
             }
             "/user/$id/$action"( controller : 'SUser') 
@@ -86,10 +88,12 @@ class UrlMappings {
             }
 
             "/related/$controller/$filterProperty?/$filterPropertyValue?" (action:'related', method:'GET')
+            
 
             "/$controller"( action:'index', method:'GET')
+            "/$controller"( action:'save', method:'POST')
             "/$controller/$id" {
-                action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
+                action = [GET:"show", PUT:"update", DELETE:"delete"]
                 constraints { id matches: /\d+/ }
             }
             "/$controller/$id/$action" {

@@ -127,7 +127,7 @@ class RecommendationController {
     */
 	def suggest = {
 
-		def model = utilsService.getSuccessModel('', null, OK.value(), namesIndexerService.suggest(params));
+		def model = utilsService.getSuccessModel('', null, OK.value(), ['instanceList':namesIndexerService.suggest(params)]);
         withFormat {
             json { render model  as JSON }
             xml { render model as XML }

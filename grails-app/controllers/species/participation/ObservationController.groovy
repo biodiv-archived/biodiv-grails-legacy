@@ -61,7 +61,7 @@ class ObservationController extends AbstractObjectController {
     def setupService;
     def springSecurityFilterChain
  
-	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDelete: ["POST", "DELETE"]]
+	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
 	def index = {
@@ -770,7 +770,7 @@ class ObservationController extends AbstractObjectController {
                         }
 					} else {
                         if(params.oldAction != "bulkSave"){
-                            def model = utilsService.getErrorModel(msg, null, OK.value());
+                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                             withFormat {
                                 html {
 						            redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
@@ -824,7 +824,7 @@ class ObservationController extends AbstractObjectController {
                         }
 					} else {
                         if(params.oldAction != "bulkSave"){
-                            def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value());
+                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                             withFormat {
                                 html {
     						        redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
@@ -861,7 +861,7 @@ class ObservationController extends AbstractObjectController {
                         }
                     }
                     if(params.oldAction != "bulkSave"){
-                        def model = utilsService.getErrorModel(msg, recommendationVoteInstance, OK.value());
+                        def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                         withFormat {
                             html {
                                 render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])

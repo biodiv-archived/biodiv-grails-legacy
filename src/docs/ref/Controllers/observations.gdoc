@@ -385,18 +385,36 @@ http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=s
 * *Response* : 
 ** Successfull response
 {code}
-<observations>
-    <dir>/a1006639-331f-4916-915a-78f688bd6fdb</dir>
-    <resources>
-        <res fileName='/a1006639-331f-4916-915a-78f688bd6fdb/817.jpeg' url='' thumbnail='http://indiabiodiversity.localhost.org/biodiv/observations//a1006639-331f-4916-915a-78f688bd6fdb/817_gall.jpg' type='IMAGE'></res>
-    </resources>
-</observations>
+{
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "model": {
+            "observations": {
+                "dir": "/7a4b7349-4845-468f-afba-a9986e9b2c93",
+                "resources": [
+                {
+                    "fileName": "/7a4b7349-4845-468f-afba-a9986e9b2c93/704.JPG",
+                    "url": "",
+                    "thumbnail": "http://indiabiodiversity.localhost.org/biodiv/observations//7a4b7349-4845-468f-afba-a9986e9b2c93/704_gall.jpg",
+                    "type": {
+                        "enumType": "species.Resource$ResourceType",
+                        "name": "IMAGE"
+                    },
+                    "jobId": 7661
+                }
+                ]
+            }
+        }
+}
 {code}
 ** in case of error
 {code}
 {
-    success:false,
-    "error": "No file is attached"
+    "success": false,
+        "status": 500,
+        "msg": "No file is attached",
+        "errors": []
 }
 {code}
 
