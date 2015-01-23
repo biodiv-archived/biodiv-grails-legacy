@@ -79,29 +79,32 @@ class SUserController extends UserController {
 		}
 		params.remove('query');
 
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model['resultType'] = 'user'
+            model['obvListHtml'] =  g.render(template:"/common/suser/showUserListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+        }
+
+        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
         withFormat {
             html { 
                 if(params.loadMore?.toBoolean()){
-                    render(template:"/common/suser/showUserListTemplate", model:model);
+                    render(template:"/common/suser/showUserListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
-                    render (view:"list", model:model)
+                    render (view:"list", model:model.model)
                     return;
-                } else{
-                    model['resultType'] = 'user'
+                } else {
+                    /*model['resultType'] = 'user'
                     def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
                     def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
                     def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
                     render result as JSON
-                    return;
+                    return;*/
                 }
             }
-            json {
-                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as JSON)
-            }
-            xml {
-                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as XML)
-            }
+            json {render model as JSON }
+            xml { render model as XML }
         }
 	}
 

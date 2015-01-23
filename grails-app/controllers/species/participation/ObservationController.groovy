@@ -99,23 +99,35 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list() {
-		
 		def model = runLastListQuery(params);
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            def tagsHtml = "";
+            if(model.showTags) {
+                //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+                //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+            }
+        }
+        
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+
         withFormat {
             html {
                 model.resultType = 'observation'
-                def userLanguage = utilsService.getCurrentLanguage(request); 
                 if(params.loadMore?.toBoolean()){
-                    render(template:"/common/observation/showObservationListTemplate", model:model);
+                    render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
-                    model['width'] = 300;
-                    model['height'] = 200;
-                    model['userLanguage'] = userLanguage;
-                    render (view:"list", model:model)
+                    model.model['width'] = 300;
+                    model.model['height'] = 200;
+                    render (view:"list", model:model.model)
                     return;
                 } else {
-                    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+/*                    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
                     def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
                     def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
                     def tagsHtml = "";
@@ -123,20 +135,15 @@ class ObservationController extends AbstractObjectController {
         //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
         //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
                     }
-        //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-        /*	        def chartModel = model.speciesGroupCountList
-                    chartModel['width'] = 300;
-                    chartModel['height'] = 270;
-        */
                     
                     def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
 
                     render result as JSON
-                    return;
+*/                  return;
                 }
             }
-            json { render utilsService.getSuccessModel("", null, OK.value(), model) as JSON }
-            xml { render utilsService.getSuccessModel("", null, OK.value(), model) as XML }
+            json { render model as JSON }
+            xml { render model as XML }
         }
 	}
 
@@ -1411,7 +1418,7 @@ println "================LIST RELATED CALLED========="
 	/**
 	 *
 	 */
-	def search = {
+/*	def search = {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 		def model = observationService.getObservationsFromSearch(params);
@@ -1442,21 +1449,12 @@ println "================LIST RELATED CALLED========="
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
-			if(model.showTags) {
-//				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-//				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			}
-//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-/*			def chartModel = model.speciesGroupCountList
-            chartModel['width'] = 300;
-            chartModel['height'] = 270;
-*/
             def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
 	}
-
+*/
 	/**
 	 *
 	 */

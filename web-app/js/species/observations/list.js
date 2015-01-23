@@ -780,13 +780,13 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
-        $('.observations_list').replaceWith(data.obvListHtml);
-        $('#info-message').replaceWith(data.obvFilterMsgHtml);
-        $('#tags_section').replaceWith(data.tagsHtml);
-        //$('#filterPanel').replaceWith(data.filterPanel);
-        //$('.observation_location').replaceWith(data.mapViewHtml);
+        $('.observations_list').replaceWith(data.model.obvListHtml);
+        $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
+        $('#tags_section').replaceWith(data.model.tagsHtml);
+        //$('#filterPanel').replaceWith(data.model.filterPanel);
+        //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);
-        updateDownloadBox(data.instanceTotal);
+        updateDownloadBox(data.model.instanceTotal);
         reInitializeGroupPost();
         updateRelativeTime();
         last_actions();
