@@ -164,29 +164,31 @@ class ObservationController extends AbstractObjectController {
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
-        println "=========ID ID ================ " + params.id?.toLong()
         params['parentId'] = params.parentId?.toLong()
         params['maxNearByRadius'] = 200;
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
-        println "=======FILTERED OBSERVATION LIST========== " + filteredObservation
 		def observationInstanceList = filteredObservation.observationInstanceList
         
         //Because returning source Ids instead of actual obv ins
         if(params.filterProperty == 'speciesName') {
+            //def fetchedCklCount = filteredObservation.checklistCount;
             def results = []
-            def cklCount = 0;
+            //def cklCount = 0;
             observationInstanceList.each {
                 def obv = Observation.read(it);
-                if(obv.isChecklist) {
-                    cklCount += 1;
-                }
+                //if(fetchedCklCount != 0 && obv.isChecklist) {
+                  //  cklCount += 1;
+                //}
                 results.add(obv)
             }
             filteredObservation.observationInstanceList = results;
             observationInstanceList = results;
-            filteredObservation.checklistCount = cklCount;
+            //if(fetchedCklCount != 0 ) {
+              //  filteredObservation.checklistCount = cklCount;
+            //}
+            //println "=============CKL COUNT========= " + cklCount
         }
 
 		def queryParams = filteredObservation.queryParams
@@ -1187,7 +1189,6 @@ class ObservationController extends AbstractObjectController {
 
 	def listRelated = {
     	log.debug params;
-println "================LIST RELATED CALLED========="
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 

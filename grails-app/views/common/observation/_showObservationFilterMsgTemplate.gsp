@@ -1,5 +1,6 @@
 <%@page import="species.auth.SUser"%>
 <%@ page import="species.participation.Observation"%>
+<%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 <script type="text/javascript">
@@ -33,8 +34,25 @@
 						<g:if test="${observationCount}"> <g:message code="text.and" /> </g:if>
 						<g:message code="text.checklists" args="${checklistCount}" /><g:if test="${checklistCount>1}"><g:message code="text.s" /></g:if>
 					</g:if>
-				</g:else> 
-			<g:message code="text.found" /> 
+                </g:else> 
+                <g:if test="${params.filterProperty == 'speciesName' || params.filterProperty == 'nearByRelated' || params.filterProperty == 'taxonConcept'}">
+                    <g:if test="${params.filterProperty == 'speciesName'}">
+                        <% def obv = Observation.read(params.parentId?.toLong()) %>
+                        of <a href="${uGroup.createLink( action:"show", controller:"observation", id:params.parentId, userGroupWebaddress:params.webaddress, absolute:true)}"> ${raw(obv.fetchSpeciesCall())}</a>
+                    </g:if>
+                    <g:elseif test="${params.filterProperty == 'taxonConcept'}">
+                        <% def sp = Species.read(params.parentId?.toLong()) %>
+                        of <a href="${uGroup.createLink(mapping:"userGroupGeneric", action:"show", controller:"species", id:params.parentId, userGroupWebaddress:params.webaddress, absolute:true)}"> ${raw(sp.title)}</a>
+                    </g:elseif>
+                    <g:elseif test="${params.filterProperty == 'nearByRelated'}">
+                        <% def obv = Observation.read(params.parentId?.toLong()) %>
+                        <g:message code="text.radius.km" /> ${obv.latitude} , ${obv.longitude}  
+                    </g:elseif>
+     
+                </g:if>
+                <g:else>
+                    <g:message code="text.found" /> 
+                </g:else>
 		</g:else>
 		<%
 			boolean dateRangeSet = false	

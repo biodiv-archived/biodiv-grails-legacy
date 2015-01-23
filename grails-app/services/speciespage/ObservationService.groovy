@@ -362,21 +362,10 @@ class ObservationService extends AbstractObjectService {
      * @return
      */
     Map getRelatedObservations(params) {
-        println "====PARAMS FILTER PROP======= " + params.filterProperty
         int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
         int offset = params.offset ? params.offset.toInteger() : 0
         def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
-            /*params.remove('fetchField');
-            println "======NEW TRY =========="
-            def obvs = getFilteredObservations(params, max, offset, true).observationInstanceList;
-            def result = []
-            obvs.each{
-                println "=======IT=== " + it
-                result.add(['observation':it, 'title':it.fetchSpeciesCall()]); 
-            }
-            relatedObv = [observations:result, count:obvs.size()]
-*/
             relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "speciesGroup"){
             relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
@@ -386,29 +375,12 @@ class ObservationService extends AbstractObjectService {
         } else if(params.filterProperty == "user"){
             relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort, params.webaddress)
         } else if(params.filterProperty == "nearByRelated"){
-            /*params['maxNearByRadius'] = 200;
-            println "======NEW TRY NEAR BY=========="
-            def obvs = getFilteredObservations(params, max, offset, true).observationInstanceList;
-            def result = []
-            obvs.each{
-                result.add(['observation':it, 'title':it.fetchSpeciesCall()]); 
-            }
-            relatedObv = [observations:result, count:obvs.size()]
-            */
             relatedObv = getNearbyObservationsRelated(params.id?:params.filterPropertyValue, max, offset)
         } else if(params.filterProperty == "nearBy"){
             float lat = params.lat?params.lat.toFloat():-1;
             float lng = params.long?params.long.toFloat():-1;
             relatedObv = getNearbyObservations(lat,lng, max, offset)
         } else if(params.filterProperty == "taxonConcept") {
-            /*println "======NEW TRY TAX CON==========" 
-            def obvs = getFilteredObservations(params, max, offset, true).observationInstanceList;
-            def result = []
-            obvs.each{
-                result.add(['observation':it, 'title':it.fetchSpeciesCall()]); 
-            }
-            relatedObv = [observations:result, count:obvs.size()]
-            */
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "latestUpdatedObservations") {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
@@ -436,7 +408,6 @@ class ObservationService extends AbstractObjectService {
                 //map.observation.inGroup = inGroup;
             }
         }
-        println "=-======RELATED OBV888==== " + relatedObv
         return [relatedObv:relatedObv, max:max]
     }
 
@@ -592,7 +563,6 @@ class ObservationService extends AbstractObjectService {
             if(limit >= 0) maxResults(limit)
                 firstResult (offset?:0)
         }
-        println "=========BY RECO OBVS ======== " + observations
         def result = [];
         observations.each {
             def obv = Observation.get(it[0])
@@ -612,7 +582,6 @@ class ObservationService extends AbstractObjectService {
                 if(obvId) ne("id", obvId)
             }
         }
-        println "================COUNT=== " + count
         return ["observations":result, "count":count]
     }
     
@@ -670,7 +639,6 @@ class ObservationService extends AbstractObjectService {
                 def obv = iter.next();
                 result.add(['observation':obv, 'title':obv.fetchSpeciesCall()]);
             }
-            println "========TAX CON COUNT======= " + count
             return ['observations':result, 'count':count]
         } else {
             return ['observations':[], 'count':0]
@@ -799,7 +767,6 @@ class ObservationService extends AbstractObjectService {
         } finally {
             sql.close();
         }
-        println "============TOTAL RESULT COUNT ========= " + totalResultCount
         return ["observations":nearbyObservations, "count":totalResultCount]
     }
 
@@ -945,8 +912,6 @@ class ObservationService extends AbstractObjectService {
 
         log.debug query;
         log.debug queryParts.queryParams;
-        println "==========MAX MAX ========== " + max 
-        println "=======QUERY PARSM====== " +  queryParts.queryParams
         def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
@@ -1015,7 +980,6 @@ class ObservationService extends AbstractObjectService {
      *
      **/
     def getFilteredObservationsFilterQuery(params) {
-        println "======FINAL =======" + params
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
@@ -1029,7 +993,6 @@ class ObservationService extends AbstractObjectService {
         if(!params.sort || params.sort == 'score') {
             params.sort = "lastRevised"
         }
-        println "========SORT SORT=============== " + params.sort;
         def orderByClause = "  obv." + params.sort +  " desc, obv.id asc"
 
         if(params.fetchField) {
@@ -1042,7 +1005,7 @@ class ObservationService extends AbstractObjectService {
             queryParams['fetchField'] = params.fetchField
         } else if(params.filterProperty == 'speciesName') {
             query += " obv.sourceId as sid "
-        } else if(params.filterProperty == 'nearByRelated') {
+        } else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
             query += " g2 "
         } 
         else {
@@ -1224,7 +1187,7 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.filterProperty == 'nearByRelated') {
+        if(params.filterProperty == 'nearByRelated' && !params.bounds) {
             nearByRelatedObvQuery = ', Observation as g2';
             query += nearByRelatedObvQuery;
             filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId and obv.id <> g2.id '
@@ -1273,7 +1236,13 @@ class ObservationService extends AbstractObjectService {
         }
 
 
-        def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery + " and obv.isChecklist = true "
+        def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery 
+        if(params.filterProperty != 'speciesName') {
+            checklistCountQuery += " and obv.isChecklist = true "
+        }
+        else { 
+            checklistCountQuery += " and obv.isShowable = false "
+        }
         def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
 
         orderByClause = " order by " + orderByClause;
@@ -2079,6 +2048,7 @@ class ObservationService extends AbstractObjectService {
             distinctRecoQuery.setFirstResult(offset);
         }
 
+        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         distinctRecoQuery.setProperties(queryParts.queryParams)
         distinctRecoCountQuery.setProperties(queryParts.queryParams)
         def distinctRecoListResult = distinctRecoQuery.list()
@@ -2166,6 +2136,7 @@ class ObservationService extends AbstractObjectService {
         if(params.bounds && boundGeometry) {
             speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
+        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
         return [speciesGroupCountList:speciesGroupCountList];
@@ -2266,7 +2237,6 @@ class ObservationService extends AbstractObjectService {
      * Get map occurences within specified bounds
      */
     def getObservationOccurences(def params) {
-        println "========PRAMS IN OCCUR========== " + params
         def queryParts = getFilteredObservationsFilterQuery(params) 
         String query = queryParts.query;
 
@@ -2275,7 +2245,8 @@ class ObservationService extends AbstractObjectService {
 
         log.debug "occurences query : "+query;
         log.debug queryParts.queryParams;
-
+        
+        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
