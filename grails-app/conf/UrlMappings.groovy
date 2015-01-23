@@ -60,8 +60,14 @@ class UrlMappings {
                 action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
                 constraints { id matches: /\d+/ }
             }
-            "/user/$id?/$action?"( controller : 'SUser') 
-            
+            "/user/$id/$action"( controller : 'SUser') 
+            "/user/$action" {
+                controller = 'SUser'
+                constraints {
+                    action(matches:/(?!\d+$)\w+/)
+                }
+            }
+
             "/group"( controller : 'UserGroup', action:'index', method:'GET')
             "/group/$id"(controller:"UserGroup") {
                 action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
@@ -70,20 +76,36 @@ class UrlMappings {
             "/group/$id/$action"( controller : 'UserGroup') {
                 constraints { id matches: /\d+/ }
             }
+            "/group/$action" {
+                controller = 'SUser'
+                constraints {
+                    action(matches:/(?!\d+$)\w+/)
+                }
+            }
             "/group/$webaddress/$controller/$action/$id?"( ) {
             }
 
             "/related/$controller/$filterProperty?/$filterPropertyValue?" (action:'related', method:'GET')
-            "/observation/occurrences" (controller:'Observation', action:'occurrences', method:'GET')
-            "/observation/distinctReco" (controller:'Observation', action:'distinctReco', method:'GET')
-            "/$controller/upload_resource" (action:'upload_resource', method:'GET')
 
             "/$controller"( action:'index', method:'GET')
             "/$controller/$id" {
                 action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
                 constraints { id matches: /\d+/ }
             }
-            "/$controller/$id?/$action?" {}
+            "/$controller/$id/$action" {
+                constraints {
+                    controller(matches:/\w+/)
+                    id(matches:/\d+/)
+                    action(matches:/\w+/)
+                }
+            }
+            "/$controller/$action" {
+                constraints {
+                    controller(matches:/\w+/)
+                    action(matches:/(?!\d+$)\w+/)
+                }
+            }
+
 
 /*            "/login" {
                       format = 'json'
@@ -98,7 +120,7 @@ class UrlMappings {
             format = 'json'
             }
 */
-            name oauth: "/oauth/${action}/${provider}"(controller: 'oauth')
+            name oauth: "/oauth/${action}/${provider}"(controller: 'restOauth')
 
             "/register/forgotPassword" {
                 controller = 'register'

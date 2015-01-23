@@ -61,7 +61,7 @@ class ObservationController extends AbstractObjectController {
     def setupService;
     def springSecurityFilterChain
  
-	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
+	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDelete: ["POST", "DELETE"]]
     static defaultAction = "list"
 
 	def index = {
@@ -260,13 +260,16 @@ class ObservationController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
 	def flagDeleted() {
 		def result = observationService.delete(params)
-        if(params.format?.equalsIgnoreCase("json")) {
-            result.remove('url')
-            render result as JSON;
-            return;
+        result.remove('url')
+        String url = result.url;
+        withFormat {
+            html {
+                flash.message = result.message
+                redirect (url:url)
+            }
+            json { render result as JSON }
+            xml { render result as XML }
         }
-		flash.message = result.message
-		redirect (url:result.url)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -1034,6 +1037,7 @@ class ObservationController extends AbstractObjectController {
        }
 	
 	   if(params.obvId) {
+           println params
 		   def observationInstance = Observation.get(params.obvId);
 		   def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
            if(!observationInstance || !recommendationVoteInstance) {
@@ -1074,8 +1078,8 @@ class ObservationController extends AbstractObjectController {
                def msg = "Error while adding agree vote ${e.getMessage()}"
                def model = utilsService.getErrorModel(msg, null, OK.value());
                withFormat {
-                   json { render r as JSON }
-                   xml { render r as XML }
+                   json { render model as JSON }
+                   xml { render model as XML }
                }
 		   }
 	   } else {
@@ -1083,8 +1087,8 @@ class ObservationController extends AbstractObjectController {
            log.error flash.message;
            def model = utilsService.getErrorModel(flash.message, null, OK.value());
            withFormat {
-               json { render r as JSON }
-               xml { render r as XML }
+               json { render model as JSON }
+               xml { render model as XML }
            }
 	   }
    }
@@ -1101,7 +1105,6 @@ class ObservationController extends AbstractObjectController {
         if(!params.id) {
             def model = utilsService.getErrorModel (g.message(code: 'error', default:'Invalid observation id'), null, OK.value())
             withFormat {
-                html {}
                 json { render model as JSON }
                 xml { render model as XML }
             }

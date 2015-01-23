@@ -12,7 +12,6 @@ class CommentController {
 
 	@Secured(['ROLE_USER'])
 	def addComment() {
-        println "++++++++++*************************************"
 		params.author = springSecurityService.currentUser;
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		
@@ -44,7 +43,7 @@ class CommentController {
 		}else{
 			//XXX handle appropriately here
 			log.error "Error in deleting comment " +  params.commentId
-			render (['success:false']as JSON);
+			render (['success':false, msg:"Error in deleting comment "] as JSON);
 		}
 	}
 	

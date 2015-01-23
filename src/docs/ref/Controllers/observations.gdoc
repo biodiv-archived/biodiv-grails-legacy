@@ -409,56 +409,63 @@ h4. getRecommendationVotes
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/getRecommendationVotes?id=245
+http://indiabiodiversity.localhost.org/api/observation/245/getRecommendationVotes
 {code}
 * *Response* :
 ** on success
 {code}
 {
-    "recoVotes": [
-    {
-        "recoId": 2693,
-            "isScientificName": true,
-            "name": "Test4",
-            "authors": [
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "model": {
+            "recoVotes": [
             {
-                "id": 2,
-                "name": "Sravanthi Mutyala",
-                "email": "pearlsravanthi@gmail.com",
-                "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+                "recoId": 2693,
+                "isScientificName": true,
+                "name": "Test4",
+                "authors": [
+                {
+                    "id": 2,
+                    "name": "Sravanthi Mutyala",
+                    "email": "pearlsravanthi@gmail.com",
+                    "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
+                }
+                ],
+                    "votedOn": [
+                        "2014-06-24T14:21:47Z"
+                        ],
+                    "noOfVotes": 1,
+                    "totalVotes": 1,
+                    "recoComments": [],
+                    "obvId": 245,
+                    "isLocked": false,
+                    "commonNames": "",
+                    "disAgree": true,
+                    "showLock": true
             }
             ],
-            "votedOn": [
-                "2014-06-24T14:21:47Z"
-                ],
-            "noOfVotes": 1,
-            "totalVotes": 1,
-            "recoComments": [],
-            "obvId": 245,
-            "isLocked": false,
-            "commonNames": "",
-            "disAgree": true,
-            "showLock": true
+                "totalVotes": 1,
+                "uniqueVotes": 1,
+                "success": true
         }
-        ],
-        "totalVotes": 1,
-        "uniqueVotes": 1,
-        "success": true
 }
-
 {code}
 ** on error
 {code}
 {
     "success": false,
-    "status": "error",
-    "msg": "Error while processing the request. Please report the necessary details to <span class='mailme'>support(at)indiabiodiversity(dot)org</span>"
+        "status": 200,
+        "msg": "Error while processing the request. Please report the necessary details to <span class='mailme'>support(at)indiabiodiversity(dot)org</span>",
+        "errors": [
+            "For input string: \"268134ds\""
+            ]
 }
 {code}
 
 h4. addRecommendationVote
 
-* *Path* : /api/observation/getRecommendationVotes
+* *Path* : /api/observation/id/getRecommendationVotes
 * *Parameters* :
 ** obvId: observation id
 ** recoName: scientific name
@@ -469,45 +476,51 @@ h4. addRecommendationVote
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
+http://indiabiodiversity.localhost.org/api/observation/id/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
 {code}
 * *Response* :
 ** on success
 {code}
 {
-    "status": "success",
-    "success": "true",
-    "recoVote": {
-        "recommendation": {
-            "name": "Animalia",
-            "taxonomyDefinition": {
-                "id": 1,
+    "success": true,
+        "status": 200,
+        "msg": "Successfully added species name Animalia",
+        "instance": {
+            "id": 369875,
+            "observation": 358907,
+            "recommendation": {
+                "id": 268187,
                 "name": "Animalia",
-                "canonicalForm": "Animalia",
-                "italicisedForm": "<i>Animalia</i>",
-                "rank": "Kingdom"
+                "taxonomyDefinition": {
+                    "id": 872,
+                    "name": "Animalia",
+                    "canonicalForm": "Animalia",
+                    "italicisedForm": "<i>Animalia</i>",
+                    "rank": "Kingdom"
+                }
+            },
+            "author": {
+                "id": 1184,
+                "name": "Sravanthi Mutyala",
+                "icon": "http://graph.facebook.com/581308415/picture?type=large"
+            },
+            "confidence": "I am certain",
+            "votedOn": "2015-01-22T15:34:37Z",
+            "commonNameReco": {
+                "id": 435387,
+                "name": "Common Name",
+                "language": {
+                    "id": 205,
+                    "name": "English"
+                }
             }
-        },
-        "commonNameReco": {
-            "name": "Common Name",
-            "taxonomyDefinition": null
-        },
-        "author": {
-            "id": 2,
-            "name": "Sravanthi Mutyala",
-            "email": "pearlsravanthi@gmail.com",
-            "icon": "http://localhost/biodiv/users//b4b3727c-b589-4953-bea4-76e7b24d8d26/resources/983_th1.jpg"
-        },
-        "confidence": "I am certain",
-        "votedOn": "2014-07-01T19:25:30Z",
-        "comment": null
-    }
+        }
 }
 {code}
 ** on error
 {code}
 {
-    "status": "error",
+    "status": 200,
     "success": "false",
     "msg": "No recommendation vote got added"
 }
@@ -517,9 +530,8 @@ http://indiabiodiversity.localhost.org/api/observation/addRecommendationVote?obv
 
 h4. removeRecommendationVote
 
-* *Path* : /api/observation/removeRecommendationVote
+* *Path* : /api/observation/id/removeRecommendationVote
 * *Parameters* :
-** obvId : obsevrationId
 ** recoId : recommendationId
 * *REST Method* : GET
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
@@ -530,17 +542,27 @@ h4. removeRecommendationVote
 * *Response* :
 ** on success
 {code}
+{
+    "status": 200,
+        "success": "true",
+        "msg": "Successfully deleted species name Test indica"
+}
 {code}
 ** on error
 {code}
+{
+    "status": 200,
+        "success": "false",
+        "msg": "Recommendation not found with id 2701"
+}
 {code}
 
 h4. flagDelete
 
-* *Path* : /api/observation/flagDeleted
+* *Path* : /api/observation/id/flagDeleted
 * *Parameters* :
 ** id : observation id
-* *REST Method* : POST
+* *REST Method* : DELETE or POST
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}

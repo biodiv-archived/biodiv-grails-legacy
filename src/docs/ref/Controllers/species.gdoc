@@ -1,31 +1,9 @@
 
 h3. Species
 
-h4. show 
-
-* *Path* : /api/species/show/id 
-* *Parameters* : id
-* *REST method* : GET
-* *Request* : 
-{code}
-http://indiabiodiversity.saturn.strandls.com/api/species/show/1
-{code}
-* *Response* :
-** Successful response
-{code}
-
-{code}
-** in case of error 
-{code}
-{
-    "success": false,
-    "msg": "Valid id is required"
-}
-{code}
-
 h4. list 
 
-* *Path* : /api/species/list 
+* *Path* : /api/species
 * *Parameters* : 
 ** startsWith : any capital letter in A-Z. Defaults to all
 ** sGroup : speciesGroupId. default all
@@ -44,31 +22,66 @@ h4. list
 * *Requests* :
 ** __With species group and habitat filter__
 {code}
-http://indiabiodiversity.org/api/species/list?sGroup=837&habitat=267835
+http://indiabiodiversity.org/api/species?sGroup=837&habitat=267835
 {code}
 
 * *Response* :
 {code}
 {
-    "speciesInstanceList": [ ... ],
-        "instanceTotal": 1769,
-        "speciesCountWithContent": 210,
-        "userGroupWebaddress": null,
-        "queryParams": {
-            "max": 42,
-            "offset": 0,
-            "sort": "lastUpdated",
-            "order": "desc",
-            "sGroup": [
-                837
-                ]
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "model": {
+            "speciesInstanceList": [ ... ],
+            "instanceTotal": 1769,
+            "speciesCountWithContent": 210,
+            "userGroupWebaddress": null,
+            "queryParams": {
+                "max": 42,
+                "offset": 0,
+                "sort": "lastUpdated",
+                "order": "desc",
+                "sGroup": [
+                    837
+                    ]
+            }
         }
 }
 {code}
 
+h4. show 
+
+* *Path* : /api/species/id 
+* *Parameters* : id
+* *REST method* : GET
+* *Request* : 
+{code}
+http://indiabiodiversity.saturn.strandls.com/api/species/1
+{code}
+* *Response* :
+** Successful response
+{code}
+
+{code}
+** in case of error 
+{code}
+{
+    "success": false,
+    "status" : 200,
+    "msg": "Valid id is required"
+}
+{
+    "success": false,
+        "status": 200,
+        "msg": "Coudn't find species with id 1",
+        "errors": []
+}
+{code}
+
+
 h4. Related Species
 
-* *Path* : /api/species/related
+* *Path* : /api/related/species/$filterProperty/$filterPropertyValue
 * *Parameters* :
 ** filterProperty : featureBy   
 ** filterPropertyValue : true   
@@ -77,7 +90,7 @@ h4. Related Species
 ** 
 * __ Featured Species__
 {code}
-http://indiabiodiversity.org/api/species/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
+http://indiabiodiversity.org/api/related/species/featureBy/true?limit=10&offset=0
 {code}
 
 h4. delete
