@@ -408,7 +408,6 @@ class ObservationService extends AbstractObjectService {
                 //map.observation.inGroup = inGroup;
             }
         }
-
         return [relatedObv:relatedObv, max:max]
     }
 
@@ -564,7 +563,6 @@ class ObservationService extends AbstractObjectService {
             if(limit >= 0) maxResults(limit)
                 firstResult (offset?:0)
         }
-
         def result = [];
         observations.each {
             def obv = Observation.get(it[0])
@@ -905,7 +903,7 @@ class ObservationService extends AbstractObjectService {
                   } else {*/
         query += queryParts.filterQuery + queryParts.orderByClause
         //		}
-
+        
         log.debug "query : "+query;
         log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
@@ -914,7 +912,6 @@ class ObservationService extends AbstractObjectService {
 
         log.debug query;
         log.debug queryParts.queryParams;
-
         def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
@@ -1006,13 +1003,18 @@ class ObservationService extends AbstractObjectService {
             }
             query = query [0..-2];
             queryParams['fetchField'] = params.fetchField
-        } else {
+        } else if(params.filterProperty == 'speciesName') {
+            query += " obv.sourceId as sid "
+        } else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
+            query += " g2 "
+        } 
+        else {
             query += " obv "
         }
         query += " from Observation obv "
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
-        def userGroupQuery = " ", tagQuery = '', featureQuery = '';
+        def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '';
         def filterQuery = " where obv.isDeleted = :isDeleted "
         
         if(params.featureBy == "true" || params.userGroup || params.webaddress){
@@ -1170,27 +1172,78 @@ class ObservationService extends AbstractObjectService {
             
             orderByClause = " ST_Distance(${point}, obv.topology)" 
         }
+        
+        if(params.filterProperty == 'speciesName') {
+            Observation parentObv = Observation.read(params.parentId?params.parentId.toLong():params.id?.toLong());
+            def parMaxVotedReco = parentObv.maxVotedReco;
+            if(parMaxVotedReco) {
+                filterQuery += " and obv.maxVotedReco = :parMaxVotedReco and obv.id != :parentId" 
+                queryParams['parMaxVotedReco'] = parMaxVotedReco
+                queryParams['parentId'] = params.parentId?params.parentId.toLong():params.id?.toLong()
+                
+                activeFilters["filterProperty"] = params.filterProperty
+                activeFilters["parentId"] = params.parentId
+
+            }
+        }
+
+        if(params.filterProperty == 'nearByRelated' && !params.bounds) {
+            nearByRelatedObvQuery = ', Observation as g2';
+            query += nearByRelatedObvQuery;
+            filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId and obv.id <> g2.id '
+            queryParams['parentId'] = params.parentId?params.parentId.toLong():params.id?.toLong()
+            queryParams['maxNearByRadius'] = params.maxNearByRadius?:200;
+            
+            activeFilters["filterProperty"] = params.filterProperty
+            activeFilters["parentId"] = params.parentId
+            activeFilters["maxNearByRadius"] = params.maxNearByRadius?:200;
+
+            //"select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset"
+        
+        }
+        
+        if(params.filterProperty == 'taxonConcept') {
+            def taxonConcept = TaxonomyDefinition.read(params.filterPropertyValue.toLong());
+            if(taxonConcept) {
+                List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+                if(scientificNameRecos) {
+                    filterQuery += " and obv.maxVotedReco in (:scientificNameRecos)"
+                        queryParams['scientificNameRecos'] = scientificNameRecos
+
+                        activeFilters["filterProperty"] = params.filterProperty
+                        activeFilters["parentId"] = params.parentId
+                        activeFilters["filterPropertyValue"] = params.filterPropertyValue;
+                }
+            }
+        }
 
         String checklistObvCond = ""
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             checklistObvCond = " and obv.id != obv.sourceId "
         }
 
-        def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
-        def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
+        def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
+        def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
 
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
-        filterQuery += " and obv.isShowable = true ";
-
+        if(params.filterProperty != 'speciesName'){
+            filterQuery += " and obv.isShowable = true ";
+        }
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             filterQuery += " and obv.isChecklist = true "
             activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
         }
 
 
-        def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery + " and obv.isChecklist = true "
-        def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+        def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery 
+        if(params.filterProperty != 'speciesName') {
+            checklistCountQuery += " and obv.isChecklist = true "
+        }
+        else { 
+            checklistCountQuery += " and obv.isShowable = false "
+        }
+        def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
 
         orderByClause = " order by " + orderByClause;
         return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
@@ -1995,6 +2048,7 @@ class ObservationService extends AbstractObjectService {
             distinctRecoQuery.setFirstResult(offset);
         }
 
+        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         distinctRecoQuery.setProperties(queryParts.queryParams)
         distinctRecoCountQuery.setProperties(queryParts.queryParams)
         def distinctRecoListResult = distinctRecoQuery.list()
@@ -2082,6 +2136,7 @@ class ObservationService extends AbstractObjectService {
         if(params.bounds && boundGeometry) {
             speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
+        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
         return [speciesGroupCountList:speciesGroupCountList];
@@ -2190,7 +2245,8 @@ class ObservationService extends AbstractObjectService {
 
         log.debug "occurences query : "+query;
         log.debug queryParts.queryParams;
-
+        
+        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
@@ -2224,10 +2280,8 @@ class ObservationService extends AbstractObjectService {
                 return []
             }
             return getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
-        }
-        else{
+        }else{
             return getFilteredObservations(params, max, offset, false).observationInstanceList
-
         }
     }
 

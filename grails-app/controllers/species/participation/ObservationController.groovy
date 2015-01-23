@@ -164,10 +164,33 @@ class ObservationController extends AbstractObjectController {
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
+        params['parentId'] = params.parentId?.toLong()
+        params['maxNearByRadius'] = 200;
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
+        
+        //Because returning source Ids instead of actual obv ins
+        if(params.filterProperty == 'speciesName') {
+            //def fetchedCklCount = filteredObservation.checklistCount;
+            def results = []
+            //def cklCount = 0;
+            observationInstanceList.each {
+                def obv = Observation.read(it);
+                //if(fetchedCklCount != 0 && obv.isChecklist) {
+                  //  cklCount += 1;
+                //}
+                results.add(obv)
+            }
+            filteredObservation.observationInstanceList = results;
+            observationInstanceList = results;
+            //if(fetchedCklCount != 0 ) {
+              //  filteredObservation.checklistCount = cklCount;
+            //}
+            //println "=============CKL COUNT========= " + cklCount
+        }
+
 		def queryParams = filteredObservation.queryParams
 		def activeFilters = filteredObservation.activeFilters
 		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
@@ -761,8 +784,11 @@ class ObservationController extends AbstractObjectController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+		            
+                    //just updates species time stamp on recommendation
+                    recommendationVoteInstance.updateSpeciesTimeStamp();			
 					
-					//sending email
+                    //sending email
 					if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
 						mailType = utilsService.OBSERVATION_ADDED;
 					} else {
@@ -949,7 +975,10 @@ class ObservationController extends AbstractObjectController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					
+				
+                    //just updates species time stamp on recommendation
+                    recommendationVoteInstance.updateSpeciesTimeStamp();			
+
 					//sending mail to user
 					utilsService.sendNotificationMail(ActivityFeedService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
@@ -1029,7 +1058,11 @@ class ObservationController extends AbstractObjectController {
 			   observationInstance.calculateMaxVotedSpeciesName();
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			   //sending mail to user
+		
+                //just updates species time stamp on recommendation
+                recommendationVoteInstance.updateSpeciesTimeStamp();				
+	
+               //sending mail to user
 			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
 			   def r = [
 				   status : OK.value(),
@@ -1159,7 +1192,6 @@ class ObservationController extends AbstractObjectController {
 
 	def listRelated = {
     	log.debug params;
-
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 
