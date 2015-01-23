@@ -55,7 +55,8 @@ class UrlMappings {
             "/api/user(.(*))?"(controller: 'user', action: 'update', method: 'PUT')
             "/api/user(.(*))?"(controller: 'user', action: 'save', method: 'POST')
 */
-            "/observation"(controller : 'observation', action : 'flagDeleted', method:'DELETE')
+            "/observation/$id"(controller : 'observation', action : 'flagDeleted', method:'DELETE')
+
             "/user"( controller : 'SUser', action:'index', method:'GET')
             "/user"( controller:'SUser', action:'save', method:'POST')
             "/user/$id"(controller:"SUser") {
