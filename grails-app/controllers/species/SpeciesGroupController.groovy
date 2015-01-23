@@ -15,7 +15,7 @@ class SpeciesGroupController {
 	}
 
 	def list = {
-        def model = utilsService.getSuccessModel('', null, OK.value(), SpeciesGroup.list());
+        def model = utilsService.getSuccessModel('', null, OK.value(), ['instanceList':SpeciesGroup.list()]);
         withFormat {
             json { render model as JSON }
             xml { render model as XML }

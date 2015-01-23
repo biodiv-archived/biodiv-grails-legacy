@@ -9,20 +9,23 @@ h4. Basic Login
 * *REST Method* : POST
 * *Request* : 
 {code}
-http://indiabiodiversity.saturn.strandls.com/api/login?username=emailAddress&password=password
+http://indiabiodiversity.localhost.org/api/login?username=emailAddress&password=password
 {code}
 * *Response* :
 ** on success
 {code}
 {
-    "username": "pearlsravanthi@gmail.com",
-        "token": "8huintdfo716d329qnpndlj0srdbufgl",
-        "roles": [
-            "ROLE_ADMIN",
-        "ROLE_CEPF_ADMIN",
-        "ROLE_SPECIES_ADMIN",
-        "ROLE_USER"
-            ]
+    "success": true,
+        "status": 200,
+        "msg": "Successfully logged in",
+        "model": {
+            "id": 1064,
+            "username": "sravanthi@strandls.com",
+            "access_token": "2meoaj8q6bnmdt2mjscjpee8ok4305jc",
+            "roles": [
+                "ROLE_USER"
+                ]
+        }
 }
 {code}
 ** in case of error
@@ -36,9 +39,9 @@ in case of missing credentials
 {code}
 in case of incorrect credentials
 {code}
-{'error':'401', 'message':'Bad credentials'}
+{'success':false, 'status':'401', 'error':'401', 'msg':'Bad credentials'}
 {code}
-in case of incorrect methos
+in case of incorrect method
 {code}
 {
     "error": "405",
@@ -65,21 +68,29 @@ http://indiabiodiversity.localhost.org/api/oauth/callback/facebook?access_token=
 ** on success
 {code}
 {
-        "token": "20efurbcrh4fg441m8e9fg5fjb4us3ut"
+    "success": true,
+        "status": 200,
+        "msg": "Successfully logged in",
+        "model": {
+            "id": 1184,
+            "token": "hkdgm6jrfg2trkmj66m60js6vd6rsscb",
+            "format": null
+        }
 }
 {code}
 ** in case of error
 {code}
 {
-    "message": "No access token",
-    "error": "500",
-    "token": ""
+    "success": false,
+        "status": 500,
+        "msg": "No access token",
+        "errors": []
 }
 {code}
 
 Google 
 
-* *Path* : /api/oauth/callback/facebook  
+* *Path* : /api/oauth/callback/google 
 * *Parameters* :
 ** access_token : valid fb access_token
 * *REST Method* : GET
@@ -91,15 +102,23 @@ http://indiabiodiversity.localhost.org/api/oauth/callback/google?access_token=ya
 ** on success
 {code}
 {
-        "token": "20efurbcrh4fg441m8e9fg5fjb4us3ut"
+    "success": true,
+        "status": 200,
+        "msg": "Successfully logged in",
+        "model": {
+            "id": 1184,
+            "token": "hkdgm6jrfg2trkmj66m60js6vd6rsscb",
+            "format": null
+        }
 }
 {code}
 ** in case of error
 {code}
 {
-    "message": "No access token",
-    "error": "500",
-    "token": ""
+    "success": false,
+        "status": 500,
+        "msg": "Failed to retrieve data / failed code : 401 and body : {\n \"error\": {\n  \"errors\": [\n   {\n    \"domain\": \"global\",\n    \"reason\": \"authError\",\n    \"message\": \"Invalid Credentials\",\n    \"locationType\": \"header\",\n    \"location\": \"Authorization\"\n   }\n  ],\n  \"code\": 401,\n  \"message\": \"Invalid Credentials\"\n }\n}\n",
+        "errors": []
 }
 {code}
 
