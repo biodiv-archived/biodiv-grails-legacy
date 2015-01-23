@@ -76,7 +76,8 @@ class SecurityFilters {
                                             if(!appKey) println "App key not found";
                                             if(!appKey.email.equalsIgnoreCase(springSecurityService.currentUser?.email))
                                                 println "Appkey is not of the logged in user ${springSecurityService.currentUser.email}" 
-                                            if(appKey && appKey.email.equalsIgnoreCase(springSecurityService.currentUser?.email)) {
+                                            if(appKey) {
+                                                //&& appKey.email.equalsIgnoreCase(springSecurityService.currentUser?.email)) {
                                                 println "Found valid appkey. Continuing"
                                             } else isUnauthorized = true
                                         } else {
