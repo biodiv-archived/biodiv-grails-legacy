@@ -486,9 +486,11 @@ class ObservationController extends AbstractObjectController {
 			return;
 		} else if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
-			response.setStatus(500)
-			message = [error:message]
-			render message as JSON
+            def model = utilsService.getErrorModel(message, null, INTERNAL_SERVER_ERROR.value())
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return;
 		}
 		
@@ -658,29 +660,41 @@ class ObservationController extends AbstractObjectController {
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
-                    if(params.format?.equalsIgnoreCase("json")) {
-                        def resourcesList = [];
-                        for(r in resourcesInfo) {
-                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
-                            resourcesList << res
-                        }
-                        render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
-                    } else {
-                        render(contentType:"text/xml") {
-                            observations {							
-                                dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
-                                resources {
-                                    for(r in resourcesInfo) {
-                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
+                    withFormat {
+                        json {    
+                            def resourcesList = [];
+                            for(r in resourcesInfo) {
+                                def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
+                                resourcesList << res
+                            }
+                            def model = [observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]]
+                            model = utilsService.getSuccessModel("", null, OK.value(), model)
+                            render model as JSON
+                        } 
+                        xml {
+                            render(contentType:"text/xml") {
+                                response {
+                                    success(true)
+                                    status(OK.value())
+                                    msg('Successfully uploaded the resource')
+                                    model {
+                                        dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
+                                        resources {
+                                            for(r in resourcesInfo) {
+                                                res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 				} else {
-					response.setStatus(500)
-					message = [success:false, error:message]
-					render message as JSON
+                    def model = utilsService.getErrorModel(message, null, INTERNAL_SERVER_ERROR.value())
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
 				}
 			/*} else {
 				response.setStatus(500)
@@ -689,9 +703,11 @@ class ObservationController extends AbstractObjectController {
 			}*/
 		} catch(e) {
 			e.printStackTrace();
-			response.setStatus(500)
-			message = [success:false, error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
-			render message as JSON
+            def model = utilsService.getErrorModel(g.message(code: 'file.upload.fail', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value(), [e.getMessage()])
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 	}
 	
