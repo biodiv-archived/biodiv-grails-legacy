@@ -919,6 +919,7 @@ class UtilsService {
     ////////////////////////RESPONSE FORMATS//////////////////
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
+        
         if(!errors) errors = [];
         if(domainObject) {
             domainObject.errors.allErrors.each {

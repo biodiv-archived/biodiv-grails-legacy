@@ -61,7 +61,100 @@ http://indiabiodiversity.saturn.strandls.com/api/species/1
 * *Response* :
 ** Successful response
 {code}
-
+{
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "instance": {
+            "id": 253727,
+            "title": "<i>Balanophora globosa </i>Jungh. ",
+            "taxonConcept": {
+                "id": 149196,
+                "name": "Balanophora globosa Jungh.",
+                "canonicalForm": "Balanophora globosa",
+                "italicisedForm": "<i>Balanophora globosa </i>Jungh. ",
+                "rank": "Species"
+            },
+            "taxonRegistry": [
+            {
+                "clasification": {
+                    "id": 818,
+                    "name": "GBIF Taxonomy Hierarchy",
+                    "citation": "<a target='_blank' href='http://data.gbif.org/datasets/resource/1'>Accessed through GBIF data portal, GBIF Backbone Taxonomy</a>"
+                },
+                "hierarchies": [
+                {
+                    "id": 2998,
+                    "name": "Plantae",
+                    "canonicalForm": "Plantae",
+                    "italicisedForm": "<i>Plantae</i>",
+                    "rank": "Kingdom"
+                },
+                {
+                    "id": 3000,
+                    "name": "Magnoliophyta",
+                    "canonicalForm": "Magnoliophyta",
+                    "italicisedForm": "<i>Magnoliophyta</i>",
+                    "rank": "Phylum"
+                },
+                {
+                    "id": 33366,
+                    "name": "Magnoliopsida",
+                    "canonicalForm": "Magnoliopsida",
+                    "italicisedForm": "<i>Magnoliopsida</i>",
+                    "rank": "Class"
+                },
+                {
+                    "id": 6136,
+                    "name": "Santalales",
+                    "canonicalForm": "Santalales",
+                    "italicisedForm": "<i>Santalales</i>",
+                    "rank": "Order"
+                },
+                {
+                    "id": 35555,
+                    "name": "Balanophoraceae",
+                    "canonicalForm": "Balanophoraceae",
+                    "italicisedForm": "<i>Balanophoraceae</i>",
+                    "rank": "Family"
+                },
+                {
+                    "id": 149184,
+                    "name": "Balanophora",
+                    "canonicalForm": "Balanophora",
+                    "italicisedForm": "<i>Balanophora</i>",
+                    "rank": "Genus"
+                },
+                {
+                    "id": 149196,
+                    "name": "Balanophora globosa Jungh.",
+                    "canonicalForm": "Balanophora globosa",
+                    "italicisedForm": "<i>Balanophora globosa </i>Jungh. ",
+                    "rank": "Species"
+                }
+                ]
+            }
+            ],
+                "synonyms": [],
+                "common_names": [],
+                "group": {
+                    "id": 833,
+                    "name": "Plants",
+                    "groupOrder": 9
+                },
+                "habitat": null,
+                "createdOn": "3912-02-22T18:30:00Z",
+                "lastRevised": "2014-11-26T12:27:30Z",
+                "thumbnail": "http://indiabiodiversity.localhost.org/biodiv/group_icons/speciesGroups/plants_th1.png",
+                "notes": "",
+                "summary": "",
+                "fields": [],
+                "resource": [],
+                "userGroups": [],
+                "featureCount": 0,
+                "featuredNotes": []
+        }
+}
 {code}
 ** in case of error 
 {code}
@@ -95,14 +188,14 @@ http://indiabiodiversity.org/api/related/species/featureBy/true?limit=10&offset=
 
 h4. delete
 
-* *Path* : /api/species/delete
+* *Path* : /api/species/id/delete
 * *Parameters* :
 ** id : species id
-** *REST Method* : POST
+** *REST Method* : DELETE or POST
 ** Permission : Need admin permission to delete
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/species/delete?id=234
+http://indiabiodiversity.localhost.org/api/species/234/delete
 {code}
 * *Response* :
 ** on success
@@ -134,7 +227,7 @@ http://indiabiodiversity.localhost.org/api/species/delete?id=234
 
 h4. update
 
-* *Path* : /api/pecies/update
+* *Path* : /api/species/id/update
 * *Parameters* :
 ** name : contributor | attribution | description | newdescription | license | audienceType | status | reference | synonym | commonname | speciesField
 ** pk : species field id
@@ -146,12 +239,12 @@ h4. update
 ** language : needed for common name. Language name as in db.
 ** speciesid : species id needed in case of new description 
 ** description : needed for updating species field
-** *REST Method* : POST
+** *REST Method* : PUT | POST
 ** Permission : user should have permission at any level in the species hierarchy to use this operation. Else please request for permission using requestPermission.
 ** Requests 
 * __ Adding synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/update
+url : http://indiabiodiversity.localhost.org/api/species/275594/update
 name:synonym
 value:Test indica
 pk:275594

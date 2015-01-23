@@ -51,7 +51,8 @@ class SpeciesController extends AbstractObjectController {
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
+    static defaultAction = "list"
     
     String contentRootDir = config.speciesPortal.content.rootDir
 
@@ -755,39 +756,53 @@ class SpeciesController extends AbstractObjectController {
                 if(success) {
 				    speciesInstance.delete(flush: true)
 				    speciesSearchService.delete(speciesInstance.id);
-				    flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-                    if(params.format?.equalsIgnoreCase("json")) {
-                        render (['success':true, msg:flash.message]) as JSON;
-                        return;
+				    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    def model = utilsService.getSuccessModel(msg, null, OK.value());
+                    withFormat {
+                        html {
+                            flash.message = msg;
+				            redirect(action: "list")
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
                     }
                 } else {
-				    flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-                    if(params.format?.equalsIgnoreCase("json")) {
-                        render (['success':false, msg:flash.message]) as JSON;
-                        return;
+				    String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    def model = utilsService.getErrorModel(msg, null, OK.value());
+                    withFormat {
+                        html {
+                            flash.message = msg;
+				            redirect(action: "show", id: params.id)
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
                     }
                 }
-
-				redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-                if(params.format?.equalsIgnoreCase("json")) {
-                    render (['success':false, msg:flash.message, 'errors':[e.getMessage()]]) as JSON;
-                    return;
+                String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(action: "show", id: params.id)
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
                 }
-
-
-				redirect(action: "show", id: params.id)
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-            if(params.format?.equalsIgnoreCase("json")) {
-                render (['success':false, msg:flash.message]) as JSON;
-                return;
-            }
-			redirect(action: "list")
+			String msg = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(action: "list")
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 		}
 	}
 

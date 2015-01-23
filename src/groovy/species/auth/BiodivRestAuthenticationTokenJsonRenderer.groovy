@@ -39,7 +39,8 @@ class BiodivRestAuthenticationTokenJsonRenderer  implements RestAuthenticationTo
             }
         }
 
-        def jsonResult = result as JSON
+        def model = [success:true, status : 200, msg:'Successfully logged in', model:result];
+        def jsonResult = model as JSON
 
         log.debug "Generated JSON:\n ${jsonResult.toString(true)}"
 

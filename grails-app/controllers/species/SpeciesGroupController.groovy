@@ -1,22 +1,34 @@
 package species
 
 import grails.converters.JSON;
+import grails.converters.XML;
 import species.groups.SpeciesGroup;
+import static org.springframework.http.HttpStatus.*;
+
 
 class SpeciesGroupController {
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    def utilsService
 
 	def index = {
 		redirect(action: "list", params: params)
 	}
 
 	def list = {
-        render SpeciesGroup.list() as JSON
+        def model = utilsService.getSuccessModel('', null, OK.value(), SpeciesGroup.list());
+        withFormat {
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 	def tags = {
-		render SpeciesGroup.list().collect{it.name} as JSON
+		def result = SpeciesGroup.list().collect{it.name} 
+        def model = utilsService.getSuccessModel('', null, OK.value(), result);
+        withFormat {
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 	
 	def create() {
