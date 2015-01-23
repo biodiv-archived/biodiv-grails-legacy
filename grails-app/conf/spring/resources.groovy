@@ -373,7 +373,7 @@ beans = {
         userService = ref('SUserService')
     }
     
-    oauthService(MyOauthService) {
+    restOauthService(MyOauthService) {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
         userDetailsService = ref('userDetailsService')
@@ -403,13 +403,14 @@ beans = {
     }
 
     /* restAuthenticationFilter */
-/*    restAuthenticationFilter(RestAuthenticationFilter) {
+    /*
+    restAuthenticationFilter(RestAuthenticationFilter) {
         authenticationManager = ref('authenticationManager')
         authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
         authenticationDetailsSource = ref('authenticationDetailsSource')
         credentialsExtractor = ref('credentialsExtractor')
-        endpointUrl = conf.rest.login.endpointUrl
+        endpointUrls = conf.rest.login.endpointUrls
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
