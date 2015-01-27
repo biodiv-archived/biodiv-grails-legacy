@@ -238,15 +238,34 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </div>
 </td>
 </tr>
+
+<tr>
+<td class="w580" width="580">
+    <p class="article-title" align="left"><small><big><a style="font-weight: bold;" href="http://www.wikwio.org/idao"><big>IDAO</big></a></big></small></p>
+<table align="right" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+    <td class="w30" height="5" width="15"><a href="http://www.wikwio.org/idao"><img src="${resource(dir:'images', file:'IDAO.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="IDAO" hspace="5"></a></td>
+</tr>
+</tbody>
+</table>
+<div class="article-content" align="left"> 
+    
+    <g:message code="welcomeEmail.idao" />
+</div>
+</td>
+</tr>
+
+
 <tr>
 <td class="w580" height="10" width="580"></td>
 </tr>
 <tr>
 <td class="w580" width="580">
-<div class="article-content" align="left">Le portail est dans un état d'évolution permanente, avec de nouvelles fonctionnalités et des améliorations constamment ajoutées. Alors, suivez-nous sur <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}">Facebook
+<div class="article-content" align="left">Le portail est dans un état d'évolution permanente, avec de nouvelles
+fonctionnalités et des améliorations constamment ajoutées. Alors, suivez-nous sur <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}">Facebook
 </a>ou <a href="${grailsApplication.config.speciesPortal.app.twitterUrl}">Twitter
-</a>pour rester à jour.Vous pouvez également laisser des  <a href="${grailsApplication.config.speciesPortal.app.feedbackFormUrl}">commentaires</a>,
-suggestions et demandes de fonctionnalités. <br><br>
+</a>pour rester à jour.Vous pouvez également laisser des  <a href="${grailsApplication.config.speciesPortal.app.feedbackFormUrl}">commentaires</a>, suggestions et demandes de fonctionnalités. <br><br>
 Nous sommes ravis de vous avoir en tant que membre. Merci de mettre à jour votre  <a href="${userProfileUrl}">profil d'utilisateur.</a>.
 Merci de vous rejoindre et nous espérons que vous apprécierez l'utilisation du portail. <br><br>
 Merci d'ajouter <a href="mailto:${grailsApplication.config.grails.mail.default.from}">${grailsApplication.config.grails.mail.default.from}</a>
@@ -254,7 +273,7 @@ Merci d'ajouter <a href="mailto:${grailsApplication.config.grails.mail.default.f
 <br>
 Cordialement,<br>
 <br><span style="font-weight: bold;">
-de ${grailsApplication.config.speciesPortal.app.siteName} L'équipe</span> </div>
+L'équipe de ${grailsApplication.config.speciesPortal.app.siteName}</span> </div>
 </td>
 </tr>
 

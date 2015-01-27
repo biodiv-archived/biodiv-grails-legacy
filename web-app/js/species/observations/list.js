@@ -845,6 +845,8 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
                 }	    				    			
             },
             error: function(xhr, status, error) {
+                console.log("error");
+                console.log(error);                
                 var msg = $.parseJSON(xhr.responseText);
                 $('.message').html(msg);
             }
