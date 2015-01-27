@@ -1563,6 +1563,21 @@ class SpeciesService extends AbstractObjectService  {
             queryParams["featType"] = Species.class.getCanonicalName();
         }
 
+        if(params.hasMedia) {
+            switch(params.hasMedia) {
+                case "true" :
+                    filterQuery += " and s.hasMedia = true "            
+                    countFilterQuery += " and s.hasMedia = true "            
+                break
+                case "false" :
+                    filterQuery += " and s.hasMedia = false "            
+                    countFilterQuery += " and s.hasMedia = false "
+                break
+                default:
+                break
+            }
+        }
+
         if(params.daterangepicker_start && params.daterangepicker_end){
 			def startDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_start))
             def endDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_end))

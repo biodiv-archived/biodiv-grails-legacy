@@ -33,7 +33,8 @@ class Species implements Rateable {
 	Date lastUpdated = dateCreated;
 	Habitat habitat;
 	StringBuilder sLog;
-	
+    boolean hasMedia = false;
+
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource

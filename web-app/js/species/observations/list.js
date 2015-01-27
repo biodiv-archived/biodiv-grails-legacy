@@ -183,6 +183,18 @@ $(document).ready(function(){
 	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 	    return true;   
     });
+    
+    $('.hasMedia_filter_label').click(function(){
+        var caret = '<span class="caret"></span>'
+        if(stringTrim(($(this).html())) == stringTrim($("#has_media").html().replace(caret, ''))){
+            return true;
+        }
+	    $('.hasMedia_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#has_media").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
+    });
 
     $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
    
@@ -469,6 +481,16 @@ function getSelectedSortBy() {
     return sortBy;	
 } 
 
+function getMediaFilterBy() {
+    var hasMedia = ''; 
+    $('.hasMedia_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            hasMedia += $(this).attr('value');
+        }
+    });
+    return hasMedia;	
+}
+
 function getSelectedFlag() {
     var flag = ''; 
     flag = $("#observationFlagFilter").attr('value');
@@ -558,6 +580,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['sort'] = sortBy;
         }
     }
+    
+    params['hasMedia'] = getMediaFilterBy();
 
     var sName = getSelectedSpeciesName();
     if(sName) {
