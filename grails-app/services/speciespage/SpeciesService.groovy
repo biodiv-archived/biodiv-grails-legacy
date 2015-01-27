@@ -1784,6 +1784,22 @@ class SpeciesService extends AbstractObjectService  {
             species.addToResources(resource);
         }
         //species.merge();
+        if(resources.size() > 0) {
+            if(species.instanceOf(Species)) {
+                species.updateHasMediaValue(true)
+            }
+            if(species.instanceOf(SpeciesField)) {
+                species.species.updateHasMediaValue(true)
+            }
+        } else {
+            if(species.instanceOf(Species)) {
+                species.updateHasMediaValue(false)
+            }
+            if(species.instanceOf(SpeciesField)) {
+                species.species.updateHasMediaValue(false)
+            }
+        }
+
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
@@ -1907,6 +1923,5 @@ def checking(){
    return "Passed!" 
 }
 
-
-
+    
 }

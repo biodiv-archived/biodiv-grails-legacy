@@ -609,7 +609,11 @@ class ObservationController extends AbstractObjectController {
 						File file = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
 
                         if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
-						    download(f.url, file );						
+                            def url = f.url;
+                            def fp = utilsService.filePickerSecurityCodes();
+                            //modifying url to give permissions.
+                            url += '?signature=' + fp.signature +'&policy='+fp.policy
+						    download(url, file );						
                         } else {
 						    f.transferTo( file );
                         }

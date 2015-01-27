@@ -439,4 +439,24 @@ class Species implements Rateable {
         return result;
 	}
 
+    def fetchSpeciesFieldResourceCount() {
+        def sql =  Sql.newInstance(dataSource);
+        def fieldIds = this.fields.id;
+        def ss = "(" + fieldIds[0] 
+        fieldIds.each{
+            ss +=  "," +it
+        }
+        ss += ")";
+        def query = "select count(*) as count from species_field_resources sfr where sfr.species_field_id in " + ss
+        def rows = sql.rows(query);
+        return rows[0].getProperty("count");
+	}
+
+    def updateHasMediaValue(boolean value) {
+        this.hasMedia = value;
+        if(!this.save(flush:true)) {
+            this.errors.each { log.error it }
+        }
+    }
+ 
 }

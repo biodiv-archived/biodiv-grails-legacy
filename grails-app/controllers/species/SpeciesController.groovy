@@ -1303,4 +1303,9 @@ class SpeciesController extends AbstractObjectController {
 
     }
 
+    def testingCount() {
+        def sp = Species.read(228424L);
+        println "=========!ST COUNT ====== " + sp.fetchResourceCount();
+        println "===NEXT COUNT ==== " + sp.fetchSpeciesFieldResourceCount();
+    }
 }
