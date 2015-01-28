@@ -580,9 +580,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['sort'] = sortBy;
         }
     }
-    
-    params['hasMedia'] = getMediaFilterBy();
-
+    if(getMediaFilterBy() != '') {
+        params['hasMedia'] = getMediaFilterBy();
+    }
     var sName = getSelectedSpeciesName();
     if(sName) {
         params['speciesName'] = sName;

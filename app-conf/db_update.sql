@@ -312,3 +312,8 @@ ALTER TABLE species ADD COLUMN has_media boolean ;
 update species set has_media = false;
 update species set has_media = true where id in (select distinct(species_resources_id) from species_resource);
 update species set has_media = true where id in (select distinct(sf.species_id) from species_field_resources sfr, species_field sf where sfr.species_field_id = sf.id);
+
+/** 28th Jan 2015
+    Updating observations which were not marked deleted when its checklist was deleted
+ **/
+update observation set is_deleted = true where source_id in (select id from observation where is_checklist = true and is_deleted = true) and is_deleted = false;
