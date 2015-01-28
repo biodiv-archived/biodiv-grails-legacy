@@ -1,4 +1,4 @@
-<%@page import="species.participation.DocSciName"%>
+<%@page import="content.eml.DocSciName"%>
 
 
 <%
