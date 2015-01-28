@@ -14,7 +14,7 @@
     Map nameParseValues = sciNames.nameparseValue
     Map nameId = sciNames.nameDisplayValues
     def docId = DocumentTokenUrl.findByDoc(documentInstance)
-    String status = docId.status
+    String status = docId?.status
 %>
 <r:require modules="pages" />
 <div  class="span4">

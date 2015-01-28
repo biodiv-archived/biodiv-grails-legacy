@@ -63,7 +63,7 @@ class SUserTagLib {
     }
 
     def permToReorderDocNames = { attrs, body ->
-    	if(SUserService.permToReorderDocNames(attrs.model.documentInstance)){
+    	if(utilsService.permToReorderDocNames(attrs.model.documentInstance)){
     		out<<body()
     	}
     }

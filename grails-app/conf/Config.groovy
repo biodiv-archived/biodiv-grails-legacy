@@ -342,6 +342,7 @@ speciesPortal {
 		ICONS = "icons"
 		AUDIO = "audio"
 		VIDEO = "video"
+		DOCUMENTS = "Documents"
 	}
 	group {
 		ALL = "All"
