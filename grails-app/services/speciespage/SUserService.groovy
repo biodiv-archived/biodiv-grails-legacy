@@ -157,6 +157,15 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
         }
     }
 
+    boolean permToReorderDocNames(document){
+        if(document){
+            return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || (springSecurityService.currentUser == document.author.username))
+        }
+        else{
+            return  springSecurityService.isLoggedIn() && SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        }
+    }
+
 	boolean ifOwns(Long id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}

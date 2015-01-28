@@ -1,5 +1,5 @@
 
-<%@page import="species.utils.Utils"%>
+<%@ page import="species.utils.Utils"%>
 <%@ page import="content.eml.Document"%>
 <html>
 <head>
@@ -153,8 +153,7 @@
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>
 		</div>
-                <g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
-
+     	<g:render template="/document/showDocumentSidebar" model="['documentInstance':documentInstance, 'webaddress':params.webaddress]" />
 	</div>
         </body>
 </html>

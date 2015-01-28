@@ -102,8 +102,7 @@ input.dms_field {
                         <div class="controls" style="">
                             <div class="span2" style="margin-left: 0px;">
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir]]" />
-
+                                model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir],uploadCallBack:'getScientificNames()']" />
 <% def upload_file_text="${g.message(code:'default.upload.file.label')}"
 %>
  <script type="text/javascript">
@@ -120,11 +119,13 @@ $(document).ready(function(){
                                 style="width: 480px;">
                                 <label class="control-label" for="uri" style="width: 40px;"><g:message code="default.url.label" /></label>
                                 <div class="controls" style="margin-left: 55px;">
-                                    <input type="text" class="input-block-level" name="uri"
+                                    <input type="text" id="link-fetch" class="input-block-level" name="uri"
                                     placeholder="${g.message(code:'placeholder.document.enter.url')}"
                                     value="${documentInstance?.uri}" />
                                 </div>
                             </div>
+                            <div> <input type="hidden" id="gnrd_tokenURL" name="tokenUrl" />
+                             </div>
                             <div class="help-inline">
                                 <g:hasErrors bean="${documentInstance}" field="uFile">
                                 <g:message code="fileOrUrl.validator.invalid" />
@@ -372,7 +373,6 @@ CKEDITOR.replace('description', config);
 						alert(error_msg)
 					}       	
 		       	
-	
 			});
 			
 			
@@ -439,5 +439,39 @@ CKEDITOR.replace('description', config);
 		
     
         </r:script>
+        <r:script>
+
+ $("#link-fetch").focusout(function() {
+   getScientificNames();
+  });
+
+ 
+function getScientificNames(){
+     $("#documentFormSubmit").addClass("disabled")
+ //console.log("${filePath}"+"=========================");
+       var urlField_value=$( "#link-fetch" ).val();
+       var uploadFile_value=$("#ufilepath_file").attr("href");
+       var filePath=null;
+       if(uploadFile_value==''){
+
+           filePath=urlField_value;
+       }else{
+            
+            filePath=uploadFile_value;
+       }
+   $.ajax({
+    url:"http://gnrd.globalnames.org/name_finder.json?url="+filePath,
+    success:function(result)
+        {
+    console.log(result.token_url)
+        $("#gnrd_tokenURL").val(result.token_url);
+        $("#documentFormSubmit").removeClass("disabled")
+       }
+
+    });//ended ajax
+
+}
+
+</r:script>
 </body>
 </html>
