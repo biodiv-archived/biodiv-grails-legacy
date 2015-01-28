@@ -1848,6 +1848,11 @@ class ObservationService extends AbstractObjectService {
                         try {
                             observationInstance.isDeleted = true;
                             observationInstance.deleteFromChecklist();
+
+                            //Delete underlying observations of checklist
+                            if(observationInstance.instanceOf(Checklists)) {
+                                observationInstance.deleteAllObservations(); 
+                            }
                             if(!observationInstance.hasErrors() && observationInstance.save(flush: true)){
                                 utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
                                 observationsSearchService.delete(observationInstance.id);
