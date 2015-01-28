@@ -946,7 +946,7 @@ class UtilsService {
         println acceptHeader
         def result = [success:true, status: status, msg:msg]
         //HACK to handle previous version of api for mobile app 
-        if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0')) {
+      /*  if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0')) {
             if(domainObject) {
                 result = [:];
                 String jsonString = (domainObject as JSON) as String;
@@ -963,11 +963,11 @@ class UtilsService {
             println result;
             return result;
         } else {
-            if(domainObject) result['instance'] = domainObject;
+    */        if(domainObject) result['instance'] = domainObject;
             if(model) result['model'] = model;
             (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
             return result;
-        } 
+     //   } 
     }
 
 }
