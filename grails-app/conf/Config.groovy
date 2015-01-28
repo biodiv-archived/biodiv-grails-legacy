@@ -342,6 +342,7 @@ speciesPortal {
 		ICONS = "icons"
 		AUDIO = "audio"
 		VIDEO = "video"
+		DOCUMENTS = "Documents"
 	}
 	group {
 		ALL = "All"
@@ -522,7 +523,7 @@ environments {
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages' //  GSP
             error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
-            debug    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
+            error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
             error   'org.codehaus.groovy.grails.commons', // core / classloading
                     'org.codehaus.groovy.grails.plugins', // plugins
                     'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration

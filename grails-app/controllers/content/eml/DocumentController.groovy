@@ -7,6 +7,10 @@ import grails.converters.XML
 import org.grails.taggable.*
 import species.AbstractObjectController;
 import speciespage.search.DocumentSearchService;
+import static groovyx.net.http.Method.*;
+import static groovyx.net.http.ContentType.*
+import groovyx.net.http.*
+import content.eml.DocSciName;
 import static org.springframework.http.HttpStatus.*;
 
 class DocumentController extends AbstractObjectController {
@@ -58,6 +62,9 @@ class DocumentController extends AbstractObjectController {
 
 					documentService.setUserGroups(documentInstance, userGroups);
 				}
+			}
+			if (params.tokenUrl != '') {
+				DocumentTokenUrl.createLog(documentInstance,params.tokenUrl)
 			}
 			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
@@ -151,6 +158,13 @@ class DocumentController extends AbstractObjectController {
 					return
 				}
 			}
+			if(params.tokenUrl != '') {
+				List docSciNames = DocSciName.findAllByDocument(documentInstance);
+				docSciNames.each{ 
+	 				it.delete(flush: true)
+		  		}
+				DocumentTokenUrl.createLog(documentInstance, params.tokenUrl)
+			}
 			params.locale_language = utilsService.getCurrentLanguage(request);
 			//documentInstance.properties = params
 			documentService.updateDocument(documentInstance, params)
@@ -183,7 +197,6 @@ class DocumentController extends AbstractObjectController {
 			}
             else {
                     def errors = [];
-
                     documentInstance.errors.allErrors .each {
                         def formattedMessage = messageSource.getMessage(it, null);
                         errors << [field: it.field, message: formattedMessage]
@@ -233,6 +246,7 @@ class DocumentController extends AbstractObjectController {
                 def documentInstance = Document.get(params.long('id'))
                 if (documentInstance) {
                     userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+				    documentService.documentDelete(documentInstance)
                     documentInstance.delete(flush: true, failOnError:true)
 
                     msg = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
@@ -291,7 +305,8 @@ class DocumentController extends AbstractObjectController {
         }
 
         model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
-
+println "++++++++++++++++++++++++++++++++"
+        println model.model
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
@@ -343,10 +358,75 @@ class DocumentController extends AbstractObjectController {
 	
 	def tagcloud = { render (view:"tagcloud") }
 
+	private void swapDisplayOrder(docSciIns1, docSciIns2){
+	 	def temp = docSciIns1.displayOrder
+       	docSciIns1.displayOrder = docSciIns2.displayOrder
+       	docSciIns2.displayOrder = temp;
+        return
+    }
+
+	def fetchDocSciName(params){
+		def docSciNameInstance = DocSciName.get(params.instanceId.toLong())
+        def disOrder = docSciNameInstance.displayOrder;
+        def docIns = Document.read(params.parentInsId.toLong())
+        def resNL = DocSciName.withCriteria{
+        	eq('document',docIns)
+                if(params.typeOfChange == "up"){
+                    gt('displayOrder', disOrder)
+                }
+                else{
+                    lt('displayOrder', disOrder)
+                }
+            
+            maxResults(1)
+            if(params.typeOfChange == "up"){
+                order("displayOrder", "asc")
+            }
+            else{
+                order("displayOrder", "desc")
+            }
+        }
+        if(resNL.size() != 0){
+            return resNL.get(0)
+        }
+        else{
+            return null
+        }
+    }
+
+	def changeDisplayOrder = {
+		def docSciNameInstance = DocSciName.get(params.instanceId.toLong())
+        def disOrder = docSciNameInstance.displayOrder;
+        //println "========DIS ORDER===== " + disOrder;
+        def otherDocSciName = fetchDocSciName(params);
+        //println "========otherDocSciName ===== " + otherDocSciName;
+        def msg
+        def success
+        if(otherDocSciName){
+            swapDisplayOrder(docSciNameInstance, otherDocSciName);
+            if(!docSciNameInstance.save(flush:true)){
+                docSciNameInstance.errors.each { log.error it }        
+            }
+            if(!otherDocSciName.save(flush:true)){
+                otherDocSciName.errors.each { log.error it }        
+            }
+            success = true
+            msg = "order changed"
+        }
+        else{
+            msg = "Its already at the extreme"
+            success = false
+        }
+                def result = [success:success, msg:msg]
+        render result as JSON
+    }
+
+	
+
 	//// SEARCH //////
 	/**
 	 * 	
-//	 */
+	 */
 //	def search = {
 //		log.debug params;
 //		def model = documentService.search(params)
@@ -388,5 +468,11 @@ class DocumentController extends AbstractObjectController {
 		documentService.processBatch(params)
 		render " done "
 	}
+
+	def runAllDocuments() {
+			
+			documentService.runAllDocuments();
+		}
+	
 
 }

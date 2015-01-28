@@ -223,13 +223,16 @@ modules = {
 
 	admin { dependsOn	'core' }
 
+	pages {
+		resource url:'/js/species/pages.js'
+	}
+	
 	userGroups_show {
-		dependsOn 'observations, gallery, carousel, activityfeed'
+		dependsOn 'observations, gallery, carousel, activityfeed, pages'
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/species/userGroups/main.js'
-        resource url:'/js/species/pages.js'
 	}
 
 	userGroups_create {

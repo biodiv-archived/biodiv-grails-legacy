@@ -892,6 +892,10 @@ class UtilsService {
         }
     }
 
+    boolean permToReorderDocNames(documentInstance) {
+        return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || springSecurityService.currentUser?.id == documentInstance.getOwner().id);
+    }
+
 	boolean ifOwns(SUser user) {
         if(!user) return false
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))

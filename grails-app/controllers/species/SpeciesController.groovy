@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import species.NamesParser
 import org.hibernate.FetchMode;
 import species.SpeciesPermission.PermissionType;
+import content.eml.DocSciName;
 
 import species.utils.Utils;
 import grails.plugin.springsecurity.annotation.Secured
@@ -240,7 +241,6 @@ class SpeciesController extends AbstractObjectController {
                         eq('language', userLanguage)
                         and{ 
                             order('displayOrder','asc')
-
                         }
                     };
 
@@ -268,14 +268,13 @@ class SpeciesController extends AbstractObjectController {
                     trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
                     sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
                     sn3: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,3,userLanguage),
-                    gsn3:converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME,3,userLanguage)
+                    gsn3:converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME,3,userLanguage),
+                    documents: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.DOCUMENTS,2,userLanguage)
                     ]
 
                     utilsService.benchmark('mapSpeciesInstanceFields') {
                         map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray,fieldFromName);
                     }
-
-
                     //def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
                     //def observationInstanceList = relatedObservations?.observations?.observation
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
@@ -350,7 +349,6 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsConnectionArray,Map config) {
-		
 		//def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
@@ -430,7 +428,7 @@ class SpeciesController extends AbstractObjectController {
 			for(category in concept.value.clone()) {
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) ) {
+				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) ) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -439,7 +437,11 @@ class SpeciesController extends AbstractObjectController {
 								break;
 							}
 						}
-					} else {
+					} else if(category.key.equals(config.documents)) {
+                        show = DocSciName.speciesHasDocuments(speciesInstance);
+                        println "======SHOW ===== " + show
+                    }
+                    else {
 						show = true;
 					}
 					if(show) {

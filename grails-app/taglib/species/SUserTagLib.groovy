@@ -61,6 +61,12 @@ class SUserTagLib {
         }
     
     }
+
+    def permToReorderDocNames = { attrs, body ->
+    	if(utilsService.permToReorderDocNames(attrs.model.documentInstance)){
+    		out<<body()
+    	}
+    }
     /**
 	 * 
 	 */
