@@ -39,7 +39,10 @@ import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
 import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
 import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
-import grails.plugin.mail.MailMessageContentRenderer
+import grails.plugin.mail.MailMessageContentRenderer;
+import grails.rest.render.json.JsonRenderer;
+import org.codehaus.groovy.grails.web.mime.MimeType;
+import species.participation.Comment;
 
 // Place your Spring DSL code here
 beans = {
@@ -246,7 +249,6 @@ beans = {
     // have to get again after overlaying DefaultFacebookecurityConfig
     def dbConf = SpringSecurityUtils.securityConfig
 
-    //    if (!dbConf.facebook.bean.dao) {
     dbConf.facebook.bean.dao = 'facebookAuthDao'
     facebookAuthDao(DefaultFacebookAuthDao) {
         domainClassName = dbConf.facebook.domain.classname
@@ -373,7 +375,7 @@ beans = {
         userService = ref('SUserService')
     }
     
-    restOauthService(MyOauthService) {
+    oauthService(MyOauthService) {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
         userDetailsService = ref('userDetailsService')
@@ -415,7 +417,13 @@ beans = {
         tokenStorageService = ref('tokenStorageService')
     }
 */
-
+/*
+    final API_MIME_TYPE = "application/vnd.biodiv.app.api+json";
+    final v1_MIME_TYPE = new MimeType(API_MIME_TYPE, [v: '1.0']);
+    final v2_MIME_TYPE = new MimeType(API_MIME_TYPE, [v: '2.0']);
+    commentV1Renderer(CommentRenderer, Comment, v1_MIME_TYPE) {
+    }
+    */
 }
 
 

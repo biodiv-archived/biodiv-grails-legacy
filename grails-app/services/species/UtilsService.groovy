@@ -919,7 +919,10 @@ class UtilsService {
     ////////////////////////RESPONSE FORMATS//////////////////
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
-        
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+        println "+++++++++++++++++++++++++++++++++++++++"
+        String acceptHeader = request.getHeader('Accept');
+
         if(!errors) errors = [];
         if(domainObject) {
             domainObject.errors.allErrors.each {
@@ -933,11 +936,22 @@ class UtilsService {
     }
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+        println "+++++++++++++++++++++++++++++++++++++++"
+        String acceptHeader = request.getHeader('Accept');
+        println acceptHeader
         def result = [success:true, status: status, msg:msg]
-        if(domainObject) result['instance'] = domainObject;
-        if(model) result['model'] = model;
-        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
-        return result;
+        if(acceptHeader.contains('application/json;v=1.0')) {
+            if(domainObject) result['instance'] = domainObject;
+            if(model) result['model'] = model;
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            return result;
+        } else {
+            if(domainObject) result[domainObject.class.name.toLowerCase()+'Instance'] = domainObject;
+            if(model) result.putAll(model);
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            return result;
+        }
     }
 
 }

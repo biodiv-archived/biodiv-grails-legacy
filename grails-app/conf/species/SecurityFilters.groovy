@@ -145,6 +145,7 @@ class SecurityFilters {
 
 
                 }
+println "after rendering"
                 log.debug "after rendering"
             }
 

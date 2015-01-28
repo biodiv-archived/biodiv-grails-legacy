@@ -1,7 +1,9 @@
 package species.participation
 
 import grails.converters.JSON
+import grails.converters.XML
 import grails.plugin.springsecurity.annotation.Secured
+import static org.springframework.http.HttpStatus.*;
 
 class CommentController {
 
@@ -56,12 +58,13 @@ class CommentController {
 		def olderTimeRef = (comments) ? (comments.last().lastUpdated.time.toString()) : null
 		def remainingCommentCount = (comments) ? getRemainingCommentCount(comments.last().lastUpdated.time.toString(), params) : 0
 		def result = [olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
-		if(params.format?.equalsIgnoreCase("json")) {
-			result['commentList'] = comments	
-		}else{
-			result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+		result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+        result['instanceList'] = comments
+        def model = utilsService.getSuccessModel('', null, OK.value(), result);
+        withFormat {
+            json { render model as JSON }
+            xml { render model as XML }
 		}
-		render result as JSON
 	}
 	
 	def getCommentByType = {
