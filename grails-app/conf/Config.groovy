@@ -45,8 +45,8 @@ grails.mime.types = [ html: [
 	csv: 'text/csv',
 	all: '*/*',
 	json: [
+        'application/json',
 		'application/json;v=1.0',
-		'application/json;v=2.0',
 		'text/json'
 	],
 	form: 'application/x-www-form-urlencoded',

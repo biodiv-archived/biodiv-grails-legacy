@@ -28,7 +28,7 @@ import java.beans.Introspector;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-
+import grails.converters.JSON;
 class UtilsService {
 
     def grailsApplication;
@@ -941,17 +941,29 @@ class UtilsService {
         String acceptHeader = request.getHeader('Accept');
         println acceptHeader
         def result = [success:true, status: status, msg:msg]
-        if(acceptHeader.contains('application/json;v=1.0')) {
+        //HACK to handle previous version of api for mobile app 
+        if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0')) {
+            if(domainObject) {
+                result = [:];
+                String jsonString = (domainObject as JSON) as String;
+                result = JSON.parse(jsonString);
+            }
+            if(model) {
+                result.putAll(model);
+                if(result.containsKey('instanceListName')) {
+                    result[result.instanceListName] = result['instanceList'];
+                    result.remove('instanceList');
+                }
+            }
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            println result;
+            return result;
+        } else {
             if(domainObject) result['instance'] = domainObject;
             if(model) result['model'] = model;
             (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
             return result;
-        } else {
-            if(domainObject) result[domainObject.class.name.toLowerCase()+'Instance'] = domainObject;
-            if(model) result.putAll(model);
-            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
-            return result;
-        }
+        } 
     }
 
 }

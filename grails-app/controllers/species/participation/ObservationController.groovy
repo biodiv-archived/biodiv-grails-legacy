@@ -478,10 +478,9 @@ class ObservationController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
 	def upload_resource() {
 		def message;
-		def msg;
 		if(params.ajax_login_error == "1") {
-			msg = messageSource.getMessage("default.login.continue", null, RCU.getLocale(request))
-            message = [status:401, error:msg]
+			String msg1 = messageSource.getMessage("default.login.continue", null, RCU.getLocale(request))
+            message = [status:401, error:msg1]
 			render message as JSON 
 			return;
 		} else if(!params.resources && !params.videoUrl) {

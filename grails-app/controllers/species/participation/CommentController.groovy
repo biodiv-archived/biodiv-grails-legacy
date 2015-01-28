@@ -40,13 +40,19 @@ class CommentController {
 
 	@Secured(['ROLE_USER'])
 	def removeComment() {
-		if(commentService.removeComment(params)){
-			render (['success:true']as JSON);
-		}else{
-			//XXX handle appropriately here
-			log.error "Error in deleting comment " +  params.commentId
-			render (['success':false, msg:"Error in deleting comment "] as JSON);
-		}
+        def model;
+        if(commentService.removeComment(params)){
+            model = utilsService.getSuccessModel('', null, OK.value());
+
+        } else{
+            //XXX handle appropriately here
+            log.error "Error in deleting comment " +  params.commentId
+            model = utilsService.getErrorModel("Error in deleting comment ", null, OK.value());
+        }
+        withFormat {
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 	
 	def getAllNewerComments = {
@@ -60,6 +66,9 @@ class CommentController {
 		def result = [olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
 		result['showCommentListHtml'] = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
         result['instanceList'] = comments
+        //HACK
+        result['instanceListName'] = 'commentList'
+
         def model = utilsService.getSuccessModel('', null, OK.value(), result);
         withFormat {
             json { render model as JSON }
