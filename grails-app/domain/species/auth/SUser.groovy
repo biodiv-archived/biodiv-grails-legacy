@@ -123,6 +123,18 @@ class SUser {
 		password = springSecurityService.encodePassword(password)
 	}
 
+    String title() {
+        this.name.capitalize();
+    }
+
+    String summary(Language userLangauge = null) {
+        return this.aboutMe?:''
+    }
+
+    String notes(Language userLangauge = null) {
+        return this.aboutMe?:'';
+    }
+
 	Resource mainImage() {
 		return new Resource(fileName:profilePicture());
 	}
@@ -171,12 +183,7 @@ class SUser {
 				}
 			}.collect {it.userGroup}
 		}else{
-            println "*************************************"
-            println this
-            println  UserGroupMemberRole.findAllBySUser(this)
-            println "*************************************"
 			uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
-            println uGroups
 		}
 		uGroups.each {
             try{

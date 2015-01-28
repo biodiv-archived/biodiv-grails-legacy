@@ -143,7 +143,7 @@
 					function(data) {
 			           	var html='';
 			           	$.each(data.result, function(i, item) {
-			           		html +="<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
+			           		html +="<a href='"+"${createLink(controller:'user', action:'show')}/"+item.id+"'>"
                                                 + "<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#members_sidebar").html(html);
@@ -165,7 +165,7 @@
 			           success: function(data) {
 			           	var html = "";
 			           	$.each(data.result, function(i, item) {
-			           		html += "<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+			           		html += "<a href='"+"${createLink(controller:'user', action:'show')}/"+item.id+"'>"+
                         			"<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#founders_sidebar").html(html);

@@ -3,6 +3,7 @@ package content.eml
 import grails.plugin.springsecurity.annotation.Secured
 
 import grails.converters.JSON
+import grails.converters.XML
 import org.grails.taggable.*
 import species.AbstractObjectController;
 import speciespage.search.DocumentSearchService;
@@ -10,24 +11,24 @@ import static groovyx.net.http.Method.*;
 import static groovyx.net.http.ContentType.*
 import groovyx.net.http.*
 import content.eml.DocSciName;
+import static org.springframework.http.HttpStatus.*;
 
 class DocumentController extends AbstractObjectController {
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
+    static defaultAction = "list"
 
 	def documentService
 	def springSecurityService
 	def userGroupService
-	def SUserService
 	def activityFeedService
-	def utilsService
 	def documentSearchService
 	//def observationService
+    def messageSource
+
 	def index = {
 		redirect(action: "browser", params: params)
 	}
-
-
 
 	@Secured(['ROLE_USER'])
 	def create() {
@@ -38,9 +39,6 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def save() {
-
-		log.debug "params in document save "+ params
-
 		params.author = springSecurityService.currentUser;
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def documentInstance = documentService.createDocument(params)
@@ -70,23 +68,64 @@ class DocumentController extends AbstractObjectController {
 			}
 			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
 			documentSearchService.publishSearchIndex(documentInstance, true)
-			redirect(action: "show", id: documentInstance.id)
+
+            def model = utilsService.getSuccessModel(flash.message, documentInstance, OK.value());
+            withFormat {
+                html {
+			        redirect(action: "show", id: documentInstance.id)
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 		else {
-			documentInstance.errors.allErrors.each { log.error it }
-			render(view: "create", model: [documentInstance: documentInstance])
+            def errors = [];
+
+            documentInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+            }
+
+            def model = utilsService.getErrorModel("Failed to save document", documentInstance, OK.value(), errors);
+            withFormat {
+                html {
+                    documentInstance.errors.allErrors.each { log.error it }
+                    render(view: "create", model: [documentInstance: documentInstance])
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 	}
 
 	def show() {
-		def documentInstance = Document.get(params.id)
-		if (!documentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "browser")
+		//cache "content"
+        params.id = params.long('id');
+
+		def documentInstance = params.id ? Document.get(params.id):null;
+		if (!params.id || !documentInstance) {
+            def model = utilsService.getErrorModel("${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}", null, OK.value());
+
+            withFormat {
+                html {
+			        flash.message = model.msg;
+                    redirect(action: "browser")
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 		else {
-			def userLanguage = utilsService.getCurrentLanguage(request);
-			[documentInstance: documentInstance,userLanguage: userLanguage]
+            def model = utilsService.getSuccessModel("", documentInstance, OK.value())
+            withFormat {
+                html {
+			        def userLanguage = utilsService.getCurrentLanguage(request);
+			        model = [documentInstance: documentInstance, userLanguage: userLanguage]
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return model;
 		}
 	}
 
@@ -96,7 +135,7 @@ class DocumentController extends AbstractObjectController {
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 			redirect(action: "browser")
-		} else if(SUserService.ifOwns(documentInstance.author)) {
+		} else if(utilsService.ifOwns(documentInstance.author)) {
 			render(view: "create", model: [documentInstance: documentInstance])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
@@ -106,8 +145,8 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])	
 	def update() {
-		log.debug "Params in Document update >> "+ params
 		def documentInstance = Document.get(params.id)
+        def msg = "";
 		if (documentInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
@@ -145,62 +184,146 @@ class DocumentController extends AbstractObjectController {
 					}
 				}
 				documentSearchService.publishSearchIndex(documentInstance, true) 
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
-				redirect(action: "show", id: documentInstance.id)
+				msg = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
+                def model = utilsService.getSuccessModel(msg, documentInstance, OK.value());
+                withFormat {
+                    html {
+                        flash.message = msg;
+				        redirect(action: "show", id: documentInstance.id)
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 			}
-			else {
-				render(view: "create", model: [documentInstance: documentInstance])
-			}
+            else {
+                    def errors = [];
+                    documentInstance.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                    }
+
+                    def model = utilsService.getErrorModel("Failed to update document", documentInstance, OK.value(), errors);
+                    withFormat {
+                        html {
+                            render(view: "create", model: [documentInstance: documentInstance])
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                    return;
+            }
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "browser")
+            msg = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
+            withFormat {
+                html {
+			        flash.message = msg;
+			        redirect(action: "browser")
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 	}
 
-	@Secured(['ROLE_USER'])	
-	def delete() {
-		Document documentInstance = Document.get(params.id)
-		if (documentInstance) {
-			try {
-				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
-				documentService.documentDelete(documentInstance)
-				documentInstance.delete(flush: true, failOnError:true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-				redirect(action: "browser")
-			}
-			catch (Exception e) {
-				log.debug e.printStackTrace()
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-				redirect(action: "show", id: params.id)
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "browser")
-		}
-	}
+    @Secured(['ROLE_USER'])	
+    def delete() {
+        def msg;
+        if(!params.id) {
+            msg = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value()); 
+            withFormat {
+                html {
+                    flash.message = msg;
+                    redirect(action: "browser")
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        } else {
+            try {
+                def documentInstance = Document.get(params.long('id'))
+                if (documentInstance) {
+                    userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+				    documentService.documentDelete(documentInstance)
+                    documentInstance.delete(flush: true, failOnError:true)
 
+                    msg = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+
+                    def model = utilsService.getSuccessModel(msg, null, OK.value()); 
+                    withFormat {
+                        html {
+                            flash.message = msg;
+                            redirect(action: "browser")
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                }
+                else {
+                    msg = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+                    def model = utilsService.getErrorModel(msg, null, OK.value()); 
+                    withFormat {
+                        html {
+                            flash.message = msg;
+                            redirect(action: "browser")
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                }
+            }
+            catch (Exception e) {
+                log.debug e.printStackTrace()
+                msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+                def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]); 
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(action: "show", id: params.id)
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
+            }
+        }
+    }
+
+    def list() {
+		redirect(action: "browser", params: params)
+    }
 	
-	def browser = {
-		log.debug params
-		
-		def model = getDocumentList(params)
-		model.userLanguage = utilsService.getCurrentLanguage(request);
-		if(params.loadMore?.toBoolean()){
-			render(template:"/document/documentListTemplate", model:model);
-			return;
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-			render (view:"browser", model:model)
-			return;
-		} else{
-			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+	def browser() {
+        def model = getDocumentList(params)
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model['resultType'] = 'document'
+            model['obvListHtml'] =  g.render(template:"/document/documentListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+        }
 
-			def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
-			render result as JSON
-			return;
-		}
+        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
+println "++++++++++++++++++++++++++++++++"
+        println model.model
+        withFormat {
+            html {
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/document/documentListTemplate", model:model.model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    render (view:"browser", model:model.model)
+                    return;
+                } else{
+                     /*def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
+                    render result as JSON
+                    */return;
+                }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 	protected def getDocumentList(params) {
@@ -227,10 +350,9 @@ class DocumentController extends AbstractObjectController {
 
 	}
 
-
 	def tags = {
-		log.debug params;
-		render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
+		//render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
+		render documentService.getFilteredTagsByUserGroup(params.webaddress, 'document') as JSON
 	}
 
 	

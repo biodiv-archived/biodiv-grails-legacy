@@ -1,17 +1,17 @@
 function showRecos(data, textStatus) {
     if(!data) return;
     if(textStatus && textStatus == 'append')
-        $('#recoSummary').append(data.recoHtml);
+        $('#recoSummary').append(data.model.recoHtml);
     else
-        $('#recoSummary').html(data.recoHtml);
-    var speciesName =  data.speciesName;
-    $('.species_title').replaceWith(data.speciesNameTemplate);
+        $('#recoSummary').html(data.model.recoHtml);
+    var speciesName =  data.model.speciesName;
+    $('.species_title').replaceWith(data.model.speciesNameTemplate);
     $('.page-header .species-page-link').hide();
-    $('.species-external-link').replaceWith(data.speciesExternalLinkHtml);
+    $('.species-external-link').replaceWith(data.model.speciesExternalLinkHtml);
     if($('#carousel_a').length > 0) {
         reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
     }
-    showUpdateStatus(data.msg, data.status);
+    showUpdateStatus(data.msg, data.success?'success':'error');
 }
 
 function lockObv(url, lockType, recoId, obvId, ele) {
@@ -39,6 +39,7 @@ function lockObv(url, lockType, recoId, obvId, ele) {
                 $(".lockObvId").hide();
                 showUpdateStatus(data.msg, 'success');
             }
+            updateFeeds();
         }
     });
 }
@@ -81,17 +82,17 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url, obj){
     data:{'obvId':obvId, 'recoId':recoId, 'currentVotes':currentVotes},
 
     success: function(data){
-        if(data.status == 'success') {
+        if(data.status == 'success' || data.success == true) {
             if(data.canMakeSpeciesCall === false){
                 $('#selectedGroupList').modal('show');
             } else {
                 preLoadRecos(3, 0, false, obvId, liComponent);
                 updateFeeds();
                 setFollowButton();
-                showUpdateStatus(data.msg, data.status);
+                showUpdateStatus(data.msg, data.success?'success':'error');
             }
         } else {
-            showUpdateStatus(data.msg, data.status);
+            showUpdateStatus(data.msg, data.success?'success':'error');
         }
         return false;
     },
@@ -114,13 +115,13 @@ function removeRecoVote(obvId, recoId, url, obj){
     data:{'obvId':obvId, 'recoId':recoId},
 
     success: function(data){
-        if(data.status == 'success') {
+        if(data.status == 'success' || data.success == true) {
             preLoadRecos(3, 0, false, obvId);
             updateFeeds();
             setFollowButton();
-            showUpdateStatus(data.msg, data.status);
+            showUpdateStatus(data.msg, data.success?'success':'error');
         } else {
-            showUpdateStatus(data.msg, data.status);
+            showUpdateStatus(data.msg, data.success?'success':'error');
         }
         return false;
     },
@@ -144,26 +145,27 @@ function preLoadRecos(max, offset, seeAllClicked) {
         dataType: "json",
         data: {max:max , offset:offset},	
         success: function(data) {
-            if(data.status == 'success') {
-                if(offset>0)
-        showRecos(data, 'append');
-                else
-        showRecos(data, null);
-    //$("#recoSummary").html(data.recoHtml);
-    var uniqueVotes = parseInt(data.uniqueVotes);
-    if(uniqueVotes > offset+max){
-        $("#seeMore").show();
-    } else {
-        $("#seeMore").hide();
-    }
-    showUpdateStatus(data.msg, data.status);
+            if(data.status == 'success' || data.success == true) {
+                if(offset>0) {
+                    showRecos(data, 'append');
+                } else {
+                    showRecos(data, null);
+                }
+                //$("#recoSummary").html(data.recoHtml);
+                var uniqueVotes = parseInt(data.model.uniqueVotes);
+                if(uniqueVotes > offset+max){
+                    $("#seeMore").show();
+                } else {
+                    $("#seeMore").hide();
+                }
+                showUpdateStatus(data.msg, data.success?'success':'error');
             } else {
-                showUpdateStatus(data.msg, data.status);
+                showUpdateStatus(data.msg, data.success?'success':'error');
             }
         }, error: function(xhr, status, error) {
             handleError(xhr, status, error, undefined, function() {
                 var msg = $.parseJSON(xhr.responseText);
-                showUpdateStatus(msg.msg, msg.status);
+                showUpdateStatus(msg.msg, msg.success?'success':'error');
             });
         }
     });
@@ -174,8 +176,8 @@ function showObservationMapView(obvId, observedOn, mapLocationPicker) {
     //var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
     refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
         google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
-            data.observations.push({'observedOn':observedOn});
-            drawVisualization(data.observations);
+            data.model.observations.push({'observedOn':observedOn});
+            drawVisualization(data.model.observations);
         }});
     }, mapLocationPicker);
     $('#big_map_canvas').trigger('maploaded');

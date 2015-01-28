@@ -278,6 +278,9 @@
                 $("#addNames").show();
             });
             var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
+            uploadResource.POLICY = "${policy}";
+            uploadResource.SIGNATURE = "${signature}";
+
         });
         </r:script>
 

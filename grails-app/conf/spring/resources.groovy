@@ -39,7 +39,10 @@ import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
 import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
 import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
-import grails.plugin.mail.MailMessageContentRenderer
+import grails.plugin.mail.MailMessageContentRenderer;
+import grails.rest.render.json.JsonRenderer;
+import org.codehaus.groovy.grails.web.mime.MimeType;
+import species.participation.Comment;
 
 // Place your Spring DSL code here
 beans = {
@@ -96,7 +99,7 @@ beans = {
 //        speciesSolrServer(EmbeddedSolrServer, container, "biodiv" )
 //        observationsSolrServer(EmbeddedSolrServer, container, "biodiv" );
 //        newsletterSolrServer(EmbeddedSolrServer, container, "biodiv" );
-//        projectSolrServer(EmbeddedSolrServer, container, "biodiv" );
+            projectSolrServer(EmbeddedSolrServer, container, "projects" );
         //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
 //        documentSolrServer(EmbeddedSolrServer, container, "biodiv" );
 //        usersSolrServer(EmbeddedSolrServer, container, "biodiv" );
@@ -139,8 +142,8 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/newsletters"
         }
-
-        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/biodiv", config.queueSize, config.threadCount ) {
+*/
+        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -149,9 +152,9 @@ beans = {
             setAllowCompression(config.allowCompression);
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/checklists"
+            println "Initialized search server to "+config.serverURL+"/projects"
         }
-
+/*
         documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -212,7 +215,7 @@ beans = {
 		sessionFactory = ref("sessionFactory");
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
-        solrServer = ref('biodivSolrServer');
+        solrServer = ref('projectSolrServer');
 		sessionFactory = ref("sessionFactory");
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
@@ -246,7 +249,6 @@ beans = {
     // have to get again after overlaying DefaultFacebookecurityConfig
     def dbConf = SpringSecurityUtils.securityConfig
 
-    //    if (!dbConf.facebook.bean.dao) {
     dbConf.facebook.bean.dao = 'facebookAuthDao'
     facebookAuthDao(DefaultFacebookAuthDao) {
         domainClassName = dbConf.facebook.domain.classname
@@ -388,7 +390,8 @@ beans = {
 
         marshallers = [
             new ObservationMarshaller(),
-            new SpeciesMarshaller()
+            new SpeciesMarshaller(),
+            new DocumentMarshaller()
         ]
     }
 
@@ -402,15 +405,25 @@ beans = {
     }
 
     /* restAuthenticationFilter */
-    restAuthenticationFilter(species.auth.RestAuthenticationFilter) {
+    /*
+    restAuthenticationFilter(RestAuthenticationFilter) {
         authenticationManager = ref('authenticationManager')
         authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
         authenticationDetailsSource = ref('authenticationDetailsSource')
         credentialsExtractor = ref('credentialsExtractor')
-        endpointUrl = conf.rest.login.endpointUrl
+        endpointUrls = conf.rest.login.endpointUrls
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
     }
-
+*/
+/*
+    final API_MIME_TYPE = "application/vnd.biodiv.app.api+json";
+    final v1_MIME_TYPE = new MimeType(API_MIME_TYPE, [v: '1.0']);
+    final v2_MIME_TYPE = new MimeType(API_MIME_TYPE, [v: '2.0']);
+    commentV1Renderer(CommentRenderer, Comment, v1_MIME_TYPE) {
+    }
+    */
 }
+
+

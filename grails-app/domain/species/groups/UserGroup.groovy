@@ -158,6 +158,22 @@ class UserGroup implements Taggable {
 		return icon(ImageType.NORMAL);
 	}
 
+    String title() {
+        return this.name;
+    }
+
+    String notes(Language userLangauge = null) {
+        return this.description;
+    }
+
+    String summary(Language userLangauge = null) {
+        return this.description;
+    }
+
+    SpeciesGroup fetchSpeciesGroup() {
+        return null;
+    }
+
 	def incrementPageVisit(){
 		visitCount++;
 

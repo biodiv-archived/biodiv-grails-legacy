@@ -32,10 +32,10 @@
 	window.leaveUrl = "${uGroup.createLink(controller:'userGroup',action:'leaveUs', 'userGroup':userGroupInstance) }";
 	window.inviteMembersFormUrl = "${uGroup.createLink(controller:'userGroup',action:'inviteMembers', 'userGroup':userGroupInstance)}";
 	window.inviteExpertsFormUrl = "${uGroup.createLink(controller:'userGroup',action:'inviteExperts', 'userGroup':userGroupInstance)}";
-	window.isLoggedInUrl = "${createLink(controller:'SUser', action:'isLoggedIn','userGroup':userGroupInstance)}";
+	window.isLoggedInUrl = "${uGroup.createLink(controller:'user', action:'isLoggedIn')}";
 	window.loginUrl = "${createLink(controller:'login','userGroup':userGroupInstance)}"
 	window.aboutUrl = "${uGroup.createLink(controller:'userGroup',action:'about', 'userGroup':userGroupInstance) }";
-	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}";
+	window.userTermsUrl = "${uGroup.createLink(controller:'user', action: 'terms')}";
 	window.members_autofillUsersId = 1;
 	window.experts_autofillUsersId = 2;
 	// Don''t put any code here. Put it in init_header function in membership.js

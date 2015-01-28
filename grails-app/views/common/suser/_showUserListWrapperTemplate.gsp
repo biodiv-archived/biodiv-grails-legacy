@@ -12,12 +12,8 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 		<div class="list">
 			<div class="observation thumbwrap">
 				<div class="observation">
-					<div>
-						<obv:showObservationFilterMessage
-							model="['instanceTotal':instanceTotal, resultType:'user']" />
-					</div>
-					<div style="clear: both;"></div>
-					<div class="btn-group" style="z-index: 10">
+					<div style="height:78px;">
+						<div class="btn-group" style="z-index: 10;float: left;padding: 3px 10px 0px 0px;">
 						<button id="selected_sort" class="btn dropdown-toggle"
 							data-toggle="dropdown" href="#" rel="tooltip"
 							data-original-title="${g.message(code:'showobservationlistwrapertemp.sort')}">
@@ -54,6 +50,12 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 						
 						</ul>
 					</div>
+
+						<obv:showObservationFilterMessage
+							model="['instanceTotal':instanceTotal, resultType:'user']" />
+					</div>
+					<div style="clear: both;"></div>
+					
 				</div>
 				<sUser:showUserList
 					model="['userInstanceList':userInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'userGroupInstance':userGroupInstance]" />

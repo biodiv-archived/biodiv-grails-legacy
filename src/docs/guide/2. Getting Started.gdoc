@@ -1,3 +1,132 @@
-Sample Application
+h4. Api Modules
 
+Quick Reference panel on the right hand side of the page gives access to api modules. 
+
+Basically API's are divided into modules depending on the type of object they are dealing with. A brief description about them is as follows.
+
+{table}
+*Module*|*Description*
+[species|Controllers] | API to create, update and manage species pages on the portal
+[observations|Controllers] | API to manage, create and update observations on the portal
+[comment|Controllers] | API to add, remove and get comments on various objects present in the portal 
+[documents|Controllers] | API to manage documents uploaded on to the portal
+[search|Controllers] | API to search all modules
+[user|Controllers] | API to get details of a user and update his settings.
+[usergroup|Controllers] | API to list all usergroups and fetch information regarding them
+[stats|Controllers] | API to get basic stats of the portal
+[speciesGroup|Controllers] | API to get all species groups across which all information in the portal is arranged
+[register|Controllers] | API to register a new user, resend verification email and forgot password 
+[login|Controllers] | API to do basic login and oauth login using facebook and google
+[logout|Controllers] | API to logout from the portal
+{table}
+
+h4. Request Format
+
+All requests except for the login and register apis should be authenticated. Only a logged in user can access them. Using login api you can generate a authentication token and it should be present in the header of every request by the name *X-Auth-Token*
+
+APIs reading data from the portal just need this authentication token, but any api writing content in to the portal also needs an appKey. This is to identify the app and discourage putting in junk data into the portal using scripts. App Key can be generated from user profile page. 
+
+All requests are of the format 
+{code}
+http://indiabiodiversity.org/api/$controller/$action/$id?
+
+X-Auth-Token is the header key for providing authentication key and 
+X-AppKey id the header key to provide app key for all write requests
+Accept header with values application/json, text/json can be provided to mention response format
+{code}
+
+h4. Response Format
+
+All responses are in JSON format.
+Any successful response will have success:true. If success = false then there is corresponding msg and errors fields detailing the king of the error.
+
+A successful api request wil get 200 OK http status and any unauthenticated request will get 401 status with appropriate message saying either auth token is missing or app key is missing. If the method is not supported for any action you would get a 405 Method Not Allowed status.
+
+Few sample applications detailing the usage of the api are shown in below section.
+
+h4. Sample Applications
+
+*IBP Android App*
+
+[IBP Android App on Google play|https://play.google.com/store/apps/details?id=com.mobisys.android.ibp&hl=en]
+
+*IBP Observation Fetcher - Chrome Extension*
+
+# [Chrome Extension using below rss feed | https://chrome.google.com/webstore/detail/ibp-observation-browser/haonlmgodffhciaehjkboiihdamgahig]
+# [RSS Feed | http://pipes.yahoo.com/pipes/pipe.run?_id=41a29b8d5dce8698e1cfc8a1adad3db4&_render=rss]
+# [Yahoo Pipes Info|http://pipes.yahoo.com/pipes/pipe.info?_id=41a29b8d5dce8698e1cfc8a1adad3db4]
+
+*IBP Moderator Mode App - by Rohit*
+
+[Curate Observations|http://projectmoths.web44.net/ibp_group_moderator/view_observations.php]
+
+*Simple login, logout and reading My observations*
+
+{code}
+# Login : http://indiabiodiversity.org/api/login?username=emailId&password=password
+
+# My observations : http://indiabiodiversity.org/api/observation/listJSON?user=1184
+
+# Logout : http://indiabiodiversity.org/api/logout
+{code}
+
+*Featured species*
+{code}
+# Getting featured species list : http://indiabiodiversity.org/species/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
+# Getting details of a particular species : http://indiabiodiversity.org/api/species/show/33485
+{code}
+
+Example : [http://indiabiodiversity.org/species/list]
+
+*Related observations by species name*
+{code}
+http://indiabiodiversity.org/api/observation/related?webaddress=dragonflies_of_india&id=358179&limit=4&offset=0&filterProperty=speciesName&filterPropertyValue=Pseudagrion+decorum
+{code}
+
+Example : [http://indiabiodiversity.org/group/dragonflies_of_india/observation/show/358179]
+
+*Observation distribution by species name*
+{code}
+# http://indiabiodiversity.org/api/observation/related?webaddress=dragonflies_of_india&filterProperty=speciesName&limit=-1&id=358179&fetchField=id,latitude,longitude,isChecklist,geoPrivacy&max=-1
+{code}
+
+Example : [http://indiabiodiversity.org/group/dragonflies_of_india/observation/show/358179]
+
+*Document Tags Cloud*
+{code}
+# http://indiabiodiversity.org/api/document/tags
+{code}
+
+Example : [http://indiabiodiversity.org/document/list]
+
+*Top contributors of the week*
+
+{code}
+$.get( "http://indiabiodiversity.org/chart/topContributors?max=10&webaddress=treesindia", undefined, function(data, textStatus, jqxhr ) {
+
+        $.each(data.htmlData, function (i, v) {
+            $('#topContributors').append("<div class='entry'>"+v[0]+v[1]+"("+v[2]+")</div>");  
+        });
+}, 'json');
+{code}
+
+Example : [http://treesindia.indiabiodiversity.org/show]
+
+*Distinct recommendation names*
+{code}
+$.getScript( "http://indiabiodiversity.org/biodiv/js/species/observations/distinctReco.js", function(e) {
+    $("#distinctRecoTableAction").unbind('click').click(loadDistinctRecoList).click();
+});
+{code}
+
+Example : [http://treesindia.indiabiodiversity.org/show]
+
+*Latest Observations*
+{code}
+$.getScript( "http://indiabiodiversity.org/biodiv/js/species/relatedStory.js", function(e) {
+    relatedStory([], "latestUpdatedObservations", "latestUpdatedObservations", "", "");
+});
+{code}
+
+This code snippet uses jquery [jcarousel|http://plugins.jquery.com/jcarousel] plugin
 

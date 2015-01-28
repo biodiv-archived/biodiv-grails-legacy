@@ -21,9 +21,12 @@ import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 import grails.converters.JSON;
+import grails.converters.XML;
 import grails.plugin.springsecurity.annotation.Secured;
 import groovy.text.SimpleTemplateEngine
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import static org.springframework.http.HttpStatus.*;
+
 class UserGroupController {
 
 	def springSecurityService;
@@ -40,15 +43,14 @@ class UserGroupController {
 
     def messageSource;
 	
-	static allowedMethods = [save: "POST", update: "POST"]
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
+    static defaultAction = "list"
 
 	def index = {
-		log.debug params
-		redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params: params)
+		redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list", params: params)
 	}
 
 	def activity = {
-		log.debug params
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			[userGroupInstance: userGroupInstance]
@@ -56,20 +58,33 @@ class UserGroupController {
 	}
 	
 	def list() {
-		def model = getUserGroupList(params);
-		if(!params.isGalleryUpdate?.toBoolean()){
-			render (view:"list", model:model)
-		} else{
-			def userGroupListHtml =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
-			def userGroupFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+		Map model = getUserGroupList(params);
 
-			def filteredTags = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it.id})
-			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[tags:filteredTags, isAjaxLoad:true]);
-			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
+        withFormat {
+            html { 
+                if(!params.isGalleryUpdate?.toBoolean()){
+                    render (view:"list", model:model)
+                } else{
+                    def userGroupListHtml =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
+                    def userGroupFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-			def result = [obvListHtml:userGroupListHtml, obvFilterMsgHtml:userGroupFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
-			render result as JSON
-		}
+                    def filteredTags = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it.id})
+                    def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[tags:filteredTags, isAjaxLoad:true]);
+                    def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
+
+                    def result = [obvListHtml:userGroupListHtml, obvFilterMsgHtml:userGroupFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
+                    render result as JSON
+                }
+            }
+            json {
+                model.remove('totalUserGroupInstanceList');
+                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as JSON)
+            }
+            xml {
+                model.remove('totalUserGroupInstanceList');
+                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as XML)
+            }
+        }
 	}
 
 	def filteredList = {
@@ -83,7 +98,7 @@ class UserGroupController {
 		render (template:"/common/userGroup/showUserGroupListTemplate", model:result);
 	}
 
-	protected def getUserGroupList(params) {
+	protected Map getUserGroupList(params) {
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 
@@ -101,7 +116,7 @@ class UserGroupController {
 		if(params.action == 'search' && !params.query) {
 			count = 0
 			totalUserGroupInstanceList = 0
-			userGroupInstanceList = []
+			userGroupInstanceList = [:]
 		}
 		
 		//storing this filtered obvs ids list in session for next and prev links
@@ -119,8 +134,6 @@ class UserGroupController {
 	}
 
 	def listRelated = {
-		log.debug params
-
 		switch(params.filterProperty) {
 			case 'featuredObservations':
 				redirect  url: uGroup.createLink(mapping: 'userGroup', action:'observation', params:['webaddress':params.webaddress]);
@@ -143,7 +156,6 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		log.debug params
 		def userGroupInstance = new UserGroup()
 		userGroupInstance.properties = params
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
@@ -151,7 +163,6 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def save() {
-		log.debug params;
 		params.domain = Utils.getDomainName(request)
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def userGroupInstance = userGroupService.create(params);
@@ -171,19 +182,37 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
-			def userLanguage = utilsService.getCurrentLanguage(request);
-			if(params.pos) {
-				int pos = params.int('pos');
-				def prevNext = getPrevNextUserGroups(pos);
-				if(prevNext) {
-					return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams,userLanguage:userLanguage]
-				} else {
-					return [userGroupInstance: userGroupInstance,userLanguage:userLanguage]
-				}
-			} else {
-				return [userGroupInstance: userGroupInstance,userLanguage:userLanguage]
-			}
-		}
+            def model = utilsService.getSuccessModel("", userGroupInstance, OK.value())
+            withFormat {
+                html{
+                    def userLanguage = utilsService.getCurrentLanguage(request);
+                    if(params.pos) {
+                        int pos = params.int('pos');
+                        def prevNext = getPrevNextUserGroups(pos);
+                        if(prevNext) {
+                            return [userGroupInstance: userGroupInstance, prevUserGroupId:prevNext.prevUserGroup, nextUserGroupId:prevNext.nextUserGroupId, lastListParams:prevNext.lastListParams, userLanguage:userLanguage]
+                        } else {
+                            return [userGroupInstance: userGroupInstance, userLanguage:userLanguage]
+                        }
+                    } else {
+                        return [userGroupInstance: userGroupInstance, userLanguage:userLanguage]
+                    }
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+		} else {
+            def model = utilsService.getErrorModel(messageSource.getMessage("id.required", ['Valid id'] as Object[], RCU.getLocale(request)), userGroupInstance, NOT_FOUND.value())
+            withFormat {
+                html {
+                    flash.message = model.msg
+                    redirect(action: "list")
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+
 	}
 
 	/**
@@ -303,27 +332,41 @@ class UserGroupController {
 		
 		if(id) {
 			if(id instanceof String) {
-				id = Long.parseLong(id);
+                try {
+				    id = Long.parseLong(id);
+                } catch(e) {
+                    id = null;
+                    e.printStackTrace();
+                }
 			}
-			userGroup = UserGroup.get(id)
+            if(id)
+			    userGroup = UserGroup.get(id)
 		} 
 		if(webaddress) {
 			userGroup = UserGroup.findByWebaddress(webaddress)
 		}
 		
-		if (!userGroup && redirectToList) {
-			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
-			redirect url: uGroup.createLink(controller:'userGroup', action:'list')
+		if (!userGroup) {
+            def model = utilsService.getErrorModel( "${message(code: 'default.not.found.message', args: ['UserGroup', id?:webaddress])}", userGroup, NOT_FOUND.value())
+                withFormat {
+                    html {
+                        flash.message = model.msg
+                        redirect url: uGroup.createLink(controller:'userGroup', action:'list')
+                        return;
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+                return;
 		}
-		userGroup
+		return userGroup
 	}
 
-	def user = {
-		println "user"
-		log.debug params
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+	def user() {
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
+        println "11111111111111111111111"
 		if (!userGroupInstance) return
-
+println "2222222222222222222"
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
@@ -334,18 +377,18 @@ class UserGroupController {
 			allMembers = userGroupInstance.getAllMembers(params.max, params.offset, params.sort);
 		}
 		
-		if(params.isAjaxLoad?.toBoolean()) {
-			def membersJSON = []
-			for(m in allMembers) {
-				membersJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
-			}
-			render ([result:membersJSON] as JSON);
-			return;
-		}
-		
-		def instanceTotal = userGroupInstance.getAllMembersCount();
-		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':allMembers, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':instanceTotal, 'expertsTotalCount': userGroupInstance.getExpertsCount()]
-		renderUsersModel(params, model);
+	        
+        def instanceTotal = userGroupInstance.getAllMembersCount();
+        def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':allMembers, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':instanceTotal, 'expertsTotalCount': userGroupInstance.getExpertsCount()]
+
+        withFormat {
+            html {
+                renderUsersModel(params, model);
+                return;
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 	private renderUsersModel (params,  model) {
@@ -372,8 +415,8 @@ class UserGroupController {
 		}
 	}
 	
-	def founders = {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+	def founders() {
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -381,21 +424,19 @@ class UserGroupController {
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
 
-		if(params.isAjaxLoad?.toBoolean()) {
-			def foundersJSON = []
-			for(m in founders) {
-				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
-			}
-			render ([result:foundersJSON] as JSON);
-			return;
-		}
 		def instanceTotal = userGroupInstance.getFoundersCount();
 		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':founders, 'instanceTotal':instanceTotal, 'foundersTotalCount':instanceTotal, 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount()]
-		renderUsersModel(params, model);
+		withFormat {
+            html{
+                renderUsersModel(params, model);
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
-	def moderators = {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+	def moderators () {
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -403,53 +444,68 @@ class UserGroupController {
 
 		def experts = userGroupInstance.getExperts(params.max, params.offset);
 
-		if(params.isAjaxLoad?.toBoolean()) {
-			def expertsJSON = []
-			for(m in experts) {
-				expertsJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
-			}
-			render ([result:expertsJSON] as JSON);
-			return;
-		}
 		def instanceTotal = userGroupInstance.getExpertsCount();
 		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':experts, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':instanceTotal]
-		renderUsersModel(params, model);
+    	withFormat {
+            html{
+                renderUsersModel(params, model);
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
+
 	}
 
-	def observation = {
-		log.debug params;
+	def observation() {
 		def model = getUserGroupObservationsList(params);
-		if(params.loadMore?.toBoolean()){
-			render(template:"/common/observation/showObservationListTemplate", model:model);
-			return;
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-			render(view:"observation", model:model);
-			return;
-		} else {
-			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-			def tagsHtml = "";
-			if(model.showTags) {
-			//	def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-			//	tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':model.userGroup]);
-			}
-			//def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':model2.userGroup]);
+        def model2 = utilsService.getSuccessModel("", null, OK.value(), model)
+        withFormat {
+            html{
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/common/observation/showObservationListTemplate", model:model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    render(view:"observation", model:model);
+                    return;
+                } else {
+                    def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+                    def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+                    def tagsHtml = "";
+                    if(model.showTags) {
+                        //	def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+                        //	tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':model.userGroup]);
+                    }
+                    //def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':model2.userGroup]);
 
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal: model.instanceTotal]
-			render result as JSON
-			return;
-		}
+                    def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal: model.instanceTotal]
+                    render result as JSON
+                    return;
+                }
+                json { render model2 as JSON }
+                xml { render model2 as XML }
+            }
 
-	}
-	
+        }
+    }
+
 	def getUserGroupObservationsList(params) {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 		
 		def model = observationService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
+        def observationInstanceList = model.observationInstanceList
+        if(params.filterProperty == 'speciesName') {
+            def results = []
+            observationInstanceList.each {
+                def obv = Observation.read(it);
+                results.add(obv)
+            }
+            model.observationInstanceList = results;
+            observationInstanceList = results;
+        }
         def checklistCount =  model.checklistCount
 		def allObservationCount =  model.allObservationCount
 		model['checklistCount'] = checklistCount
@@ -477,8 +533,14 @@ class UserGroupController {
 	
 	def filteredMapBasedObservationsList = {
 		def model = getUserGroupObservationsList(params);
-
-		render (template:"/common/observation/showObservationListTemplate", model:model);
+        def model2 = utilsService.getSuccessModel("", null, OK.value(), model)
+        withFormat {
+            html{
+		        render (template:"/common/observation/showObservationListTemplate", model:model);
+            }
+            json {render model2 as JSON}
+            xml {render model2 as XML}
+        }
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
@@ -497,49 +559,94 @@ class UserGroupController {
 				return ['userGroupInstance':userGroupInstance]
 			}
 		return;
-	}
+    }
 
-	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
-	def joinUs() {
-		def msg
-		def userGroupInstance = findInstance(params.id, params.webaddress)
-		if (!userGroupInstance) {
-			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
-			render (['success':true,'statusComplete':false, 'msg':msg] as JSON);
-			return;
-		}
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+    def joinUs() {
+        def msg
+        def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
+        if (!userGroupInstance) {
+            msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
+            def model = utilsService.getErrorModel(msg, null, OK.value())
+            withFormat {
+                html {
+                    flash.message = msg;
+                    render (['success':true,'statusComplete':false, 'msg':msg] as JSON);
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return;
+        }
 
-		def user = springSecurityService.currentUser;
-		if(user) {
-			if(userGroupInstance.isMember(user)) {
-				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], RCU.getLocale(request))
-				flash.message = msg;
-				render ([success:true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg]as JSON);
-			} else {
-				if(userGroupInstance.addMember(user)) {
-					msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request))
-					flash.message = msg;
-					render ([success:true, 'statusComplete':true, 'shortMsg':messageSource.getMessage("info.joined", null, RCU.getLocale(request)), 'msg':msg]as JSON);
-					return;
-				}
-			}
-		}
-		msg = messageSource.getMessage("default.not.able.process", null, RCU.getLocale(request))
-		flash.error = msg;
-		render ([success:true, 'statusComplete':false, 'shortMsg':'Cannot process now', 'msg':msg]as JSON);
-	} 
+        def user = springSecurityService.currentUser;
+        if(user) {
+            if(userGroupInstance.isMember(user)) {
+                msg = messageSource.getMessage("default.already.user", ['member'] as Object[], RCU.getLocale(request))
+
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = msg;
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        render ([success:true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg]as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
+
+            } else {
+                if(userGroupInstance.addMember(user)) {
+
+                    msg = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request))
+                    def model = utilsService.getSuccessModel(msg, null, OK.value())
+                    model['shortMsg'] = messageSource.getMessage("info.joined", null, RCU.getLocale(request));
+                    withFormat {
+                        html {
+                            flash.message = msg;
+                            render ([success:true, 'statusComplete':true, 'shortMsg':model.shortMsg, 'msg':msg]as JSON);
+                        } 
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+
+                    return;
+                }
+            }
+
+            msg = messageSource.getMessage("default.not.able.process", null, RCU.getLocale(request))
+            def model = utilsService.getErrorModel(msg, null, OK.value())
+            model['shortMsg'] = 'Cannot process now';
+            withFormat {
+                html {
+                    flash.error = msg;
+                    render ([success:true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg]as JSON);
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    } 
 
 	@Secured(['ROLE_USER'])
 	def inviteMembers() {
 		def msg
 		List members = Utils.getUsersList(params.memberUserIds);
-		log.debug members;
 
 		if(members) {
-			def userGroupInstance = findInstance(params.id, params.webaddress)
+			def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
-				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = msg;
+                withFormat {
+                    html {
+				        render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 				return;
 			}
 
@@ -550,25 +657,50 @@ class UserGroupController {
 				int alreadyMembersCount = membersCount-members.size();
 
 				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], RCU.getLocale(request))	
-			}
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+            }
+            def model = utilsService.getSuccessModel(msg, null, OK.value())
+            model['shortMsg'] = 'Sent request';
+            withFormat {
+                html {
+                    render (['success':true, 'statusComplete':true, 'shortMsg':model.shortMsg, 'msg':msg] as JSON)
+                } 
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return
 		}
 		msg = messageSource.getMessage("default.provide.details.invite", null, RCU.getLocale(request))
-		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':msg] as JSON)
+        def model = utilsService.getErrorModel(msg, null, OK.value())
+        model['shortMsg'] = 'Please provide details';
+        withFormat {
+            html {
+                flash.error = msg;
+		        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON)
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 	
 	@Secured(['ROLE_USER'])
 	def inviteExperts() {
 		List members = Utils.getUsersList(params.expertUserIds);
-		log.debug members;
 		def msg
 
 		if(members) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
-				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = msg;
+                withFormat {
+                    html {
+				        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
 				return;
 			}
 			
@@ -588,30 +720,67 @@ class UserGroupController {
 
 				msg += messageSource.getMessage("default.usergroup.send.invite.success.contd", [alreadyMembersCount] as Object[], RCU.getLocale(request))
 			}
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
+            
+            def model = utilsService.getSuccessModel(msg, null, OK.value())
+            model['shortMsg'] = 'Sent request';
+            withFormat {
+                html {
+			        render (['success':true, 'statusComplete':true, 'shortMsg':model.shortMsg, 'msg':msg] as JSON)
+                } 
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
 			return
 		}
 		msg = messageSource.getMessage("default.provide.details.invite", null, RCU.getLocale(request))
-		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':msg] as JSON)
+        def model = utilsService.getErrorModel(msg, null, OK.value())
+        model['shortMsg'] = 'Please provide details';
+        withFormat {
+            html {
+		        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON)
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 
 	@Secured(['ROLE_USER'])
 	def requestMembership() {
-		log.debug params;
 		def user = springSecurityService.currentUser;
 		def msg;
 		if(user) {
-			def userGroupInstance = findInstance(params.id, params.webaddress)
+			def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
-				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = msg;
+                withFormat {
+                    html {
+				        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
+
 				return;
 			}
 
 			if(userGroupInstance.isMember(user)) {
 				msg = messageSource.getMessage("default.already.user", ['member'] as Object[], RCU.getLocale(request))
-				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = msg;
+                withFormat {
+                    html {
+                        render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
+
 				return;
 			}
 			
@@ -628,30 +797,61 @@ class UserGroupController {
 						msg ,  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestMembership'], userToken.token);
 			}
 			msg = messageSource.getMessage("default.sent.request.admin", null, RCU.getLocale(request))
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
+            def model = utilsService.getSuccessModel(msg, null, OK.value())
+            model['shortMsg'] = 'Sent request';
+            withFormat {
+                html {
+			        render (['success':true, 'statusComplete':true, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                } 
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return;
 		}
 		msg = messageSource.getMessage("default.login.confirm", null, RCU.getLocale(request))
-		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':msg] as JSON);
+        def model = utilsService.getErrorModel(msg, null, OK.value())
+        model['shortMsg'] = 'Please login';
+        withFormat {
+            html {
+		        render (['success':true,'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 
 	}
 	
 	@Secured(['ROLE_USER'])
 	def requestModeratorship() {
-		log.debug params;
 		def user = springSecurityService.currentUser;
 		def msg;
 		if(user) {
-			def userGroupInstance = findInstance(params.id, params.webaddress)
+			def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 			if (!userGroupInstance) {
 				msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
-				render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = msg;
+                withFormat {
+                    html {
+				        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 				return;
 			}
 
 			if(userGroupInstance.isExpert(user)) {
 				msg = messageSource.getMessage("default.already.user", ['moderator'] as Object[], RCU.getLocale(request))
-				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a moderator', 'msg':msg] as JSON);
+                def model = utilsService.getErrorModel(msg, null, OK.value())
+                model['shortMsg'] = 'Already a moderator';
+                withFormat {
+                    html {
+				        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 				return;
 			}
 			
@@ -668,11 +868,27 @@ class UserGroupController {
 						msg,  [founder:founder, message:params.message, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestModeratorship'], userToken.token);
 			}
 			msg = messageSource.getMessage("default.sent.request.admin", null, RCU.getLocale(request))
-			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON);
+            def model = utilsService.getSuccessModel(msg, null, OK.value())
+            model['shortMsg'] = 'Sent request';
+            withFormat {
+                html {
+			        render (['success':true, 'statusComplete':true, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                } 
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return;
 		}
 		msg = messageSource.getMessage("default.login.confirm", null, RCU.getLocale(request))
-		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':msg] as JSON);
+        def model = utilsService.getErrorModel(msg, null, OK.value())
+        model['shortMsg'] = 'Please login';
+        withFormat {
+            html {
+		        render (['success':true,'statusComplete':false, 'shortMsg': model.shortMsg, 'msg':msg] as JSON);
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 
 	}
 	
@@ -805,11 +1021,19 @@ class UserGroupController {
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def leaveUs() {
 		def msg;
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) {
 			msg = messageSource.getMessage("default.not.selected", ['userGroup'] as Object[], RCU.getLocale(request))
-			flash.error = msg
-			render (['success':true, 'statusComplete':false, 'shortMsg':msg, 'msg':msg] as JSON);
+            def model = utilsService.getErrorModel(msg, null, OK.value())
+            model['shortMsg'] = msg;
+            withFormat {
+                html {
+			        flash.error = msg
+			        render (['success':true, 'statusComplete':false, 'shortMsg':model.shortMsg, 'msg':msg] as JSON);
+                } 
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return;
 		}
 
@@ -817,13 +1041,29 @@ class UserGroupController {
 		if(user && userGroupInstance.deleteMember(user)) {
 			activityFeedService.addActivityFeed(userGroupInstance, user, user, activityFeedService.MEMBER_LEFT);
 			msg = messageSource.getMessage("default.thankYouForBeingWithUS", null, RCU.getLocale(request))
-			flash.message = msg
-			render (['msg':msg, 'shortMsg':'Thank you', 'success':true, 'statusComplete':true] as JSON);
+            def model = utilsService.getSuccessModel(msg, null, OK.value())
+            model['shortMsg'] = 'Thank you';
+            withFormat {
+                html {
+                    flash.message = msg
+			        render (['msg':msg, 'shortMsg':model.shortMsg, 'success':true, 'statusComplete':true] as JSON);
+                } 
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return;
 		}
 		msg = messageSource.getMessage("default.YourPresenceImportant", null, RCU.getLocale(request))
-		flash.error = msg
-		render (['msg':msg, 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
+        def model = utilsService.getErrorModel(msg, null, OK.value())
+        model['shortMsg'] = 'Cannot let you leave';
+        withFormat {
+            html {
+                flash.error = msg
+                render (['msg':msg, 'shortMsg':model.shortMsg, 'success':true, 'statusComplete':false]as JSON);
+            } 
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
    
 
@@ -835,7 +1075,6 @@ class UserGroupController {
 	}
 
 	def getRelatedUserGroups() {
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -862,7 +1101,6 @@ class UserGroupController {
 	}
 
 	def getFeaturedUserGroups() {
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -980,10 +1218,9 @@ class UserGroupController {
 	}
 
 	def getFeaturedObservations() {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return;
 
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 		params.sort = "visitCount";
@@ -1002,10 +1239,9 @@ class UserGroupController {
 	}
 
 	def getFeaturedMembers() {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return;
 
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -1026,31 +1262,32 @@ class UserGroupController {
 	}
 
 	def getUserUserGroups() {
-		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
-		if(!params.id) return;
-
 		def userInstance = SUser.get(params.long('id'))
 		if (!userInstance) {
-			flash.message = messageSource.getMessage("default.Not.Founded", ['SUser',params.id] as Object[], RCU.getLocale(request))
+			flash.message = messageSource.getMessage("default.not.found", ['SUser',params.id] as Object[], RCU.getLocale(request))
+            def model = utilsService.getErrorModel(flash.message, null, OK.value())
+            render model as JSON
 			return;
 		}
 
 		def userGroups = userGroupService.getUserUserGroups(userInstance, max, offset);
-
 		def result = [];
-		userGroups.each {
-			result.add(['observation':it, 'title':it.name]);
+		userGroups.each {key, value ->
+            value.each {
+			    result.add(['observation':it.userGroup, 'title':it.userGroup.name]);
+            }
 		}
 
 		def r = ["observations":result, "count":userGroupService.getNoOfUserUserGroups(userInstance)]
 		if(r.observations) {
 			r.observations = observationService.createUrlList2(r.observations, '');
 		}
-		
-		render r as JSON
+	
+        def model = utilsService.getSuccessModel("", null, OK.value(), r);
+	    render model as JSON
 	}
 	
 	def actionsHeader() {
@@ -1060,7 +1297,6 @@ class UserGroupController {
 	}
 
 	def pages() {
-		log.debug params
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
@@ -1068,14 +1304,12 @@ class UserGroupController {
 	} 
 	
 	def page() {
-		log.debug params;
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.id])
 	} 
 	
 	def pageCreate() {
-		log.debug params;
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		render (view:'pageCreate', model:['userGroupInstance':userGroupInstance])
@@ -1089,8 +1323,6 @@ class UserGroupController {
 	 *
 	 */
 	def search() {
-		log.debug params;
-		
 		def model = getUserGroupList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"search", model:model)
@@ -1124,15 +1356,13 @@ class UserGroupController {
    }
       
    def allGroups() {
-	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'allGroups', model:['userGroupInstance':userGroupInstance])
    }
    
    def myGroups() {
-	   log.debug params;
-		def userGroupInstance = findInstance(params.id, params.webaddress)
+		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
@@ -1157,16 +1387,19 @@ class UserGroupController {
    }
    
    def bulkPost() {
-	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
-       def resObj = r.remove('resourceObj')
-	   if(params.pullType == 'single'){
-           r['resourceGroupHtml'] =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]);
-		   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
-	   }
-	   
-       r['msg'] = "${message(code:r.remove('msgCode'))}"
-	   render r as JSON
+       withFormat {
+           json {
+               def resObj = r.remove('resourceObj')
+               if(params.pullType == 'single'){
+                   r['resourceGroupHtml'] =  g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':resObj]);
+                   r['featureGroupHtml'] = uGroup.featureUserGroups([model:['observationInstance':resObj]]);
+               }
+
+               r['msg'] = "${message(code:r.remove('msgCode'))}"
+               render r as JSON
+           }
+       }
    } 
    /////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////To create and add user to a specific group (i.e BirdRace)////////////////

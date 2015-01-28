@@ -72,7 +72,6 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	def SUserService;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -633,6 +632,7 @@ class UserGroupService {
 	def getUserUserGroups(SUser user, int max, long offset) {
 		if(max==-1 && offset==-1)
 			return  UserGroupMemberRole.findAllBySUser(user).groupBy{ it.role };
+
 		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).groupBy{ it.role };
 	}
 
@@ -1263,7 +1263,7 @@ class UserGroupService {
 		
 		SUser currUser = springSecurityService.currentUser;
 		//returning true for user with admin role
-		if(SUserService.isAdmin(currUser?.id)){
+		if(utilsService.isAdmin(currUser?.id)){
 			return true
 		}
 		
@@ -1286,6 +1286,7 @@ class UserGroupService {
 	}
 	
 	private class ResourceUpdate {
+		private static final int POST_BATCH_SIZE = 50
 		private static final log = LogFactory.getLog(this);
 		
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
@@ -1316,30 +1317,38 @@ class UserGroupService {
 		
 		
 		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
-			UserGroup.withTransaction(){  status ->
+			
+			UserGroup.withNewTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
 					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
 					obvs = getFeatureSafeList(ug, obvs)
 				}
-				if(obvs.isEmpty()){
-					log.debug "Nothing to update because of permissoin or not part of group"
-					return false
+			}
+			
+			if(obvs.isEmpty()){
+				log.debug "Nothing to update because of permissoin or not part of group"
+				return false
+			}
+			//XXX: to avoid connection time out posting in batches
+			List resSubLists = obvs.collate(POST_BATCH_SIZE)
+			resSubLists.each { resList ->
+				UserGroup.withNewTransaction(){  status ->
+					log.debug submitType + " for group " + ug + "  resources size " +  resList.size()
+					ug = ug.merge()
+					resList.each { obv ->
+						obv = obv.merge()
+						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+					}
+					try{
+						ug.save(flush:true, failOnError:true)
+					}catch(Exception e){
+						ug.errors.allErrors.each { log.debug it }
+						status.setRollbackOnly()
+						e.printStackTrace()
+					} 
 				}
-				log.debug submitType + " for group " + ug + "  resources size " +  obvs.size()
-				ug = ug.merge()
-				obvs.each { obv ->
-					obv = obv.merge()
-					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
-				}
-				try{
-					ug.save(flush:true, failOnError:true)
-				}catch(Exception e){
-					ug.errors.allErrors.each { log.debug it }
-					status.setRollbackOnly()
-					e.printStackTrace()
-				} 
 			}
 			return !ug.hasErrors()
 		}
@@ -1356,7 +1365,7 @@ class UserGroupService {
 		private List getFeatureSafeList(ug, obvs){
 			SUser currUser = springSecurityService.currentUser;
 			//if admin or founder or expert then can un post any featured resource
-			if(SUserService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
+			if(utilsService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
 				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
 				return obvs
 			}

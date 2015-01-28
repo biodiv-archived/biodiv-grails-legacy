@@ -19,11 +19,25 @@ http://indiabiodiversity.localhost.org/api/register/user?email=username@gmail.co
 ** Successful response : 
 Upon successful registration following response is sent and a verification link is sent at the given address along with a registration code. 
 {code}
-{"success":true,"message":"Welcome user Devaki. A verification link has been sent to devaki.anugu@gmail.com. Please click on the verification link in the email to activate your account."}
+{
+    "success": true,
+        "status": 200,
+        "msg": "Welcome user Devaki. A verification link has been sent to devaki.anugu1@gmail.com. Please click on the verification link in the email to activate your account."
+}
 {code}
 ** in case of error
 {code}
-{"success":false,"message":"Failed to register the user because of the following errors: [[field:email, message:This email id is already registered.]]"}
+{
+    "success": false,
+        "status": 200,
+        "msg": "Failed to register the user because of the following errors: [{field=email, message=This email id is already registered.}]",
+        "errors": [
+        {
+            "field": "email",
+            "message": "This email id is already registered."
+        }
+    ]
+}
 {code}
 
 h4. Resend the verification email
@@ -39,11 +53,20 @@ http://indiabiodiversity.localhost.org/api/register/resend?email=username@gmail.
 * *Response* :
 ** on success
 {code}
-{"success":true,"msg":"Successfully sent verification email to username@gmail.com. Please check your inbox."}
+{
+    "success": true,
+        "status": 200,
+        "msg": "Successfully sent verification email to 123@gmail.com. Please check your inbox."
+}
 {code}
 ** in case of error 
 {code}
-{"success":false,"msg":"Registration code for the email address devaki.anugu@gmail.com is not found"}
+{
+    "success": false,
+        "status": 200,
+        "msg": "Registration code for the email address devaki.anugu@gmail.com is not found",
+        "errors": []
+}
 {code}
 
 h4. Forgot Password 
@@ -59,9 +82,18 @@ http://indiabiodiversity.localhost.org/api/register/forgotPassword?email=usernam
 * *Response* :
 ** on success
 {code}
-{"success":true,"msg":"An email has been sent to pearlsravanthi@gmail.com. Please click on the link in the email."}
+{
+    "success": true,
+        "status": 200,
+        "msg": "An email has been sent to pearlsravanthi@gmail.com. Please click on the link in the email."
+}
 {code}
 ** in case of error 
 {code}
-{"success":false,"msg":"No user was found with that email"}
+{
+    "success": false,
+        "status": 200,
+        "msg": "No user was found with that email",
+        "errors": []
+}
 {code}
