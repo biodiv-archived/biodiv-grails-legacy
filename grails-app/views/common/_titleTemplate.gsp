@@ -29,7 +29,7 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title><g:if test="${title}">${title} | </g:if><g:if test="${params.action.equals('show')}"> ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
+<title><g:if test="${title}">${title} | </g:if><g:if test="${params.action.equals('show')}"> ${params.controller?.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
 
 <g:if test="${favIconPath}">
 <link rel="shortcut icon" href="${favIconPath}" type="image/x-icon" />

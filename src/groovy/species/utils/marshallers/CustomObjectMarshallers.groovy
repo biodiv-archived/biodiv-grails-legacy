@@ -50,6 +50,8 @@ class CustomObjectMarshallers {
     List marshallers = []
 
     def register() {
+
+        JSON.createNamedConfig('v1') {
         marshallers.each{ it.register() }
 
         JSON.registerObjectMarshaller(Geometry) {
@@ -131,7 +133,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
-            def r = [id:it.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
+            def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
             };
@@ -161,6 +163,7 @@ class CustomObjectMarshallers {
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
+            println "comment marshaller"
 			return ['id':it.id, 'text':it.body, 'authorId':it.author.id, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
 		}
 
@@ -206,5 +209,6 @@ class CustomObjectMarshallers {
                 }
             }
         })
+    }
     }
 }

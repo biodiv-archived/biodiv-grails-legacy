@@ -9,7 +9,7 @@
 <html>
 <head>
 
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'show', id:user.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'user', action:'show', id:user.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${user.name}"/>
 <%def imagePath = user.profilePicture();%>
 <g:set var="description" value="${Utils.stripHTML(user.aboutMe)?:'' }" />
@@ -48,9 +48,9 @@
 					<sUser:ifOwns model="['user':user]">
 
 						<a class="btn btn-info pull-right"
-							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
+							href="${uGroup.createLink(action:'edit', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
                                                             class="icon-edit"></i><g:message code="button.edit.profile" /> </a>
-                                                    <a class="btn btn-info" style="float: right; margin-right: 5px;"href="${uGroup.createLink(action:'myuploads', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><iclass="icon-edit"></i><g:message code="button.my.uploads" /> </a>
+                                                    <a class="btn btn-info" style="float: right; margin-right: 5px;"href="${uGroup.createLink(action:'myuploads', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><iclass="icon-edit"></i><g:message code="button.my.uploads" /> </a>
 
 					</sUser:ifOwns>
 				</div>
@@ -65,7 +65,7 @@
 				<div class="figure span3"
 					style="float: left; max-height: 220px; max-width: 220px; font-size: 75%;">
 					<a
-						href="${uGroup.createLink(action:'show', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+						href="${uGroup.createLink(action:'show', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
 					<div class="prop">
 						<span class="name"><i class="icon-time"></i><g:message code="default.member.since.label" /> </span>
@@ -143,7 +143,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                 			<sUser:ifOwns model="['user':user]">
 
 						<a class="btn btn-link"
-							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
+							href="${uGroup.createLink(action:'edit', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
 							class="icon-edit"></i><g:message code="button.edit" /> </a>
 					</sUser:ifOwns>
                                 </h5>
@@ -228,7 +228,7 @@ def contact_me_text=g.message(code:'button.contact.me')
 
                                     </h6>
                                     <obv:showRelatedStory
-                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
+                                    model="['controller':'user', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
 
                                 </div>
                                 
@@ -317,7 +317,7 @@ def contact_me_text=g.message(code:'button.contact.me')
 </r:script>
 <script type="text/javascript">
 $(document).ready(function(){
-    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'SUser', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'user', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
     window.params.observation.listUrl = "${uGroup.createLink(controller:'observation', action: 'listJSON')}"
 });
 </script>

@@ -225,4 +225,15 @@ class Checklists extends Observation {
         }
         return
     }
+
+    def deleteAllObservations() {
+        def cklObvs = this.observations
+        cklObvs.each {
+            it.isDeleted = true;
+            if(!it.save(flush:true)){
+                it.errors.allErrors.each { log.error it } 
+            }
+        } 
+        return
+    }
 }

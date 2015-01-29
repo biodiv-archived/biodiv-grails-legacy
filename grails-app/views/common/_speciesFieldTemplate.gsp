@@ -94,7 +94,6 @@
                 data-name="description" 
                 placeholder="Write a small descripiton about the field." style="display:none;">
                 ${raw(speciesFieldInstance?.description)}
-
             </textarea>        
 
             <div class="description">

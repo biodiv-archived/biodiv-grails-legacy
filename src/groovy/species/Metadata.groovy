@@ -41,8 +41,7 @@ abstract class Metadata {
     def grailsApplication
 	def activityFeedService
     def observationService
-	def utilsService
-	
+    def utilsService;
     //TODO: Contributions and Attributions
 
     static constraints = {

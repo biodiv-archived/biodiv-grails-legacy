@@ -488,6 +488,11 @@ class SpeciesUploadService {
 						taxonConcept.attach();
 					}
 					groupHandlerService.updateGroup(taxonConcept);
+                    def rCount = s.fetchResourceCount();
+                    def rsfCount = s.fetchSpeciesFieldResourceCount();
+                    if(rCount.size() > 0 || rsfCount > 0) {
+                        s.updateHasMediaValue(true);
+                    }
 					log.info "post processed spcecies ${s}"
 				}
 			//}

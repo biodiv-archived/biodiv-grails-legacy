@@ -44,6 +44,17 @@ import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
 import species.participation.Discussion;
 
+import groovyx.net.http.HTTPBuilder
+import static groovyx.net.http.ContentType.JSON
+import static groovyx.net.http.ContentType.XML
+import static groovyx.net.http.Method.GET
+import speciespage.ObvUtilService;
+
+import java.net.URL;
+import java.lang.Boolean;
+import species.NamesParser;
+
+
 class DocumentService extends AbstractObjectService {
 
 	static transactional = false
@@ -646,4 +657,147 @@ class DocumentService extends AbstractObjectService {
 		}
 	}
 
+	Map getGnrdScientificNames(String tokenUrl){
+			//	println "=====token==="+tokenUrl
+			URL url = new URL(tokenUrl)
+			def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+			//println "===hostName==="+hostName
+			def path = url.getPath()
+			//println "===path==="+path
+			def query=url.getQuery()
+			//println "===query==="+query
+
+		HTTPBuilder http = new HTTPBuilder(hostName)
+		Map names = [:];
+		Map offset = [:];
+		Map parsedNameSet = [:];
+		String status = '';
+       http.request( GET, JSON ) {  
+       
+			
+			 //def q1 = query.split('=')[0];
+			def q = query.split('=')[1];
+
+        	 uri.path = path
+ 			 uri.query = [ token:q ]     	
+
+  			headers.Accept = '*/*'
+           	response.success = { resp, reader ->
+      			//println "================ resp ==" + response
+    			//println "================ reader ==" + reader
+      			//println "=====STATUS CODE==== " + reader.status
+      			names = countScientificNames(reader.names);
+      			offset = getOffsetValues(reader.names);
+      			List nameSetKeys = names.keySet().toList();
+      			parsedNameSet = gnrdNameParsing(nameSetKeys);
+
+      			//println "=====names===" +names
+      			int statusCode = reader.status
+      			if(statusCode == 303){
+      				status = ObvUtilService.SCHEDULED
+      			} else if(statusCode == 404){
+      				status = ObvUtilService.FAILED
+      			} else if(statusCode == 200){
+      				status = ObvUtilService.SUCCESS
+      			} else {
+      				status = ObvUtilService.FAILED
+      			}
+         	}
+            response.'404' = { status = ObvUtilService.FAILED }
+
+        }
+        return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset, parsedNameSetMap:parsedNameSet]
+	}
+
+
+	private Map countScientificNames(List names) {
+		Map clearNameset = [:]
+		names.each { name ->
+		 if(clearNameset[name.scientificName]) {//adding count to map
+
+              clearNameset[name.scientificName] = clearNameset[name.scientificName] + 1
+
+          } else {
+
+                 clearNameset[name.scientificName] = 1
+
+            }
+        }
+        return clearNameset.sort { a, b -> b.value <=> a.value }
+	}
+
+	private Map gnrdNameParsing(List names) {
+		NamesParser nameParser = new NamesParser();
+		Map parsedNameSetMap = [:]
+		names.each { name ->
+			parsedNameSetMap[name] = nameParser.parse([name])[0].canonicalForm
+		}
+		return parsedNameSetMap
+	}
+
+	private Map getOffsetValues(List names){
+			Map offsetMap = [:]
+			names.each { name ->
+				List countArray = []
+					countArray[0] = name.offsetStart
+					countArray[1] = name.offsetEnd
+					if(!offsetMap[name.scientificName]){
+						offsetMap[name.scientificName] = []
+						offsetMap[name.scientificName].add(countArray)
+					}else{
+						
+						offsetMap[name.scientificName].add(countArray)
+					}
+			}
+		return offsetMap;	
+
+	}
+
+    def runAllDocuments() {
+        List documentInstanceList = Document.list();
+        def url = '';
+        def tokenUrl = '';
+        int i = 0;
+        def numOfDocs = documentInstanceList.size()
+        while(i < numOfDocs) {
+            DocumentTokenUrl.withNewTransaction { 
+                def instance = documentInstanceList.get(i)
+                i++;
+                def p = DocumentTokenUrl.findByDoc(instance)
+                if(!p) {
+                    if(instance?.uFile != null){
+                        url = grailsApplication.config.speciesPortal.content.serverURL
+                        url = url+instance?.uFile?.path 
+
+                    } else {
+                        url=instance.uri;
+                    }
+                    def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+                    HTTPBuilder http = new HTTPBuilder(hostName)
+                    http.request( GET, JSON ) {
+                        uri.path = "/name_finder.json"
+                        uri.query = [ url:url ]     	
+                        headers.Accept = '*/*'
+                        response.success = { resp,  reader ->
+                            //println "========reader====="+reader;
+                            //println "========reader====="+reader.token_url;
+                            tokenUrl = reader.token_url;
+                        }
+                        response.'404' = { status = ObvUtilService.FAILED }
+                    }
+                    DocumentTokenUrl.createLog(instance, tokenUrl);
+                }//IF
+            }
+        }//each
+    }
+     def documentDelete(Document docInstance){
+    	def  docTokenId =DocumentTokenUrl.findByDoc(docInstance)
+    		 docTokenId.delete();
+    	List docSciNameId = DocSciName.findAllByDocument(docInstance)
+    		 docSciNameId.each {
+    			it.delete();
+    			}
+    }
+
 }
+

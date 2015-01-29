@@ -245,7 +245,7 @@ class ChecklistService {
 						obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
 	                    log.debug "saving observation ${obsParams}"
 						def res = observationService.saveObservation(obsParams, false)
-						Observation observationInstance = res.observationInstance
+						Observation observationInstance = res.instance
 						saveReco(observationInstance, m, checklistInstance)
 						
 						if(!oldObvId){

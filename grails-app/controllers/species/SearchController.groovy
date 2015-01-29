@@ -4,6 +4,7 @@ import grails.converters.JSON;
 
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
+import static org.springframework.http.HttpStatus.*;
 
 import species.utils.Utils;
 

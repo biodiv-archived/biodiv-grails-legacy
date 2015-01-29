@@ -51,7 +51,7 @@ class SUserController extends UserController {
     def messageSource;
     def speciesPermissionService;
     
-	static allowedMethods = [save: "POST", update: ["POST","PUT"], delete: "DELETE"]
+	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
@@ -79,29 +79,32 @@ class SUserController extends UserController {
 		}
 		params.remove('query');
 
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model['resultType'] = 'user'
+            model['obvListHtml'] =  g.render(template:"/common/suser/showUserListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+        }
+
+        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
         withFormat {
             html { 
                 if(params.loadMore?.toBoolean()){
-                    render(template:"/common/suser/showUserListTemplate", model:model);
+                    render(template:"/common/suser/showUserListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
-                    render (view:"list", model:model)
+                    render (view:"list", model:model.model)
                     return;
-                } else{
-                    model['resultType'] = 'user'
+                } else {
+                    /*model['resultType'] = 'user'
                     def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
                     def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
                     def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
                     render result as JSON
-                    return;
+                    return;*/
                 }
             }
-            json {
-                render (utilsService.getSuccessModel("Success in executing ${params.action} of ${params.controller}", null, OK.value(), model) as JSON)
-            }
-            xml {
-                render (utilsService.getSuccessModel("Success in executing ${params.action} of ${params.controller}", null, OK.value(), model) as XML)
-            }
+            json {render model as JSON }
+            xml { render model as XML }
         }
 	}
 
@@ -119,9 +122,8 @@ class SUserController extends UserController {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
 			user.password = params.password; //SpringSecurityUiService.encodePassword(params.password, salt)
 		}
-
 		if (!user.save(flush: true)) {
-            def model = utilsService.getErrorModel("Error in executing ${params.action} of ${params.controller}", user, UNPROCESSABLE_ENTITY.value())
+            def model = utilsService.getErrorModel("Error in executing ${actionName} of ${params.controller}", user, UNPROCESSABLE_ENTITY.value())
             withFormat {
                 html { 
                     render view: 'create', model: [user: user, authorityList: sortedRoles()]
@@ -189,7 +191,7 @@ class SUserController extends UserController {
                     result.put('userGroupWebaddress', params.webaddress)
                     result.put('obvData', chartService.getUserStats(SUserInstance, userGroupInstance));
                     result['currentUser'] = springSecurityService.currentUser;
-                    result['currentUserProfile'] = result['currentUser']?utilsService.generateLink("SUser", "show", ["id": result['currentUser'].id], request):'';
+                    result['currentUserProfile'] = result['currentUser']?utilsService.generateLink("user", "show", ["id": result['currentUser'].id], request):'';
                     return result
                 }
                 json { render model as JSON }
@@ -202,7 +204,6 @@ class SUserController extends UserController {
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def edit() {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
 		if((params.id && utilsService.ifOwns(params.long('id'))) || (params.email && utilsService.ifOwnsByEmail(params.email))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById();
@@ -225,7 +226,7 @@ class SUserController extends UserController {
         withFormat {
             html {
                 flash.message = "${message(code: 'edit.denied.message')}";
-                redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+                redirect (url:uGroup.createLink(action:'show', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
             }
             '*' { 
                 render status: UNAUTHORIZED 
@@ -300,7 +301,7 @@ class SUserController extends UserController {
             withFormat {
                 html { 
                     flash.message = model.msg
-			        redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroupWebaddress':params.webaddress))
+			        redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -310,7 +311,7 @@ class SUserController extends UserController {
             withFormat {
                 html { 
                     flash.message = model.msg
-                    redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroupWebaddress':params.webaddress))
+                    redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -326,7 +327,7 @@ class SUserController extends UserController {
             withFormat {
                 html { 
                     flash.error = model.msg
-                    redirect (url:uGroup.createLink(action:'list', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+                    redirect (url:uGroup.createLink(action:'list', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -365,7 +366,7 @@ class SUserController extends UserController {
             withFormat {
                 html { 
                     flash.message = model.msg
-                    redirect (url:uGroup.createLink(action:'list', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+                    redirect (url:uGroup.createLink(action:'list', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
                     return;
                 }
                 json { render model as JSON }
@@ -378,7 +379,7 @@ class SUserController extends UserController {
             withFormat {
                 html { 
                     flash.error = model.msg
-                    redirect (url:uGroup.createLink(action:'edit', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+                    redirect (url:uGroup.createLink(action:'edit', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
 
                 }
                 json { render model as JSON }
@@ -395,7 +396,7 @@ class SUserController extends UserController {
 		// add query params to model for paging
 	
 		//model['isSearch'] = true;
-		params.action = 'search'
+		actionName = 'search'
 		params.controller = 'SUser'
 
 		if(params.loadMore?.toBoolean()){
@@ -430,7 +431,7 @@ class SUserController extends UserController {
 		def results = [];
 		def queryParams = [:]
 
-		if(params.action != 'search' || (params.action == 'search' && params.query)) {
+		if(actionName != 'search' || (actionName == 'search' && params.query)) {
 			def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
 			def cond = new StringBuilder("");
 
@@ -951,7 +952,7 @@ class SUserController extends UserController {
             withFormat {
                 html {
                     flash.message = message(code: 'spring.security.ui.resetPassword.success')
-                    redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+                    redirect (url:uGroup.createLink(action:'show', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -961,7 +962,7 @@ class SUserController extends UserController {
             def model = utilsService.getErrorModel(flash.message, null, OK.value(), null);
             withFormat {
                 html {
-			        redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+			        redirect (url:uGroup.createLink(action:'show', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -1063,7 +1064,18 @@ class SUserController extends UserController {
 
     @Secured(['ROLE_ADMIN'])
 	def generateAppKey() {
-        def author = springSecurityService.currentUser;
+        if(!params.id) {
+            render ([success:false, msg:'Missing user id', 'errors':[]] as JSON)
+            return;
+        }
+
+        def author = SUser.read(params.long('id'));
+        if(!author) {
+            render ([success:false, msg:"No user with id ${params.id}", 'errors':[]] as JSON)
+            return;
+        }
+
+
         AppKey appKey = AppKey.findByEmail(author.email);
         if(appKey) {
             appKey.key = UUID.randomUUID().toString()

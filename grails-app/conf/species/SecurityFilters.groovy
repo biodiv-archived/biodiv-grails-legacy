@@ -49,6 +49,9 @@ class SecurityFilters {
 
                 def appName = grailsApplication.metadata['app.name']
                 
+                //HACK
+                params.action = actionName;
+
                 //verify appkey if present
                 String appKeyHeader = request.getHeader('X-AppKey');
                 println "------------------------------------------------)"
@@ -57,21 +60,25 @@ class SecurityFilters {
                 println request.forwardURI
                 println "------------------------------------------------)"
                 if(request.forwardURI.startsWith("/${appName}/api/")) {
-                    if (!params.action) params.action = 'index'
-                        println "MATCHED--------${params.controller}------${params.action}-----------------)"
+                    if (!actionName) actionName = 'index'
+                        println "MATCHED--------${params.controller}------${params.action}---${controllerName}--${actionName}------------)"
                         for( cc in ApplicationHolder.application.controllerClasses) {
                             for (m in cc.clazz.methods) {
                                 def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
                                 if (ann) {
                                     String con = cc.logicalPropertyName
                                     String act = m.name
-                                    if(params.controller.equalsIgnoreCase(con) && params.action.equalsIgnoreCase(act)) {
+                                    if(controllerName.equalsIgnoreCase(con) && actionName.equalsIgnoreCase(act)) {
                                         boolean isUnauthorized = false;
                                         if(appKeyHeader) {
-                                            log.debug "Verifying app key ${appKeyHeader}"
+                                            println "Verifying app key ${appKeyHeader}"
                                             AppKey appKey = AppKey.findByKey(appKeyHeader);
+                                            if(!appKey) println "App key not found";
+                                            if(!appKey.email.equalsIgnoreCase(springSecurityService.currentUser?.email))
+                                                println "Appkey is not of the logged in user ${springSecurityService.currentUser.email}" 
                                             if(appKey) {
-                                                log.debug "Found valid appkey. Continuing"
+                                                //&& appKey.email.equalsIgnoreCase(springSecurityService.currentUser?.email)) {
+                                                println "Found valid appkey. Continuing"
                                             } else isUnauthorized = true
                                         } else {
                                             isUnauthorized = true;
@@ -138,6 +145,7 @@ class SecurityFilters {
 
 
                 }
+println "after rendering"
                 log.debug "after rendering"
             }
 

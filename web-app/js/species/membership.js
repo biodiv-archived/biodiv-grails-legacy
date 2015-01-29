@@ -13,7 +13,7 @@ function joinAction(me, joinUsUrl) {
         method: "POST",
         dataType: "json",
         success: function(data) {
-        	if(data.statusComplete) {
+        	if(data.success) {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+"."+ window.i8ln.species.specie.reload);
         		//document.location.reload(true);
@@ -40,7 +40,7 @@ function requestMembershipAction(me, requestMembershipUrl) {
         method: "POST",
         dataType: "json",
         success: function(data) {
-        	if(data.statusComplete) {
+        	if(data.success) {
         		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
         		//document.location.reload(true);
@@ -69,7 +69,7 @@ function requestModeratorshipAction(me, url) {
         success: function(data) {
         	$('#requestModerator').html(data.shortMsg).removeClass("btn-success").addClass("disabled");
     		$('#requestModeratorDialog').modal('hide');
-        	if(data.statusComplete) {
+        	if(data.success) {
         		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
         	} else {
         		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
@@ -116,7 +116,7 @@ function membership_actions() {
             dataType: "json",
             data:{'id':dataGroupId},
             success: function(data) {
-            	if(data.statusComplete) {
+            	if(data.success) {
             		$("me").html(data.shortMsg).removeClass("btn-info").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             		//reloadMembers();
@@ -146,7 +146,7 @@ function membership_actions() {
 			type: 'POST',
 			data:{message:$('#inviteMemberMsg').val()},
 			success: function(data, statusText, xhr, form) {
-				if(data.statusComplete) {
+				if(data.success) {
 					$('#inviteMembersDialog').modal('hide');
 					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				} else {
@@ -175,7 +175,7 @@ function membership_actions() {
 			type: 'POST',
 			data:{message:$('#inviteModeratorMsg').val()},
 			success: function(data, statusText, xhr, form) {
-				if(data.statusComplete) {
+				if(data.success) {
 					$('#inviteExpertsDialog').modal('hide');
 					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				} else {

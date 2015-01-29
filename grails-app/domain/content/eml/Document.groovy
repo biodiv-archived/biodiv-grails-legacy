@@ -16,6 +16,7 @@ import species.participation.Follow;
 import species.participation.Featured;
 import species.Language;
 import org.springframework.context.MessageSourceResolvable;
+import content.eml.DocSciName;
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -189,6 +190,8 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
         return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
 
+ 	
+
 	def beforeUpdate(){
 		if(isDirty() && isDirty('topology')){
 			updateLatLong()
@@ -216,4 +219,23 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	int compareTo(obj) {
 		createdOn.compareTo(obj.createdOn)
 	}
+	Map fetchSciNames(){
+		Map nameValue = [:]
+		Map nameParseValues = [:]
+		Map nameId = [:]
+		def c = DocSciName.createCriteria()
+			def results = c.list {
+			eq("document", this)
+		    order("displayOrder", "desc")
+			}
+		def docSciNames = results ;//DocSciName.findAllByDocument(this)
+		docSciNames.each{ dsn ->
+		nameValue.put(dsn.scientificName,dsn.frequency)
+		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
+		nameId.put(dsn.scientificName,dsn.id)
+		}
+		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId]
+
+	}
+
 }

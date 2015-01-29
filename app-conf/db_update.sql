@@ -304,3 +304,16 @@ ALTER TABLE species DROP constraint fk8849413c32f2eca9 ;
 ALTER TABLE comment ADD visit_count bigint;
 update comment set visit_count = 0;
 
+/** 27th Jan 2015
+    Adding new column has_media in species
+    to apply filter on species having media
+ **/
+ALTER TABLE species ADD COLUMN has_media boolean ;
+update species set has_media = false;
+update species set has_media = true where id in (select distinct(species_resources_id) from species_resource);
+update species set has_media = true where id in (select distinct(sf.species_id) from species_field_resources sfr, species_field sf where sfr.species_field_id = sf.id);
+
+/** 28th Jan 2015
+    Updating observations which were not marked deleted when its checklist was deleted
+ **/
+update observation set is_deleted = true where source_id in (select id from observation where is_checklist = true and is_deleted = true) and is_deleted = false;

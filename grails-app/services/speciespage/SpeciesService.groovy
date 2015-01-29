@@ -1563,6 +1563,21 @@ class SpeciesService extends AbstractObjectService  {
             queryParams["featType"] = Species.class.getCanonicalName();
         }
 
+        if(params.hasMedia) {
+            switch(params.hasMedia) {
+                case "true" :
+                    filterQuery += " and s.hasMedia = true "            
+                    countFilterQuery += " and s.hasMedia = true "            
+                break
+                case "false" :
+                    filterQuery += " and s.hasMedia = false "            
+                    countFilterQuery += " and s.hasMedia = false "
+                break
+                default:
+                break
+            }
+        }
+
         if(params.daterangepicker_start && params.daterangepicker_end){
 			def startDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_start))
             def endDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_end))
@@ -1769,6 +1784,22 @@ class SpeciesService extends AbstractObjectService  {
             species.addToResources(resource);
         }
         //species.merge();
+        if(resources.size() > 0) {
+            if(species.instanceOf(Species)) {
+                species.updateHasMediaValue(true)
+            }
+            if(species.instanceOf(SpeciesField)) {
+                species.species.updateHasMediaValue(true)
+            }
+        } else {
+            if(species.instanceOf(Species)) {
+                species.updateHasMediaValue(false)
+            }
+            if(species.instanceOf(SpeciesField)) {
+                species.species.updateHasMediaValue(false)
+            }
+        }
+
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
@@ -1892,6 +1923,5 @@ def checking(){
    return "Passed!" 
 }
 
-
-
+    
 }

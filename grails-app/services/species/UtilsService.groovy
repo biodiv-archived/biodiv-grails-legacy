@@ -28,7 +28,7 @@ import java.beans.Introspector;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-
+import grails.converters.JSON;
 class UtilsService {
 
     def grailsApplication;
@@ -99,6 +99,8 @@ class UtilsService {
     def userGroupBasedLink(attrs) {
         def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
         String url = "";
+
+        if(attrs.controller == 'SUser') attrs.controller = 'user';
 
         if(attrs.userGroupInstance){
 			//XXX removing  userGroupInstance from attrs show that it should not come in url in toString form of userGroup
@@ -180,7 +182,7 @@ class UtilsService {
                 url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
-        return url.replace('/api/', '/');
+        return url;//.replace('/api/', '/');
     }
 
     File getUniqueFile(File root, String fileName){
@@ -900,6 +902,10 @@ class UtilsService {
         }
     }
 
+    boolean permToReorderDocNames(documentInstance) {
+        return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || springSecurityService.currentUser?.id == documentInstance.getOwner().id);
+    }
+
 	boolean ifOwns(SUser user) {
         if(!user) return false
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
@@ -927,6 +933,10 @@ class UtilsService {
     ////////////////////////RESPONSE FORMATS//////////////////
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+        println "+++++++++++++++++++++++++++++++++++++++"
+        String acceptHeader = request.getHeader('Accept');
+
         if(!errors) errors = [];
         if(domainObject) {
             domainObject.errors.allErrors.each {
@@ -940,11 +950,40 @@ class UtilsService {
     }
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+//        println "+++++++++++++++++++++++++++++++++++++++"
+        String acceptHeader = request.getHeader('Accept');
+//        println acceptHeader
         def result = [success:true, status: status, msg:msg]
-        if(domainObject) result['instance'] = domainObject;
-        if(model) result['model'] = model;
-        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
-        return result;
+        //HACK to handle previous version of api for mobile app 
+/*        boolean isMobileApp = true;// need to check using user agent
+        if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0') && isMobileApp) {
+            if(domainObject) {
+                //only if actionName is show
+                if(request.forwardURI.contains('/show/')) {
+                result = [:];
+                String jsonString = (domainObject as JSON) as String;
+                result = JSON.parse(jsonString);
+                } else {
+                    result[domainObject.class.simpleName.toLowerCase()+'Instance'] = domainObject;
+                }
+            }
+
+            if(model) {
+                result.putAll(model);
+                if(result.containsKey('instanceListName')) {
+                    result[result.instanceListName] = result['instanceList'];
+                    result.remove('instanceList');
+                }
+            }
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            return result;
+        } else {
+*/            if(domainObject) result['instance'] = domainObject;
+            if(model) result['model'] = model;
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            return result;
+//        } 
     }
 
 }

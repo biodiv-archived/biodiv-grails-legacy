@@ -183,6 +183,18 @@ $(document).ready(function(){
 	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 	    return true;   
     });
+    
+    $('.hasMedia_filter_label').click(function(){
+        var caret = '<span class="caret"></span>'
+        if(stringTrim(($(this).html())) == stringTrim($("#has_media").html().replace(caret, ''))){
+            return true;
+        }
+	    $('.hasMedia_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#has_media").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
+    });
 
     $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
    
@@ -469,6 +481,16 @@ function getSelectedSortBy() {
     return sortBy;	
 } 
 
+function getMediaFilterBy() {
+    var hasMedia = ''; 
+    $('.hasMedia_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            hasMedia += $(this).attr('value');
+        }
+    });
+    return hasMedia;	
+}
+
 function getSelectedFlag() {
     var flag = ''; 
     flag = $("#observationFlagFilter").attr('value');
@@ -546,7 +568,7 @@ function getSelectedFilters($ele, noneSelected) {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-
+    console.log(params);
     if(removeParam) {
         delete params[removeParam]
     }
@@ -558,7 +580,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['sort'] = sortBy;
         }
     }
-
+    if(getMediaFilterBy() != '') {
+        params['hasMedia'] = getMediaFilterBy();
+    }
     var sName = getSelectedSpeciesName();
     if(sName) {
         params['speciesName'] = sName;
@@ -780,13 +804,13 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
-        $('.observations_list').replaceWith(data.obvListHtml);
-        $('#info-message').replaceWith(data.obvFilterMsgHtml);
-        $('#tags_section').replaceWith(data.tagsHtml);
-        //$('#filterPanel').replaceWith(data.filterPanel);
-        //$('.observation_location').replaceWith(data.mapViewHtml);
+        $('.observations_list').replaceWith(data.model.obvListHtml);
+        $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
+        $('#tags_section').replaceWith(data.model.tagsHtml);
+        //$('#filterPanel').replaceWith(data.model.filterPanel);
+        //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);
-        updateDownloadBox(data.instanceTotal);
+        updateDownloadBox(data.model.instanceTotal);
         reInitializeGroupPost();
         updateRelativeTime();
         last_actions();
@@ -1005,15 +1029,15 @@ function loadSpeciesGroupCount() {
         dataType: "json",
         data:params,
         success: function(data) {
-            if(data.status === 'success') {
-                if(data.speciesGroupCountList) {
+            if(data.success == true) {
+                if(data.model.speciesGroupCountList) {
                     loadGoogleVisualizationAPI(function(){
                         var visualization_data = new google.visualization.DataTable();
-                        $.each(data.speciesGroupCountList.columns, function(index, item) {
+                        $.each(data.model.speciesGroupCountList.columns, function(index, item) {
                             visualization_data.addColumn( item[0], item[1]);
                         });
 
-                        $.each(data.speciesGroupCountList.data, function(index, item) {
+                        $.each(data.model.speciesGroupCountList.data, function(index, item) {
                             visualization_data.addRow(item);
                         });
 
