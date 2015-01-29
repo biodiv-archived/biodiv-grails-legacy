@@ -290,11 +290,11 @@ h6 {
 /* 	clear:none; */
 /* } */
 .observation_story .prop .name {
-	width: 120px;
+	width: 100px;
 }
 
 .observation .prop .value {
-	margin-left: 130px;
+	margin-left: 110px;
 }
 
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */

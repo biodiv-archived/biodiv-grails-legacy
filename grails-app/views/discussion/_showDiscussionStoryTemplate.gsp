@@ -30,12 +30,12 @@
 
 
         <div class="prop">
-            <span class="name"><g:message code="default.subject.label" /></span>
+            <span class="name"><i class="icon-align-justify"></i><g:message code="default.subject.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(clickcontentVar)}
                 <div style="display:${styleVar}">
                 <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:discussionInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
-               		${raw(discussionInstance?.subject)}
+               		<b>${raw(discussionInstance?.subject)}</b>
                	</g:link>	
                 </div>    
             </div>
@@ -49,7 +49,7 @@
 		%>
        
         <div class="prop">
-            <span class="name"><g:message code="default.message.label" /></span>
+            <span class="name"><i class="icon-align-justify"></i><g:message code="default.message.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(clickcontentVar)}
                 <div class="${params.action == 'show'?'':''}" style="display:${styleVar};">

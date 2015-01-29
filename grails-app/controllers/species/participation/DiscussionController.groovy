@@ -3,8 +3,10 @@ package species.participation
 import grails.plugin.springsecurity.annotation.Secured
 
 import grails.converters.JSON
+import grails.converters.XML
 import org.grails.taggable.*
 import species.AbstractObjectController;
+import static org.springframework.http.HttpStatus.*;
 
 class DiscussionController extends AbstractObjectController {
 
@@ -62,29 +64,32 @@ class DiscussionController extends AbstractObjectController {
 			}
 			utilsService.sendNotificationMail(activityFeedService.DISCUSSION_CREATED, discussionInstance, request, params.webaddress, af);
 			//discussionSearchService.publishSearchIndex(discussionInstance, true)
-
-            if(params.format?.equalsIgnoreCase("json")) {
-                render ([success:true, 'discussionInstance':discussionInstance] as JSON)
-                return;
-            } else {
-			    redirect(action: "show", id: discussionInstance.id)
-            }
+			
+			def model = utilsService.getSuccessModel(flash.message, discussionInstance, OK.value());
+			withFormat {
+				html {
+					redirect(action: "show", id: discussionInstance.id)
+				}
+				json { render model as JSON }
+				xml { render model as XML }
+			}
 		}
-		else {
-            if(params.format?.equalsIgnoreCase("json")) {
-                def errors = [];
-
+		else {   
+				def errors = [];
                 discussionInstance.errors.allErrors .each {
                     def formattedMessage = messageSource.getMessage(it, null);
                     errors << [field: it.field, message: formattedMessage]
                 }
-
-                render (['success' : false, 'msg':'Failed to save discussion', 'errors':errors] as JSON)
-                return;
-            } else {
-			    discussionInstance.errors.allErrors.each { log.error it }
-			    render(view: "create", model: [discussionInstance: discussionInstance])
-            }
+				
+				def model = utilsService.getErrorModel("Failed to save discussion", discussionInstance, OK.value(), errors);
+				withFormat {
+					html {
+						discussionInstance.errors.allErrors.each { log.error it }
+						render(view: "create", model: [discussionInstance:discussionInstance])
+					}
+					json { render model as JSON }
+					xml { render model as XML }
+				}
 		}
 	}
 
@@ -94,23 +99,31 @@ class DiscussionController extends AbstractObjectController {
 
 		def discussionInstance = params.id ? Discussion.get(params.id):null;
 		if (!params.id || !discussionInstance) {
-            if(params.format?.equalsIgnoreCase("json")) {
-                render (['success':false, 'msg':"Coudn't find discussion with id ${params.id}"] as JSON)
-                return
-            } else {
-			    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'discussion.label', default: 'discussion'), params.id])}"
-			    redirect(action: "list")
-            }
+				def model = utilsService.getErrorModel("${message(code: 'default.not.found.message', args: [message(code: 'discussion.label', default: 'Discussion'), params.id])}", null, OK.value());
+	
+				withFormat {
+					html {
+						flash.message = model.msg;
+						redirect(action: "list")
+					}
+					json { render model as JSON }
+					xml { render model as XML }
+				}
 		}
 		else {
-             if(params.format?.equalsIgnoreCase("json")) {
-                render discussionInstance as JSON;
-                return;
-            } 
 			discussionInstance.incrementPageVisit()
-			def userLanguage = utilsService.getCurrentLanguage(request);
-			return [discussionInstance: discussionInstance, userLanguage: userLanguage]
+			def model = utilsService.getSuccessModel("", discussionInstance, OK.value())
+			withFormat {
+				html {
+					def userLanguage = utilsService.getCurrentLanguage(request);
+					model = [discussionInstance:discussionInstance, userLanguage: userLanguage]
+				}
+				json { render model as JSON }
+				xml { render model as XML }
+			}
+			return model;
 		}
+             
 	}
 
 	@Secured(['ROLE_USER'])
@@ -182,29 +195,33 @@ class DiscussionController extends AbstractObjectController {
     }
 
  	def list() {
-		log.debug params
-		def model = getDiscussionList(params)
-        if(params.format?.equalsIgnoreCase("json")) {
-            render model as JSON;
-            return
-        }
-
-
-		model.userLanguage = utilsService.getCurrentLanguage(request);
-		if(params.loadMore?.toBoolean()){
-			render(template:"/discussion/discussionListTemplate", model:model);
-			return;
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-			render (view:"list", model:model)
-			return;
-		} else{
-			def obvListHtml =  g.render(template:"/discussion/discussionListTemplate", model:model);
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
-			render result as JSON
-			return;
-		}
+		 def model = getDiscussionList(params)
+		 model.userLanguage = utilsService.getCurrentLanguage(request);
+		 if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+			 model['resultType'] = 'discussion'
+			 model['obvListHtml'] =  g.render(template:"/discussion/discussionListTemplate", model:model);
+			 model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+		 }
+ 
+		 model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model)
+ 		 withFormat {
+			 html {
+				 if(params.loadMore?.toBoolean()){
+					 render(template:"/discussion/discussionListTemplate", model:model.model);
+					 return;
+				 } else if(!params.isGalleryUpdate?.toBoolean()){
+					 render (view:"list", model:model.model)
+					 return;
+				 } else{
+					  /*def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
+					 render result as JSON
+					 */return;
+				 }
+			 }
+			 json { render model as JSON }
+			 xml { render model as XML }
+		 }
+		 
 	}
 
 	protected def getDiscussionList(params) {
@@ -236,6 +253,7 @@ class DiscussionController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
 	def update() {
 		log.debug params
+		def msg = "";
 		def discussionInstance = Discussion.get(params.id)
 		if (discussionInstance) {
 			params.locale_language = utilsService.getCurrentLanguage(request);
@@ -257,39 +275,47 @@ class DiscussionController extends AbstractObjectController {
 				}
 				utilsService.sendNotificationMail(activityFeedService.DISCUSSION_UPDATED, discussionInstance, request, params.webaddress, af);
 	
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'discussion.label', default: 'Discussion'), discussionInstance.id])}"
-
-				if(params.format?.equalsIgnoreCase("json")) {
-					render ([success:true, 'discussionInstance':discussionInstance] as JSON)
-					return;
-				} else {
-					redirect(action: "show", id: discussionInstance.id)
+				msg = "${message(code: 'default.updated.message', args: [message(code: 'discussion.label', default: 'Discussion'), discussionInstance.id])}"
+				def model = utilsService.getSuccessModel(msg, discussionInstance, OK.value());
+				withFormat {
+					html {
+						flash.message = msg;
+						redirect(action: "show", id: discussionInstance.id)
+					}
+					json { render model as JSON }
+					xml { render model as XML }
 				}
 			}
 			else {
-				if(params.format?.equalsIgnoreCase("json")) {
 					def errors = [];
 
 					discussionInstance.errors.allErrors .each {
 						def formattedMessage = messageSource.getMessage(it, null);
 						errors << [field: it.field, message: formattedMessage]
 					}
-					render (['success' : false, 'msg':'Failed to save discussion', 'errors':errors] as JSON)
+					
+					def model = utilsService.getErrorModel("Failed to update discussion",  discussionInstance, OK.value(), errors);
+					withFormat {
+						html {
+							render(view: "create", model: [discussionInstance: discussionInstance])
+						}
+						json { render model as JSON }
+						xml { render model as XML }
+					}
 					return;
-				} else {
-					render(view: "create", model: [discussionInstance : discussionInstance])
-				}
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'discussion.label', default: 'Discussion'), params.id])}"
-
-			if(params.format?.equalsIgnoreCase("json")) {
-				render (['success' : false, 'msg':flash.message, 'errors':errors] as JSON)
-				return;
+			msg = "${message(code: 'default.not.found.message', args: [message(code: 'discussion.label', default: 'Discussion'), params.id])}"
+			def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
+			withFormat {
+				html {
+					flash.message = msg;
+					redirect(action: "list")
+				}
+				json { render model as JSON }
+				xml { render model as XML }
 			}
-
-			redirect(action: "list")
 		}
 	}
 
