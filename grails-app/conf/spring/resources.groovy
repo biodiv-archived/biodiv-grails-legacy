@@ -375,7 +375,7 @@ beans = {
         userService = ref('SUserService')
     }
     
-    oauthService(MyOauthService) {
+    restOauthService(MyOauthService) {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
         userDetailsService = ref('userDetailsService')
