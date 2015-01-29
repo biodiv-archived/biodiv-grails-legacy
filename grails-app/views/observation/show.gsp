@@ -94,9 +94,12 @@ if(r) {
                                                     <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                                    href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
-                                                
+                                                    href="#"
+                                                    onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+                                                <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                                                    <input type="hidden" name="id" value="${observationInstance.id}" />
+                                                </form>
+ 
                                                 </sUser:ifOwns>
 
                                             </div>
@@ -433,6 +436,13 @@ $(document).ready(function(){
         } 
         initializeLanguage(); 
     });
+    function deleteObservation(){
+        var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";
+
+        if(confirm(test)){
+            document.forms.deleteForm.submit();
+        }
+    }
 
 </r:script>
 

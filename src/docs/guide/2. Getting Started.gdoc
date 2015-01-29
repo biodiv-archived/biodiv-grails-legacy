@@ -67,11 +67,11 @@ Few sample applications detailing the usage of the api are shown in below sectio
 *Simple login, logout and reading My observations*
 
 {code}
-# Login : http://indiabiodiversity.org/api/login?username=emailId&password=password
+# Login : curl -X POST -H "Accept:application/json;v=1.0"  http://indiabiodiversity.org/api/login --data "username=emailId&password=password"
 
-# My observations : http://indiabiodiversity.org/api/observation?user=1184
+# My observations : curl -L -X GET -H "Accept:application/json;v=1.0" -H "X-Auth-Token:ov6eov262mr716sbg06b2d31kq5l13gi" http://indiabiodiversity.org/api/observation?user=1184
 
-# Logout : http://indiabiodiversity.org/api/logout
+# Logout : curl -L -X POST -H "Accept:application/json;v=1.0" -H "X-Auth-Token:ov6eov262mr716sbg06b2d31kq5l13gi" http://indiabiodiversity.org/api/logout
 {code}
 
 *Featured species*
