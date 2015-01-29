@@ -941,17 +941,24 @@ class UtilsService {
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
         def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
-        println "+++++++++++++++++++++++++++++++++++++++"
+//        println "+++++++++++++++++++++++++++++++++++++++"
         String acceptHeader = request.getHeader('Accept');
-        println acceptHeader
+//        println acceptHeader
         def result = [success:true, status: status, msg:msg]
         //HACK to handle previous version of api for mobile app 
-      /*  if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0')) {
+/*        boolean isMobileApp = true;// need to check using user agent
+        if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0') && isMobileApp) {
             if(domainObject) {
+                //only if actionName is show
+                if(request.forwardURI.contains('/show/')) {
                 result = [:];
                 String jsonString = (domainObject as JSON) as String;
                 result = JSON.parse(jsonString);
+                } else {
+                    result[domainObject.class.simpleName.toLowerCase()+'Instance'] = domainObject;
+                }
             }
+
             if(model) {
                 result.putAll(model);
                 if(result.containsKey('instanceListName')) {
@@ -960,14 +967,13 @@ class UtilsService {
                 }
             }
             (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
-            println result;
             return result;
         } else {
-    */        if(domainObject) result['instance'] = domainObject;
+*/            if(domainObject) result['instance'] = domainObject;
             if(model) result['model'] = model;
             (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
             return result;
-     //   } 
+//        } 
     }
 
 }
