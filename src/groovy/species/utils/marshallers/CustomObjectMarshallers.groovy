@@ -50,6 +50,8 @@ class CustomObjectMarshallers {
     List marshallers = []
 
     def register() {
+
+        JSON.createNamedConfig('v1') {
         marshallers.each{ it.register() }
 
         JSON.registerObjectMarshaller(Geometry) {
@@ -161,6 +163,7 @@ class CustomObjectMarshallers {
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
+            println "comment marshaller"
 			return ['id':it.id, 'text':it.body, 'authorId':it.author.id, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
 		}
 
@@ -206,5 +209,6 @@ class CustomObjectMarshallers {
                 }
             }
         })
+    }
     }
 }

@@ -1,11 +1,11 @@
-function changeDisplayOrder(url, pageId, typeOfChange){
+function changeDisplayOrder(url, instanceId, typeOfChange, type, parentInsId){
     $.ajax({
         url : url,
         datatype : 'json',
-        data: {'pageId' : pageId, 'typeOfChange': typeOfChange},
+        data: {'instanceId' : instanceId, 'typeOfChange': typeOfChange, 'parentInsId': parentInsId},
         success: function(data) {
             if(data.success){
-                var a = $('#newsletter_'+pageId);
+                var a = $('#'+type+'_'+instanceId);
                 //var toBeMovedLi = $("#newsletter_"+pageId);
                 if(typeOfChange == "up"){
                     var b = $(a).prev()
