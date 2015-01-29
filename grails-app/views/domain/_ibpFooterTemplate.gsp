@@ -62,6 +62,9 @@
 				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
 				<li><a href="${ '/sitemap'}"><g:message code="link.sitemap" /></a>
 				</li>
+                <li><a href="${ '/biodiv/docs'}"><g:message code="link.apidocs" /></a>
+				</li>
+
 				<li><a href="${ '/feedback_form'}"><g:message code="link.feedbak" /></a>
 				</li>
 				<li><a href="${ '/contact'}"><g:message code="link.contact.us" /></a>
