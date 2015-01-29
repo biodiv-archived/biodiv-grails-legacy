@@ -72,7 +72,7 @@
 
 
 
-                <div class="span8 right-shadow-box observation" style="margin:0;">
+                <div class="span8 right-shadow-box" style="margin:0;">
                     <g:render template="/discussion/showDiscussionStoryTemplate" model="['discussionInstance':discussionInstance, showDetails:true,'userLanguage':userLanguage]"/>
 
 			<div class="union-comment">

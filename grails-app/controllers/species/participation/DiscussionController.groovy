@@ -182,7 +182,7 @@ class DiscussionController extends AbstractObjectController {
     }
 
  	def list() {
-		log.debug ">>>>>>>>>>>>>>>>>>>>>>>>>  discussion controller "  +  params
+		log.debug params
 		def model = getDiscussionList(params)
         if(params.format?.equalsIgnoreCase("json")) {
             render model as JSON;
@@ -257,7 +257,7 @@ class DiscussionController extends AbstractObjectController {
 				}
 				utilsService.sendNotificationMail(activityFeedService.DISCUSSION_UPDATED, discussionInstance, request, params.webaddress, af);
 	
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), discussionInstance.id])}"
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'discussion.label', default: 'Discussion'), discussionInstance.id])}"
 
 				if(params.format?.equalsIgnoreCase("json")) {
 					render ([success:true, 'discussionInstance':discussionInstance] as JSON)
@@ -282,7 +282,7 @@ class DiscussionController extends AbstractObjectController {
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'discussion.label', default: 'Discussion'), params.id])}"
 
 			if(params.format?.equalsIgnoreCase("json")) {
 				render (['success' : false, 'msg':flash.message, 'errors':errors] as JSON)
@@ -348,7 +348,8 @@ class DiscussionController extends AbstractObjectController {
 		discussionService.processBatch(params)
 		render " done "
 	}
-
+	
+	@Secured(['ROLE_ADMIN'])
 	def migrate(){
 		discussionService.migrate()
 		render "=============== done"
