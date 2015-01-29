@@ -2,6 +2,7 @@ package species
 import org.apache.commons.logging.LogFactory;
 
 import species.participation.Observation;
+import species.participation.Discussion;
 import species.utils.Utils;
 import content.eml.Document;
 
@@ -13,6 +14,7 @@ class ResourceFetcher {
 	private Observation obv = new Observation();
 	private Document doc = new Document()
 	private Species species = new Species()
+	private Discussion discussion = new Discussion()
 	
 	
 	private String rType;
@@ -69,6 +71,11 @@ class ResourceFetcher {
 					paramsMap.offset = offset
 					paramsMap.max = BATCH_SIZE
 					nextResult = doc.fetchList(paramsMap, BATCH_SIZE, offset).documentInstanceList
+					break
+				case Discussion.class.canonicalName:
+					paramsMap.offset = offset
+					paramsMap.max = BATCH_SIZE
+					nextResult = discussion.fetchList(paramsMap, BATCH_SIZE, offset).discussionInstanceList
 					break
 				case Species.class.canonicalName:
 					paramsMap.offset = offset

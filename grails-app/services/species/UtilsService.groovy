@@ -104,7 +104,7 @@ class UtilsService {
 			//XXX removing  userGroupInstance from attrs show that it should not come in url in toString form of userGroup
 			attrs.userGroup = attrs.remove('userGroupInstance')
         }
-        if(attrs.userGroup && attrs.userGroup.id) {
+		if(attrs.userGroup && attrs.userGroup.id) {
             attrs.webaddress = attrs.userGroup.webaddress
             String base = attrs.remove('base')
             String controller = attrs.remove('controller')
@@ -293,7 +293,6 @@ class UtilsService {
                     mailSubject = messageSource.getMessage("mail.obs.added", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.add.obs", null, LCH.getLocale())
                 } else {
-                    mailSubject = messageSource.getMessage("mail.obs.added", null, LCH.getLocale())
                     mailSubject = messageSource.getMessage("mail.obs.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.following.obs", null, LCH.getLocale())
                 }
@@ -302,6 +301,21 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
+				case [ActivityFeedService.DISCUSSION_CREATED, ActivityFeedService.DISCUSSION_UPDATED] :
+				if( notificationType == ActivityFeedService.DISCUSSION_CREATED ) {
+					mailSubject = messageSource.getMessage("mail.sub.discussion.added", null, LCH.getLocale())
+					templateMap["message"] = messageSource.getMessage("mail.msg.discussion.added", null, LCH.getLocale())
+				} else {
+					mailSubject = messageSource.getMessage("mail.sub.discussion.updated", null, LCH.getLocale())
+					templateMap["message"] = messageSource.getMessage("mail.msg.discussion.updated", null, LCH.getLocale())
+				}
+				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				toUsers.add(getOwner(obv))
+				break
+
+	
+				
                 case [ActivityFeedService.CHECKLIST_CREATED, ActivityFeedService.CHECKLIST_UPDATED]:
                 if( notificationType == ActivityFeedService.CHECKLIST_CREATED ) {
                     mailSubject = messageSource.getMessage("mail.list.added", null, LCH.getLocale())
@@ -474,6 +488,7 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
+			
                 case [ActivityFeedService.FEATURED, ActivityFeedService.UNFEATURED]:
                 boolean a
                 if(notificationType == ActivityFeedService.FEATURED) {
@@ -692,14 +707,9 @@ class UtilsService {
             def domainObject = getDomainObject(feed.rootHolderType, feed.rootHolderId);
             templateMap['domainObjectTitle'] = getTitle(domainObject);
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
-            def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
-            if(isCommentThread) {
-                templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
-                templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
-                templateMap['commentInstance'] = getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
-                templateMap['group'] = domainObject;
-            }
+			templateMap['domainObject'] = domainObject 
         }
+		
     }
 
     private List getParticipants(observation) {

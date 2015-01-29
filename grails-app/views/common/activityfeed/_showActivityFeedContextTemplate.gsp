@@ -1,5 +1,6 @@
 <%@page import="species.participation.Checklists"%>
 <%@page import="species.participation.Observation"%>
+<%@page import="species.participation.Discussion"%>
 <%@page import="species.participation.Comment"%>
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.Species"%>
@@ -8,8 +9,8 @@
 
 <div class="activityFeedContext thumbnails" >
 		<div class="feedParentContext thumbnail clearfix">
-		<g:if test="${isCommentThread}">
-			<comment:showCommentWithSub model="['feedInstance':feedInstance]"/>
+		<g:if test="${feedInstance.rootHolderType ==  Discussion.class.getCanonicalName()}">
+			<g:render template="/discussion/showDiscussionSnippetTemplate" model="['discussionInstance':feedParentInstance]"/>
 		</g:if> 
 		<g:elseif test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName() || feedInstance.rootHolderType ==  Checklists.class.getCanonicalName() }" >
 			<%
@@ -37,11 +38,6 @@
 			</table>
 		</div>
 		</g:elseif>
-<%--		<g:elseif test="${feedInstance.rootHolderType ==  Checklist.class.getCanonicalName()}" >--%>
-<%--			<div class="span10">--%>
-<%--				<clist:showSnippet model="['checklistInstance':feedParentInstance, userGroup:tmpUserGroup]"></clist:showSnippet>--%>
-<%--			</div>	--%>
-<%--		</g:elseif>--%>
 		<g:elseif test="${feedInstance.rootHolderType ==  Species.class.getCanonicalName()}" >
 			<s:showSnippet model="['speciesInstance':feedParentInstance]" />
 		</g:elseif>
@@ -52,10 +48,5 @@
 			${feedInstance.rootHolderType}
 		</g:else>
 	</div>
-	<g:if test="${isCommentThread}">
-		<div class="feedSubParentContext ${feedInstance.subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">
-<%--		Comment thread--%>
-		</div>
-	</g:if>
-	<feed:showAllActivityFeeds model="['rootHolder':feedParentInstance, 'isCommentThread':isCommentThread, 'subRootHolderType':feedInstance.subRootHolderType, 'subRootHolderId':feedInstance.subRootHolderId, 'feedType':ActivityFeedService.SPECIFIC, 'refreshType':ActivityFeedService.MANUAL, 'feedPermission':feedPermission]" />
+	<feed:showAllActivityFeeds model="['rootHolder':feedParentInstance, 'subRootHolderType':feedInstance.subRootHolderType, 'subRootHolderId':feedInstance.subRootHolderId, 'feedType':ActivityFeedService.SPECIFIC, 'refreshType':ActivityFeedService.MANUAL, 'feedPermission':feedPermission]" />
 </div>

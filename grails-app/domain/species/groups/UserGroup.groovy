@@ -18,6 +18,7 @@ import content.eml.Document;
 import content.Project;
 import species.Species
 import species.Language;
+import species.participation.Discussion;
 
 import utils.Newsletter;
 
@@ -55,7 +56,7 @@ class UserGroup implements Taggable {
 	// Language
     Language language;
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true
