@@ -52,7 +52,6 @@ class Discussion implements Taggable, Rateable {
 	static belongsTo = [SUser, UserGroup]
 	
 	static mapping = {
-		version false;
 		subject type:"text"
 		body type:"text"
 		plainText type:"text"
@@ -117,9 +116,9 @@ class Discussion implements Taggable, Rateable {
 	}
 
 	def onAddActivity(af, flushImmidiatly){
-		this.lastRevised = new Date();
-		if(!this.save(flush:flushImmidiatly)){
-			this.errors..allErrors.each { log.error it }
+		lastRevised = new Date();
+		if(!save(flush:flushImmidiatly)){
+			errors..allErrors.each { log.error it }
 		}
 	}
 	

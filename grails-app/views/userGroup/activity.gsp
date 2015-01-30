@@ -22,10 +22,6 @@ width:715px;
 		<uGroup:showSubmenuTemplate model="['entityName':'Activity']"/>
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<div class="userGroup-section">
-			<div>
-				<comment:showAllComments
-					model="['commentHolder':userGroupInstance, commentType:'super', 'showCommentList':false]" />
-			</div>
 			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', feedPermission:'editable', feedCategory:UserGroup.class.canonicalName,'feedOrder':'latestFirst']" />
 		</div>	
 	</div>

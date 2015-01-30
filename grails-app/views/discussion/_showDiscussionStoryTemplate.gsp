@@ -44,7 +44,7 @@
        <%
 			def message = raw(discussionInstance.body)
 			if(params.action != 'show'){
-				message = discussionInstance.plainText.substring(0, Math.min(discussionInstance.plainText.length(), 100)) + "..."
+				message = discussionInstance.plainText.substring(0, Math.min(discussionInstance.plainText.length(), 140)) + "..."
 			}
 		%>
        

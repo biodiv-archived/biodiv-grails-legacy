@@ -7,6 +7,7 @@ import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
+import content.eml.Document
  
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ActivityFeedService {
@@ -196,7 +197,7 @@ class ActivityFeedService {
 		Set otherFeedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->
-			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklists.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName() || it.rootHolderType == Discussion.class.getCanonicalName()){
+			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklists.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName() || it.rootHolderType == Discussion.class.getCanonicalName() || it.rootHolderType == Document.class.getCanonicalName()){
 				//aggregating observation object
 				def feedKey = it.rootHolderType + it.rootHolderId;
 				if(!genericFeedSet.contains(feedKey)){

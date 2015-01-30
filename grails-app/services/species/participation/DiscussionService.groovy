@@ -258,10 +258,16 @@ class DiscussionService extends AbstractObjectService {
 			af.delete(flush:true)
 		}
 		
+//		println "================================="
+//		println cToFeed.keySet().collect { it.id }.join(", ")
+//		println "=================================="
+		
+		cToFeed.keySet().each { Comment c ->
+			sql.executeUpdate('update comment set parent_id = null where parent_id = :oldCommentId ', [oldCommentId:c.id] );
+		}
+		
 		sql.executeUpdate("delete from comment where root_holder_type = 'species.groups.UserGroup' and comment_holder_type = 'species.groups.UserGroup' ")
-//		cToFeed.keySet().each { Comment c ->
-//			c.delete(flush:true)
-//		}
+		
 		
 	}
 }
