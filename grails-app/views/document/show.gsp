@@ -56,10 +56,10 @@
 						}
 						</r:script>
 	                                        </div>					
-						<s:showHeadingAndSubHeading
-						model="['heading':documentInstance.title, 'subHeading':documentInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
-
+						
 				</sUser:ifOwns>
+<s:showHeadingAndSubHeading
+						model="['heading':documentInstance.title, 'subHeading':documentInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 
 
                             </div>

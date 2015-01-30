@@ -47,6 +47,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
+import species.participation.Discussion
 import species.participation.Observation;
 import species.participation.UserToken;
 import species.utils.ImageUtils;
@@ -443,7 +444,7 @@ class UserGroupService {
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
 		userGroup.addToObservations(observation);
 		if(!userGroup.save()) {
-			log.error "Could not add ${observation} to ${usergroup}"
+			log.error "Could not add ${observation} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
@@ -1082,7 +1083,7 @@ class UserGroupService {
 	void postDocumentToUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.addToDocuments(document);
 		if(!userGroup.save()) {
-			log.error "Could not add ${document} to ${usergroup}"
+			log.error "Could not add ${document} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
@@ -1107,7 +1108,7 @@ class UserGroupService {
 	void removeDocumentFromUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.documents.remove(document);
 		if(!userGroup.save()) {
-			log.error "Could not remove ${document} from ${usergroup}"
+			log.error "Could not remove ${document} from ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
@@ -1136,8 +1137,57 @@ class UserGroupService {
 		return Document.executeQuery(query, queryParams)[0]
 	}
 	
-	
-	
+	/////////////// Discussion RELATED /////////////////
+	void postDiscussiontoUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
+		log.debug "Posting ${discussion} to userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postDiscussionToUserGroup(discussion, userGroup, sendMail)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postDiscussionToUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
+		userGroup.addToDiscussions(discussion);
+		if(!userGroup.save()) {
+			log.error "Could not add ${discussion} to ${userGroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
+			log.debug "Added ${discussion} to userGroup ${userGroup}"
+		}
+	}
+
+	void removeDiscussionFromUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
+		log.debug "Removing ${discussion} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong("" + it));
+				if(userGroup) {
+					removeDiscussionFromUserGroup(discussion, userGroup, sendMail)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void removeDiscussionFromUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
+		userGroup.discussions.remove(discussion);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${discussion} from ${userGroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
+			log.debug "Removed ${discussion} from userGroup ${userGroup}"
+		}
+	}
+
 	/////////////// PROJECTS RELATED /////////////////
 	void postProjecttoUserGroups(Project project, List userGroupIds) {
 		log.debug "Posting ${project} to userGroups ${userGroupIds}"
@@ -1156,7 +1206,7 @@ class UserGroupService {
 	void postProjectToUserGroup(Project project, UserGroup userGroup) {
 		userGroup.addToProjects(project);
 		if(!userGroup.save()) {
-			log.error "Could not add ${project} to ${usergroup}"
+			log.error "Could not add ${project} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, true);
@@ -1181,7 +1231,7 @@ class UserGroupService {
 	void removeProjectFromUserGroup(Project project, UserGroup userGroup) {
 		userGroup.projects.remove(project);
 		if(!userGroup.save()) {
-			log.error "Could not remove ${project} from ${usergroup}"
+			log.error "Could not remove ${project} from ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, false);
@@ -1240,6 +1290,10 @@ class UserGroupService {
 				case Document.class.getCanonicalName():
 					groupRes += 'documents'
 					functionString += (submitType == 'post')? 'addToDocuments' : 'removeFromDocuments'
+					break
+				case Discussion.class.getCanonicalName():
+					groupRes += 'discussions'
+					functionString += (submitType == 'post')? 'addToDiscussions' : 'removeFromDiscussions'
 					break
 				default:
 					break

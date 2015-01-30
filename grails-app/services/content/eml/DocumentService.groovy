@@ -42,6 +42,7 @@ import species.auth.SUser;
 import species.groups.UserGroup;
 import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
+import species.participation.Discussion;
 
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.ContentType.JSON
@@ -485,6 +486,15 @@ class DocumentService extends AbstractObjectService {
 					tags = getTags(userGroupInstance.projects?.collect{it.id}, tagType)
 				}
 				break
+			
+			case GrailsNameUtils.getPropertyName(Discussion.class).toLowerCase():
+				if(!userGroupInstance){
+					tags = TagCloudUtil.tags(Discussion)
+				}else{
+					tags = getTags(userGroupInstance.discussions?.collect{it.id}, tagType)
+				}
+				break
+
 			default:
 				break
 		}

@@ -19,6 +19,9 @@ $(document).ready(function() {
     <g:elseif test="${controller=='observation'}">
         <%  controller_name=g.message(code:'default.observation.label')  %>
     </g:elseif>
+    <g:elseif test="${controller=='discussion'}">
+        <%  controller_name=g.message(code:'default.discussion.label')  %>
+    </g:elseif>
     <g:else test="${controller=='document'}" >
         <%  controller_name=g.message(code:'feature.part.document')   %>
     </g:else>

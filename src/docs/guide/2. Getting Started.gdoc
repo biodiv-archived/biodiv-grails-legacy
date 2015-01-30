@@ -35,16 +35,20 @@ X-AppKey id the header key to provide app key for all write requests
 Accept header with values application/json, text/json can be provided to mention response format
 {code}
 
+Please email support [[at]] indiabiodiversity [[dot]] org to get a appkey
+
 h4. Response Format
 
-All responses are in JSON format.
-Any successful response will have success:true. If success = false then there is corresponding msg and errors fields detailing the king of the error.
+Any response is of the format [[success : true or false, status : HTTP status code, instance : object details if requesting for an object, model : any other params]. 
+
+If success = false in the above response then there is corresponding msg and errors fields detailing the kind of the error.
 
 A successful api request wil get 200 OK http status and any unauthenticated request will get 401 status with appropriate message saying either auth token is missing or app key is missing. If the method is not supported for any action you would get a 405 Method Not Allowed status.
 
-Few sample applications detailing the usage of the api are shown in below section.
 
 h4. Sample Applications
+
+Few sample applications detailing the usage of the api are shown in below section.
 
 *IBP Android App*
 
@@ -63,41 +67,41 @@ h4. Sample Applications
 *Simple login, logout and reading My observations*
 
 {code}
-# Login : http://indiabiodiversity.org/api/login?username=emailId&password=password
+# Login : curl -X POST -H "Accept:application/json;v=1.0"  http://indiabiodiversity.org/api/login --data "username=emailId&password=password"
 
-# My observations : http://indiabiodiversity.org/api/observation/listJSON?user=1184
+# My observations : curl -L -X GET -H "Accept:application/json;v=1.0" -H "X-Auth-Token:ov6eov262mr716sbg06b2d31kq5l13gi" http://indiabiodiversity.org/api/observation?user=1184
 
-# Logout : http://indiabiodiversity.org/api/logout
+# Logout : curl -L -X POST -H "Accept:application/json;v=1.0" -H "X-Auth-Token:ov6eov262mr716sbg06b2d31kq5l13gi" http://indiabiodiversity.org/api/logout
 {code}
 
 *Featured species*
 {code}
-# Getting featured species list : http://indiabiodiversity.org/species/related?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
-# Getting details of a particular species : http://indiabiodiversity.org/api/species/show/33485
+# Getting featured species list : http://indiabiodiversity.org/related/species?limit=10&offset=0&filterProperty=featureBy&filterPropertyValue=true
+# Getting details of a particular species : http://indiabiodiversity.org/api/species/33485
 {code}
 
 Example : [http://indiabiodiversity.org/species/list]
 
 *Related observations by species name*
 {code}
-http://indiabiodiversity.org/api/observation/related?webaddress=dragonflies_of_india&id=358179&limit=4&offset=0&filterProperty=speciesName&filterPropertyValue=Pseudagrion+decorum
+http://indiabiodiversity.org/api/related/observation?webaddress=dragonflies_of_india&id=358179&limit=4&offset=0&filterProperty=speciesName&filterPropertyValue=Pseudagrion+decorum
 {code}
 
-Example : [http://indiabiodiversity.org/group/dragonflies_of_india/observation/show/358179]
+Example : [http://indiabiodiversity.org/group/dragonflies_of_india/observation/358179]
 
 *Observation distribution by species name*
 {code}
-# http://indiabiodiversity.org/api/observation/related?webaddress=dragonflies_of_india&filterProperty=speciesName&limit=-1&id=358179&fetchField=id,latitude,longitude,isChecklist,geoPrivacy&max=-1
+# http://indiabiodiversity.org/api/related/observation?webaddress=dragonflies_of_india&filterProperty=speciesName&limit=-1&id=358179&fetchField=id,latitude,longitude,isChecklist,geoPrivacy&max=-1
 {code}
 
-Example : [http://indiabiodiversity.org/group/dragonflies_of_india/observation/show/358179]
+Example : [http://indiabiodiversity.org/group/dragonflies_of_india/observation/358179]
 
 *Document Tags Cloud*
 {code}
 # http://indiabiodiversity.org/api/document/tags
 {code}
 
-Example : [http://indiabiodiversity.org/document/list]
+Example : [http://indiabiodiversity.org/document]
 
 *Top contributors of the week*
 

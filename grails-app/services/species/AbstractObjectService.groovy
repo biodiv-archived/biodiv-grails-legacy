@@ -121,7 +121,7 @@ class AbstractObjectService {
 		        iconBasePath = config.speciesPortal.observations.serverURL
                 break;
             default:
-                log.warn "Invalid controller type for iconbasepath"
+                log.warn "Invalid controller type for iconbasepath " + controller
         }
         return iconBasePath;
     }
@@ -144,7 +144,9 @@ class AbstractObjectService {
         else if (controller == "document") {
             type = "content.eml.Document";
         }
-        else {    
+		else if (controller == "discussion") {
+			type = "species.participation.Discussion";
+		}else {    
         }
 
         def featured = []
