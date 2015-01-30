@@ -2031,7 +2031,6 @@ class ObservationService extends AbstractObjectService {
      */
     def getDistinctRecoList(params, int max, int offset) {
         def distinctRecoList = [];
-
         def queryParts = getFilteredObservationsFilterQuery(params) 
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
 
@@ -2059,7 +2058,12 @@ class ObservationService extends AbstractObjectService {
         def distinctRecoListResult = distinctRecoQuery.list()
         distinctRecoListResult.each {it->
             def reco = Recommendation.read(it[0]);
-            distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, it[1]]
+            if(params.downloadFrom == 'uniqueSpecies') {
+                //HACK: request not available as its from job scheduler
+                distinctRecoList << [reco.name, reco.isScientificName, it[1], getSpeciesHardLink(reco)]
+            }else {
+                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, it[1]]
+            }
         }
 
         def count = distinctRecoCountQuery.list()[0]
@@ -2126,6 +2130,16 @@ class ObservationService extends AbstractObjectService {
 		return "" + '<a  href="' +  link +'"><i>' + reco.name + "</i></a>"
 	}
 
+    private String getSpeciesHardLink(reco) {
+        if(!reco) return ;
+        def speciesId = reco.taxonConcept?.findSpeciesId()
+        if(!speciesId){
+            return ''
+        }
+
+        def link = utilsService.createHardLink("species", "show", speciesId)
+        return link 
+    }
     /**
      */
     def getSpeciesGroupCount(params) {

@@ -25,7 +25,7 @@ function loadDistinctRecoList() {
         dataType: "json",
         data:params,
         success: function(data) {
-            $('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
+            $('#distinctRecoList .distinctRecoHeading').html(data.model.totalRecoCount?(' (' + data.model.totalRecoCount + ')'):'');
             if(data.success == true) {
                 $.each(data.model.distinctRecoList, function(index, item) {
                     if(item[1])

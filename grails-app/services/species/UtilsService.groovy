@@ -867,7 +867,6 @@ class UtilsService {
     }
 
     ///////////// FILE PICKER SECURITY /////////////////////
-
     
     def filePickerSecurityCodes() {
         def codes = [:]
