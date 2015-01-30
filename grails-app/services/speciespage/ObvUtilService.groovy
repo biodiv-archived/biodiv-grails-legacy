@@ -91,14 +91,67 @@ class ObvUtilService {
 	
 	def export(params, dl){
 		log.debug(params)
-		def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
-		log.debug " Obv total $observationInstanceList.size()" 
-		return exportObservation(observationInstanceList, dl.type, dl.author)
-	}
+        if(params.downloadFrom && params.downloadFrom == 'uniqueSpecies') {
+            def max = Math.min(params.max ? params.int('max') : 10, 100)
+            def offset = params.offset ? params.int('offset') : 0
+            //TODO: distinct reco can be from search also - not handled (ref - obvCont -line -1610)
+            def distinctRecoListResult = observationService.getDistinctRecoList(params, BATCH_SIZE, offset);
+            def totalRecoCount = distinctRecoListResult.totalCount;
+            def completeResult = distinctRecoListResult.distinctRecoList;
+            offset = offset + BATCH_SIZE
+            while(offset <= totalRecoCount) {
+                Observation.withNewTransaction {
+                    completeResult.addAll(observationService.getDistinctRecoList(params, BATCH_SIZE, offset).distinctRecoList);
+                    offset = offset + BATCH_SIZE
+                }
+            }
+            distinctRecoListResult.distinctRecoListResult = completeResult;
+            return exportUniqueSpeciesList(distinctRecoListResult); 
+        }else {
+            def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
+            log.debug " Obv total $observationInstanceList.size()" 
+            return exportObservation(observationInstanceList, dl.type, dl.author)
+        }
+    }
 	
 	
+    private File exportUniqueSpeciesList(Map distinctRecoListResult) {
+        if(!distinctRecoListResult) {
+            return null;
+        } 
+        if(distinctRecoListResult.totalCount == 0) {
+            return null;
+        }
+        File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		} 
+		return exportDistinctRecoAsCSV(downloadDir, distinctRecoListResult);
+    }
+	
+    private File exportDistinctRecoAsCSV(downloadDir, Map distinctRecoListResult){
+        File csvFile = new File(downloadDir, "UniqueSpecies_" + new Date().getTime() + ".csv")
+        CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
+        
+        def header = ['Species Name', 'Count', 'URL'];
+        writer.writeNext(header.toArray(new String[0]))
+        def distinctRecoList = distinctRecoListResult.distinctRecoList;
+        def dataToWrite = []
+        distinctRecoList.each {
+            log.debug "Writting " + it
+            def temp = []
+            temp.add("" + it[0]);
+            temp.add("" + it[2]);
+            temp.add("" + it[3]);
+            dataToWrite.add(temp.toArray(new String[0]))
+        }
+        writer.writeAll(dataToWrite);
+        writer.flush()
+        writer.close()
 
-	
+        return csvFile
+    }
+
 	private File exportObservation(List obvList, exportType, reqUser){
 		if(! obvList)
 			return null

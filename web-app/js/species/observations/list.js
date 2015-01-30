@@ -353,6 +353,50 @@ $(document).ready(function(){
         $.autopager('load');
         return false;
     });
+    
+    $('.download-form').bind('submit', function(event) {
+            var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
+            var filterUrl = '';
+            if(downloadFrom == 'uniqueSpecies') {
+                var hostName = 'http://' + document.location.hostname;
+                var target = window.location.pathname + window.location.search;
+                var a = $('<a href="'+target+'"></a>');
+                var url = a.url();
+                var href = url.attr('path');
+                href = href.replace('list', 'distinctReco');
+                var params = getFilterParameters(url);
+                filterUrl = hostName + href + '?';
+                params['actionType'] = 'list';
+                $.each(params, function(key, value){
+                    filterUrl = filterUrl + key + '=' + value + '&';
+                });
+            } else {
+                filterUrl = window.location.href;
+            }
+			var queryString =  window.location.search
+			$(this).ajaxSubmit({ 
+	         	url:window.params.requestExportUrl + queryString,
+				dataType: 'json', 
+				type: 'POST',
+				beforeSubmit: function(formData, jqForm, options) {
+					formData.push({ "name": "filterUrl", "value": filterUrl});
+					//formData.push({ "name": "source", "value": "${source}"});
+					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
+				}, 
+	            success: function(data, statusText, xhr, form) {
+	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+	            	$('.download-box').find('.download-options').hide();
+	            	$("html, body").animate({ scrollTop: 0 });
+	            	return false;
+	            },
+	            error:function (xhr, ajaxOptions, thrownError){
+	            	//successHandler is used when ajax login succedes
+	            	var successHandler = this.success, errorHandler = null;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+				} 
+	     	});
+	     	event.preventDefault();
+     	});
 
     //	last_actions();
     eatCookies();
@@ -997,9 +1041,9 @@ function intializesSpeciesHabitatInterest(multiSelect){
 
 function updateDownloadBox(instanceTotal){
     if(instanceTotal > 0){
-        $('#download-box').show();
+        $('.download-box').show();
     }else{
-        $('#download-box').hide();
+        $('.download-box').hide();
     }
 }
 	
