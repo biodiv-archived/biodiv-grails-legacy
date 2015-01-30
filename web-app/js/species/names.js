@@ -41,7 +41,8 @@
                            success: function(data, status, xhr) {
                                //cache[_options.nameFilter][ term ] = data;
                                //if ( xhr === lastXhr ) {
-                                   response( data );
+                               if(data.success == true) 
+                                   response( data.model.instanceList );
                                //}
 
                            }

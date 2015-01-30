@@ -87,9 +87,13 @@
                     <g:if test="${observationInstance?.id}">
                     <div class="btn btn-danger"
                         style="float: right; margin-right: 5px;">
-                        <a
-                            href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-                            onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><g:message code="button.delete.observation" />   </a>
+
+                        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                            href="#"
+                            onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete.observation" /></a>
+                        <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                            <input type="hidden" name="id" value="${observationInstance.id}" />
+                        </form>
                     </div>
                     </g:if>
                     <a id="addObservationSubmit" class="btn btn-primary"
@@ -142,8 +146,16 @@ $(document).ready(function(){
            }
     %>
     initializeLanguage();
+
 });
 
+function deleteObservation(){
+    var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";
+                                        
+    if(confirm(test)){
+        document.forms.deleteForm.submit();
+    }                       
+}
 
 </r:script>
 

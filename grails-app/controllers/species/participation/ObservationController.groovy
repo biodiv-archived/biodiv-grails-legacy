@@ -977,11 +977,8 @@ class ObservationController extends AbstractObjectController {
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
-					def r = [
-						status : OK.value(),
-						success : 'true',
-						msg:msg,
-						canMakeSpeciesCall:canMakeSpeciesCall]
+					def r = utilsService.getSuccessModel(msg, null, OK.value());
+					r['canMakeSpeciesCall'] = canMakeSpeciesCall
                         withFormat {
                             json { render r as JSON }
                             xml { render r as XML }
@@ -1000,11 +997,8 @@ class ObservationController extends AbstractObjectController {
 
 					//sending mail to user
 					utilsService.sendNotificationMail(ActivityFeedService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
-					def r = [
-						status : OK.value(),
-						success : 'true',
-						msg:msg,
-						canMakeSpeciesCall:canMakeSpeciesCall]
+					def r = utilsService.getSuccessModel(msg, null, OK.value());
+					r['canMakeSpeciesCall'] = canMakeSpeciesCall;
                     withFormat {
                             json { render r as JSON }
                             xml { render r as XML }
@@ -1056,14 +1050,10 @@ class ObservationController extends AbstractObjectController {
        }
 	
 	   if(params.obvId) {
-           println params
 		   def observationInstance = Observation.get(params.obvId);
 		   def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
            if(!observationInstance || !recommendationVoteInstance) {
-            	   def r = [
-				   status : OK.value(),
-				   success : 'false',
-				   msg:"${message(code: 'default.not.found.message', args: ['Recommendation', params.recoId])}"]
+            	   def r = utilsService.getErrorModel("${message(code: 'default.not.found.message', args: ['Recommendation', params.recoId])}", null, OK.value());
                    withFormat {
                        json { render r as JSON }
                        xml { render r as XML }
@@ -1083,10 +1073,7 @@ class ObservationController extends AbstractObjectController {
 	
                //sending mail to user
 			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
-			   def r = [
-				   status : OK.value(),
-				   success : 'true',
-				   msg:"${message(code: 'recommendations.deleted.message', args: [recommendationVoteInstance.recommendation.name])}"]
+			   def r = utilsService.getSuccessModel("${message(code: 'recommendations.deleted.message', args: [recommendationVoteInstance.recommendation.name])}", null, OK.value());
                    withFormat {
                        json { render r as JSON }
                        xml { render r as XML }
@@ -1708,11 +1695,15 @@ class ObservationController extends AbstractObjectController {
             if(recVo){
                 if(reco != recVo.recommendation) {
                     recVo.delete(flush: true, failOnError:true)
+                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                    if(!newRecVo.save(flush:true)){
+                        newRecVo.errors.allErrors.each { log.error it } 
+                    }
+                } else {
+                    //user locking his own reco
+                    newRecVo = recVo;
                 }
-                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
-                if(!newRecVo.save(flush:true)){
-                    newRecVo.errors.allErrors.each { log.error it } 
-                }
+                
             }
             if(!recVo){
                 newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
