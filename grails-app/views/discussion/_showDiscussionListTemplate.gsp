@@ -4,7 +4,7 @@
 			<g:each in="${discussionInstanceList}" status="i"
 				var="discussionInstance">
 				<li>
-						<g:render template="/discussion/showDiscussionSnippetTemplate" model="['discussionInstance':discussionInstance, canPullResource:canPullResource, 'userGroupInstance':userGroupInstance]"/>
+						<g:render template="/discussion/showDiscussionStoryTemplate" model="['discussionInstance':discussionInstance, canPullResource:canPullResource, 'userGroupInstance':userGroupInstance]"/>
 				</li>
 			</g:each>
 		</ul>

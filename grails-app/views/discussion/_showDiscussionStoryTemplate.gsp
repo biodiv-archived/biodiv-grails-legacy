@@ -1,5 +1,5 @@
-<div class="observation_story" style="border: 1px solid rgb(106, 201, 162);">
-    <div style="height: 175px;">
+<div class="observation_story observation" style="border: 1px solid rgb(106, 201, 162);">
+    <div style="height:${params.action == 'show'?'inherit':'160px'};">
         <g:if test="${showFeatured}">
 
         <div class="featured_body">
@@ -30,53 +30,52 @@
 
 
         <div class="prop">
-            <span class="name"><g:message code="default.subject.label" /></span>
+            <span class="name"><i class="icon-align-justify"></i><g:message code="default.subject.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(clickcontentVar)}
                 <div style="display:${styleVar}">
                 <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:discussionInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
-               		${raw(discussionInstance?.subject)}
+               		<b>${raw(discussionInstance?.subject)}</b>
                	</g:link>	
                 </div>    
             </div>
         </div>
        
+       <%
+			def message = raw(discussionInstance.body)
+			if(params.action != 'show'){
+				message = discussionInstance.plainText.substring(0, Math.min(discussionInstance.plainText.length(), 100)) + "..."
+			}
+		%>
+       
         <div class="prop">
-            <span class="name"><g:message code="default.message.label" /></span>
+            <span class="name"><i class="icon-align-justify"></i><g:message code="default.message.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(clickcontentVar)}
-                <div class="ellipsis multiline" style="display:${styleVar};">
-                    ${raw(discussionInstance?.body)}
+                <div class="${params.action == 'show'?'':''}" style="display:${styleVar};">
+                    ${message}
                 </div>    
             </div>
         </div>
-       
+
+	  	<g:if test="${showDetails}">
         <div class="prop">
-        	<g:if test="${showDetails}">
-             	<span class="name"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
-             </g:if>
-             <g:else>
-                  <i class="pull-left icon-time"></i>
-             </g:else>
+             <span class="name"><i class="icon-time"></i><g:message code="default.started.label" /></span>
              <div class="value">
              	<time class="timeago"
                       datetime="${discussionInstance.createdOn.getTime()}"></time>
              </div>
         </div>
-
+        </g:if>
+    
         <div class="prop">
-        	<g:if test="${showDetails}">
                 <span class="name"><i class="icon-time"></i><g:message code="default.updated.label" /></span>
-            </g:if>
-            <g:else>
-                <i class="pull-left icon-time"></i>
-            </g:else>
                 <div class="value">
                     <time class="timeago"
                     datetime="${discussionInstance.lastRevised?.getTime()}"></time>
                 </div>
             </div>
-<%--        <g:if test="${showDetails && discussionInstance?.tags}">--%>
+        <g:if test="${discussionInstance.tags}">
         <div class="prop">
             <span class="name"><g:message code="default.tags.label" /></span>
 
@@ -85,11 +84,11 @@
                 model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list']" />
             </div>
         </div>
-<%--        </g:if>--%>
+        </g:if>
         
         <div class="row observation_footer" style="margin-left:0px;">
              <g:render template="/discussion/showDiscussionStoryFooterTemplate"
-                model="['discussionInstance':discussionInstance, 'showDetails':showDetails, 'showLike':true]" />
+                model="['discussionInstance':discussionInstance, 'showDetails':true, 'showLike':true]" />
 
             <div class="story-footer" style="right:3px;">
                 <sUser:showUserTemplate

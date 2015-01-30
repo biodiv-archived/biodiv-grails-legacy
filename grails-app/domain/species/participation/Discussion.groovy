@@ -67,7 +67,7 @@ class Discussion implements Taggable, Rateable {
 	Resource mainImage() {
 		String reprImage = "Discussion.jpg"
 		String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
-		return new Resource(fileName: "discussion"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL)
+		return new Resource(fileName: "discussions"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DISCUSSION, baseUrl:grailsApplication.config.speciesPortal.content.serverURL)
 	 }
 
 	

@@ -30,5 +30,5 @@ def obvId = discussionInstance.id
         </g:link>
         </div>
         </g:if>
-        <g:render template="/discussion/showDiscussionStoryTemplate" model="['discussionInstance':discussionInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:true, showFeatured:showFeatured]"></g:render>
+        <g:render template="/discussion/showDiscussionStoryTemplate" model="['discussionInstance':discussionInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:false, showFeatured:showFeatured]"></g:render>
 </div>
