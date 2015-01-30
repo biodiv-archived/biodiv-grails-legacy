@@ -1,4 +1,4 @@
-<div class="observations_list" style="top: 0px; clear: both;">
+<div class="observations_list discussion" style="top: 0px; clear: both;">
 	<g:render template="/discussion/showDiscussionListTemplate"
 		model="['discussionInstanceList':discussionInstanceList, canPullResource:canPullResource, 'userGroupInstance':userGroupInstance]" />
 		
