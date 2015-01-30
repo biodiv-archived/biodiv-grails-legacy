@@ -55,7 +55,8 @@ class Resource extends Sourcedata implements Rateable {
         DOCUMENT("DOCUMENT"),
         SPECIES_FIELD("SPECIES_FIELD"),
 		CHECKLIST("CHECKLIST"),
-        USER("USER")
+        USER("USER"),
+		DISCUSSION("DISCUSSION")
 		
         private String value;
 
@@ -68,7 +69,7 @@ class Resource extends Sourcedata implements Rateable {
         }
 
         static def toList() {
-            return [ OBSERVATION,SPECIES,DOCUMENT, SPECIES_FIELD, CHECKLIST, USER]
+            return [ OBSERVATION,SPECIES,DOCUMENT, SPECIES_FIELD, CHECKLIST, USER, DISCUSSION]
         }
 
         public String toString() {
