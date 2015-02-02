@@ -6,7 +6,7 @@
 	<% params['isGalleryUpdate'] = false; %>
 	<div class="paginateButtons centered">
 		<p:paginate controller="discussion" action="list"
-			total="${instanceTotal}" userGroup="${userGroup}"
+			total="${instanceTotal}" userGroup="${userGroupInstance}"
 			userGroupWebaddress="${params.webaddress}" params="${activeFilters}"
 			max="${queryParams.max }" maxsteps="12" />
 	</div>
