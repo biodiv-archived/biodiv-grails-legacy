@@ -31,7 +31,7 @@
             <h4><g:message code="species.list.browse.species" /></h4>
 
 		<div class="tabbable" style="margin-left:0px;clear:both;">
-			<ul class="nav nav-tabs" style="margin-bottom: 0px">
+			<ul class="nav nav-tabs species-list-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" ><g:message code="button.gallery" /></a>
 				</li>
 				<li><a href="#taxonBrowser"><g:message code="button.taxon.browser" /></a>
@@ -121,7 +121,7 @@
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
             expandAll:false
         });	
-        $('.nav-tabs a').click(function (e) {
+        $('.species-list-tabs a').click(function (e) {
           e.preventDefault();
           $('.nav-tabs li').removeClass('active');
           $(this).parent().addClass('active');
