@@ -93,7 +93,7 @@ class ObservationService extends AbstractObjectService {
     def resourcesService;
     def request;
     def speciesPermissionService;
-
+	
     /**
      * 
      * @param params
@@ -1273,12 +1273,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     Date parseDate(date){
-        try {
-            return date? Date.parse("dd/MM/yyyy", date):new Date();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return null;
+		return utilsService.parseDate(date)
     }
 
     /**

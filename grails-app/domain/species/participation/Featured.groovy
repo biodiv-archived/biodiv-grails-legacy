@@ -1,12 +1,16 @@
 package species.participation
 
 import species.groups.UserGroup
+import java.util.Date;
+
 import species.auth.SUser
 import species.participation.Observation
+
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
+
 import species.Language;
 import species.auth.Role;
 import species.groups.UserGroup;
@@ -15,6 +19,7 @@ import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.Utils;
 import grails.plugin.springsecurity.SpringSecurityUtils;
+
 import org.apache.commons.logging.LogFactory;
 
 class Featured extends AbstractAction {
@@ -22,10 +27,13 @@ class Featured extends AbstractAction {
     def springSecurityService
     def userGroupService;
     def activityFeedService;
-
+	def utilsService;
+	
     String notes;
     UserGroup userGroup;
     Language language;
+	
+	Date expireTime;
 	private static final log = LogFactory.getLog(this);
 
     static constraints = {
@@ -35,6 +43,7 @@ class Featured extends AbstractAction {
         createdOn nullable:false
         notes nullable:false, blank: false
         notes (size:0..400)
+		expireTime nullable:true
     }
 
     static boolean deleteFeatureOnObv(object, SUser user, UserGroup ug = null) {
@@ -123,5 +132,32 @@ class Featured extends AbstractAction {
             fs = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
         return fs; 
     }
+	
+	
+	static List fetchFeature(String classType, UserGroup  ug=null, Date startTime=null, Date endTime=null){
+		def res = Featured.withCriteria{
+				and{
+					eq('objectType', classType)
+					if(ug){
+						eq('userGroup', ug)
+					}
+					if(startTime){
+						eq('createdOn', startTime)
+					}
+					if(endTime){
+						eq('expireTime', endTime)
+					}
+				}
+				maxResults(5)
+				order('createdOn', "desc")
+			}
+		
+		List finalResult = []
+		res.each { 
+			finalResult << utilsService.getDomainObject(it.objectType, it.id)
+		}
+		
+		return finalResult
+	}
 
 }
