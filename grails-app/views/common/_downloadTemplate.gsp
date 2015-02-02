@@ -1,6 +1,6 @@
 <div class="download-box btn-group"  style="z-index: 10; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
     <a class="download-action ${(onlyIcon == 'true')?'':'btn'} ${(params.action=='show')?'btn-link':''} dropdown-toggle" data-toggle="dropdown"
-        href="#"> <i class=" icon-download-alt" style="${(downloadFrom=='uniqueSpecies')?'margin-top:-7px':''}"></i>
+        href="#" title="Download"> <i class=" icon-download-alt" style="${(downloadFrom=='uniqueSpecies')?'margin-top:-7px':''}"></i>
         <g:if test="${onlyIcon == 'false'}">
             <g:message code="button.download" />
         </g:if>
@@ -63,8 +63,4 @@ $('.download-action').click(function(){
 		} 
     	});
 });
-
-$(document).ready(function(){
-	
-});     	
 </r:script>
