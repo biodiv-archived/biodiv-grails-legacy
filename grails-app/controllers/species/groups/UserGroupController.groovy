@@ -201,17 +201,18 @@ class UserGroupController {
                 json { render model as JSON }
                 xml { render model as XML }
             }
-		} else {
+		} 
+        /*else {
             def model = utilsService.getErrorModel(messageSource.getMessage("id.required", ['Valid id'] as Object[], RCU.getLocale(request)), userGroupInstance, NOT_FOUND.value())
             withFormat {
                 html {
-                    flash.message = model.msg
-                    redirect(action: "list")
+                    //flash.message = model.msg
+                    //redirect(action: "list")
                 }
                 json { render model as JSON }
                 xml { render model as XML }
             }
-        }
+        }*/
 
 	}
 
@@ -346,7 +347,7 @@ class UserGroupController {
 			userGroup = UserGroup.findByWebaddress(webaddress)
 		}
 		
-		if (!userGroup) {
+		if (!userGroup && redirectToList) {
             def model = utilsService.getErrorModel( "${message(code: 'default.not.found.message', args: ['UserGroup', id?:webaddress])}", userGroup, NOT_FOUND.value())
                 withFormat {
                     html {

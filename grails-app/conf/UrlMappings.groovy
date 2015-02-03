@@ -5,7 +5,8 @@ class UrlMappings {
 
 	static mappings = {
 
-		
+
+        "/jcaptcha/$action/$id"(controller:'Jcaptcha')
 		//"500"(controller:'BiodivException', action:'error')
 		"500"(view:'/error')
 		"403"(view:'/error')
