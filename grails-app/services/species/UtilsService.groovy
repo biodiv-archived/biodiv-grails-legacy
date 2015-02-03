@@ -941,7 +941,6 @@ class UtilsService {
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
         def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
-        println "+++++++++++++++++++++++++++++++++++++++"
         String acceptHeader = request.getHeader('Accept');
 
         if(!errors) errors = [];
@@ -953,7 +952,10 @@ class UtilsService {
         }
 
         (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
-        return [success:false, status:status, msg:msg, errors:errors]
+        def result = [success:false, status:status, msg:msg, errors:errors];
+        if(domainObject) 
+            result['instance'] = domainObject;
+        return result;
     }
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {

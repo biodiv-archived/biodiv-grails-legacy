@@ -122,7 +122,7 @@
                 <input class="videoUrl" type="hidden" name='videoUrl' value="" />
                 <input class="audioUrl" type="hidden" name='audioUrl' value="" />
                 <input type="hidden" name='obvDir' value="${obvDir}" />
-                <input type="hidden" name='resType' value='${observationInstance.class.name}'>
+                <input type="hidden" name='resType' value='${observationInstance?observationInstance.class.name:""}'>
             </form>
 
         </div>
