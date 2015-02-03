@@ -2602,7 +2602,7 @@ small {
     background-image: url('../images/groups.png');
 }
 #home #dashboard {
-    background-image: url('../images/dashboard.png');
+    background-image: url('../images/discussions.png');
 }   
 
 #home .entry:hover {
@@ -2917,6 +2917,3 @@ small {
     margin-left:140px;
 }
 
-.discussion .story-footer{
-    bottom:0px;
-}

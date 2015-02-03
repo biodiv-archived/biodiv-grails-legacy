@@ -93,7 +93,7 @@ class ObservationService extends AbstractObjectService {
     def resourcesService;
     def request;
     def speciesPermissionService;
-
+	
     /**
      * 
      * @param params
@@ -1174,6 +1174,14 @@ class ObservationService extends AbstractObjectService {
         }
         
         if(params.filterProperty == 'speciesName' && params.parentId) {
+            //Check because ajax calls sending these parameters
+            if(params.parentId && params.parentId != '') {
+                try { 
+                    params.parentId = Integer.parseInt(params.parentId.toString()).toLong(); 
+                } catch(NumberFormatException e) { 
+                    params.parentId = null 
+                }
+            }
             Observation parentObv = Observation.read(params.parentId);
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
@@ -1188,6 +1196,14 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.filterProperty == 'nearByRelated' && !params.bounds && params.parentId) {
+            //Check because ajax calls sending these parameters
+            if(params.parentId && params.parentId != '') {
+                try { 
+                    params.parentId = Integer.parseInt(params.parentId.toString()).toLong(); 
+                } catch(NumberFormatException e) { 
+                    params.parentId = null 
+                }
+            }
             nearByRelatedObvQuery = ', Observation as g2';
             query += nearByRelatedObvQuery;
             filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId and obv.id <> g2.id '
@@ -1273,12 +1289,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     Date parseDate(date){
-        try {
-            return date? Date.parse("dd/MM/yyyy", date):new Date();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return null;
+		return utilsService.parseDate(date)
     }
 
     /**

@@ -17,17 +17,25 @@ import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
+
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.InvalidKeyException;
+import java.util.Date;
+
 import org.codehaus.groovy.grails.web.util.WebUtils;
+
 import java.beans.Introspector;
+
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+
 import grails.converters.JSON;
 class UtilsService {
 
@@ -984,6 +992,20 @@ class UtilsService {
             return result;
 //        } 
     }
+	
+	Date parseDate(date, sendNew = true){
+		try {
+            if(!sendNew) {
+			    return date? Date.parse("dd/MM/yyyy", date):null;
+            }else {
+			    return date? Date.parse("dd/MM/yyyy", date):new Date();
+            }
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+
 
 }
 

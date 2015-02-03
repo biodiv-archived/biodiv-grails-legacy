@@ -134,36 +134,4 @@ class Discussion implements Taggable, Rateable {
 		return body
 	}
 	
-	def print(){
-		int[] inputArray = [5,2,3,4,6,7,8,9,4]
-		
-		int dim = Math.ceil(inputArray.length / 2) // 5
-		
-		int[][] outputArray = new int[dim][dim] //int[5][5]
-		
-		int startColIndex = Math.ceil(dim/2) // 2
-		
-		int size = inputArray.length
-		int index = 0
-		int iterCount = 1
-		int rowIndex = 0
-		 
-		while(index < size){ //to iterate all the element in input array
-			int colIndex = startColIndex
-			for(int i = 0; i<iterCount; i++){ // iteration of 1, 2, 3 , 2 ,1 
-				outputArray[rowIndex][colIndex] = inputArray[index]
-				index++
-				colIndex = colIndex + 2 // fill in interval on a given row
-			}
-			if(startColIndex > 0){
-				startColIndex--
-				iterCount++
-			}else{
-				startColIndex++
-				iterCount--
-			}
-			rowIndex++  
-		}
-	}
-	
 }

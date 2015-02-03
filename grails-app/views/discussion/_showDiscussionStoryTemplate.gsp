@@ -5,7 +5,7 @@
         <div class="featured_body">
         <div class="featured_title ellipsis"> 
             <div class="heading">
-                <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:discussionInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:discussionInstance.id, 'pos':pos, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
                 	<span class="ellipsis">${discussionInstance.subject}</span>
                 </g:link>
             </div>
@@ -28,13 +28,12 @@
         </g:if>
                 
 
-
         <div class="prop">
             <span class="name"><i class="icon-align-justify"></i><g:message code="default.subject.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(clickcontentVar)}
                 <div style="display:${styleVar}">
-                <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:discussionInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:discussionInstance.id, 'pos':pos, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
                		<b>${raw(discussionInstance?.subject)}</b>
                	</g:link>	
                 </div>    
@@ -77,8 +76,7 @@
             </div>
         <g:if test="${discussionInstance.tags}">
         <div class="prop">
-            <span class="name"><g:message code="default.tags.label" /></span>
-
+            <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
             <div class="value">
                 <g:render template="/project/showTagsList"
                 model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list']" />

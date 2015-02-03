@@ -317,3 +317,9 @@ update species set has_media = true where id in (select distinct(sf.species_id) 
     Updating observations which were not marked deleted when its checklist was deleted
  **/
 update observation set is_deleted = true where source_id in (select id from observation where is_checklist = true and is_deleted = true) and is_deleted = false;
+
+
+
+//2nd feb 2015
+alter table featured add column expire_time timestamp without time zone ;
+

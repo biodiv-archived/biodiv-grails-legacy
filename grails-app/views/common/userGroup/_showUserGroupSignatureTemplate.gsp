@@ -58,6 +58,10 @@ if(userGroup && userGroup.id) {
                 <i class="icon-file"></i>
                 ${userGroup.noOfDocuments()}
             </div>
+            <div class="footer-item" title="${g.message(code:'showusergroupsig.title.discussions')}">
+                <i class="icon-comment"></i>
+                ${userGroup.noOfDocuments()}
+            </div>
             </g:if>
     </div>
 </div>

@@ -256,7 +256,6 @@ class DigestService {
             res['documents'] = docList
             res['users'] = userList
             res['discussions'] = disList
-            println "===============DIS LIST=============== " + disList
             def p = [webaddress:digest.userGroup.webaddress];
 
             def recentTopContributors = [];
@@ -291,8 +290,13 @@ log.debug resultSet
                 res['topIDProviders'] = topIDProviders
             }
 
+            def announcedInstances = Featured.fetchFeature(Discussion.class.getCanonicalName(),digest.userGroup, null, new Date());
+            Map finalAnnouncedRes = [:]
+		    announcedInstances.each { 
+			    finalAnnouncedRes[utilsService.getDomainObject(it.objectType, it.objectId)] = it.notes;
+		    }
 
-            def stats = [observationCount:chartService.getObservationCount(p), speciesCount:chartService.getSpeciesCount(p), checklistsCount:chartService.getChecklistCount(p), documentCount:chartService.getDocumentCount(p), userCount:chartService.getUserCount(p), discussionCount:'30'/*chartService.getDiscussionCount(p)*/];
+            def stats = [observationCount:chartService.getObservationCount(p), speciesCount:chartService.getSpeciesCount(p), checklistsCount:chartService.getChecklistCount(p), documentCount:chartService.getDocumentCount(p), userCount:chartService.getUserCount(p), discussionCount:chartService.getDiscussionCount(p)];
 
             res['obvListCount'] = stats.observationCount;
             //res['idObvListCount'] = idObvListCount;
@@ -301,6 +305,7 @@ log.debug resultSet
             res['docListCount'] = stats.documentCount;
             res['userListCount'] = stats.userCount;
             res['disListCount'] = stats.discussionCount;
+            res['announcements'] = finalAnnouncedRes;
         }
         return res
     }

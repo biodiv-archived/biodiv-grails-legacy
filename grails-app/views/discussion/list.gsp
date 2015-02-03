@@ -11,12 +11,9 @@
             margin: 0 0 10px 0px;
             width:100%;
             }
-
-
         </style>
     </head>
     <body>
-
         <div class="span12">           
             <g:render template="/discussion/discussionSubMenuTemplate" model="['entityName': entityName]" />
             <uGroup:rightSidebar/>
