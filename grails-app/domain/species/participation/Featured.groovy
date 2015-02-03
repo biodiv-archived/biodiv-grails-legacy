@@ -27,7 +27,6 @@ class Featured extends AbstractAction {
     def springSecurityService
     def userGroupService;
     def activityFeedService;
-	def utilsService;
 	
     String notes;
     UserGroup userGroup;
@@ -142,22 +141,16 @@ class Featured extends AbstractAction {
 						eq('userGroup', ug)
 					}
 					if(startTime){
-						eq('createdOn', startTime)
+						lt('createdOn', startTime)
 					}
 					if(endTime){
-						eq('expireTime', endTime)
+						gt('expireTime', endTime)
 					}
 				}
-				maxResults(5)
+				maxResults(2)
 				order('createdOn', "desc")
 			}
-		
-		List finalResult = []
-		res.each { 
-			finalResult << utilsService.getDomainObject(it.objectType, it.id)
-		}
-		
-		return finalResult
+		return res
 	}
 
 }

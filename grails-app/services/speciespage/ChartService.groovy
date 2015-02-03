@@ -15,13 +15,14 @@ import species.utils.ImageType;
 import species.participation.ActivityFeed;
 import species.participation.ActivityFeedService;
 import species.participation.Observation;
+import species.participation.Discussion;
 import species.participation.Checklists;
 import content.eml.Document;
 import species.participation.RecommendationVote;
 import groovy.sql.Sql;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
-;
+
 
 class ChartService {
 
@@ -607,6 +608,20 @@ def messageSource;
 		
 		if(userGroup){
 			count = userGroupService.getCountByGroup(Document.simpleName, userGroup);
+		}else{
+			count = Document.count();
+		}
+		return count
+	}
+
+    def long getDiscussionCount(params){
+		def userGroup, count 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			count = userGroupService.getCountByGroup(Discussion.simpleName, userGroup);
 		}else{
 			count = Document.count();
 		}

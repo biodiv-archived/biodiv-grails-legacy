@@ -995,9 +995,13 @@ class UtilsService {
 //        } 
     }
 	
-	Date parseDate(date){
+	Date parseDate(date, sendNew = true){
 		try {
-			return date? Date.parse("dd/MM/yyyy", date):new Date();
+            if(!sendNew) {
+			    return date? Date.parse("dd/MM/yyyy", date):null;
+            }else {
+			    return date? Date.parse("dd/MM/yyyy", date):new Date();
+            }
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

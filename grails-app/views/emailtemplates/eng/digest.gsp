@@ -18,8 +18,34 @@
             <tr>
                 <td class="w580" style="height: 10px; background-color: white;"></td>
             </tr>
-            <big style="font-weight: bold;"> <small>Dear</small> <small>&nbsp;${username},</small></big>
+            <big style="font-weight: bold;"> <small>Dear</small><small>&nbsp;${username},</small></big>
             <p>Here is the activity digest for the <a href="${uGroup.createLink(controller:'userGroup', action:'show','userGroup':userGroup, absolute:true)}">${userGroup.name}</a> group on the India Biodiversity Portal</p>
+
+            <g:if test = "${digestContent.announcements}">
+            <g:set var="annIns" value="${digestContent.announcements}"></g:set>
+            <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
+                <h2>Announcements</h2>
+                <g:each in="${annIns}" var="annInstance">
+                <%
+                def discussionText = annInstance.key.plainText.replaceAll('<(.|\n)*?>', '');
+                discussionText = discussionText.replaceAll('&nbsp;', '');
+                if(discussionText.length() > 160) {
+                discussionText = discussionText[0..158] + '...'
+                }
+                %> 
+                    <table style="border-collapse: collapse; width:630px;">
+                    <tr style="border: 2px solid burlywood; border-bottom:0;background-color: khaki;"><td style="border: 1px solid lightgray;padding-top:2px;padding-bottom:2px;"><i>${annInstance.value}</i></td></tr> 
+                    </table>
+                    <table style="border-collapse: collapse;margin-bottom:3px;">
+                        <tr style="border: 2px solid burlywood; border-bottom:0;border-top:0;background-color: #d4ece3;"><td style="width:63px; vertical-align:top;"><i>Subject:</i></td><td> <a href="${uGroup.createLink(controller:'discussion', action:'show','id': annInstance.key.id, absolute:true,'userGroup':userGroup)}">${annInstance.key.subject}</a></td></tr>
+                        
+                        <tr style="border: 2px solid burlywood; border-top:0;background-color: #d4ece3;"><td style="width:63px; vertical-align:top;"><i>Message:</i></td><td> ${discussionText}</td></tr>
+                    </table>   
+                    </g:each>
+                    <p style="text-align:right; padding-right:5px; font-weight:bold;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'discussion', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
+            </div>
+            </g:if>
+
             <g:if test = "${digestContent.observations || digestContent.unidObvs}">
             <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
                 <h2>Observations (${digestContent.obvListCount})</h2>
@@ -125,8 +151,8 @@
                             def spId = speciesInstance.id
                             imagePath = imagePath.replaceAll(' ','%20');
                             %>
-                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a title="${speciesInstance.title}" href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;">
-                                    <p style="text-overflow: ellipsis;overflow: hidden;width: 120px;white-space: nowrap;">${speciesInstance.title}</p>
+                            <td class="w640" height="30" width="120" style=" border: 1px solid lightblue;"><a title="${speciesInstance.title.replaceAll('<(.|\n)*?>', '')}" href="${uGroup.createLink(controller:'species', action:'show','id': spId, absolute:true,'userGroup':userGroup)}"><img src="${imagePath}" alt="" style="border: 0px solid ; width: 120px; height: 120px;">
+                                    <p style="text-overflow: ellipsis;overflow: hidden;width: 120px;white-space: nowrap;">${speciesInstance.title.replaceAll('<(.|\n)*?>', '')}</p>
                             </a></td>
                             </g:each>
                         </tr>
@@ -202,6 +228,54 @@
                 <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'document', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
             </div>
             </g:if>
+
+            <g:if test = "${digestContent.discussions}">
+            <g:set var="disIns" value="${digestContent.discussions}"></g:set>
+            <%
+            def counter = 1
+            %>
+            <div class="resBlock" style="border:1px solid rgb(236, 233, 183);">
+                <h2>Discussions (${digestContent.disListCount})</h2>
+                <div style="background-color: #d4ece3;">
+                    <h3>Recent</h3>
+                    <table>
+                        <tr align="left">
+                            <g:each in="${disIns.size() < 5 ? disIns : disIns.subList(0, 5)}" var="discussionInstance">
+                            <%
+                            def disId = discussionInstance.id
+                            %>
+                            <tr>
+                                <td class="w640" height="30" width="627" style="font-weight:bold;padding-left:5px;">${counter}. <a href="${uGroup.createLink(controller:'discussion', action:'show','id': disId, absolute:true,'userGroup':userGroup)}" style="color:#2ba6cb;">${discussionInstance.subject}</a></td>
+                            </tr>
+                            <tr> 
+                                <td class="w640" height="30" width="627" style="border-bottom:1px solid white">
+                                    <g:if test="${discussionInstance.plainText != null}">
+                                    <%
+                                    def disText = discussionInstance.plainText
+                                    disText = disText.replaceAll('<(.|\n)*?>', '');
+                                    disText = disText.replaceAll('&nbsp;', '');
+                                    %>
+                                    <g:if test="${disText.length() > 160}">
+                                    ${disText[0..158] + '...'} <br />
+                                    </g:if>
+                                    <g:else>
+                                    ${disText?:''} <br />
+                                    </g:else>
+                                    </g:if>
+                                </td>
+                            </tr>
+                            <%
+                            counter++
+                            %>
+                            </g:each>
+                        </tr>
+                    </table>
+                </div>
+                <p style="text-align:right; padding-right:5px; font-weight:bold;color:#2ba6cb;background-color:white;margin:0;"><a href="${uGroup.createLink(controller:'discussion', action:'list','userGroup':userGroup, absolute:true)}" style="color:#2ba6cb;">View More</a></p>
+            </div>
+            </g:if>
+
+
             <p>If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${uGroup.createLink(controller:'SUser', action:'show','id':userID,'userGroup':userGroup, absolute:true)}"> your profile</a></p>
         </table>
     </body>
