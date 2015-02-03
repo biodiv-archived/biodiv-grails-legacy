@@ -1534,7 +1534,8 @@ jcaptchas {
 			)
 		),
 		180, // minGuarantedStorageDelayInSeconds
-		180000 // maxCaptchaStoreSize
+		180000, // maxCaptchaStoreSize
+        75000
 	)
 
 	/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
