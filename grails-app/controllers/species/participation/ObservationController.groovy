@@ -164,7 +164,13 @@ class ObservationController extends AbstractObjectController {
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
-        params['parentId'] = params.parentId?.toLong()
+        if(params.parentId && params.parentId != '') {
+            try { 
+                params.parentId = Integer.parseInt(params.parentId.toString()).toLong(); 
+            } catch(NumberFormatException e) { 
+                params.parentId = null 
+            }
+        }
         params['maxNearByRadius'] = 200;
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0

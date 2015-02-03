@@ -162,7 +162,7 @@ class ActionController {
                         featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
                            if(!featuredInstance) {
                             def userLanguage = utilsService.getCurrentLanguage(request); 
-                            featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes,language:userLanguage)
+                            featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes,language:userLanguage, expireTime:utilsService.parseDate(params.expireTime))
                                                         status = saveActMail(params, featuredInstance, obv, ug);
                             obv.featureCount++
 		                    if(!obv.save(flush:true)) {
@@ -184,7 +184,9 @@ class ActionController {
                                 }catch (Exception e) {
                                     e.printStackTrace()
                                 }
-                                featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
+								def expireTime = utilsService.parseDate(params.expireTime)
+								
+								featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes, expireTime:expireTime)
                                 status = saveActMail(params, featuredInstance, obv, ug)
                                 if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes.again", [obv.class.simpleName] as Object[], RCU.getLocale(request))
 

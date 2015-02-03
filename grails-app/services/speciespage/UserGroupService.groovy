@@ -531,6 +531,12 @@ class UserGroupService {
             if(userGroupInstance)
                 query += "join obv.userGroups userGroup where userGroup=:userGroup"
             count =  Document.executeQuery(query, queryParams, [cache:true])[0]
+			
+			case Discussion.simpleName :
+			query = "select count(*) from Discussion obv "
+			if(userGroupInstance)
+				query += "join obv.userGroups userGroup where userGroup=:userGroup"
+			count =  Discussion.executeQuery(query, queryParams, [cache:true])[0]
         }
         return count;
 	}

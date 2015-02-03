@@ -1,7 +1,18 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Checklists"%>
 
+
+<style>
+	.discussion .story-footer{
+   		bottom:0px;
+	}
     
+    .discussion .selectable {
+		margin-left:20px;
+    }
+
+</style>
+
 <div class="story-footer">
 
     <g:if test="${showLike && !showDetails}">
@@ -26,7 +37,7 @@
     
      <g:if test="${showDetails}">
       <div class="footer-item"> 
-     	<i class="icon-user" title="${g.message(code:'showobservationstoryfooter.title.user')}"></i>
+     	<i class="icon-user" title="${g.message(code:'showobservationstoryfooter.title.discussions.participants')}"></i>
         <span class="">${discussionInstance.activeUserCount()}</span>
       </div>
     </g:if>

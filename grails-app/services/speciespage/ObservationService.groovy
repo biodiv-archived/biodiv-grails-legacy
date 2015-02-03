@@ -93,7 +93,7 @@ class ObservationService extends AbstractObjectService {
     def resourcesService;
     def request;
     def speciesPermissionService;
-
+	
     /**
      * 
      * @param params
@@ -1173,13 +1173,13 @@ class ObservationService extends AbstractObjectService {
             orderByClause = " ST_Distance(${point}, obv.topology)" 
         }
         
-        if(params.filterProperty == 'speciesName') {
-            Observation parentObv = Observation.read(params.parentId?params.parentId.toLong():params.id?.toLong());
+        if(params.filterProperty == 'speciesName' && params.parentId) {
+            Observation parentObv = Observation.read(params.parentId);
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
                 filterQuery += " and obv.maxVotedReco = :parMaxVotedReco and obv.id != :parentId" 
                 queryParams['parMaxVotedReco'] = parMaxVotedReco
-                queryParams['parentId'] = params.parentId?params.parentId.toLong():params.id?.toLong()
+                queryParams['parentId'] = params.parentId;
                 
                 activeFilters["filterProperty"] = params.filterProperty
                 activeFilters["parentId"] = params.parentId
@@ -1187,11 +1187,11 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.filterProperty == 'nearByRelated' && !params.bounds) {
+        if(params.filterProperty == 'nearByRelated' && !params.bounds && params.parentId) {
             nearByRelatedObvQuery = ', Observation as g2';
             query += nearByRelatedObvQuery;
             filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId and obv.id <> g2.id '
-            queryParams['parentId'] = params.parentId?params.parentId.toLong():params.id?.toLong()
+            queryParams['parentId'] = params.parentId
             queryParams['maxNearByRadius'] = params.maxNearByRadius?:200;
             
             activeFilters["filterProperty"] = params.filterProperty
@@ -1273,12 +1273,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     Date parseDate(date){
-        try {
-            return date? Date.parse("dd/MM/yyyy", date):new Date();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return null;
+		return utilsService.parseDate(date)
     }
 
     /**
