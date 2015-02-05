@@ -183,7 +183,7 @@ speciesPortal {
     app.logo = "logo/wikwio.png"
     app.favicon = "logo/favicon.png"
    
-    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com","projectwikwio@gmail.com"]
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com","projectwikwio@gmail.com","pascal.marnotte@cirad.fr"]
 
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
