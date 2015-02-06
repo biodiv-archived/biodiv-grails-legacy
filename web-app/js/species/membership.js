@@ -308,7 +308,7 @@ console.log('init_group_header');
  * as calling this function multiple times would result in
  * multiple bindings of following event handlers
  */
-function init_header() {
+function init_header(statsUrl) {
 	$("#allGroups").click(function(){
 		
 			$("#myGroupsInfo").slideUp('fast');
@@ -337,6 +337,8 @@ function init_header() {
 	init_group_header();
 
 	membership_actions();
+	
+	init_stats(statsUrl);
 	
 }
 
@@ -491,3 +493,22 @@ $(document).click(function(){
  	$(document).unbind('click');
 });
 }
+
+function init_stats(statsUrl){
+	$.ajax({
+ 		url: statsUrl,
+ 		type: 'GET',
+ 		dataType: "json",
+		success: function(data) {			
+				$(".statsTicker.speciesUpdateCount").text(' ' + data.Species);
+				$(".statsTicker.obvUpdateCount").text(' ' + data.Observation);
+				$(".statsTicker.docUpdateCount").text(' ' + data.Document);
+				$(".statsTicker.disUpdateCount").text(' ' + data.Discussion);
+				return false;
+		}, error: function(xhr, status, error) {
+			alert(xhr.responseText);
+	   	}
+	});
+	
+}
+

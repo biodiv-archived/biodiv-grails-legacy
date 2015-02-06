@@ -4,6 +4,7 @@ import groovy.sql.Sql;
 
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
+import org.codehaus.groovy.runtime.DateGroovyMethods;
 
 import content.eml.Document;
 
@@ -448,6 +449,69 @@ class ActivityFeed {
 		}
 		
 		return new ActivityFeed().getResult(queryList, map, true, null)
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////
+	///////////////////////////// DAILY STATS ////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	
+	private Map getPortalDailyStats(startDate){
+		String query = ''' select count(distinct(root_holder_id)) as c from activity_feed where date_created > :startDate and is_showable = :isShowable and root_holder_type = :rootHolderType '''
+		String obvQuery = " and activity_type = 'Observation created' "
+		def m = ['startDate':startDate, 'isShowable':true]
+		
+		List moduleList = [Species.class.canonicalName, Observation.class.canonicalName, Document.class.canonicalName, Discussion.class.canonicalName]
+		
+		def result = [:]
+		def sql =  Sql.newInstance(dataSource)
+		moduleList.each { rootHolderType ->
+			String q = query
+			m['rootHolderType'] = rootHolderType
+			if(rootHolderType == Observation.class.canonicalName){
+				q = query + obvQuery
+			}
+			def count = sql.rows(q, m).c[0]
+			result[rootHolderType.split("\\.")[-1]] = count
+		}
+		
+		return result
+	}
+	
+	private Map getPortalDailyStats(startDate, UserGroup ug){
+		String selectFromClause  = "select count(distinct(af.root_holder_id)) as c  from activity_feed af "
+		String whereClause = " where af.is_showable = :isShowable and date_created > :startDate "
+		String obvWhereClause = whereClause + " and af.activity_type = 'Observation created' "
+		def m = ['startDate':startDate, 'isShowable':true]
+		
+		String obvQuery = " ${selectFromClause}, user_group_observations ugo ${obvWhereClause} and ((ugo.user_group_id = ${ug.id} and af.root_holder_type = 'species.participation.Observation' and af.root_holder_id = ugo.observation_id))"
+		String spQuery = " ${selectFromClause}, user_group_species ugs ${whereClause} and ((ugs.user_group_id = ${ug.id} and af.root_holder_type = 'species.Species' and af.root_holder_id = ugs.species_id)) "
+		String docQuery = " ${selectFromClause}, user_group_documents ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'content.eml.Document' and af.root_holder_id = ugd.document_id))"
+		String disQuery = " ${selectFromClause}, user_group_discussions ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'species.participation.Discussion' and af.root_holder_id = ugd.discussion_id))"
+
+		def result = [:]
+		def sql =  Sql.newInstance(dataSource)
+		
+		result['Observation'] = sql.rows(obvQuery, m).c[0]
+		result['Species'] = sql.rows(spQuery, m).c[0]
+		result['Document'] = sql.rows(docQuery, m).c[0]
+		result['Discussion'] = sql.rows(disQuery, m).c[0]
+		
+		return result
+	}
+	
+	public static dailyStats(UserGroup ug=null){
+		def startDate = new Date().minus(50)
+		DateGroovyMethods.clearTime(startDate)
+		startDate = new java.sql.Date(startDate.getTime())
+		
+		ActivityFeed af = new ActivityFeed()
+		
+		if(ug){
+			return af.getPortalDailyStats(startDate, ug)
+		}else{
+			return  af.getPortalDailyStats(startDate)
+		}
 	}
 
 }
