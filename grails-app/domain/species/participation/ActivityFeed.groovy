@@ -501,7 +501,7 @@ class ActivityFeed {
 	}
 	
 	public static dailyStats(UserGroup ug=null){
-		def startDate = new Date().minus(50)
+		def startDate = new Date().minus(1)
 		DateGroovyMethods.clearTime(startDate)
 		startDate = new java.sql.Date(startDate.getTime())
 		
