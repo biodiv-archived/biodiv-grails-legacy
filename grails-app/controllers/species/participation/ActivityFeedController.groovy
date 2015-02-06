@@ -5,6 +5,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import species.participation.Follow
 import species.auth.SUser
 import species.groups.UserGroup
+import species.participation.Stats
+
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 import  org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
