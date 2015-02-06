@@ -499,12 +499,40 @@ function init_stats(statsUrl){
  		url: statsUrl,
  		type: 'GET',
  		dataType: "json",
-		success: function(data) {			
-				$(".statsTicker.speciesUpdateCount").text(' ' + data.Species);
-				$(".statsTicker.obvUpdateCount").text(' ' + data.Observation);
-				$(".statsTicker.docUpdateCount").text(' ' + data.Document);
-				$(".statsTicker.disUpdateCount").text(' ' + data.Discussion);
-				return false;
+		success: function(data) {
+			var comp = $(".statsTicker.speciesUpdateCount");
+			if(parseInt(data.Species) == 0){
+				sComp.hide();
+			}else{
+				comp.text(' ' + data.Species);
+				comp.show();
+			}
+			
+			comp = $(".statsTicker.obvUpdateCount");
+			if(parseInt(data.Observation) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Observation);
+				comp.show();
+			}
+			
+			var comp = $(".statsTicker.docUpdateCount");
+			if(parseInt(data.Document) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Document);
+				comp.show();
+			}
+			
+			var comp = $(".statsTicker.disUpdateCount");
+			if(parseInt(data.Discussion) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Discussion);
+				comp.show();
+			}
+			return false;
+			
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
 	   	}
