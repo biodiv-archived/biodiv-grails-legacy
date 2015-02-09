@@ -63,6 +63,8 @@ class ChecklistService {
 	static final String MEDIA_COLUMN = "Media"
 	static final String SPECIES_TITLE_COLUMN = "speciesTitle"
 	static final String SPECIES_ID_COLUMN = "speciesId"
+	private static final int  BATCH_SIZE = 100
+	
 	def grailsApplication
 	def observationService
 	def checklistSearchService;
@@ -140,10 +142,12 @@ class ChecklistService {
                     break;
                 }
             }
-            if(!validObvPresent) {
-                def request = RequestContextHolder.currentRequestAttributes().request
+            if(!validObvPresent && params.action == "save") {
+                //def request = RequestContextHolder.currentRequestAttributes().request
 				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
+            
+            if(params.checklistData.size() == 0 && params.action != 'save') validObvPresent = true;
 
             println "----------------------------------------------checklist lic"
             println checklistInstance.license
@@ -188,88 +192,100 @@ class ChecklistService {
 	    if(!params.checklistData && !isGlobalUpdate)
 			return
             
-		//Checklists.withTransaction() {
-			
-			//checklistInstance = Checklists.get(checklistInstance.id)
-			log.debug "adding observation to checklist " + checklistInstance.title
-			Set updatedObv = new HashSet()
-			Set newObv = new HashSet()
-			def commonObsParams = getParamsForObv(params, checklistInstance)
-			
-			//Each entry in checklistData represent one observatoin
-			// if it has observation id column then those observation needs to be updated else new observation will be created
-			// checklist Edit page will return only dirty list that needs to be updated + new rows that will create new observation
-			// checklist save page will have all new rows that will create new observation
-			params.checklistData.each {  Map m ->
-				def oldObvId = m.remove(OBSERVATION_COLUMN)
-				if(isValidObservation(m, oldObvId, checklistInstance)){
-					def media = m.remove(MEDIA_COLUMN);
-					m.remove(SPECIES_TITLE_COLUMN);
-					m.remove(SPECIES_ID_COLUMN);
-
-	                Map obsParams = new HashMap(commonObsParams);
-	                if(media) {
-	                    media.eachWithIndex{ item, index ->
-	                        item.each { key, value ->
-	                            obsParams.put(key+'_'+index, value);
+		
+		//checklistInstance = Checklists.get(checklistInstance.id)
+		log.debug "adding observation to checklist " + checklistInstance.title
+		Set updatedObv = new HashSet()
+		Set newObv = new HashSet()
+		def commonObsParams = getParamsForObv(params, checklistInstance)
+		
+		//Each entry in checklistData represent one observatoin
+		// if it has observation id column then those observation needs to be updated else new observation will be created
+		// checklist Edit page will return only dirty list that needs to be updated + new rows that will create new observation
+		// checklist save page will have all new rows that will create new observation
+		
+		//XXX: Doing in batch to avoid connection time out
+		List obvSubLists = params.checklistData.collate(BATCH_SIZE)
+		obvSubLists.each { obvSubList ->
+			Observation.withNewTransaction(){  status ->
+				obvSubList.each {  Map m ->
+					def oldObvId = m.remove(OBSERVATION_COLUMN)
+					if(isValidObservation(m, oldObvId, checklistInstance)){
+						def media = m.remove(MEDIA_COLUMN);
+						m.remove(SPECIES_TITLE_COLUMN);
+						m.remove(SPECIES_ID_COLUMN);
+	
+		                Map obsParams = new HashMap(commonObsParams);
+		                if(media) {
+		                    media.eachWithIndex{ item, index ->
+		                        item.each { key, value ->
+		                            obsParams.put(key+'_'+index, value);
+		                        }
+		                    }
+		                }
+		
+						// for old observation
+						if(oldObvId){
+							obsParams.action = "update"
+							obsParams.id = oldObvId
+							updatedObv.add(oldObvId)
+						}else{
+							obsParams.action = "save"
+						}
+	                    if(params.obvDate != '') {
+	                        obsParams.fromDate = m.get(params.obvDate)
+	                        obsParams.toDate = m.get(params.obvDate)
+	                    }
+	                    if(params.latitude != '' && params.longitude != '') {
+	                        //Generating point string if lat long columns marked for each rows
+	                        if(m.get(params.latitude) != '' && m.get(params.longitude) != '') {
+	                            obsParams.areas = "POINT("+m.get(params.longitude)+" " + m.get(params.latitude)+")"
 	                        }
 	                    }
-	                }
-	
-					// for old observation
-					if(oldObvId){
-						obsParams.action = "update"
-						obsParams.id = oldObvId
-						updatedObv.add(oldObvId)
-					}else{
-						obsParams.action = "save"
+						obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
+	                    log.debug "saving observation ${obsParams}"
+						def res = observationService.saveObservation(obsParams, false)
+						Observation observationInstance = res.instance
+						saveReco(observationInstance, m, checklistInstance)
+						
+						if(!oldObvId){
+	                        log.debug "Adding ${observationInstance} to checklist ${checklistInstance}"
+							checklistInstance.addToObservations(observationInstance)
+							newObv.add(observationInstance.id)
+						}
 					}
-                    if(params.obvDate != '') {
-                        obsParams.fromDate = m.get(params.obvDate)
-                        obsParams.toDate = m.get(params.obvDate)
-                    }
-                    if(params.latitude != '' && params.longitude != '') {
-                        //Generating point string if lat long columns marked for each rows
-                        if(m.get(params.latitude) != '' && m.get(params.longitude) != '') {
-                            obsParams.areas = "POINT("+m.get(params.longitude)+" " + m.get(params.latitude)+")"
-                        }
-                    }
-					obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
-                    log.debug "saving observation ${obsParams}"
-					def res = observationService.saveObservation(obsParams, false)
-					Observation observationInstance = res.observationInstance
-					saveReco(observationInstance, m, checklistInstance)
-					
-					if(!oldObvId){
-                        log.debug "Adding ${observationInstance} to checklist ${checklistInstance}"
-						checklistInstance.addToObservations(observationInstance)
-						newObv.add(observationInstance.id)
+				} //ends observation create
+			} //ends transaction
+		} //ends batches
+		
+		//if any global thing (ie. species group, habitat) changes then updating all the observation
+		if(isGlobalUpdate){
+			commonObsParams.action = "update"
+			commonObsParams.checklistAnnotations = null
+			obvSubLists = checklistInstance.observations.collate(BATCH_SIZE)
+			obvSubLists.each { obvSubList ->
+				Observation.withNewTransaction(){  status ->
+					obvSubList.each { obv ->
+						if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
+							commonObsParams.id = obv.id
+							observationService.saveObservation(commonObsParams, false, false)
+						}
 					}
-				}
-			}
-			//if any global thing (ie. species group, habitat) changes then updating all the observation
-			if(isGlobalUpdate){
-				commonObsParams.action = "update"
-				commonObsParams.checklistAnnotations = null
-				checklistInstance.observations.each { obv ->
-					if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
-						commonObsParams.id = obv.id
-						observationService.saveObservation(commonObsParams, false, false)
-					}
-				}
-			}
-            log.debug "All checklist observations  ${checklistInstance.observations.size()}";
-			//updating obv count
+				} //ends transaction
+			} // ends batches
+		}
+		 
+        log.debug "All checklist observations  ${checklistInstance.observations.size()}";
+		//updating obv count
+		Observation.withNewTransaction(){  status ->
 			checklistInstance.speciesCount = (checklistInstance.observations) ? checklistInstance.observations.size() : 0
             log.debug "Updating checklist count to ${checklistInstance.speciesCount}"
             if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
             } else {
 				checklistInstance.errors.allErrors.each { log.error it }
 			}
-            log.debug "Updating checklist count to ${checklistInstance.getPersistentValue('speciesCount')}"
-            
-		//}
-			
+		}
+        log.debug "Updating checklist count to ${checklistInstance.getPersistentValue('speciesCount')}"
 		log.debug "saved checklist observations"
 	}
 	

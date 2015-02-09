@@ -81,8 +81,8 @@
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 
 					<li
-						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
-						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
+						class="${(params.controller == 'discussion' && params.action == 'list')?' active':''}"><a
+						href="${uGroup.createLink('controller':'discussion', 'action':'list', 'userGroup':userGroupInstance)}"
 						title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
 					</li>
 					
@@ -90,11 +90,13 @@
 								href="${uGroup.createLink(mapping:'userGroup', 'action':'pages', 'userGroup':userGroupInstance)}"
 								title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
 					</li>
-
-					<li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
-						href="${uGroup.createLink(mapping:'userGroup', 'action':'about', 'userGroup':userGroupInstance)}"
-						title="${g.message(code:'button.about.us')}"><g:message code="button.about.us" /></a>
+					
+					<li
+						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
+						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
+						title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
 					</li>
+
 					
 
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -113,6 +115,11 @@
                                                         href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
                                                         title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a>
                                                     </li>
+                                                    
+                                                    <li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
+														href="${uGroup.createLink(mapping:'userGroup', 'action':'about', 'userGroup':userGroupInstance)}"
+														title="${g.message(code:'button.about.us')}"><g:message code="button.about.us" /></a>
+													</li>
 						
 						</ul></li>
 				</ul>
@@ -157,8 +164,8 @@
                                 </ul>
 
 				<ul class="nav pull-right">
-					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
+					<li class=" ${(params.controller == 'discussion')?'active':''}"><a
+                                            href="${uGroup.createLink("controller":"discussion", "action":"list")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
@@ -166,10 +173,11 @@
 								href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
 								title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
 					</li>
+					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
+                                href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
+					</li>
 					
-					<li
-						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
-						href="/theportal" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>
+					
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> <g:message code="link.moree" /> <b class="caret"></b> </a>
 
@@ -189,6 +197,9 @@
 								class="${(params.controller == 'chart')?' active':''}"><a
 								href="${uGroup.createLink(controller:'chart')}"
 								title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a> </li>
+							<li
+								class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
+								href="/theportal" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>	
 						</ul>
 					</li>
 				</ul>

@@ -36,7 +36,7 @@
                     <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
                 </h6>
                 <div>
-                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) && !category.key.equalsIgnoreCase(fieldFromName.references) && isSpeciesContributor && category.value.isContributor!=2}">
+                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) && !category.key.equalsIgnoreCase(fieldFromName.references) && !category.key.equalsIgnoreCase(fieldFromName.documents) && isSpeciesContributor && category.value.isContributor!=2}">
                 <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:category.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
                 </g:if>
 
@@ -45,7 +45,7 @@
                 <div 
                     class="<%=category.key.equals(brief)?'defaultSpeciesField':''%> speciesField">
                     <div>   
-                    <g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) || category.key.equalsIgnoreCase(fieldFromName.references)}">
+                    <g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) || category.key.equalsIgnoreCase(fieldFromName.references)|| category.key.equalsIgnoreCase(fieldFromName.documents)}">
                     <g:if
                     test="${category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords)}">
                     <g:render template="/species/showSpeciesOccurences" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance, 'category':category]"/> 
@@ -53,6 +53,10 @@
 
                     <g:elseif test="${category.key.equalsIgnoreCase(fieldFromName.references)}">
                     <g:render template="/species/showSpeciesReferences" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance, 'category':category, 'isSpeciesContributor':isSpeciesContributor, 'isSpeciesFieldContributor':isSpeciesFieldContributor]"/> 
+                    </g:elseif>
+
+                    <g:elseif test="${category.key.equalsIgnoreCase(fieldFromName.documents)}">
+                        <g:render template="/species/speciesFieldDocumentListWrapperTemplate" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance]"/> 
                     </g:elseif>
 
                     <g:else>

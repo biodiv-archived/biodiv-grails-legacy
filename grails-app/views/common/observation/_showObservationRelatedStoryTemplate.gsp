@@ -19,6 +19,9 @@ $(document).ready(function() {
     <g:elseif test="${controller=='observation'}">
         <%  controller_name=g.message(code:'default.observation.label')  %>
     </g:elseif>
+    <g:elseif test="${controller=='discussion'}">
+        <%  controller_name=g.message(code:'default.discussion.label')  %>
+    </g:elseif>
     <g:else test="${controller=='document'}" >
         <%  controller_name=g.message(code:'feature.part.document')   %>
     </g:else>
@@ -46,12 +49,12 @@ $(document).ready(function() {
 		<div class="observation_links">
 			<g:if test="${observationId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
+					href="${uGroup.createLink(controller:controller, action:'list', parentType:'observation', filterProperty : filterProperty, offset:0, limit:12, 'userGroupInstance':userGroupInstance, parentId:observationId )}"><g:message code="button.show.all" />
 					</a>
 			</g:if>
 			<g:elseif test="${speciesId}">
 				<a class="btn btn-mini"
-					href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance)}"><g:message code="button.show.all" />
+					href="${uGroup.createLink(controller:controller, action:'list', parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:12, 'userGroupInstance':userGroupInstance, parentId:speciesId )}"><g:message code="button.show.all" />
 					</a>
 			</g:elseif>
                         <g:else>

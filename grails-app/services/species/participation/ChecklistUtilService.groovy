@@ -367,22 +367,21 @@ class ChecklistUtilService {
 //	}
 //	
 //	//XXX this method is to add activity on back date only for checklist to observation migration
-	public addActivityFeed(rootHolder, activityHolder, author, activityType, date, description=null, isShowable=null){
+	public addActivityFeed(rootHolder, activityHolder, author, activityType, Date date, description=null, isShowable=null){
+		def newDate = new Date(date.time)
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
-		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
-			subRootHolderType = activityHolder.class.getCanonicalName()
-			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
-		}
 		isShowable= (isShowable != null) ? isShowable : (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:ActivityFeedService.getType(activityHolder), \
 						isShowable:isShowable,activityDescrption:description,\
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId,
-						dateCreated :date, lastUpdated:date);
-					
+						dateCreated :newDate, lastUpdated:newDate);
+		
+		af.dateCreated = newDate
+		af.lastUpdated = newDate
 		if(!af.save(flush:true)){
 			af.errors.allErrors.each { log.error it }
 			return null

@@ -305,20 +305,24 @@ class SpeciesService extends AbstractObjectService  {
                 //updating metadata for the species field
                 def result = updateSpeciesFieldInstance(speciesFieldInstance, params);
                 def errors = result.errors;
-                speciesInstance.addToFields(speciesFieldInstance);
+                if(result.success) {
+                    speciesInstance.addToFields(speciesFieldInstance);
 
-                //TODO:make sure this is run in only one user updates this species at a time
-                Species.withTransaction {
-                    if(!speciesInstance.save()) {
-                        speciesInstance.errors.each { errors << it; log.error it }
-                        return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
+                    //TODO:make sure this is run in only one user updates this species at a time
+                    Species.withTransaction {
+                        if(!speciesInstance.save()) {
+                            speciesInstance.errors.each { errors << it; log.error it }
+                            return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
+                        }
                     }
-                }
 
-                List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
-                sortAsPerRating(sameFieldSpeciesFieldInstances);
-                addMediaInSpField(params, speciesFieldInstance);
-                return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
+                    List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
+                    sortAsPerRating(sameFieldSpeciesFieldInstances);
+                    addMediaInSpField(params, speciesFieldInstance);
+                    return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
+                } else {
+                    return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -347,7 +351,7 @@ class SpeciesService extends AbstractObjectService  {
             def result;
             SpeciesField.withTransaction { status ->
                 result = updateSpeciesFieldInstance(speciesField, params); 
-                if(!speciesField.save(flush:true)) {
+                if(result.success  == false || !speciesField.save(flush:true)) { 
                     speciesField.errors.each { result.errors << it }
                     return [success:false, msg:messageSource.getMessage("info.update.speciesfield", null, LCH.getLocale()), errors:result.errors]
                 }
@@ -364,12 +368,12 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     private def updateSpeciesFieldInstance(SpeciesField speciesField, params) {
-        
+        List errors = [];
+
         if(!params.description) {
-            return [success:false, msg:messageSource.getMessage("info.about.description", null, LCH.getLocale())]
+            return [success:false, msg:messageSource.getMessage("info.about.description", null, LCH.getLocale()), errors:[messageSource.getMessage("info.about.description", null, LCH.getLocale())]]
         }
 
-        List errors = [];
         String msg;
         if(!params.contributor) {
             params.contributor = springSecurityService.currentUser.id+'';
@@ -465,7 +469,7 @@ class SpeciesService extends AbstractObjectService  {
         
         
         log.warn errors
-        return [errors:errors]
+        return [success:true, errors:errors]
     }
 
 
@@ -621,52 +625,101 @@ class SpeciesService extends AbstractObjectService  {
         }
     }
 
-    def updateReference(referenceId, long speciesFieldId, def value) {
-        
-        if(!value) {
+    def updateReference(referenceId, long speciesId, long fieldId, speciesFieldId, def value) {
+         if(!value) {
             return [success:false, msg:messageSource.getMessage("info.field.cannot.empty", null, LCH.getLocale())]
         }
 
-        Reference oldReference;
-        if(referenceId) {
-            oldReference = Reference.read(referenceId);
+        if(speciesId && fieldId){
+            return updateSpeciesReference(referenceId, speciesId, fieldId, value);
+        }
+    }
 
-            if(!oldReference) {
-                 def messagesourcearg = new Object[1];
-                    messagesourcearg[0] = referenceId;
+
+    private def updateSpeciesReference(referenceId, long speciesId, long fieldId, def value) {
+        String msg = '';
+        def content;
+        def count_chk = ['success_count' : 0 ,'failure_count' : 0];
+        SpeciesField speciesField,speciesFields;
+        Species speciesInstance = Species.get(speciesId);
+        if(speciesId && !referenceId){               
+            if(!speciesInstance){
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = referenceId;
                 return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
-            } else if(oldReference.title == value) {
-                return [success:true, msg:"Nothing to change"]
             }
-        }
 
-        SpeciesField speciesField = SpeciesField.get(speciesFieldId);
-        if(!speciesField) {
-            def messagesourcearg = new Object[1];
-                messagesourcearg[0] = speciesFieldId;
-            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
-        }
+            Field field = Field.read(fieldId);       
+            speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
+            if(!speciesField){
+                speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
+            }
+            def references = [];        
+            value?.split("\\r?\\n").each { l ->
+                l = l.trim(); 
+                if(l && l.trim()) {                 
+                    def chk = is_exist_reference(speciesInstance, l);
+                    if(chk){
+                        Reference reference;
+                        if(l.startsWith("http://")) {
+                            reference = new Reference(url:l); 
+                        }else{
+                            reference = new Reference(title:l); 
+                        }   
+                        speciesField.addToReferences(reference);
+                        references.push(reference);
+                        count_chk.success_count =  count_chk.success_count +1;
+                    }else{
+                        count_chk.failure_count =  count_chk.failure_count +1;
+                    }    
 
-        if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
-        }
+                }
+            }
 
-
-        SpeciesField.withTransaction { status ->
-            String msg = '';
-            def content;
-            if(oldReference)
-                speciesField.removeFromReferences(oldReference);
-            speciesField.addToReferences(new Reference(title:value));
+            if(!speciesField.save(flush:true)){
+                speciesField.errors.allErrors.each { log.error it }
+            }
             msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
-            content = speciesField.references;
-
-            if(!speciesField.save()) {
-                speciesField.errors.each { log.error it }
-                return [success:false, msg:messageSource.getMessage("info.error.updating.reference", null, LCH.getLocale())]
+            content = references;
+        }else{
+            if(!referenceId) {
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = referenceId;
+                return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
             }
-            return [success:true, id:speciesFieldId, type:'reference', msg:msg, content:content]
+            def chk = is_exist_reference(speciesInstance, value); 
+            if(!chk){
+                return [success:false, msg:messageSource.getMessage("info.reference.id.duplicate.found", null, LCH.getLocale())]
+
+            }
+            Reference reference = Reference.get(referenceId);            
+            speciesField = reference.speciesField;
+            if(value.startsWith("http://")) {
+                reference.url= value;
+            }else{
+                reference.title= value;
+            }
+
+            if(!reference.save(flush:true)){
+                reference.errors.allErrors.each { log.error it }
+            }
+            content = reference;
+            msg = messageSource.getMessage("info.success.adding.reference", null, LCH.getLocale());
         }
+
+        return [success:true, id:speciesField.id, type:'reference', msg:msg, content:content, count_chk:count_chk]
+    }
+
+    private def is_exist_reference(Species speciesInstance, def title){
+        SpeciesField speciesFields = SpeciesField.findBySpecies(speciesInstance); 
+        def rf_chk;
+        for( sf in speciesFields){
+            rf_chk = Reference.findAllBySpeciesFieldAndTitle(sf,title);
+            if(rf_chk){
+                return false;                
+            }
+        }  
+        return true;   
     }
 
     def addDescription(long speciesId, long fieldId, String value) {
@@ -1147,7 +1200,7 @@ class SpeciesService extends AbstractObjectService  {
                 messagesourcearg[0] = speciesFieldId;
             return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
-
+        
         if(!speciesPermissionService.isSpeciesFieldContributor(speciesField, springSecurityService.currentUser)) {
             return [success:false, msg:messageSource.getMessage("info.no.permission.delete.reference", null, LCH.getLocale())]
         }
@@ -1602,6 +1655,21 @@ class SpeciesService extends AbstractObjectService  {
             queryParams["featType"] = Species.class.getCanonicalName();
         }
 
+        if(params.hasMedia) {
+            switch(params.hasMedia) {
+                case "true" :
+                    filterQuery += " and s.hasMedia = true "            
+                    countFilterQuery += " and s.hasMedia = true "            
+                break
+                case "false" :
+                    filterQuery += " and s.hasMedia = false "            
+                    countFilterQuery += " and s.hasMedia = false "
+                break
+                default:
+                break
+            }
+        }
+
         if(params.daterangepicker_start && params.daterangepicker_end){
 			def startDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_start))
             def endDate = DATE_FORMAT.parse(URLDecoder.decode(params.daterangepicker_end))
@@ -1808,6 +1876,22 @@ class SpeciesService extends AbstractObjectService  {
             species.addToResources(resource);
         }
         //species.merge();
+        if(resources.size() > 0) {
+            if(species.instanceOf(Species)) {
+                species.updateHasMediaValue(true)
+            }
+            if(species.instanceOf(SpeciesField)) {
+                species.species.updateHasMediaValue(true)
+            }
+        } else {
+            if(species.instanceOf(Species)) {
+                species.updateHasMediaValue(false)
+            }
+            if(species.instanceOf(SpeciesField)) {
+                species.species.updateHasMediaValue(false)
+            }
+        }
+
         if(!species.save(flush:true)){
             species.errors.allErrors.each { log.error it }
             return false
@@ -1884,4 +1968,52 @@ class SpeciesService extends AbstractObjectService  {
             def out1 = updateSpecies(p1, speciesField)
         }
     }
+
+def checking(){
+    Field field = Field.read(81L);
+    
+    int limit = 500, offset = 0, insert_check = 0,exist_check =0;
+    while(true){
+     println "offset=================="+offset +"==========================limit"+limit;  
+    def sf = SpeciesField.createCriteria()  
+    def speciesFieldInstancesList = sf.list (max: limit , offset:offset) {        
+            eq("field", field)             
+    }  
+   
+    for ( speciesFieldInstances in speciesFieldInstancesList ) {
+         SpeciesField.withNewTransaction{
+            if(!speciesFieldInstances?.description){
+                speciesFieldInstances.description = "dummy";
+                speciesFieldInstances.save();                
+            }else{
+                Reference reference = Reference.findBySpeciesField(speciesFieldInstances);                            
+                if(!reference){
+                     speciesFieldInstances?.description?.split("\\r?\\n").each { l ->
+                        l = l.trim(); 
+                       if(l && l != "dummy" ) {
+                            println "SpecieField ID ====="+speciesFieldInstances.id;
+                            speciesFieldInstances.addToReferences(new Reference(title:l.trim()));
+                            speciesFieldInstances.description = "dummy";
+                            speciesFieldInstances.save();                            
+                            insert_check+= 1;
+                            println "Inserted "+insert_check; 
+                        }else{
+                            println "NOT Inserted"; 
+                        }
+                    }                      
+                }else{
+                    println "Passed Existed!"
+                }
+            }
+        }
+    }
+    offset = offset+limit; 
+    utilsService.cleanUpGorm(true); 
+    if(!speciesFieldInstancesList) break;  
+    } 
+
+   return "Passed!" 
+}
+
+    
 }

@@ -1,4 +1,6 @@
 <%@page import="species.participation.Observation"%>
+<%@page import="species.participation.Discussion"%>
+<%@page import="content.eml.Document"%>
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.participation.Checklists"%>
 <%@page import="species.Species"%>
@@ -20,6 +22,10 @@
 				value="${Checklists.class.getCanonicalName()}"> <g:message code="default.checklist.label" /> </a></li>
 			<li class="group_option"><a class=" feed_filter_label"
 				value="${Species.class.getCanonicalName()}"> <g:message code="default.species.label" /> </a></li>
+			<li class="group_option"><a class=" feed_filter_label"
+				value="${Discussion.class.getCanonicalName()}"> <g:message code="default.discussion.label" /> </a></li>
+			<li class="group_option"><a class=" feed_filter_label"
+				value="${Document.class.getCanonicalName()}"> <g:message code="default.document.label" /> </a></li>		
 		</ul>
 	</div>
 </div>

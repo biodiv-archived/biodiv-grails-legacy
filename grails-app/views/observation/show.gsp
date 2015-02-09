@@ -94,9 +94,12 @@ if(r) {
                                                     <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                                    href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
-                                                
+                                                    href="#"
+                                                    onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+                                                <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                                                    <input type="hidden" name="id" value="${observationInstance.id}" />
+                                                </form>
+ 
                                                 </sUser:ifOwns>
 
                                             </div>
@@ -111,7 +114,7 @@ if(r) {
                                
                                <div class="span12" style="margin-left:0px">
                                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true]" />
+                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress, 'userGroup':userGroupInstance]" />
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
@@ -385,18 +388,18 @@ $(document).ready(function(){
                     return true;
                 }, 
                 success: function(data, statusText, xhr, form) {
-                    if(data.status == 'success') {
+                    if(data.status == 'success' || data.success == true) {
                         if(data.canMakeSpeciesCall === 'false'){
                             $('#selectedGroupList').modal('show');
                         } else{
-                            showRecos(data, null);
+                            preLoadRecos(3, 0, false);
                             updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
                             updateFeeds();
                             setFollowButton();
-                            showUpdateStatus(data.msg, data.status);
+                            showUpdateStatus(data.msg, data.success?'success':'error');
                         }
                     } else {
-                        showUpdateStatus(data.msg, data.status);
+                        showUpdateStatus(data.msg, data.success?'success':'error');
                     }
                     $("#addRecommendation")[0].reset();
                     $("#canName").val("");
@@ -433,6 +436,13 @@ $(document).ready(function(){
         } 
         initializeLanguage(); 
     });
+    function deleteObservation(){
+        var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";
+
+        if(confirm(test)){
+            document.forms.deleteForm.submit();
+        }
+    }
 
 </r:script>
 

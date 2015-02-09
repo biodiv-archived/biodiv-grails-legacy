@@ -451,7 +451,7 @@ class Utils {
 	public static boolean isSearchAction(params, String action = null){
 		return ("search".equalsIgnoreCase(action) || "search".equalsIgnoreCase(params.action) ||  params.aq || params.query ) 
 	}
-	
+
 }
 
 

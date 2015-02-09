@@ -4,7 +4,7 @@
 	<g:if test="${!showDetails }">
 		<h5 class="ellipsis">
 			<a
-				href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
+				href="${uGroup.createLink([action:"show", controller:"user", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 				${userInstance.name} </a>
 		</h5>
 	</g:if>

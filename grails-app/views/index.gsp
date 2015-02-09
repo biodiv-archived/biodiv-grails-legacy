@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Species"%>
 <%@page import="species.participation.Observation"%>
-<%@page import="species.participation.ActivityFeed"%>
+<%@page import="species.participation.Discussion"%>
 <%@page import="species.groups.UserGroup"%>
 <%@page import="content.eml.Document"%>
 <html>
@@ -37,7 +37,7 @@
 
                 <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">${g.message(code:'button.documents')}</span></div>
                 <div id="groups_entry" class="entry"  onclick="location.href='${uGroup.createLink(controller:'group', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.groups.label')}</span></div>
-                <div id="dashboard" class="entry" onclick="location.href='${uGroup.createLink(controller:'chart', action:'show', absolute:true)}'"><span class="content">${g.message(code:'button.dashboard')}</span></div>
+                <div id="dashboard" class="entry" onclick="location.href='${uGroup.createLink(controller:'discussion', action:'list', absolute:true)}'"><span class="content">${g.message(code:'button.discussions')}</span></div>
 
             </div>
 
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">202</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.maps')}">206</div>
                 </div>
                 <div class="entry">
                     <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>
@@ -60,7 +60,7 @@
                     <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.count()}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.activity')}">${ActivityFeed.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.discussions')}">${Discussion.count()}</div>
                 </div>
 
             </div>

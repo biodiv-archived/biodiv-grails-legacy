@@ -15,6 +15,7 @@ h4. addComment
 ** subject: subject
 ** newerTimeRef : current time in milliseconds
 * *REST method* : POST
+* *Permissions* : logged in user. needs X-Auth-Token header
 * *Request* :
 {code}
 http://indiabiodiversity.localhost.org/api/comment/addComment?commentHolderId=268292&rootHolderId=268292&rootHolderType=species.participation.Observation&commentHolderType=species.participation.Observation&newerTimeRef=1403071938526&commentBody=test comment
@@ -30,6 +31,7 @@ parentId:
 mainParentId:
 subject:test subject
 newerTimeRef:1403071938526
+{code}
 
 * *Response* :
 ** Successful response :
@@ -85,6 +87,7 @@ h4. removeComment
 * *Parameters* :
 ** commentId : Id of comment object
 * *REST method* : GET
+* *Permissions* : logged in user. needs X-Auth-Token header
 * *Request* :
 {code}
 http://indiabiodiversity.localhost.org/api/comment/removeComment?commentId=12375
@@ -92,6 +95,7 @@ http://indiabiodiversity.localhost.org/api/comment/removeComment?commentId=12375
 For example
 {code}
 commentId:12375
+{code}
 
 * *Response* :
 ** Successful response :
@@ -133,6 +137,7 @@ parentId:
 max:3
 refTime:1403071938526
 timeLine:older
+{code}
 
 * *Response* :
 {code}

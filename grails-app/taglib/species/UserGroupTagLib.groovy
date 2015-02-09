@@ -270,6 +270,7 @@ class UserGroupTagLib {
         }
         return result;
     } 
+
 	def getCurrentUserUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
 		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
@@ -335,7 +336,7 @@ class UserGroupTagLib {
 	def isUserGroupMember = { attrs, body->
 		def user = springSecurityService.getCurrentUser();
 		//TODO:optimize count
-		if(user.getUserGroups().size() > 0) {
+		if(user && user.getUserGroups().size() > 0) {
 			out<< body();
 		}
 	}

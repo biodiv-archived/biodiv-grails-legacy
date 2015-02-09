@@ -18,6 +18,7 @@ import content.eml.Document;
 import content.Project;
 import species.Species
 import species.Language;
+import species.participation.Discussion;
 
 import utils.Newsletter;
 
@@ -55,7 +56,7 @@ class UserGroup implements Taggable {
 	// Language
     Language language;
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true
@@ -157,6 +158,22 @@ class UserGroup implements Taggable {
 	Resource mainImage() {
 		return icon(ImageType.NORMAL);
 	}
+
+    String title() {
+        return this.name;
+    }
+
+    String notes(Language userLangauge = null) {
+        return this.description;
+    }
+
+    String summary(Language userLangauge = null) {
+        return this.description;
+    }
+
+    SpeciesGroup fetchSpeciesGroup() {
+        return null;
+    }
 
 	def incrementPageVisit(){
 		visitCount++;
@@ -409,7 +426,10 @@ class UserGroup implements Taggable {
     def noOfDocuments() {
         return userGroupService.getCountByGroup(Document.simpleName, this.id?this:null);
     }
-    
+	
+	def noOfDiscussions() {
+		return userGroupService.getCountByGroup(Discussion.simpleName, this.id?this:null);
+	}
     
     static UserGroup findByWebaddress(webaddress){
     	if(webaddress){

@@ -1,5 +1,6 @@
 <%@page import="species.auth.SUser"%>
 <%@ page import="species.participation.Observation"%>
+<%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 <script type="text/javascript">
@@ -18,7 +19,7 @@
 </script>
 <div class="info-message" id="info-message">
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
-                        class="icon-search"></i></span> ${speciesCountWithContent}<g:message code="common.observation.species.pages" /> <g:if test="${speciesCountWithContent>1}"></g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}"><g:message code="text.and" /> ${instanceTotal- speciesCountWithContent} <g:message code="common.observation.species.stubs" /> </g:if> <g:message code="text.found" /></g:if>
+                class="icon-search"></i></span> ${speciesCountWithContent} <g:message code="common.observation.species.pages" /> <g:if test="${speciesCountWithContent>1}"></g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}"><g:message code="text.and" /> ${instanceTotal- speciesCountWithContent} <g:message code="common.observation.species.stubs" /> </g:if> <g:message code="text.found" /><g:if test="${params.hasMedia == 'true'}"> <g:message code="with.media" /></g:if><g:if test="${params.hasMedia == 'false'}"> <g:message code="without.media" /></g:if></g:if>
 		<g:else>
 			<span class="name" style="color: #b1b1b1;"><i
 				class="icon-search"></i></span> <g:if test="${instanceTotal==0}"><g:message code="text.no.result" /> </g:if>
@@ -33,8 +34,25 @@
 						<g:if test="${observationCount}"> <g:message code="text.and" /> </g:if>
 						<g:message code="text.checklists" args="${checklistCount}" /><g:if test="${checklistCount>1}"><g:message code="text.s" /></g:if>
 					</g:if>
-				</g:else> 
-			<g:message code="text.found" /> 
+                </g:else> 
+                <g:if test="${params.filterProperty == 'speciesName' || params.filterProperty == 'nearByRelated' || params.filterProperty == 'taxonConcept'}">
+                    <g:if test="${params.filterProperty == 'speciesName'}">
+                        <% def obv = Observation.read(params.parentId?.toLong()) %>
+                        of <a href="${uGroup.createLink( action:"show", controller:"observation", id:params.parentId, userGroupWebaddress:params.webaddress, absolute:true)}"> ${raw(obv.fetchSpeciesCall())}</a>
+                    </g:if>
+                    <g:elseif test="${params.filterProperty == 'taxonConcept'}">
+                        <% def sp = Species.read(params.parentId?.toLong()) %>
+                        of <a href="${uGroup.createLink(mapping:"userGroupGeneric", action:"show", controller:"species", id:params.parentId, userGroupWebaddress:params.webaddress, absolute:true)}"> ${raw(sp.title)}</a>
+                    </g:elseif>
+                    <g:elseif test="${params.filterProperty == 'nearByRelated'}">
+                        <% def obv = Observation.read(params.parentId?.toLong()) %>
+                        <g:message code="text.radius.km" /> ${obv.latitude} , ${obv.longitude}  
+                    </g:elseif>
+     
+                </g:if>
+                <g:else>
+                    <g:message code="text.found" /> 
+                </g:else>
 		</g:else>
 		<%
 			boolean dateRangeSet = false	
@@ -102,7 +120,7 @@
 				test="${queryParam.key == 'user' && SUser.read(queryParam.value)}">
                                     <g:message code="text.by.user" />  <span class="highlight">
 					<a
-					href="${uGroup.createLink(controller:"SUser", action:"show", id:queryParam.value)}">
+					href="${uGroup.createLink(controller:"user", action:"show", id:queryParam.value)}">
 						${SUser.read(queryParam.value).name.encodeAsHTML()} <a
 						id="removeUserFilter" href="#">[X]</a> </a> </span>
 			</g:if>

@@ -45,11 +45,15 @@ grails.mime.types = [ html: [
 	csv: 'text/csv',
 	all: '*/*',
 	json: [
-		'application/json',
+        'application/json',
+		'application/json;v=1.0',
 		'text/json'
 	],
 	form: 'application/x-www-form-urlencoded',
-	multipartForm: 'multipart/form-data'
+	multipartForm: 'multipart/form-data',
+    all:'*/*',
+    api:['application/vnd.biodiv.app.api+json;v=1.0', 'application/json'],
+    apiv2:['application/vnd.biodiv.app.api+json;v=2.0', 'application/json']
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -338,6 +342,7 @@ speciesPortal {
 		ICONS = "icons"
 		AUDIO = "audio"
 		VIDEO = "video"
+		DOCUMENTS = "Documents"
 	}
 	group {
 		ALL = "All"
@@ -516,10 +521,10 @@ environments {
             }
             error stdout:"StackTrace"
             error   'net.sf.ehcache.hibernate'
-            error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
+            error    'org.codehaus.groovy.grails.web.pages' //  GSP
+            error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
+            error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
+            error   'org.codehaus.groovy.grails.commons', // core / classloading
                     'org.codehaus.groovy.grails.plugins', // plugins
                     'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
                     'grails.app.tagLib.org.grails.plugin.resource',
@@ -571,6 +576,8 @@ environments {
             debug 'org.springframework.transaction'
             info    'org.hibernate.jdbc.ConnectionManager'
             */
+            trace   'com.grailsrocks.emailconfirmation'
+            debug   'com.odobo.grails.plugin.springsecurity.rest'
        }
     }
 	test {
@@ -1527,7 +1534,8 @@ jcaptchas {
 			)
 		),
 		180, // minGuarantedStorageDelayInSeconds
-		180000 // maxCaptchaStoreSize
+		180000, // maxCaptchaStoreSize
+        75000
 	)
 
 	/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
@@ -1606,16 +1614,18 @@ grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
 
 //REST
 //grails.plugin.springsecurity.rest.login.useJsonCredentials = true
-grails.plugin.springsecurity.rest.login.useRequestParamsCredentials=true
 grails.plugin.springsecurity.rest.token.storage.useGorm=true
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName='species.auth.AuthenticationToken'
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenValuePropertyName='tokenValue'
 grails.plugin.springsecurity.rest.token.storage.gorm.usernamePropertyName='email'
+grails.plugin.springsecurity.rest.login.useRequestParamsCredentials=true
 grails.plugin.springsecurity.rest.login.endpointUrl='/api/login'
 grails.plugin.springsecurity.rest.login.failureStatusCode=401
 grails.plugin.springsecurity.rest.logout.endpointUrl='/api/logout'
 grails.plugin.springsecurity.rest.token.validation.headerName='X-Auth-Token'
-
+grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
+grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
+grails.plugin.springsecurity.rest.token.rendering.tokenPropertyName = "token"
 //APPINFO
 
 grails.plugins.dynamicController.mixins = [
@@ -1650,6 +1660,14 @@ grails.plugin.springsecurity.filterChain.chainMap = [
     '/**/css/**':'exceptionTranslationFilter',
     '/**/images/**':'exceptionTranslationFilter',
     '/**/img/**':'exceptionTranslationFilter',
-    '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',  // Stateless chain
+    '/api/guest/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+    '/api/oauth/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+    '/api/register/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+    '/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
     '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]
+
+//http://mrhaki.blogspot.in/2014/07/grails-goodness-enable-accept-header.html
+grails.mime.use.accept.header = true // Default value is true.
+grails.mime.disable.accept.header.userAgents = []
+

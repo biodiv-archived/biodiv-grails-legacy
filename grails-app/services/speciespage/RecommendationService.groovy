@@ -22,7 +22,7 @@ class RecommendationService {
 	def namesIndexerService;
 
 	static transactional = false
-	static int BATCH_SIZE = 20
+	static int BATCH_SIZE = 50
 
 	/**
 	 * TODO:Bind this call to recommendation domain object save
@@ -71,7 +71,7 @@ class RecommendationService {
 					reco.errors.allErrors.each { log.error it }
 					log.error "Coundn't save the recommendation : "+reco				
 				}
-				if (index % BATCH_SIZE == 0) {
+				if (index != 0 && index % BATCH_SIZE == 0) {
 					log.debug "Persisted ${index} recommendations"
 					cleanUpGorm();
 				}
@@ -275,7 +275,8 @@ class RecommendationService {
 		return null;
 	}
 	
-	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
+	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept){
+        println "${name}  ${isScientificName}    ${languageId}    ${taxonConcept}"
         if(!name) return;
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {

@@ -1,5 +1,6 @@
 function feature(submitType, objectId, objectType, url) {
     var featureNotes = $("#featureNotes").val();
+    var expireTime = ''; //$(".expireTime").val();
     userGroup = getSelectedUserGroups($("#featureIn"));
     if(userGroup.length === 0){
         alert('Please select at least one group')
@@ -10,12 +11,20 @@ function feature(submitType, objectId, objectType, url) {
             alert('Notes are required while featuring.')
                 return;
         }
+        if($(".expireTime").length != 0) {
+            if($('.expireTime').val() == '') {
+                alert('Announce till date is required while featuring');
+                return;
+            } else {
+                expireTime = $('.expireTime').val();
+            }
+        }
     }
     $.ajax({
         url: url,
         type: 'POST',
         dataType: "json",
-        data:{'id':objectId, 'type':objectType, 'userGroup': userGroup.join(","), 'notes': featureNotes},
+        data:{'id':objectId, 'type':objectType, 'userGroup': userGroup.join(","), 'notes': featureNotes, 'expireTime' : expireTime},
         success: function(data) {
             if(data.status == 'success'){
                 $(".feature-user-groups button.active").removeClass("btn-success active");

@@ -25,16 +25,16 @@ function loadDistinctRecoList() {
         dataType: "json",
         data:params,
         success: function(data) {
-            $('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
-            if(data.status === 'success') {
-                $.each(data.distinctRecoList, function(index, item) {
+            $('#distinctRecoList .distinctRecoHeading').html(data.model.totalRecoCount?(' (' + data.model.totalRecoCount + ')'):'');
+            if(data.success == true) {
+                $.each(data.model.distinctRecoList, function(index, item) {
                     if(item[1])
                     $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
                     else
                     $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
                 });
-                $me.data('offset', data.next);
-                if(!data.next){
+                $me.data('offset', data.model.next);
+                if(!data.model.next){
                     $me.hide();
                 }
             } else {

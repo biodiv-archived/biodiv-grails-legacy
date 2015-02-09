@@ -81,7 +81,6 @@ class SpeciesUploadService {
 	def speciesSearchService;
 	def springSecurityService
 	def speciesPermissionService;
-	def SUserService;
 	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -131,7 +130,10 @@ class SpeciesUploadService {
 		errorFile.write(mylog)
 		
 		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
-		sBulkUploadEntry.save()
+		
+		if(!sBulkUploadEntry.save(flush:true)){
+			sBulkUploadEntry.errors.allErrors.each { log.error it }
+		}
 		
 		//Every thing is fine then sending mail
 		String link
@@ -276,46 +278,38 @@ class SpeciesUploadService {
 		converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
-		def speciesElements = [];
+		List speciesElements = [];
 		int noOfSpecies = content.size();
 		
 		log.info " CONTENT SIZE " + noOfSpecies
 		boolean isAborted = false
-		for(int i=0; i<noOfSpecies; i++) {
-			if(speciesElements.size() == BATCH_SIZE) {
-				if(shouldAbortUpload(sBulkUploadEntry)){
-					isAborted = true
-					log.debug "Aborting bulk upload"
-					break;
+		List contentSubLists = content.collate(BATCH_SIZE)
+		contentSubLists.each { contentSubList ->
+			if(isAborted || shouldAbortUpload(sBulkUploadEntry)){
+				isAborted = true
+				log.debug "Aborting bulk upload"
+			}
+			
+			if(!isAborted){
+				contentSubList.each { speciesContent ->
+					Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir);
+					if(speciesElement){
+						speciesElements.add(speciesElement);
+					}
 				}
-				
 				def res = saveSpeciesElementsWrapper(speciesElements)
+				speciesElements.clear()
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
-				speciesElements.clear();
 				cleanUpGorm();
 			}
-
-			def speciesContent = content.get(i);
-			Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir);
-			if(speciesElement)
-				speciesElements.add(speciesElement);
 		}
 		
-		//saving last batch
-		if(speciesElements.size() > 0 && !isAborted) {
-			def res = saveSpeciesElementsWrapper(speciesElements)
-			noOfInsertions += res.noOfInsertions;
-			converter.addToSummary(res.summary);
-			converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
-			speciesElements.clear();
-			cleanUpGorm();
+		Species.withNewTransaction { status ->
+			sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
 		}
-		
-		sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
-			
 		
 		log.info "================================ LOG ============================="
 		println  converter.getLogs()
@@ -359,18 +353,14 @@ class SpeciesUploadService {
 
 		int noOfInsertions = 0;
 		try {
-			//Species.withTransaction { status ->
-				for(Node speciesElement : speciesElements) {
+			for(Node speciesElement : speciesElements) {
+				Species.withNewTransaction { status ->
 					Species s = converter.convertSpecies(speciesElement)
 					if(s)
 						species.add(s);
 				}
-				noOfInsertions += saveSpecies(species);
-				//addedSpecies = saveSpeciesBatch(species);
-				//noOfInsertions += addedSpecies.size()
-			//}
-				//converter.addToSummary("Saved ${noOfInsertions} species till now")
-
+			}
+			noOfInsertions += saveSpecies(species);
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
@@ -498,6 +488,11 @@ class SpeciesUploadService {
 						taxonConcept.attach();
 					}
 					groupHandlerService.updateGroup(taxonConcept);
+                    def rCount = s.fetchResourceCount();
+                    def rsfCount = s.fetchSpeciesFieldResourceCount();
+                    if(rCount.size() > 0 || rsfCount > 0) {
+                        s.updateHasMediaValue(true);
+                    }
 					log.info "post processed spcecies ${s}"
 				}
 			//}
@@ -631,12 +626,9 @@ class SpeciesUploadService {
         //storing current locale language information
         //this will be available in mappingConfig for each field
         if(headerMarkers) {
-            println headerMarkers.class;
             def newHeaders = new JSONObject();
             headerMarkers.each {
-                println it.class
                 it.value.language = params.locale_language.id.toString();
-                println it
                 newHeaders.put(it.key, it.value);
             }
             headerMarkers = newHeaders;
@@ -673,7 +665,7 @@ class SpeciesUploadService {
 	def String abortBulkUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+		if((sbu.author != springSecurityService.currentUser) && (!utilsService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
 			return "Authentication failed for user. Please login."
 		}
@@ -691,7 +683,7 @@ class SpeciesUploadService {
 	def String rollBackUpload(params){
 		SpeciesBulkUpload sbu = SpeciesBulkUpload.read(params.id.toLong())
 		
-		if((sbu.author != springSecurityService.currentUser) && (!SUserService.isAdmin(springSecurityService.currentUser?.id))){
+		if((sbu.author != springSecurityService.currentUser) && (!utilsService.isAdmin(springSecurityService.currentUser?.id))){
 			log.error "Authentication failed for user " + springSecurityService.currentUser
 			return "Authentication failed for user. Please login."
 		}
@@ -783,7 +775,8 @@ class SpeciesUploadService {
 		return sList.unique() 
 	}
  
- 	private void unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+ 	boolean unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
+        println "++++++++++++++++++++++"
  		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
 		List sFieldToDelete = specificSFields.intersect(sFields)
 		
@@ -791,15 +784,18 @@ class SpeciesUploadService {
 			and{
 				eq('taxonDefinition', s.taxonConcept)
 				eq('uploader', user)
-				between("uploadTime", sbu.startDate, sbu.endDate)
+				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
-
+        println specificSFields
+        println sFieldToDelete
+        println taxonReg
+        println  TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept)
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			try{
 				Featured.deleteFeatureOnObv(s, user)
-				if(s.userGroups){
+				if(s.userGroups) {
 					List ugIds = s.userGroups.collect {it.id}
 					ugIds.each { ugId ->
 						def ug = UserGroup.get(ugId) 
@@ -808,9 +804,11 @@ class SpeciesUploadService {
 						ug.save(flush:true, failOnError:true)
 					}
 				}
-				if(!s.save(flush:true)){
+				if(!s.save(flush:true)) {
 					s.errors.allErrors.each { log.error it }
+                    return false
 				}
+                return true;
 			}
 			catch (Exception e) {
 				log.error "Error in unposting from usergroup"
@@ -818,6 +816,8 @@ class SpeciesUploadService {
 				throw e
 			}
 		}
+        log.debug "Can't delete species"
+        return false
  	}
 	
 	private void rollBackSpeciesUpdate(Species s, List sFields, List resources, SUser user, SpeciesBulkUpload sbu) throws Exception {

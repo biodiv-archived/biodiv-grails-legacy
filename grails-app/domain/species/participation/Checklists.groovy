@@ -28,7 +28,6 @@ class Checklists extends Observation {
 	
 	def activityFeedService;
 	def obvUtilService;
-	def utilsService;
 	
 	String title;
 	int speciesCount = 0;
@@ -224,6 +223,17 @@ class Checklists extends Observation {
         if(!this.save(flush:true)){
             this.errors.allErrors.each { log.error it } 
         }
+        return
+    }
+
+    def deleteAllObservations() {
+        def cklObvs = this.observations
+        cklObvs.each {
+            it.isDeleted = true;
+            if(!it.save(flush:true)){
+                it.errors.allErrors.each { log.error it } 
+            }
+        } 
         return
     }
 }

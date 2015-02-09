@@ -484,7 +484,11 @@
 
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
     <g:render template="/namelist/newNamePopupTemplate" model="[]"/>
+    <g:render template="/namelist/dialogMsgTemplate" model="[]"/>
     <div id="searching" style="font-weight:bold">Loading...</div>
+    <div id="dialog" title="Basic dialog" style="display:none;">
+        <p id="dialogMsg"></p>
+    </div>
 <script type="text/javascript">
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">

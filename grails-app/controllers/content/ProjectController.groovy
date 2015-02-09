@@ -17,6 +17,7 @@ class ProjectController {
 	def springSecurityService
 	def documentService
     def userGroupService
+    def utilsService
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -86,7 +87,8 @@ class ProjectController {
 			redirect(action: "list")
 		}
 		else {
-			[projectInstance: projectInstance]
+		    [projectInstance: projectInstance,userLanguage : utilsService.getCurrentLanguage(request)]	
+            //[projectInstance: projectInstance]
 		}
 	}
 

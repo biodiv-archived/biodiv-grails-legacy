@@ -7,6 +7,7 @@ import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
+import content.eml.Document
  
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ActivityFeedService {
@@ -56,6 +57,11 @@ class ActivityFeedService {
 	//document related
 	static final String DOCUMENT_CREATED = "Document created"
 	static final String DOCUMENT_UPDATED = "Document updated"
+	
+	//document related
+	static final String DISCUSSION_CREATED = "Discussion created"
+	static final String DISCUSSION_UPDATED = "Discussion updated"
+
 	//static final String DOCUMENT_POSTED_ON_GROUP = "Posted document to group"
 	//static final String DOCUMENT_REMOVED_FROM_GROUP = "Removed document from group"
 	
@@ -188,23 +194,15 @@ class ActivityFeedService {
 		
 		// aggregating object based on feed type
 		Set genericFeedSet = new HashSet()
-		Set commentFeedSet = new HashSet()
 		Set otherFeedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->
-			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklists.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName()){
+			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklists.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName() || it.rootHolderType == Discussion.class.getCanonicalName() || it.rootHolderType == Document.class.getCanonicalName()){
 				//aggregating observation object
 				def feedKey = it.rootHolderType + it.rootHolderId;
 				if(!genericFeedSet.contains(feedKey)){
 					retList.add(it)
 					genericFeedSet.add(feedKey)
-				}
-			}else if(it.rootHolderType == UserGroup.class.getCanonicalName() && it.subRootHolderType == Comment.class.getCanonicalName()){
-				//aggregating comment
-				def feedKey = it.subRootHolderType + it.subRootHolderId;
-				if(!commentFeedSet.contains(feedKey)){
-					retList.add(it)
-					commentFeedSet.add(feedKey)
 				}
 			}else if(params.feedType == GROUP_SPECIFIC){
 				//adding object as it is if group specific object	
@@ -267,7 +265,7 @@ class ActivityFeedService {
 		def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
 		def text = null
 		def activityTitle = null
-		//log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
+		//log.debug "==================== feed === $feedInstance.id === $feedInstance.activityType"
 		switch (activityType) {
 			case COMMENT_ADDED:
 				activityTitle = getLocalizedMessage(COMMENT_ADDED)  + getCommentContext(activityDomainObj, params)
@@ -279,6 +277,10 @@ class ActivityFeedService {
 			case SPECIES_AGREED_ON:
 				activityTitle =  getLocalizedMessage(SPECIES_AGREED_ON) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
+            case [utilsService.OBV_LOCKED, utilsService.OBV_UNLOCKED]:
+				activityTitle =  getLocalizedMessage(activityType) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				break
+
 			case OBSERVATION_FLAGGED:
 			     def messagesourcearg = new Object[1];
                  messagesourcearg[0] =utilsService.getResType(activityRootObj).capitalize();
@@ -344,7 +346,7 @@ class ActivityFeedService {
                     activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
                 }
                 else {
-                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + messageSource.getMessage("info.in", null, LCH.getLocale()) + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) +" "+ messageSource.getMessage("info.in", null, LCH.getLocale()) +" "+ "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
                 }
                 text = feedInstance.activityDescrption
                 break
@@ -353,7 +355,6 @@ class ActivityFeedService {
                 break
 
 			default:
-			println "====================activity====================="+activityType
 				activityTitle = getLocalizedMessage(activityType)
 				break
 		}
@@ -441,21 +442,28 @@ class ActivityFeedService {
 		log.debug "Adding feed for resources " + resources.size()
 		def activityType = isPost ? RESOURCE_POSTED_ON_GROUP : RESOURCE_REMOVED_FROM_GROUP
 		Map resCountMap = [:]
-		def af 
-		resources.each { r->
-			def description = getDescriptionForResourcePull(r, isPost)
-			af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
-			int oldCount = resCountMap.get(r.class.canonicalName)?:0
-			resCountMap.put(r.class.canonicalName, ++oldCount)
-			if(!isBulkPull && sendMail){
-				utilsService.sendNotificationMail(activityType, r, null, null, af)
+		def af
+		List resSubLists = resources.collate(50)
+		resSubLists.each { resList ->
+			ActivityFeed.withNewTransaction { status ->
+				resList.each { r->
+					def description = getDescriptionForResourcePull(r, isPost)
+					af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
+					int oldCount = resCountMap.get(r.class.canonicalName)?:0
+					resCountMap.put(r.class.canonicalName, ++oldCount)
+					if(!isBulkPull && sendMail){
+						utilsService.sendNotificationMail(activityType, r, null, null, af)
+					}
+				}
 			}
 		}
 		if(isBulkPull){
-			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
-			af = addActivityFeed(ug, ug, author, activityType, description, true)
-            if(sendMail)
-			    utilsService.sendNotificationMail(activityType, ug, null, null, af)
+			ActivityFeed.withNewTransaction { status ->
+				def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
+				af = addActivityFeed(ug, ug, author, activityType, description, true)
+	            if(sendMail)
+				    utilsService.sendNotificationMail(activityType, ug, null, null, af)
+			}
 		} 
 		return af
 	}

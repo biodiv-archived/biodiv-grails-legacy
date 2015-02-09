@@ -10,7 +10,7 @@
 </g:if>
 
 <g:elseif test="${feedType == ActivityFeedService.GROUP_SPECIFIC}">
-	<g:if test="${feedInstance.rootHolderType == Observation.class.getCanonicalName() || (feedInstance.rootHolderType == UserGroup.class.getCanonicalName() &&  feedInstance.activityHolderType == Comment.class.getCanonicalName())}">
+	<g:if test="${feedInstance.rootHolderType != UserGroup.class.getCanonicalName()}">
 	<feed:showAggregateFeed
 			model="['feedInstance' : feedInstance, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:feedHomeObject]" />
 	</g:if>

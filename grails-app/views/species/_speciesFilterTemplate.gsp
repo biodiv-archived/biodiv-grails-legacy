@@ -8,8 +8,9 @@
 		</center>
 	</div>
 
+
 	<div class="btn-group pull-right" style="z-index: 10">
-		<button id="selected_sort" class="btn dropdown-toggle"
+        <button id="selected_sort" class="btn dropdown-toggle"
 			data-toggle="dropdown" href="#" rel="tooltip"
 			data-original-title="${g.message(code:'showobservationlistwrapertemp.sort')}">
 
@@ -43,7 +44,31 @@
 			</g:else>
 		</ul>
 	</div>
+	<div class="btn-group pull-right" style="z-index: 10">
+        <button id="has_media" class="btn dropdown-toggle"
+			data-toggle="dropdown" href="#" rel="tooltip"
+			data-original-title="${g.message(code:'has.media.filter')}">
 
+			<g:if test="${params.hasMedia == 'true'}">
+            	<g:message code="with.media" />
+            </g:if>
+            <g:elseif test="${params.hasMedia == 'false'}">
+				<g:message code="without.media" /> 
+            </g:elseif>
+			<g:else>
+            	<g:message code="all.small" />
+            </g:else>
+			<span class="caret"></span>
+		</button>
+		<ul id="hasMediaFilter" class="dropdown-menu">
+				<li class="hasMediaFilterOptions"><a class=" hasMedia_filter_label"
+					value="true"> <g:message code="with.media" /> </a></li>
+				<li class="hasMediaFilterOptions"><a class=" hasMedia_filter_label"
+					value="false"> <g:message code="without.media" /> </a></li>
+				<li class="hasMediaFilterOptions"><a class=" hasMedia_filter_label"
+					value="all"> <g:message code="all.small" /> </a></li>
+		</ul>
+    </div>
 	<obv:showGroupFilter model="['hideHabitatFilter':true]" />
 	
 </div>

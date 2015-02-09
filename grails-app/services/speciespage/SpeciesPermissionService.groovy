@@ -51,7 +51,6 @@ class SpeciesPermissionService {
         return result
     }
 
-
     boolean addCurator(SUser author, List<Species> species) {
         def result = addUsers(author, species, PermissionType.ROLE_CURATOR)
         return result
@@ -114,8 +113,6 @@ class SpeciesPermissionService {
     }
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        //println "IS SPECIES CONTRIBUTOR -----------------"
-        //println speciesInstance.taxonConcept;
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
@@ -128,8 +125,6 @@ class SpeciesPermissionService {
     }
 
     boolean isTaxonContributor(List<TaxonomyDefinition> parentTaxons, SUser user, List<PermissionType> permissionTypes = [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
-        println "PARENT TAXONS-----------------------"
-        println parentTaxons
         if(!parentTaxons || !user || !permissionTypes) return false;
         def permissions = permissionTypes.collect {it.value()};
         def res = SpeciesPermission.withCriteria {
@@ -137,14 +132,9 @@ class SpeciesPermissionService {
             inList('permissionType', permissions)
             inList('taxonConcept',  parentTaxons)
         }
-        println "^^^^^^^^^^^^^^^++++++++++++++++"
-println res;
-        println "^^^^^^^^^^^^^^^++++++++++++++++"
         if(res && res.size() > 0) {
-            println true
             return true
         } else {
-            println false
             return false
         }
     }
@@ -153,7 +143,7 @@ println res;
         if(!user) return false;
         boolean flag = false;
         speciesFieldInstance.contributors.each { c ->
-            if(c.id == user.id) {
+            if((c.id == user.id) || (utilsService.isAdmin(user))) {
                 flag = true;
                 return
             }
@@ -330,21 +320,26 @@ println res;
         return msg
     }
 
-    void addCurator(SUser user, TaxonomyDefinition taxonConcept){
+    boolean addCurator(SUser user, TaxonomyDefinition taxonConcept){
         def cu = SpeciesPermission.findWhere(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CURATOR.toString())
         if(!cu){
             try{
                 def newCu = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CURATOR.toString())
                 if(!newCu.save(flush:true)){
                     newCu.errors.allErrors.each { log.error it }
-                    return null
-                } else {
-                    
-                }
+                    return false;
+                } 
+
+                return true;
 
             }catch (org.springframework.dao.DataIntegrityViolationException e) {
                 log.error "error adding new CURATOR " + e.getMessage()
+                return false
             }
+        } else { 
+            log.debug "${user} is already a curator for ${taxonConcept}"
+            return true;
         }
+
     }
 }

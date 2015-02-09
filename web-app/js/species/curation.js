@@ -81,7 +81,7 @@ function getNameDetails(taxonId, classificationId, ele) {
         success: function(data) {
             changeEditingMode(false);
             populateNameDetails(data);
-            populateTabDetails(data);
+            populateTabDetails(data, false);
             $(".countSp").text(data["countSp"]);
             $(".countObv").text(data["countObv"]);
             $(".countCKL").text(data["countCKL"]);
@@ -92,7 +92,9 @@ function getNameDetails(taxonId, classificationId, ele) {
                 return;
             }
             if($(ele).parents(".dl_content").length) {
-                alert("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
+                $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
+                $("#dialogMsg").modal('show');
+                //alert("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
                 $('.queryDatabase option[value="col"]').attr("selected", "selected");
                 $('.queryString').trigger("click");
             }
@@ -106,11 +108,13 @@ function getNameDetails(taxonId, classificationId, ele) {
     });
 }
 
-function populateTabDetails(data) {
+function populateTabDetails(data, appendData) {
     console.log("====TAB DETAILS====");
     console.log(data);
-    //clearing synonyms
-    reinitializeRows($("#names-tab1"));
+    if(appendData == false) {
+        //clearing synonyms
+        reinitializeRows($("#names-tab1"));
+    }
     //$("#names-tab1 .singleRow input").val('');
     //$("#names-tab1 .singleRow input").prop("disabled", false); 
     var synonymsList = data['synonymsList']
@@ -130,9 +134,11 @@ function populateTabDetails(data) {
             $(ele).find("input[name='contributor']").val(value["contributors"]);
         })
     }
-    //clearing common names
-    reinitializeRows($("#names-tab2"));
-    //$("#names-tab2 .singleRow input").val('');
+
+    if(appendData == false) {
+        //clearing common names
+        reinitializeRows($("#names-tab2"));
+    }//$("#names-tab2 .singleRow input").val('');
     //$("#names-tab2 .singleRow input").prop("disabled", false); 
     var commonNamesList = data['commonNamesList'];
     console.log("===%%%%%%%%%%%%%%%%%%=====")
@@ -155,8 +161,10 @@ function populateTabDetails(data) {
         })
     }
     
-    //clearing accepted names
-    reinitializeRows($("#names-tab0"));
+    if(appendData == false) {
+        //clearing accepted names
+        reinitializeRows($("#names-tab0"));
+    }
     //$("#names-tab0 .singleRow input").val('');
     //$("#names-tab0 .singleRow input").prop("disabled", false); 
     var acceptedNamesList = data['acceptedNamesList']
@@ -346,7 +354,7 @@ function getExternalDbDetails(externalId) {
             console.log("======SUCCESS ID DETAILS====");
             $("#externalDbResults").modal('hide');
             populateNameDetails(data);
-            populateTabDetails(data);
+            populateTabDetails(data, true);
             if(dbName == 'col') {
                 changeEditingMode(true);
                 console.log("======ID DETAILS====");

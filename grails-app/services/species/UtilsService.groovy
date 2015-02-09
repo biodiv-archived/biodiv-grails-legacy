@@ -17,11 +17,26 @@ import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
+
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import java.security.InvalidKeyException;
+import java.util.Date;
+
+import org.codehaus.groovy.grails.web.util.WebUtils;
+
 import java.beans.Introspector;
+
+import org.codehaus.groovy.grails.web.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+
+import grails.converters.JSON;
 class UtilsService {
 
     def grailsApplication;
@@ -51,6 +66,9 @@ class UtilsService {
 
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
+    
+    static final String OBV_LOCKED = "obv locked";
+    static final String OBV_UNLOCKED = "obv unlocked";
 
     private void cleanUpGorm() {
         cleanUpGorm(true)
@@ -73,6 +91,8 @@ class UtilsService {
         }
     }
 
+    ///////////////////////LINKS/////////////////////////////////
+
     public String generateLink( String controller, String action, linkParams, request=null) {
         request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
         return userGroupBasedLink(base: Utils.getDomainServerUrl(request),
@@ -88,11 +108,13 @@ class UtilsService {
         def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
         String url = "";
 
+        if(attrs.controller == 'SUser') attrs.controller = 'user';
+
         if(attrs.userGroupInstance){
 			//XXX removing  userGroupInstance from attrs show that it should not come in url in toString form of userGroup
 			attrs.userGroup = attrs.remove('userGroupInstance')
         }
-        if(attrs.userGroup && attrs.userGroup.id) {
+		if(attrs.userGroup && attrs.userGroup.id) {
             attrs.webaddress = attrs.userGroup.webaddress
             String base = attrs.remove('base')
             String controller = attrs.remove('controller')
@@ -168,9 +190,8 @@ class UtilsService {
                 url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
-        return url;
+        return url;//.replace('/api/', '/');
     }
-
 
     File getUniqueFile(File root, String fileName){
         File imageFile = new File(root, fileName);
@@ -229,6 +250,7 @@ class UtilsService {
 
         return null;
     }
+
     Language getCurrentLanguage(request = null){
        // println "====================================="+request
         
@@ -238,8 +260,8 @@ class UtilsService {
         return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
     }
 
-    /**
-     */
+    ///////////////////////////MAIL RELATED///////////////////////
+
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
         def conf = SpringSecurityUtils.securityConfig
         log.debug "Sending email"
@@ -281,7 +303,6 @@ class UtilsService {
                     mailSubject = messageSource.getMessage("mail.obs.added", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.add.obs", null, LCH.getLocale())
                 } else {
-                    mailSubject = messageSource.getMessage("mail.obs.added", null, LCH.getLocale())
                     mailSubject = messageSource.getMessage("mail.obs.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.following.obs", null, LCH.getLocale())
                 }
@@ -290,6 +311,21 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
+				case [ActivityFeedService.DISCUSSION_CREATED, ActivityFeedService.DISCUSSION_UPDATED] :
+				if( notificationType == ActivityFeedService.DISCUSSION_CREATED ) {
+					mailSubject = messageSource.getMessage("mail.sub.discussion.added", null, LCH.getLocale())
+					templateMap["message"] = messageSource.getMessage("mail.msg.discussion.added", null, LCH.getLocale())
+				} else {
+					mailSubject = messageSource.getMessage("mail.sub.discussion.updated", null, LCH.getLocale())
+					templateMap["message"] = messageSource.getMessage("mail.msg.discussion.updated", null, LCH.getLocale())
+				}
+				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				toUsers.add(getOwner(obv))
+				break
+
+	
+				
                 case [ActivityFeedService.CHECKLIST_CREATED, ActivityFeedService.CHECKLIST_UPDATED]:
                 if( notificationType == ActivityFeedService.CHECKLIST_CREATED ) {
                     mailSubject = messageSource.getMessage("mail.list.added", null, LCH.getLocale())
@@ -379,6 +415,16 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
+                case [OBV_LOCKED,OBV_UNLOCKED] :
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                //message on type
+                def messageKey = Arrays.asList(notificationType.split(":"));
+                messageKey = messageKey[0].trim().toLowerCase().replaceAll(' ','.')
+                mailSubject = messageSource.getMessage(messageKey, null, LCH.getLocale())
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                toUsers.addAll(getParticipants(obv))
+                break
+
                 case ActivityFeedService.RECOMMENDATION_REMOVED:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -452,6 +498,7 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
+			
                 case [ActivityFeedService.FEATURED, ActivityFeedService.UNFEATURED]:
                 boolean a
                 if(notificationType == ActivityFeedService.FEATURED) {
@@ -562,13 +609,12 @@ class UtilsService {
 
                 case NEW_SPECIES_PERMISSION : 
                 mailSubject = notificationType
-                    bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/grantedPermission"
-                    def user = otherParams['user'];
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/grantedPermission"
+                def user = otherParams['user'];
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
-
-
+                
                 default:
                 log.debug "invalid notification type"
             }
@@ -633,7 +679,16 @@ class UtilsService {
             templateMap["obvCName"] =  values[ObvUtilService.CN]
             templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
             templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
-            templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
+            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            def mainImage = obv.mainImage()
+            def imagePath;
+
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else {
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
+            }
+            templateMap["obvImage"] = imagePath;
             //get All the UserGroups an observation is part of
             templateMap["groups"] = obv.userGroups
         }
@@ -662,14 +717,9 @@ class UtilsService {
             def domainObject = getDomainObject(feed.rootHolderType, feed.rootHolderId);
             templateMap['domainObjectTitle'] = getTitle(domainObject);
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
-            def isCommentThread = (feed.subRootHolderType == Comment.class.getCanonicalName() && feed.rootHolderType == UserGroup.class.getCanonicalName()) 
-            if(isCommentThread) {
-                templateMap['feedInstance'] = feed.fetchMainCommentFeed(); 
-                templateMap["feedActorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
-                templateMap['commentInstance'] = getDomainObject(feed.subRootHolderType, feed.subRootHolderId)
-                templateMap['group'] = domainObject;
-            }
+			templateMap['domainObject'] = domainObject 
         }
+		
     }
 
     private List getParticipants(observation) {
@@ -805,6 +855,8 @@ class UtilsService {
         return groupId
     }
 
+    //////////////////////TIME LOGGING/////////////////////
+
     def benchmark(String blockName, Closure closure) {
         def start = System.currentTimeMillis()  
         closure.call()  
@@ -821,6 +873,141 @@ class UtilsService {
         sqlLogger.setLevel(currentLevel)
         result
     }
+
+    ///////////// FILE PICKER SECURITY /////////////////////
+    
+    def filePickerSecurityCodes() {
+        def codes = [:]
+        Integer expiry = (System.currentTimeMillis()/1000).toInteger() + 60*60*2;  //expiry = 2 hours
+        def jsonPolicy = new JSONObject();
+        jsonPolicy.put('expiry', expiry)
+        jsonPolicy = jsonPolicy.toString();
+        String policy = Base64.encodeBase64URLSafeString(jsonPolicy.bytes);       //URL SAFE
+        codes['policy'] = policy
+        String secretKey = grailsApplication.config.speciesPortal.observations.filePicker.secret
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+            mac.init(secretKeySpec);
+            byte[] digest = mac.doFinal(policy.getBytes());
+            String signature = Hex.encodeHexString(digest);
+            codes['signature'] = signature;
+            return codes
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException("Invalid key exception while converting to HMac SHA256")
+        }
+    }
+    
+    ///////////////////////PERMISSIONS//////////////////////
+
+    boolean permToReorderPages(uGroup){
+        if(uGroup){
+            return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || uGroup.isFounder(springSecurityService.currentUser))
+        }
+        else{
+            return  springSecurityService.isLoggedIn() && SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        }
+    }
+
+    boolean permToReorderDocNames(documentInstance) {
+        return  springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || springSecurityService.currentUser?.id == documentInstance.getOwner().id);
+    }
+
+	boolean ifOwns(SUser user) {
+        if(!user) return false
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean ifOwns(Long id) {
+        if(!id) return false
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean ifOwnsByEmail(String email) {
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+
+	boolean isAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+	}
+	
+	boolean isCEPFAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
+	}
+
+    ////////////////////////RESPONSE FORMATS//////////////////
+
+    Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+        String acceptHeader = request.getHeader('Accept');
+
+        if(!errors) errors = [];
+        if(domainObject) {
+            domainObject.errors.allErrors.each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+            }
+        }
+
+        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        def result = [success:false, status:status, msg:msg, errors:errors];
+        if(domainObject) 
+            result['instance'] = domainObject;
+        return result;
+    }
+
+    Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+//        println "+++++++++++++++++++++++++++++++++++++++"
+        String acceptHeader = request.getHeader('Accept');
+//        println acceptHeader
+        def result = [success:true, status: status, msg:msg]
+        //HACK to handle previous version of api for mobile app 
+/*        boolean isMobileApp = true;// need to check using user agent
+        if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0') && isMobileApp) {
+            if(domainObject) {
+                //only if actionName is show
+                if(request.forwardURI.contains('/show/')) {
+                result = [:];
+                String jsonString = (domainObject as JSON) as String;
+                result = JSON.parse(jsonString);
+                } else {
+                    result[domainObject.class.simpleName.toLowerCase()+'Instance'] = domainObject;
+                }
+            }
+
+            if(model) {
+                result.putAll(model);
+                if(result.containsKey('instanceListName')) {
+                    result[result.instanceListName] = result['instanceList'];
+                    result.remove('instanceList');
+                }
+            }
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            return result;
+        } else {
+*/            if(domainObject) result['instance'] = domainObject;
+            if(model) result['model'] = model;
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            return result;
+//        } 
+    }
+	
+	Date parseDate(date, sendNew = true){
+		try {
+            if(!sendNew) {
+			    return date? Date.parse("dd/MM/yyyy", date):null;
+            }else {
+			    return date? Date.parse("dd/MM/yyyy", date):new Date();
+            }
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+
 
 }
 

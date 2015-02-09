@@ -23,6 +23,9 @@ import grails.converters.JSON;
 import species.participation.Featured;
 import species.TaxonomyRegistry;
 import species.Classification;
+import grails.plugin.springsecurity.SecurityFilterPosition
+import grails.plugin.springsecurity.SpringSecurityUtils;
+
 
 class BootStrap {
 

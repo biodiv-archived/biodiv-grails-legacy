@@ -55,7 +55,8 @@ class Resource extends Sourcedata implements Rateable {
         DOCUMENT("DOCUMENT"),
         SPECIES_FIELD("SPECIES_FIELD"),
 		CHECKLIST("CHECKLIST"),
-        USER("USER")
+        USER("USER"),
+		DISCUSSION("DISCUSSION")
 		
         private String value;
 
@@ -68,7 +69,7 @@ class Resource extends Sourcedata implements Rateable {
         }
 
         static def toList() {
-            return [ OBSERVATION,SPECIES,DOCUMENT, SPECIES_FIELD, CHECKLIST]
+            return [ OBSERVATION,SPECIES,DOCUMENT, SPECIES_FIELD, CHECKLIST, USER, DISCUSSION]
         }
 
         public String toString() {
@@ -108,13 +109,13 @@ class Resource extends Sourcedata implements Rateable {
 	static transients = ['baseUrl']
 	
 	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
-		String thumbnailUrl = '';
+        String thumbnailUrl = '';
         def basePath = '';
         if(this?.context?.value() == Resource.ResourceContext.OBSERVATION.toString()) {
             basePath = grailsApplication.config.speciesPortal.observations.serverURL
         } else if(this?.context?.value() == Resource.ResourceContext.SPECIES.toString() || this?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()) {
             basePath = grailsApplication.config.speciesPortal.resources.serverURL
-        } else if(this?.context?.value() == Resource.ResourceContext.DOCUMENT.toString()) {
+        } else if(this?.context?.value() == Resource.ResourceContext.DOCUMENT.toString() || this?.context?.value() == Resource.ResourceContext.DISCUSSION.toString()) {
             basePath = grailsApplication.config.speciesPortal.content.serverURL
         } else {
             basePath = this.baseUrl;

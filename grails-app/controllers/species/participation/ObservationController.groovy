@@ -40,6 +40,7 @@ import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
+import static org.springframework.http.HttpStatus.*;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -52,14 +53,16 @@ class ObservationController extends AbstractObjectController {
 	def namesIndexerService;
 	def userGroupService;
 	def activityFeedService;
-	def SUserService;
 	def obvUtilService;
     def chartService;
     def messageSource;
     def commentService;
-    def utilsService;
+    def speciesService;
     def setupService;
-	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
+    def springSecurityFilterChain
+ 
+	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
+    static defaultAction = "list"
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -96,103 +99,57 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list() {
-		
 		def model = runLastListQuery(params);
-		model.resultType = 'observation'
-		def userLanguage = utilsService.getCurrentLanguage(request); 
-		if(params.loadMore?.toBoolean()){
-			render(template:"/common/observation/showObservationListTemplate", model:model);
-			return;
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-            model['width'] = 300;
-            model['height'] = 200;
-            model['userLanguage'] = userLanguage;
-            render (view:"list", model:model)
-			return;
-		} else {
-			model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
-			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-			def tagsHtml = "";
-			if(model.showTags) {
-//				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-//				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			 }
-//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-/*	        def chartModel = model.speciesGroupCountList
-            chartModel['width'] = 300;
-            chartModel['height'] = 270;
-*/
-			
-            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
+        model.userLanguage = utilsService.getCurrentLanguage(request);
 
-			render result as JSON
-			return;
-		}
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            def tagsHtml = "";
+            if(model.showTags) {
+                //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+                //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+            }
+        }
+        
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+
+        withFormat {
+            html {
+                model.resultType = 'observation'
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/common/observation/showObservationListTemplate", model:model.model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    model.model['width'] = 300;
+                    model.model['height'] = 200;
+                    render (view:"list", model:model.model)
+                    return;
+                } else {
+/*                    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+                    def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+                    def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+                    def tagsHtml = "";
+                    if(model.showTags) {
+        //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+        //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+                    }
+                    
+                    def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
+
+                    render result as JSON
+*/                  return;
+                }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 	def listJSON = {
 		def model = getObservationList(params);
         model.queryParams.remove('userGroup');
-
-        /*model.observations = [];
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-        String iconBasePath = config.speciesPortal.observations.serverURL;
-		for(obv in model.observationInstanceList){
-			def item = [:];
-            item.id = obv.id
-			Resource image = obv.mainImage()
-            def sGroup = obv.fetchSpeciesGroup()
-            if(sGroup)
-			    item.sGroup = sGroup.name
-            if(obv.habitat)
-			    item.habitat = obv.habitat?.name
-			if(image){
-				if(image.type == ResourceType.IMAGE) {
-                    boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
-				} else if(image.type == ResourceType.VIDEO) {
-					item.imageLink = image.thumbnailUrl()
-				}
-			}else{
-				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
-			} 			
-		
-            item.author = obv.author;
-            item.createdOn = obv.createdOn;
-            item.notes = obv.notes()
-  			item.summary = obv.summary();				
-            item.maxVotedReco = obv.maxVotedReco;
-            item.placeName = obv.placeName;
-            item.topology = obv.topology; 
-           
-            def obj = obv;
-            if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
-            if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
-            if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
-            if(obj.hasProperty('fromDate') && obj.fromDate) item.observedOn = obj.fromDate.getTime();
-            if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy){
-				item.geoPrivacy = obj.geoPrivacy
-				item.geoPrivacyAdjust = obj.fetchGeoPrivacyAdjustment()
-			}
-            item.featureCount = obv.featureCount;
-            item.flagCount = obv.flagCount;
-            item.rating = obv.rating;
-            item.visitCount = obv.visitCount;
-            item.isLocked = obv.isLocked;
-            if(obj.hasProperty('isChecklist') && obj.isChecklist) {
-                 item.toDate = obj.toDate.getTime();
-                item.isChecklist = obj.isChecklist;
-                item.isShowable = obv.isShowable;
-                item.sourceId = obv.sourceId;
-            }
-
-            item.userGroups = obv.userGroups;
-			model.observations << item;
-		}
-
-        model.remove('observationInstanceList');
-*/
 		render model as JSON
 	}
 
@@ -207,10 +164,39 @@ class ObservationController extends AbstractObjectController {
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
+        if(params.parentId && params.parentId != '') {
+            try { 
+                params.parentId = Integer.parseInt(params.parentId.toString()).toLong(); 
+            } catch(NumberFormatException e) { 
+                params.parentId = null 
+            }
+        }
+        params['maxNearByRadius'] = 200;
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
+        
+        //Because returning source Ids instead of actual obv ins
+        if(params.filterProperty == 'speciesName') {
+            //def fetchedCklCount = filteredObservation.checklistCount;
+            def results = []
+            //def cklCount = 0;
+            observationInstanceList.each {
+                def obv = Observation.read(it);
+                //if(fetchedCklCount != 0 && obv.isChecklist) {
+                  //  cklCount += 1;
+                //}
+                results.add(obv)
+            }
+            filteredObservation.observationInstanceList = results;
+            observationInstanceList = results;
+            //if(fetchedCklCount != 0 ) {
+              //  filteredObservation.checklistCount = cklCount;
+            //}
+            //println "=============CKL COUNT========= " + cklCount
+        }
+
 		def queryParams = filteredObservation.queryParams
 		def activeFilters = filteredObservation.activeFilters
 		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
@@ -239,9 +225,13 @@ class ObservationController extends AbstractObjectController {
 		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 	
-	def occurrences = {
+	def occurrences() {
 		def result = observationService.getObservationOccurences(params)
-		render result as JSON
+        def model = utilsService.getSuccessModel('', null, OK.value(), result);
+        withFormat {
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 	@Secured(['ROLE_USER'])
@@ -250,7 +240,8 @@ class ObservationController extends AbstractObjectController {
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
-		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService]
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+        return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
 
 	@Secured(['ROLE_USER'])
@@ -259,54 +250,76 @@ class ObservationController extends AbstractObjectController {
 			//TODO:edit also calls here...handle that wrt other domain objects
 			saveAndRender(params, false)
 		} else {
-			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			msg = "Method Not Allowed"
+            def model = utilsService.getErrorModel(msg, null, METHOD_NOT_ALLOWED.value());
+            withFormat {
+                html {
+                    flash.message = msg;
+			        redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 	}
 
     @Secured(['ROLE_USER'])
 	def flagDeleted() {
 		def result = observationService.delete(params)
-        if(request.getHeader('X-Auth-Token')) {
-            result.remove('url')
-            render result as JSON;
-            return;
+        result.remove('url')
+        String url = result.url;
+        withFormat {
+            html {
+                flash.message = result.message
+                redirect (url:url)
+            }
+            json { render result as JSON }
+            xml { render result as XML }
         }
-		flash.message = result.message
-		redirect (url:result.url)
 	}
 
 	@Secured(['ROLE_USER'])
 	def update() {
 		def observationInstance = Observation.get(params.id?.toLong())
+        def msg;
 		if(observationInstance)	{
 			saveAndRender(params, true)
-		}else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+		} else {
+			msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.message = msg;
+			        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
 		}
 	}
 	
 	private saveAndRender(params, sendMail=true){
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
-        /*if(request.getHeader('X-Auth-Token')) {
-            if(!result.success) result.remove('observationInstance');
-            render result as JSON;
-            return
-
-        }*/
 		if(result.success){
-            if(request.getHeader('X-Auth-Token')) 
-                params.isMobileApp = true;
-                println "==========================="+params
+            //if(params.format?.equalsIgnoreCase("json") || params.format?.equalsIgnoreCase("xml") ) 
+            //    params.isMobileApp = true;
 			forward (action: 'addRecommendationVote', params:params);
-		} else{
-            if(request.getHeader('X-Auth-Token')) {
-                result.remove('observationInstance');
-                render result as JSON
-            } else {
-			    //flash.message = "${message(code: 'error')}";
-			    render(view: "create", model: [observationInstance: result.observationInstance, lastCreatedObv:null])
+		} else {
+            withFormat {
+                html {
+                    //flash.message = "${message(code: 'error')}";
+			        render(view: "create", model: [observationInstance: result.instance, lastCreatedObv:null])
+                }
+                json {
+                    result.remove('instance');
+                    render result as JSON 
+                }
+                xml {
+                    result.remove('instance');
+                    render result as XML
+                }
             }
 		}
 	}
@@ -314,63 +327,62 @@ class ObservationController extends AbstractObjectController {
 	def show() {
         params.id = params.long('id');
         def msg;
-        if(request.getHeader('X-Auth-Token')) {
-            
-            if(params.id) {
-    			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
-	    		if (!observationInstance) {
-	    			msg = messageSource.getMessage("default.not.find.by.id", ['Observation',params.id] as Object[], RCU.getLocale(request))
-                    render (['success':false, 'msg':msg] as JSON)
-                    return
-                } else {
-    				if(observationInstance.instanceOf(Checklists)){
-    					msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], RCU.getLocale(request))
-                        render (['success':false, 'msg':msg] as JSON)
-					    return
-	    			}
-
-		            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		            String iconBasePath = config.speciesPortal.observations.serverURL
-                    //def obvJSON = observationService.asJSON(observationInstance, iconBasePath)
-                    //render ([success:true, msg:'', observation:obvJSON] as JSON)
-                    render observationInstance as JSON
-                    return
-                }
-
-            } else {
-            	msg = messageSource.getMessage("id.required", ['Valid id'] as Object[], RCU.getLocale(request))
-                render (['success':false, 'msg':msg] as JSON)
-                return
-            }
-        }
-
-		if(params.id) {
+        if(params.id) {
 			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
 			if (!observationInstance) {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-				//redirect(action: "list")
+                msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+                def model = utilsService.getErrorModel(msg, null, OK.value());
+                withFormat {
+                    html {
+				        flash.message = model.msg;
+				        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 			}
 			else {
-				if(observationInstance.instanceOf(Checklists)){
-					redirect(controller:'checklist', action:'show', params: params)
+    			if(observationInstance.instanceOf(Checklists)){
+                    msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], RCU.getLocale(request))
+                    def model = utilsService.getErrorModel(msg, null, OK.value());
+                    withFormat {
+                        html {
+					        redirect(controller:'checklist', action:'show', params: params)
+                        } 
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
 					return
 				}
+
 				observationInstance.incrementPageVisit()
 				def userLanguage = utilsService.getCurrentLanguage(request);   
                 int pos = params.pos?params.int('pos'):0;
 				def prevNext = getPrevNextObservations(pos, params.webaddress);
-					
-				if(prevNext) {
-						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage]
-				} else {
-					[observationInstance: observationInstance,'userLanguage':userLanguage]
-				}
+
+                def model = utilsService.getSuccessModel("", observationInstance, OK.value());
+                withFormat {
+                    html {
+                        if(prevNext) {
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage]
+                        } else {
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage]
+                        }
+                    } 
+                    json  { render model as JSON }
+                    xml { render model as JSON }
+                }
 			}
 		} else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-
+            msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+			        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
 	}
 
@@ -436,7 +448,7 @@ class ObservationController extends AbstractObjectController {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
-		} else if(SUserService.ifOwns(observationInstance.author)) {
+		} else if(utilsService.ifOwns(observationInstance.author)) {
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
@@ -472,17 +484,18 @@ class ObservationController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
 	def upload_resource() {
 		def message;
-		def msg;
 		if(params.ajax_login_error == "1") {
-			msg = messageSource.getMessage("default.login.continue", null, RCU.getLocale(request))
-            message = [status:401, error:msg]
+			String msg1 = messageSource.getMessage("default.login.continue", null, RCU.getLocale(request))
+            message = [status:401, error:msg1]
 			render message as JSON 
 			return;
 		} else if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
-			response.setStatus(500)
-			message = [error:message]
-			render message as JSON
+            def model = utilsService.getErrorModel(message, null, INTERNAL_SERVER_ERROR.value())
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 			return;
 		}
 		
@@ -601,7 +614,11 @@ class ObservationController extends AbstractObjectController {
 						File file = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
 
                         if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
-						    download(f.url, file );						
+                            def url = f.url;
+                            def fp = utilsService.filePickerSecurityCodes();
+                            //modifying url to give permissions.
+                            url += '?signature=' + fp.signature +'&policy='+fp.policy
+						    download(url, file );						
                         } else {
 						    f.transferTo( file );
                         }
@@ -652,29 +669,41 @@ class ObservationController extends AbstractObjectController {
 				log.debug resourcesInfo
 				// render some XML markup to the response
 				if(resourcesInfo) {
-                    if(request.getHeader('X-Auth-Token')) {
-                        def resourcesList = [];
-                        for(r in resourcesInfo) {
-                            def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
-                            resourcesList << res
-                        }
-                        render ([observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]] as JSON)
-                    } else {
-                        render(contentType:"text/xml") {
-                            observations {							
-                                dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
-                                resources {
-                                    for(r in resourcesInfo) {
-                                        res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
+                    withFormat {
+                        json {    
+                            def resourcesList = [];
+                            for(r in resourcesInfo) {
+                                def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
+                                resourcesList << res
+                            }
+                            def model = [observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]]
+                            model = utilsService.getSuccessModel("", null, OK.value(), model)
+                            render model as JSON
+                        } 
+                        xml {
+                            render(contentType:"text/xml") {
+                                response {
+                                    success(true)
+                                    status(OK.value())
+                                    msg('Successfully uploaded the resource')
+                                    model {
+                                        dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
+                                        resources {
+                                            for(r in resourcesInfo) {
+                                                res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 				} else {
-					response.setStatus(500)
-					message = [success:false, error:message]
-					render message as JSON
+                    def model = utilsService.getErrorModel(message, null, INTERNAL_SERVER_ERROR.value())
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
 				}
 			/*} else {
 				response.setStatus(500)
@@ -683,9 +712,11 @@ class ObservationController extends AbstractObjectController {
 			}*/
 		} catch(e) {
 			e.printStackTrace();
-			response.setStatus(500)
-			message = [success:false, error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
-			render message as JSON
+            def model = utilsService.getErrorModel(g.message(code: 'file.upload.fail', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value(), [e.getMessage()])
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
 		}
 	}
 	
@@ -703,18 +734,11 @@ class ObservationController extends AbstractObjectController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote() {
-		/*if(chainModel?.chainedParams) {
-			//need to change... dont pass on params
-			chainModel.chainedParams.each {
-				params[it.key] = it.value;
-			}
-			params.action = 'addRecommendationVote'
-		}*/
 		params.author = springSecurityService.currentUser;
-        boolean isMobileApp = request.getHeader('X-Auth-Token') || params.isMobileApp; 
-        
+        //boolean isMobileApp = params.format?.equalsIgnoreCase("json") || params.isMobileApp; 
+        String msg; 
         try {
-            params.obvId = params.obvId?.toLong();
+            params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
         } catch(e) {
             e.printStackTrace();
             params.obvId = null;
@@ -723,18 +747,19 @@ class ObservationController extends AbstractObjectController {
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			//Saves recommendation if its not present
-			def recVoteResult, recommendationVoteInstance, msg
+			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
 				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
-			
+
 			def observationInstance = Observation.get(params.obvId);
 			def mailType
 			try {
 				if(!recommendationVoteInstance) {
-					log.debug "No reco instance"
+					msg = msg ?: "No reco instance"
+                    log.debug msg
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
@@ -743,33 +768,52 @@ class ObservationController extends AbstractObjectController {
 						utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
 					}
 
-					if(!params["createNew"] && !isMobileApp){
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					} else if(!params["createNew"] && isMobileApp){
-						render (['status':'error', 'success':'false', 'msg':msg] as JSON);
-					}else{
+					if(!params["createNew"]){
+                        def model = utilsService.getErrorModel(msg, null, OK.value());
+                        withFormat {
+                            html {
+                                redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
+					} else {
                         if(params.oldAction != "bulkSave"){
-                            if(isMobileApp){
-                                render (['status':'error', 'success' : true, observationInstance:observationInstance, 'msg':msg] as JSON);
-                            } else {
-						        redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
+                            withFormat {
+                                html {
+						            redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                                }
+                                json { render model as JSON }
+                                xml { render model as XML }
                             }
                         } else {
-                            def output = [:]
+                            //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
-                            output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
-                            render output as JSON
-                        }		//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                            def model = utilsService.getErrorModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml]);
+                            //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
+                            withFormat {
+                                html {
+                            		//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                                }
+                                json { render model as JSON }
+                                xml { render model as XML}
+                            }
+                        }
 					}
 					return
 				} else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
-					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					msg = msg ?: "Successfully added reco vote : "+recommendationVoteInstance
+                    log.debug msg;
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+		            
+                    //just updates species time stamp on recommendation
+                    recommendationVoteInstance.updateSpeciesTimeStamp();			
 					
-					//sending email
+                    //sending email
 					if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
 						mailType = utilsService.OBSERVATION_ADDED;
 					} else {
@@ -778,83 +822,133 @@ class ObservationController extends AbstractObjectController {
 					utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					
-                    if(!params["createNew"] && !isMobileApp){
-						//utilsService.sendNotificationMail(utilsService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					} else if(!params["createNew"] && isMobileApp){
-						render (['status':'success', 'success':'true', 'recoVote':recommendationVoteInstance] as JSON);
+                    if(!params["createNew"]) {
+                        def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value());
+                        withFormat {
+                            html {
+        						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
 					} else {
                         if(params.oldAction != "bulkSave"){
-                            if(isMobileApp){
-                                render (['status':'success', 'success' : true, observationInstance:observationInstance.refresh()] as JSON);
-                            } else {
-    						    redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
+                            withFormat {
+                                html {
+    						        redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                                } 
+                                json { render model as JSON }
+                                xml { render model as XML }
                             }
                         } else {
-                            def output = [:]
+                            //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
-                            output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
-                            render output as JSON
+                            def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml]);
+                            //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
+                            //render output as JSON
+                            withFormat {
+                                html {
+                                    //redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                                }
+                                json { render model as JSON }
+                                xml { render model as XML}
+                            }
                         }
-                        //redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 				} else {
-                    log.debug "Error in reco instance"
+                    msg = msg ?: messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
+                    log.debug msg
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					recommendationVoteInstance.errors.allErrors.each { log.error it }
 
-                    if(!params["createNew"] && isMobileApp) {
-                        def errors = [];
-                        recommendationVoteInstance.errors.allErrors .each {
-                            def formattedMessage = messageSource.getMessage(it, null);
-                            errors << [field: it.field, message: formattedMessage]
+                    if(!params["createNew"]) {
+                        def model = utilsService.getErrorModel(msg, recommendationVoteInstance, OK.value());
+                        withFormat {
+                            json { render model as JSON }
+                            xml { render model as XML }
                         }
-                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
-                        render (['status':'error', 'success' : 'false', 'msg':msg, 'errors':errors] as JSON)
                     }
                     if(params.oldAction != "bulkSave"){
-                        if(isMobileApp){
-                            render (['status':'error', 'success' : true, observationInstance:observationInstance, errors:errors] as JSON);
-                        } else {
-                            render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                        def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
+                        withFormat {
+                            html {
+                                render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
                         }
                     } else {
-                        def output = [:]
+                        //def output = [:]
                         def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
-                        output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
-                        render output as JSON
+                        //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
+                        //render output as JSON
+                        def model = utilsService.getErrorModel(msg, recommendationVoteInstance, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml]);
+                        //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
+                        //render output as JSON
+                        withFormat {
+                            html {
+                                //redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML}
+                        }
+
                     }
 
 				}
 			} catch(e) {
-				e.printStackTrace()
-				if(!params["createNew"] && isMobileApp){
-					render (['status':'error', 'success':'false', 'msg':e.getMessage()] as JSON);
-				}else{
+                e.printStackTrace();
+                msg  = e.getMessage();
+                log.error msg;
+
+                if(params["createNew"]){
                     if(params.oldAction != "bulkSave"){
-                        if(isMobileApp){
-                            render (['status':'error', 'success' : true, observationInstance:observationInstance, 'msg':e.getMessage()] as JSON);
-                        } else {
-    					    render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                        def model = utilsService.getErrorModel(msg, null, OK.value());
+                        withFormat {
+                            html {
+                                render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+                            }
+                            json { render model as JSON; } 
+                            xml { render model as XML; } 
                         }
                     } else {
-                        def output = [:]
                         def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
-                        output = [miniObvCreateHtml: miniObvCreateHtml, observationInstance: observationInstance, lastCreatedObv:null, statusComplete: false]
-                        render output as JSON
+                        def model = utilsService.getErrorModel(msg, recommendationVoteInstance, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml]);
+                        withFormat {
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
                     }
+                }
+                else {
+                    def model = utilsService.getErrorModel(msg, null, OK.value());
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+
                 }
 			}
 		} else {
-			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
-			log.error flash.message;
-            if(!params["createNew"] && isMobileApp){
-                render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
-            } else{
-                redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			msg  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+			log.error msg;
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            if(params['createNew']) {
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+            } else {
+                withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
             }
-			//redirect(action: "list")
 		}
 	}
 
@@ -868,7 +962,7 @@ class ObservationController extends AbstractObjectController {
 		params.author = springSecurityService.currentUser;
  
         try {
-            params.obvId = params.obvId?.toLong();
+            params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
         } catch(e) {
             e.printStackTrace();
             params.obvId = null;
@@ -889,12 +983,13 @@ class ObservationController extends AbstractObjectController {
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
-					def r = [
-						status : 'success',
-						success : 'true',
-						msg:msg,
-						canMakeSpeciesCall:canMakeSpeciesCall]
-					render r as JSON
+					def r = utilsService.getSuccessModel(msg, null, OK.value());
+					r['canMakeSpeciesCall'] = canMakeSpeciesCall
+                        withFormat {
+                            json { render r as JSON }
+                            xml { render r as XML }
+                        }
+					//render r as JSON
 					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, msg:msg])
 					return
 				} else if(recommendationVoteInstance.save(flush: true)) {
@@ -902,50 +997,47 @@ class ObservationController extends AbstractObjectController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-					
+				
+                    //just updates species time stamp on recommendation
+                    recommendationVoteInstance.updateSpeciesTimeStamp();			
+
 					//sending mail to user
 					utilsService.sendNotificationMail(ActivityFeedService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
-					def r = [
-						status : 'success',
-						success : 'true',
-						msg:msg,
-						canMakeSpeciesCall:canMakeSpeciesCall]
-					render r as JSON
+					def r = utilsService.getSuccessModel(msg, null, OK.value());
+					r['canMakeSpeciesCall'] = canMakeSpeciesCall;
+                    withFormat {
+                            json { render r as JSON }
+                            xml { render r as XML }
+                        }
 					//redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg])
 					return
 				}
 				else {
-					recommendationVoteInstance.errors.allErrors.each { log.error it }
-                    if(request.getHeader('X-Auth-Token')) {
-                        def errors = [];
-                        recommendationVoteInstance.errors.allErrors .each {
-                            def formattedMessage = messageSource.getMessage(it, null);
-                            errors << [field: it.field, message: formattedMessage]
-                        }
-                        msg = messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
-                        render (['status':'error', 'success' : 'false', 'msg':msg, 'errors':errors] as JSON)
-                    }            
+                    msg = messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
+                    def model = utilsService.getErrorModel(msg, recommendationVoteInstance, OK.value());
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
 				}
 			} catch(e) {
 				e.printStackTrace();
-                if(request.getHeader('X-Auth-Token')){
-                	msg = messageSource.getMessage("default.error.adding.vote", [e.getMessage()] as Object[], RCU.getLocale(request))
-                    render (['status':'error', 'success':'false', 'msg':msg] as JSON);
-                } else{
-                    //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                msg = messageSource.getMessage("default.error.adding.vote", [e.getMessage()] as Object[], RCU.getLocale(request))
+                def model = utilsService.getErrorModel(msg, null, OK.value());
+                withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML }
                 }
-
 			}
-		} else {
-		    flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
-			log.error flash.message;
-            if(request.getHeader('X-Auth-Token')){
-                render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
-            } else{
-                //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+        } else {
+            flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+            log.error flash.message;
+            def model = utilsService.getErrorModel(flash.message, null, OK.value());
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
             }
-		
-		}
+        }
 	}
 	
 	/**
@@ -957,7 +1049,7 @@ class ObservationController extends AbstractObjectController {
 	   def author = springSecurityService.currentUser;
  
        try {
-           params.obvId = params.obvId?.toLong();
+           params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
        } catch(e) {
            e.printStackTrace();
            params.obvId = null;
@@ -967,11 +1059,11 @@ class ObservationController extends AbstractObjectController {
 		   def observationInstance = Observation.get(params.obvId);
 		   def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
            if(!observationInstance || !recommendationVoteInstance) {
-            	   def r = [
-				   status : 'error',
-				   success : 'false',
-				   msg:"${message(code: 'default.not.found.message', args: ['Recommendation', params.recoId])}"]
-			   render r as JSON
+            	   def r = utilsService.getErrorModel("${message(code: 'default.not.found.message', args: ['Recommendation', params.recoId])}", null, OK.value());
+                   withFormat {
+                       json { render r as JSON }
+                       xml { render r as XML }
+                   }
 			   return
 
            }
@@ -981,31 +1073,35 @@ class ObservationController extends AbstractObjectController {
 			   observationInstance.calculateMaxVotedSpeciesName();
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			   //sending mail to user
+		
+                //just updates species time stamp on recommendation
+                recommendationVoteInstance.updateSpeciesTimeStamp();				
+	
+               //sending mail to user
 			   utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
-			   def r = [
-				   status : 'success',
-				   success : 'true',
-				   msg:"${message(code: 'recommendations.deleted.message', args: [recommendationVoteInstance.recommendation.name])}"]
-			   render r as JSON
-			   return
+			   def r = utilsService.getSuccessModel("${message(code: 'recommendations.deleted.message', args: [recommendationVoteInstance.recommendation.name])}", null, OK.value());
+                   withFormat {
+                       json { render r as JSON }
+                       xml { render r as XML }
+                   }
+               return
 		   } catch(e) {
 			   e.printStackTrace();
-               if(request.getHeader('X-Auth-Token')){
-                   render (['status':'error', 'success':'false', 'msg':"Error while adding agree vote ${e.getMessage()}"] as JSON);
-               } else{
-                   //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+               def msg = "Error while adding agree vote ${e.getMessage()}"
+               def model = utilsService.getErrorModel(msg, null, OK.value());
+               withFormat {
+                   json { render model as JSON }
+                   xml { render model as XML }
                }
 		   }
 	   } else {
            flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
            log.error flash.message;
-           if(request.getHeader('X-Auth-Token')){
-               render (['status':'error', 'success':'false', 'msg':flash.message] as JSON);
-           } else{
-               //redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+           def model = utilsService.getErrorModel(flash.message, null, OK.value());
+           withFormat {
+               json { render model as JSON }
+               xml { render model as XML }
            }
-
 	   }
    }
 
@@ -1016,11 +1112,14 @@ class ObservationController extends AbstractObjectController {
 	def getRecommendationVotes = {
 		params.max = params.max ? params.int('max') : 1
 		params.offset = params.offset ? params.long('offset'): 0
-
+        String msg;
 
         if(!params.id) {
-			def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:'Invalid observation id')];
-			render message as JSON
+            def model = utilsService.getErrorModel (g.message(code: 'error', default:'Invalid observation id'), null, OK.value())
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
             return;
         }
 
@@ -1035,8 +1134,10 @@ class ObservationController extends AbstractObjectController {
                 html = html.replaceAll('\\n|\\t','');
                 def result = [
                 'status' : 'success',
+                recoVotes:results.recoVotes?:'',
                 canMakeSpeciesCall:params.canMakeSpeciesCall,
                 recoHtml:html?:'',
+                totalVotes:results.totalVotes?:'',
                 uniqueVotes:results.uniqueVotes?:'',
                 msg:params.msg?:'',
                 speciesNameTemplate:speciesNameHtml?:'',
@@ -1044,11 +1145,11 @@ class ObservationController extends AbstractObjectController {
                 speciesName:observationInstance.fetchSpeciesCall()?:'']
 
                 if(results?.recoVotes.size() > 0) {
-                    if(request.getHeader('X-Auth-Token')) {
-                        result = results;
-                        result.success = true;
-                    } 
-                    render result as JSON
+                    def model = utilsService.getSuccessModel('', null, OK.value(), result);
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML}
+                    }
                     return
                 } else {
                     //response.setStatus(500);
@@ -1059,20 +1160,33 @@ class ObservationController extends AbstractObjectController {
                         message = g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest');
                     }
                     result["msg"] = message
-                    render result as JSON
+                    def model = utilsService.getSuccessModel(message, null, OK.value(), result);
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML}
+                    }
                     return
                 }
 
             } else {
                 //response.setStatus(500)
-                def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:"No observation found with ${params.id}")]
-                render message as JSON
+                msg = g.message(code: 'error', default:"No observation found with ${params.id}")
+                def model = utilsService.getErrorModel(msg, null, OK.value());
+                withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML}
+                }
+
             }
         } catch(e){
             e.printStackTrace();
             //response.setStatus(500);
-            def message = ['success':false, 'status':'error', 'msg':g.message(code: 'error', default:"Error while processing the request : ${e.getMessage()}")];
-            render message as JSON
+            msg = g.message(code: 'error', default:"Error while processing the request : ${e.getMessage()}");
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML}
+            }
         }
 	}
 
@@ -1090,7 +1204,6 @@ class ObservationController extends AbstractObjectController {
 
 	def listRelated = {
     	log.debug params;
-
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 
@@ -1198,7 +1311,7 @@ class ObservationController extends AbstractObjectController {
 			//user presses on agree button so getting reco from id and creating new recoVote without additional common name
 			reco = Recommendation.get(recoId);
 			isAgreeRecommendation = true
-		} else{
+		} else {
 			//add recommendation used so taking both reco and common name reco if available
 			def recoResultMap = observationService.getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
 			reco = recoResultMap.mainReco;
@@ -1208,9 +1321,9 @@ class ObservationController extends AbstractObjectController {
 		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence);
 
 		if(!reco){
-			log.debug "Not a valid recommendation"
-			return null
-		}else{
+			def msg = "Not a valid recommendation"
+			return [recoVote:null, msg:msg]
+		} else {
 			if(!existingRecVote){
 				log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
 				def msg = "${message(code: 'recommendations.added.message', args: [reco.name])}"
@@ -1251,6 +1364,7 @@ class ObservationController extends AbstractObjectController {
 				}
 			}
 		}
+        return;
 	}
    
     /**
@@ -1320,7 +1434,7 @@ class ObservationController extends AbstractObjectController {
 	/**
 	 *
 	 */
-	def search = {
+/*	def search = {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 		def model = observationService.getObservationsFromSearch(params);
@@ -1351,21 +1465,12 @@ class ObservationController extends AbstractObjectController {
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
-			if(model.showTags) {
-//				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-//				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			}
-//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-/*			def chartModel = model.speciesGroupCountList
-            chartModel['width'] = 300;
-            chartModel['height'] = 270;
-*/
             def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
 	}
-
+*/
 	/**
 	 *
 	 */
@@ -1502,7 +1607,7 @@ class ObservationController extends AbstractObjectController {
 
     /**
     */
-    def distinctReco = {
+    def distinctReco() {
         def max = Math.min(params.max ? params.int('max') : 10, 100)
         def offset = params.offset ? params.int('offset') : 0
         Map result = [:];
@@ -1527,17 +1632,27 @@ class ObservationController extends AbstractObjectController {
                 result = [msg:message]
             }
 
+            def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
         } catch(e) {
             e.printStackTrace();
             log.error e.getMessage();
-            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+            String msg = g.message(code: 'error', default:'Error while processing the request.');
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
-        render result as JSON
     }
 
     /**
     */
-    def speciesGroupCount = {
+    def speciesGroupCount() {
         Map result = [:];
         try {
             def speciesGroupCountListResult;
@@ -1554,13 +1669,21 @@ class ObservationController extends AbstractObjectController {
                 def message = g.message(code: 'speciesGroup.count.zero.message', default:'No data');
                 result = [msg:message]
             }
-
+            def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         } catch(e) {
             e.printStackTrace();
             log.error e.getMessage();
-            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+            String msg = g.message(code: 'error', default:'Error while processing the request.');
+             def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
-        render result as JSON
     }
     
     @Secured(['ROLE_ADMIN','ROLE_SPECIES_ADMIN'])
@@ -1569,18 +1692,27 @@ class ObservationController extends AbstractObjectController {
         def obv = Observation.get(params.id.toLong());
         def reco = Recommendation.get(params.recoId.toLong());
         def currentUser = springSecurityService.currentUser;
+        def mailType = '';
+        def activityFeed;
         if(params.lockType == "Lock"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
-            if(recVo && reco != recVo.recommendation){
-                recVo.delete(flush: true, failOnError:true)
-                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
-                if(!newRecVo.save(flush:true)){
-                    newRecVo.errors.allErrors.each { log.error it } 
+            def newRecVo;
+            if(recVo){
+                if(reco != recVo.recommendation) {
+                    recVo.delete(flush: true, failOnError:true)
+                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                    if(!newRecVo.save(flush:true)){
+                        newRecVo.errors.allErrors.each { log.error it } 
+                    }
+                } else {
+                    //user locking his own reco
+                    newRecVo = recVo;
                 }
+                
             }
             if(!recVo){
-                def newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
                 if(!newRecVo.save(flush:true)){
                     newRecVo.errors.allErrors.each { log.error it } 
                 }
@@ -1588,28 +1720,34 @@ class ObservationController extends AbstractObjectController {
             obv.maxVotedReco = reco; 
             obv.isLocked = true;
             msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
-            
+            mailType = utilsService.OBV_LOCKED;
+            activityFeed = activityFeedService.addActivityFeed(obv, newRecVo, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(newRecVo.recommendation, null));
         }else{
             obv.removeResourcesFromSpecies()
             obv.isLocked = false;
             obv.calculateMaxVotedSpeciesName()
             msg = messageSource.getMessage("default.observation.unlocked", null, RCU.getLocale(request))
+            mailType = utilsService.OBV_UNLOCKED;
+            def recommendationVoteInstance =  RecommendationVote.findWhere(recommendation: reco, observation:obv, author: currentUser)
+            activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
         }
         if(!obv.save(flush:true)){
             obv.errors.allErrors.each { log.error it } 
         }
+		utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
+
         def result = ['msg': msg]
         render result as JSON
     }
 
-    def getRecommendationListJSON(LinkedHashMap result){
+    /*def getRecommendationListJSON(LinkedHashMap result){
 
     	if(result){	    	
 	   		def test = ['result' : result];
 	   		return test; // as JSON;
    		}
 
-	} 
+	}*/ 
    
     @Secured(['ROLE_USER'])
     def bulkCreate(){
@@ -1617,7 +1755,8 @@ class ObservationController extends AbstractObjectController {
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
-		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author] 
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature] 
     }
 
     @Secured(['ROLE_USER'])
@@ -1652,6 +1791,13 @@ class ObservationController extends AbstractObjectController {
     }
 
     def testy(){
-	    setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    //setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
+	    println speciesService.checking();
+    	//return false;
+        //render springSecurityFilterChain
+    }
+
+    def filePickerSecurityCodes() {
+        utilsService.filePickerSecurityCodes();
     }
 }

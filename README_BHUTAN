@@ -1,0 +1,62 @@
+Server machine : 10.0.0.7, 
+External IP Address: 122.181.163.169
+
+Login details:- 
+	User Name: biodiv
+	Password: rose#237%
+
+
+A. Database migration
+	On your local system 
+		Take database dump from current server i.e biodiv.dmp.
+		prepare database for migration by running following on shell prompt
+			dropdb biodiv; createdb biodiv; psql biodiv < biodiv.dmp
+		open psql
+			psql biodiv
+		run 1st half of sql commands written in 'bhutan_db_update.sql'
+		
+		Get latest code from bbp master 
+		in 'BuildConfig.groovy' comment 'tomcat' section to run script
+		in bhutanMigration.groovy correct file path for contributor mapping
+		run grails --stacktrace run-script userscripts/bhutanMigration.groovy 	 
+		
+		Run 2nd half of sql commands written in 'bhutan_db_update.sql'
+		
+		Take dump of this database and restore it on new production server.
+
+B. Resource set up
+	Copy all the resources from current server to new server
+	Data directory on new server is : biodiv@bbp:/apps/biodiv
+	Once copied run following command
+		sudo chown -R tomcat7:tomcat7 /apps/biodiv/
+
+C. Chef set up
+	First push all changes to master repository.
+	
+	On production server
+		go to biodiv@bbp:~/git/chef-biodiv/
+			in 'biodiv.json' file edit these field appropriately
+				"servername": "portal.bbp1.org"
+				"supportEmail" : "support(at)biodiversity(dot)bt",
+				"myhostname" : "bbp1.org",
+	
+		To re deploy
+			sudo chef-solo -c solo.rb -j biodiv.json
+			Check tomcat log at '/var/log/tomcat7/' and nginx log at '/var/log/nginx/'
+			
+D. Solr indexing
+	On browser open following url. 
+		http://<server-name>/biodivAdmin/reloadBiodivSearchIndex			
+					
+			
+E. Application status check 
+	GeoServer
+		http://<server-name>:8080/geoserver	
+	solr
+		http://<server-name>:8080/solr
+	tomcat
+		http://<server-name>:8080/biodiv/observation
+	name parser
+		sudo ps -aef | grep parserver
+	tomcat log at '/var/log/tomcat7/' and nginx log at '/var/log/nginx/'
+			
