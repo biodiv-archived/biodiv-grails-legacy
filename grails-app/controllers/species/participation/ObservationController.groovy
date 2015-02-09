@@ -103,6 +103,7 @@ class ObservationController extends AbstractObjectController {
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -117,7 +118,6 @@ class ObservationController extends AbstractObjectController {
 
         withFormat {
             html {
-                model.resultType = 'observation'
                 if(params.loadMore?.toBoolean()){
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
