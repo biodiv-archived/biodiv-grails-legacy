@@ -1607,6 +1607,8 @@ grails.exceptionresolver.logRequestParameters=true
 grails.plugin.springsecurity.logout.postOnly = false
 grails.plugin.springsecurity.logout.handlerNames = ['securityContextLogoutHandler', 'facebookAuthCookieLogout'];
 
+grails.doc.title="${speciesPortal.app.siteName}"
+grails.doc.subtitle=""
 grails.doc.authors='Prabhakar R, Thomas Vattakaven, Sravanthi M, Sandeep Tandekar, Rahul kumar Sinha'
 grails.doc.license=''
 grails.doc.copyright=''
