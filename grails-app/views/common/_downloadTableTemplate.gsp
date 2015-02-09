@@ -17,8 +17,14 @@
 				<g:each in="${downloadLogList}" status="i"
 					var="downloadLog">
 					<tr class="mainContent">
-						<td>${downloadLog.createdOn}</td>
-						<td><a href="${downloadLog.filterUrl}" title="${downloadLog.filterUrl}"><g:message code="button.filter.url" /> </a></td>
+                        <td>${downloadLog.createdOn}</td>
+                        <%
+                        def filterUrl = downloadLog.filterUrl;
+                        if(downloadLog.sourceType == 'Unique Species') {
+                            filterUrl = filterUrl.replace("distinctReco", 'list');
+                        }
+                        %>
+						<td><a href="${filterUrl}" title="${filterUrl}"><g:message code="button.filter.url" /> </a></td>
 						<td>${downloadLog.type}</td>
 						<sUser:ifOwns model="['user':user]">
 							<td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadFile', controller:'observation', id:downloadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.download" /></a></td>

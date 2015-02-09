@@ -493,7 +493,7 @@ println "2222222222222222222"
 		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		params.max = Math.min(params.max ? params.int('max') : 24, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 		
 		def model = observationService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
