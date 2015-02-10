@@ -998,7 +998,14 @@ class UtilsService {
 	Date parseDate(date, sendNew = true){
 		try {
             if(!sendNew) {
-			    return date? Date.parse("dd/MM/yyyy", date):null;
+                Date d;
+                if(date) {
+                    d = Date.parse("dd/MM/yyyy", date) 
+                    d.set(['hourOfDay':23, 'minute':59, 'second':59]);
+                }else {
+                    d = null
+                }
+                return d
             }else {
 			    return date? Date.parse("dd/MM/yyyy", date):new Date();
             }
