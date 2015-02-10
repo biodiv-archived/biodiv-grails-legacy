@@ -244,7 +244,7 @@ if(r) {
                                     <div class="sidebar_section">
                                         <h5><g:message code="observation.show.related.observations" /> </h5>
                                         <div class="tile" style="clear: both">
-                                            <div class="title"><g:message code="observation.show.other.observations" /></div>
+                                            <div class="title"><g:message code="observation.show.other.observations" /><span class="item_count"></span></div>
                                             <obv:showRelatedStory
                                             model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
                                         </div>
