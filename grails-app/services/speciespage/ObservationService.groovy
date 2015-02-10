@@ -47,6 +47,7 @@ import java.beans.Introspector;
 import species.CommonNames;
 import species.Language;
 import species.Species;
+import species.SpeciesPermission;
 
 
 //import org.apache.lucene.document.DateField;
