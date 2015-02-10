@@ -181,9 +181,16 @@ def contact_me_text=g.message(code:'button.contact.me')
                                     <h6>
                                          <g:message code="suser.show.observations.spread" />
                                     </h6>
-        			    <obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:460, height:400]">
-				    </obv:showObservationsLocation>
+                                    <obv:showObservationsLocation
+                                    model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:460, height:400]">
+                                    </obv:showObservationsLocation>
+                                    <a id="resetMap" data-toggle="dropdown"
+                                        href="#"><i class="icon-refresh"></i>
+                                        <g:message code="button.reset" /></a>
+
+                                    <div><i class="icon-info"></i><g:message code="map.limit.info" /></div>
+                                    <input id="bounds" name="bounds" value="" type="hidden"/>
+                                    <input id="user" name="user" value="${user.id}" type="hidden"/>
                                 </div>
                                 <div id="expertice" class="section span6" style="margin:0px;margin-left:20px;width:420px;">
                                 <%
@@ -297,14 +304,14 @@ def contact_me_text=g.message(code:'button.contact.me')
 	var userRecoffset = 0;
         $(document).ready(function() {
             updateMapView({'user':'${user?.id}'});
-		$("#seeMoreMessage").hide();
-		$('#tc_tagcloud a').click(function(){
-			var tg = $(this).contents().first().text();
-			window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
-	    	return false;
-	 	});
+            $("#seeMoreMessage").hide();
+            $('#tc_tagcloud a').click(function(){
+			    var tg = $(this).contents().first().text();
+			    window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
+	    	    return false;
+	 	    });
             var max = 3;
-	    $("#seeMore").click(function(){
+	        $("#seeMore").click(function(){
                 preLoadRecos(max, userRecoffset, true);
                 userRecoffset = max + userRecoffset;
             });
@@ -313,6 +320,15 @@ def contact_me_text=g.message(code:'button.contact.me')
             userRecoffset = max + userRecoffset;
             $('.linktext').linkify();
             //$('#userprofilenavbar').affix();
+        
+            $("#resetMap").click(function() {
+                var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker');
+                //refreshList(mapLocationPicker.getSelectedBounds());
+                $("#bounds").val('');
+                refreshMapBounds(mapLocationPicker);
+            });
+
+
 	});
 </r:script>
 <script type="text/javascript">

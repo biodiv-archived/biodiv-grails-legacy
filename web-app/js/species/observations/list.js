@@ -612,7 +612,7 @@ function getSelectedFilters($ele, noneSelected) {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-    console.log(params);
+    console.log('url params : '+params);
     if(removeParam) {
         delete params[removeParam]
     }
@@ -782,6 +782,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     } else {
         delete params['isMapView']
     }
+
+    var user = $("#user").val();
+    if(user) {
+        params['user'] = user;
+    } 
 
     var object_type = getSelectedFilters($("input.moduleFilter"))
     if(object_type) {
