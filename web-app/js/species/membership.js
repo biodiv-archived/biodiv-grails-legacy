@@ -502,7 +502,7 @@ function init_stats(statsUrl){
 		success: function(data) {
 			var comp = $(".statsTicker.speciesUpdateCount");
 			if(parseInt(data.Species) == 0){
-				sComp.hide();
+				comp.hide();
 			}else{
 				comp.text(' ' + data.Species);
 				comp.show();
