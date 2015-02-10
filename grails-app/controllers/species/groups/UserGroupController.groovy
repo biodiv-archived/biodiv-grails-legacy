@@ -161,7 +161,7 @@ class UserGroupController {
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
 	}
 
-	@Secured(['ROLE_USER'])
+    @Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def save() {
 		params.domain = Utils.getDomainName(request)
 		params.locale_language = utilsService.getCurrentLanguage(request);
