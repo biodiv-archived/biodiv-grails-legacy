@@ -10,6 +10,7 @@ class ExportJob {
 	private final static String OBSERVATION_LIST = "Observations"
 	private final static String CHECKLIST = "Checklist"
 	private final static String SPECIES = "Species"
+	private final static String UNIQUE_SPECIES = "Unique Species"
 	
 	def obvUtilService
     def utilsService;
@@ -33,7 +34,7 @@ class ExportJob {
 				File f
 				
 				switch (dl.sourceType) {
-					case OBSERVATION_LIST:
+					case [OBSERVATION_LIST, UNIQUE_SPECIES]:
 						f = obvUtilService.export(dl.fetchMapFromText(), dl)
 						break
 					case CHECKLIST:

@@ -183,6 +183,18 @@ $(document).ready(function(){
 	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 	    return true;   
     });
+    
+    $('.hasMedia_filter_label').click(function(){
+        var caret = '<span class="caret"></span>'
+        if(stringTrim(($(this).html())) == stringTrim($("#has_media").html().replace(caret, ''))){
+            return true;
+        }
+	    $('.hasMedia_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#has_media").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
+    });
 
     $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
    
@@ -341,6 +353,50 @@ $(document).ready(function(){
         $.autopager('load');
         return false;
     });
+    
+    $('.download-form').bind('submit', function(event) {
+            var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
+            var filterUrl = '';
+            if(downloadFrom == 'uniqueSpecies') {
+                var hostName = 'http://' + document.location.hostname;
+                var target = window.location.pathname + window.location.search;
+                var a = $('<a href="'+target+'"></a>');
+                var url = a.url();
+                var href = url.attr('path');
+                href = href.replace('list', 'distinctReco');
+                var params = getFilterParameters(url);
+                filterUrl = hostName + href + '?';
+                params['actionType'] = 'list';
+                $.each(params, function(key, value){
+                    filterUrl = filterUrl + key + '=' + value + '&';
+                });
+            } else {
+                filterUrl = window.location.href;
+            }
+			var queryString =  window.location.search
+			$(this).ajaxSubmit({ 
+	         	url:window.params.requestExportUrl + queryString,
+				dataType: 'json', 
+				type: 'POST',
+				beforeSubmit: function(formData, jqForm, options) {
+					formData.push({ "name": "filterUrl", "value": filterUrl});
+					//formData.push({ "name": "source", "value": "${source}"});
+					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
+				}, 
+	            success: function(data, statusText, xhr, form) {
+	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+	            	$('.download-box').find('.download-options').hide();
+	            	$("html, body").animate({ scrollTop: 0 });
+	            	return false;
+	            },
+	            error:function (xhr, ajaxOptions, thrownError){
+	            	//successHandler is used when ajax login succedes
+	            	var successHandler = this.success, errorHandler = null;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+				} 
+	     	});
+	     	event.preventDefault();
+     	});
 
     //	last_actions();
     eatCookies();
@@ -469,6 +525,16 @@ function getSelectedSortBy() {
     return sortBy;	
 } 
 
+function getMediaFilterBy() {
+    var hasMedia = ''; 
+    $('.hasMedia_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            hasMedia += $(this).attr('value');
+        }
+    });
+    return hasMedia;	
+}
+
 function getSelectedFlag() {
     var flag = ''; 
     flag = $("#observationFlagFilter").attr('value');
@@ -546,7 +612,7 @@ function getSelectedFilters($ele, noneSelected) {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-
+    console.log('url params : '+params);
     if(removeParam) {
         delete params[removeParam]
     }
@@ -558,7 +624,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['sort'] = sortBy;
         }
     }
-
+    if(getMediaFilterBy() != '') {
+        params['hasMedia'] = getMediaFilterBy();
+    }
     var sName = getSelectedSpeciesName();
     if(sName) {
         params['speciesName'] = sName;
@@ -715,6 +783,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['isMapView']
     }
 
+    var user = $("#user").val();
+    if(user) {
+        params['user'] = user;
+    } 
+
     var object_type = getSelectedFilters($("input.moduleFilter"))
     if(object_type) {
         params['object_type'] = object_type
@@ -780,13 +853,13 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
-        $('.observations_list').replaceWith(data.obvListHtml);
-        $('#info-message').replaceWith(data.obvFilterMsgHtml);
-        $('#tags_section').replaceWith(data.tagsHtml);
-        //$('#filterPanel').replaceWith(data.filterPanel);
-        //$('.observation_location').replaceWith(data.mapViewHtml);
+        $('.observations_list').replaceWith(data.model.obvListHtml);
+        $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
+        $('#tags_section').replaceWith(data.model.tagsHtml);
+        //$('#filterPanel').replaceWith(data.model.filterPanel);
+        //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);
-        updateDownloadBox(data.instanceTotal);
+        updateDownloadBox(data.model.instanceTotal);
         reInitializeGroupPost();
         updateRelativeTime();
         last_actions();
@@ -975,9 +1048,9 @@ function intializesSpeciesHabitatInterest(multiSelect){
 
 function updateDownloadBox(instanceTotal){
     if(instanceTotal > 0){
-        $('#download-box').show();
+        $('.download-box').show();
     }else{
-        $('#download-box').hide();
+        $('.download-box').hide();
     }
 }
 	
@@ -1007,15 +1080,15 @@ function loadSpeciesGroupCount() {
         dataType: "json",
         data:params,
         success: function(data) {
-            if(data.status === 'success') {
-                if(data.speciesGroupCountList) {
+            if(data.success == true) {
+                if(data.model.speciesGroupCountList) {
                     loadGoogleVisualizationAPI(function(){
                         var visualization_data = new google.visualization.DataTable();
-                        $.each(data.speciesGroupCountList.columns, function(index, item) {
+                        $.each(data.model.speciesGroupCountList.columns, function(index, item) {
                             visualization_data.addColumn( item[0], item[1]);
                         });
 
-                        $.each(data.speciesGroupCountList.data, function(index, item) {
+                        $.each(data.model.speciesGroupCountList.data, function(index, item) {
                             visualization_data.addRow(item);
                         });
 

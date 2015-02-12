@@ -12,7 +12,7 @@
 
 <g:set var="title" value="${g.message(code:'ugroup.value.pages')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_show" />
+<r:require modules="pages" />
 <style>
     #contentMenu > .nav-tabs > .active > a {
         font-weight:normal;
@@ -64,7 +64,7 @@
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
                                                 <li id="newsletter_${newsletterInstance.id}"><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}"><p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                     ${fieldValue(bean: newsletterInstance, field: "title")}</p>
-                                                            <sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up")'></i>
+                                                            <sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down", "newsletter")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up", "newsletter")'></i>
                                                             </sUser:permToReorderPages>
                                                         </a></li>
 						</g:each>

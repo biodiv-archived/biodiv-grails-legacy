@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Species"%>
 <%@page import="species.participation.Observation"%>
-<%@page import="species.participation.ActivityFeed"%>
+<%@page import="species.participation.Discussion"%>
 <%@page import="species.groups.UserGroup"%>
 <%@page import="content.eml.Document"%>
 <html>
@@ -62,7 +62,6 @@
                 <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">${g.message(code:'button.maps')}</span></div>
 
                 <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">${g.message(code:'button.documents')}</span></div>
-                
 
                 <div id="checklists" class="entry" onclick="location.href='${uGroup.createLink(controller:'checklist', action:'list', absolute:true)}'"><span class="content">${g.message(code:'title.checklists')}</span></div>
                 <a href="http://www.wikwio.org/idao" target="_blank">   <div id="IDAOTool" class="entry"><span class="content">${g.message(code:'idao.tool')}</span></div></a>                

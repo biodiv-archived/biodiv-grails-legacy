@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'list', base:Utils.getIBPServerDomain()])}" />
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'user', action:'list', base:Utils.getIBPServerDomain()])}" />
 <g:set var="title" value="${g.message(code:'title.value.users')}"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'canonicalUrl':canonicalUrl]"/>
 

@@ -47,6 +47,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
+import species.participation.Discussion
 import species.participation.Observation;
 import species.participation.UserToken;
 import species.utils.ImageUtils;
@@ -72,7 +73,6 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	def SUserService;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -444,7 +444,7 @@ class UserGroupService {
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
 		userGroup.addToObservations(observation);
 		if(!userGroup.save()) {
-			log.error "Could not add ${observation} to ${usergroup}"
+			log.error "Could not add ${observation} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
@@ -531,6 +531,12 @@ class UserGroupService {
             if(userGroupInstance)
                 query += "join obv.userGroups userGroup where userGroup=:userGroup"
             count =  Document.executeQuery(query, queryParams, [cache:true])[0]
+			
+			case Discussion.simpleName :
+			query = "select count(*) from Discussion obv "
+			if(userGroupInstance)
+				query += "join obv.userGroups userGroup where userGroup=:userGroup"
+			count =  Discussion.executeQuery(query, queryParams, [cache:true])[0]
         }
         return count;
 	}
@@ -633,6 +639,7 @@ class UserGroupService {
 	def getUserUserGroups(SUser user, int max, long offset) {
 		if(max==-1 && offset==-1)
 			return  UserGroupMemberRole.findAllBySUser(user).groupBy{ it.role };
+
 		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).groupBy{ it.role };
 	}
 
@@ -1082,7 +1089,7 @@ class UserGroupService {
 	void postDocumentToUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.addToDocuments(document);
 		if(!userGroup.save()) {
-			log.error "Could not add ${document} to ${usergroup}"
+			log.error "Could not add ${document} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
@@ -1107,7 +1114,7 @@ class UserGroupService {
 	void removeDocumentFromUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
 		userGroup.documents.remove(document);
 		if(!userGroup.save()) {
-			log.error "Could not remove ${document} from ${usergroup}"
+			log.error "Could not remove ${document} from ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
@@ -1136,8 +1143,57 @@ class UserGroupService {
 		return Document.executeQuery(query, queryParams)[0]
 	}
 	
-	
-	
+	/////////////// Discussion RELATED /////////////////
+	void postDiscussiontoUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
+		log.debug "Posting ${discussion} to userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postDiscussionToUserGroup(discussion, userGroup, sendMail)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postDiscussionToUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
+		userGroup.addToDiscussions(discussion);
+		if(!userGroup.save()) {
+			log.error "Could not add ${discussion} to ${userGroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
+			log.debug "Added ${discussion} to userGroup ${userGroup}"
+		}
+	}
+
+	void removeDiscussionFromUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
+		log.debug "Removing ${discussion} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong("" + it));
+				if(userGroup) {
+					removeDiscussionFromUserGroup(discussion, userGroup, sendMail)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void removeDiscussionFromUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
+		userGroup.discussions.remove(discussion);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${discussion} from ${userGroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
+			log.debug "Removed ${discussion} from userGroup ${userGroup}"
+		}
+	}
+
 	/////////////// PROJECTS RELATED /////////////////
 	void postProjecttoUserGroups(Project project, List userGroupIds) {
 		log.debug "Posting ${project} to userGroups ${userGroupIds}"
@@ -1156,7 +1212,7 @@ class UserGroupService {
 	void postProjectToUserGroup(Project project, UserGroup userGroup) {
 		userGroup.addToProjects(project);
 		if(!userGroup.save()) {
-			log.error "Could not add ${project} to ${usergroup}"
+			log.error "Could not add ${project} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, true);
@@ -1181,7 +1237,7 @@ class UserGroupService {
 	void removeProjectFromUserGroup(Project project, UserGroup userGroup) {
 		userGroup.projects.remove(project);
 		if(!userGroup.save()) {
-			log.error "Could not remove ${project} from ${usergroup}"
+			log.error "Could not remove ${project} from ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, false);
@@ -1241,6 +1297,10 @@ class UserGroupService {
 					groupRes += 'documents'
 					functionString += (submitType == 'post')? 'addToDocuments' : 'removeFromDocuments'
 					break
+				case Discussion.class.getCanonicalName():
+					groupRes += 'discussions'
+					functionString += (submitType == 'post')? 'addToDiscussions' : 'removeFromDiscussions'
+					break
 				default:
 					break
 			}
@@ -1263,7 +1323,7 @@ class UserGroupService {
 		
 		SUser currUser = springSecurityService.currentUser;
 		//returning true for user with admin role
-		if(SUserService.isAdmin(currUser?.id)){
+		if(utilsService.isAdmin(currUser?.id)){
 			return true
 		}
 		
@@ -1286,6 +1346,7 @@ class UserGroupService {
 	}
 	
 	private class ResourceUpdate {
+		private static final int POST_BATCH_SIZE = 50
 		private static final log = LogFactory.getLog(this);
 		
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
@@ -1316,30 +1377,38 @@ class UserGroupService {
 		
 		
 		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
-			UserGroup.withTransaction(){  status ->
+			
+			UserGroup.withNewTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
 					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
 					obvs = getFeatureSafeList(ug, obvs)
 				}
-				if(obvs.isEmpty()){
-					log.debug "Nothing to update because of permissoin or not part of group"
-					return false
+			}
+			
+			if(obvs.isEmpty()){
+				log.debug "Nothing to update because of permissoin or not part of group"
+				return false
+			}
+			//XXX: to avoid connection time out posting in batches
+			List resSubLists = obvs.collate(POST_BATCH_SIZE)
+			resSubLists.each { resList ->
+				UserGroup.withNewTransaction(){  status ->
+					log.debug submitType + " for group " + ug + "  resources size " +  resList.size()
+					ug = ug.merge()
+					resList.each { obv ->
+						obv = obv.merge()
+						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+					}
+					try{
+						ug.save(flush:true, failOnError:true)
+					}catch(Exception e){
+						ug.errors.allErrors.each { log.debug it }
+						status.setRollbackOnly()
+						e.printStackTrace()
+					} 
 				}
-				log.debug submitType + " for group " + ug + "  resources size " +  obvs.size()
-				ug = ug.merge()
-				obvs.each { obv ->
-					obv = obv.merge()
-					Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
-				}
-				try{
-					ug.save(flush:true, failOnError:true)
-				}catch(Exception e){
-					ug.errors.allErrors.each { log.debug it }
-					status.setRollbackOnly()
-					e.printStackTrace()
-				} 
 			}
 			return !ug.hasErrors()
 		}
@@ -1356,7 +1425,7 @@ class UserGroupService {
 		private List getFeatureSafeList(ug, obvs){
 			SUser currUser = springSecurityService.currentUser;
 			//if admin or founder or expert then can un post any featured resource
-			if(SUserService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
+			if(utilsService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
 				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
 				return obvs
 			}

@@ -245,8 +245,9 @@ class XMLConverter extends SourceConverter {
                     //                      mergeSpecies(existingSpecies, s);
                     //                      s = existingSpecies;
                     //                  }
-
-                    s.reprImage = null;
+                    
+                    //Dropped reprImage Column
+                    //s.reprImage = null;
                     return s;
                 } else {
                     log.error "TaxonConcept is not found"

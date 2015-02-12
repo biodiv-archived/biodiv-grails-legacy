@@ -20,7 +20,7 @@
 </div>
 
 <div class="sidebar_section">
-    <h5><g:message code="observation.show.related.observations" /></h5>
+    <h5><g:message code="observation.show.related.observations" /><span class="item_count"></span></h5>
     <div class="tile" style="clear: both">
         <obv:showRelatedStory
         model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupInstance':userGroupInstance]" />

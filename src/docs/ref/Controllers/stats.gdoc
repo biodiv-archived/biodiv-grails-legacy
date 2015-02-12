@@ -1,0 +1,65 @@
+h4. Basic Stat
+
+* *Path* : /api/chart/basicStat 
+* *Parameters* : 
+** webaddress : usergroup webaddress
+* *REST method* : GET
+* *Requests* :
+{code}
+http://indiabiodiversity.localhost.org/api/chart/basicStat
+{code}
+* *Response* : 
+{code}
+{
+    "observationCount": 35923,
+        "speciesCount": 49499,
+        "checklistsCount": 425,
+        "documentCount": 635,
+        "userCount": 5020
+}
+{code}
+
+h4. Top Contributors
+
+* *Path* : /api/chart/topContributors 
+* *Parameters* : 
+** webaddress : usergroup webaddress
+* *REST method* : GET
+* *Requests* :
+{code}
+http://indiabiodiversity.localhost.org/api/chart/topContributors
+{code}
+* *Response* : 
+{code}
+{
+        obvCount: 34,
+              data: [
+                  [
+                  "Chief RedEarth",
+              14
+                  ],
+              [
+                  "Santhan p",
+              8
+                  ],
+              [
+                  "Thomas Vattakaven",
+              5
+                  ],
+              [
+                  "V.Arun",
+              4
+                  ],
+              [
+                  "Ajit Ampalakkad",
+              2
+                  ],
+              [
+                  "Segu Mohamed Kasim",
+              1
+                  ]
+                  ]
+}
+{code}
+
+

@@ -460,11 +460,11 @@ $(document).ready(function() {
      	
      	
 	var founders_autofillUsersComp = $("#userAndEmailList_${founders_autofillUsersId}").autofillUsers({
-		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
+		usersUrl : '${createLink(controller:'user', action: 'terms')}'
 	});
 	
 	var experts_autofillUsersComp = $("#userAndEmailList_${experts_autofillUsersId}").autofillUsers({
-		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
+		usersUrl : '${createLink(controller:'user', action: 'terms')}'
 	});
 	
 	<g:if test="${userGroupInstance.isAttached() }">

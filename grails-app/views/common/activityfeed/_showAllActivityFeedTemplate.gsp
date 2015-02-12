@@ -19,7 +19,6 @@
 	<input type="hidden" name='user' value="${user}"/>
 	<input type="hidden" name='userGroupFromUserProfile' value="${userGroup?.id}"/>
 	
-	<input type="hidden" name='isCommentThread' value="${isCommentThread}"/>
 	<input type="hidden" name='subRootHolderId' value="${subRootHolderId}"/>
 	<input type="hidden" name='subRootHolderType' value="${subRootHolderType}"/>
 	<input type="hidden" name='feedHomeObjectId' value="${rootHolder?.id}"/>

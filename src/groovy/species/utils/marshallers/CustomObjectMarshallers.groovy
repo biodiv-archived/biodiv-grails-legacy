@@ -3,6 +3,7 @@ package species.utils.marshallers;
 import org.apache.commons.logging.LogFactory;
 
 import species.Field;
+import species.SpeciesField;
 import species.UserGroupTagLib;
 import species.Synonyms;
 import species.CommonNames;
@@ -12,7 +13,9 @@ import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
 import species.Habitat;
+import species.Language;
 import species.License;
+import species.Reference;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
@@ -30,9 +33,14 @@ import species.Resource;
 import species.participation.Comment;
 import species.utils.ImageType;
 import species.Language;
+import content.eml.UFile;
 
 import grails.converters.JSON
 import species.participation.Observation
+import org.codehaus.groovy.grails.web.converters.marshaller.xml.MapMarshaller;
+import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException;
+import java.util.Map;
+import grails.converters.XML;
 
 class CustomObjectMarshallers {
     
@@ -42,6 +50,8 @@ class CustomObjectMarshallers {
     List marshallers = []
 
     def register() {
+
+        JSON.createNamedConfig('v1') {
         marshallers.each{ it.register() }
 
         JSON.registerObjectMarshaller(Geometry) {
@@ -123,7 +133,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
-            def r = [id:it.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
+            def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
             };
@@ -153,8 +163,52 @@ class CustomObjectMarshallers {
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
+            println "comment marshaller"
 			return ['id':it.id, 'text':it.body, 'authorId':it.author.id, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
 		}
 
+        JSON.registerObjectMarshaller(SpeciesField) {
+			return ['id':it.id, 'field':it.field, 'text':it.description, 'dateCreated' : it.dateCreated, 'lastUpdated' : it.lastUpdated, 'licenses':it.licenses, 'audienceTypes':it.audienceTypes, 'resources':it.resources, 'references':it.references, 'contributors':it.contributors, 'attributors':it.attributors, 'uploader':it.uploader, 'uploadTime':it.uploadTime.getTime(), 'language':it.language, 'rating':it.averageRating?:0];
+		}
+
+        JSON.registerObjectMarshaller(Field) {
+            Map result = [:];
+            result['concept'] = it.concept
+            if(it.category) result['category'] = it.category;
+            if(it.subCategory) result['subCategory'] = it.subCategory;
+            result['description'] = it.description
+            result['language'] = it.language
+            return result;
+        }
+        
+        JSON.registerObjectMarshaller(Reference) {
+            Map result = [:];
+            if(it.title) result['title'] = it.title;
+            if(it.url) result['url'] = it.url;
+            return result;
+        }
+
+        JSON.registerObjectMarshaller(Language) {
+            return ['id':it.id, 'name':it.name]
+        }
+ 
+        JSON.registerObjectMarshaller(UFile) {
+            return ['path': grailsApplication.config.speciesPortal.content.serverURL + it.path, 'size':it.size, 'mimetype':it.mimetype]
+        }
+
+        XML.registerObjectMarshaller(new MapMarshaller() {
+            public String getElementName(Object o) {
+                return "response";
+            }
+            public void marshalObject(Object o, XML xml) throws ConverterException {
+                Map<Object,Object> map = (Map<Object,Object>) o;
+                for (Map.Entry<Object,Object> entry : map.entrySet()) {
+                    xml.startNode(entry.getKey().toString());
+                    xml.convertAnother(entry.getValue());
+                    xml.end();
+                }
+            }
+        })
+    }
     }
 }

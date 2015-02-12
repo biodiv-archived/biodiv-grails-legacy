@@ -19,7 +19,6 @@
         </style>
     </head>
     <body>
-
         <div class="span12">           
             <g:render template="/document/documentSubMenuTemplate" model="['entityName': entityName]" />
             <uGroup:rightSidebar/>
@@ -33,10 +32,10 @@
 
                 <obv:showObservationFilterMessage />
 
-                <g:render template="/document/documentListTemplate" model="['userGroupInstance':userGroupInstance]"/>
+                <g:render template="/document/documentListTemplate" model="${model}"/>
             </div>
 
-            <g:render template="/document/documentSidebar" />
+            <g:render template="/document/documentSidebar" model="[]"/>
         </div>
 	    </body>
 </html>

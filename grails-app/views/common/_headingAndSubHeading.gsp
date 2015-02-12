@@ -1,4 +1,3 @@
-
 <g:if test="${heading}">
     <h1 class="${headingClass?:''}" title="${heading.replaceAll('<.*>','')}">
 		${raw(heading)}

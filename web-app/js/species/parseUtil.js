@@ -62,7 +62,10 @@ function parseCSVData(data, options) {
     var headerCount = 0;
     var error = '';
     var foundHeader = false;
-    var rowLimit = 500;
+    var rowLimit = 1000;
+    if(options.res === "species") {
+        rowLimit = 500;
+    }
     var rowCount = 0;
     $.each(lines, function(lineCount, line) {
         line = $.trim(line);

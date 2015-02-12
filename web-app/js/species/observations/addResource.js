@@ -353,7 +353,9 @@ function createResources(start, end, w, count) {
                 'PICASA', 
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
-                mimetypes: ['image/*']
+                mimetypes: ['image/*'],
+                policy: me.POLICY, 
+                signature: me.SIGNATURE
             };
             try {
             filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
@@ -406,7 +408,9 @@ function createResources(start, end, w, count) {
                 //'FACEBOOK',                 
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
-                mimetypes: ['audio/*']
+                mimetypes: ['audio/*'],
+                policy: me.POLICY, 
+                signature: me.SIGNATURE
             };
             try {
             filepicker.pickMultiple(filepickerOptions1, onSuccess, function(FPError){ 

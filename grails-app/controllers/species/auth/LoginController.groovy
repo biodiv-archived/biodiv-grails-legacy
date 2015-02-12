@@ -1,7 +1,9 @@
 package species.auth
 
 import grails.converters.JSON
+import grails.converters.XML
 
+import static org.springframework.http.HttpStatus.*;
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
@@ -38,6 +40,7 @@ class LoginController {
 	def grailsApplicaiton
 
 	def messageSource;
+    def utilsService;
 
 	/**
 	 * Default action; redirects to 'defaultTargetUrl' if logged in, /login/auth otherwise.
@@ -99,11 +102,18 @@ class LoginController {
             if(!params.token) {
                 params.remove('token');
             } 
-            
+        
+            def model;
             if(params.id) {
                 params.id = Long.parseLong(params.id);
+                model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), params);
+            } else if(params.error) {
+                model = utilsService.getErrorModel(params.message, null, params.int('error'))
             }
-            render params as JSON
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
 	}
 

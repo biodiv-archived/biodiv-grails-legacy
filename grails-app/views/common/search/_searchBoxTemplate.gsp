@@ -19,7 +19,8 @@
 <input type="hidden" id="userLanguage" value="${userLanguage?.id}" />
 <script type="text/javascript">
 $(document).ready(function() {    
-	window.params = {
+    window.params = {
+                'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",
                 'offset':"${params.offset}",
@@ -47,8 +48,8 @@ $(document).ready(function() {
                     'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
-                'isLoggedInUrl' : "${createLink(controller:'SUser', action:'isLoggedIn','userGroup':userGroupInstance)}",
-                'userTermsUrl' : "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}",
+                'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
+                'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
                 'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
                 'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
                 'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",

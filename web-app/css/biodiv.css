@@ -290,11 +290,11 @@ h6 {
 /* 	clear:none; */
 /* } */
 .observation_story .prop .name {
-	width: 120px;
+	width: 100px;
 }
 
 .observation .prop .value {
-	margin-left: 130px;
+	margin-left: 110px;
 }
 
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
@@ -2586,7 +2586,6 @@ small {
     margin-bottom:-1px;
 }
 
-
 #home .entry:hover {
     background-position: -135px 0;
     box-shadow: -1px -1px 21px #efefef;
@@ -2899,3 +2898,16 @@ small {
     margin-left:140px;
 }
 
+.statsTicker {
+	position:absolute;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .7);
+	background-color: #5468F0;
+	padding: 1px 3px;
+	font-size: 10px;
+	margin-top:-8px;
+	color:white;
+	border-radius: 10px;
+/* 	width: 16px; */
+	height : 16px;
+	display:none;
+}

@@ -172,6 +172,8 @@ $(document).ready(function() {
 
     $("#addSpeciesImagesBtn").click(function(){
         uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
+        uploadResource.POLICY = $("input[name='policy']").val();
+        uploadResource.SIGNATURE = $("input[name='signature']").val();
         $(".speciesImage-wrapper").toggle();
         $('html, body').animate({
             scrollTop: $(".speciesImage-wrapper").offset().top
@@ -219,6 +221,8 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
                 $("#addSpFieldResourcesModal").modal("toggle");
                 $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
                 uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
+                uploadResource.POLICY = $("input[name='policy']").val();
+                uploadResource.SIGNATURE = $("input[name='signature']").val();
                 $("input[name='speciesFieldId']").val(spFieldId);
             }
         }, error: function(xhr, status, error) {

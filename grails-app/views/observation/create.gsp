@@ -87,9 +87,13 @@
                     <g:if test="${observationInstance?.id}">
                     <div class="btn btn-danger"
                         style="float: right; margin-right: 5px;">
-                        <a
-                            href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-                            onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><g:message code="button.delete.observation" />   </a>
+
+                        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                            href="#"
+                            onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete.observation" /></a>
+                        <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                            <input type="hidden" name="id" value="${observationInstance.id}" />
+                        </form>
                     </div>
                     </g:if>
                     <a id="addObservationSubmit" class="btn btn-primary"
@@ -118,7 +122,7 @@
                 <input class="videoUrl" type="hidden" name='videoUrl' value="" />
                 <input class="audioUrl" type="hidden" name='audioUrl' value="" />
                 <input type="hidden" name='obvDir' value="${obvDir}" />
-                <input type="hidden" name='resType' value='${observationInstance.class.name}'>
+                <input type="hidden" name='resType' value='${observationInstance?observationInstance.class.name:""}'>
             </form>
 
         </div>
@@ -131,7 +135,9 @@
 
 $(document).ready(function(){
     var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
-     <%
+    uploadResource.POLICY = "${policy}";
+    uploadResource.SIGNATURE = "${signature}";
+    <%
            if(observationInstance?.group) {
            out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
            }
@@ -140,8 +146,16 @@ $(document).ready(function(){
            }
     %>
     initializeLanguage();
+
 });
 
+function deleteObservation(){
+    var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";
+                                        
+    if(confirm(test)){
+        document.forms.deleteForm.submit();
+    }                       
+}
 
 </r:script>
 
