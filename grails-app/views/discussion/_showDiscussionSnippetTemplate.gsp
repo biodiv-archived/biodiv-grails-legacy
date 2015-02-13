@@ -11,7 +11,7 @@ def obvId = discussionInstance.id
 <div class="snippet" style="width:100%;margin-bottom: 2px;">
     <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
     </span>
-    <g:if test="${params.action != 'list'}">
+<%--    <g:if test="${params.showFeatured}">--%>
     <div class="figure pull-left observation_story_image"  
         title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
         <g:link url="${uGroup.createLink(controller:'discussion', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
@@ -29,6 +29,6 @@ def obvId = discussionInstance.id
 
         </g:link>
         </div>
-        </g:if>
+<%--        </g:if>--%>
         <g:render template="/discussion/showDiscussionStoryTemplate" model="['discussionInstance':discussionInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:false, showFeatured:showFeatured]"></g:render>
 </div>
