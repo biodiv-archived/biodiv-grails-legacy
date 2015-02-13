@@ -142,7 +142,19 @@ class NamelistService {
             temp['sourceDatabase'] = r?.source_database?.text()
 
             temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
-
+            println "==========NAME STATUS========= " + temp['nameStatus']
+            if(temp['nameStatus'] == "synonym") {
+                def aList = []
+                r.accepted_name.each {
+                    def m = [:]
+                    m['id'] = it.id.text()
+                    m['name'] = it.name.text() + " " + it.author.text();
+                    m['source'] = "COL"
+                    aList.add(m);
+                }
+                println "======A LIST======== " + aList;
+                temp['acceptedNamesList'] = aList;
+            }
             if(searchBy == 'id') {
                 //println "============= references  "
                 r.references.reference.each { ref ->
@@ -172,6 +184,7 @@ class NamelistService {
                 //println ref.source.text()
                 }
                 }
+                /*
                 println "==========NAME STATUS========= " + temp['nameStatus']
                 if(temp['nameStatus'] == "synonym") {
                     def aList = []
@@ -182,8 +195,10 @@ class NamelistService {
                         m['source'] = "COL"
                         aList.add(m);
                     }
+                    println "======A LIST======== " + aList;
                     temp['acceptedNamesList'] = aList;
                 }
+                */
             }
             
             temp['id_details'] = id_details
@@ -251,20 +266,70 @@ class NamelistService {
         }
 
         println "total result size === " + rs.size()
+        
+        def dirtyList = [:]
+        def workingList = [:]
+        def cleanList = [:]
+        
+        def accDL = [], accWL = [], accCL = []
+        def synDL = [], synWL = [], synCL = []
+        def comDL = [], comWL = [], comCL = []
 
-        def dirtyList = []
-        def workingList = []
-        def cleanList = []
 
+        ///////////////////////////////
+        rs.each {
+            //NOT SENDING PATH
+            def s1 = "select s.taxon_concept_id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+                from synonyms s where s.taxon_concept_id = :taxonId";
+
+            def q1 = sql.rows(s1, [taxonId:it.taxonid])
+            q1.each {
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
+                    synDL << it
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    synWL << it
+                }else{
+                    synCL << it
+                }
+            }
+            
+            def s2 = "select c.taxon_concept_id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position \
+                from common_names c where c.taxon_concept_id = :taxonId";
+
+            def q2 = sql.rows(s2, [taxonId:it.taxonid])
+            q2.each {
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
+                    comDL << it
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    comWL << it
+                }else{
+                    comCL << it
+                }
+            }
+        }
+
+        println "==========SYN DL============= " + synDL
+        println "==========COM DL============= " + comDL
+        ///////////////////////////////
+        
         rs.each {
             if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
-                dirtyList << it
+                accDL << it
             }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                workingList << it
+                accWL << it
             }else{
-                cleanList << it
+                accCL << it
             }
-        }		
+        }
+        dirtyList['accDL'] = accDL
+        dirtyList['synDL'] = synDL
+        dirtyList['comDL'] = comDL
+        workingList['accWL'] = accWL
+        workingList['synWL'] = synWL
+        workingList['comWL'] = comWL
+        cleanList['accCL'] = accCL
+        cleanList['synCL'] = synCL
+        cleanList['comCL'] = comCL
         return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]	
     }
 

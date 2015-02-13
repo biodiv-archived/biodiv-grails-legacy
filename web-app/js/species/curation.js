@@ -18,9 +18,9 @@ function getNamesFromTaxon(ele , parentId) {
         data: {parentId:parentId, classificationId:classificationId},	
         success: function(data) {
             console.log("======SUCCESS====");
-            if(data.dirtyList){
+            if(data.dirtyList.accDL){
                 var dlContent = "<ul>";
-                $.each(data.dirtyList, function(index, value){
+                $.each(data.dirtyList.accDL, function(index, value){
                     dlContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
@@ -28,9 +28,9 @@ function getNamesFromTaxon(ele , parentId) {
                 $(".dl_content ul").remove();
                 $(".dl_content").append(dlContent);
             }
-            if(data.workingList){
+            if(data.workingList.accWL){
                 var wlContent = "<ul>";
-                $.each(data.workingList, function(index, value){
+                $.each(data.workingList.accWL, function(index, value){
                     wlContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+",this)'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
@@ -39,9 +39,9 @@ function getNamesFromTaxon(ele , parentId) {
                 $(".wl_content").append(wlContent);
 
             }
-            if(data.cleanList){
+            if(data.cleanList.accCL){
                 var clContent = "<ul><li>";
-                $.each(data.cleanList, function(index, value){
+                $.each(data.cleanList.accCL, function(index, value){
                     clContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+",this)'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
                     console.log(value.name);
                 });
@@ -260,11 +260,14 @@ function searchDatabase(addNewName) {
             //show the popup
             if(data.length != 0) {
                 $("#externalDbResults").modal('show');
+                //TODO : for synonyms
+                $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData");
                 console.log("======SUCCESS====");
                 console.log(data); 
-            } else {
-                alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+            }else {
+                $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 if(addNewName) {
                     alert("Searching name in IBP Database");
                     searchIBP(name);
@@ -299,6 +302,8 @@ function searchIBP(name) {
             //show the popup
             if(data.length != 0) {
                 $("#externalDbResults").modal('show');
+                //TODO : for synonyms
+                $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "IBPData");
                 console.log("======SUCCESS====");
                 console.log(data); 
@@ -326,8 +331,28 @@ function fillPopupTable(data, $ele, dataFrom) {
     var rows = "";
     $.each(data, function(index, value) {
         if(dataFrom == "externalData") {
-            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
-        } else {
+            var nameStatus = value['nameStatus'];
+            var colLink = 'http://www.catalogueoflife.org/annual-checklist/2014/details/species/id/'+value['externalId']
+            if(nameStatus == 'synonym') {
+                colLink = 'http://www.catalogueoflife.org/annual-checklist/2014/details/species/id/'+value['acceptedNamesList'][0]['id']
+                if(value['rank'] == 'species') {
+                    nameStatus = nameStatus + " for <a style = 'color:blue;' target='_blank' href='"+colLink+"'>" + value['acceptedNamesList'][0]['name']+"</a>";
+                }else {
+                    nameStatus = nameStatus + " for " + value['acceptedNamesList'][0]['name'];
+                }
+                $.each(value['acceptedNamesList'], function(index,value) {
+                    if(index > 0) {
+                        nameStatus = nameStatus + " and " + value['name'];
+                    }
+                });
+            }
+            if(value['rank'] == 'species') {
+                rows+= "<tr><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
+            }else {
+                rows+= "<tr><td>"+value['name'] +"</td>"
+            }
+            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
+        }else {
             rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",undefined)'>Select this</button></td></tr>"
         }
     });

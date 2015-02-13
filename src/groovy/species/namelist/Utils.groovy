@@ -134,7 +134,7 @@ class Utils {
             sb.append(results.'@total_number_of_results' + "|")
             sb.append(results.'@error_message' + "|")
             sb.append(r.name.text() + "|") //canonical
-            sb.append(r.name.text() + r.author?.text() + "|") //verbatim
+            sb.append(r.name.text() + " " + r.author?.text() + "|") //verbatim
             sb.append(r.rank?.text() + "|") //rank
             sb.append(r.id.text() + "|") //ID
             sb.append(r.name_status?.text() + "|") //Name status
