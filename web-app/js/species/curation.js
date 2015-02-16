@@ -1,4 +1,25 @@
+var accDLContent, accWLContent, accCLContent;
+var synDLContent, synWLContent, synCLContent;
+var comDLContent, comWLContent, comCLContent;
+
+function createListHTML(list) {
+    var listContent = "<ul>";
+    $.each(list, function(index, value){
+        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+    });
+    listContent += "</ul>";
+    return listContent;
+}
+
 function getNamesFromTaxon(ele , parentId) {
+    $("body").css("cursor", "progress");
+    $("#searching").show();
+    $("HTML").mousemove(function(e) {
+        $("#searching").css({
+            "top" : e.pageY,
+            "left" : e.pageX + 15
+        });
+    });
     console.log(ele);
     if($("#taxonHierarchy tr").hasClass("clickedEle")) {
         $("#taxonHierarchy tr").removeClass("clickedEle");
@@ -17,39 +38,45 @@ function getNamesFromTaxon(ele , parentId) {
         type: "POST",
         data: {parentId:parentId, classificationId:classificationId},	
         success: function(data) {
-            console.log("======SUCCESS====");
+            $('.listSelector option:eq(0)').prop('selected', true);
+            //DIRTY LIST 
             if(data.dirtyList.accDL){
-                var dlContent = "<ul>";
-                $.each(data.dirtyList.accDL, function(index, value){
-                    dlContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
-                    console.log(value.name);
-                });
-                dlContent += "</ul>";
+                accDLContent = createListHTML(data.dirtyList.accDL); 
                 $(".dl_content ul").remove();
-                $(".dl_content").append(dlContent);
+                $(".dl_content").append(accDLContent);
             }
+            if(data.dirtyList.synDL){
+                synDLContent = createListHTML(data.dirtyList.synDL); 
+            }
+            if(data.dirtyList.comDL){
+                comDLContent = createListHTML(data.dirtyList.comDL); 
+            }
+            //WORKING LIST
             if(data.workingList.accWL){
-                var wlContent = "<ul>";
-                $.each(data.workingList.accWL, function(index, value){
-                    wlContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+",this)'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
-                    console.log(value.name);
-                });
-                wlContent += "</ul>";
+                accWLContent = createListHTML(data.workingList.accWL); 
                 $(".wl_content ul").remove();
-                $(".wl_content").append(wlContent);
-
+                $(".wl_content").append(accWLContent);
             }
+            if(data.workingList.synWL){
+                synWLContent = createListHTML(data.workingList.synWL); 
+            }
+            if(data.workingList.comWL){
+                comWLContent = createListHTML(data.workingList.comWL); 
+            }
+            //CLEAN LIST
             if(data.cleanList.accCL){
-                var clContent = "<ul><li>";
-                $.each(data.cleanList.accCL, function(index, value){
-                    clContent +="<li onclick='getNameDetails("+value.taxonid+","+ value.classificationid+",this)'><a>" + value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
-                    console.log(value.name);
-                });
-                clContent += "</ul>";
+                accCLContent = createListHTML(data.cleanList.accCL);
                 $(".cl_content ul").remove();
-                $(".cl_content").append(clContent);
-
+                $(".cl_content").append(accCLContent);
             }
+            if(data.cleanList.synCL){
+                synCLContent = createListHTML(data.cleanList.synCL);
+            }
+            if(data.cleanList.comCL){
+                comCLContent = createListHTML(data.cleanList.comCL);
+            }
+            $("#searching").hide();
+            $("body").css("cursor", "default");
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 

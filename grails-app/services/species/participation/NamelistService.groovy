@@ -278,12 +278,16 @@ class NamelistService {
 
         ///////////////////////////////
         rs.each {
+            if(it.taxonid == 269611) {
+                println "========HERE HERE============= " + it.name
+            }
             //NOT SENDING PATH
             def s1 = "select s.taxon_concept_id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
                 from synonyms s where s.taxon_concept_id = :taxonId";
 
             def q1 = sql.rows(s1, [taxonId:it.taxonid])
             q1.each {
+                println "==========TAXA IDS======= " + it.taxonid
                 if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
                     synDL << it
                 }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){

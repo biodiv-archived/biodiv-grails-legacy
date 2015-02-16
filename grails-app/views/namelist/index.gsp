@@ -45,7 +45,7 @@
      }   
 	.listarea{
 		border:1px solid #ccc;
-		height:250px;
+		height:288px;
 		margin:0px !important;
 	}
 	.taxon_selector_wrapper{
@@ -101,7 +101,7 @@
   		<div class="taxon_selector_span taxon_selector_wrapper_span">
             Taxon Selector
         </div>
-        <div class="taxonomyBrowser listarea_content" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+        <div class="taxonomyBrowser listarea_content" style="position: relative;height:233px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
             <div id="taxaHierarchy">
                 <%
                 def classifications = [];
@@ -128,6 +128,11 @@
         <span class="dirty_list_span taxon_selector_wrapper_span">
             Dirty List
         </span>
+        <select class="span12 listSelector">
+            <option value='accDLContent'>Accepted Names</option>
+            <option value='synDLContent'>Synonyms</option>
+            <option value='comDLContent'>Common Names</option>
+        </select>
         <div class="dl_content taxon_selector_list listarea_content">
         </div>
 
@@ -141,12 +146,16 @@
         <span class="working_list_span taxon_selector_wrapper_span">
             Working List
         </span>
+        <select class="span12 listSelector">
+            <option value='accWLContent'>Accepted Names</option>
+            <option value='synWLContent'>Synonyms</option>
+            <option value='comWLContent'>Common Names</option>
+        </select>
+
         <div class="wl_content taxon_selector_list listarea_content">
-                   
         </div>
 
         <div class="row-fluid">
-
             <g:render template="/namelist/actionFieldsTemplate" model="['showArrow':true]"/>
         </div>
     </div>
@@ -154,8 +163,13 @@
         <span class="clean_list_span taxon_selector_wrapper_span">
             Clean List
         </span>
-        <div class=" cl_content taxon_selector_list listarea_content">
+        <select class="span12 listSelector">
+            <option value='accCLContent'>Accepted Names</option>
+            <option value='synCLContent'>Synonyms</option>
+            <option value='comCLContent'>Common Names</option>
+        </select>
 
+        <div class="cl_content taxon_selector_list listarea_content">
         </div>
 
         <div class="row-fluid">
@@ -501,6 +515,41 @@
                 showCheckBox:false
             });	
             //initializeLanguage();
+            $(".listSelector").change(function () {
+                var selectedList = $(this).val();
+                var list_content = $(this).parents(".listarea").find(".listarea_content");
+                $(list_content).find("ul").remove();
+                switch (selectedList) {
+                    case 'accDLContent':
+                        $(list_content).append(accDLContent);
+                    break;
+                    case 'synDLContent':
+                        $(list_content).append(synDLContent);
+                    break;
+                    case 'comDLContent':
+                        $(list_content).append(comDLContent);
+                    break;
+                    case 'accWLContent':
+                        $(list_content).append(accWLContent);
+                    break;
+                    case 'synWLContent':
+                        $(list_content).append(synWLContent);
+                    break;
+                    case 'comWLContent':
+                        $(list_content).append(comWLContent);
+                    break;
+                    case 'accCLContent':
+                        $(list_content).append(accCLContent);
+                    break;
+                    case 'synCLContent':
+                        $(list_content).append(synCLContent);
+                    break;
+                    case 'comCLContent':
+                        $(list_content).append(comCLContent);
+                    break;
+                    default: alert('Wrong option selected!!')
+                }
+            });
         });
         </r:script>
 </script>
