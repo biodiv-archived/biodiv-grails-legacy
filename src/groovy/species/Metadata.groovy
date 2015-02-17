@@ -12,6 +12,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import speciespage.ObservationService;
 import species.participation.Featured;
 import species.utils.Utils;
+import species.Language;
 
 abstract class Metadata {
 	
@@ -40,7 +41,7 @@ abstract class Metadata {
     def grailsApplication
 	def activityFeedService
     def observationService
-
+    def utilsService;
     //TODO: Contributions and Attributions
 
     static constraints = {
@@ -76,11 +77,15 @@ abstract class Metadata {
         }
     }
 
-    String notes(){
+    String title(){
         return ""
     }
 
-    String summary() {
+    String notes(Language userLanguage = null){
+        return ""
+    }
+
+    String summary(Language userLanguage = null) {
         return "";
     }
 
@@ -130,11 +135,11 @@ abstract class Metadata {
 	}
 	
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
-		if(!geoPrivacy || SUserService.ifOwns(author)){
+		if(!geoPrivacy || utilsService.ifOwns(author)){
 			return 0
 		}
 		//for backend thred e.g download request reqUser will be passed as argument
-		if(reqUser && (reqUser.id == author.id || SUserService.isAdmin(reqUser.id))){
+		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser.id))){
 			return 0
 		}
 		return Utils.getRandomFloat()

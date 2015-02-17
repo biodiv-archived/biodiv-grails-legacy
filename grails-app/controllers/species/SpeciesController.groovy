@@ -2,6 +2,8 @@ package species
 
 import java.sql.ResultSet;
 
+import grails.web.Action;
+
 import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
@@ -26,12 +28,14 @@ import java.io.FileOutputStream;
 import species.NamesParser
 import org.hibernate.FetchMode;
 import species.SpeciesPermission.PermissionType;
+import content.eml.DocSciName;
 
 import species.utils.Utils;
 import grails.plugin.springsecurity.annotation.Secured
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 import species.participation.UserToken;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import static org.springframework.http.HttpStatus.*;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -51,7 +55,8 @@ class SpeciesController extends AbstractObjectController {
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
+    static defaultAction = "list"
     
     String contentRootDir = config.speciesPortal.content.rootDir
 
@@ -65,24 +70,38 @@ class SpeciesController extends AbstractObjectController {
 		params.controller="species"
 		params.action="list"
         model.userLanguage = utilsService.getCurrentLanguage(request);
-		if(params.loadMore?.toBoolean()){
-			render(template:"/species/showSpeciesListTemplate", model:model);
-			return;
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-			render (view:"list", model:model)
-			return;
-		} else{
-            if(params.webaddress)
-			    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
-			def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
-			model.resultType = "species"
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model['obvListHtml'] =  g.render(template:"/species/showSpeciesListTemplate", model:model);
+            model.resultType = "species"
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+        }
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+        withFormat {
+            html{
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/species/showSpeciesListTemplate", model:model.model);
+                    return;
+                    } else if(!params.isGalleryUpdate?.toBoolean()){
+                        render (view:"list", model:model.model);
+                        return;
+                        } else{
+                            /* 
+                            if(params.webaddress)
+                            model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+                            def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
+                            model.resultType = "species"
+                            def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-			render (result as JSON)
-			return;
-		}
+                            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+
+                            render (result as JSON)
+                             */          return;
+                        }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
 	}
 
 	def listXML() {
@@ -188,91 +207,95 @@ class SpeciesController extends AbstractObjectController {
 
 		def speciesInstance = params.id ? Species.get(params.id):null;
 		if (!params.id || !speciesInstance) {
-            if(request.getHeader('X-Auth-Token')) {
-                render (['success':false, 'msg':"Coudn't find species with id ${params.id}"] as JSON)
-                return
-            } else {
-			    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-			    redirect(action: "list")
+            def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
+            withFormat {
+                html {
+                    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    redirect(action: "list")
+
+                } json { render model as JSON }
+                xml { render model as XML }
             }
-		}
+        }
 		else {
             if(params.editMode) {
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
-                   // flash.message = "Sorry, you don't have permission to contribute to this species ${}. Please request for permission below."
-                    if(request.getHeader('X-Auth-Token')) {
-                        render (['success':false, 'msg':flash.message] as JSON)
-                        return
-                    } else {
-                        def url = uGroup.createLink(controller:"species", action:"contribute");
-                        redirect url: url
-            		    return;
+                    def model = utilsService.getErrorModel(flash.message, null, OK.value())
+                    withFormat {
+                        html {
+                            url = uGroup.createLink(controller:"species", action:"contribute");
+                            redirect url: url
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
                     }
+            		return;
                 }
             }
-            
-            if(request.getHeader('X-Auth-Token')) {
-                render speciesInstance as JSON;
-                return;
-            } 
 
-            def userLanguage = utilsService.getCurrentLanguage(request);
-			def c = Field.createCriteria();
-			def fields = c.list(){
-				eq('language', userLanguage)
-				and{ 
-                        order('displayOrder','asc')
-					 
-					}
-			};
+            def result;
+            withFormat {
+                html {
+                    def userLanguage = utilsService.getCurrentLanguage(request);
+                    def c = Field.createCriteria();
+                    def fields = c.list(){
+                        eq('language', userLanguage)
+                        and{ 
+                            order('displayOrder','asc')
+                        }
+                    };
 
-			Map map;
-            
-            utilsService.benchmark('getTreeMap') {
-                map = getTreeMap(speciesInstance, fields, userLanguage);
+                    Map map;
+
+                    utilsService.benchmark('getTreeMap') {
+                        map = getTreeMap(speciesInstance, fields, userLanguage);
+                    }
+                    def converter = new XMLConverter()
+                    Map fieldFromName = [                
+                    summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
+                    occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
+                    references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
+                    brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
+                    gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
+                    gege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage) ,
+                    idge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage), 
+                    iege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage),
+                    tri  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXONRECORDID,1,userLanguage),
+                    gui  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER,1,userLanguage),
+                    nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
+                    md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
+                    overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
+                    acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,
+                    trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
+                    sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
+                    sn3: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,3,userLanguage),
+                    gsn3:converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME,3,userLanguage),
+                    documents: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.DOCUMENTS,2,userLanguage)
+                    ]
+
+                    utilsService.benchmark('mapSpeciesInstanceFields') {
+                        map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray,fieldFromName);
+                    }
+                    //def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
+                    //def observationInstanceList = relatedObservations?.observations?.observation
+                    //def instanceTotal = relatedObservations?relatedObservations.count:0
+
+                    def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
+
+                    if(springSecurityService.currentUser) {
+                        SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
+                        result['newSpeciesFieldInstance'] = newSpeciesFieldInstance
+                    }
+                }
+                json { render utilsService.getSuccessModel('', speciesInstance, OK.value()) as JSON }
+                xml { render utilsService.getSuccessModel('', speciesInstance, OK.value()) as XML }
             }
-            def converter = new XMLConverter()
-            Map fieldFromName = [                
-                summary : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUMMARY,2,userLanguage),
-                occurrenceRecords : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS,2,userLanguage),
-                references : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
-                brief : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.BRIEF,2,userLanguage),
-                gdge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage),
-                gege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage) ,
-                idge : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY,3,userLanguage), 
-                iege : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY,3,userLanguage),
-                tri  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXONRECORDID,1,userLanguage),
-                gui  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER,1,userLanguage),
-                nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
-                md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
-                overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
-                acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,
-                trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
-                sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
-                sn3: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,3,userLanguage),
-                gsn3:converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME,3,userLanguage)
-            ]
-
-            utilsService.benchmark('mapSpeciesInstanceFields') {
-			    map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray,fieldFromName);
-            }
-
-           
-			//def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
-			//def observationInstanceList = relatedObservations?.observations?.observation
-			//def instanceTotal = relatedObservations?relatedObservations.count:0
-			
-			def result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName]
-
-             if(springSecurityService.currentUser) {
-                SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
-                result['newSpeciesFieldInstance'] = newSpeciesFieldInstance
-            }
-            return result
-		}
-	}
+            if(result) return result
+        }
+    }
 
 	private Map getTreeMap(Species speciesInstance, List fields, Language userLanguage) {
         def user = springSecurityService.currentUser;
@@ -329,7 +352,6 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map, ArrayList fieldsConnectionArray,Map config) {
-		
 		//def config = grailsApplication.config.speciesPortal.fields
         SUser user = springSecurityService.currentUser;
 
@@ -409,7 +431,7 @@ class SpeciesController extends AbstractObjectController {
 			for(category in concept.value.clone()) {
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) ) {
+				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) ) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -418,7 +440,11 @@ class SpeciesController extends AbstractObjectController {
 								break;
 							}
 						}
-					} else {
+					} else if(category.key.equals(config.documents)) {
+                        show = DocSciName.speciesHasDocuments(speciesInstance);
+                        println "======SHOW ===== " + show
+                    }
+                    else {
 						show = true;
 					}
 					if(show) {
@@ -504,7 +530,7 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
     def update() {
-    	def msg;
+        def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
@@ -514,9 +540,10 @@ class SpeciesController extends AbstractObjectController {
             render ([success:false, msg:msg] as JSON)
             return;
         }
+        
         try {
             def result;
-            long speciesFieldId = params.pk ? params.long('pk'):null;
+            Long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
@@ -570,11 +597,13 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.updateStatus(speciesFieldId, value);
                 break;
                 case "reference":
-                long cid = params.cid?params.long('cid'):null;
+                Long cid = params.cid?params.long('cid'):null;
                 if(params.act == 'delete') {
                     result = speciesService.deleteReference(cid, speciesFieldId);
                 } else {
-                    result = speciesService.updateReference(cid, speciesFieldId, value);
+                    Long speciesId = params.speciesid? params.long('speciesid') : null;
+                    Long fieldId   = params.fieldId? params.long('fieldId') : null;                    
+                    result = speciesService.updateReference(cid, speciesId,fieldId,speciesFieldId, value);
                 }
                 break;
                 case 'synonym':
@@ -728,18 +757,57 @@ class SpeciesController extends AbstractObjectController {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
-				speciesInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-				redirect(action: "list")
+                boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], springSecurityService.currentUser, null);
+                if(success) {
+				    speciesInstance.delete(flush: true)
+				    speciesSearchService.delete(speciesInstance.id);
+				    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    def model = utilsService.getSuccessModel(msg, null, OK.value());
+                    withFormat {
+                        html {
+                            flash.message = msg;
+				            redirect(action: "list")
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                } else {
+				    String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    def model = utilsService.getErrorModel(msg, null, OK.value());
+                    withFormat {
+                        html {
+                            flash.message = msg;
+				            redirect(action: "show", id: params.id)
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                }
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-				redirect(action: "show", id: params.id)
+                String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(action: "show", id: params.id)
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-			redirect(action: "list")
+			String msg = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(action: "list")
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
 		}
 	}
 
@@ -1013,9 +1081,10 @@ class SpeciesController extends AbstractObjectController {
         render '';
         return;
     }
-
+    
+    //ADDS/EDITS/DELETES media in species
     @Secured(['ROLE_USER'])
-    def pullImageForSpecies() {
+    def setResources() {
         log.debug params
         //pass that same species
         Language userLanguage = utilsService.getCurrentLanguage(request);
@@ -1032,7 +1101,6 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 
-    @Secured(['ROLE_USER'])
     def getRelatedObvForSpecies() {
         if(!params.speciesId) {
             log.error "NO SPECIES ID TO FETCH RELATED OBV";
@@ -1239,23 +1307,4 @@ class SpeciesController extends AbstractObjectController {
         }    
 
     }
-	
-	def testReader(){
-		def filePath = params.xlsFilePath
-		def compContent = SpreadsheetReader.readSpreadSheet(filePath)
-		def spread = compContent.get(0)
-		def headerNameList = spread.get(0).collect {
-			StringEscapeUtils.escapeCsv(it.getKey());
-		}
-		def  joinedHeader = headerNameList.join(",")
-		println "header name list ===== " + joinedHeader
-
-		spread.each { rowMap->
-			List rowValues = []
-			rowMap.each{
-				rowValues << StringEscapeUtils.escapeCsv(it.getValue());
-				println " --- " + it.getValue() + " ||||| " + StringEscapeUtils.escapeCsv(it.getValue())
-			}
-		}
-	}
 }

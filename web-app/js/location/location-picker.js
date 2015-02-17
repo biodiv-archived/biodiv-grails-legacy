@@ -383,7 +383,7 @@ function useTitle(obj){
             if(options.clickable) {
                 marker.on('click', function() {
                     if($.isFunction(options.clickable)) {
-                        options.clickable.call(me, options.data);
+                        options.clickable.call(marker, options.data);
                     } else {
                         me.select_location(marker);
                     }
@@ -652,8 +652,8 @@ function useTitle(obj){
 
         setInfoFromImage : function(image){
             var me = this;
-            var map_class = $(image).closest(".map_class");
-            var date = $(image).find('input[name="dateFromImage"]').val();
+            var map_class = $(me.$ele).parents(".map_class");
+            var date = map_class.find('input[name="dateFromImage"]').last().val();
             if(date){
                 me.set_date(date, image);
             }

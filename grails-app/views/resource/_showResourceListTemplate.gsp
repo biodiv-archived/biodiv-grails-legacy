@@ -62,7 +62,7 @@
                     </div>
                     <g:if test="${params.action == 'bulkUploadResources'}">
                     <div>
-                        <a href="${uGroup.createLink(action:'show', controller:'SUser', id:resourceInstance.uploader.id, 'userGroup':userGroup)}">
+                        <a href="${uGroup.createLink(action:'show', controller:'user', id:resourceInstance.uploader.id, 'userGroup':userGroup)}">
                             ${resourceInstance.uploader.name}
                         </a> 
                     </div>

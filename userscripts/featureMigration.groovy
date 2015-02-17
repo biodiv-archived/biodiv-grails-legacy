@@ -44,9 +44,9 @@ def migrateFlag() {
 
 
 //migrateFlag()
-migrateFeedForFlag()
+//migrateFeedForFlag()
 
-println "=========== done"
+//println "=========== done"
 
 //SQL COMMANDS
 //ALTER TABLE follow RENAME COLUMN user_id TO author_id;
@@ -65,3 +65,11 @@ println "=========== done"
 
 //ALTER TABLE activity_feed ALTER COLUMN activity_descrption TYPE varchar(400);
 //update document set flag_count = 0;
+
+def migrateComment(){
+	def s = ctx.getBean("discussionService")
+	s.migrate()
+	println "done"
+}
+
+migrateComment()

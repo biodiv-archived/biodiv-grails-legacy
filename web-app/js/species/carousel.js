@@ -1,5 +1,4 @@
 function langwrap(data,dataLanguage){
-    console.log(dataLanguage);
     var userLanguageId = $('#userLanguage').val();
     var result;
     if(dataLanguage[0]['id'] == userLanguageId){
@@ -29,14 +28,13 @@ var itemLoadCallback = function(carousel, state) {
 		params.limit = carousel.last;
 	}
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
-		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
+		itemAddCallback(carousel, carousel.first, carousel.last, data['model'], state);
 	});
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3	
 	});
 
 	$(".jcarousel-item  .thumbnail .ellipsis").trunk8({lines:1});
-
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
@@ -58,6 +56,12 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 			}
 		} else {
 			carousel.size(data["count"]);
+			if(carousel.options.filterProperty == 'speciesName'){
+                $(carousel.options.carouselDivId).parents(".tile").find(".item_count").html(" ("+data["count"]+")");
+            }
+			if(carousel.options.filterProperty == 'taxonConcept'){
+                $(carousel.options.carouselDivId).parents(".sidebar_section").find(".item_count").html(" ("+data["count"]+")");
+            }
 		}
 	}	
 	if($(".jcarousel-item-horizontal").closest('.speciesField').length > 0)
@@ -110,7 +114,6 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 }
 
 var itemAfterLoadCallback = function(carousel, state) {
-    console.log('ellipsis');
 }
 
 var initCallback = function(carousel, status) {

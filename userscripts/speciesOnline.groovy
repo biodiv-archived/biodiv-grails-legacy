@@ -5,12 +5,12 @@ import species.formatReader.*;
 import groovy.sql.Sql
 
 def addNewField(){
-	def f = new Field(concept:'Information Listing',category:'Images', description:'Place holder for images', displayOrder:83)
+	def f = new Field(concept:'Information Listing',category:'Images', description:'Place holder for images', displayOrder:83, connection:83)
 	f.save(flush:true)
 }
 
 def addMetadataField(){
-	def f = new Field(concept:'Meta data', category:'Meta data', description:'Place holder for marking meta data', displayOrder:84)
+	def f = new Field(concept:'Meta data', category:'Meta data', description:'Place holder for marking meta data', displayOrder:84, connection:84)
 	f.save(flush:true)
 }
 

@@ -245,7 +245,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-    <td class="w30" height="5" width="15"><a href="http://www.wikwio.org/idao"><img src="${resource(dir:'images', file:'IDAO.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="IDAO" hspace="5"></a></td>
+    <td class="w30" height="5" width="15"><a href="http://www.wikwio.org/idao"><img src="${resource(dir:'images', file:'IDAO_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="IDAO" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>

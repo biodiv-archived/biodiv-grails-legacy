@@ -30,7 +30,7 @@ class RestAuthenticationFailureHandler extends com.odobo.grails.plugin.springsec
     
     protected void setJSONResponse(response, statusCode, String message) {
         log.debug message;
-        String jsonResponse = "{'error':'${statusCode}', 'message':'${message}'}";
+        String jsonResponse = "{'success':false, 'status':'${statusCode}', 'error':'${statusCode}', 'msg':'${message}'}";
         response.setStatus(statusCode)
         response.setContentType("application/json");
         // Get the printwriter object from response to write the required json object to the output stream      

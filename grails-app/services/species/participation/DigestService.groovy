@@ -114,8 +114,8 @@ class DigestService {
 
         def res = [:]
         res = latestContentsByGroup(digest)
-        def obvList = [], unidObvList = [], spList = [], docList = [], userList = [];
-        boolean obvFlag = false, unidObvFlag = false, spFlag = false, docFlag = false, userFlag = false;
+        def obvList = [], unidObvList = [], spList = [], docList = [], userList = [], disList = [];
+        boolean obvFlag = false, unidObvFlag = false, spFlag = false, docFlag = false, userFlag = false, disFlag = false;
         //HashSet obvIds = new HashSet(), unidObvIds = new HashSet(), spIds = new HashSet(), docIds = new HashSet(), userIds = new HashSet();
         log.debug "Fetching activity after refTime satisfying params ${params}"
         def feedsList = activityFeedService.getActivityFeeds(params)
@@ -186,6 +186,17 @@ class DigestService {
                     //spIds.add(it.rootHolderId);
                     break
 
+                    case Discussion.class.getCanonicalName():
+                    if(disList.size() < MAX_DIGEST_OBJECTS){
+                        def dis = Discussion.read(feed.rootHolderId)
+                        if(!disList.contains(dis)){
+                            disList.add(dis)
+                        }
+                    } else {
+                        disFlag = true;
+                    }
+                    break
+
                     case Document.class.getCanonicalName():
                     if(docList.size() < MAX_DIGEST_OBJECTS){
                         def doc = Document.read(feed.rootHolderId)
@@ -240,12 +251,11 @@ class DigestService {
             /*
             res['observations'] = obvList
             res['unidObvs'] = unidObvList
-            res['species'] = spList
             */
+            res['species'] = spList
             res['documents'] = docList
             res['users'] = userList
-
-
+            res['discussions'] = disList
             def p = [webaddress:digest.userGroup.webaddress];
 
             def recentTopContributors = [];
@@ -280,8 +290,13 @@ log.debug resultSet
                 res['topIDProviders'] = topIDProviders
             }
 
+            def announcedInstances = Featured.fetchFeature(Discussion.class.getCanonicalName(),digest.userGroup, null, new Date());
+            Map finalAnnouncedRes = [:]
+		    announcedInstances.each { 
+			    finalAnnouncedRes[utilsService.getDomainObject(it.objectType, it.objectId)] = it.notes;
+		    }
 
-            def stats = [observationCount:chartService.getObservationCount(p), speciesCount:chartService.getSpeciesCount(p), checklistsCount:chartService.getChecklistCount(p), documentCount:chartService.getDocumentCount(p), userCount:chartService.getUserCount(p)];
+            def stats = [observationCount:chartService.getObservationCount(p), speciesCount:chartService.getSpeciesCount(p), checklistsCount:chartService.getChecklistCount(p), documentCount:chartService.getDocumentCount(p), userCount:chartService.getUserCount(p), discussionCount:chartService.getDiscussionCount(p)];
 
             res['obvListCount'] = stats.observationCount;
             //res['idObvListCount'] = idObvListCount;
@@ -289,6 +304,8 @@ log.debug resultSet
             res['spListCount'] = stats.speciesCount;
             res['docListCount'] = stats.documentCount;
             res['userListCount'] = stats.userCount;
+            res['disListCount'] = stats.discussionCount;
+            res['announcements'] = finalAnnouncedRes;
         }
         return res
     }

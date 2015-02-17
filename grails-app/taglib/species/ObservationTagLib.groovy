@@ -222,8 +222,8 @@ class ObservationTagLib {
 	def showMapInput = {attrs, body->
 		def model = attrs.model
 		model.sourceInstance = model.sourceInstance ?: model.observationInstance
-		model.placeNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
-		model.topologyNameField = (model.sourceInstance?.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
+		model.placeNameField = (model.sourceInstance && model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
+		model.topologyNameField = (model.sourceInstance && model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
         out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	

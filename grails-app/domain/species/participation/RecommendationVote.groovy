@@ -2,6 +2,7 @@ package species.participation
 
 import species.TaxonomyDefinition;
 import species.auth.SUser;
+import species.Species;
 
 class RecommendationVote {
 	
@@ -52,4 +53,17 @@ class RecommendationVote {
 		//activityFeedService.deleteFeed(this)
 	}
 
+    def updateSpeciesTimeStamp() {
+        def taxCon = this.recommendation?.taxonConcept
+        if(taxCon) {
+            def sp = Species.findByTaxonConcept(taxCon);
+            if(sp) {
+            sp.lastUpdated = new Date();
+            if(!sp.save(flush:true)) {
+                this.errors.each { log.error it }
+            }
+            }
+        }
+    }
+    
 }

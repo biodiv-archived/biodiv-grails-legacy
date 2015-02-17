@@ -16,6 +16,7 @@ import species.participation.Follow;
 import species.participation.Featured;
 import species.Language;
 import org.springframework.context.MessageSourceResolvable;
+import content.eml.DocSciName;
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -25,7 +26,6 @@ import org.springframework.context.MessageSourceResolvable;
 class Document extends Metadata implements Comparable, Taggable, Rateable {
 	
 	def springSecurityService;
-	def SUserService;
 	def documentService
 
     public enum DocumentType implements org.springframework.context.MessageSourceResolvable{
@@ -149,17 +149,24 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		return Follow.fetchIsFollowing(this, user)
 	}
 
+    String title() {
+        return this.title;
+    }
+
     String fetchSpeciesCall(){
 		return this.title;
 	}
 
+    String notes(Language userLanguage = null) {
+        return this.notes?:'';
+    }
+
+    String summary(Language userLanguage = null) {
+        return this.notes?:'';
+    }
 
 	def getOwner() {
 		return author;
-	}
-	
-	String toString() {
-		return title;
 	}
 	
 	def setSource(parent) {
@@ -176,16 +183,14 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-
-    String notes() {
-        return this.notes;
-    }
     
     Resource mainImage() {  
 		String reprImage = "Document.png"
 	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
         return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
  	}
+
+ 	
 
 	def beforeUpdate(){
 		if(isDirty() && isDirty('topology')){
@@ -214,4 +219,23 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	int compareTo(obj) {
 		createdOn.compareTo(obj.createdOn)
 	}
+	Map fetchSciNames(){
+		Map nameValue = [:]
+		Map nameParseValues = [:]
+		Map nameId = [:]
+		def c = DocSciName.createCriteria()
+			def results = c.list {
+			eq("document", this)
+		    order("displayOrder", "desc")
+			}
+		def docSciNames = results ;//DocSciName.findAllByDocument(this)
+		docSciNames.each{ dsn ->
+		nameValue.put(dsn.scientificName,dsn.frequency)
+		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
+		nameId.put(dsn.scientificName,dsn.id)
+		}
+		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId]
+
+	}
+
 }

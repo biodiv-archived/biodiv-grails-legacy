@@ -7,6 +7,6 @@ class BlockedMails {
 		email email: true, blank: false, unique: true, nullable:false
     }
 	static mapping = {
-		version false;
+        version: false;
     }
 }

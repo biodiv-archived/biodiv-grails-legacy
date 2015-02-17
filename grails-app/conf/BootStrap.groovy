@@ -26,6 +26,9 @@ import species.TaxonomyDefinition;
 import species.TaxonomyDefinition.TaxonomyRank;
 import species.TaxonomyRegistry;
 import species.Classification;
+import grails.plugin.springsecurity.SecurityFilterPosition
+import grails.plugin.springsecurity.SpringSecurityUtils;
+
 
 class BootStrap {
 

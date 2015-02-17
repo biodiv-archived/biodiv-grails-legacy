@@ -1,3 +1,15 @@
+-- Enable PostGIS (includes raster)
+CREATE EXTENSION postgis;
+-- Enable Topology
+CREATE EXTENSION postgis_topology;
+-- fuzzy matching needed for Tiger
+CREATE EXTENSION fuzzystrmatch;
+-- Enable US Tiger Geocoder
+CREATE EXTENSION postgis_tiger_geocoder;
+
+create extension dblink;
+
+
 /*
  *  All the sql commands are specific to Postgres database only 
  */
@@ -241,3 +253,73 @@ update solr schema.xml biodiv/conf/schema.xml
 //added on 19th nov
 //Dropping license from checklists table
 ALTER TABLE checklists DROP COLUMN license_id;
+
+//5th Dec 2014
+//create index taxonomy_definition_canonical_form_idx on taxonomy_definition ((lower(canonical_form)));
+//create index recommendation_name_idx on recommendation ((lower(name)));
+CREATE EXTENSION pg_trgm;
+CREATE INDEX ON recommendation using GIST(name gist_trgm_ops);
+CREATE INDEX ON taxonomy_definition using GIST(canonical_form gist_trgm_ops);
+
+
+delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id where lower(r.name) in (select lower(r.name) from recommendation as r, taxonomy_definition as t where r.name ilike t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true) and r.taxon_concept_id is not null and rv.id is  null);
+
+delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id where lower(r.name) in (select lower(r.name) from recommendation as r, synonyms as s where r.name ilike s.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true) and r.taxon_concept_id is not null and rv.id is  null);
+
+CREATE TABLE tmp_table_update_taxonconcept as ( select r.id as recoid,  t.id as taxonid, r.name as name, r.language_id as rl, c.language_id as c_lang from recommendation as r, taxonomy_definition as t, common_names as c where 
+            r.name ilike c.name and 
+                    ((r.language_id is null and c.language_id is null) or (r.language_id is not null and c.language_id is not null and r.language_id = c.language_id ) or (r.language_id = c.language_id )) and 
+                            c.taxon_concept_id = t.id and c.taxon_concept_id is not null and
+                                    r.taxon_concept_id is null and r.is_scientific_name = false);
+
+update recommendation_vote set common_name_reco_id = 316619 where common_name_reco_id = 366025;
+
+delete from recommendation where id in (select r.id from recommendation r left outer join recommendation_vote rv on r.id=rv.recommendation_id or r.id=rv.common_name_reco_id where r.id in (select r.id from recommendation r , tmp_table_update_taxonconcept t where lower(r.name)=lower(t.name) and ((r.language_id is not null and t.c_lang is not null and r.language_id = t.c_lang) or (r.language_id is null and t.language_id is null)) and r.is_scientific_name = false and r.taxon_concept_id = t.taxonid ));
+
+
+/** 9th Jan 2015
+    After restoring and th1 creation, removing invalid images and resource mappings and row entries
+    Dropping reprImage column in species. No longer used.
+ **/
+ALTER TABLE species DROP COLUMN repr_image_id ;
+ALTER TABLE species DROP constraint fk8849413c32f2eca9 ;
+
+/** Then run script crop.groovy **/
+
+/** 16th Jan 2015
+    FilePicker security
+    1. switch on security for biodiv account on filepicker
+    2. generate secret key
+    3. put it in additional-config file like this - 
+    -----------------
+    speciesPortal {
+        observations {
+            filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
+            filePicker.secret = '4UCJGK6GLVDTRDAHETOCHGPGIY'
+        }
+    }
+    ----------------
+**/
+// added on 19th jan 2015
+ALTER TABLE comment ADD visit_count bigint;
+update comment set visit_count = 0;
+
+/** 27th Jan 2015
+    Adding new column has_media in species
+    to apply filter on species having media
+ **/
+ALTER TABLE species ADD COLUMN has_media boolean ;
+update species set has_media = false;
+update species set has_media = true where id in (select distinct(species_resources_id) from species_resource);
+update species set has_media = true where id in (select distinct(sf.species_id) from species_field_resources sfr, species_field sf where sfr.species_field_id = sf.id);
+
+/** 28th Jan 2015
+    Updating observations which were not marked deleted when its checklist was deleted
+ **/
+update observation set is_deleted = true where source_id in (select id from observation where is_checklist = true and is_deleted = true) and is_deleted = false;
+
+
+
+//2nd feb 2015
+alter table featured add column expire_time timestamp without time zone ;
+

@@ -73,7 +73,7 @@ class AbstractObjectService {
             def sGroup = obv.fetchSpeciesGroup()
             if(sGroup)
 			    item.sGroup = sGroup.name
-            if(obv.habitat)
+            if(obv.hasProperty('habitat') && obv.habitat)
 			    item.habitat = obv.habitat?.name
 			
             Resource image = obv.mainImage()
@@ -121,7 +121,7 @@ class AbstractObjectService {
 		        iconBasePath = config.speciesPortal.observations.serverURL
                 break;
             default:
-                log.warn "Invalid controller type for iconbasepath"
+                log.warn "Invalid controller type for iconbasepath " + controller
         }
         return iconBasePath;
     }
@@ -144,7 +144,9 @@ class AbstractObjectService {
         else if (controller == "document") {
             type = "content.eml.Document";
         }
-        else {    
+		else if (controller == "discussion") {
+			type = "species.participation.Discussion";
+		}else {    
         }
 
         def featured = []

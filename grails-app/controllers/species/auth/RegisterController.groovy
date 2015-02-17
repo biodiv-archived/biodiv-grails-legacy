@@ -1,6 +1,8 @@
 package species.auth;
 
 import grails.util.Environment;
+import grails.converters.JSON;
+import grails.converters.XML;
 
 import grails.plugin.springsecurity.annotation.Secured;
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource;
@@ -21,6 +23,7 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import species.groups.UserGroup;
 import grails.converters.JSON;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import static org.springframework.http.HttpStatus.*;
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 	
@@ -171,16 +174,20 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	}
 
     def user( CustomRegisterCommand2 command ) {
-		def config = SpringSecurityUtils.securityConfig
-		def msg
-		log.debug "Registering user $command"
-		if (springSecurityService.isLoggedIn()) {
-			msg = messageSource.getMessage("login.already", null, RCU.getLocale(request))
-            render(['success':false, 'msg':msg] as JSON) 
-			return;
-		}
-		
-		def conf = SpringSecurityUtils.securityConfig
+        def config = SpringSecurityUtils.securityConfig
+        def msg
+        log.debug "Registering user $command"
+        if (springSecurityService.isLoggedIn()) {
+            msg = messageSource.getMessage("login.already", null, RCU.getLocale(request))
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return;
+        }
+
+        def conf = SpringSecurityUtils.securityConfig
         if (command.hasErrors()) {
             def errors = [];
             for (int i = 0; i < command.errors.allErrors.size(); i++) {
@@ -188,48 +195,65 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
             }
             msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], RCU.getLocale(request))
-            render(['success':false, 'msg':msg] as JSON) 
-			return
-		}
+            def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return
+        }
 
         if(!command.username) command.username = command.name;
 
-		def userLanguage = utilsService.getCurrentLanguage(request); 
-		def user = SUserService.create(command.properties, userLanguage);
-		
-			log.debug("Is an local account registration");
-			user.accountLocked = true;
-			SUserService.save(user);
-		
-		if (user == null || user.hasErrors()) {
+        def userLanguage = utilsService.getCurrentLanguage(request); 
+        def user = SUserService.create(command.properties, userLanguage);
+
+        log.debug("Is an local account registration");
+        user.accountLocked = true;
+        SUserService.save(user);
+
+        if (user == null || user.hasErrors()) {
             def errors = [];
             if(user) {
-            for (int i = 0; i < user.errors.allErrors.size(); i++) {
-                def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
-                errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
-            }
+                for (int i = 0; i < user.errors.allErrors.size(); i++) {
+                    def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
+                    errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
+                }
             } else {
                 errors << messageSource.getMessage("user.null", null, RCU.getLocale(request))
             }
-            
-            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], RCU.getLocale(request))
-            render(['success':false, 'msg':msg] as JSON) 
-			return
-		}
 
-		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
-		activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
-		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
+            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], RCU.getLocale(request))
+
+            def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return
+        }
+
+        def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
+        activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
+        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
 
         def registrationCode = registerAndEmail user.username, user.email, request, false	
-        
-		if (registrationCode == null || registrationCode.hasErrors()) {
-			msg = messageSource.getMessage("register.errors.send.verification.token", [user] as Object[], RCU.getLocale(request))
-            render(['success':false, 'msg':msg] as JSON) 
+
+        if (registrationCode == null || registrationCode.hasErrors()) {
+            msg = messageSource.getMessage("register.errors.send.verification.token", [user] as Object[], RCU.getLocale(request))
+                def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
         msg = messageSource.getMessage("register.success.send.verification.token", [user,user.email] as Object[], RCU.getLocale(request))
-        render(['success':true, 'msg':msg] as JSON) 
-	}
+            def model = utilsService.getSuccessModel(msg, null, OK.value());
+        withFormat {
+            json { render model as JSON }
+            xml { render model as XML }
+        }
+    }
 
     def verifyRegistration = {
         if (springSecurityService.isLoggedIn()) {
@@ -284,28 +308,35 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		def msg 
 		String username = params.username?:params.email
 		if (!username) {
-            flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
-                render (['success':false, 'msg':flash.error] as JSON);
-                return;
-            } else {
-                render view: 'forgotPassword'
-                return
+            msg = message(code: 'spring.security.ui.forgotPassword.username.missing')
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.error = msg;
+                    render view: 'forgotPassword'
+                }
+                json { render model as JSON }
+                xml { render model as XML }
             }
+            return
 		}
 		
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
-                render (['success':false, 'msg':flash.error] as JSON);
-                return;
-            } else {
-			    render view: 'forgotPassword'
-			    return
+			msg = message(code: 'spring.security.ui.forgotPassword.user.notFound')
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.error = msg;
+			        render view: 'forgotPassword'
+                }
+                json { render model as JSON }
+                xml { render model as XML }
             }
+			return
 		}
+
         flash.error = '';
 		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
 		registrationCode.save(flush: true)
@@ -328,25 +359,32 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 				from grailsApplication.config.grails.mail.default.from
 				subject messageSource.getMessage("grails.plugin.springsecurity.ui.forgotPassword.emailSubject", null, RCU.getLocale(request))
 				html body.toString()
-			}
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
-            	msg = messageSource.getMessage("register.success.email.nofity", [user.email] as Object[], RCU.getLocale(request))
-                render (['success':true, 'msg':msg] as JSON);
-                return;
-            } else {
-			    [emailSent: true]
             }
+
+            msg = messageSource.getMessage("register.success.email.nofity", [user.email] as Object[], RCU.getLocale(request))
+            def model = utilsService.getSuccessModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.message = msg;
+			        model = [emailSent: true]
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return model;
 		} catch(all)  {
             all.printStackTrace();
-            if(request.getHeader('X-Auth-Token') || params.isMobileApp) {
-		        log.error all.getMessage()
-		        msg = messageSource.getMessage("register.generating.token",[all.getMessage()]as Object[], RCU.getLocale(request))
-                render (['success':false, 'msg':msg] as JSON);
-                return;
-            } else {
-		      log.error all.getMessage()
-		      [emailSent:false]
-            }
+		    msg = messageSource.getMessage("register.generating.token",[all.getMessage()]as Object[], RCU.getLocale(request))
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.error = msg;
+                    model = [emailSent:false]
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            } 
+            return model;
 		}
 	}
 
@@ -439,18 +477,30 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 SUser user = SUser.findByEmail(username);
                 sendVerificationMail(user.name, username, url, request)
                 msg = messageSource.getMessage("resend.email.verficiation.code.success", [username] as Object[], RCU.getLocale(request))
-                render ([success:true, 'msg':msg] as JSON)
+                def model = utilsService.getSuccessModel(msg, null, OK.value());
+                withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
                 return;
             } else {
                 log.error "registration code for ${username} is not present"
                 msg = messageSource.getMessage("resend.email.verficiation.code.fail", [username] as Object[], RCU.getLocale(request))
-                render ([success:false, 'msg':msg] as JSON)
+                def model = utilsService.getErrorModel(msg, null, OK.value());
+                 withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML }
+                 }
                 return;
             }
         } else {
             log.error "username is null"
             msg = messageSource.getMessage("registerCommand.email.email.invalid", null, RCU.getLocale(request))
-            render ([success:false, 'msg':msg] as JSON)
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
         }
 	}
 

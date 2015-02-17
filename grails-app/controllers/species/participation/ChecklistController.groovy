@@ -15,7 +15,6 @@ class ChecklistController {
 	def grailsApplication
 	def checklistUtilService
 	def observationService
-	def SUserService
 	def chartService
     def utilsService;
 	
@@ -101,7 +100,8 @@ class ChecklistController {
 	def create() {
 		def checklistInstance = new Checklists(license:License.findByName(License.LicenseType.CC_BY))
 		checklistInstance.properties = params;
-		return [observationInstance: checklistInstance]
+		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+		return [observationInstance: checklistInstance, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -189,7 +189,7 @@ class ChecklistController {
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-		} else if(SUserService.ifOwns(observationInstance.author)) {
+		} else if(utilsService.ifOwns(observationInstance.author)) {
             def checklist = getChecklistData(params.id.toLong());
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, sciNameColumn:observationInstance.sciNameColumn, commonNameColumn:observationInstance.commonNameColumn])
 		} else {
@@ -277,6 +277,10 @@ class ChecklistController {
 	
 	
 	def observationData = {
+        if(!params.id) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
+            redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
+        }
 		def observations = checklistService.getObservationData(params.id, params)
 		def model =[observations:observations, checklistInstance:Checklists.read(params.id.toLong())]
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);

@@ -2,6 +2,8 @@ package species.participation
 
 import grails.plugin.springsecurity.annotation.Secured
 import grails.converters.JSON
+import grails.converters.XML
+
 import java.util.List;
 
 import org.apache.solr.common.util.NamedList
@@ -9,14 +11,15 @@ import org.apache.solr.common.util.NamedList
 import species.Species;
 import species.TaxonomyDefinition;
 import species.participation.Recommendation;
+import static org.springframework.http.HttpStatus.*;
 
 class RecommendationController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def grailsApplication
 	def namesIndexerService;
 	def recommendationService;
+    def utilsService;
 
     def index = {
         redirect(action: "list", params: params)
@@ -123,7 +126,12 @@ class RecommendationController {
     * suggest recommendations
     */
 	def suggest = {
-		render namesIndexerService.suggest(params) as JSON;
+
+		def model = utilsService.getSuccessModel('', null, OK.value(), ['instanceList':namesIndexerService.suggest(params)]);
+        withFormat {
+            json { render model  as JSON }
+            xml { render model as XML }
+        }
 	}
  
     /**

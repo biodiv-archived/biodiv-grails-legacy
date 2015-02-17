@@ -43,7 +43,7 @@
 		
 						<div style="float: right; margin: 10px 0;">
 							<a class="btn btn-info pull-right"
-								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.view.my.profile" /></a>
+								href="${uGroup.createLink(action:'show', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><g:message code="button.view.my.profile" /></a>
 						</div>
 					</div>
 				</div>
@@ -57,8 +57,7 @@
 					<%--<g:renderErrors bean="${user}" as="list" />--%>
 				</g:hasErrors>
 
-				<form class="form-horizontal" action="${uGroup.createLink(action:'update', controller:'SUser', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" id='userEditForm' method="POST">
-					<g:hiddenField name="id" value="${user?.id}" />
+				<form class="form-horizontal" action="${uGroup.createLink(action:'update', controller:'user', 'id':user?.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" id='userEditForm' method="POST">
 					<g:hiddenField name="version" value="${user?.version}" />
 
 					<div style="clear: both;">
@@ -271,16 +270,27 @@
 									</div>
 								</div>
 							</div>
-						</div>
-						<div class="super-section" style="clear: both;">
-							<h5>
-								<i class="icon-cog"></i><g:message code="suser.edit.actions" />
-							</h5>
-                                                        <ul>
-                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
-                                                        </ul>
+                        </div>
+                        <div class="super-section" style="clear: both;">
+                            <h5>
+                                <i class="icon-cog"></i><g:message code="suser.edit.actions" />
+                            </h5>
+                            <ul>
+                                <li><a href="${uGroup.createLink(controller:'user', action:'resetPassword', id:user.id) }"><g:message code="button.change.password" /></a></li>
 
-                                                </div>
+                                <sUser:isAdmin model="['user':user]">
+                                <li>
+                                <a id="generateAppKey" data-id="${user.id}"><g:message code="button.generate.appKey" /></a>
+                                    <div id="appKey" class="text-info" style="display:none;">
+                                        
+                                    </div>
+                                </li>
+                                </sUser:isAdmin>
+
+
+                            </ul>
+
+                        </div>
 
 						<sUser:isAdmin model="['user':user]">
 							<div class="super-section" style="clear: both;">
@@ -370,8 +380,7 @@
 				
 				<sUser:isAdmin model="['user':user]">
 					<g:if test='${user}'>
-						<form action="${uGroup.createLink(controller:'SUser', action:'delete')}" method='POST' name='deleteForm'>
-							<input type="hidden" name="id" value="${user.id}" />
+						<form action="${uGroup.createLink(controller:'user', action:'delete', 'id':user.id)}" method='POST' name='deleteForm'>
 						</form>
 						<div id="deleteConfirmDialog" title="Are you sure?"></div>
 
@@ -489,59 +498,83 @@
         }
 		
 		$('#attachFile').change(function(e){
-  			$('.upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+  			$('.upload_resource').find("span.msg").html("Uploading... Please wait...");
+            var onUploadResourceSuccess =  function(responseXML, statusText, xhr, form) {
+                if($(responseXML).find('success').text() == 'true') {
+                    $(form).find("span.msg").html("");
+                    var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
+                    var dir = $(responseXML).find('dir').text();
+                    var dirInput = $('.upload_resource input[name="dir"]');
+                    if(!dirInput.val()){
+                        $(dirInput).val(dir);
+                    }
+                    
+                    $(responseXML).find('resources').find('image').each(function() {
+                        var file = dir + "/" + $(this).attr('fileName');
+                        var thumbnail = rootDir + file.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+                        $("#icon").val(file);
+                        $("#thumbnail").attr("src", thumbnail);
+                    });
+                    $("#image-resources-msg").parent(".resources").removeClass("error");
+                    $("#image-resources-msg").html("");
+                } else {
+                    onUploadResourceError(xhr);
+                }
+            }
+
+            var onUploadResourceError = function (xhr, ajaxOptions, thrownError){
+                    //successHandler is used when ajax login succedes
+                    var successHandler = onUploadResourceSuccess, errorHandler;
+                    handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+                        var response = $(xhr.responseXML).find('msg').text();
+                        if(response){
+                            $("#image-resources-msg").parent(".resources").addClass("error");
+                            $("#image-resources-msg").html(response);
+                        }
+                        
+                        var messageNode = $(".message .resources");
+                        if(messageNode.length == 0 ) {
+                            $(".upload_resource").prepend('<div class="message">'+(response?response:"Error")+'</div>');
+                        } else {
+                            messageNode.append(response?response:"Error");
+                        }
+                    });
+                } 
+            $('.upload_resource').ajaxSubmit({ 
+                url:'${g.createLink(controller:'user', action:'upload_resource')}',
+                dataType : 'xml',
+                clearForm: true,
+                resetForm: true,
+                type: 'POST',
+                success:onUploadResourceSuccess, 
+                error:onUploadResourceError
+            });
 		});
 
-     	$('.upload_resource').ajaxForm({ 
-			url:'${g.createLink(controller:'SUser', action:'upload_resource')}',
-			dataType: 'xml',//could not parse json wih this form plugin 
-			clearForm: true,
-			resetForm: true,
-			type: 'POST',
-			 
-			beforeSubmit: function(formData, jqForm, options) {
-				return true;
-			}, 
-                        xhr: function() {  // custom xhr
-                            myXhr = $.ajaxSettings.xhr();
-                            return myXhr;
-                        },
-                        success: function(responseXML, statusText, xhr, form) {
-				$(form).find("span.msg").html("");
-				var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
-				var dir = $(responseXML).find('dir').text();
-				var dirInput = $('.upload_resource input[name="dir"]');
-				if(!dirInput.val()){
-					$(dirInput).val(dir);
-				}
-				
-				$(responseXML).find('resources').find('image').each(function() {
-					var file = dir + "/" + $(this).attr('fileName');
-					var thumbnail = rootDir + file.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
-					$("#icon").val(file);
-					$("#thumbnail").attr("src", thumbnail);
-				});
-				$("#image-resources-msg").parent(".resources").removeClass("error");
-                                $("#image-resources-msg").html("");
-			}, error:function (xhr, ajaxOptions, thrownError){
-					//successHandler is used when ajax login succedes
-                                        var successHandler = this.success, errorHandler;
-                                        handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
-						var response = $.parseJSON(xhr.responseText);
-						if(response.error){
-							$("#image-resources-msg").parent(".resources").addClass("error");
-							$("#image-resources-msg").html(response.error);
-						}
-						
-						var messageNode = $(".message .resources");
-						if(messageNode.length == 0 ) {
-							$(".upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-						} else {
-							messageNode.append(response?response.error:"Error");
-						}
-					});
-           		} 
-     		});
+            $('#generateAppKey').click(function() {
+                $.ajax({
+                    url:'${g.createLink(controller:'user', action:'generateAppKey')}',
+                    dataType: 'json',
+                    type: 'GET',
+                    data:{id:$(this).data('id')},
+                    
+                    success: function(response, statusText, xhr, form) {
+                        if(response.success == true) {
+                            $('#appKey').removeClass('text-error').html("Generated app key is : "+response.appKey+"<br/>"+response.msg).show();
+                        } else {
+                            $('#appKey').removeClass('text-info').addClass('text-error').html(response.msg+" "+response.errors).show();
+                        }
+                    }, error:function (xhr, ajaxOptions, thrownError){
+                        handleError(xhr, ajaxOptions, thrownError, this.success, function() {
+                            var response = $.parseJSON(xhr.responseText);
+                            if(response.status == false){
+                                $('#appKey').removeClass('text-info').addClass('text-error').html(response.msg+" "+response.errors).show();
+                            }
+
+                        });
+                    } 
+                });
+            });
 		});
 	</r:script>
 

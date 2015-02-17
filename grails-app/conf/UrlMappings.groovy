@@ -1,10 +1,12 @@
 import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class UrlMappings {
 
 	static mappings = {
 
-		
+
+        "/jcaptcha/$action/$id"(controller:'Jcaptcha')
 		//"500"(controller:'BiodivException', action:'error')
 		"500"(view:'/error')
 		"403"(view:'/error')
@@ -31,8 +33,109 @@ class UrlMappings {
 		}
 
 
-		"/user/$action?/$id?" { controller = 'SUser' }
-		"/api/user/$action?/$id?" { controller = 'SUser' }
+		"/user/create"( controller : 'SUser', action:'create', method:'GET')
+		"/user"( controller : 'SUser', action:'index', method:'GET')
+		"/user/list"( controller : 'SUser', action:'list', method:'GET')
+		"/user/edit/$id?"( controller : 'SUser', action:'edit', method:'GET')
+        "/user/$action/$id?"(controller:"SUser") {
+            action = [GET:"show", POST:"update", POST:"delete", POST:"save"]
+        }
+        "/user/$action/$id?"(controller:"SUser")
+/*		"/api/user/$action?/$id?" { 
+            controller = 'SUser' 
+            format = 'json'
+            constraints { id matches: /\d+/ }
+        }
+*/		
+
+        group('/api') {
+//          "/user"(resources:'SUser')
+/*          "/api/user/create"(controller: 'user', action: 'create', method: 'GET')
+            "/api/user/edit"(controller: 'user', action: 'edit', method: 'GET')
+            "/api/user(.(*))?"(controller: 'user', action: 'delete', method: 'DELETE')
+            "/api/user(.(*))?"(controller: 'user', action: 'update', method: 'PUT')
+            "/api/user(.(*))?"(controller: 'user', action: 'save', method: 'POST')
+*/
+            "/observation/$id"(controller : 'observation', action : 'flagDeleted', method:'DELETE')
+
+            "/user"( controller : 'SUser', action:'index', method:'GET')
+            "/user"( controller:'SUser', action:'save', method:'POST')
+            "/user/$id"(controller:"SUser") {
+                action = [GET:"show", PUT:"update", DELETE:"delete"]
+                constraints { id matches: /\d+/ }
+            }
+            "/user/$id/$action"( controller : 'SUser') 
+            "/user/$action" {
+                controller = 'SUser'
+                constraints {
+                    action(matches:/(?!\d+$)\w+/)
+                }
+            }
+
+            "/group"( controller : 'UserGroup', action:'index', method:'GET')
+            "/group/$id"(controller:"UserGroup") {
+                action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
+                constraints { id matches: /\d+/ }
+            }
+            "/group/$id/$action"( controller : 'UserGroup') {
+                constraints { id matches: /\d+/ }
+            }
+            "/group/$action" {
+                controller = 'SUser'
+                constraints {
+                    action(matches:/(?!\d+$)\w+/)
+                }
+            }
+            "/group/$webaddress/$controller/$action/$id?"( ) {
+            }
+
+            "/related/$controller/$filterProperty?/$filterPropertyValue?" (action:'related', method:'GET')
+            
+
+            "/$controller"( action:'index', method:'GET')
+            "/$controller"( action:'save', method:'POST')
+            "/$controller/$id" {
+                action = [GET:"show", PUT:"update", DELETE:"delete"]
+                constraints { id matches: /\d+/ }
+            }
+            "/$controller/$id/$action" {
+                constraints {
+                    controller(matches:/\w+/)
+                    id(matches:/\d+/)
+                    action(matches:/\w+/)
+                }
+            }
+            "/$controller/$action" {
+                constraints {
+                    controller(matches:/\w+/)
+                    action(matches:/(?!\d+$)\w+/)
+                }
+            }
+
+
+/*            "/login" {
+                      format = 'json'
+
+            }
+
+            "/validate" {
+            format = 'json'
+            }
+
+            "/logout" {
+            format = 'json'
+            }
+*/
+            name oauth: "/oauth/${action}/${provider}"(controller: 'restOauth')
+
+            "/register/forgotPassword" {
+                controller = 'register'
+                action = 'forgotPasswordMobile'
+                format = 'json'
+            }
+
+
+        }
 
 		"/" {
             controller='home'
@@ -41,37 +144,12 @@ class UrlMappings {
 		"/logout/$action?"(controller: "logout")
 
         //DONOT REMOVE
-		"/$controller/$action?/$id?"{ 
-            constraints { // apply constraints here
-			} 
+		"/$controller/$action?/$id?(.${format})?"{ 
+            constraints { id matches: /\d+/ }
         }
-
-        "/api/login" {
-            
-        }
-
-        "/api/validate" {
-        }
-
-        "/api/logout" {
-        }
-
-        name oauth: "/api/oauth/${action}/${provider}"(controller: 'oauth')
-
-        "/api/register/forgotPassword" {
-            controller = 'register'
-            action = 'forgotPasswordMobile'
-        }
-
-        "/api/$controller/$action?/$id?"{ 
-        }
-
 		"/static/$path"(controller:"species", action:"staticContent")
 		
-		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
-		
-		}
-		
+	
 		name pages:"/pages" {
 			controller = 'userGroup'
 			action = 'pages'
@@ -81,12 +159,8 @@ class UrlMappings {
 			controller = 'userGroup'
 			action = 'pages'
 		}
-		
-		name userGroupPageShow: "/group/$webaddress/page/$newsletterId" {
-			controller = 'userGroup'
-			action = 'pages'
-		}
-		
+	
+       
 		//just for replacement sake in taglib..not to be used for mapping
 		name onlyUserGroup:"/group/$webaddress" {
 			controller='userGroup'
@@ -98,57 +172,55 @@ class UrlMappings {
 			controller = 'userGroup'
 		}
 
+        name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
+	        method='*'	
+		}
+		
+		name userGroupPageShow: "/group/$webaddress/page/$newsletterId" {
+			controller = 'userGroup'
+			action = 'pages'
+		}
+		
 		name userGroup: "/group/$webaddress/$action" {
 			controller = 'userGroup'
 		}
-		
-/*		"/group/$webaddress/observation/list" {
-			controller='userGroup'
-			action='observation'
-		}*/
+	
+        group("/group") {
+            "/$webaddress/user/list" {
+                controller='userGroup'
+                action='user'
+            }
+            "/$webaddress/user" {
+                controller='userGroup'
+                action='user'
+            }
 
-		"/group/$webaddress/user/list" {
-			controller='userGroup'
-			action='user'
-		}
-		"/group/$webaddress/user" {
-			controller='userGroup'
-			action='user'
-		}
-//		"/group/$webaddress/species/list" {
-//			controller='userGroup'
-//			action='species'
-//		}
+            "/$webaddress/login/auth/$id?" {
+                controller = "openId"
+                action = "auth"
+            }
 
-//		"/group/$webaddress/login/$action?" {
-//			controller = "login"
-//		}
-		
-		"/group/$webaddress/login/auth/$id?" {
-			controller = "openId"
-			action = "auth"
-		}
-		
-		"/group/$webaddress/login/openIdCreateAccount" {
-			controller = "openId"
-			action = "createAccount"
-		}
-		
-		"/group/$webaddress/login/facebookCreateAccount" {
-			controller = "openId"
-			action = "createFacebookAccount"
-		}
-		
-		
-		"/group/$webaddress/group/$action/$id?" {
-			controller = "userGroup"
-		}
-		
-		
-		"/group/$webaddress/user/$action/$id?" {
-			controller = "SUser"
-		}
-		
+            "/$webaddress/login/openIdCreateAccount" {
+                controller = "openId"
+                action = "createAccount"
+            }
+
+            "/$webaddress/login/facebookCreateAccount" {
+                controller = "openId"
+                action = "createFacebookAccount"
+            }
+
+
+            "/$webaddress/group/$action/$id?" {
+                controller = "userGroup"
+            }
+
+
+            "/$webaddress/user/$action/$id?" {
+                controller = "SUser"
+            }
+        }
+
 		"/confirm/$id?" {
 			controller = 'emailConfirmation'
 			action = "index"
@@ -196,4 +268,5 @@ class UrlMappings {
     "/adminManage/$action?"(controller: "errors", action: "urlMapping")
      
     }
+
 }

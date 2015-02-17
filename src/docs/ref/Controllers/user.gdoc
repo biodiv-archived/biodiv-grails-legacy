@@ -1,77 +1,198 @@
 h3. User
 
+h4. list 
+
+* *Path* : /api/user 
+* *Parameters* : 
+
+** max: limit of number of results. default 24
+** offset : offset in to the result set. default 0
+** sort: lastLoginDate|activity
+
+* *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
+* *Requests* :
+{code}
+{
+    "success": true,
+        "status": 200,
+        "msg": "Success in executing list of SUser",
+        "model": {
+            "userInstanceList": [
+            {
+                "id": 1426,
+                "name": "Thomas Vattakaven",
+                "icon": "http://graph.facebook.com/801960161/picture?type=large"
+            },
+            {
+                "id": 4105,
+                "name": "Rohit George",
+                "icon": "http://graph.facebook.com/540935480/picture?type=large"
+            }
+            ],
+                "instanceTotal": 5011,
+                "searchQuery": {
+                    "username": "%%"
+                },
+                "searched": true,
+                "username": null,
+                "enabled": null,
+                "accountExpired": null,
+                "accountLocked": null,
+                "passwordExpired": null,
+                "sort": "activity",
+                "order": null
+        }
+}
+{code}
+
+
 h4. show 
 
-* *Path* : /api/user/show/id
+* *Path* : /api/user/id
 * *Parameters* : id :long
 * *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* :
 {code}
-http://indiabiodiversity.saturn.strandls.com/api/user/show/1
+http://indiabiodiversity.localhost.org/api/user/1
 {code}
 * *Response* : 
 ** Successful response
 {code}
 {
     "success": true,
-        "user": {
+        "status": 200,
+        "msg": "",
+        "instance": {
             "id": 1,
             "name": "admin",
-            "email": "admin@strandls.com",
-            "icon": "http://indiabiodiversity.localhost.org/biodiv/img/user_large.png"
+            "icon": "http://localhost/biodiv/users/user_large.png"
         },
-        "roles": [
-            "ROLE_ADMIN",
+        "model": {
+            "roles": [
+                "ROLE_ADMIN",
             "ROLE_USER"
-            ],
-        "stat": {
-            "data": [
-                [
-                "Others",
-                1,
-                0
-                ]
-            ],
-            "columns": [
-                [
-                    "string",
-                    "Species Group"
                 ],
+            "stat": {
+                "data": [
+                    [
+                    "Mammals",
+                4,
+                5
+                    ],
+                [
+                    "Reptiles",
+                0,
+                4
+                    ],
+                [
+                    "Molluscs",
+                0,
+                2
+                    ],
+                [
+                    "Plants",
+                0,
+                2
+                    ],
+                [
+                    "Fish",
+                0,
+                1
+                    ],
+                [
+                    "Birds",
+                0,
+                11
+                    ],
+                [
+                    "Arthropods",
+                0,
+                21
+                    ]
+                    ],
+                "columns": [
+                    [
+                    "string",
+                "Species Group"
+                    ],
                 [
                     "number",
-                    "Observations"
-                ],
+                ""
+                    ],
                 [
                     "number",
-                    "Identifications"
-                ]
-            ],
-            "htmlData": [
+                "Identifications"
+                    ]
+                    ],
+                "htmlData": [
+                    [
+                    "<button class=\"btn species_groups_sprites mammals_gall_th active\" title=\"Mammals\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=841&user=1\">Mammals</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=841&user=1\">4</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=841&user=1\">5</a>"
+                    ],
                 [
-                    "<button class=\"btn species_groups_sprites others_gall_th active\" title=\"Others\"></button>",
-                    "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=2&user=1\">Others</a>",
-                    "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=2&user=1\">1</a>",
-                    "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=2&user=1\">0</a>"
-                ]
-            ],
-            "htmlColumns": [
+                    "<button class=\"btn species_groups_sprites reptiles_gall_th active\" title=\"Reptiles\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=843&user=1\">Reptiles</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=843&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=843&user=1\">4</a>"
+                    ],
+                [
+                    "<button class=\"btn species_groups_sprites molluscs_gall_th active\" title=\"Molluscs\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=856&user=1\">Molluscs</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=856&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=856&user=1\">2</a>"
+                    ],
+                [
+                    "<button class=\"btn species_groups_sprites plants_gall_th active\" title=\"Plants\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=833&user=1\">Plants</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=833&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=833&user=1\">2</a>"
+                    ],
+                [
+                    "<button class=\"btn species_groups_sprites fish_gall_th active\" title=\"Fish\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=845&user=1\">Fish</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=845&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=845&user=1\">1</a>"
+                    ],
+                [
+                    "<button class=\"btn species_groups_sprites birds_gall_th active\" title=\"Birds\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=837&user=1\">Birds</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=837&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=837&user=1\">11</a>"
+                    ],
+                [
+                    "<button class=\"btn species_groups_sprites arthropods_gall_th active\" title=\"Arthropods\"></button>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=839&user=1\">Arthropods</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=839&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=839&user=1\">21</a>"
+                    ]
+                    ],
+                "htmlColumns": [
+                    [
+                    "string",
+                ""
+                    ],
                 [
                     "string",
-                    ""
-                ],
+                "Species Group"
+                    ],
                 [
                     "string",
-                    "Species Group"
-                ],
+                ""
+                    ],
                 [
                     "string",
-                    "Observations"
-                ],
-                [
-                    "string",
-                    "Identifications"
-                ]
-            ]
+                "Identifications"
+                    ]
+                    ]
+            },
+            "userLanguage": {
+                "id": 205,
+                "name": "English"
+            }
         }
 }
 {code}
@@ -80,19 +201,70 @@ http://indiabiodiversity.saturn.strandls.com/api/user/show/1
 {code}
 {
     "success": false,
-        "msg": "Coudn't find user with id 1dsdf"
+        "status": 404,
+        "msg": "SUser not found with id 1s",
+        "errors": []
+}
+{code}
+
+h4. update 
+
+* *Path* : /api/user/id
+* *Parameters* : 
+** id : long or 
+** email : registered email addredd
+** username : string
+** name : string
+** profilePic : url for profilePic
+** icon : icon path
+** website : website address
+** aboutMe : brief description about me
+** location : string
+** sendDigest : boolean
+** hideEmailId : boolean
+** sendNotification : boolean 
+** allowIdentificationMail : boolean
+** speciesGroup : interested species group ids
+** habitat : interested habitat ids
+* *REST method* : PUT
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
+* *Request* :
+{code}
+http://indiabiodiversity.localhost.org/api/user/1
+{code}
+* *Response* : 
+** Successful response
+{code}
+{
+    "success": true,
+        "status": 200,
+        "msg": "User 1 updated",
+        "instance": {
+            "id": 1,
+            "name": "admin",
+            "icon": "http://localhost/biodiv/users/user_large.png"
+        }
+}
+{code}
+** in case of error
+{code}
+{
+    "success": false,
+        "status": 200,
+        "msg": "Sorry, you're not authorized to update this page.",
+        "errors": []
 }
 {code}
 
 h4. resetPassword
 
-* *Path* : /api/user/resetPassword
+* *Path* : /api/user/id/resetPassword
 * *Parameters* : 
-** email : email address of the logged in user
 ** currentPassword : old password 
 ** password : new password
 ** password2 : confirmation for new password
 * *REST method* : POST
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
 http://indiabiodiversity.saturn.strandls.com/api/user/resetPassword?currentPassword=kmvrgbsr&password=123123&password2=123123
@@ -102,6 +274,7 @@ http://indiabiodiversity.saturn.strandls.com/api/user/resetPassword?currentPassw
 {code}
 {
     "success": true,
+        "status": 200,
         "msg": "Successfully updated password"
 }
 {code}
@@ -109,73 +282,64 @@ http://indiabiodiversity.saturn.strandls.com/api/user/resetPassword?currentPassw
 {code}
 {
     "success": false,
-    "msg": "Failed to reset password",
-    "errors": [
-    {
-        "field": "currentPassword",
-        "message": "Current password doesnt match"
-    }
+        "status": 200,
+        "msg": "Failed to reset password",
+        "errors": [
+        {
+            "field": "currentPassword",
+            "message": "Current password doesnt match"
+        }
     ]
 }
 {code}
 
-h4. update 
-
-* *Path* : /api/user/update
-* *Parameters* : 
-** id : long - user id
-** icon : string - relative path of the icon
-** username : string - username 
-** name : string - full name of the user
-** website : string - csv of websites
-** location : string 
-** aboutMe : text 
-** sendNotification : on
-** allowIdentifactionMail : on
-** hideEmailId : on
-** sendDigest : on
-* *REST method* : POST
-* *Request* :
-{code}
-http://indiabiodiversity.localhost.org/api/user/update
-{code}
-* *Response* : 
-** Successfull response
-{code}
-{code}
-** in case of error
-{code}
-{code}
-
 h4. Upload Resource
 
-* *Path* : /api/user/upload_resource
+* *Path* : /api/user/id/upload_resource
 * *Parameters* : 
 ** resources : file attachment (MAX_IMAGE_SIZE = 2097000)
 ** usersDir : directory into which the resource should be put into. If null, a new folder is created.
 * *REST method* : POST
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/user/upload_resource
+http://indiabiodiversity.localhost.org/api/user/1/upload_resource
 {code}
 * *Response* : 
 ** Successfull response
 {code}
-<users>
-    <dir>/28bc2245-4a21-4c51-9cde-5904c8ed8085/resources</dir>
-    <resources>
-        <image fileName='950.jpeg' size='111343'></image>
-    </resources>
-</users>
+{
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "model": {
+            "users": {
+                "dir": "/25023f57-f8bd-442c-b783-b54e6bd5070f/resources",
+                "resources": [
+                {
+                    "fileName": "453.jpg",
+                    "size": 35912
+                }
+                ]
+            }
+        }
+}
 {code}
 ** in case of error
 {code}
 {
-    success:false,
-    "error": "No file is attached"
+    "success": false,
+        "status": 500,
+        "msg": "Ignoring file 984.jpg (16,832.317) as it exceed size limit",
+        "errors": []
+}
+{code}
+{code}
+{
+    "success": false,
+        "status": 500,
+        "msg": "No file is attached",
+        "errors": []
 }
 {code}
 
-h4. Settings
-
-h6. Notifications

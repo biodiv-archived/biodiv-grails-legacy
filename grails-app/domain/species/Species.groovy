@@ -24,7 +24,7 @@ class Species implements Rateable {
  	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
-	Resource reprImage;
+	//Resource reprImage;
 	Float percentOfInfo;  
     Date updatedOn;
     int featureCount = 0;
@@ -33,7 +33,8 @@ class Species implements Rateable {
 	Date lastUpdated = dateCreated;
 	Habitat habitat;
 	StringBuilder sLog;
-	
+    boolean hasMedia = false;
+
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
@@ -64,7 +65,7 @@ class Species implements Rateable {
 
 	static constraints = {
 		guid(blank: false, unique: true);
-		reprImage(nullable:true);
+		//reprImage(nullable:true);
 		percentOfInfo(nullable:true);
 		updatedOn(nullable:true);
         featureCount nullable:false;
@@ -197,7 +198,11 @@ class Species implements Rateable {
 		}
 		return icons;
 	}
-	
+
+    String title() {
+        return fetchSpeciesCall();
+    }
+
 	String notes(Language userLanguage = null) {
         if(!userLanguage) {
             userLanguage = utilsService.getCurrentLanguage();
@@ -217,11 +222,11 @@ class Species implements Rateable {
                 field.concept.equalsIgnoreCase(overview) && field.category.equalsIgnoreCase(brief)
             }
         }
-		return f?.description;
+		return f?.description?:'';
 	}
 
-    String summary() {
-        return "";
+    String summary(Language userLanguage = null) {
+        return notes(userLanguage);
     }
 
 	SpeciesGroup fetchSpeciesGroup() {
@@ -434,4 +439,24 @@ class Species implements Rateable {
         return result;
 	}
 
+    def fetchSpeciesFieldResourceCount() {
+        def sql =  Sql.newInstance(dataSource);
+        def fieldIds = this.fields.id;
+        def ss = "(" + fieldIds[0] 
+        fieldIds.each{
+            ss +=  "," +it
+        }
+        ss += ")";
+        def query = "select count(*) as count from species_field_resources sfr where sfr.species_field_id in " + ss
+        def rows = sql.rows(query);
+        return rows[0].getProperty("count");
+	}
+
+    def updateHasMediaValue(boolean value) {
+        this.hasMedia = value;
+        if(!this.save(flush:true)) {
+            this.errors.each { log.error it }
+        }
+    }
+ 
 }

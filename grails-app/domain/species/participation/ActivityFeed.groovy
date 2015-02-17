@@ -4,6 +4,7 @@ import groovy.sql.Sql;
 
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
+import org.codehaus.groovy.runtime.DateGroovyMethods;
 
 import content.eml.Document;
 
@@ -32,8 +33,8 @@ class ActivityFeed {
 	Long activityHolderId; 
 	String activityHolderType;
 	
-	//subroot : this is to support aggregation on commnet(ie. thread) on group or obv
-	//it will be null for all except the commnet activity where is will store main comment thread
+	//subroot : this is to support aggregation on comment(ie. thread) on group or obv
+	//it will be null for all except the comment activity where is will store main comment thread
 	Long subRootHolderId;
 	String subRootHolderType;
 	
@@ -110,8 +111,8 @@ class ActivityFeed {
 		}
 		
 		if(params.feedClass){
-			whereClause += " and af.activity_holder_type = :activityHolderType "
-			map['activityHolderType'] = params.feedClass
+			whereClause += " and af.activity_type = :activityType "
+			map['activityType'] = params.feedClass.trim()
 		}
 		
 		
@@ -124,36 +125,29 @@ class ActivityFeed {
 		
 		List queryList
 		
-		if(params.isCommentThread){
-			whereClause += " and af.sub_root_holder_type = :subRootHolderType "
-			whereClause += " and af.sub_root_holder_id = :subRootHolderId "
-			map['subRootHolderType'] = params.subRootHolderType
-			map['subRootHolderId'] = params.subRootHolderId
-		}else{
-			switch (feedType) {
-				case ActivityFeedService.GENERIC:
-					whereClause += " and af.root_holder_type = :rootHolderType "
-					map['rootHolderType'] = params.rootHolderType
-					break
-				case ActivityFeedService.SPECIFIC:
-					whereClause += " and af.root_holder_type = :rootHolderType "
-					whereClause += " and af.root_holder_id = :rootHolderId "
-					map['rootHolderType'] = params.rootHolderType
-					map['rootHolderId'] = params.rootHolderId.toLong()
-					break
-				case [ActivityFeedService.USER, ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
-					if(feedType == ActivityFeedService.USER){
-						whereClause += " and af.author_id = :authorId "
-						map['authorId'] = params.user.toLong()
-					}
-					if(params.userGroupList){
-						queryList = getUserGroupFeedQuery(params.userGroupList, selectClause, fromClause, whereClause, orderClause)
-					}
-					break
-		
-				default:
-					break
-			}
+		switch (feedType) {
+			case ActivityFeedService.GENERIC:
+				whereClause += " and af.root_holder_type = :rootHolderType "
+				map['rootHolderType'] = params.rootHolderType
+				break
+			case ActivityFeedService.SPECIFIC:
+				whereClause += " and af.root_holder_type = :rootHolderType "
+				whereClause += " and af.root_holder_id = :rootHolderId "
+				map['rootHolderType'] = params.rootHolderType
+				map['rootHolderId'] = params.rootHolderId.toLong()
+				break
+			case [ActivityFeedService.USER, ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
+				if(feedType == ActivityFeedService.USER){
+					whereClause += " and af.author_id = :authorId "
+					map['authorId'] = params.user.toLong()
+				}
+				if(params.userGroupList){
+					queryList = getUserGroupFeedQuery(params.userGroupList, selectClause, fromClause, whereClause, orderClause)
+				}
+				break
+	
+			default:
+				break
 		}
 		
 		//if query without group 
@@ -209,13 +203,8 @@ class ActivityFeed {
 	private static validateParams(params){
 		params.feedType = params.feedType ?: ActivityFeedService.ALL
 		params.checkFeed = (params.checkFeed != null)? params.checkFeed.toBoolean() : false
-		params.isCommentThread = (params.isCommentThread != null)? params.isCommentThread.toBoolean() : false
 		// in default showing only feeds having isShowable = true 
 		params.isShowableOnly = true
-		
-		if(params.isCommentThread){
-			params.subRootHolderId = params.subRootHolderId.toLong()
-		}
 		
 		switch (params.feedType) {
 			//to handle complete list (ie groups, obvs, species)
@@ -266,17 +255,16 @@ class ActivityFeed {
 		return true
 	}
 	
-	def isMainThreadComment(){
-		return (activityHolderId == subRootHolderId && activityHolderType == subRootHolderType)
-	}
-	
-	def fetchMainCommentFeed(){
-		return ActivityFeed.findByActivityHolderTypeAndActivityHolderId(subRootHolderType, subRootHolderId)
-	}
-	
-	def showComment(){
-		return (rootHolderType == Observation.class.getCanonicalName() || !isMainThreadComment())
-	}
+//	def isMainThreadComment(){
+//		return (activityHolderId == subRootHolderId && activityHolderType == subRootHolderType)
+//	}
+//	
+//	def fetchMainCommentFeed(){
+//		return ActivityFeed.findByActivityHolderTypeAndActivityHolderId(subRootHolderType, subRootHolderId)
+//	}
+//	def showComment(){
+//		return (rootHolderType == Observation.class.getCanonicalName() || !isMainThreadComment())
+//	}
 	
 	def fetchUserGroup(){
 		if(rootHolderType == UserGroup.class.getCanonicalName()){
@@ -426,9 +414,10 @@ class ActivityFeed {
 		String obvQuery = " ${fromClause}, user_group_observations ugo ${whereClause} and ((ugo.user_group_id = ${ug.id} and af.root_holder_type = 'species.participation.Observation' and af.root_holder_id = ugo.observation_id))" 
 		String spQuery = " ${fromClause}, user_group_species ugs ${whereClause} and ((ugs.user_group_id = ${ug.id} and af.root_holder_type = 'species.Species' and af.root_holder_id = ugs.species_id)) "
 		String docQuery = " ${fromClause}, user_group_documents ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'content.eml.Document' and af.root_holder_id = ugd.document_id))"
+		String disQuery = " ${fromClause}, user_group_discussions ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'species.participation.Discussion' and af.root_holder_id = ugd.discussion_id))"
 		String groupQuery = " ${fromClause} ${whereClause} and ((af.root_holder_type = 'species.groups.UserGroup' and af.root_holder_id = ${ug.id})) "
 
-		return [spQuery, obvQuery,docQuery, groupQuery]
+		return [spQuery, obvQuery,docQuery, disQuery, groupQuery]
 	}
 	
 	public static int getActivityCount(Date startDate, Date endDate, UserGroup ug, feedType=null){
@@ -460,6 +449,69 @@ class ActivityFeed {
 		}
 		
 		return new ActivityFeed().getResult(queryList, map, true, null)
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////
+	///////////////////////////// DAILY STATS ////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	
+	private Map getPortalDailyStats(startDate){
+		String query = ''' select count(distinct(root_holder_id)) as c from activity_feed where date_created > :startDate and is_showable = :isShowable and root_holder_type = :rootHolderType '''
+		String obvQuery = " and activity_type = 'Observation created' "
+		def m = ['startDate':startDate, 'isShowable':true]
+		
+		List moduleList = [Species.class.canonicalName, Observation.class.canonicalName, Document.class.canonicalName, Discussion.class.canonicalName]
+		
+		def result = [:]
+		def sql =  Sql.newInstance(dataSource)
+		moduleList.each { rootHolderType ->
+			String q = query
+			m['rootHolderType'] = rootHolderType
+			if(rootHolderType == Observation.class.canonicalName){
+				q = query + obvQuery
+			}
+			def count = sql.rows(q, m).c[0]
+			result[rootHolderType.split("\\.")[-1]] = count
+		}
+		
+		return result
+	}
+	
+	private Map getPortalDailyStats(startDate, UserGroup ug){
+		String selectFromClause  = "select count(distinct(af.root_holder_id)) as c  from activity_feed af "
+		String whereClause = " where af.is_showable = :isShowable and date_created > :startDate "
+		String obvWhereClause = whereClause + " and af.activity_type = 'Observation created' "
+		def m = ['startDate':startDate, 'isShowable':true]
+		
+		String obvQuery = " ${selectFromClause}, user_group_observations ugo ${obvWhereClause} and ((ugo.user_group_id = ${ug.id} and af.root_holder_type = 'species.participation.Observation' and af.root_holder_id = ugo.observation_id))"
+		String spQuery = " ${selectFromClause}, user_group_species ugs ${whereClause} and ((ugs.user_group_id = ${ug.id} and af.root_holder_type = 'species.Species' and af.root_holder_id = ugs.species_id)) "
+		String docQuery = " ${selectFromClause}, user_group_documents ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'content.eml.Document' and af.root_holder_id = ugd.document_id))"
+		String disQuery = " ${selectFromClause}, user_group_discussions ugd ${whereClause} and ((ugd.user_group_id =  ${ug.id} and af.root_holder_type = 'species.participation.Discussion' and af.root_holder_id = ugd.discussion_id))"
+
+		def result = [:]
+		def sql =  Sql.newInstance(dataSource)
+		
+		result['Observation'] = sql.rows(obvQuery, m).c[0]
+		result['Species'] = sql.rows(spQuery, m).c[0]
+		result['Document'] = sql.rows(docQuery, m).c[0]
+		result['Discussion'] = sql.rows(disQuery, m).c[0]
+		
+		return result
+	}
+	
+	public static dailyStats(UserGroup ug=null){
+		def startDate = new Date()
+		DateGroovyMethods.clearTime(startDate)
+		startDate = new java.sql.Date(startDate.getTime())
+		
+		ActivityFeed af = new ActivityFeed()
+		
+		if(ug){
+			return af.getPortalDailyStats(startDate, ug)
+		}else{
+			return  af.getPortalDailyStats(startDate)
+		}
 	}
 
 }

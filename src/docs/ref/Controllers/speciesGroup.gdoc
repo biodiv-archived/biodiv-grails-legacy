@@ -1,8 +1,79 @@
 h3. Species Group
 
 h4. list : 
+* *Path* : /api/speciesGroup
+* *REST method* : GET
+* *Headers Required* : X-Auth-Token, Accept:application/json, text/json
+* *Requests* :
 {code}
 http://indiabiodiversity.saturn.strandls.com/speciesGroup/list
+{code}
+* *Response* :
+{code}
+{
+    "success": true,
+        "status": 200,
+        "msg": "",
+        "model": {
+            "instanceList": [
+            {
+                "id": 829,
+                "name": "All",
+                "groupOrder": 1
+            },
+            {
+                "id": 841,
+                "name": "Mammals",
+                "groupOrder": 2
+            },
+            {
+                "id": 837,
+                "name": "Birds",
+                "groupOrder": 3
+            },
+            {
+                "id": 845,
+                "name": "Fish",
+                "groupOrder": 4
+            },
+            {
+                "id": 835,
+                "name": "Amphibians",
+                "groupOrder": 5
+            },
+            {
+                "id": 843,
+                "name": "Reptiles",
+                "groupOrder": 6
+            },
+            {
+                "id": 856,
+                "name": "Molluscs",
+                "groupOrder": 7
+            },
+            {
+                "id": 839,
+                "name": "Arthropods",
+                "groupOrder": 8
+            },
+            {
+                "id": 833,
+                "name": "Plants",
+                "groupOrder": 9
+            },
+            {
+                "id": 831,
+                "name": "Fungi",
+                "groupOrder": 10
+            },
+            {
+                "id": 830,
+                "name": "Others",
+                "groupOrder": 11
+            }
+            ]
+        }
+}
 {code}
 
 

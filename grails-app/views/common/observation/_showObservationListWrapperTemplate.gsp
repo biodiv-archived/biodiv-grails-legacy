@@ -16,7 +16,7 @@
 			<div class="observation">
 				<div>
 					<obv:showObservationFilterMessage
-						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams, resultType:'observation']" />
+						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'observation']" />
 						
 				</div>
 				<div style="clear: both;"></div>
@@ -72,7 +72,7 @@
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:g.message(code:'button.share')]" />
 				
 				<obv:download
-					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
+					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML], 'onlyIcon': 'false', 'downloadFrom' : 'obvList']" />
 
 			</div>
                         <div class="span8 right-shadow-box" style="margin:0px;clear:both;">

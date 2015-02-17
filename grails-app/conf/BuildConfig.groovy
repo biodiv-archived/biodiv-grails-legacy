@@ -152,7 +152,12 @@ grails.project.dependency.resolution = {
         runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
-        compile ":spring-security-acl:2.0-RC1"
+        compile ":spring-security-acl:2.0-RC2"
+
+        compile (":spring-security-rest:1.4.0") {
+                excludes 'spring-security-core', 'cors'
+        }
+
         compile (":spring-security-facebook:0.15.2-CORE2") {
             excludes 'spring-web' 
         } 
@@ -160,9 +165,6 @@ grails.project.dependency.resolution = {
         compile ":spring-security-openid:2.0-RC2"
         compile ":spring-security-ui:1.0-RC2"
 
-        compile (":spring-security-rest:1.3.4") {
-                excludes 'spring-security-core', 'cors'
-        }
 
         compile ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
@@ -177,7 +179,7 @@ grails.project.dependency.resolution = {
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
         compile ":grails-melody:1.47.2"
-        compile ":jcaptcha:1.2.1"
+        compile ":jcaptcha:1.5.0"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
         compile (":mail:1.0.7")

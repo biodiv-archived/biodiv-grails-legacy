@@ -37,6 +37,10 @@
 		    </div>
 		</g:if>
 
+	<%
+		params.loadMore = true
+		params.webaddress = userGroupInstance?.webaddress
+	%>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<p:paginate total="${instanceTotal}" max="${params.max}" action="${params.action}" controller="${params.controller?:'user'}"
 			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress}"

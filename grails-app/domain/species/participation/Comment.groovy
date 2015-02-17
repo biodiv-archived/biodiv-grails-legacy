@@ -14,7 +14,7 @@ class Comment{
 	String body;
 	Date dateCreated;
 	Date lastUpdated;
-	//main comment thread may have subject (i.e will be shown in group discussion foram)
+	//main comment thread may have subject (i.e will be shown in group discussion forum)
 	String subject; 
 
 	//comment holder (i.e recoVote, image)
@@ -132,15 +132,13 @@ class Comment{
 	}
 	
 	def isMainThread(){
-		return mainParentId == null;
+		return parentId == null;
 	}
 	
 	
 	def deleteComment(){
 		this.delete(flush:true, failOnError:true)
 		if(isMainThread()){
-			deleteAllChild()
-		}else{
 			setParentToNull()
 		}
 	}
@@ -154,18 +152,18 @@ class Comment{
 	
 	}
 	
-	def deleteAllChild(){
-		def commentList = Comment.findAllByMainParentId(this.id)
-		commentList.each{ Comment c ->
-			try{
-				//Comment.withNewSession {
-					c.delete(flush:true, failOnError:true)
-				//} 
-			}catch(Exception e){
-				e.printStackTrace()
-			}
-		}
-	}
+//	def deleteAllChild(){
+//		def commentList = Comment.findAllByParentId(this.id)
+//		commentList.each{ Comment c ->
+//			try{
+//				//Comment.withNewSession {
+//					c.delete(flush:true, failOnError:true)
+//				//} 
+//			}catch(Exception e){
+//				e.printStackTrace()
+//			}
+//		}
+//	}
 	
 	def setParentToNull(){
 		def commentList = Comment.findAllByParentId(this.id)
