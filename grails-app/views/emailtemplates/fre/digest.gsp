@@ -145,7 +145,7 @@
                             if(mainImage?.fileName == speciesGroupIcon.fileName) 
                             imagePath = mainImage.thumbnailUrl("${resourcesServerURL}", '.png');
                             else
-                            imagePath = mainImage?mainImage.thumbnailUrl("${resourcesServerURL}"):null;
+                            imagePath = mainImage?mainImage.thumbnailUrl():null;
                             def spId = speciesInstance.id
                             imagePath = imagePath.replaceAll(' ','%20');
                             %>
