@@ -3,8 +3,10 @@
 
 <div id="distinctRecoList" class="sidebar_section" style="clear:both; border:1px solid #CECECE">
     <h5><g:message code="distinctrecotable.unique.species" /><span class="distinctRecoHeading">${totalCount?' (' + totalCount + ')' :''}</span>
-        <span class='pull-right'><obv:download
-            model="['source':'Unique Species', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], 'onlyIcon': 'true', 'downloadFrom' : 'uniqueSpecies']" /></span>
+        <span class='pull-right'>
+            <obv:download
+            model="['source':'Unique Species', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], 'onlyIcon': 'true', 'downloadFrom' : 'uniqueSpecies']" />
+        </span>
 </h5>
     <table id="distinctRecoTable" class="table table-bordered table-condensed table-striped">
     <tbody>

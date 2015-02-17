@@ -36,7 +36,7 @@
                     <table style="border-collapse: collapse; width:630px;">
                     <tr style="border: 2px solid burlywood; border-bottom:0;background-color: khaki;"><td style="border: 1px solid lightgray;padding-top:2px;padding-bottom:2px;"><i>${annInstance.value}</i></td></tr> 
                     </table>
-                    <table style="border-collapse: collapse;margin-bottom:3px;">
+                    <table style="border-collapse: collapse;margin-bottom:3px;width:630px;">
                         <tr style="border: 2px solid burlywood; border-bottom:0;border-top:0;background-color: #d4ece3;"><td style="width:63px; vertical-align:top;"><i>Subject:</i></td><td> <a href="${uGroup.createLink(controller:'discussion', action:'show','id': annInstance.key.id, absolute:true,'userGroup':userGroup)}">${annInstance.key.subject}</a></td></tr>
                         
                         <tr style="border: 2px solid burlywood; border-top:0;background-color: #d4ece3;"><td style="width:63px; vertical-align:top;"><i>Message:</i></td><td> ${discussionText}</td></tr>
@@ -145,7 +145,7 @@
                             if(mainImage?.fileName == speciesGroupIcon.fileName) 
                             imagePath = mainImage.thumbnailUrl("${resourcesServerURL}", '.png');
                             else
-                            imagePath = mainImage?mainImage.thumbnailUrl("${resourcesServerURL}"):null;
+                            imagePath = mainImage?mainImage.thumbnailUrl():null;
                             def spId = speciesInstance.id
                             imagePath = imagePath.replaceAll(' ','%20');
                             %>

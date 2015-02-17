@@ -47,6 +47,7 @@ import java.beans.Introspector;
 import species.CommonNames;
 import species.Language;
 import species.Species;
+import species.SpeciesPermission;
 
 
 //import org.apache.lucene.document.DateField;
@@ -1196,10 +1197,11 @@ class ObservationService extends AbstractObjectService {
         }
 
         if(params.filterProperty == 'nearByRelated' && !params.bounds && params.parentId) {
+            params.maxNearByRadius = 200
             //Check because ajax calls sending these parameters
             if(params.parentId && params.parentId != '') {
                 try { 
-                    params.parentId = Integer.parseInt(params.parentId.toString()).toLong(); 
+                    params.parentId = Long.parseLong(params.parentId.toString()); 
                 } catch(NumberFormatException e) { 
                     params.parentId = null 
                 }
@@ -1208,11 +1210,11 @@ class ObservationService extends AbstractObjectService {
             query += nearByRelatedObvQuery;
             filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId and obv.id <> g2.id '
             queryParams['parentId'] = params.parentId
-            queryParams['maxNearByRadius'] = params.maxNearByRadius?:200;
+            queryParams['maxNearByRadius'] = params.maxNearByRadius?params.int('maxNearByRadius'):200;
             
             activeFilters["filterProperty"] = params.filterProperty
             activeFilters["parentId"] = params.parentId
-            activeFilters["maxNearByRadius"] = params.maxNearByRadius?:200;
+            activeFilters["maxNearByRadius"] = params.maxNearByRadius?params.int('maxNearByRadius'):200;
 
             //"select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset"
         
@@ -2063,7 +2065,6 @@ class ObservationService extends AbstractObjectService {
             distinctRecoQuery.setFirstResult(offset);
         }
 
-        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         distinctRecoQuery.setProperties(queryParts.queryParams)
         distinctRecoCountQuery.setProperties(queryParts.queryParams)
         def distinctRecoListResult = distinctRecoQuery.list()
@@ -2166,7 +2167,6 @@ class ObservationService extends AbstractObjectService {
         if(params.bounds && boundGeometry) {
             speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         } 
-        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
         return [speciesGroupCountList:speciesGroupCountList];
@@ -2276,7 +2276,6 @@ class ObservationService extends AbstractObjectService {
         log.debug "occurences query : "+query;
         log.debug queryParts.queryParams;
         
-        queryParts.queryParams.maxNearByRadius =  queryParts.queryParams.maxNearByRadius?.toInteger()
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))

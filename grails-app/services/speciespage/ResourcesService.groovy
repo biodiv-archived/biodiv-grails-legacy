@@ -240,7 +240,9 @@ class ResourcesService extends AbstractObjectService {
 
     def deleteUsersResourceById(id){
         def result = UsersResource.findByRes(Resource.read(id.toLong()))
-        result.delete(flush:true, failOnError:true)
+        if(result) {
+            result.delete(flush:true, failOnError:true)
+        }
     }
 
     def getBulkUploadResourcesList(params) {

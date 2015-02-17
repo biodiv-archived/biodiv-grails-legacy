@@ -33,24 +33,23 @@
 
 				<ul class="nav pull-left">
 
-					<li
+					<li 
 						class="${((params.controller == 'userGroup' && params.action == 'species')||(params.controller == 'species'))?' active':''}"><a
 						href="${uGroup.createLink('controller':'species', 'action':'list', 'userGroup':userGroupInstance)}"
-						title="${g.message(code:'default.species.label')}"><g:message code="default.species.label" /></a>
+						title="${g.message(code:'default.species.label')}"><g:message code="default.species.label" /><span title="${g.message(code:'updated.today')}" class="statsTicker speciesUpdateCount"> </span></a>
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('controller':'observation', 'action':'list', 'userGroup':userGroupInstance)}"
-                                                title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a> 
+                                                title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /><span title="${g.message(code:'created.today')}" class="statsTicker obvUpdateCount"> </span></a> 
                                             <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
 					<li
 						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)}" title="${g.message(code:'button.maps')}"><g:message code="button.maps" /></a></li>
 					
-			 		<li
-                    	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+			 		<li class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
                         href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                        title="${g.message(code:'button.documents')}"><g:message code="button.documents" /></a>
+                        title="${g.message(code:'button.documents')}"><g:message code="button.documents" /><span title="${g.message(code:'updated.today')}" class="statsTicker docUpdateCount"> </span></a>
                     </li>
 					
 <%--					<li--%>
@@ -83,7 +82,7 @@
 					<li
 						class="${(params.controller == 'discussion' && params.action == 'list')?' active':''}"><a
 						href="${uGroup.createLink('controller':'discussion', 'action':'list', 'userGroup':userGroupInstance)}"
-						title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
+						title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span  title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
 					
 					<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
@@ -132,10 +131,10 @@
 				<ul class="nav">
 					<li class=" ${(params.controller == 'species')?'active':''}"><a
 						href="${uGroup.createLink('controller':'species')}" title="${g.message(code:'default.species.label')}">
-							<g:message code="default.species.label" /></a></li>
+							<g:message code="default.species.label" /><span  title="${g.message(code:'updated.today')}" class="statsTicker speciesUpdateCount"> </span></a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${uGroup.createLink('controller':'observation')}"
-                                                title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a>
+                                                title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /><span title="${g.message(code:'created.today')}" class="statsTicker obvUpdateCount"> </span></a>
                                             <!--a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a--> 
 </li>
 					<li
@@ -145,7 +144,7 @@
 					<li
                     	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
                     	href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                        title="${g.message(code:'button.documents')}"><g:message code="button.documents" /></a></li>	
+                        title="${g.message(code:'button.documents')}"><g:message code="button.documents" /><span title="${g.message(code:'updated.today')}" class="statsTicker docUpdateCount"> </span></a></li>	
 <%--					<li--%>
 <%--						class="${(params.controller == 'checklist')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"checklist")}' title="Checklists">Checklists</a></li>--%>
@@ -165,7 +164,7 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'discussion')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"discussion", "action":"list")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /></a>
+                                            href="${uGroup.createLink("controller":"discussion", "action":"list")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
@@ -213,7 +212,7 @@
 $(document).ready(function(){
 	//IMP:Header is loaded in drupal pages as well. Any code in this block is not run when loaded by ajax
 	//So please don't put any code here. Put it in init_header function in membership.js
-	 init_header();
+	 init_header("${uGroup.createLink('controller':'activityFeed', 'action':'stats', 'userGroup':userGroupInstance)}");
 });
 
 </script>

@@ -308,7 +308,7 @@ console.log('init_group_header');
  * as calling this function multiple times would result in
  * multiple bindings of following event handlers
  */
-function init_header() {
+function init_header(statsUrl) {
 	$("#allGroups").click(function(){
 		
 			$("#myGroupsInfo").slideUp('fast');
@@ -337,6 +337,8 @@ function init_header() {
 	init_group_header();
 
 	membership_actions();
+	
+	init_stats(statsUrl);
 	
 }
 
@@ -491,3 +493,50 @@ $(document).click(function(){
  	$(document).unbind('click');
 });
 }
+
+function init_stats(statsUrl){
+	$.ajax({
+ 		url: statsUrl,
+ 		type: 'GET',
+ 		dataType: "json",
+		success: function(data) {
+			var comp = $(".statsTicker.speciesUpdateCount");
+			if(parseInt(data.Species) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Species);
+				comp.show();
+			}
+			
+			comp = $(".statsTicker.obvUpdateCount");
+			if(parseInt(data.Observation) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Observation);
+				comp.show();
+			}
+			
+			var comp = $(".statsTicker.docUpdateCount");
+			if(parseInt(data.Document) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Document);
+				comp.show();
+			}
+			
+			var comp = $(".statsTicker.disUpdateCount");
+			if(parseInt(data.Discussion) == 0){
+				comp.hide();
+			}else{
+				comp.text(' ' + data.Discussion);
+				comp.show();
+			}
+			return false;
+			
+		}, error: function(xhr, status, error) {
+			alert(xhr.responseText);
+	   	}
+	});
+	
+}
+

@@ -103,6 +103,7 @@ class ObservationController extends AbstractObjectController {
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -111,13 +112,13 @@ class ObservationController extends AbstractObjectController {
                 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
                 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
             }
+            model.remove('observationInstanceList');
         }
         
         model = utilsService.getSuccessModel('', null, OK.value(), model);
 
         withFormat {
             html {
-                model.resultType = 'observation'
                 if(params.loadMore?.toBoolean()){
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
@@ -166,12 +167,11 @@ class ObservationController extends AbstractObjectController {
         }
         if(params.parentId && params.parentId != '') {
             try { 
-                params.parentId = Integer.parseInt(params.parentId.toString()).toLong(); 
+                params.parentId = Long.parseLong(params.parentId.toString()); 
             } catch(NumberFormatException e) { 
                 params.parentId = null 
             }
         }
-        params['maxNearByRadius'] = 200;
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)

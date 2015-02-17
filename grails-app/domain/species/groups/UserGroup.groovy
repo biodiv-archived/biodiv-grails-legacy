@@ -371,16 +371,8 @@ class UserGroup implements Taggable {
 		if(!sortBy || sortBy.trim().equalsIgnoreCase("Activity")){
 			def res = []
 			def groupId = this.id
-			def groupClass = "'" + this.class.getCanonicalName() + "'"
-			def obvClass = "'" + Observation.class.getCanonicalName() + "'"
-			def obvIds = this.observations.collect{it.id}.join(", ")
-			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg left outer join activity_feed as af on(umg.s_user_id = af.author_id) where umg.user_group_id = $groupId ";
-            if(obvIds) {
-			    query += " and ((af.root_holder_id = $groupId and af.root_holder_type = $groupClass) or (af.root_holder_type = $obvClass and af.root_holder_id in ($obvIds)) ) "
-            } else {
-			    query += " and ((af.root_holder_id = $groupId and af.root_holder_type = $groupClass)) "
-            }
-			query += (roleId) ? " and umg.role_id $roleId" : ""
+			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg left outer join activity_feed as af on(umg.s_user_id = af.author_id) where umg.user_group_id = $groupId and af.is_showable = true ";
+        	query += (roleId) ? " and umg.role_id $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
 			
 			//log.debug "Getting users list : $query"

@@ -383,7 +383,7 @@ function useTitle(obj){
             if(options.clickable) {
                 marker.on('click', function() {
                     if($.isFunction(options.clickable)) {
-                        options.clickable.call(me, options.data);
+                        options.clickable.call(marker, options.data);
                     } else {
                         me.select_location(marker);
                     }

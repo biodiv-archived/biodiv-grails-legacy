@@ -152,7 +152,7 @@ grails.project.dependency.resolution = {
         runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
-        compile ":spring-security-acl:2.0-RC1"
+        compile ":spring-security-acl:2.0-RC2"
 
         compile (":spring-security-rest:1.4.0") {
                 excludes 'spring-security-core', 'cors'
