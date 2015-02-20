@@ -112,6 +112,7 @@ class ObservationController extends AbstractObjectController {
                 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
                 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
             }
+            model.remove('observationInstanceList');
         }
         
         model = utilsService.getSuccessModel('', null, OK.value(), model);

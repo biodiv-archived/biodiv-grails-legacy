@@ -75,6 +75,7 @@ class SpeciesController extends AbstractObjectController {
             model['obvListHtml'] =  g.render(template:"/species/showSpeciesListTemplate", model:model);
             model.resultType = "species"
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model.remove('speciesInstanceList');
         }
         model = utilsService.getSuccessModel('', null, OK.value(), model);
         withFormat {
@@ -96,10 +97,12 @@ class SpeciesController extends AbstractObjectController {
                             def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
 
                             render (result as JSON)
-                             */          return;
+                             */   
+                            
+                            return;
                         }
             }
-            json { render model as JSON }
+            json { render model as JSON; }
             xml { render model as XML }
         }
 	}

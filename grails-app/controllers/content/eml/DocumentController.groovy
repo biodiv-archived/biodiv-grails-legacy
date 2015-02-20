@@ -302,11 +302,11 @@ class DocumentController extends AbstractObjectController {
             model['resultType'] = 'document'
             model['obvListHtml'] =  g.render(template:"/document/documentListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model.remove('documentInstanceList');
         }
 
         model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
-println "++++++++++++++++++++++++++++++++"
-        println model.model
+
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){

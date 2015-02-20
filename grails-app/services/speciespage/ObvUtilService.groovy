@@ -76,7 +76,7 @@ class ObvUtilService {
 	def grailsApplication
 	def activityFeedService
 	def observationsSearchService
-	
+	def commentService
 	
 	///////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Export ////////////////////////////////
@@ -540,8 +540,8 @@ class ObvUtilService {
 		}
 		
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
-			log.debug "Successfully added reco vote : "+recommendationVoteInstance
-			observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+			log.debug "Successfully added reco vote : " + recommendationVoteInstance
+			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 			observationInstance.lastRevised = new Date();
 			//saving max voted species name for observation instance
 			observationInstance.calculateMaxVotedSpeciesName();

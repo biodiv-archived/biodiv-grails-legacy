@@ -300,9 +300,6 @@ ALTER TABLE species DROP constraint fk8849413c32f2eca9 ;
     }
     ----------------
 **/
-// added on 19th jan 2015
-ALTER TABLE comment ADD visit_count bigint;
-update comment set visit_count = 0;
 
 /** 27th Jan 2015
     Adding new column has_media in species
@@ -323,3 +320,5 @@ update observation set is_deleted = true where source_id in (select id from obse
 //2nd feb 2015
 alter table featured add column expire_time timestamp without time zone ;
 
+#added by sathish for add references
+update species_field SET description = 'dummy' where field_id = 81 and description = '';
