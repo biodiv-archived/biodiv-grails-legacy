@@ -320,3 +320,5 @@ update observation set is_deleted = true where source_id in (select id from obse
 //2nd feb 2015
 alter table featured add column expire_time timestamp without time zone ;
 
+#added by sathish for add references
+update species_field SET description = 'dummy' where field_id = 81 and description = '';
