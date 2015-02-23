@@ -18,4 +18,8 @@ class Synonyms extends ScientificName {
         sort id:'asc'
 		version false;
 	}
+
+    Map fetchGeneralInfo(){
+        return [name:name, position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+    }
 }

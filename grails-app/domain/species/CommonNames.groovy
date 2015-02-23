@@ -21,4 +21,8 @@ class CommonNames extends NamesMetadata {
 	}
 
     static fetchMode = [language:'eager']
+
+    Map fetchGeneralInfo(){
+	   return [name:name, position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+   }
 }

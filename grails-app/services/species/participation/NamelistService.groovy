@@ -282,7 +282,8 @@ class NamelistService {
                 println "========HERE HERE============= " + it.name
             }
             //NOT SENDING PATH
-            def s1 = "select s.taxon_concept_id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+            //SENDING IDS as taxonid for synonyms and common names
+            def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
                 from synonyms s where s.taxon_concept_id = :taxonId";
 
             def q1 = sql.rows(s1, [taxonId:it.taxonid])
@@ -297,7 +298,7 @@ class NamelistService {
                 }
             }
             
-            def s2 = "select c.taxon_concept_id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position \
+            def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position \
                 from common_names c where c.taxon_concept_id = :taxonId";
 
             def q2 = sql.rows(s2, [taxonId:it.taxonid])
@@ -339,26 +340,46 @@ class NamelistService {
 
     def getNameDetails(params){
         log.debug params
-        def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
-        def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
-        def result = taxonDef.fetchGeneralInfo()
-        result['taxonId'] = params.taxonId;
-	
-        if(taxonReg) {
-            result['taxonRegId'] = taxonReg.id?.toString()
-            taxonReg.path.tokenize('_').each { taxonDefinitionId ->
-                def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+        if(params.nameType == '1') {
+            def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
+            def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
+            def result = taxonDef.fetchGeneralInfo()
+            result['taxonId'] = params.taxonId;
+
+            if(taxonReg) {
+                result['taxonRegId'] = taxonReg.id?.toString()
+                taxonReg.path.tokenize('_').each { taxonDefinitionId ->
+                    def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
+                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                }
             }
+            result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
+            result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
+            def counts = getObvCKLCountsOfTaxon(taxonDef);
+            result['countObv'] = counts['countObv'];
+            result['countCKL'] = counts['countCKL'];
+            result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
+            println "=========COUNTS============= " + counts
+            return result
+        }else if(params.nameType == '2') {
+            if(params.choosenName && params.choosenName != '') {
+                //taxonId here is id of synonyms table
+                def syn = Synonyms.read(params.taxonId.toLong());
+                def result = syn.fetchGeneralInfo()
+                result['acceptedNamesList'] = getAcceptedNamesOfSynonym(params.choosenName);
+                println "========SYNONYMS NAME DETAILS ===== " + result
+                return result
+            }    
+        }else if(params.nameType == '3') {
+            if(params.choosenName && params.choosenName != '') {
+                //taxonId here is id of common names table
+                def com = CommonNames.read(params.taxonId.toLong());
+                def result = com.fetchGeneralInfo()
+                result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
+                println "========SYNONYMS NAME DETAILS ===== " + result
+                return result
+            }    
         }
-        result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
-        result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
-        def counts = getObvCKLCountsOfTaxon(taxonDef);
-        result['countObv'] = counts['countObv'];
-        result['countCKL'] = counts['countCKL'];
-        result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
-        println "=========COUNTS============= " + counts
-        return result
     }
 
     List searchIBP(String canonicalForm) {
@@ -492,6 +513,58 @@ class NamelistService {
 	
     def getSynonymsOfTaxon(TaxonomyDefinition taxonConcept) {
         def res = Synonyms.findAllByTaxonConcept(taxonConcept);
+        def result = []
+        res.each {
+            def temp = [:]
+            temp['id'] = it.id.toString();
+            temp['name'] = it.name;
+            temp['source'] = it.viaDatasource;
+            String contri = '';
+            it.contributors.each {
+                contri += it.name + ", "
+            }
+            if(contri != '') {
+                contri = contri.substring(0,contri.lastIndexOf(','));
+            }
+            temp['contributors'] = contri; 
+            println "======TEMP ==== " +temp
+            result.add(temp);
+        }
+        return result
+    }
+    
+    def getAcceptedNamesOfSynonym(String synName) {
+        def r = Synonyms.findAllByName(synName);
+        def res = []
+        r.each {
+            res.add(it.taxonConcept);
+        }
+        def result = []
+        res.each {
+            def temp = [:]
+            temp['id'] = it.id.toString();
+            temp['name'] = it.name;
+            temp['source'] = it.viaDatasource;
+            String contri = '';
+            it.contributors.each {
+                contri += it.name + ", "
+            }
+            if(contri != '') {
+                contri = contri.substring(0,contri.lastIndexOf(','));
+            }
+            temp['contributors'] = contri; 
+            println "======TEMP ==== " +temp
+            result.add(temp);
+        }
+        return result
+    }
+
+    def getAcceptedNamesOfCommonNames(String comName) {
+        def r = CommonNames.findAllByName(comName);
+        def res = []
+        r.each {
+            res.add(it.taxonConcept);
+        }
         def result = []
         res.each {
             def temp = [:]

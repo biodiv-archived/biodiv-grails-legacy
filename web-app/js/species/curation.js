@@ -2,10 +2,10 @@ var accDLContent, accWLContent, accCLContent;
 var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
 
-function createListHTML(list) {
+function createListHTML(list, nameType) {
     var listContent = "<ul>";
     $.each(list, function(index, value){
-        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+","+nameType+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
     });
     listContent += "</ul>";
     return listContent;
@@ -41,39 +41,39 @@ function getNamesFromTaxon(ele , parentId) {
             $('.listSelector option:eq(0)').prop('selected', true);
             //DIRTY LIST 
             if(data.dirtyList.accDL){
-                accDLContent = createListHTML(data.dirtyList.accDL); 
+                accDLContent = createListHTML(data.dirtyList.accDL, 1); 
                 $(".dl_content ul").remove();
                 $(".dl_content").append(accDLContent);
             }
             if(data.dirtyList.synDL){
-                synDLContent = createListHTML(data.dirtyList.synDL); 
+                synDLContent = createListHTML(data.dirtyList.synDL, 2); 
             }
             if(data.dirtyList.comDL){
-                comDLContent = createListHTML(data.dirtyList.comDL); 
+                comDLContent = createListHTML(data.dirtyList.comDL, 3); 
             }
             //WORKING LIST
             if(data.workingList.accWL){
-                accWLContent = createListHTML(data.workingList.accWL); 
+                accWLContent = createListHTML(data.workingList.accWL, 1); 
                 $(".wl_content ul").remove();
                 $(".wl_content").append(accWLContent);
             }
             if(data.workingList.synWL){
-                synWLContent = createListHTML(data.workingList.synWL); 
+                synWLContent = createListHTML(data.workingList.synWL, 2); 
             }
             if(data.workingList.comWL){
-                comWLContent = createListHTML(data.workingList.comWL); 
+                comWLContent = createListHTML(data.workingList.comWL, 3); 
             }
             //CLEAN LIST
             if(data.cleanList.accCL){
-                accCLContent = createListHTML(data.cleanList.accCL);
+                accCLContent = createListHTML(data.cleanList.accCL, 1);
                 $(".cl_content ul").remove();
                 $(".cl_content").append(accCLContent);
             }
             if(data.cleanList.synCL){
-                synCLContent = createListHTML(data.cleanList.synCL);
+                synCLContent = createListHTML(data.cleanList.synCL, 2);
             }
             if(data.cleanList.comCL){
-                comCLContent = createListHTML(data.cleanList.comCL);
+                comCLContent = createListHTML(data.cleanList.comCL, 3);
             }
             $("#searching").hide();
             $("body").css("cursor", "default");
@@ -84,7 +84,7 @@ function getNamesFromTaxon(ele , parentId) {
 
 }
 
-function getNameDetails(taxonId, classificationId, ele) {
+function getNameDetails(taxonId, classificationId, nameType, ele) {
     $("#externalDbResults").modal('hide');
     $("body").css("cursor", "progress");
     $("#searching").show();
@@ -100,11 +100,15 @@ function getNameDetails(taxonId, classificationId, ele) {
     $(ele).find("a").css('background-color','#3399FF');
     $('.taxonId').val(taxonId);
     var url = window.params.curation.getNameDetailsUrl;
+    var choosenName = ''
+    if(nameType == 2 || nameType == 3) {
+        choosenName = $(ele).text();
+    }
     $.ajax({
         url: url,
         dataType: "json",
         type: "POST",
-        data: {taxonId:taxonId, classificationId:classificationId},	
+        data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},	
         success: function(data) {
             changeEditingMode(false);
             populateNameDetails(data);
@@ -250,6 +254,7 @@ function populateNameDetails(data){
 
 //takes name for search
 function searchDatabase(addNewName) {
+    console.log("in search database");
     $("body").css("cursor", "progress");
     $("#searching").show();
     $("HTML").mousemove(function(e) {
@@ -380,7 +385,7 @@ function fillPopupTable(data, $ele, dataFrom) {
             }
             rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
         }else {
-            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",undefined)'>Select this</button></td></tr>"
+            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",1, undefined)'>Select this</button></td></tr>"
         }
     });
     $ele.find("table").append(rows);
