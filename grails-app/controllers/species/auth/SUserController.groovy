@@ -192,6 +192,7 @@ class SUserController extends UserController {
                     result.put('obvData', chartService.getUserStats(SUserInstance, userGroupInstance));
                     result['currentUser'] = springSecurityService.currentUser;
                     result['currentUserProfile'] = result['currentUser']?utilsService.generateLink("user", "show", ["id": result['currentUser'].id], request):'';
+                    result['userLanguage'] = userLanguage;
                     return result
                 }
                 json { render model as JSON }
