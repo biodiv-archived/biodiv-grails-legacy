@@ -4,6 +4,7 @@ import species.TaxonomyRegistry
 
 import species.namelist.Utils
 import species.Classification
+import species.Language;
 
 def migrate(){
 	def nSer = ctx.getBean("namelistService")
@@ -11,7 +12,7 @@ def migrate(){
 	println "done "
 }
 
-migrate()
+//migrate()
 
 /*
 def startDate = new Date()
@@ -82,19 +83,20 @@ update  synonyms set status = 'SYNONYM';
 update  synonyms set position = 'DIRTY';
 
 */
-/*
+
 def addIBPTaxonHie() {
     println "====ADDING IBP TAXON HIERARCHY======"
     def cl = new Classification();
     cl.name = "IBP Taxonomy Hierarchy";
+    cl.language = Language.read(205L);
     if(!cl.save(flush:true)) {
-        cl.errors.allErrors.each { log.error it }
+        cl.errors.allErrors.each { println it }
     }
     println "====DONE======"
 }
 
 addIBPTaxonHie();
-*/
+
 /*
 #alter table classification alter column language_id drop not null;
 #UPDATE classification set language_id = 205 where id = (whatever id it gets);
