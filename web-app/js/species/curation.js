@@ -1,6 +1,7 @@
 var accDLContent, accWLContent, accCLContent;
 var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
+var oldName = '';
 
 function createListHTML(list, nameType) {
     var listContent = "<ul>";
@@ -20,18 +21,15 @@ function getNamesFromTaxon(ele , parentId) {
             "left" : e.pageX + 15
         });
     });
-    console.log(ele);
     if($("#taxonHierarchy tr").hasClass("clickedEle")) {
         $("#taxonHierarchy tr").removeClass("clickedEle");
     }
     $(ele).parents("tr").addClass("clickedEle");
     $("#taxonHierarchy tr").css('background', 'white');
-    console.log($(ele).parents("tr"));
     $(ele).parents("tr").css('background', '#3399FF');
     var taxonId = $(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
     var url = window.params.curation.getNamesFromTaxonUrl;
-    console.log("===URL=== " + url);
     $.ajax({
         url: url,
         dataType: "json",
@@ -94,9 +92,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             "left" : e.pageX + 15
         });
     });
-    console.log("=======NAME DEATILS=======" + taxonId);
     $(ele).parent("ul").find("a").css('background-color','inherit');
-    console.log(ele);
     $(ele).find("a").css('background-color','#3399FF');
     $('.taxonId').val(taxonId);
     var url = window.params.curation.getNameDetailsUrl;
@@ -113,6 +109,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             changeEditingMode(false);
             populateNameDetails(data);
             populateTabDetails(data, false);
+            alert($("."+data.rank).val());
             $(".countSp").text(data["countSp"]);
             $(".countObv").text(data["countObv"]);
             $(".countCKL").text(data["countCKL"]);
@@ -123,14 +120,13 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
                 return;
             }
             if($(ele).parents(".dl_content").length) {
-                $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
+                $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, auto-querying CoL for up-to-date name attributes.");
                 $("#dialogMsg").modal('show');
                 //alert("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
                 $('.queryDatabase option[value="col"]').attr("selected", "selected");
                 $('.queryString').trigger("click");
             }
-            console.log("======SUCCESS====");
-            console.log(data);  
+            oldName = $("."+$("#rankDropDown").val()).val();
         }, error: function(xhr, status, error) {
             $("#searching").hide();
             $("body").css("cursor", "default");
@@ -140,8 +136,6 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
 }
 
 function populateTabDetails(data, appendData) {
-    console.log("====TAB DETAILS====");
-    console.log(data);
     if(appendData == false) {
         //clearing synonyms
         reinitializeRows($("#names-tab1"));
@@ -150,16 +144,13 @@ function populateTabDetails(data, appendData) {
     //$("#names-tab1 .singleRow input").prop("disabled", false); 
     var synonymsList = data['synonymsList']
     if(synonymsList && synonymsList.length > 0) {
-        console.log(synonymsList);
         var e = $("#names-tab1 .singleRow").first().clone();
         $("#names-tab1 .singleRow").remove();
         $.each(synonymsList, function(index, value){
             var f = $(e).clone();
             $(f).insertBefore("#names-tab1 .add_new_row");
             var ele = $("#names-tab1 .singleRow").last();
-            console.log(value["id"]);
             $(ele).find("input[name='sid']").val(value["id"]);
-            console.log($(ele).find("input[name='value']"));
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
@@ -172,19 +163,14 @@ function populateTabDetails(data, appendData) {
     }//$("#names-tab2 .singleRow input").val('');
     //$("#names-tab2 .singleRow input").prop("disabled", false); 
     var commonNamesList = data['commonNamesList'];
-    console.log("===%%%%%%%%%%%%%%%%%%=====")
-    console.log(commonNamesList);
     if(commonNamesList && commonNamesList.length > 0) {
-        console.log(commonNamesList);
         var e = $("#names-tab2 .singleRow").first().clone();
         $("#names-tab2 .singleRow").remove();
         $.each(commonNamesList, function(index, value){
             var f = $(e).clone();
             $(f).insertBefore("#names-tab2 .add_new_row");
             var ele = $("#names-tab2 .singleRow").last();
-            console.log(value["id"]);
             $(ele).find("input[name='cid']").val(value["id"]);
-            console.log($(ele).find("input[name='value']"));
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
@@ -200,16 +186,13 @@ function populateTabDetails(data, appendData) {
     //$("#names-tab0 .singleRow input").prop("disabled", false); 
     var acceptedNamesList = data['acceptedNamesList']
     if(acceptedNamesList && acceptedNamesList.length > 0) {
-        console.log(acceptedNamesList);
         var e = $("#names-tab0 .singleRow").first().clone();
         $("#names-tab0 .singleRow").remove();
         $.each(acceptedNamesList, function(index, value){
             var f = $(e).clone();
             $(f).insertBefore("#names-tab0 .add_new_row");
             var ele = $("#names-tab0 .singleRow").last();
-            console.log(value["id"]);
             $(ele).find("input[name='aid']").val(value["id"]);
-            console.log($(ele).find("input[name='value']"));
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
@@ -218,9 +201,7 @@ function populateTabDetails(data, appendData) {
 }
 
 function setOption(selectElement, value) {
-    console.log(selectElement);
     var options = selectElement.options;
-    console.log(options);
     for (var i = 0, optionsLength = options.length; i < optionsLength; i++) {
         if (options[i].value == value) {
             selectElement.selectedIndex = i;
@@ -231,20 +212,16 @@ function setOption(selectElement, value) {
 }
 
 function populateNameDetails(data){
-    console.log("=======REACHED POPULATE====");
-    console.log(data);
     $(".canBeDisabled input[type='text']").val('');
     $('.rankDropDown option:first-child').attr("selected", "selected");
     $('.statusDropDown option:first-child').attr("selected", "selected");
     for (var key in data) {
-        console.log(key +"===== "+ data[key]);
         if(key != "rank" && key!= "status"){
             $("."+key).val(data[key]);
         }
     }  
     $(".via").val(data["sourceDatabase"]);
     if(data["externalId"]) {
-        console.log(data["externalId"]);
         $(".source").val($("#queryDatabase option:selected ").text());
         $(".id").val(data["externalId"]);
     }
@@ -254,7 +231,6 @@ function populateNameDetails(data){
 
 //takes name for search
 function searchDatabase(addNewName) {
-    console.log("in search database");
     $("body").css("cursor", "progress");
     $("#searching").show();
     $("HTML").mousemove(function(e) {
@@ -291,12 +267,11 @@ function searchDatabase(addNewName) {
             $("body").css("cursor", "default");
             //show the popup
             if(data.length != 0) {
+                $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData");
-                console.log("======SUCCESS====");
-                console.log(data); 
             }else {
                 $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
@@ -333,12 +308,11 @@ function searchIBP(name) {
             $("body").css("cursor", "default");
             //show the popup
             if(data.length != 0) {
+                $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "IBPData");
-                console.log("======SUCCESS====");
-                console.log(data); 
             } else {
                 alert("Sorry no results found from IBP Database. Fill in details manually");
             }
@@ -352,8 +326,6 @@ function searchIBP(name) {
 }
 
 function fillPopupTable(data, $ele, dataFrom) {
-    console.log("=====fill popup table====");
-    console.log(data.length);
     if(data.length == 0) {
         alert("Sorry No results found!!");
     }
@@ -408,17 +380,16 @@ function getExternalDbDetails(externalId) {
         data: {externalId:externalId, dbName:dbName},	
         success: function(data) {
             //show the popup
-            console.log("======SUCCESS ID DETAILS====");
             $("#externalDbResults").modal('hide');
             populateNameDetails(data);
             populateTabDetails(data, true);
             if(dbName == 'col') {
                 changeEditingMode(true);
-                console.log("======ID DETAILS====");
-                console.log(data['id_details']);
                 $(".id_details").val(JSON.stringify(data['id_details']));
+            }else {
+                changeEditingMode(false);
             }
-            console.log(data);  
+            oldName = $("."+$("#rankDropDown").val()).val();
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -433,12 +404,14 @@ function saveHierarchy(moveToWKG) {
         taxonRegistryData['abortOnNewName'] = false;
         taxonRegistryData['id_details'] = JSON.parse($(".id_details").val());
     }
-    console.log("===============");
-    console.log(taxonRegistryData);
     var url =  window.params.taxon.classification.updateUrl;
-    console.log("====URL========= " + url);
     if(moveToWKG == true) {
         taxonRegistryData['moveToWKG'] = true;
+    }
+    if(oldName == $("."+$("#rankDropDown").val()).val()) {
+        taxonRegistryData['spellCheck'] = false;
+    }else {
+        taxonRegistryData['spellCheck'] = true;
     }
     $.ajax({
         url: url,
@@ -449,8 +422,6 @@ function saveHierarchy(moveToWKG) {
         success: function(data) {
             //show the popup                                   //what in response
             //$("#externalDbResults").modal('hide');
-            console.log("======SUCCESS SAVED HIERARCHY====");
-            console.log(data);
             if(data['success']) {
                 /*
                 var index = $(".rankDropDown")[0].selectedIndex -1;
@@ -468,7 +439,6 @@ function saveHierarchy(moveToWKG) {
                     alert( "Successfully " + data['activityType']);
                 }
                 if(moveToWKG == true) {
-                    console.log("========TRIGGERING CLICK======");
                     $(".clickedEle .taxDefIdSelect").trigger("click");
                 }
             } else {
@@ -532,6 +502,15 @@ function changeEditingMode(mode) {
     $(".canBeDisabled select").prop("disabled", mode); 
 }
 
+function modifySourceOnEdit() {
+    $(".canBeDisabled").click(function() {
+        if(!($(".canBeDisabled input").prop("disabled"))) {
+            $(".source").val('user entered');
+            $(".via").val('');
+        }
+    });
+}
+
 
 //====================== SYNONYM RELATED ===============================
 function modifyContent(ele, type) {
@@ -551,7 +530,6 @@ function modifyContent(ele, type) {
         relationship = 'reference';
     }
     event.preventDefault();
-    console.log("========UPDATE SY=========");
     var that = $(ele);
     var url = window.params.species.updateUrl;
     var p = {};
@@ -581,7 +559,6 @@ function modifyContent(ele, type) {
     }
 
     form_value = form_var.serializeArray();
-    console.log(form_value);
     for (var i = 0; i < form_value.length; i++) {
         p[form_value[i].name] = form_value[i].value;        
     }
@@ -594,7 +571,6 @@ function modifyContent(ele, type) {
     otherParams['taxonId'] = $(".taxonId").val();  //272991;
     p['otherParams'] = otherParams    
     form_var.find('input').attr("disabled", true);
-    console.log(p);
     if(modifyType != 'delete') {
         that.html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
     }
@@ -607,12 +583,8 @@ function modifyContent(ele, type) {
             //show the popup
             //$("#externalDbResults").modal('hide');
             if(data['success']) {
-                console.log("===COMPLETE DATA=========");
-                console.log(data);
                 form_var.find("."+type).val(data['dataId']);
                 that.next().html("<i class='icon-trash'></i>");
-                console.log("======SUCCESS====");
-                console.log(data);  
                 if(modifyType == 'delete') {
                     form_var.parent().hide();
                 }
@@ -627,12 +599,10 @@ function modifyContent(ele, type) {
 }
 
 $('.add_new_row').click(function(){
-    console.log("======ADD NEW CALLED=======");
     var me = this;
     var typeClass = $(me).prev().find("input[type='hidden']").attr('name')
     var p = new Object();
     p['typeClass']= typeClass;
-    console.log(p);
     var html = $('#newRowTmpl').render(p);
     $(me).before(html);
 });

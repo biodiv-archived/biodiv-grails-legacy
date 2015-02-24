@@ -823,11 +823,11 @@ class TaxonService {
         return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, LCH.getLocale()), errors:errors]
     }
 
-    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
-        return deleteTaxonEntries(reg, force);
+    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false, boolean checkContributor = true) {
+        return deleteTaxonEntries(reg, force, checkContributor);
     } 
 
-    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false, boolean checkContributor = true) {
     	 
         String msg = '';
         def content;
@@ -839,9 +839,10 @@ class TaxonService {
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
          } 
-
-         if(!reg.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, LCH.getLocale()), errors:errors]
+        if(checkContributor) {
+            if(!reg.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, LCH.getLocale()), errors:errors]
+            }
         }
         def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
             projections {

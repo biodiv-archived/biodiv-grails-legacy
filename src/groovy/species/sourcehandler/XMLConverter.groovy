@@ -1433,6 +1433,8 @@ class XMLConverter extends SourceConverter {
     List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         log.debug "Getting classification hierarchy : "+classification.name;
         println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL 
+
+        println "============OTHER PARAMS ========= " + otherParams
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1518,30 +1520,34 @@ class XMLConverter extends SourceConverter {
                                     println "=========NAME STATUS============ " + res.nameStatus +"======= " + res.nameStatus.getClass();
                                     def finalNameStatus;
                                     switch(res.nameStatus) {
-                                        case "accepted":
+                                        case ["accepted","provisionally"] :
                                         finalNameStatus = NameStatus.ACCEPTED;
                                         break
-
+                                        /*
                                         case "provisionally":
                                         finalNameStatus = NameStatus.PROV_ACCEPTED;
                                         break
-
+                                        */
 
                                         case ["synonyms", "ambiguous", "misapplied"]:
-                                        finalNameStatus = NameStatus.SYNONYM;
+                                        finalNameStatus = null  //NameStatus.SYNONYM;
                                         break
 
                                         case "common" :
-                                        finalNameStatus = NameStatus.COMMON;
+                                        finalNameStatus = null  //NameStatus.COMMON;
                                         break
 
                                         default:
-                                        finalNameStatus = ""
+                                        finalNameStatus = null //""
                                         break
                                     }
                                     println "=======FINAL NAME STATUS======= " + finalNameStatus;
                                     taxon.status = finalNameStatus; 
                                 }
+                                // else search COL
+                                // if single acc name take in
+                                // if single synonym take its acc name and show msg, change return or this function,
+                                //if multiple reject save name with null status.
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
@@ -1563,7 +1569,10 @@ class XMLConverter extends SourceConverter {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
                             ent.classification = classification;
-                            if(fromCOL) {
+                            //all hierarchy from curation interface
+                            //to go under IBP tax hie
+                            //earlier it was just from COL
+                            if(otherParams) {
                                  ent.classification = Classification.findByName("IBP Taxonomy Hierarchy");
                             }
                             ent.parentTaxon = getParentTaxon(taxonEntities, rank);

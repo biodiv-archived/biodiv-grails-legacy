@@ -513,7 +513,8 @@
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false,
                 showCheckBox:false
-            });	
+            });
+            modifySourceOnEdit();
             //initializeLanguage();
             $(".listSelector").change(function () {
                 var selectedList = $(this).val();

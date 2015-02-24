@@ -506,7 +506,11 @@ class TaxonController {
                             def updateStatus = taxonService.updateTaxonName(params, reg);
                             return
                         }*/
-						result = taxonService.deleteTaxonHierarchy(reg, true);
+                        def checkContributor = true;
+                        if(params.fromCurationInterface) {
+                            checkContributor = false;
+                        }
+						result = taxonService.deleteTaxonHierarchy(reg, true, checkContributor);
                         println "======the result ===== " + result
 					}
 					println "=======5======== " + result
