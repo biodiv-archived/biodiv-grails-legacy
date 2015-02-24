@@ -23,7 +23,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					<li><b><g:message code="species.contributetemp.Offline.creation" /></b> :<g:message code="species.contributetemp.template" /><a
 						href="${createLinkTo(dir: '/../static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>,
 						<g:message code="species.contributetemp.spreadsheet.species" /> <span
-                            class="mailme">${supportEmail}</span>.<g:message code="species.contributetemp.we.upload" /> 
+                            class="mailme">${supportEmail}</span>. <g:message code="species.contributetemp.we.upload" /> 
 					</li>
 	
 				</ol>
