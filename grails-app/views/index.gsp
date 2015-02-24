@@ -51,7 +51,7 @@
             <div class="navblock" style="margin-top:20px;background-color:white;padding:10px;">
                 <h2 style="text-align:center;color: #db7421;font-size: 1.5em;margin: 0;"><g:message code="index.welcome" /> <g:message code="app.siteName" />  </h2>
                 <p style="line-height:1.5">${g.message(code:'app.homepageDescription')}
-                <a href="about"><g:message code="link.more" /></a>
+                
                 </p>
             </div>
         
