@@ -1427,7 +1427,7 @@ class SpeciesService extends AbstractObjectService  {
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
                 def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
 
-                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
+                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
                 def tD = tR.taxonDefinition
                 if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;

@@ -1,7 +1,7 @@
 var accDLContent, accWLContent, accCLContent;
 var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
-var oldName = '';
+var oldName = '', oldRank = '';
 
 function createListHTML(list, nameType) {
     var listContent = "<ul>";
@@ -109,7 +109,6 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             changeEditingMode(false);
             populateNameDetails(data);
             populateTabDetails(data, false);
-            alert($("."+data.rank).val());
             $(".countSp").text(data["countSp"]);
             $(".countObv").text(data["countObv"]);
             $(".countCKL").text(data["countCKL"]);
@@ -127,6 +126,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
                 $('.queryString').trigger("click");
             }
             oldName = $("."+$("#rankDropDown").val()).val();
+            oldRank = $("#rankDropDown").val();
         }, error: function(xhr, status, error) {
             $("#searching").hide();
             $("body").css("cursor", "default");
@@ -390,6 +390,7 @@ function getExternalDbDetails(externalId) {
                 changeEditingMode(false);
             }
             oldName = $("."+$("#rankDropDown").val()).val();
+            oldRank = $("#rankDropDown").val();
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -408,10 +409,12 @@ function saveHierarchy(moveToWKG) {
     if(moveToWKG == true) {
         taxonRegistryData['moveToWKG'] = true;
     }
+    //check for spell check
     if(oldName == $("."+$("#rankDropDown").val()).val()) {
         taxonRegistryData['spellCheck'] = false;
-    }else {
+    }else if(oldName != $("."+$("#rankDropDown").val()).val() && oldRank == $("#rankDropDown").val()){
         taxonRegistryData['spellCheck'] = true;
+        taxonRegistryData['oldTaxonId'] = $('.taxonId').val();
     }
     $.ajax({
         url: url,
@@ -436,11 +439,16 @@ function saveHierarchy(moveToWKG) {
                 if(data["newlyCreated"]) {
                     alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
                 } else {
-                    alert( "Successfully " + data['activityType']);
+                    var resMsg = "Successfully " + data['activityType'];
+                    if(data['spellCheckMsg']) {
+                        resMsg = resMsg + " . " + data['spellCheckMsg'];
+                    }
+                    alert(resMsg);
                 }
                 if(moveToWKG == true) {
                     $(".clickedEle .taxDefIdSelect").trigger("click");
                 }
+                alert(data['spellCheckMsg']);
             } else {
                 alert(data['msg']);
             }

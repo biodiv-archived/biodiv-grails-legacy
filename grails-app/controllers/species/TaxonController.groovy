@@ -459,6 +459,8 @@ class TaxonController {
 			params.remove('taxonData');
 			otherParams['id_details'] = params.id_details;
 			otherParams['metadata'] = params.metadata;
+			otherParams['spellCheck'] = params.spellCheck;
+			otherParams['oldTaxonId'] = params.oldTaxonId;
 		}
         if(params.metadata?.nameStatus != "accepted") {
             println "=========STATUS======== " + params.metadata?.nameStatus
