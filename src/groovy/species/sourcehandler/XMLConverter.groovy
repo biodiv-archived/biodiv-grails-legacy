@@ -1560,7 +1560,7 @@ class XMLConverter extends SourceConverter {
                                 println "=====VARIABLE SET TRUe================================== "
                                 newNameSaved = true;
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
-                            } else if(taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
+                            } else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
                                 def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
                                 spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
                                 //copy names of taxon to old taxon.
