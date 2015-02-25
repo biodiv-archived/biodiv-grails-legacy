@@ -1564,6 +1564,8 @@ class XMLConverter extends SourceConverter {
                                 def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
                                 spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
                                 //copy names of taxon to old taxon.
+                                //mark it flagged
+                                //save oldTaxon
                                 taxon = oldTaxon;
                             } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
                                 println "=====TAXON WAS THERE================================== "

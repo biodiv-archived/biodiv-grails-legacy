@@ -15,7 +15,7 @@ class TaxonomyDefinition extends ScientificName {
 	SpeciesGroup group;
 	String threatenedStatus;
 	ExternalLinks externalLinks;
-
+    boolean isFlagged = false;
 
 	static hasMany = [author:String, year:String]
 
@@ -23,6 +23,7 @@ class TaxonomyDefinition extends ScientificName {
 		name(blank:false)
 		canonicalForm (nullable:false, unique:['rank']);
 		group nullable:true;
+		isFlagged nullable:true;
 		threatenedStatus nullable:true;
 		externalLinks nullable:true;
 	}

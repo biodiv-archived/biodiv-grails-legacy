@@ -303,6 +303,10 @@ ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
 update  synonyms set status = 'SYNONYM';
 update  synonyms set position = 'DIRTY';
 
+//added on 25th Feb 2015
+ALTER TABLE taxonomy_definition add column is_flagged boolean;
+update taxonomy_definition set is_flagged = false;
+
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 
