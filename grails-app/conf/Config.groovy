@@ -288,6 +288,7 @@ speciesPortal {
 	fields  {
 		COMBINED_TAXONOMIC_HIERARCHY = "Combined Taxonomy Hierarchy"
 		AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY = "Author Contributed Taxonomy Hierarchy"
+		IBP_TAXONOMIC_HIERARCHY = "IBP Taxonomy Hierarchy"
 		GBIF_TAXONOMIC_HIERARCHY = "GBIF Taxonomy Hierarchy"
 		CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY = 'Catalogue of Life Taxonomy Hierarchy'
 		EFLORA_TAXONOMIC_HIERARCHY = 'Eflora Taxonomy Hierarchy'

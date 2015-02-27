@@ -459,6 +459,8 @@ class TaxonController {
 			params.remove('taxonData');
 			otherParams['id_details'] = params.id_details;
 			otherParams['metadata'] = params.metadata;
+			otherParams['spellCheck'] = params.spellCheck;
+			otherParams['oldTaxonId'] = params.oldTaxonId;
 		}
         if(params.metadata?.nameStatus != "accepted") {
             println "=========STATUS======== " + params.metadata?.nameStatus
@@ -506,7 +508,11 @@ class TaxonController {
                             def updateStatus = taxonService.updateTaxonName(params, reg);
                             return
                         }*/
-						result = taxonService.deleteTaxonHierarchy(reg, true);
+                        def checkContributor = true;
+                        if(params.fromCurationInterface) {
+                            checkContributor = false;
+                        }
+						result = taxonService.deleteTaxonHierarchy(reg, true, checkContributor);
                         println "======the result ===== " + result
 					}
 					println "=======5======== " + result

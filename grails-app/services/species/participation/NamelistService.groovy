@@ -576,27 +576,28 @@ class NamelistService {
             }
 
             //changing status
-            sciName.status = getNewNameStatus(colMatch.name_status);
-            switch(sciName.status) {
+            def newStatus = getNewNameStatus(colMatch.name_status);
+            switch(newStatus) {
                 case NameStatus.ACCEPTED : 
-                    
+                    def result = speciesService.deleteSynonym(sciName);
+                    if(!result.success) {
+                        log.debug "Error in deleting synonym ${sciName}. Not updating status."
+                    }
+                    sciName = saveAcceptedName(colMatch);
+                    break;
                 case NameStatus.SYNONYM :                     
-                    //delete the name from sciName.class table and add it to name_status table
+                    //delete the name from taxonDefinition table and add it to synonyms table
+                    taxonService.deleteTaxon(sciName);
+                    def synonym;
                     //if the changed status is Synonym and its accepted name doesn't exist create it
                     colMatch.acceptedNamesList.each { colAcceptedNameData ->
-                        ScientificName acceptedName = checkIfSciNameExists(colAcceptedNameData);
-                        if(!acceptedName) {
-                            //create acceptedName
-                            log.debug "Creating accepted name of this synonym as it doesnt exist"
-                            acceptedName = saveAcceptedName(colAcceptedNameData); 
-                        }
-                        //update acceptedName property for this synonym  
-                        sciName.taxonConcept = acceptedName
-                        //CHK: there is only one accepted name for a synonym ... this won't work
-                        saveSynonym(sciName);
+                        ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+                       //update acceptedName property for this synonym  
+                        synonym = saveSynonym(sciName, acceptedName);
                     }
                     break;
             }
+            sciName.status = newStatus;
         }
     }
 
@@ -624,17 +625,40 @@ class NamelistService {
     }
     
     ScientificName saveAcceptedName(Map colAcceptedNameData) {
+        ScientificName acceptedName = checkIfSciNameExists(colAcceptedNameData);
+        if(!acceptedName) {
+            //create acceptedName
+            log.debug "Creating accepted name of this synonym as it doesnt exist"
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
 
-        def classification = Classification.findByName(IBP_TAXONOMIC_HIERARCHY);
-        List taxonRegistryNames = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
-        SUser contributor = springSecurityService.currentUser;
+            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            List taxonRegistryNames = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
+            SUser contributor = springSecurityService.currentUser;
 
-        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, null);
-        def acceptedName = res.newlyCreatedName;
+            def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, [metadata:[source:'COL', authorString:colAcceptedNameData.authorString]]);
+            //[metadata:[source:, via, authorString:, id_details:[name], spellCheck, oldTaxonId,  ]]
+
+            acceptedName = res.newlyCreatedName;
+        }
+
         return acceptedName;
     }
 
-    private boolean saveSynonym(ScientificName sciName) {
+    ScientificName saveSynonym(ScientificName sciName, ScientificName acceptedName) {
+        //check if another synonym exists with same name relationship and for same acceptedName
+        def synonyms = Synonym.withCriteria() {
+            eq('name', sciName.canonicalForm)
+            eq('relationship', ScientificName.SYNONYM)
+            eq('taxonConcept', acceptedName)
+        }
+
+        if(!synonyms) {
+            def result = speciesService.updateSynonym(null, null, ScientificName.RelationShip.SYNONYM, sciName.name, ['taxonId':acceptedName.id]);  
+            return result.dataInstance;
+        } else {
+            log.debug "Already a synonym exists with same name for this acceptedName"
+            return synonyms;
+        }
     }
 
     private void updateRank(ScientificName sciName, int rank) {

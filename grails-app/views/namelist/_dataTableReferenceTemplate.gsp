@@ -5,16 +5,16 @@
 <g:set var="typeClass" value="${type}id"/>
 <g:each in="${1..4}">
 <div class="row-fluid tab_div singleRow">
- <form class="tab_form">
+ <span class="tab_form">
   <div class="span10"> 
       <input type="hidden" class = "${typeClass}" name="${typeClass}" value=""/>
             <input type="text" class="nameInputs span12" name="value">
   </div>  
   <div class="span2">
-        <button class="btn btn-mini btn-primary" onClick='modifyContent(this, "${type}");' rel="add"><i class="icon-ok icon-white"></i></button>
-        <button class="btn btn-mini" onClick='modifyContent(this, "${type}");' rel='delete'><i class="icon-remove"></i></button>
+        <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this, "${type}");' rel="add"><i class="icon-ok icon-white"></i></button>
+        <button class="btn btn-mini addEdit" onClick='modifyContent(this, "${type}");' rel='delete'><i class="icon-remove"></i></button>
   </div>
- </form> 
+ </span> 
 </div>
 </g:each>
 

@@ -118,7 +118,7 @@ class XMLConverter extends SourceConverter {
             addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
             if(speciesName) {
                 //getting classification hierarchies and saving these taxon definitions
-                List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
+                List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
 
                 //taxonConcept is being taken from only author contributed taxonomy hierarchy
                 TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
@@ -1393,20 +1393,24 @@ class XMLConverter extends SourceConverter {
      * Creating the given classification entries hierarchy.
      * Saves any new taxondefinition found 
      */
-     List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false, otherParams= null) {
+     //List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false, otherParams= null) {
+     def getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false, otherParams= null) {
         log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
-        def taxonHierarchies = new ArrayList();
+        List<TaxonomyRegistry> taxonHierarchies = new ArrayList<TaxonomyRegistry>();
+        String spellCheckMsg = ''
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
             println "=========YAHAN SE AYA====="
-            def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams);
+            def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
+            def t = getTaxonHierarchyRes.taxonRegistry;
+            spellCheckMsg += getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
                 cleanUpGorm();
                 taxonHierarchies.addAll(t);
             }
         }
-        return taxonHierarchies;
+        return ['taxonRegistry':taxonHierarchies, 'spellCheckMsg':spellCheckMsg];
     }
 
     private List<Node> getNodesFromCategory(List speciesNodes, String category) {
@@ -1430,9 +1434,12 @@ class XMLConverter extends SourceConverter {
      * @param scientificName
      * @return
      */
-    List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
+    //List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
+    def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         log.debug "Getting classification hierarchy : "+classification.name;
         println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL 
+
+        println "============OTHER PARAMS ========= " + otherParams
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1459,6 +1466,7 @@ class XMLConverter extends SourceConverter {
         parsedNames = namesParser.parse(names);
         fieldNodes = sortedFieldNodes;
     
+        String spellCheckMsg = ''
         int i=0;
         boolean flag = true;
         fieldNodes.each { fieldNode ->
@@ -1518,42 +1526,53 @@ class XMLConverter extends SourceConverter {
                                     println "=========NAME STATUS============ " + res.nameStatus +"======= " + res.nameStatus.getClass();
                                     def finalNameStatus;
                                     switch(res.nameStatus) {
-                                        case "accepted":
+                                        case ["accepted","provisionally"] :
                                         finalNameStatus = NameStatus.ACCEPTED;
                                         break
-
+                                        /*
                                         case "provisionally":
                                         finalNameStatus = NameStatus.PROV_ACCEPTED;
                                         break
-
+                                        */
 
                                         case ["synonyms", "ambiguous", "misapplied"]:
-                                        finalNameStatus = NameStatus.SYNONYM;
+                                        finalNameStatus = null  //NameStatus.SYNONYM;
                                         break
 
                                         case "common" :
-                                        finalNameStatus = NameStatus.COMMON;
+                                        finalNameStatus = null  //NameStatus.COMMON;
                                         break
 
                                         default:
-                                        finalNameStatus = ""
+                                        finalNameStatus = null //""
                                         break
                                     }
                                     println "=======FINAL NAME STATUS======= " + finalNameStatus;
                                     taxon.status = finalNameStatus; 
                                 }
+                                // else search COL
+                                // if single acc name take in
+                                // if single synonym take its acc name and show msg, change return or this function,
+                                //if multiple reject save name with null status.
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
                                 println "=====VARIABLE SET TRUe================================== "
                                 newNameSaved = true;
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
+                            } else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
+                                def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
+                                spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
+                                //copy names of taxon to old taxon.
+                                //mark it flagged
+                                //save oldTaxon
+                                taxon = oldTaxon;
                             } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
                                 println "=====TAXON WAS THERE================================== "
                                 def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
                                 if(synonym)
                                     synonym.updateContributors(getUserContributors(fieldNode.data))
-                            }
+                            } 
                             def ent = new TaxonomyRegistry();
                             ent.taxonDefinition = taxon
                             //newNameSaved true becoz now this taxon cant be used in hierarchy 
@@ -1563,8 +1582,11 @@ class XMLConverter extends SourceConverter {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
                             ent.classification = classification;
-                            if(fromCOL) {
-                                 ent.classification = Classification.findByName("IBP Taxonomy Hierarchy");
+                            //all hierarchy from curation interface
+                            //to go under IBP tax hie
+                            //earlier it was just from COL
+                            if(otherParams) {
+                                 ent.classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                             }
                             ent.parentTaxon = getParentTaxon(taxonEntities, rank);
                             log.debug("Parent Taxon : "+ent.parentTaxon)
@@ -1606,7 +1628,7 @@ class XMLConverter extends SourceConverter {
         //      if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {
         //          updateSpeciesGroup(taxonEntities);
         //      }
-        return taxonEntities;
+        return ['taxonRegistry' : taxonEntities, 'spellCheckMsg' : spellCheckMsg];
     }
 
     /**

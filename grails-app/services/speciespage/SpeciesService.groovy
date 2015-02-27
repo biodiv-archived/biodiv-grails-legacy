@@ -963,7 +963,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 if(!result.success) {
                     def messagesourcearg = new Object[1];
-                messagesourcearg[0] = result.msg;
+                    messagesourcearg[0] = result.msg;
                     return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
                 }
             } 
@@ -1224,7 +1224,7 @@ class SpeciesService extends AbstractObjectService  {
         return deleteSpeciesField(id);
     }
 
-    def deleteSynonym(long synonymId, long speciesId) {
+    def deleteSynonym(long synonymId, def speciesId = null, def taxonId = null) {
         Synonyms oldSynonym;
         if(synonymId) {
             oldSynonym = Synonyms.read(synonymId);
@@ -1234,7 +1234,7 @@ class SpeciesService extends AbstractObjectService  {
         return deleteSynonym(oldSynonym, speciesInstance);
     }
     
-    def deleteSynonym(Synonyms oldSynonym, Species speciesInstance) {
+    def deleteSynonym(Synonyms oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
         
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
@@ -1242,12 +1242,14 @@ class SpeciesService extends AbstractObjectService  {
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
-        if(!oldSynonym.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
-        }
+        if(speciesInstance) {
+            if(!oldSynonym.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+            }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
+            }
         }
 
         Synonyms.withTransaction { status ->
@@ -1265,8 +1267,9 @@ class SpeciesService extends AbstractObjectService  {
                     }
                 }
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
-                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+                taxonConcept = speciesInstance ? speciesInstance.taxonConcept : oldSynonym.taxonConcept;
+                content = taxonConcept ? Synonyms.findAllByTaxonConcept(taxonConcept) :  null;
+                return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1277,67 +1280,21 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
     }
-    
-    //RELATED TO CURATION INTERFACE
-    def deleteSynonym(long synonymId, String taxonId) {
-        Synonyms oldSynonym;
-        if(synonymId) {
-            oldSynonym = Synonyms.read(synonymId);
-        }
-        TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(taxonId.toLong())
-        
-        return deleteSynonym(oldSynonym, taxonConcept);
-    }
-
-    def deleteSynonym(Synonyms oldSynonym, TaxonomyDefinition taxonConcept) {
-        if(!oldSynonym) {
-            def messagesourcearg = new Object[1];
-                messagesourcearg[0] = synonymId;
-            return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
-        } 
-
-        Synonyms.withTransaction { status ->
-            String msg = '';
-            def content;
-            try{
-                oldSynonym.removeFromContributors(springSecurityService.currentUser);
-                
-                if(oldSynonym.contributors.size() == 0) {
-                    oldSynonym.delete(failOnError:true)
-                } else {
-                    if(!oldSynonym.save()) {
-                        oldSynonym.errors.each { log.error it }
-                        return [success:false, msg:messageSource.getMessage("info.error.deleting.synonym", null, LCH.getLocale())]
-                    }
-                }
-                msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
-                content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
-                return [success:true, msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
-            } 
-            catch(e) {
-                e.printStackTrace();
-                log.error e.getMessage();
-                def messagesourcearg = new Object[1];
-                messagesourcearg[0] = e.getMessage();
-                return [success:false, msg:messageSource.getMessage("info.error.synonym.deletion", messagesourcearg, LCH.getLocale())]
-            }
-        }
-    }
-
+  
     //taxonId comes from curation interface only 
-    def deleteCommonname(def cnId, def speciesId, def taxonId = null) {
+    def deleteCommonname(def cnId, def speciesId = null, def taxonId = null) {
         CommonNames oldCommonname;
         if(cnId) {
             oldCommonname = CommonNames.read(cnId);
         }
 
-        Species speciesInstance = (speciesId)?Species.get(speciesId):null;
+        Species speciesInstance = (speciesId) ? Species.get(speciesId):null;
         TaxonomyDefinition taxonConcept = (taxonId)?TaxonomyDefinition.get(taxonId.toLong()):null;
         return deleteCommonname(oldCommonname, speciesInstance, taxonConcept);
     }
 
     //taxonConcept comes from curation interface only 
-    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance, TaxonomyDefinition taxonConcept = null) {
+    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
         if(!taxonConcept) taxonConcept = speciesInstance?.taxonConcept
         if(!oldCommonname) {
             def messagesourcearg = new Object[1];
@@ -1374,7 +1331,7 @@ class SpeciesService extends AbstractObjectService  {
                 if(speciesInstance) {
                     return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
                 } else {
-                    return [success:true, msg:msg, type:'commonname', content:content,taxonConcept:taxonConcept,activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                    return [success:true, msg:msg, type:'commonname', content:content, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
                 }
             } 
             catch(e) {
@@ -1427,7 +1384,7 @@ class SpeciesService extends AbstractObjectService  {
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
                 def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
 
-                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
+                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
                 def tD = tR.taxonDefinition
                 if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;

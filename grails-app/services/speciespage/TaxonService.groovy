@@ -578,7 +578,7 @@ class TaxonService {
 			new Node(taxon1, "subcategory", "species")
 			new Node(taxon1, "data", name)
 			taxonEntries.add(taxon1);
-			List<TaxonomyRegistry> registry = converter.getClassifications(taxonEntries, name);
+			List<TaxonomyRegistry> registry = converter.getClassifications(taxonEntries, name).taxonRegistry;
 
 			def taxonConcept = converter.getTaxonConcept(registry,  Classification.findByName(grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY));
 			if(!taxonConcept.isAttached()) {
@@ -792,7 +792,8 @@ class TaxonService {
         XMLConverter converter = new XMLConverter();
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
         println "======YAHAN HAI=========";
-        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams);
+        def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
+        List<TaxonomyRegistry> taxonRegistry = getClassifictaionsRes.taxonRegistry;
 /*        //check if user has permission to contribute to the taxon hierarchy
         if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {
             taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);            
@@ -813,7 +814,7 @@ class TaxonService {
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, LCH.getLocale()), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors, taxonRegistry: taxonRegistry]
+            def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, LCH.getLocale()), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors, taxonRegistry: taxonRegistry, 'spellCheckMsg':getClassifictaionsRes.spellCheckMsg]
             if(!(taxonRegistry[-1].taxonDefinition.status)) {
                 res['newlyCreated'] = true
                 res['newlyCreatedName'] = taxonRegistry[-1].taxonDefinition.name
@@ -823,11 +824,11 @@ class TaxonService {
         return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, LCH.getLocale()), errors:errors]
     }
 
-    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
-        return deleteTaxonEntries(reg, force);
+    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false, boolean checkContributor = true) {
+        return deleteTaxonEntries(reg, force, checkContributor);
     } 
 
-    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false, boolean checkContributor = true) {
     	 
         String msg = '';
         def content;
@@ -839,9 +840,10 @@ class TaxonService {
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
          } 
-
-         if(!reg.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, LCH.getLocale()), errors:errors]
+        if(checkContributor) {
+            if(!reg.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, LCH.getLocale()), errors:errors]
+            }
         }
         def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
             projections {
@@ -952,7 +954,7 @@ class TaxonService {
 	 * 
 	 */
 	private List<TaxonomyRegistry> saveTaxonEntries(converter, List taxonEntries, Classification c, String name) {
-		List<TaxonomyRegistry> registry = converter.getTaxonHierarchy(new NodeList(taxonEntries), c, name);
+		List<TaxonomyRegistry> registry = converter.getTaxonHierarchy(new NodeList(taxonEntries), c, name).taxonRegistry;
 		//cleanUpGorm();
 		//registry.each { e ->
 		//	e.save(flush:true);
