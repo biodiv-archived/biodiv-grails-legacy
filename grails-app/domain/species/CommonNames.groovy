@@ -1,5 +1,7 @@
 package species
 
+import species.ScientificName.TaxonomyRank
+
 class CommonNames extends NamesMetadata {
 
 	String name;
@@ -23,6 +25,7 @@ class CommonNames extends NamesMetadata {
     static fetchMode = [language:'eager']
 
     Map fetchGeneralInfo(){
-	   return [name:name, position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+        def rank = this.taxonConcept.rank;
+	    return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }
 }

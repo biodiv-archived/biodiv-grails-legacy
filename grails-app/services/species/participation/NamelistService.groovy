@@ -365,7 +365,8 @@ class NamelistService {
             if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table
                 def syn = Synonyms.read(params.taxonId.toLong());
-                def result = syn.fetchGeneralInfo()
+                def result = syn.fetchGeneralInfo();
+                result[result['rank']] = params.choosenName;
                 result['acceptedNamesList'] = getAcceptedNamesOfSynonym(params.choosenName);
                 println "========SYNONYMS NAME DETAILS ===== " + result
                 return result
@@ -375,6 +376,7 @@ class NamelistService {
                 //taxonId here is id of common names table
                 def com = CommonNames.read(params.taxonId.toLong());
                 def result = com.fetchGeneralInfo()
+                result[result['rank']] = params.choosenName;
                 result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
                 println "========SYNONYMS NAME DETAILS ===== " + result
                 return result
