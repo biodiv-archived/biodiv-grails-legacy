@@ -399,7 +399,7 @@
 
                         <script id="newRowTmpl" type="text/x-jquery-tmpl">
                             <div class="row-fluid tab_div singleRow new">
-                                <form>
+                                <span class="tab_form">
                                {{if typeClass == "rid"}}
                                     <div class="span10">
                                         <input type="hidden" class ="{{>typeClass}}" name="{{>typeClass}}" value=""/>
@@ -431,11 +431,11 @@
                                     {{/if}}
                                 {{/if}}    
                                     <div class="span2">
-                                        <button class="btn btn-mini btn-primary" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
-                                        <button class="btn btn-mini" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>
+                                        <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
+                                        <button class="btn btn-mini delete" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>
                                     </div>
 
-                                </form>
+                                </span>
                             </div>
                         </script>
 
@@ -499,7 +499,7 @@
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
     <g:render template="/namelist/newNamePopupTemplate" model="[]"/>
     <g:render template="/namelist/dialogMsgTemplate" model="[]"/>
-    <div id="searching" style="font-weight:bold">Loading...</div>
+    <div id="searching" style="font-weight:bold">Processing...</div>
     <div id="dialog" title="Basic dialog" style="display:none;">
         <p id="dialogMsg"></p>
     </div>

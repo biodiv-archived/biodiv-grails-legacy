@@ -12,7 +12,7 @@ function createListHTML(list, nameType) {
     return listContent;
 }
 
-function getNamesFromTaxon(ele , parentId) {
+function processingStart() {
     $("body").css("cursor", "progress");
     $("#searching").show();
     $("HTML").mousemove(function(e) {
@@ -21,6 +21,15 @@ function getNamesFromTaxon(ele , parentId) {
             "left" : e.pageX + 15
         });
     });
+}
+
+function processingStop() {
+    $("#searching").hide();
+    $("body").css("cursor", "default");
+}
+
+function getNamesFromTaxon(ele , parentId) {
+    processingStart();
     if($("#taxonHierarchy tr").hasClass("clickedEle")) {
         $("#taxonHierarchy tr").removeClass("clickedEle");
     }
@@ -73,8 +82,7 @@ function getNamesFromTaxon(ele , parentId) {
             if(data.cleanList.comCL){
                 comCLContent = createListHTML(data.cleanList.comCL, 3);
             }
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop(); 
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -84,14 +92,7 @@ function getNamesFromTaxon(ele , parentId) {
 
 function getNameDetails(taxonId, classificationId, nameType, ele) {
     $("#externalDbResults").modal('hide');
-    $("body").css("cursor", "progress");
-    $("#searching").show();
-    $("HTML").mousemove(function(e) {
-        $("#searching").css({
-            "top" : e.pageY,
-            "left" : e.pageX + 15
-        });
-    });
+    processingStart();
     $(ele).parent("ul").find("a").css('background-color','inherit');
     $(ele).find("a").css('background-color','#3399FF');
     $('.taxonId').val(taxonId);
@@ -109,12 +110,12 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             changeEditingMode(false);
             populateNameDetails(data);
             populateTabDetails(data, false);
+            showProperTabs();
             $(".countSp").text(data["countSp"]);
             $(".countObv").text(data["countObv"]);
             $(".countCKL").text(data["countCKL"]);
             $(".taxonRegId").val(data['taxonRegId']);
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop();
             if(ele == undefined) {
                 return;
             }
@@ -128,8 +129,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             oldName = $("."+$("#rankDropDown").val()).val();
             oldRank = $("#rankDropDown").val();
         }, error: function(xhr, status, error) {
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop()
             alert(xhr.responseText);
         } 
     });
@@ -231,14 +231,7 @@ function populateNameDetails(data){
 
 //takes name for search
 function searchDatabase(addNewName) {
-    $("body").css("cursor", "progress");
-    $("#searching").show();
-    $("HTML").mousemove(function(e) {
-        $("#searching").css({
-            "top" : e.pageY,
-            "left" : e.pageX + 15
-        });
-    });
+    processingStart()
     var name = "";
     if(addNewName) {
         name = $(".newName").val();
@@ -263,8 +256,7 @@ function searchDatabase(addNewName) {
         type: "POST",
         data: {name:name, dbName:dbName},	
         success: function(data) {
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop()
             //show the popup
             if(data.length != 0) {
                 $("#dialogMsg").modal('hide');
@@ -281,22 +273,14 @@ function searchDatabase(addNewName) {
                 }
             }
         }, error: function(xhr, status, error) {
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop()
             alert(xhr.responseText);
         } 
     });
 }
 
 function searchIBP(name) {
-    $("body").css("cursor", "progress");
-    $("#searching").show();
-    $("HTML").mousemove(function(e) {
-        $("#searching").css({
-            "top" : e.pageY,
-            "left" : e.pageX + 15
-        });
-    });
+    processingStart();
     var url = window.params.curation.searchIBPURL;
     $.ajax({
         url: url,
@@ -304,8 +288,7 @@ function searchIBP(name) {
         type: "POST",
         data: {name:name},	
         success: function(data) {
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop();
             //show the popup
             if(data.length != 0) {
                 $("#dialogMsg").modal('hide');
@@ -317,8 +300,7 @@ function searchIBP(name) {
                 alert("Sorry no results found from IBP Database. Fill in details manually");
             }
         }, error: function(xhr, status, error) {
-            $("#searching").hide();
-            $("body").css("cursor", "default");
+            processingStop();
             alert(xhr.responseText);
         } 
     });
@@ -383,6 +365,7 @@ function getExternalDbDetails(externalId) {
             $("#externalDbResults").modal('hide');
             populateNameDetails(data);
             populateTabDetails(data, true);
+            showProperTabs();
             if(dbName == 'col') {
                 changeEditingMode(true);
                 $(".id_details").val(JSON.stringify(data['id_details']));
@@ -398,64 +381,60 @@ function getExternalDbDetails(externalId) {
 }
 
 function saveHierarchy(moveToWKG) {
-    var taxonRegistryData = fetchTaxonRegistryData();
-    taxonRegistryData['abortOnNewName'] = true;
-    taxonRegistryData['fromCOL'] = $('.fromCOL').val();
-    if($('.fromCOL').val() == "true") {
-        taxonRegistryData['abortOnNewName'] = false;
-        taxonRegistryData['id_details'] = JSON.parse($(".id_details").val());
-    }
-    var url =  window.params.taxon.classification.updateUrl;
-    if(moveToWKG == true) {
-        taxonRegistryData['moveToWKG'] = true;
-    }
-    //check for spell check
-    if(oldName == $("."+$("#rankDropDown").val()).val()) {
-        taxonRegistryData['spellCheck'] = false;
-    }else if(oldName != $("."+$("#rankDropDown").val()).val() && oldRank == $("#rankDropDown").val()){
-        taxonRegistryData['spellCheck'] = true;
-        taxonRegistryData['oldTaxonId'] = $('.taxonId').val();
-    }
-    $.ajax({
-        url: url,
-        type: "POST",
-        dataType: "json",
-        //contentType: "application/json",
-        data: {taxonData: JSON.stringify(taxonRegistryData)},	
-        success: function(data) {
-            //show the popup                                   //what in response
-            //$("#externalDbResults").modal('hide');
-            if(data['success']) {
-                /*
-                var index = $(".rankDropDown")[0].selectedIndex -1;
-                var arr = data['activityType'].split('>');
-                var index1 = arr.length -1;
-                if(index >= 4) {
-                    index1 = index1 + 1; 
-                }
-                var lastName = arr[arr.length - 2];
-                */
-                
-                if(data["newlyCreated"]) {
-                    alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
-                } else {
-                    var resMsg = "Successfully " + data['activityType'];
-                    if(data['spellCheckMsg']) {
-                        resMsg = resMsg + " . " + data['spellCheckMsg'];
+    processingStart();
+    if($("#statusDropDown").val() == 'accepted'){
+        var taxonRegistryData = fetchTaxonRegistryData();
+        taxonRegistryData['abortOnNewName'] = true;
+        taxonRegistryData['fromCOL'] = $('.fromCOL').val();
+        if($('.fromCOL').val() == "true") {
+            taxonRegistryData['abortOnNewName'] = false;
+            taxonRegistryData['id_details'] = JSON.parse($(".id_details").val());
+        }
+        var url =  window.params.taxon.classification.updateUrl;
+        if(moveToWKG == true) {
+            taxonRegistryData['moveToWKG'] = true;
+        }
+        //check for spell check
+        if(oldName == $("."+$("#rankDropDown").val()).val()) {
+            taxonRegistryData['spellCheck'] = false;
+        }else if(oldName != $("."+$("#rankDropDown").val()).val() && oldRank == $("#rankDropDown").val()){
+            taxonRegistryData['spellCheck'] = true;
+            taxonRegistryData['oldTaxonId'] = $('.taxonId').val();
+        }
+        console.log(event);
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            //contentType: "application/json",
+            data: {taxonData: JSON.stringify(taxonRegistryData)},	
+            success: function(data) {
+                //show the popup                                   //what in response
+                //$("#externalDbResults").modal('hide');
+                if(data['success']) {
+                    if(data["newlyCreated"]) {
+                        alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
+                    } else {
+                        var resMsg = "Successfully " + data['activityType'];
+                        if(data['spellCheckMsg']) {
+                            resMsg = resMsg + " . " + data['spellCheckMsg'];
+                        }
+                        alert(resMsg);
                     }
-                    alert(resMsg);
+                    if(moveToWKG == true) {
+                        $(".clickedEle .taxDefIdSelect").trigger("click");
+                    }
+                    processingStop();
+                    postProcessOnAcceptedName();
+                } else {
+                    alert(data['msg']);
                 }
-                if(moveToWKG == true) {
-                    $(".clickedEle .taxDefIdSelect").trigger("click");
-                }
-                alert(data['spellCheckMsg']);
-            } else {
-                alert(data['msg']);
-            }
-        }, error: function(xhr, status, error) {
-            alert(xhr.responseText);
-        } 
-    });
+            }, error: function(xhr, status, error) {
+                processingStop();
+                alert(xhr.responseText);
+            } 
+        });
+    }
 }
 
 function fetchTaxonRegistryData() {
@@ -520,8 +499,9 @@ function modifySourceOnEdit() {
 }
 
 
-//====================== SYNONYM RELATED ===============================
+//====================== SYNONYM/COMMON NAME RELATED ===============================
 function modifyContent(ele, type) {
+    processingStart();
     var typeName = '';
     var relationship = '';
     if(type == 'a' || type == 'aid') {
@@ -537,12 +517,11 @@ function modifyContent(ele, type) {
         typeName = 'reference';
         relationship = 'reference';
     }
-    event.preventDefault();
     var that = $(ele);
     var url = window.params.species.updateUrl;
     var p = {};
     var  modifyType = that.attr('rel');
-    var form_var = that.closest('form');   
+    var form_var = that.closest('.tab_form');   
 
     if(modifyType == "edit"){
         form_var.find('input').attr("disabled", false);
@@ -565,11 +544,11 @@ function modifyContent(ele, type) {
             }
         }    
     }
-
-    form_value = form_var.serializeArray();
-    for (var i = 0; i < form_value.length; i++) {
-        p[form_value[i].name] = form_value[i].value;        
-    }
+    var inputs = form_var.find("input");
+    $.each(inputs, function(index, value){
+        console.log($(value).attr('name') + '==== '+ $(value).val());
+        p[$(value).attr('name')] = $(value).val();
+    });
     p['name']  = typeName;
     p['act'] = modifyType;    
     p['relationship'] = relationship;
@@ -588,8 +567,6 @@ function modifyContent(ele, type) {
         dataType: "json",
         data: {dataFromCuration: JSON.stringify(p)},	
         success: function(data) {
-            //show the popup
-            //$("#externalDbResults").modal('hide');
             if(data['success']) {
                 form_var.find("."+type).val(data['dataId']);
                 that.next().html("<i class='icon-trash'></i>");
@@ -599,7 +576,10 @@ function modifyContent(ele, type) {
             } else {
                 alert("Error in saving - "+data['msg']);
             }
+            processingStop();
+            //return false;
         }, error: function(xhr, status, error) {
+            processingStop();
             alert(xhr.responseText);
         } 
     });
@@ -625,4 +605,56 @@ function reinitializeRows($context) {
         $context.find(".add_new_row").trigger("click");
     }
     $context.find(".tab_div:lt("+numRows+")").remove();
+}
+
+function showProperTabs() {
+    var nameStatus = $("#statusDropDown").val();
+    if(nameStatus == 'accepted') {
+        $('#names-li1 a').attr('data-toggle', 'tab');
+        $('#names-li2 a').attr('data-toggle', 'tab');
+        $('#names-li0 a').removeAttr('data-toggle');
+        $('#names-li1 a').tab('show');
+    }else if(nameStatus == 'synonym') {
+        $('#names-li1 a').removeAttr('data-toggle');
+        $('#names-li2 a').removeAttr('data-toggle');
+        $('#names-li0 a').attr('data-toggle', 'tab');
+        $('#names-li0 a').tab('show');
+    }else if(nameStatus == 'common') {
+        $('#names-li1 a').removeAttr('data-toggle');
+        $('#names-li2 a').removeAttr('data-toggle');
+        $('#names-li0 a').attr('data-toggle', 'tab');
+        $('#names-li0 a').tab('show');
+    }else {
+        $('#names-li0 a').attr('data-toggle', 'tab');
+        $('#names-li1 a').attr('data-toggle', 'tab');
+        $('#names-li2 a').attr('data-toggle', 'tab');
+        $('#names-li0 a').tab('show');
+    }
+}
+
+function postProcessOnAcceptedName() {
+    //fetch all synonyms and common names and refrences to be saved
+    var synNameRows = $("#names-tab1 input[name='value']");
+    $.each(synNameRows, function(index, value){
+        if($(value).val() != ''){
+            $(value).parents(".tab_form").find(".addEdit").trigger("click");
+        }
+    });
+    console.log(e);
+    var comNameRows = $("#names-tab2 input[name='value']");
+    $.each(comNameRows, function(index, value){
+        if($(value).val() != ''){
+            $(value).parents(".tab_form").find(".addEdit").trigger("click");
+        }
+    });
+}
+
+function preProcessOnSynonym() {
+    var accNameRows = $("#names-tab0 input[name='value']");
+    $.each(accNameRows, function(index, value){
+        if($(value).val() != ''){
+            var e = jQuery.Event( "click" );
+            $(value).parents(".tab_form").find(".addEdit").trigger(e);
+        }
+    });
 }
