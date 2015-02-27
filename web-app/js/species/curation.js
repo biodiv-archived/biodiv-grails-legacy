@@ -382,7 +382,7 @@ function getExternalDbDetails(externalId) {
 
 function saveHierarchy(moveToWKG) {
     processingStart();
-    if($("#statusDropDown").val() == 'accepted'){
+    if($("#statusDropDown").val() == 'accepted') {
         var taxonRegistryData = fetchTaxonRegistryData();
         taxonRegistryData['abortOnNewName'] = true;
         taxonRegistryData['fromCOL'] = $('.fromCOL').val();
@@ -401,16 +401,12 @@ function saveHierarchy(moveToWKG) {
             taxonRegistryData['spellCheck'] = true;
             taxonRegistryData['oldTaxonId'] = $('.taxonId').val();
         }
-        console.log(event);
         $.ajax({
             url: url,
             type: "POST",
             dataType: "json",
-            //contentType: "application/json",
             data: {taxonData: JSON.stringify(taxonRegistryData)},	
             success: function(data) {
-                //show the popup                                   //what in response
-                //$("#externalDbResults").modal('hide');
                 if(data['success']) {
                     if(data["newlyCreated"]) {
                         alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
@@ -434,6 +430,8 @@ function saveHierarchy(moveToWKG) {
                 alert(xhr.responseText);
             } 
         });
+    }else if($("#statusDropDown").val() == 'synonym') {
+        preProcessOnSynonym(); 
     }
 }
 
@@ -504,9 +502,13 @@ function modifyContent(ele, type) {
     processingStart();
     var typeName = '';
     var relationship = '';
+    var p = {};
     if(type == 'a' || type == 'aid') {
         typeName = 'accepted';
         relationship = 'accepted';
+        p['synComName'] = $(".name").val();
+        p['synComSource'] = $(".source").val();
+        p['modifyingFor'] = $("#statusDropDown").val();
     } else if( type == 's'|| type == 'sid') {
         typeName = 'synonym';
         relationship = 'synonym';
@@ -519,7 +521,6 @@ function modifyContent(ele, type) {
     }
     var that = $(ele);
     var url = window.params.species.updateUrl;
-    var p = {};
     var  modifyType = that.attr('rel');
     var form_var = that.closest('.tab_form');   
 
@@ -653,8 +654,7 @@ function preProcessOnSynonym() {
     var accNameRows = $("#names-tab0 input[name='value']");
     $.each(accNameRows, function(index, value){
         if($(value).val() != ''){
-            var e = jQuery.Event( "click" );
-            $(value).parents(".tab_form").find(".addEdit").trigger(e);
+            $(value).parents(".tab_form").find(".addEdit").trigger("click");
         }
     });
 }

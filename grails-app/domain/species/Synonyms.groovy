@@ -1,6 +1,7 @@
 package species
 
 import species.ScientificName.RelationShip
+import species.ScientificName.TaxonomyRank
 
 class Synonyms extends ScientificName {
 
@@ -20,6 +21,7 @@ class Synonyms extends ScientificName {
 	}
 
     Map fetchGeneralInfo(){
-        return [name:name, position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+        def rank = this.taxonConcept.rank;
+        return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
     }
 }

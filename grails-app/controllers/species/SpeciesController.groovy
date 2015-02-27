@@ -546,7 +546,7 @@ class SpeciesController extends AbstractObjectController {
             println "=======HERE========= "
             return;
         }
-        
+         
         try {
             def result;
             Long speciesFieldId = params.pk ? params.long('pk'):null;
@@ -675,6 +675,43 @@ class SpeciesController extends AbstractObjectController {
                 result.content = html.join();
                 
                 break;
+
+                //only possible thru curation interface
+                //adding an accpted name to synonym
+                //if accepted name exists use it
+                //else create and match to COL
+                case 'accepted':
+                println "=====HELLO HERE========"
+                if(params.modifyingFor == 'synonym') {
+                    //get aid if not present
+                    //and put in params aid
+                    //create new if aid not present
+                    Long sid = params.otherParams?params.otherParams.taxonId.toLong():null;
+                    String relationship = "synonym"; //params.relationship?:null;
+
+                    if(params.act == 'delete') {
+                        if(params.otherParams) {
+                            result = speciesService.deleteSynonym(sid, params.aid);
+                        } else {
+                            //NOT POSSIBLE
+                            //result = speciesService.deleteSynonym(sid, speciesFieldId);
+                        }
+                    } else {
+                        def otherParams = null
+                        if(params.otherParams) {
+                            otherParams = params.otherParams
+                            otherParams.taxonId = params.aid;
+                            otherParams['source'] = params.synComSource; //'DUMMY';    //params.source;
+                            otherParams['contributor'] = params.contributor;
+                        }
+                        value = params.synComName;
+                        result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value, otherParams);
+                    }
+                }else if(params.modifyingFor == 'common'){
+                
+                }
+                break;
+
                 default :
                 msg=messageSource.getMessage("default.species.incorrect.datatype", null, RCU.getLocale(request))
                 result=['success':false, msg:msg];
