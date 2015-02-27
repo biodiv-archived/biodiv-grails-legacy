@@ -12,6 +12,9 @@ import species.Species;
 import species.ScientificName.TaxonomyRank
 import species.Synonyms;
 import species.CommonNames;
+import species.NamesMetadata.NameStatus;
+import species.NamesMetadata.NamePosition;
+import species.auth.SUser;
 
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.Method.GET
@@ -21,6 +24,8 @@ import groovy.sql.Sql
 import groovy.util.XmlParser
 import grails.converters.JSON;
 import wslite.soap.*
+import species.NamesParser;
+import species.sourcehandler.XMLConverter;
 
 class NamelistService {
    
@@ -51,6 +56,8 @@ class NamelistService {
 
 	def dataSource
     def groupHandlerService
+    def springSecurityService;
+    def taxonService;
 
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
@@ -412,12 +419,11 @@ class NamelistService {
 			return
 		}
 		
-		addNameToIBPHirarchyFromCol(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
-		//addNameToIBPHirarchyFromCol(new File(sourceDir, Synonyms.class.simpleName), Synonyms.class)
+		curateName(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
+		//curateName(new File(sourceDir, Synonyms.class.simpleName), Synonyms.class)
 	}
 	
-	
-	private void addNameToIBPHirarchyFromCol(File domainSourceDir, domainClass){
+	void curateName(File domainSourceDir, domainClass){
 		if(!domainSourceDir.exists()){
 			log.debug "Source dir does not exist. ${domainSourceDir} Aborting now..."
 			return
@@ -435,43 +441,254 @@ class NamelistService {
 			}
 			offset += BATCH_SIZE
 			tds.each {
-				log.debug  "===== starting " + it.canonicalForm + "   index >>>>>> " + (++i)
-				processColData(new File(domainSourceDir, "" + it.id + ".xml"), it)
+                curateName(it, domainSourceDir);
 			}
 		}
 	}
 	
-	private void processColData(File f, ScientificName sciName){
+    void curateName (ScientificName sciName, File domainSourceDir) {
+        File f = new File(domainSourceDir, "" + sciName.id + ".xml")
+        log.debug  "===== starting " + f
+        List colData = processColData( f );
+        curateName(sciName, colData);
+    }
+
+    void curateName (ScientificName sciName, List colData) {
+        log.debug "Curating name ${sciName} with col data ${colData}"
+        def acceptedMatch;
+
+        if(!colData) return;
+
+        //check if this is a single direct match
+        if(colData.size() == 1 ) {
+            //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
+            if(sciName.status != NameStatus.COMMON && colData['name_status'] == NamesMetadata.COLNameStatus.COMMON.value()) {
+                //reject ... position remains DIRTY
+                log.debug "${sciName} is a sciname but it is common name as per COL. So leaving this name for curation"
+                return;
+            } else {
+                log.debug "There is only a single match on col for this name. So accepting name match"
+                acceptedMatch = colData[0]
+            }
+        } else {
+            log.debug "There are multiple matches on COL for this name. Trying to filter out"
+            //multiple match case
+            Map colNames = [:];
+            NamesParser namesParser = new NamesParser();
+            colData.each { colMatch ->
+                def colMatchVerbatim = colMatch.name;
+                if(colMatch.authorString) {
+                    colMatchVerbatim = colMatch.name + " " + colMatch.authorString
+                }
+                def parsedNames = namesParser.parse([colMatchVerbatim]);
+                colMatchVerbatim = parsedNames[0].normalizedForm;
+                colMatch['parsedName'] = parsedNames[0];
+                colMatch['parsedRank'] = XMLConverter.getTaxonRank(colMatch.rank);
+                if(!colNames[colMatchVerbatim]) {
+                    colNames[colMatchVerbatim] = [];
+                }
+                colNames[colMatchVerbatim] << colMatch;
+            }
+
+            if(!colNames[sciName.normalizedForm]) {
+                log.debug "No verbatim match for ${sciName.name}"
+            }
+            else if(colNames[sciName.normalizedForm].size() == 1) {
+                //generate and compare verbatim. If verbatim matches with a single match accept. 
+                acceptedMatch = colNames[sciName.normalizedForm][0]
+                log.debug "Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
+            } else {
+                //checking only inside all matches of verbatim
+                log.debug "There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
+                int noOfMatches = 0;
+                colNames[sciName.normalizedForm].each { colMatch ->
+                    //If Verbatims match with multiple matches, then match with verbatim+rank.
+                    if(colMatch.parsedName.normalizedForm == sciName.normalizedForm && colMatch.parsedRank == sciName.rank) {
+                        noOfMatches++;
+                        acceptedMatch = colMatch;
+                    }
+                }
+                if(noOfMatches == 1) {
+                    //acceptMatch
+                    log.debug "Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                } else if(noOfMatches == 0) {
+                    log.debug "No match on verbatim + rank"
+                    acceptedMatch = null;
+                    //If verbatim shows no match, and the original has no author year, compare Canonical+ rank.  If matched with single match exists accept match. 
+                    if(sciName.authorYear) {
+                    
+                        //If original has author year and no match exists, leave for curation (if author info exists and only canonical+rank match is considered, errors may occur eg: Aq matched with Ax, Ay and Az)(comparing hierarchies to further match will not help as a single name on IBP can have multiple hierarchies).
+                        log.debug "As there is no author year info .. leaving name for manual curation"
+                    } else {
+                        //comparing Canonical + rank
+                        log.debug "Comparing now with canonical + rank"
+                        noOfMatches = 0;
+                        colNames[sciName.normalizedForm].each { colMatch ->
+                            //If no match exists with Verbatim+rank and there is no author year info then match with canonical+rank.
+                            if(colMatch.parsedName.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
+                                noOfMatches++;
+                                acceptedMatch = colMatch;
+
+                            }
+                        }
+                        if(noOfMatches == 1) {
+                            //acceptMatch
+                            log.debug "Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                        } else {
+                            acceptedMatch = null;
+                            log.debug "No single match on canonical+rank... leaving name for manual curation"
+                        }
+                    }
+                } else if (noOfMatches > 1) {
+                    acceptedMatch = null;
+                    log.debug "Multiple matches even on verbatim + rank. So leaving name for manual curation"
+                }
+
+            }
+        }
+       
+        if(acceptedMatch) {
+            log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
+            //if sciName_status != colData[name_status] update status
+            updateStatus(sciName, acceptedMatch);
+            updateRank(sciName, acceptedMatch.parsedRank);            
+            addIBPHierarchyFromCol(sciName, fetchTaxonRegistryData(acceptedMatch));            
+            updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
+
+            if(!sciName.hasErrors() && sciName.save(flush:true)) {
+                log.debug "Saved sciname ${sciName}"        
+            } else {
+                sciName.errors.allErrors.each { log.error it }
+            }
+        } else {
+            log.debug "No accepted match in colData. So leaving name in dirty list for manual curation"
+        }
+    }
+
+    boolean updateStatus(ScientificName sciName, Map colMatch) {
+        if(sciName.status.value() != colMatch.name_status) {
+            log.debug "Changing status from ${sciName.status} to ${colMatch.name_status}"
+            //check if there is another taxon with same name and rank and changed status
+            boolean duplicateExists = checkForDuplicateSciNameOnStatusAndRank(sciName, colMatch.name_status, colMatch.parsedRank);
+            if(duplicateExists) {
+                log.debug "Changing status is resulting in a duplicate name with same status and rank... so leaving name for curation"
+                return false;
+            }
+
+            //changing status
+            sciName.status = getNewNameStatus(colMatch.name_status);
+            switch(sciName.status) {
+                case NameStatus.ACCEPTED : 
+                    
+                case NameStatus.SYNONYM :                     
+                    //delete the name from sciName.class table and add it to name_status table
+                    //if the changed status is Synonym and its accepted name doesn't exist create it
+                    colMatch.acceptedNamesList.each { colAcceptedNameData ->
+                        ScientificName acceptedName = checkIfSciNameExists(colAcceptedNameData);
+                        if(!acceptedName) {
+                            //create acceptedName
+                            log.debug "Creating accepted name of this synonym as it doesnt exist"
+                            acceptedName = saveAcceptedName(colAcceptedNameData); 
+                        }
+                        //update acceptedName property for this synonym  
+                        sciName.taxonConcept = acceptedName
+                        //CHK: there is only one accepted name for a synonym ... this won't work
+                        saveSynonym(sciName);
+                    }
+                    break;
+            }
+        }
+    }
+
+    private boolean checkForDuplicateSciNameOnStatusAndRank(ScientificName sciName, String name_status, int rank) {
+        def taxonConcept = sciName.class.withCriteria() {
+            ne ('id', sciName.id)
+            eq ('status', name_status)
+            eq ('rank', rank)
+        }
+        if(taxonConcept)  return true;
+        return false;
+    }
+
+    private NameStatus getNewNameStatus(String name_status) {
+        if(!name_status) return null;
+		for(NameStatus s : NameStatus){
+			if(s.value().equalsIgnoreCase(name_status))
+				return s
+		}
+        return null;
+    }
+    
+    private ScientificName checkIfSciNameExists(Map colAcceptedNameData) {
+        return searchIBP(colAcceptedNameData.name);
+    }
+    
+    ScientificName saveAcceptedName(Map colAcceptedNameData) {
+
+        def classification = Classification.findByName(IBP_TAXONOMIC_HIERARCHY);
+        List taxonRegistryNames = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
+        SUser contributor = springSecurityService.currentUser;
+
+        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, null);
+        def acceptedName = res.newlyCreatedName;
+        return acceptedName;
+    }
+
+    private boolean saveSynonym(ScientificName sciName) {
+    }
+
+    private void updateRank(ScientificName sciName, int rank) {
+        if(sciName.rank != rank) {
+            log.debug "Updating rank from ${sciName.rank} to ${rank}"
+            sciName.rank = rank;
+        }
+    }
+        
+    private boolean addIBPHierarchyFromCol(ScientificName sciName, Map colTaxonRegistryData) {
+
+        def classification = Classification.findByName(IBP_TAXONOMIC_HIERARCHY);
+        List taxonRegistryNames = fetchTaxonRegistryData(colTaxonRegistryData).taxonRegistry;
+        SUser contributor = springSecurityService.currentUser;
+        def result = taxonService.addTaxonHierarchy(colTaxonRegistryData.name, taxonRegistryNames, classification, contributor, null, false, true, null);
+        return result.success;
+    }
+
+    boolean updatePosition(ScientificName sciName, NamePosition position) {
+        sciName.position = position;
+    }
+
+	List processColData(File f) {
 		if(!f.exists()){
-			log.debug "File not found for sciName ${sciName} skipping now..."
+			log.debug "File not found skipping now..."
 			return
 		}
 		def results = new XmlParser().parse(f)
 		
 		String errMsg = results.'@error_message'
 		int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
-		if(errMsg != ""){
+		 if(errMsg != ""){
 			log.debug "Error in col response " + errMsg
 			return
 		}
 		
-		if(resCount != 1 ){
-			log.debug "Multiple result found [${resCount}]. so skipping this ${sciName} for manual curation"
+		/*if(resCount != 1 ){
+			log.debug "Multiple result found [${resCount}]. so skipping this ${f.name} for manual curation"
 			return
-		}
+		}*/
 		
 		//Every thing is fine so now populating CoL info
 		List res = responseAsMap(results, "id")
 		
 		log.debug "================   Response map   =================="
 		log.debug res
-		log.debug "=========ui map ==========="
+		/*log.debug "=========ui map ==========="
 		def newRes = fetchTaxonRegistryData(res[0])
-		newRes['nameDbInstance'] = sciName
+		//newRes['nameDbInstance'] = sciName
 		log.debug newRes
 		log.debug "================   Response map   =================="
+        */
+        return res
 	}
-	
 	
 	private Map fetchTaxonRegistryData(Map m) {
 		def result = [:]

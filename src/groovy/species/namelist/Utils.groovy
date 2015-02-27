@@ -13,13 +13,14 @@ import groovy.util.XmlParser
 import species.participation.Recommendation;
 import species.participation.Observation;
 import species.Species;
+import species.NamesMetadata;
 
 class Utils {
 
 	private static final String COL_SITE = 'http://www.catalogueoflife.org'
 	private static final String COL_URI = '/annual-checklist/2014/webservice'
 	
-	private static final int BATCH_SIZE = 100000
+	private static final int BATCH_SIZE = 100
 	private static final log = LogFactory.getLog(this);
 
 	private static final String ACCEPTED_NAME = "accepted name"
@@ -28,6 +29,9 @@ class Utils {
 	private static final String COMMON_NAME = "common name"
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
+	
+    private static final int MAX_TO_DOWNLOAD = BATCH_SIZE * 2;
+
 
 	static void generateColStats(String sourceDir){
 		File f = new File(sourceDir)
@@ -38,7 +42,6 @@ class Utils {
 		generateReport(f, TaxonomyDefinition.class)
 		generateReport(f, Synonyms.class)
 	}
-	
 	
 	private static generateReport(File soruceDir, Class c){
 		File taxonSourceDir = new File(soruceDir, c.simpleName)
@@ -218,19 +221,23 @@ class Utils {
         if(domainClass == Synonyms.class) {
             sortBy = 'id'
         }
-		while(true){ 
-			List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
-			tds.each {
-				println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 
-			}
-			if(tds.isEmpty()){
-				break
-			}
-			offset += BATCH_SIZE
-			tds.each { 
-				println "===== Searching name " + it.canonicalForm + "   index >>>>>> " + (++i)  	
-				saveFile(sourceDir, it)
-			}
+
+        List tds;
+		while(MAX_TO_DOWNLOAD == -1 || offset + BATCH_SIZE < MAX_TO_DOWNLOAD){ 
+            domainClass.withNewTransaction([readOnly:true]) { status ->
+                tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+                tds.each {
+                    println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 
+                }
+                offset += BATCH_SIZE
+                tds.each { 
+                    println "===== Searching name " + it.canonicalForm + "   index >>>>>> " + (++i)  	
+                    saveFile(sourceDir, it)
+                }
+            }
+            if(tds.isEmpty()){
+                break; 
+            }
 		}
 	}
 	

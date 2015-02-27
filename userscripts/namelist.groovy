@@ -1,17 +1,37 @@
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 import species.TaxonomyRegistry
+import species.TaxonomyDefinition
 
 import species.namelist.Utils
 import species.Classification
+import species.ScientificName
+
+import groovy.io.FileType
+
+nSer = ctx.getBean("namelistService");
 
 def migrate(){
-	def nSer = ctx.getBean("namelistService")
-	nSer.populateInfoFromCol(new File("/home/sandeept/col"))
+    nSer.populateInfoFromCol(new File('col_feb24'));
 	println "done "
 }
 
-migrate()
+def migrateFromDir(domainSourceDir) {
+    domainSourceDir.eachFileRecurse (FileType.FILES) { file ->
+        curateName(file.name.replace('.xml','').toLong())
+    }
+}
+
+def curateName(taxonId, domainSourceDir) {
+    List colData = nSer.processColData(new File(domainSourceDir, taxonId+'.xml'));
+    ScientificName sciName = TaxonomyDefinition.read(taxonId);
+    nSer.curateName(sciName, colData);
+}
+
+File domainSourceDir = new File("col_feb24/TaxonomyDefinition");
+//migrate()
+//migrateFromDir(domainSourceDir);
+curateName(30075, domainSourceDir);
 
 /*
 def startDate = new Date()

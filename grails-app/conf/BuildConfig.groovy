@@ -135,7 +135,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-        build   ":tomcat:7.0.52.1"
+        build   ":tomcat:7.0.54"
         //build ":tomcat8:8.0.5"
         //build ':jetty:2.0.3'
 
@@ -146,7 +146,7 @@ grails.project.dependency.resolution = {
         }
 //        runtime ":database-migration:1.4.0"
 
-        compile ':hibernate:3.6.10.15'
+        compile ':hibernate:3.6.10.16'
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
         runtime ":resources:1.2.8"

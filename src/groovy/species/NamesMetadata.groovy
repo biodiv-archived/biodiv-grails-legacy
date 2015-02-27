@@ -61,6 +61,39 @@ abstract class NamesMetadata extends NamesSorucedata {
 		}
 	}
 
+	public enum COLNameStatus {
+        ACCEPTED("accepted name"),
+        COMMON("common name"),
+        SYNONYM("synonym"),
+        MISAPPLIED("misapplied name"),
+        AMBIGUOUS_SYNONYM("ambiguous synonym"),
+        PROV_ACCEPTED("provisionally accepted name");
+
+		private String value;
+
+		COLNameStatus(String value) {
+			this.value = value;
+		}
+
+		static list() {
+			[
+				ACCEPTED,
+				SYNONYM,
+                AMBIGUOUS_SYNONYM,
+				PROV_ACCEPTED,
+				COMMON
+			]
+		}
+
+		String value() {
+			return this.value;
+		}
+
+		String toString() {
+			return this.value();
+		}
+	}
+
 	public enum IbpSource {
 		SPECIES("Species"),
 		OBSERVATION("Observation"),

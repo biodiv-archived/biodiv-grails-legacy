@@ -1616,11 +1616,15 @@ class XMLConverter extends SourceConverter {
      */
     static int getTaxonRank(String rankStr) {
         MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
-        def request = RequestContextHolder.currentRequestAttributes().request
+        def request = null;
+        try {
+            request = RequestContextHolder.currentRequestAttributes().request
+        } catch (e) {
+            log.debug "No thread bound request"
+        }
 
         for(TaxonomyRank type : TaxonomyRank) {
-            String message = messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request));
-            println type.value()+"  "+ message + "   "+rankStr
+            String message = request ? messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request)) : type.value()
             if(type.value().equalsIgnoreCase(rankStr) || message.equalsIgnoreCase(rankStr)) {
                 return type.ordinal();
             }
