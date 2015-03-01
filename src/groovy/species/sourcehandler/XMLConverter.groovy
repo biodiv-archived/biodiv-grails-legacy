@@ -1521,11 +1521,11 @@ class XMLConverter extends SourceConverter {
                                     println "=========EXTERNAL ID===== " + externalId
                                     def ctx = ApplicationHolder.getApplication().getMainContext();
                                     namelistService = ctx.getBean("namelistService");
-                                    def res = namelistService.searchCOL(externalId, 'id')[0];
-                                    println "=========NAMESTATUS===== " + res
-                                    println "=========NAME STATUS============ " + res.nameStatus +"======= " + res.nameStatus.getClass();
+                                    String nameStatus = otherParams.nameStatus ?: namelistService.searchCOL(externalId, 'id')[0];
+                                    println "=========NAMESTATUS===== " + nameStatus
+                                    println "=========NAME STATUS============ " + nameStatus +"======= " + nameStatus.getClass();
                                     def finalNameStatus;
-                                    switch(res.nameStatus) {
+                                    switch(nameStatus) {
                                         case ["accepted","provisionally"] :
                                         finalNameStatus = NameStatus.ACCEPTED;
                                         break

@@ -1235,10 +1235,10 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def deleteSynonym(Synonyms oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
-        
+       println oldSynonym; 
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
-                messagesourcearg[0] = synonymId;
+            messagesourcearg[0] = oldSynonym.id;
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 

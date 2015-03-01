@@ -58,6 +58,8 @@ class NamelistService {
     def groupHandlerService
     def springSecurityService;
     def taxonService;
+    def grailsApplication;
+    def speciesService;
 
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
@@ -464,16 +466,16 @@ class NamelistService {
         //check if this is a single direct match
         if(colData.size() == 1 ) {
             //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
-            if(sciName.status != NameStatus.COMMON && colData['name_status'] == NamesMetadata.COLNameStatus.COMMON.value()) {
+            if(sciName.status != NameStatus.COMMON && colData['nameStatus'] == NamesMetadata.COLNameStatus.COMMON.value()) {
                 //reject ... position remains DIRTY
-                log.debug "${sciName} is a sciname but it is common name as per COL. So leaving this name for curation"
+                log.debug "[REJECTING AS NAME IS COMMON NAME] ${sciName} is a sciname but it is common name as per COL. So leaving this name for curation"
                 return;
             } else {
-                log.debug "There is only a single match on col for this name. So accepting name match"
+                log.debug "[CANONICAL : SINGLE MATCH] There is only a single match on col for this name. So accepting name match"
                 acceptedMatch = colData[0]
             }
         } else {
-            log.debug "There are multiple matches on COL for this name. Trying to filter out"
+            log.debug "[CANONICAL : MULTIPLE MATCHES] There are multiple matches on COL for this name. Trying to filter out."
             //multiple match case
             Map colNames = [:];
             NamesParser namesParser = new NamesParser();
@@ -493,18 +495,20 @@ class NamelistService {
             }
 
             if(!colNames[sciName.normalizedForm]) {
-                log.debug "No verbatim match for ${sciName.name}"
+                log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
             }
             else if(colNames[sciName.normalizedForm].size() == 1) {
                 //generate and compare verbatim. If verbatim matches with a single match accept. 
                 acceptedMatch = colNames[sciName.normalizedForm][0]
-                log.debug "Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
+                log.debug "[VERBATIM : SINGLE MATCH] Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
             } else {
                 //checking only inside all matches of verbatim
-                log.debug "There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
+                log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
                 int noOfMatches = 0;
                 colNames[sciName.normalizedForm].each { colMatch ->
                     //If Verbatims match with multiple matches, then match with verbatim+rank.
+                    println colMatch
+                    println sciName.rank
                     if(colMatch.parsedName.normalizedForm == sciName.normalizedForm && colMatch.parsedRank == sciName.rank) {
                         noOfMatches++;
                         acceptedMatch = colMatch;
@@ -512,9 +516,9 @@ class NamelistService {
                 }
                 if(noOfMatches == 1) {
                     //acceptMatch
-                    log.debug "Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                    log.debug "[VERBATIM+RANK : SINGLE MATCH] Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 } else if(noOfMatches == 0) {
-                    log.debug "No match on verbatim + rank"
+                    log.debug "[VERBATIM+RANK : NO MATCH] No match on verbatim + rank"
                     acceptedMatch = null;
                     //If verbatim shows no match, and the original has no author year, compare Canonical+ rank.  If matched with single match exists accept match. 
                     if(sciName.authorYear) {
@@ -535,15 +539,15 @@ class NamelistService {
                         }
                         if(noOfMatches == 1) {
                             //acceptMatch
-                            log.debug "Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                            log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                         } else {
                             acceptedMatch = null;
-                            log.debug "No single match on canonical+rank... leaving name for manual curation"
+                            log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
                         }
                     }
                 } else if (noOfMatches > 1) {
                     acceptedMatch = null;
-                    log.debug "Multiple matches even on verbatim + rank. So leaving name for manual curation"
+                    log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
                 }
 
             }
@@ -551,37 +555,38 @@ class NamelistService {
        
         if(acceptedMatch) {
             log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
-            //if sciName_status != colData[name_status] update status
+            //if sciName_status != colData[nameStatus] update status
             updateStatus(sciName, acceptedMatch);
             updateRank(sciName, acceptedMatch.parsedRank);            
-            addIBPHierarchyFromCol(sciName, fetchTaxonRegistryData(acceptedMatch));            
+            addIBPHierarchyFromCol(sciName, acceptedMatch);            
             updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
 
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
+                println sciName.position
                 log.debug "Saved sciname ${sciName}"        
             } else {
                 sciName.errors.allErrors.each { log.error it }
             }
         } else {
-            log.debug "No accepted match in colData. So leaving name in dirty list for manual curation"
+            log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
         }
     }
 
     boolean updateStatus(ScientificName sciName, Map colMatch) {
-        if(sciName.status.value() != colMatch.name_status) {
-            log.debug "Changing status from ${sciName.status} to ${colMatch.name_status}"
+        if(!sciName.status.value().equalsIgnoreCase(colMatch.nameStatus)) {
+            log.debug "Changing status from ${sciName.status} to ${colMatch.nameStatus}"
             //check if there is another taxon with same name and rank and changed status
-            boolean duplicateExists = checkForDuplicateSciNameOnStatusAndRank(sciName, colMatch.name_status, colMatch.parsedRank);
+            boolean duplicateExists = checkForDuplicateSciNameOnStatusAndRank(sciName, getNewNameStatus(colMatch.nameStatus), colMatch.parsedRank);
             if(duplicateExists) {
                 log.debug "Changing status is resulting in a duplicate name with same status and rank... so leaving name for curation"
                 return false;
             }
 
             //changing status
-            def newStatus = getNewNameStatus(colMatch.name_status);
+            def newStatus = getNewNameStatus(colMatch.nameStatus);
             switch(newStatus) {
                 case NameStatus.ACCEPTED : 
-                    def result = speciesService.deleteSynonym(sciName);
+                    def result = speciesService.deleteSynonym(sciName.id);
                     if(!result.success) {
                         log.debug "Error in deleting synonym ${sciName}. Not updating status."
                     }
@@ -603,20 +608,20 @@ class NamelistService {
         }
     }
 
-    private boolean checkForDuplicateSciNameOnStatusAndRank(ScientificName sciName, String name_status, int rank) {
+    private boolean checkForDuplicateSciNameOnStatusAndRank(ScientificName sciName, NameStatus nameStatus, int rank) {
         def taxonConcept = sciName.class.withCriteria() {
             ne ('id', sciName.id)
-            eq ('status', name_status)
+            eq ('status', nameStatus)
             eq ('rank', rank)
         }
         if(taxonConcept)  return true;
         return false;
     }
 
-    private NameStatus getNewNameStatus(String name_status) {
-        if(!name_status) return null;
+    private NameStatus getNewNameStatus(String nameStatus) {
+        if(!nameStatus) return null;
 		for(NameStatus s : NameStatus){
-			if(s.value().equalsIgnoreCase(name_status))
+			if(s.value().equalsIgnoreCase(nameStatus))
 				return s
 		}
         return null;
@@ -632,15 +637,8 @@ class NamelistService {
             //create acceptedName
             log.debug "Creating accepted name of this synonym as it doesnt exist"
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
-
-            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-            List taxonRegistryNames = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
-            SUser contributor = springSecurityService.currentUser;
-
-            def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, [metadata:[source:'COL', authorString:colAcceptedNameData.authorString]]);
-            //[metadata:[source:, via, authorString:, id_details:[name], spellCheck, oldTaxonId,  ]]
-
-            acceptedName = res.newlyCreatedName;
+            def result = addIBPHierarchyFromCol(acceptedName, colAcceptedNameData);
+            acceptedName = result.newlyCreatedName;
         }
 
         return acceptedName;
@@ -670,16 +668,25 @@ class NamelistService {
         }
     }
         
-    private boolean addIBPHierarchyFromCol(ScientificName sciName, Map colTaxonRegistryData) {
+    private def  addIBPHierarchyFromCol(ScientificName sciName, Map colAcceptedNameData) {
 
-        def classification = Classification.findByName(IBP_TAXONOMIC_HIERARCHY);
-        List taxonRegistryNames = fetchTaxonRegistryData(colTaxonRegistryData).taxonRegistry;
-        SUser contributor = springSecurityService.currentUser;
-        def result = taxonService.addTaxonHierarchy(colTaxonRegistryData.name, taxonRegistryNames, classification, contributor, null, false, true, null);
-        return result.success;
+        def fieldsConfig = grailsApplication.config.speciesPortal.fields
+        def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+        Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
+        List taxonRegistryNames = [];
+        taxonRegistryNamesTemp.each { key, value ->
+            taxonRegistryNames[Integer.parseInt(key)] = value;
+        }
+
+        log.debug "Adding ${classification} ${taxonRegistryNames}"
+        SUser contributor = springSecurityService.currentUser?:SUser.findByName('admin');
+        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
+        println result
+        return result;
     }
 
     boolean updatePosition(ScientificName sciName, NamePosition position) {
+        log.debug "Updating position from ${sciName.position} to ${position}"
         sciName.position = position;
     }
 

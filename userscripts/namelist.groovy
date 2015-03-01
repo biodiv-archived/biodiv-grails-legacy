@@ -32,7 +32,7 @@ def curateName(taxonId, domainSourceDir) {
 File domainSourceDir = new File("col_feb24/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-curateName(30075, domainSourceDir);
+curateName(167956, domainSourceDir);
 
 /*
 def startDate = new Date()
@@ -115,7 +115,7 @@ def addIBPTaxonHie() {
     println "====DONE======"
 }
 
-addIBPTaxonHie();
+//addIBPTaxonHie();
 
 /*
 #alter table classification alter column language_id drop not null;
