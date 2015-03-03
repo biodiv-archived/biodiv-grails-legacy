@@ -50,6 +50,7 @@ class SpeciesController extends AbstractObjectController {
     def activityFeedService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
+    def namelistService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -619,7 +620,7 @@ class SpeciesController extends AbstractObjectController {
 
                 if(params.act == 'delete') {
                     if(params.otherParams) {
-                        result = speciesService.deleteSynonym(sid, params.otherParams.taxonId);
+                        result = speciesService.deleteSynonym(sid, null, params.otherParams.taxonId);
                     } else {
                         result = speciesService.deleteSynonym(sid, speciesFieldId);
                     }
@@ -681,17 +682,34 @@ class SpeciesController extends AbstractObjectController {
                 //if accepted name exists use it
                 //else create and match to COL
                 case 'accepted':
+                def resMsg = '';
                 println "=====HELLO HERE========"
                 if(params.modifyingFor == 'synonym') {
                     //get aid if not present
                     //and put in params aid
                     //create new if aid not present
+                    if(!params.aid){
+                        NamesParser namesParser = new NamesParser();
+                        List<TaxonomyDefinition> taxDefs = namesParser.parse([value]);
+                        TaxonomyDefinition taxDef = taxDefs[0];
+                        namelistService.curateName(taxDef);
+                        if(taxDef.id){
+                            params.aid = taxDef.id
+                            println "========NEW ID CREATED ====== " + taxDef.id
+                            resMsg = "Successfully created " + value + " as new accepted name using COL attributes and added " + params.synComName + " as a synonym to it."
+                        }else {
+                            println "========NO ACCPTED NAME ====== "
+                            def result1 = ['success': false, 'msg':'Could not create an accepted name of ' + value]
+                            render result1 as JSON
+                            return;
+                        }
+                    }
                     Long sid = params.otherParams?params.otherParams.taxonId.toLong():null;
                     String relationship = "synonym"; //params.relationship?:null;
 
                     if(params.act == 'delete') {
                         if(params.otherParams) {
-                            result = speciesService.deleteSynonym(sid, params.aid);
+                            result = speciesService.deleteSynonym(sid, null, params.aid);
                         } else {
                             //NOT POSSIBLE
                             //result = speciesService.deleteSynonym(sid, speciesFieldId);
@@ -706,6 +724,12 @@ class SpeciesController extends AbstractObjectController {
                         }
                         value = params.synComName;
                         result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value, otherParams);
+                        result.newSynComId = result.dataInstance?.id.toString();
+                        result.dataId = params.aid;
+                        if(result.success) {
+                            result.msg = resMsg;
+                        }
+
                     }
                 }else if(params.modifyingFor == 'common'){
                 
@@ -721,7 +745,7 @@ class SpeciesController extends AbstractObjectController {
                 def feedInstance;
                 if(result.activityType) {
                     if(result.taxonConcept) {
-                        result['dataId'] = result.dataInstance?.id.toString()
+                        result['dataId'] = result.dataId?:result.dataInstance?.id.toString()
                         feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType);
                     } else {
                         feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
@@ -746,13 +770,13 @@ class SpeciesController extends AbstractObjectController {
                         utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParamsForMail);
                     }
                 }
+                println "---------RESULT---- " + result
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
                 result.remove('synonymInstance');
                 result.remove('taxonConcept');
             }
-
             render result as JSON
             return;
         } catch(Exception e) {

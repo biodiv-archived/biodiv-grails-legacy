@@ -457,6 +457,11 @@ class NamelistService {
         curateName(sciName, colData);
     }
 
+    void curateName (ScientificName sciName) {
+        List res = searchCOL(sciName.canonicalForm, 'name');
+        curateName(sciName, res);
+    }
+
     void curateName (ScientificName sciName, List colData) {
         log.debug "Curating name ${sciName} with col data ${colData}"
         def acceptedMatch;
@@ -473,6 +478,13 @@ class NamelistService {
             } else {
                 log.debug "[CANONICAL : SINGLE MATCH] There is only a single match on col for this name. So accepting name match"
                 acceptedMatch = colData[0]
+                def  colMatchVerbatim = acceptedMatch.name + " " + acceptedMatch.authorString
+                NamesParser namesParser = new NamesParser();
+                def parsedNames = namesParser.parse([colMatchVerbatim]);
+                colMatchVerbatim = parsedNames[0].normalizedForm;
+                acceptedMatch['parsedName'] = parsedNames[0];
+                acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
+                println "============ACCEPTED MATCH ======= " + acceptedMatch
             }
         } else {
             log.debug "[CANONICAL : MULTIPLE MATCHES] There are multiple matches on COL for this name. Trying to filter out."
@@ -557,6 +569,7 @@ class NamelistService {
             log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
             //if sciName_status != colData[nameStatus] update status
             updateStatus(sciName, acceptedMatch);
+            println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
             updateRank(sciName, acceptedMatch.parsedRank);            
             addIBPHierarchyFromCol(sciName, acceptedMatch);            
             updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
@@ -573,6 +586,7 @@ class NamelistService {
     }
 
     boolean updateStatus(ScientificName sciName, Map colMatch) {
+        println "===========SCIENTIFIC NAME === " + sciName
         if(!sciName.status.value().equalsIgnoreCase(colMatch.nameStatus)) {
             log.debug "Changing status from ${sciName.status} to ${colMatch.nameStatus}"
             //check if there is another taxon with same name and rank and changed status
@@ -680,6 +694,13 @@ class NamelistService {
 
         log.debug "Adding ${classification} ${taxonRegistryNames}"
         SUser contributor = springSecurityService.currentUser?:SUser.findByName('admin');
+        //to match the input format
+        //getTaxonHierarchy() XMLConverter
+        def metadata1 = [:]
+		metadata1['authorString'] = colAcceptedNameData['authorString']
+		metadata1['source'] = colAcceptedNameData['source'] //col
+		metadata1['via'] = colAcceptedNameData['sourceDatabase']
+        colAcceptedNameData['metadata'] = metadata1
         def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
         return result;

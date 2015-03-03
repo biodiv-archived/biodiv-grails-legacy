@@ -957,7 +957,8 @@ class SpeciesService extends AbstractObjectService  {
             if(oldSynonym) {
                 def result
                 if(otherParams) {
-                    result = deleteSynonym(oldSynonym, taxonConcept);
+                    println "===========HERE HERE ======= " + oldSynonym +"===== "+ taxonConcept
+                    result = deleteSynonym(oldSynonym, null, taxonConcept);
                 } else {
                     result = deleteSynonym(oldSynonym, speciesInstance);
                 }

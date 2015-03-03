@@ -11,7 +11,7 @@ class TaxonomyDefinition extends ScientificName {
 
 	int rank;
 	String name;
-
+    NamesMetadata.NameStatus status = NamesMetadata.NameStatus.ACCEPTED;
 	SpeciesGroup group;
 	String threatenedStatus;
 	ExternalLinks externalLinks;
@@ -94,4 +94,5 @@ class TaxonomyDefinition extends ScientificName {
    Map fetchGeneralInfo(){
 	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }
+
 }

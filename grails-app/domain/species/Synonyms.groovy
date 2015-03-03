@@ -9,6 +9,7 @@ class Synonyms extends ScientificName {
 	RelationShip relationship;
 	TaxonomyDefinition taxonConcept;
 	
+    NamesMetadata.NameStatus status = NamesMetadata.NameStatus.ACCEPTED;
 	static constraints = {
 		name(blank : false);
 		canonicalForm(blank : false, nullable:false, unique:['relationship', 'taxonConcept']);
@@ -24,4 +25,5 @@ class Synonyms extends ScientificName {
         def rank = this.taxonConcept.rank;
         return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
     }
+	
 }

@@ -115,6 +115,10 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             $(".countObv").text(data["countObv"]);
             $(".countCKL").text(data["countCKL"]);
             $(".taxonRegId").val(data['taxonRegId']);
+            if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
+                $('.lt_family input').val('');
+                $('.lt_family input').prop("disabled", true);
+            }
             processingStop();
             if(ele == undefined) {
                 return;
@@ -374,6 +378,10 @@ function getExternalDbDetails(externalId) {
             }
             oldName = $("."+$("#rankDropDown").val()).val();
             oldRank = $("#rankDropDown").val();
+            if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
+                $('.lt_family input').val('');
+                $('.lt_family input').prop("disabled", true);
+            }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         } 
@@ -536,9 +544,11 @@ function modifyContent(ele, type) {
             form_var.find('input').attr("disabled", true);
             that.prev().html("<i class='icon-edit icon-white'></i>").attr('rel','edit');
             that.html("<i class='icon-trash'></i>");
+            processingStop();
             return false;
         }else{
             if(!confirm("Are you sure to delete?")) {
+                processingStop();
                 return false;
             } else {
                 form_var.find('input').attr("disabled", false);
@@ -573,6 +583,10 @@ function modifyContent(ele, type) {
                 that.next().html("<i class='icon-trash'></i>");
                 if(modifyType == 'delete') {
                     form_var.parent().hide();
+                }
+                if(type == 'a' || type == 'aid') {
+                    $(".taxonId").val(data['newSynComId']);
+                    $(".clickedEle .taxDefIdSelect").trigger("click");
                 }
             } else {
                 alert("Error in saving - "+data['msg']);

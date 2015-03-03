@@ -1514,6 +1514,7 @@ class XMLConverter extends SourceConverter {
                                 taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
                                 if(fromCOL) {
                                     println "=========COL SE REQUIRED==============="
+                                    taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"COL";
                                     //get its data from col and save
                                     println "=======NAME======== " + name
                                     println "========NAME KA ID ======= " + otherParams.id_details[name]
@@ -1549,16 +1550,28 @@ class XMLConverter extends SourceConverter {
                                     }
                                     println "=======FINAL NAME STATUS======= " + finalNameStatus;
                                     taxon.status = finalNameStatus; 
+                                    println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
+                                    newNameSaved = true;
                                 }
                                 // else search COL
                                 // if single acc name take in
                                 // if single synonym take its acc name and show msg, change return or this function,
                                 //if multiple reject save name with null status.
+                                else {
+                                    curateName(taxon)
+                                    if(!taxon.id){
+                                        taxon.status = null;
+                                        //even no proper match from COL
+                                        println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
+                                        newNameSaved = true;
+                                    }else {
+                                        //because new name saved from COL details
+                                        newNameSaved = false;
+                                    }
+                                }
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
-                                println "=====VARIABLE SET TRUe================================== "
-                                newNameSaved = true;
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
                             } else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
                                 def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
