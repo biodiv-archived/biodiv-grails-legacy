@@ -13,6 +13,9 @@
 
 <title>NameList - Curation Interface</title>
 <style type="text/css">
+    a.not_in_use {
+        cursor:not-allowed;
+    }
     input[type=text], select
     {
         min-height:22px !important;

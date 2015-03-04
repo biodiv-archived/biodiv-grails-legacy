@@ -126,7 +126,6 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             if($(ele).parents(".dl_content").length) {
                 $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, auto-querying CoL for up-to-date name attributes.");
                 $("#dialogMsg").modal('show');
-                //alert("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, please proceed to auto-query CoL for up-to-date name attributes.");
                 $('.queryDatabase option[value="col"]').attr("selected", "selected");
                 $('.queryString').trigger("click");
             }
@@ -144,8 +143,6 @@ function populateTabDetails(data, appendData) {
         //clearing synonyms
         reinitializeRows($("#names-tab1"));
     }
-    //$("#names-tab1 .singleRow input").val('');
-    //$("#names-tab1 .singleRow input").prop("disabled", false); 
     var synonymsList = data['synonymsList']
     if(synonymsList && synonymsList.length > 0) {
         var e = $("#names-tab1 .singleRow").first().clone();
@@ -164,8 +161,7 @@ function populateTabDetails(data, appendData) {
     if(appendData == false) {
         //clearing common names
         reinitializeRows($("#names-tab2"));
-    }//$("#names-tab2 .singleRow input").val('');
-    //$("#names-tab2 .singleRow input").prop("disabled", false); 
+    }
     var commonNamesList = data['commonNamesList'];
     if(commonNamesList && commonNamesList.length > 0) {
         var e = $("#names-tab2 .singleRow").first().clone();
@@ -186,8 +182,6 @@ function populateTabDetails(data, appendData) {
         //clearing accepted names
         reinitializeRows($("#names-tab0"));
     }
-    //$("#names-tab0 .singleRow input").val('');
-    //$("#names-tab0 .singleRow input").prop("disabled", false); 
     var acceptedNamesList = data['acceptedNamesList']
     if(acceptedNamesList && acceptedNamesList.length > 0) {
         var e = $("#names-tab0 .singleRow").first().clone();
@@ -625,21 +619,25 @@ function reinitializeRows($context) {
 function showProperTabs() {
     var nameStatus = $("#statusDropDown").val();
     if(nameStatus == 'accepted') {
+        $('#names-li1 a').removeClass('not_in_use').addClass('btn');
+        $('#names-li2 a').removeClass('not_in_use').addClass('btn');
         $('#names-li1 a').attr('data-toggle', 'tab');
         $('#names-li2 a').attr('data-toggle', 'tab');
         $('#names-li0 a').removeAttr('data-toggle');
+        $('#names-li0 a').removeClass('btn').addClass('not_in_use');
         $('#names-li1 a').tab('show');
-    }else if(nameStatus == 'synonym') {
+    }else if(nameStatus == 'synonym' || nameStatus == 'common') {
+        $('#names-li1 a').removeClass('btn').addClass('not_in_use');
+        $('#names-li2 a').removeClass('btn').addClass('not_in_use');
         $('#names-li1 a').removeAttr('data-toggle');
         $('#names-li2 a').removeAttr('data-toggle');
         $('#names-li0 a').attr('data-toggle', 'tab');
-        $('#names-li0 a').tab('show');
-    }else if(nameStatus == 'common') {
-        $('#names-li1 a').removeAttr('data-toggle');
-        $('#names-li2 a').removeAttr('data-toggle');
-        $('#names-li0 a').attr('data-toggle', 'tab');
+        $('#names-li0 a').removeClass('not_in_use').addClass('btn');
         $('#names-li0 a').tab('show');
     }else {
+        $('#names-li0 a').removeClass('not_in_use').addClass('btn');
+        $('#names-li1 a').removeClass('not_in_use').addClass('btn');
+        $('#names-li2 a').removeClass('not_in_use').addClass('btn');
         $('#names-li0 a').attr('data-toggle', 'tab');
         $('#names-li1 a').attr('data-toggle', 'tab');
         $('#names-li2 a').attr('data-toggle', 'tab');
