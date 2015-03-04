@@ -529,6 +529,7 @@ function modifyContent(ele, type) {
     if(modifyType == "edit"){
         form_var.find('input').attr("disabled", false);
         that.html("<i class='icon-ok icon-white'></i>").attr('rel','update');
+        processingStop();
         return false;
     }   
 
@@ -551,7 +552,6 @@ function modifyContent(ele, type) {
     }
     var inputs = form_var.find("input");
     $.each(inputs, function(index, value){
-        console.log($(value).attr('name') + '==== '+ $(value).val());
         p[$(value).attr('name')] = $(value).val();
     });
     p['name']  = typeName;
@@ -653,7 +653,6 @@ function postProcessOnAcceptedName() {
             $(value).parents(".tab_form").find(".addEdit").trigger("click");
         }
     });
-    console.log(e);
     var comNameRows = $("#names-tab2 input[name='value']");
     $.each(comNameRows, function(index, value){
         if($(value).val() != ''){
