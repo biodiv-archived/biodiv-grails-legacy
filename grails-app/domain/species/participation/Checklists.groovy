@@ -11,11 +11,11 @@ import org.hibernate.criterion.DetachedCriteria
 import species.License;
 import species.Reference;
 import species.Contributor;
-
 import species.auth.SUser
 import species.groups.SpeciesGroup
 import species.groups.UserGroup;
 import species.participation.ActivityFeedService
+
 import org.grails.rateable.*
 
 
@@ -56,7 +56,8 @@ class Checklists extends Observation {
 	String columns;
 	
 	//backword reference to drupal checklist for all old checlist 
-	long drupalId = -1; 
+	long drupalId = -1;
+	
 	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
@@ -99,6 +100,8 @@ class Checklists extends Observation {
 		sourceText type:'text';
 		columns type:'text';
 	}
+	
+	
 
 	def fetchColumnNames(){
 		def itr =  JSON.parse(columns).iterator()
@@ -236,4 +239,9 @@ class Checklists extends Observation {
         } 
         return
     }
+	
+	private updateLocationScale(){
+		locationScale = locationScale?:LocationScale.LOCAL
+	}
+
 }

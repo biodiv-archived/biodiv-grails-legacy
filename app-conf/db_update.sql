@@ -322,3 +322,10 @@ alter table featured add column expire_time timestamp without time zone ;
 
 #added by sathish for add references
 update species_field SET description = 'dummy' where field_id = 81 and description = '';
+
+
+
+# 2nd march 2015
+# Observation enhancement
+#update location scale colum  in checklist and observation (write actual sql)
+ALTER TABLE observation ADD COLUMN location_scale character varying(255);
