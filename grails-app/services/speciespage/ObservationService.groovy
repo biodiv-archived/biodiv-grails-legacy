@@ -94,7 +94,7 @@ class ObservationService extends AbstractObjectService {
     def resourcesService;
     def request;
     def speciesPermissionService;
-	
+	def customFieldService;
     /**
      * 
      * @param params
@@ -313,6 +313,8 @@ class ObservationService extends AbstractObjectService {
 
                     }
                 }
+				
+				customFieldService.updateCustomFields(params, observationInstance.id)
                 return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -330,6 +332,7 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
+	
     /**
      * @param params
      * @param observationInstance

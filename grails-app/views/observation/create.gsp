@@ -38,7 +38,7 @@
             %>
 
             <form class="${form_class} form-horizontal" action="${form_action}" method="POST">
-                <div class="span12 super-section">
+                 <div class="span12 super-section">
                     <div class="section">
                         <h3><g:message code="checklist.create.what.observe" /> </h3>
                         <obv:addPhotoWrapper model="['observationInstance':observationInstance, 'resourceListType':'ofObv']"></obv:addPhotoWrapper>
@@ -68,10 +68,16 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="span12 super-section"  style="clear: both">
+				 	<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
+				</div>
+                
                 <div class="span12 super-section"  style="clear: both">
                     <g:render template="addNotes" model="['observationInstance':observationInstance]"/>
                 </div>
-
+				
+				
                 <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                 <div class="span12 submitButtons">
 
@@ -146,6 +152,7 @@ $(document).ready(function(){
            }
     %>
     initializeLanguage();
+    $(".CustomField_multiselectcombo").multiselect();
 
 });
 

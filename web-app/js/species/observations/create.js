@@ -472,7 +472,8 @@ $('#addNewColumn').unbind('click').click(function(){
 $( ".date" ).datepicker({ 
     changeMonth: true,
     changeYear: true,
-    dateFormat: 'dd/mm/yy' 
+    dateFormat: 'dd/mm/yy',
+    maxDate:0
 });
 
 /**
@@ -744,6 +745,19 @@ $(document).ready(function(){
         return JSON.stringify(ck);
     }
 
+    
+    function customFieldValidation(){
+    	var result = true;
+    	$("input.CustomField_number").each(function( index ) {
+    		var val = $(this).val();
+    		if(val && !$.isNumeric(val)){
+    			$(this).closest('.control-group').addClass('error');
+    			result = false;
+    		}
+    	});
+    	
+    	return result;
+    }
     /**
      *
      */
@@ -753,6 +767,13 @@ $(document).ready(function(){
             event.preventDefault();
             return false; 		 		
         }
+        
+        if(!customFieldValidation()) {
+            alert(window.i8ln.observation.bulkObvCreate.failedCustomFieldValidation);
+            event.preventDefault();
+            return false; 		 		
+        }
+        
 
         if (document.getElementById('agreeTerms').checked) {
             $(this).addClass("disabled");
