@@ -44,7 +44,11 @@ class CustomFieldService {
 	
 	def updateCustomFields(params, obvId){
 		UserGroup ug = UserGroup.findByWebaddress(params.webaddress)
-
+		
+		if(!ug || CustomField.fetchCustomFields(ug).isEmpty()){
+			return
+		}
+		
 		def  customFieldMap = [:]
 		params.each { String k, v ->
 			if(k.startsWith(CustomField.PREFIX)){
