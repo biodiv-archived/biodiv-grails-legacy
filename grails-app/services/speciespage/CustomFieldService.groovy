@@ -19,10 +19,10 @@ class CustomFieldService {
 		obv.userGroups.collect{it}.each { ug ->
 			CustomField.fetchCustomFields(ug).each { cf ->
 				def val = fetchValue(cf, obv.id)
-				//if(val != null){
-					result << [key:cf.name, value : val]
-				//}
-				
+				if(val && (cf.dataType == CustomField.DataType.DATE)){
+					val = val.format('MMMM d, y')
+				}
+				result << [key:cf.name, value : val]
 			}
 		}
 		return result

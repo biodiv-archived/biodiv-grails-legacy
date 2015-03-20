@@ -2,16 +2,16 @@
 <div style="margin-top:8px;" class="sidebar_section">
 	<h5><g:message code="heading.customfields" /></h5>
 	<div>
-		<table class="table table-hover"
+		<table class="table"
 			style="margin-left: 0px;">
-			<tbody class="mainContentList">
+			<tbody>
 				<g:each in="${customFields}" status="i"
 					var="annot">
-					<tr class="mainContent">
+					<tr>
 						<td>
 							${annot.key}
 						</td>
-						<td class="ellipsis multiline">
+						<td>
 							${annot.value}
 						</td>
 					</tr>

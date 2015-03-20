@@ -12,11 +12,12 @@
 		}  
 		def options =  customFieldInstance.fetchOptions()
 		boolean isNumber =  (customFieldInstance.dataType == CustomField.DataType.INTEGER || customFieldInstance.dataType == CustomField.DataType.DECIMAL)
+		def mandatoryFieldClass = customFieldInstance.isMandatory ? ' mandatoryField ':''
 	  %>
       <div class="controls">
       <g:if test="${options}">
       	<g:if test="${customFieldInstance.allowedMultiple}">
-      		<select class="${CustomField.PREFIX + 'multiselectcombo'}" multiple="multiple" name="${CustomField.PREFIX + customFieldInstance.name}" >
+      		<select class="${CustomField.PREFIX + 'multiselectcombo' + mandatoryFieldClass}" multiple="multiple" title="${customFieldInstance.notes}" name="${CustomField.PREFIX + customFieldInstance.name}" >
    			<g:each in="${options}">
     				<g:if test="${it in cValue}">
         				<option selected="selected" value="${it}"> ${it}</option>
@@ -28,9 +29,10 @@
    			</select>
       	</g:if>
       	<g:else>
-      		<select class="combobox" name="${CustomField.PREFIX + customFieldInstance.name}" >
-      			<g:each in="${options}">
-    				<g:if test="${cValue == it}">
+      		<select class="${'combobox' + mandatoryFieldClass}" name="${CustomField.PREFIX + customFieldInstance.name}" title="${customFieldInstance.notes}" >
+      			<option></option>
+    			<g:each in="${options}">
+      				<g:if test="${cValue == it}">
         				<option selected="selected" value="${it}"> ${it}</option>
         			</g:if>
         			<g:else>
@@ -44,19 +46,19 @@
 	  </g:if>
 	  <g:else>
 	  	<g:if test="${CustomField.DataType.PARAGRAPH_TEXT == customFieldInstance.dataType}">
-	  		<textarea style="resize: vertical;" class="input-block-level" name="${CustomField.PREFIX + customFieldInstance.name}">${cValue}</textarea>
+	  		<textarea style="resize: vertical;" class="${'input-block-level' + mandatoryFieldClass}" title="${customFieldInstance.notes}" name="${CustomField.PREFIX + customFieldInstance.name}">${cValue}</textarea>
         </g:if>
         <g:elseif test="${CustomField.DataType.DATE == customFieldInstance.dataType}">
         	<%
 				if(cValue instanceof String)
 					cValue = species.UtilsService.parseDate(cValue)
 			%>
-        	<input name="${CustomField.PREFIX + customFieldInstance.name}" type="text" class="date" class="input-block-level"
+        	<input name="${CustomField.PREFIX + customFieldInstance.name}" title="${customFieldInstance.notes}" type="text" class="${'date input-block-level' + mandatoryFieldClass}"
         			value="${cValue?.format('dd/MM/yyyy')}"/>
         </g:elseif>
         <g:else>	
           <div class="textbox">
-              <input type="text" name="${CustomField.PREFIX + customFieldInstance.name}" value="${cValue}" class="${'input-block-level ' + (isNumber?'CustomField_number':'')}"/>
+              <input type="text" title="${customFieldInstance.notes}" name="${CustomField.PREFIX + customFieldInstance.name}" value="${cValue}" class="${'input-block-level ' + (isNumber?'CustomField_number':'') + mandatoryFieldClass}"/>
           </div>
         </g:else>  
       </g:else>    

@@ -1,7 +1,7 @@
 <%@ page import="species.groups.CustomField"%>
 
-<g:if test="${userGroupInstance}"> 
-  <div class="section" style="position: relative; overflow: visible;">
+<g:if test="${userGroupInstance && !CustomField.fetchCustomFields(userGroupInstance).isEmpty()}"> 
+  <div class="section customFieldForm" style="position: relative; overflow: visible;">
       <h3><g:message code="heading.customfields.create" /></h3>
       <div>
         <g:each var="customFieldInstance" in="${CustomField.fetchCustomFields(userGroupInstance)}">
