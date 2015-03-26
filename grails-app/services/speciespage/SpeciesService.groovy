@@ -27,6 +27,7 @@ import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
 import species.Synonyms;
+import species.SynonymsMerged;
 import species.CommonNames;
 import species.Language;
 import species.Classification;
@@ -932,9 +933,9 @@ class SpeciesService extends AbstractObjectService  {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
         println "=====2========"
-        Synonyms oldSynonym;
+        SynonymsMerged oldSynonym;
         if(synonymId) {
-            oldSynonym = Synonyms.read(synonymId);
+            oldSynonym = SynonymsMerged.read(synonymId);
 
             if(!oldSynonym) {
         println "=====a========"
@@ -979,15 +980,19 @@ class SpeciesService extends AbstractObjectService  {
             if(otherParams) {
                 new Node(data, "viaDatasource", otherParams['source']);
             }
-            List<Synonyms> synonyms = converter.createSynonyms(synonym, taxonConcept);
+            List<SynonymsMerged> synonyms = converter.createSynonyms(synonym, taxonConcept);
             
             if(!synonyms) {
                 return [success:false, msg:messageSource.getMessage("info.error.update.synonym", null, LCH.getLocale())]
             } else {
+                synonyms.each {
+                    taxonConcept.addSynonym(it);
+                }
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
-                content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
+                //content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
+                content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
                 String activityType, mailType;
                 if(oldSynonym) {
                     activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
@@ -1226,16 +1231,22 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def deleteSynonym(long synonymId, def speciesId = null, def taxonId = null) {
-        Synonyms oldSynonym;
+        SynonymsMerged oldSynonym;
         if(synonymId) {
-            oldSynonym = Synonyms.read(synonymId);
+            oldSynonym = SynonymsMerged.read(synonymId);
         }
-        Species speciesInstance = Species.get(speciesId);
+        Species speciesInstance = null;
+        if(speciesId)
+            speciesInstance = Species.get(speciesId);
 
-        return deleteSynonym(oldSynonym, speciesInstance);
+        TaxonomyDefinition taxonConcept = null;
+        if(taxonId)
+            taxonConcept = TaxonomyDefinition.get(taxonId);
+
+        return deleteSynonym(oldSynonym, speciesInstance, taxonConcept);
     }
     
-    def deleteSynonym(Synonyms oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
+    def deleteSynonym(SynonymsMerged oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
        println oldSynonym; 
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
@@ -1253,14 +1264,15 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
 
-        Synonyms.withTransaction { status ->
+        SynonymsMerged.withTransaction { status ->
             String msg = '';
             def content;
             try{
                 oldSynonym.removeFromContributors(springSecurityService.currentUser);
-                
+                taxonConcept = speciesInstance ? speciesInstance.taxonConcept : oldSynonym.taxonConcept;
+                taxonConcept.removeSynonym(oldSynonym);
                 if(oldSynonym.contributors.size() == 0) {
-                    oldSynonym.delete(failOnError:true)
+                    oldSynonym.delete(failOnError:true) //should not delete synonym entry
                 } else {
                     if(!oldSynonym.save()) {
                         oldSynonym.errors.each { log.error it }
@@ -1268,8 +1280,8 @@ class SpeciesService extends AbstractObjectService  {
                     }
                 }
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
-                taxonConcept = speciesInstance ? speciesInstance.taxonConcept : oldSynonym.taxonConcept;
-                content = taxonConcept ? Synonyms.findAllByTaxonConcept(taxonConcept) :  null;
+                //content = taxonConcept ? Synonyms.findAllByTaxonConcept(taxonConcept) :  null;
+                content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
                 return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {

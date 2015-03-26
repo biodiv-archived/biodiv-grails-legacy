@@ -4,6 +4,7 @@ import org.apache.commons.logging.LogFactory;
 
 import species.ScientificName
 import species.TaxonomyDefinition;
+import species.SynonymsMerged;
 import species.Synonyms;
 import species.NamesMetadata;
 import species.TaxonomyRegistry
@@ -60,6 +61,7 @@ class NamelistService {
     def taxonService;
     def grailsApplication;
     def speciesService;
+    def utilsService;
 
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
@@ -158,6 +160,10 @@ class NamelistService {
                     def m = [:]
                     m['id'] = it.id.text()
                     m['name'] = it.name.text() + " " + it.author.text();
+                    m['canonicalForm'] = it.name.text();
+                    m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
+                    m['rank'] = it.rank?.text()?.toLowerCase();
+                    m['authorString'] = it.author.text();
                     m['source'] = "COL"
                     aList.add(m);
                 }
@@ -287,13 +293,13 @@ class NamelistService {
 
         ///////////////////////////////
         rs.each {
-            if(it.taxonid == 269611) {
-                println "========HERE HERE============= " + it.name
-            }
             //NOT SENDING PATH
             //SENDING IDS as taxonid for synonyms and common names
-            def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
-                from synonyms s where s.taxon_concept_id = :taxonId";
+            //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+                //from synonyms s where s.taxon_concept_id = :taxonId";
+            
+            def s1 = "select s.id as taxonid, s.rank as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+                from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId";
 
             def q1 = sql.rows(s1, [taxonId:it.taxonid])
             q1.each {
@@ -393,8 +399,75 @@ class NamelistService {
         }
     }
 
-    List searchIBP(String canonicalForm) {
-        def res = TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
+    //Searches IBP accepted and synonym
+    List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank) {  
+        println "========SEARCH IBP CALLED======="
+        println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "=--- "+ rank;
+        //Decide in what class to search TaxonomyDefinition/SynonymsMerged
+        def res = [];
+        def clazz;
+        if(status == NameStatus.ACCEPTED) {
+            clazz = TaxonomyDefinition.class;
+        } else {
+            clazz = SynonymsMerged.class; 
+        }
+        println "====SEARCHING ON IBP IN CLASS ====== " + clazz
+        //FINDING BY CANONICAL
+        res = clazz.findAllWhere(canonicalForm:canonicalForm, status: status);
+
+        //CANONICAL ZERO MATCH OR SINGLE MATCH
+        if(res.size() < 2) { 
+            println "====CANONICAL - ZERO/SINGLE MATCH ====== "
+            return res;
+        }
+        //CANONICAL MULTIPLE MATCH
+        else {
+            //FINDING BY VERBATIM
+            if(!authorYear) authorYear = '';
+            res = clazz.findAllWhere(name: (canonicalForm + " " + authorYear), status: status);
+
+            //VERBATIM SINGLE MATCH
+            if(res.size() == 1) {
+                println "====VERBATIM - SINGLE MATCH ====== "
+                return res;
+            }
+
+            //VERBATIM ZERO MATCH/MULTIPLE MATCH
+            else if(res.size() > 2 || res.size() == 0) {
+                //FINDING BY VERBATIM + RANK
+                res = clazz.findAllWhere(name:(canonicalForm + " " + authorYear),rank: rank, status: status);
+
+                //VERBATIM + RANK ZERO MATCH
+                if(res.size() == 0) {
+                    if(authorYear) {
+                        println "====TRYING VERBATIM + RANK - ZERO MATCH AND ALSO HAS AUTHOR YEAR"
+                        return res;
+                    }
+                    else {
+                        //FINDING BY CANONICAL + RANK
+                        println "====TRYING VERBATIM + RANK - ZERO MATCH & NO AUTHOR YEAR - SO MATCHED ON CANONICAL + RANK"
+                        res = clazz.findAllWhere(canonicalForm:canonicalForm ,rank: rank, status: status);
+                        return res;
+                    }
+                }
+                //VERBATIM + RANK SINGLE MATCH
+                if(res.size() == 1) {
+                    println "====TRYING VERBATIM + RANK - SINGLE MATCH"
+                    return res;
+                }
+
+                //VERBATIM + RANK MULTIPLE MATCH
+                else {
+                    println "====TRYING VERBATIM + RANK - MULTIPLE MATCH"
+                    return res;
+                }
+            }
+        }
+        return res;
+    }
+    
+    List searchIBPResults(String canonicalForm, String authorYear, NameStatus status, rank) {
+        def res = searchIBP(canonicalForm, authorYear, status, rank) //TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
         def finalResult = []
         res.each { 
             def taxonConcept = TaxonomyDefinition.get(it.id.toLong());
@@ -424,7 +497,7 @@ class NamelistService {
 		}
 		
 		curateName(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
-		//curateName(new File(sourceDir, Synonyms.class.simpleName), Synonyms.class)
+		//curateName(new File(sourceDir, Synon//TaxonomyDefinition.findAllByCanonicalForm(canonicalForm)yms.class.simpleName), Synonyms.class)
 	}
 	
 	void curateName(File domainSourceDir, domainClass){
@@ -487,6 +560,16 @@ class NamelistService {
                 println "============ACCEPTED MATCH ======= " + acceptedMatch
             }
         } else {
+            if(sciName.status != NameStatus.COMMON) {
+                log.debug "[CANONICAL : MULTIPLE MATCHES] Removing names with status as common name if IBP name is not a common name"
+                def colDataTemp = [];
+                colData.each {
+                    if(it['nameStatus'] != NamesMetadata.COLNameStatus.COMMON.value()) {
+                        colDataTemp.add(it);
+                    }
+                }
+                colData = colDataTemp
+            }
             log.debug "[CANONICAL : MULTIPLE MATCHES] There are multiple matches on COL for this name. Trying to filter out."
             //multiple match case
             Map colNames = [:];
@@ -536,7 +619,7 @@ class NamelistService {
                     if(sciName.authorYear) {
                     
                         //If original has author year and no match exists, leave for curation (if author info exists and only canonical+rank match is considered, errors may occur eg: Aq matched with Ax, Ay and Az)(comparing hierarchies to further match will not help as a single name on IBP can have multiple hierarchies).
-                        log.debug "As there is no author year info .. leaving name for manual curation"
+                        log.debug "As there is author year info .. leaving name for manual curation"
                     } else {
                         //comparing Canonical + rank
                         log.debug "Comparing now with canonical + rank"
@@ -567,16 +650,20 @@ class NamelistService {
        
         if(acceptedMatch) {
             log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
-            //if sciName_status != colData[nameStatus] update status
-            updateStatus(sciName, acceptedMatch);
+            //sciName = updateAttributes(sciName, acceptedMatch);
+            //if sciName_status != colData[nameStatus] -> update status
+            sciName = updateStatus(sciName, acceptedMatch);
             println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
             updateRank(sciName, acceptedMatch.parsedRank);            
-            addIBPHierarchyFromCol(sciName, acceptedMatch);            
+            //WHY required here??
+            //addIBPHierarchyFromCol(sciName, acceptedMatch);            
             updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
-
+            println "=======SCI NAME POSITION ========== " + sciName.position
+            println "=====SCI NAME ==== " + sciName
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 println sciName.position
                 log.debug "Saved sciname ${sciName}"        
+                utilsService.cleanUpGorm(true);
             } else {
                 sciName.errors.allErrors.each { log.error it }
             }
@@ -584,30 +671,38 @@ class NamelistService {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
         }
     }
-
-    boolean updateStatus(ScientificName sciName, Map colMatch) {
+    
+    //Handles name moving from accepted to synonym & vice versa
+    //also updates IBP Hierarchy if no status change and its accepted name
+    ScientificName updateStatus(ScientificName sciName, Map colMatch) {
         println "===========SCIENTIFIC NAME === " + sciName
         if(!sciName.status.value().equalsIgnoreCase(colMatch.nameStatus)) {
             log.debug "Changing status from ${sciName.status} to ${colMatch.nameStatus}"
+            //NOW WILL BE FLAGGING IT
             //check if there is another taxon with same name and rank and changed status
+            /*
             boolean duplicateExists = checkForDuplicateSciNameOnStatusAndRank(sciName, getNewNameStatus(colMatch.nameStatus), colMatch.parsedRank);
             if(duplicateExists) {
                 log.debug "Changing status is resulting in a duplicate name with same status and rank... so leaving name for curation"
-                return false;
+                return sciName;
             }
-
+            */
             //changing status
             def newStatus = getNewNameStatus(colMatch.nameStatus);
             switch(newStatus) {
                 case NameStatus.ACCEPTED : 
+                    sciName = changeSynonymToAccepted(sciName, colMatch);
+                    /*    
                     def result = speciesService.deleteSynonym(sciName.id);
                     if(!result.success) {
                         log.debug "Error in deleting synonym ${sciName}. Not updating status."
                     }
                     sciName = saveAcceptedName(colMatch);
-                    break;
+                    */
+                    break;sciName.errors.allErrors.each { log.error it }
                 case NameStatus.SYNONYM :                     
-                    //delete the name from taxonDefinition table and add it to synonyms table
+                    sciName = changeAcceptedToSynonym(sciName, colMatch);
+                    /*//delete the name from taxonDefinition table and add it to synonyms table
                     taxonService.deleteTaxon(sciName);
                     def synonym;
                     //if the changed status is Synonym and its accepted name doesn't exist create it
@@ -615,21 +710,36 @@ class NamelistService {
                         ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
                        //update acceptedName property for this synonym  
                         synonym = saveSynonym(sciName, acceptedName);
-                    }
+                    }*/
                     break;
             }
-            sciName.status = newStatus;
+            //handling inside the cases only
+            //sciName.status = newStatus;
+        } else {        //Do when status does not change and its accepted
+            if(sciName.status == NameStatus.ACCEPTED) {
+                colMatch.curatingTaxonId = sciName.id;
+                //sciName = updateAttributes(sciName, colMatch)
+                sciName = addIBPHierarchyFromCol(colMatch).lastTaxonInIBPHierarchy;            
+            } else {
+                //sciName = updateAttributes(sciName, colMatch)
+            }
         }
+        return sciName;
     }
 
     private boolean checkForDuplicateSciNameOnStatusAndRank(ScientificName sciName, NameStatus nameStatus, int rank) {
-        def taxonConcept = sciName.class.withCriteria() {
+        def res = searchIBP(sciName.canonicalForm, sciName.authorYear, nameStatus, rank)
+        println "========RESULT FROM SEARCH IBP============ " + res;
+        /*def taxonConcept = sciName.class.withCriteria() {
             ne ('id', sciName.id)
             eq ('status', nameStatus)
             eq ('rank', rank)
         }
         if(taxonConcept)  return true;
         return false;
+        */
+        if(res.size() == 0) return false;
+        else return true;
     }
 
     private NameStatus getNewNameStatus(String nameStatus) {
@@ -641,20 +751,25 @@ class NamelistService {
         return null;
     }
     
-    private ScientificName checkIfSciNameExists(Map colAcceptedNameData) {
-        return searchIBP(colAcceptedNameData.name);
+    private List<ScientificName> checkIfSciNameExists(Map colAcceptedNameData) {
+        NameStatus status = getNewNameStatus(colAcceptedNameData.nameStatus);
+        def rank = XMLConverter.getTaxonRank(colAcceptedNameData.rank);
+        println "======PARAMS FOR SEARCH IBP ===== " + colAcceptedNameData.canonicalForm +" =--- "+colAcceptedNameData.authorString +" =--- "+ status + " =--- "+ rank;
+        def res = searchIBP(colAcceptedNameData.canonicalForm, colAcceptedNameData.authorString, status , rank);
+        println "========RESULTS of SEARCH IBP ===== " + res
+        return res;
     }
     
     ScientificName saveAcceptedName(Map colAcceptedNameData) {
-        ScientificName acceptedName = checkIfSciNameExists(colAcceptedNameData);
-        if(!acceptedName) {
+        //List<ScientificName> acceptedNameList = checkIfSciNameExists(colAcceptedNameData);
+        ScientificName acceptedName = null;
+        //if(acceptedNameList.size() == 0) {
             //create acceptedName
-            log.debug "Creating accepted name of this synonym as it doesnt exist"
+            log.debug "Creating/Updating accepted name of this synonym"
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def result = addIBPHierarchyFromCol(acceptedName, colAcceptedNameData);
-            acceptedName = result.newlyCreatedName;
-        }
-
+            def result = addIBPHierarchyFromCol(colAcceptedNameData);
+            acceptedName = result.lastTaxonInIBPHierarchy;
+        //}
         return acceptedName;
     }
 
@@ -682,18 +797,27 @@ class NamelistService {
         }
     }
         
-    private def  addIBPHierarchyFromCol(ScientificName sciName, Map colAcceptedNameData) {
-
+    //A scientific name was also passed to this function but not used - so removed
+    private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
+        //  Because - not complete details of accepted name coming
+        //  but its id is present - so searching COL based on ID
+        //  Might happen when name changes from accepeted to synonym
+        if(!colAcceptedNameData.kingdom && colAcceptedNameData.id) {
+            def temp = colAcceptedNameData.curatingTaxonId
+            colAcceptedNameData = searchCOL(colAcceptedNameData.id, 'id')[0];
+            colAcceptedNameData.curatingTaxonId = temp;
+        }
         def fieldsConfig = grailsApplication.config.speciesPortal.fields
         def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
         Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
+        println "======USE THIS ==== " + taxonRegistryNamesTemp
         List taxonRegistryNames = [];
         taxonRegistryNamesTemp.each { key, value ->
             taxonRegistryNames[Integer.parseInt(key)] = value;
         }
 
         log.debug "Adding ${classification} ${taxonRegistryNames}"
-        SUser contributor = springSecurityService.currentUser?:SUser.findByName('admin');
+        SUser contributor = springSecurityService.currentUser?:SUser.read(1L) //findByName('admin');
         //to match the input format
         //getTaxonHierarchy() XMLConverter
         def metadata1 = [:]
@@ -701,6 +825,7 @@ class NamelistService {
 		metadata1['source'] = colAcceptedNameData['source'] //col
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
+        println "=====T R N======= " + taxonRegistryNames
         def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
         return result;
@@ -745,7 +870,8 @@ class NamelistService {
 	}
 	
 	private Map fetchTaxonRegistryData(Map m) {
-		def result = [:]
+		println "=======MAP M ========= " + m
+        def result = [:]
 		def res = [:]
 		
 		result['taxonRegistry.0'] = res['0'] = m['kingdom']
@@ -1052,5 +1178,93 @@ class NamelistService {
         }
         println "======RESPONSE======== " + response
         */
+    }
+
+    public ScientificName changeSynonymToAccepted(ScientificName sciName,  Map colMatch) {
+        //Remove as synonym from all accepted names
+        sciName.removeAsSynonym();
+        //sciName = updateAttributes(sciName, colMatch)
+        //Change status and class for this row entry in database
+        sciName = updateStatusAndClass(sciName, NameStatus.ACCEPTED)
+        //Add IBP Hierarchy to this name
+        //TODO Pass on id information of last node
+        colMatch.curatingTaxonId = sciName.id;
+        sciName = addIBPHierarchyFromCol(colMatch).lastTaxonInIBPHierarchy;
+    }
+    
+    public ScientificName changeAcceptedToSynonym(ScientificName sciName,  Map colMatch) {
+        println "======PROCESS START ACCEPTED TO SYNONYM===="
+        //Attach its synonyms to the new accepted suggested by COL
+        def oldSynonyms = sciName.fetchSynonyms();
+        println "======OLD SYNONYMS OF THAT ==== " + oldSynonyms
+        //Remove as accepted name from all synonyms 
+        sciName.removeAsAcceptedName();
+        println "======REMOVED AS ACCEPTED NAME ==== "
+        
+        //sciName = updateAttributes(sciName, colMatch)
+        //Change status and class for this row entry in database
+        sciName = updateStatusAndClass(sciName, NameStatus.SYNONYM)
+        println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
+        //Save all the new accepted names or update its hierarchy
+        colMatch.acceptedNamesList.each { colAcceptedNameData ->
+            println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
+            //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
+            colAcceptedNameData.curatingTaxonId = sciName.id;
+            ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+            println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
+            //add old synonyms to this new accepted name
+            oldSynonyms.each {
+                acceptedName.addSynonym(it);
+            }
+            println "======ADDED OLD SYNONYMS ==== " + acceptedName.fetchSynonyms();
+        }
+        println "======Returning this NEW SYNONYM ==== " + sciName;
+        return sciName;
+    }
+
+    ScientificName updateStatusAndClass(ScientificName sciName, NameStatus status) {
+        def sql =  Sql.newInstance(dataSource);
+        String query = "";
+
+        if(status == NameStatus.ACCEPTED) {
+            sciName.relationship = null;
+            query = "update taxonomy_definition set class = 'species.TaxonomyDefinition' where id = " + sciName.id.toString();
+            sql.execute(query);
+            utilsService.cleanUpGorm(true);
+            sciName = TaxonomyDefinition.get(sciName.id.toLong())
+        } else {
+            query = "update taxonomy_definition set class = 'species.SynonymsMerged' where id = " + sciName.id.toString();
+            sql.execute(query);
+            utilsService.cleanUpGorm(true);
+            sciName = SynonymsMerged.get(sciName.id.toLong())
+            sciName.relationship = ScientificName.RelationShip.SYNONYM;
+        }
+        sciName.status = status;
+        return sciName;
+    }
+
+    ScientificName updateAttributes(ScientificName sciName, Map colMatch) {
+        println "=========UPDATING ATTRIBUTES ========"
+        NamesParser namesParser = new NamesParser();
+        def name = sciName.canonicalForm + " " + colMatch.authorString
+        def parsedNames = namesParser.parse([name]);
+        def pn = parsedNames[0];
+        TaxonomyDefinition.withNewSession {
+            if(pn.canonicalForm) {
+                println "============= " + pn.canonicalForm +"============= "+ pn.name
+                sciName.canonicalForm = pn.canonicalForm
+                sciName.binomialForm = pn.binomialForm
+                sciName.normalizedForm = pn.normalizedForm
+                sciName.italicisedForm = pn.italicisedForm
+                sciName.name = pn.name
+            }
+            sciName.authorYear = colMatch.authorString;
+
+            if(!sciName.save(flush:true)) {
+                sciName.errors.allErrors.each { log.error it }
+            }
+            println "=========DONE UPDATING ATTRIBUTES ========"
+            return sciName
+        }
     }
 }

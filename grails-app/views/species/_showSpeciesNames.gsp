@@ -44,7 +44,10 @@
 </g:if>
 
 <!-- Synonyms -->
-<%def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) %>
+<%
+//def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) 
+def synonyms = speciesInstance.taxonConcept.fetchSynonyms(); 
+%>
 <g:if test="${synonyms}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 

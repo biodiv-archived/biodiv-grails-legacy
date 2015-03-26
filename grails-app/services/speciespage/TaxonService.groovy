@@ -790,8 +790,11 @@ class TaxonService {
         }
         
         XMLConverter converter = new XMLConverter();
+        println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
         println "======YAHAN HAI=========";
+        println "======TAXON REGISTRY NODES ========= " + taxonRegistryNodes;
+
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
         List<TaxonomyRegistry> taxonRegistry = getClassifictaionsRes.taxonRegistry;
 /*        //check if user has permission to contribute to the taxon hierarchy
@@ -815,10 +818,20 @@ class TaxonService {
                 hier += it.taxonDefinition.name +" > "
             }
             def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, LCH.getLocale()), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors, taxonRegistry: taxonRegistry, 'spellCheckMsg':getClassifictaionsRes.spellCheckMsg]
-            if(!(taxonRegistry[-1].taxonDefinition.status)) {
+            def taxonRegistryForIBPHierarchy = null;
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def IBPClassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            taxonRegistry.each {
+                if(it.classification == IBPClassification) {
+                    taxonRegistryForIBPHierarchy = it 
+                }
+            }
+            if(taxonRegistryForIBPHierarchy && !(taxonRegistryForIBPHierarchy.taxonDefinition.status)) {
                 res['newlyCreated'] = true
                 res['newlyCreatedName'] = taxonRegistry[-1].taxonDefinition.name
             }
+            def lastTaxonInIBPHierarchy = (taxonRegistryForIBPHierarchy)?taxonRegistryForIBPHierarchy.taxonDefinition:null;
+            res['lastTaxonInIBPHierarchy'] = lastTaxonInIBPHierarchy;
             return res   
         }
         return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, LCH.getLocale()), errors:errors]

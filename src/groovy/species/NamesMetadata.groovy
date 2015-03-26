@@ -62,12 +62,12 @@ abstract class NamesMetadata extends NamesSorucedata {
 	}
 
 	public enum COLNameStatus {
-        ACCEPTED("accepted name"),
-        COMMON("common name"),
+        ACCEPTED("accepted"),
+        COMMON("common"),
         SYNONYM("synonym"),
-        MISAPPLIED("misapplied name"),
-        AMBIGUOUS_SYNONYM("ambiguous synonym"),
-        PROV_ACCEPTED("provisionally accepted name");
+        MISAPPLIED("misapplied"),
+        AMBIGUOUS_SYNONYM("ambiguous"),
+        PROV_ACCEPTED("provisionally");
 
 		private String value;
 

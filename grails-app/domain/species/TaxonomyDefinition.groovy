@@ -5,6 +5,7 @@ import java.util.List;
 import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
+import species.NamesMetadata.NameStatus;
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -21,7 +22,7 @@ class TaxonomyDefinition extends ScientificName {
 
 	static constraints = {
 		name(blank:false)
-		canonicalForm (nullable:false, unique:['rank']);
+		canonicalForm nullable:false;
 		group nullable:true;
 		isFlagged nullable:true;
 		threatenedStatus nullable:true;
@@ -31,6 +32,7 @@ class TaxonomyDefinition extends ScientificName {
 	static mapping = {
 		sort "rank"
 		version false;
+		tablePerHierarchy true
 	}
 
 	Long findSpeciesId() {
@@ -94,5 +96,28 @@ class TaxonomyDefinition extends ScientificName {
    Map fetchGeneralInfo(){
 	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }
+
+    def addSynonym(SynonymsMerged syn) {
+        AcceptedSynonym.createEntry(this, syn);
+        return;
+    }
+
+    List<SynonymsMerged> fetchSynonyms() {
+        return AcceptedSynonym.fetchSynonyms(this);
+    }
+
+    def removeSynonym(SynonymsMerged syn) {
+        if(!syn)return;
+        AcceptedSynonym.removeEntry(this, syn);
+        return;
+    }
+    
+    //Removes as accepted name from all synonyms
+    def removeAsAcceptedName() {
+        def synonyms = this.fetchSynonyms();
+        synonyms.each { syn ->
+            this.removeSynonym(syn);
+        }
+    }
 
 }

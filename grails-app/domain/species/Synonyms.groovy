@@ -9,7 +9,7 @@ class Synonyms extends ScientificName {
 	RelationShip relationship;
 	TaxonomyDefinition taxonConcept;
 	
-    NamesMetadata.NameStatus status = NamesMetadata.NameStatus.ACCEPTED;
+    NamesMetadata.NameStatus status = NamesMetadata.NameStatus.SYNONYM;
 	static constraints = {
 		name(blank : false);
 		canonicalForm(blank : false, nullable:false, unique:['relationship', 'taxonConcept']);
