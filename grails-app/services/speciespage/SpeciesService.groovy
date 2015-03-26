@@ -1878,7 +1878,7 @@ class SpeciesService extends AbstractObjectService  {
     }
 
 def checking(){
-    Field field = Field.read(81L);
+    Field field = Field.read(165L);
     
     int limit = 500, offset = 0, insert_check = 0,exist_check =0;
     while(true){
