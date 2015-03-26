@@ -24,7 +24,7 @@
     </g:if>
     </g:each>
     </select-->
-    <div class="groups_div dropdown" style="z-index:3;">
+    <div class="groups_div dropdown" style="z-index:15;">
         <div class="dropdown-toggle btn selected_group selected_value " data-toggle="dropdown">
             <span style="float:left;"
                         class="group_icon species_groups_sprites active ${SpeciesGroup.findByName('All').iconClass()}"

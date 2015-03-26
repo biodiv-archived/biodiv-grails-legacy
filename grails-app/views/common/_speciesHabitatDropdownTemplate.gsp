@@ -31,7 +31,7 @@
         <option>Unknown</option>
         </select-->	
 
-        <div class="habitat_div dropdown" style="z-index:2;">
+        <div class="habitat_div dropdown" style="z-index:11;">
             <div class="selected_habitat selected_value dropdown-toggle btn" data-toggle="dropdown">
                 <span style="float:left;"
                     class="habitat_icon group_icon habitats_sprites active ${Habitat.findByName('All').iconClass()}"

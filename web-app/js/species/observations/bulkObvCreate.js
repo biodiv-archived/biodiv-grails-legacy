@@ -111,8 +111,8 @@ function submitForms(counter, size, allForms, showListPage){
             dataType : 'json', 
             type : 'POST',
             success : function(data, statusText, xhr, form) {
-                if(data.statusComplete) {
-                    miniObvCreateHtmlSuccess = data.miniObvCreateHtml;
+                if(data.model.statusComplete) {
+                    miniObvCreateHtmlSuccess = data.model.miniObvCreateHtml;
                     $(form).find('input').attr('disabled', 'disabled');
                     $(form).find('button').attr('disabled', 'disabled');
                     $(form).find('.error-message').hide();
@@ -123,7 +123,7 @@ function submitForms(counter, size, allForms, showListPage){
                 } else {
                     gotError = true;
                     errorCount = errorCount + 1;
-                    var miniObvCreateHtmlError = data.miniObvCreateHtml;
+                    var miniObvCreateHtmlError = data.model.miniObvCreateHtml;
                     var wrapper = $(form).parent();
                     $(form).replaceWith(miniObvCreateHtmlError);
                     $(wrapper).find(".imageHolder").append(imagesPulled);
