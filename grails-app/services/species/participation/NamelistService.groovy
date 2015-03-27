@@ -757,6 +757,18 @@ class NamelistService {
                 sciName = addIBPHierarchyFromCol(colMatch).lastTaxonInIBPHierarchy;            
             } else {
                 //sciName = updateAttributes(sciName, colMatch)
+                //For synonym work on its accepted name
+                colMatch.acceptedNamesList.each { colAcceptedNameData ->
+                    println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
+                    //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
+                    colAcceptedNameData.curatingTaxonId = sciName.id;
+                    ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+                    println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
+                    //add old synonyms to this new accepted name
+                    oldSynonyms.each {
+                        acceptedName.addSynonym(sciName);
+                    }
+                }
             }
         }
         return sciName;
@@ -1223,11 +1235,12 @@ class NamelistService {
         //Remove as synonym from all accepted names
         sciName.removeAsSynonym();
         //sciName = updateAttributes(sciName, colMatch)
+        colMatch.curatingTaxonId = sciName.id;
+        colMatch.curatingTaxonStatus = sciName.status;
         //Change status and class for this row entry in database
         sciName = updateStatusAndClass(sciName, NameStatus.ACCEPTED)
         //Add IBP Hierarchy to this name
         //TODO Pass on id information of last node
-        colMatch.curatingTaxonId = sciName.id;
         sciName = addIBPHierarchyFromCol(colMatch).lastTaxonInIBPHierarchy;
     }
     
@@ -1241,6 +1254,8 @@ class NamelistService {
         println "======REMOVED AS ACCEPTED NAME ==== "
         
         //sciName = updateAttributes(sciName, colMatch)
+        colAcceptedNameData.curatingTaxonId = sciName.id;
+        colMatch.curatingTaxonStatus = sciName.status;
         //Change status and class for this row entry in database
         sciName = updateStatusAndClass(sciName, NameStatus.SYNONYM)
         println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
@@ -1248,7 +1263,6 @@ class NamelistService {
         colMatch.acceptedNamesList.each { colAcceptedNameData ->
             println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
             //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
-            colAcceptedNameData.curatingTaxonId = sciName.id;
             ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
             println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
             //add old synonyms to this new accepted name
@@ -1286,6 +1300,17 @@ class NamelistService {
         println "=========UPDATING ATTRIBUTES ========"
         NamesParser namesParser = new NamesParser();
         def name = sciName.canonicalForm + " " + colMatch.authorString
+        def res1 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
+        def res2 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
+        res2.addAll(res1);
+        if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
+            sciName.isFlagged = true;
+            String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+            res2.each {
+                flaggingReason = flaggingReason + it.id.toString() + ", ";
+            }
+            sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
+        }
         def parsedNames = namesParser.parse([name]);
         def pn = parsedNames[0];
         TaxonomyDefinition.withNewSession {

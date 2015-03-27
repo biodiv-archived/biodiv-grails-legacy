@@ -203,7 +203,7 @@ class Utils {
 		}
 		
 		saveInBatch(new File(f, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
-		saveInBatch(new File(f, Synonyms.class.simpleName), Synonyms.class)
+		//saveInBatch(new File(f, Synonyms.class.simpleName), Synonyms.class)
 
 	}
 
@@ -223,14 +223,14 @@ class Utils {
         }
 
         List tds;
-		while(MAX_TO_DOWNLOAD == -1 || offset + BATCH_SIZE < MAX_TO_DOWNLOAD){ 
-            domainClass.withNewTransaction([readOnly:true]) { status ->
-                tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
-                tds.each {
-                    println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 
-                }
-                offset += BATCH_SIZE
-                tds.each { 
+        while(MAX_TO_DOWNLOAD == -1 || offset + BATCH_SIZE < MAX_TO_DOWNLOAD){ 
+            tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+            tds.each {
+                println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 
+            }
+            offset += BATCH_SIZE
+            tds.each { 
+                domainClass.withNewTransaction([readOnly:true]) { status ->
                     println "===== Searching name " + it.canonicalForm + "   index >>>>>> " + (++i)  	
                     saveFile(sourceDir, it)
                 }

@@ -46,7 +46,7 @@ def curateName(taxonId, domainSourceDir) {
 File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-curateName(7, domainSourceDir);
+//curateName(7, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -204,7 +204,7 @@ def createTestEntry(){
 //createTestEntry();
 
 def migrateSynonyms() {
-    int limit = 50, offset = 300, insert_check = 0,exist_check = 0;
+    int limit = 50, offset = 0, insert_check = 0,exist_check = 0;
     int counter = 0;
     def nonParsedSyns = [];
     while(true){
@@ -335,3 +335,25 @@ def createAcceptedSynonym(){
     x.addSynonym(y);
 }
 //createAcceptedSynonym()
+
+def curateAllNames() {
+    int limit = 50, offset = 0;
+    int counter = 0;
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit     
+        def taxDefList = TaxonomyDefinition.list (max: limit , offset:offset);
+        for(taxDef in taxDefList) {
+            TaxonomyDefinition.withNewTransaction {
+                println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
+                counter++;
+                File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+                curateName(taxDef.id, domainSourceDir);
+            }
+        }
+        offset = offset + limit; 
+        //utilsService.cleanUpGorm(true); 
+        if(!taxDefList) break;  
+    }
+}
+
+//curateAllNames()

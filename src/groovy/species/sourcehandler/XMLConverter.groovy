@@ -1526,11 +1526,26 @@ class XMLConverter extends SourceConverter {
                                         if(otherParams.curatingTaxonId) {
                                             TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
                                             if(sciName.status == NameStatus.ACCEPTED) {
+                                                println "############==== Flagging accepted name " + sciName;
                                                 taxon = sciName;
                                                 taxon.isFlagged = true;
+                                                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+                                                searchIBP.each {
+                                                    flaggingReason = flaggingReason + it.id.toString() + ", ";
+                                                }
+                                                taxon.flaggingReason = taxon.flaggingReason + " ### " + flaggingReason;
+                                                if(!taxon.save()) {
+                                                    taxon.errors.each { log.error it }
+                                                }
                                             } else {
+                                                println "############==== Flagging synonym " + sciName;
                                                 taxon = searchIBP[0];
                                                 sciName.isFlagged = true;
+                                                String flaggingReason = "The accepted name for this is a system default.Multiple potential matches exist.IDs- ";
+                                                searchIBP.each {
+                                                    flaggingReason = flaggingReason + it.id.toString() + ", ";
+                                                }
+                                                sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
                                                 if(!sciName.save()) {
                                                     sciName.errors.each { log.error it }
                                                 }

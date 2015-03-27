@@ -307,6 +307,25 @@ update  synonyms set position = 'DIRTY';
 ALTER TABLE taxonomy_definition add column is_flagged boolean;
 update taxonomy_definition set is_flagged = false;
 
+////////////////**SYNONYM Migration**//////////////
+
+RUN-APP to create SynonymsMerged table;
+then run these sqls
+
+//12th March 2015
+//Synonyms migration to new table
+ALTER TABLE taxonomy_definition ADD COLUMN class varchar(255);
+update taxonomy_definition set class = 'species.TaxonomyDefinition';
+alter table taxonomy_definition alter column class set not null;
+
+/**if tax_def table does not have relationship column**/
+ALTER TABLE taxonomy_definition ADD COLUMN relationship varchar(255);
+
+/**Drop unique constraint**/
+ALTER TABLE taxonomy_definition DROP CONSTRAINT taxonomy_definition_rank_key;
+/**Adding flagging reason column**/
+ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(600);
+
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 
@@ -376,17 +395,4 @@ update observation set is_deleted = true where source_id in (select id from obse
 //2nd feb 2015
 alter table featured add column expire_time timestamp without time zone ;
 
-////////////////**SYNONYM Migration**//////////////
-
-//12th March 2015
-//Synonyms migration to new table
-ALTER TABLE taxonomy_definition ADD COLUMN class varchar(255);
-update taxonomy_definition set class = 'species.TaxonomyDefinition';
-alter table taxonomy_definition alter column class set not null;
-
-/**if tax_def table does not have relationship column**/
-ALTER TABLE taxonomy_definition ADD COLUMN relationship varchar(255);
-
-/**Drop unique constraint**/
-ALTER TABLE taxonomy_definition DROP CONSTRAINT taxonomy_definition_rank_key;
 
