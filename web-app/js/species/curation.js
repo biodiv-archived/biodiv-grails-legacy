@@ -383,6 +383,7 @@ function getExternalDbDetails(externalId) {
 }
 
 function saveHierarchy(moveToWKG) {
+    /*
     processingStart();
     if($("#statusDropDown").val() == 'accepted') {
         var taxonRegistryData = fetchTaxonRegistryData();
@@ -403,6 +404,10 @@ function saveHierarchy(moveToWKG) {
             taxonRegistryData['spellCheck'] = true;
             taxonRegistryData['oldTaxonId'] = $('.taxonId').val();
         }
+        console.log("check this data ");
+        console.log(JSON.stringify(taxonRegistryData));
+        console.log(JSON.stringify(dataToProcess()));
+        return
         $.ajax({
             url: url,
             type: "POST",
@@ -435,6 +440,40 @@ function saveHierarchy(moveToWKG) {
     }else if($("#statusDropDown").val() == 'synonym') {
         preProcessOnSynonym(); 
     }
+    */
+    var url = window.params.curateNameURL;
+    $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        data: {acceptedMatch: JSON.stringify(dataToProcess(moveToWKG))},	
+        success: function(data) {
+            console.log("============YUHU ===");
+            console.log(data);
+            /*
+            if(data['success']) {
+                if(data["newlyCreated"]) {
+                    alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
+                } else {
+                    var resMsg = "Successfully " + data['activityType'];
+                    if(data['spellCheckMsg']) {
+                        resMsg = resMsg + " . " + data['spellCheckMsg'];
+                    }
+                    alert(resMsg);
+                }
+                if(moveToWKG == true) {
+                    $(".clickedEle .taxDefIdSelect").trigger("click");
+                }
+                processingStop();
+                postProcessOnAcceptedName();
+            } else {
+                alert(data['msg']);
+            }*/
+        }, error: function(xhr, status, error) {
+            processingStop();
+            alert(xhr.responseText);
+        } 
+    });
 }
 
 function fetchTaxonRegistryData() {
@@ -668,4 +707,45 @@ function preProcessOnSynonym() {
             $(value).parents(".tab_form").find(".addEdit").trigger("click");
         }
     });
+}
+
+function dataToProcess(moveToWKG) {
+    var result = {}
+    result['kingdom'] = $('.kingdom').val();
+    result['phylum'] = $('.phylum').val();
+    result['class'] = $('.class').val();
+    result['order'] = $('.order').val();
+    result['superfamily'] =$('.superfamily').val();
+    result['family'] =$('.family').val();
+    result['subfamily'] = $('.subfamily').val();
+    result['genus'] = $('.genus').val();
+    result['subgenus'] = $('.subgenus').val();
+    result['species'] =$('.species').val();
+
+    result['name'] = $('.name').val();
+    result['group'] = $('.kingdom').val();
+    result['rank'] = $('.rankDropDown').val();
+    result['authorString'] = $('.authorString').val();
+    result['nameStatus'] = $('.statusDropDown').val();
+    result['source'] = $('.source').val();
+    result['sourceDatabase'] = $('.source').val();
+    result['via'] = $('.via').val();
+    result['id'] = $('.id').val(); 
+    result['externalId'] = $('.id').val();
+    result['abortOnNewName'] = true;
+    result['fromCOL'] = $('.fromCOL').val();
+    if($('.fromCOL').val() == "true") {
+        result['abortOnNewName'] = false;
+        result['id_details'] = JSON.parse($(".id_details").val());
+    }
+    result['taxonId'] = $('.taxonId').val();
+    result['moveToWKG'] = moveToWKG
+    //check for spell check
+    if(oldName == $("."+$("#rankDropDown").val()).val()) {
+        result['spellCheck'] = false;
+    }else if(oldName != $("."+$("#rankDropDown").val()).val() && oldRank == $("#rankDropDown").val()){
+        result['spellCheck'] = true;
+        result['oldTaxonId'] = $('.taxonId').val();
+    }
+    return result;
 }

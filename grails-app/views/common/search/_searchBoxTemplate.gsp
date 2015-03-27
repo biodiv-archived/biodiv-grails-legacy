@@ -20,6 +20,7 @@
 <script type="text/javascript">
 $(document).ready(function() {    
     window.params = {
+                'curateNameURL' : "${uGroup.createLink('controller':'namelist', action:'curateName')}",
                 'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",

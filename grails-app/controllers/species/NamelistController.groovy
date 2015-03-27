@@ -7,6 +7,7 @@ import species.Classification;
 import species.TaxonomyDefinition;
 import grails.plugin.springsecurity.annotation.Secured;
 import species.NamesParser;
+import species.sourcehandler.XMLConverter;
 
 class NamelistController {
     
@@ -145,5 +146,14 @@ class NamelistController {
         println "========RES ======= " + res
         render res as JSON
     }
-    
+   
+    def curateName() {
+        def acceptedMatch = JSON.parse(params.acceptedMatch);
+        acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
+        println "=============ACCEPTED MATCH=========== " + acceptedMatch
+        
+        ScientificName sciName = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
+        println "=============SCIENTIFIC NAME ========= " + sciName;
+        namelistService.processDataFromUI(sciName, acceptedMatch)
+    }
 }

@@ -36,6 +36,7 @@ import species.utils.ImageUtils
 import species.utils.Utils
 import species.auth.SUser
 import species.NamesMetadata.NameStatus;
+import species.NamesMetadata.NamePosition;
 import species.participation.NamelistService;
 
 import org.apache.log4j.Logger; 
@@ -1572,11 +1573,10 @@ class XMLConverter extends SourceConverter {
                                     println "=========COL SE REQUIRED==============="
                                     taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"COL";
                                     //get its data from col and save
-                                    /*println "=======NAME======== " + name
+                                    println "=======NAME======== " + name
                                     println "========NAME KA ID ======= " + otherParams.id_details[name]
                                     def externalId = otherParams.id_details[name].trim();
                                     println "=========EXTERNAL ID===== " + externalId
-                                    */
                                     String nameStatus = otherParams.nameStatus //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
                                     println "=========NAMESTATUS===== " + nameStatus
                                     println "=========NAME STATUS============ " + nameStatus +"======= " + nameStatus.getClass();
@@ -1606,7 +1606,9 @@ class XMLConverter extends SourceConverter {
                                     println "=======FINAL NAME STATUS======= " + finalNameStatus;
                                     taxon.status = finalNameStatus; 
                                     println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
+                                    taxon.position = NamePosition.WORKING;
                                     newNameSaved = true;
+
                                 }
                                 // else search COL
                                 // if single acc name take in
@@ -1642,6 +1644,11 @@ class XMLConverter extends SourceConverter {
                                 if(synonym)
                                     synonym.updateContributors(getUserContributors(fieldNode.data))
                                 */
+                            } else if(taxon && fromCOL) {
+                                taxon.position = NamePosition.WORKING
+                                if(!taxon.save()) {
+                                    taxon.errors.each { log.error it }
+                                }
                             } 
                             def ent = new TaxonomyRegistry();
                             ent.taxonDefinition = taxon

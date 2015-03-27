@@ -46,7 +46,7 @@ def curateName(taxonId, domainSourceDir) {
 File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-curateName(59, domainSourceDir);
+curateName(7, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -227,14 +227,18 @@ def migrateSynonyms() {
                     def parsedNames = namesParser.parse([oldSyn.name]);
                     if(!parsedNames[0]?.canonicalForm) {
                         nonParsedSyns.add(oldSyn.id);
-                        println "===COULD NOT PARSE==="
+                        println "===COULD NOT PARSE copying its name in other name variants==="
+                        oldSyn.canonicalForm = oldSyn.name;
+                        oldSyn.normalizedForm = oldSyn.name;
+                        oldSyn.italicisedForm = oldSyn.name;
+                        oldSyn.binomialForm = oldSyn.name;
                         flag = true;
                     }
                     if(!flag && parsedNames[0]?.canonicalForm) {
                         oldSyn.canonicalForm = parsedNames[0].canonicalForm;
-                        oldSyn.normalizedForm = parsedNames[0].normalizedForm;;
-                        oldSyn.italicisedForm = parsedNames[0].italicisedForm;;
-                        oldSyn.binomialForm = parsedNames[0].binomialForm;;
+                        oldSyn.normalizedForm = parsedNames[0].normalizedForm;
+                        oldSyn.italicisedForm = parsedNames[0].italicisedForm;
+                        oldSyn.binomialForm = parsedNames[0].binomialForm;
                     }
                 }
                 if(!flag) {

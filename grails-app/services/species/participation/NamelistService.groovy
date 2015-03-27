@@ -370,12 +370,12 @@ class NamelistService {
             }
             result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
             result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
-            def counts = getObvCKLCountsOfTaxon(taxonDef);
+            /*def counts = getObvCKLCountsOfTaxon(taxonDef);
             result['countObv'] = counts['countObv'];
             result['countCKL'] = counts['countCKL'];
             result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
             println "=========COUNTS============= " + counts
-            return result
+            */return result
         }else if(params.nameType == '2') {
             if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table
@@ -536,6 +536,7 @@ class NamelistService {
     }
 
     void curateName (ScientificName sciName, List colData) {
+        println "================LIST OF COL DATA=========================== " + colData
         log.debug "Curating name ${sciName} with col data ${colData}"
         def acceptedMatch;
 
@@ -649,29 +650,63 @@ class NamelistService {
         }
        
         if(acceptedMatch) {
+            println "================ACCEPTED MATCH=========================== " + acceptedMatch
             log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
-            //sciName = updateAttributes(sciName, acceptedMatch);
-            //if sciName_status != colData[nameStatus] -> update status
-            sciName = updateStatus(sciName, acceptedMatch);
-            println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
-            updateRank(sciName, acceptedMatch.parsedRank);            
-            //WHY required here??
-            //addIBPHierarchyFromCol(sciName, acceptedMatch);            
-            updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
-            println "=======SCI NAME POSITION ========== " + sciName.position
-            println "=====SCI NAME ==== " + sciName
-            if(!sciName.hasErrors() && sciName.save(flush:true)) {
-                println sciName.position
-                log.debug "Saved sciname ${sciName}"        
-                utilsService.cleanUpGorm(true);
-            } else {
-                sciName.errors.allErrors.each { log.error it }
-            }
+            processDataForMigration(sciName, acceptedMatch);            
         } else {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
         }
     }
-    
+
+    def processDataForMigration(ScientificName sciName, Map acceptedMatch) {
+        //sciName = updateAttributes(sciName, acceptedMatch);
+        //if sciName_status != colData[nameStatus] -> update status
+        sciName = updateStatus(sciName, acceptedMatch);
+        println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
+        updateRank(sciName, acceptedMatch.parsedRank);            
+        //WHY required here??
+        //addIBPHierarchyFromCol(sciName, acceptedMatch);
+        updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
+        /*else if(sciName.status == NameStatus.ACCEPTED) {
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def cl = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(cl, sciName);
+            taxonService.moveToWKG([taxonReg]);
+        }*/
+        println "=======SCI NAME POSITION ========== " + sciName.position
+        println "=====SCI NAME ==== " + sciName
+        if(!sciName.hasErrors() && sciName.save(flush:true)) {
+            println sciName.position
+            log.debug "Saved sciname ${sciName}"        
+            utilsService.cleanUpGorm(true);
+        } else {
+            sciName.errors.allErrors.each { log.error it }
+        }
+
+    }
+   
+    def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
+        //sciName = updateAttributes(sciName, acceptedMatch);
+        //if sciName_status != colData[nameStatus] -> update status
+        sciName = updateStatus(sciName, acceptedMatch);
+        println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
+        updateRank(sciName, acceptedMatch.parsedRank);            
+        //WHY required here??
+        //addIBPHierarchyFromCol(sciName, acceptedMatch);            
+        updatePosition(sciName, NamesMetadata.NamePosition.WORKING);    
+        //taxonService.moveToWKG([taxonReg]);
+        println "=======SCI NAME POSITION ========== " + sciName.position
+        println "=====SCI NAME ==== " + sciName
+        if(!sciName.hasErrors() && sciName.save(flush:true)) {
+            println sciName.position
+            log.debug "Saved sciname ${sciName}"        
+            utilsService.cleanUpGorm(true);
+        } else {
+            sciName.errors.allErrors.each { log.error it }
+        }
+
+    }
+
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
     ScientificName updateStatus(ScientificName sciName, Map colMatch) {
@@ -826,6 +861,10 @@ class NamelistService {
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
         println "=====T R N======= " + taxonRegistryNames
+        println colAcceptedNameData.abortOnNewName;
+        println colAcceptedNameData.fromCOL;
+        println colAcceptedNameData.spellCheck
+        //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL, colAcceptedNameData);
         def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
         return result;
