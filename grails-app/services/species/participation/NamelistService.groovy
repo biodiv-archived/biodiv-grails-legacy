@@ -765,9 +765,6 @@ class NamelistService {
                     ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
                     println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
                     //add old synonyms to this new accepted name
-                    oldSynonyms.each {
-                        acceptedName.addSynonym(sciName);
-                    }
                 }
             }
         }

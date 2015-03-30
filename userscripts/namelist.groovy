@@ -337,7 +337,7 @@ def createAcceptedSynonym(){
 //createAcceptedSynonym()
 
 def curateAllNames() {
-    int limit = 50, offset = 0;
+    int limit = 50, offset = 17775 ;
     int counter = 0;
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit     

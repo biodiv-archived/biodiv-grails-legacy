@@ -328,7 +328,7 @@ ALTER TABLE taxonomy_definition DROP CONSTRAINT taxonomy_definition_rank_key;
 
 /**Adding flagging reason column**/
 ALTER TABLE taxonomy_definition DROP COLUMN flagging_reason;
-ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(600);
+ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(1500);
 
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
