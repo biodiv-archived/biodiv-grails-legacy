@@ -94,7 +94,7 @@ class ObservationService extends AbstractObjectService {
     def resourcesService;
     def request;
     def speciesPermissionService;
-	
+	def customFieldService;
     /**
      * 
      * @param params
@@ -313,6 +313,8 @@ class ObservationService extends AbstractObjectService {
 
                     }
                 }
+				
+				customFieldService.updateCustomFields(params, observationInstance.id)
                 return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -330,6 +332,7 @@ class ObservationService extends AbstractObjectService {
         }
     }
 
+	
     /**
      * @param params
      * @param observationInstance
@@ -1186,7 +1189,7 @@ class ObservationService extends AbstractObjectService {
             Observation parentObv = Observation.read(params.parentId);
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
-                filterQuery += " and obv.maxVotedReco = :parMaxVotedReco and obv.id != :parentId" 
+                filterQuery += " and obv.maxVotedReco = :parMaxVotedReco " //removed check for not equal to parentId to include it in show page 
                 queryParams['parMaxVotedReco'] = parMaxVotedReco
                 queryParams['parentId'] = params.parentId;
                 
@@ -1208,7 +1211,7 @@ class ObservationService extends AbstractObjectService {
             }
             nearByRelatedObvQuery = ', Observation as g2';
             query += nearByRelatedObvQuery;
-            filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId and obv.id <> g2.id '
+            filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId '                                              //removed check for not equal to parentId to include it in show page
             queryParams['parentId'] = params.parentId
             queryParams['maxNearByRadius'] = params.maxNearByRadius?params.int('maxNearByRadius'):200;
             

@@ -650,7 +650,7 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             Field field = Field.read(fieldId);       
-            speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
+            speciesField = SpeciesField.findByFieldAndSpeciesAndDescription(field,speciesInstance,value);
             if(!speciesField){
                 speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
             }

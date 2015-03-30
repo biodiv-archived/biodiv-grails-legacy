@@ -194,7 +194,9 @@ $(document).ready(function() {
 
                 "error":"${g.message(code:'errror.refresh')}",   
                  "suc":"${g.message(code:'error.message.success')}",
-                 "submit":"${g.message(code:'errors.submission')}"
+                 "submit":"${g.message(code:'errors.submission')}",
+                 "failedNumericFieldValidation":"${g.message(code:'errors.failedNumericFieldValidation')}",
+                 "failedMandatoryFieldValidation":"${g.message(code:'errors.failedMandatoryFieldValidation')}"    
                  
             },
 

@@ -57,7 +57,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		} else {
 			carousel.size(data["count"]);
 			if(carousel.options.filterProperty == 'speciesName'){
-                $(carousel.options.carouselDivId).parents(".tile").find(".item_count").html(" ("+data["count"]+")");
+                $(carousel.options.carouselDivId).parents(".tile").find(".item_count").html(" ("+data["count"]+" more)");
             }
 			if(carousel.options.filterProperty == 'taxonConcept'){
                 $(carousel.options.carouselDivId).parents(".sidebar_section").find(".item_count").html(" ("+data["count"]+")");

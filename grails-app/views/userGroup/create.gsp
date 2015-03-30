@@ -306,7 +306,12 @@ max-width: 100%;
 						
 					</div>
 				</div>
-
+				
+				<div class="super-section"  style="clear: both">
+				 	<g:render template="/observation/createCustomFieldTemplate" model="['userGroupInstance':userGroupInstance]"/>
+				</div>
+    
+				
 				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
@@ -384,6 +389,7 @@ max-width: 100%;
 </div>
 	<r:script>
 $(document).ready(function() {
+
 
     	//hack: for fixing ie image upload
         if (navigator.appName.indexOf('Microsoft') != -1) {
@@ -499,6 +505,26 @@ $(document).ready(function() {
 	    return hbt;	
 	}
 	
+	function getCustomFields(){
+		var result = [];
+		var cPrefixClass = '.CustomField_';
+		var fieldList = ['name', 'description','dataType', 'isMandatory', 'allowedMultiple' , 'options', 'defaultValue'];
+		$("ul.customFieldList li").each( function (index){
+			var thisli = $(this);
+			var cfMap = {};
+			$.each(fieldList, function(index, value){
+				var key = cPrefixClass + value;
+				var val = $(thisli).find(key).val();
+				if(key == '.CustomField_isMandatory' || key == '.CustomField_allowedMultiple' ){
+					var val = $(thisli).find(key).prop('checked');
+				}
+				cfMap[value] = val;
+			});
+			result.push(cfMap);
+		});
+		return  JSON.stringify(result);
+	}
+	
 	$("#createGroupSubmit").click(function(){
 		$('input[name="founderUserIds"]').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		$('input[name="expertUserIds"]').val(experts_autofillUsersComp[0].getEmailAndIdsList().join(","));
@@ -523,10 +549,12 @@ $(document).ready(function() {
        	
        	$('#homePage').val(getSelectedVal('home_page_label'));
 		$('#theme').val(getSelectedVal('theme_label')); 
+		
+		var cfInput = $("<input>").attr("type", "hidden").attr("name", "customFieldMapList").val(getCustomFields());
+       	$('#${form_id}').append($(cfInput));
        	
         $("#${form_id}").submit();
         return false;
-        
 	});
 	
 	//$("#tags .tagit-input").watermark("Add some tags");	
