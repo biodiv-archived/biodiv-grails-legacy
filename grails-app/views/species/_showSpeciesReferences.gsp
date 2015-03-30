@@ -1,20 +1,26 @@
 <%@page import="species.SpeciesField"%>
+<%@page import="species.Field"%>
 <%
-//def references = speciesInstance.fields.collect{it.references};
+def fieldInstance = Field.findByCategory(fieldFromName.references);
 def results = [];
 def sfInstance 	  = category.value.get('speciesFieldInstance');
+
 if(sfInstance) {
-    def fieldInstance = sfInstance[0]?.field;
+   // fieldInstance = sfInstance[0]?.field;
     //references = refs.values();
     //printing only if references are not available.. using description
 
-    if(sfInstance && sfInstance[0]?.description && sfInstance[0]?.description != 'dummy') { %>
-        <s:updatereference model="['referenceId': '','speciesId':speciesInstance.id,'speciesFieldId':sfInstance[0].id,
-                        'fieldId':fieldInstance.id,'value':sfInstance[0]?.description]" />
+if(sfInstance.size() >0 ){
+for (int i = 0; i < sfInstance.size(); i++) {
+    if(sfInstance && sfInstance[i]?.description && sfInstance[i]?.description != 'dummy') { %>    	
+        <s:updatereference model="['referenceId': '','speciesId':speciesInstance.id,'speciesFieldId':sfInstance[i].id,
+                        'fieldId': sfInstance[i]?.field?.id,'value':sfInstance[i]?.description]" />
     <%		
-        sfInstance[0]?.description = 'dummy';
-        sfInstance[0].save();
+        sfInstance[i]?.description = 'dummy';
+        sfInstance[i].save();
     }
+  }
+}
 
     def criteria = SpeciesField.createCriteria();
     results = criteria.list {
@@ -30,24 +36,28 @@ def references = [];
   	references	<< result.references
   }
 
-
+def check_repeat_heading = [];
 
 %>
 
 <ol class="references" style="list-style:disc;list-style-type:decimal">
 <g:if test="${references}">
     <g:each in="${references}" var="ref">
+    	<% if(!check_repeat_heading.contains(ref.speciesField.field[0])){
+    		check_repeat_heading << ref.speciesField.field[0];    		
+    	%>
       <h6 style="margin-left: -35px;">
       	<span style="color: #413D3D;text-decoration: none;"> 
 			<% def species_field_block = ref.speciesField.field[0]; %>
 			${species_field_block}
 	  	</span>
 	  </h6>
+	  <% } %>
       <g:each in="${ref}" var="r">
     <li class="linktext">
    
-<span class="ref_val" data-species-id ="${speciesInstance?.id}" data-field-id="${fieldInstance?.id}" 
-	 data-refference-id="${r?.id}" data-speciesfield-id="${sfInstance[0]?.id}">
+<span class="ref_val" data-species-id ="${speciesInstance?.id}" data-field-id="${r?.speciesField?.field?.id}" 
+	 data-refference-id="${r?.id}" data-speciesfield-id="${r?.speciesField?.id}">
     <g:if test="${r.url}">
      ${r.title?r.title:r.url}
     </g:if> <g:else>
@@ -56,7 +66,7 @@ def references = [];
 </a>
 </span>
 <sUser:ifOwns model="['user':r?.speciesField?.uploader]">
-	<g:if test="${fieldInstance == species_field_block }">
+	<g:if test="${fieldInstance?.id == r?.speciesField?.field?.id }">
 	<span class="ed_de" style="display:none;">
 		<a class="btn btn-small btn-primary edit_ref_val" style="padding:0px;" ><i class="icon-edit"></i></a>
   		<a class="btn btn-small btn-danger del_ref_val" style="padding:0px;"><i class="icon-trash"></i></a>
