@@ -659,7 +659,7 @@ class NamelistService {
     }
 
     def processDataForMigration(ScientificName sciName, Map acceptedMatch) {
-        //sciName = updateAttributes(sciName, acceptedMatch);
+        sciName = updateAttributes(sciName, acceptedMatch);
         //if sciName_status != colData[nameStatus] -> update status
         sciName = updateStatus(sciName, acceptedMatch);
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
@@ -1251,14 +1251,14 @@ class NamelistService {
         println "======REMOVED AS ACCEPTED NAME ==== "
         
         //sciName = updateAttributes(sciName, colMatch)
-        colAcceptedNameData.curatingTaxonId = sciName.id;
-        colMatch.curatingTaxonStatus = sciName.status;
         //Change status and class for this row entry in database
         sciName = updateStatusAndClass(sciName, NameStatus.SYNONYM)
         println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
         //Save all the new accepted names or update its hierarchy
         colMatch.acceptedNamesList.each { colAcceptedNameData ->
             println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
+            colAcceptedNameData.curatingTaxonId = sciName.id;
+            colAcceptedNameData.curatingTaxonStatus = sciName.status;
             //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
             ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
             println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
@@ -1275,16 +1275,18 @@ class NamelistService {
     ScientificName updateStatusAndClass(ScientificName sciName, NameStatus status) {
         def sql =  Sql.newInstance(dataSource);
         String query = "";
-
+        println "=======RUNNING SQL TO UPDATE CLASS=========="
         if(status == NameStatus.ACCEPTED) {
             sciName.relationship = null;
             query = "update taxonomy_definition set class = 'species.TaxonomyDefinition' where id = " + sciName.id.toString();
             sql.execute(query);
+            println " ========executed query =="
             utilsService.cleanUpGorm(true);
             sciName = TaxonomyDefinition.get(sciName.id.toLong())
         } else {
             query = "update taxonomy_definition set class = 'species.SynonymsMerged' where id = " + sciName.id.toString();
             sql.execute(query);
+            println " ========executed query =="
             utilsService.cleanUpGorm(true);
             sciName = SynonymsMerged.get(sciName.id.toLong())
             sciName.relationship = ScientificName.RelationShip.SYNONYM;
@@ -1309,23 +1311,22 @@ class NamelistService {
             sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
         }
         def parsedNames = namesParser.parse([name]);
+        println "=============PARSING THIS ========== " + name
         def pn = parsedNames[0];
-        TaxonomyDefinition.withNewSession {
-            if(pn.canonicalForm) {
-                println "============= " + pn.canonicalForm +"============= "+ pn.name
-                sciName.canonicalForm = pn.canonicalForm
-                sciName.binomialForm = pn.binomialForm
-                sciName.normalizedForm = pn.normalizedForm
-                sciName.italicisedForm = pn.italicisedForm
-                sciName.name = pn.name
-            }
-            sciName.authorYear = colMatch.authorString;
-
-            if(!sciName.save(flush:true)) {
-                sciName.errors.allErrors.each { log.error it }
-            }
-            println "=========DONE UPDATING ATTRIBUTES ========"
-            return sciName
+        if(pn.canonicalForm) {
+            println "============= " + pn.canonicalForm +"============= "+ pn.name
+            sciName.canonicalForm = pn.canonicalForm
+            sciName.binomialForm = pn.binomialForm
+            sciName.normalizedForm = pn.normalizedForm
+            sciName.italicisedForm = pn.italicisedForm
+            sciName.name = pn.name
         }
+        sciName.authorYear = colMatch.authorString;
+
+        if(!sciName.save()) {
+            sciName.errors.allErrors.each { log.error it }
+        }
+        println "=========DONE UPDATING ATTRIBUTES ========"
+        return sciName
     }
 }

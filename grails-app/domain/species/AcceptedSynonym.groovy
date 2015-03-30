@@ -50,7 +50,10 @@ class AcceptedSynonym {
         if(ent) {
             try {
                 println "deleting"
-                ent.delete(flush:true, failOnError:true)
+                if(!ent.delete(failOnError:true)){
+                    ent.errors.allErrors.each { log.error it }
+                }
+                println "deleted"
             }catch (Exception e) {
                 e.printStackTrace()
             }

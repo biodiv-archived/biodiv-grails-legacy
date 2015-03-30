@@ -46,7 +46,7 @@ def curateName(taxonId, domainSourceDir) {
 File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(7, domainSourceDir);
+//curateName(39, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -341,7 +341,7 @@ def curateAllNames() {
     int counter = 0;
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit     
-        def taxDefList = TaxonomyDefinition.list (max: limit , offset:offset);
+        def taxDefList = TaxonomyDefinition.list (max: limit , offset:offset, sort: "rank", order: "asc");
         for(taxDef in taxDefList) {
             TaxonomyDefinition.withNewTransaction {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
@@ -356,4 +356,4 @@ def curateAllNames() {
     }
 }
 
-//curateAllNames()
+curateAllNames()
