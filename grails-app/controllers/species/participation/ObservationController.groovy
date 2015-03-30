@@ -734,7 +734,7 @@ class ObservationController extends AbstractObjectController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote() {
-		params.author = springSecurityService.currentUser;
+        params.author = springSecurityService.currentUser;
         //boolean isMobileApp = params.format?.equalsIgnoreCase("json") || params.isMobileApp; 
         String msg; 
         try {
@@ -753,7 +753,7 @@ class ObservationController extends AbstractObjectController {
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
-
+            
 			def observationInstance = Observation.get(params.obvId);
 			def mailType
 			try {
@@ -769,7 +769,7 @@ class ObservationController extends AbstractObjectController {
 					}
 
 					if(!params["createNew"]){
-                        def model = utilsService.getErrorModel(msg, null, OK.value());
+                def model = utilsService.getErrorModel(msg, null, OK.value());
                         withFormat {
                             html {
                                 redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
@@ -779,7 +779,7 @@ class ObservationController extends AbstractObjectController {
                         }
 					} else {
                         if(params.oldAction != "bulkSave"){
-                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
+                def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                             withFormat {
                                 html {
 						            redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
@@ -790,7 +790,7 @@ class ObservationController extends AbstractObjectController {
                         } else {
                             //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
-                            def model = utilsService.getErrorModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml]);
+                            def model = utilsService.getSuccessModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
                             //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             withFormat {
                                 html {
@@ -844,7 +844,7 @@ class ObservationController extends AbstractObjectController {
                         } else {
                             //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
-                            def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml]);
+                            def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
                             //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             //render output as JSON
                             withFormat {
@@ -1769,10 +1769,23 @@ class ObservationController extends AbstractObjectController {
             if(result.success){
                 forward(action: 'addRecommendationVote', params:params);
             } else {
+                def msg = "Failed bulk upload";
+                def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: result.observationInstance]);
+                def model = utilsService.getSuccessModel(msg, null, OK.value(), [miniObvCreateHtml: miniObvCreateHtml, observationInstance: result.observationInstance, lastCreatedObv:null, statusComplete: false]);
+                //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
+                withFormat {
+                    html {
+                        //redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML}
+                }
+                /*
                 def output = [:]
                 def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: result.observationInstance]);
                 output = [miniObvCreateHtml: miniObvCreateHtml, observationInstance: result.observationInstance, lastCreatedObv:null, statusComplete: false]
                 render output as JSON
+                 */
             }
         } else {
             redirect (url:uGroup.createLink(action:'bulkCreate', controller:"observation", 'userGroupWebaddress':params.webaddress))

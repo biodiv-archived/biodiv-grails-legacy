@@ -31,7 +31,7 @@
         <option>Unknown</option>
         </select-->	
 
-        <div class="habitat_div dropdown" style="z-index:2;">
+        <div class="habitat_div dropdown" style="z-index:11;">
             <div class="selected_habitat selected_value dropdown-toggle btn" data-toggle="dropdown">
                 <span style="float:left;"
                     class="habitat_icon group_icon habitats_sprites active ${Habitat.findByName('All').iconClass()}"
@@ -60,7 +60,7 @@
     <input class="habitat" type="hidden" name="habitat_id"></input>
 </div>
 
-<script type="text/javascript">
+<r:script>
 
 $(document).ready(function(){
     $(".selected_habitat").unbind('click').click(function(){
@@ -80,5 +80,5 @@ $(document).ready(function(){
     });
 });
 
-</script>
+</r:script>
 </div>

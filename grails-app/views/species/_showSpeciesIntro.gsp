@@ -40,10 +40,18 @@
                 </div>
                 
                 <div id="gallery1" class="gallery" style="margin-top: 60px;">
-
-                    <g:if test="${resourcesInstanceList}">
-                    
-                    <s:showSpeciesImages model="['speciesInstance':speciesInstance , 'resourcesInstanceList' : resourcesInstanceList]"></s:showSpeciesImages>
+                    <%
+                        def resSize = resourcesInstanceList.size()
+                        def imageResSize = 0;
+                        resourcesInstanceList.each {
+                        if(it.type == ResourceType.IMAGE) {
+                            imageResSize += 1 
+                        }
+                        }
+                    %> 
+                    <g:if test="${resourcesInstanceList && imageResSize > 0}">
+                       
+                    <s:showSpeciesImages model="['speciesInstance':speciesInstance , 'resourcesInstanceList' : resourcesInstanceList, 'imageResSize':imageResSize]"></s:showSpeciesImages>
                     </g:if>
                     <g:else>
                     <% def fileName = speciesInstance.fetchSpeciesGroup().icon(ImageType.LARGE).fileName%>

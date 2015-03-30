@@ -310,7 +310,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def beforeInsert(){
-        updateIsShowable()
+		updateLocationScale()
+		updateIsShowable()
 		updateLatLong()
 	}
 	
@@ -326,6 +327,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def getPageVisitCount(){
 		return visitCount;
+	}
+	
+	private updateLocationScale(){
+		locationScale = locationScale?:LocationScale.APPROXIMATE
 	}
 
 	public static int getCountForGroup(groupId){

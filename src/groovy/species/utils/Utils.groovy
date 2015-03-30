@@ -113,6 +113,11 @@ class Utils {
 		def f = FILE_NAME_GENEROTR.nextFloat()
 		return f*MAX_FLOAT + MIN_FLOAT
 	}
+	
+	static int getRandomInt(){
+		return FILE_NAME_GENEROTR.nextInt(10000);
+	}
+	
 	  
 	/**
 	 * @param fileName

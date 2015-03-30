@@ -472,7 +472,8 @@ $('#addNewColumn').unbind('click').click(function(){
 $( ".date" ).datepicker({ 
     changeMonth: true,
     changeYear: true,
-    dateFormat: 'dd/mm/yy' 
+    dateFormat: 'dd/mm/yy',
+    maxDate:0
 });
 
 /**
@@ -744,6 +745,41 @@ $(document).ready(function(){
         return JSON.stringify(ck);
     }
 
+    
+    function customFieldNumericValidation(){
+    	var result = true;
+    	$("input.CustomField_number").each(function( index ) {
+    		var comp = $(this).closest('.control-group');
+    		comp.removeClass('error');
+    		var val = $(this).val();
+    		if(val && !$.isNumeric(val)){
+    			comp.addClass('error');
+    			result = false;
+    		}
+    	});
+    	return result;
+    }
+    
+    function customFieldMandatoryValidation(){
+    	var result = true;
+    	$(".customField .mandatoryField").each(function( index ) {
+    		var comp = $(this).closest('.control-group');
+    		comp.removeClass('error');
+    		var val = $(this).val();
+    		if(!val){
+    			comp.addClass('error');
+    			result = false;
+    		}
+    	});
+    	
+    	return result;
+    }
+    
+    function scrollToCustomForm(){
+    	$('html, body').animate({
+            scrollTop: $(".customFieldForm").offset().top
+        }, 800);
+    }
     /**
      *
      */
@@ -753,7 +789,21 @@ $(document).ready(function(){
             event.preventDefault();
             return false; 		 		
         }
-
+ 
+        if(!customFieldMandatoryValidation()) {
+            alert(window.i8ln.observation.bulkObvCreate.failedMandatoryFieldValidation);
+            event.preventDefault();
+            scrollToCustomForm();
+            return false; 		 		
+        }
+        
+        if(!customFieldNumericValidation()) {
+            alert(window.i8ln.observation.bulkObvCreate.failedNumericFieldValidation);
+            event.preventDefault();
+            scrollToCustomForm();
+            return false; 		 		
+        }
+        
         if (document.getElementById('agreeTerms').checked) {
             $(this).addClass("disabled");
 

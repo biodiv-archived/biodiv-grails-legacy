@@ -18,6 +18,7 @@ class ObservationTagLib {
 	def grailsApplication
     def springSecurityService;
     def chartService;
+	def customFieldService;
     //def SUserService;
 
 	def create = {attrs, body ->
@@ -230,6 +231,12 @@ class ObservationTagLib {
 	def showAnnotation = {attrs, body->
 		out << render(template:"/common/observation/showAnnotationTemplate", model:attrs.model);
 	}
+	
+	def showCustomFields = {attrs, body->
+		attrs.model.customFields = customFieldService.fetchAllCustomFields(attrs.model.observationInstance)
+		out << render(template:"/observation/showCustomFieldsTemplate", model:attrs.model);
+	}
+
 	
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);

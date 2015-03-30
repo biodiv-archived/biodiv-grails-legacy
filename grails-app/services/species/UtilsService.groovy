@@ -995,7 +995,7 @@ class UtilsService {
 //        } 
     }
 	
-	Date parseDate(date, sendNew = true){
+	static Date parseDate(date, sendNew = true){
 		try {
             if(!sendNew) {
                 Date d;
@@ -1015,6 +1015,8 @@ class UtilsService {
 		return null;
 	}
 
-
+	public String getTableNameForGroup(UserGroup ug){
+		return "custom_fields_group_" + ug.id
+	}
 }
 
