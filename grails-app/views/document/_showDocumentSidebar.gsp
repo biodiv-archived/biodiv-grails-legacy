@@ -48,14 +48,14 @@
                 <g:if test="${speciesObjId}">
                     <a class="species-page-link" style="font-style: normal;" href= "${link}">${sciName.key}</a>
                     <sUser:permToReorderDocNames model="['documentInstance':documentInstance]">
-                       <i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroup':webaddress)}","${nameId[sciName.key]}", "down", "docSciName", "${documentInstance.id}")'></i>
-                       <i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroup':webaddress)}", "${nameId[sciName.key]}", "up", "docSciName", "${documentInstance.id}")'></i>
+                       <i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", "down", "docSciName", "${documentInstance.id}")'></i>
+                       <i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroupWebaddress':webaddress)}", "${nameId[sciName.key]}", "up", "docSciName", "${documentInstance.id}")'></i>
                     </sUser:permToReorderDocNames>
                 </g:if>
                 <g:else>
                   <sUser:permToReorderDocNames model="['documentInstance':documentInstance]">
-                       <i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroup':webaddress)}","${nameId[sciName.key]}", "down", "docSciName", "${documentInstance.id}")'></i>
-                       <i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroup':webaddress)}", "${nameId[sciName.key]}", "up", "docSciName", "${documentInstance.id}")'></i>
+                       <i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", "down", "docSciName", "${documentInstance.id}")'></i>
+                       <i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'changeDisplayOrder', 'userGroupWebaddress':webaddress)}", "${nameId[sciName.key]}", "up", "docSciName", "${documentInstance.id}")'></i>
                   </sUser:permToReorderDocNames>
                     ${sciName.key}
                 </g:else>
