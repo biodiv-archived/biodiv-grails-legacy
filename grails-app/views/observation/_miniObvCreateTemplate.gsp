@@ -66,7 +66,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         <input class="agreeTerms" type="checkbox" name='agreeTerms' style ="display:none;"/>
     </div>
 </form>
-<script type="text/javascript">
+<r:script>
 
 $(document).ready(function(){
     $(".toggleGrpsDiv").unbind("click").click(function(){
@@ -78,4 +78,4 @@ $(document).ready(function(){
     });
 });
 
-</script>
+</r:script>

@@ -54,7 +54,7 @@
     <input class="group" type="hidden" name="group_id"></input>
 </div>
 
-<script type="text/javascript">
+<r:script>
 
 $(document).ready(function(){
     $(".selected_group").unbind('click').click(function(){
@@ -74,5 +74,5 @@ $(document).ready(function(){
 
 });
 
-</script>
+</r:script>
 </div>
