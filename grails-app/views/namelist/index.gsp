@@ -444,7 +444,7 @@
 
 
 
-                        <button type="button" class="save_button" style="background-color:#C0504D;" onClick='saveHierarchy(false)'>Save & Retain</button> 
+                        <!--button type="button" class="save_button" style="background-color:#C0504D;" onClick='saveHierarchy(false)'>Save & Retain</button--!> 
                         <button type="button" class="save_button" style="background-color:#FF9900;" onClick='saveHierarchy(true)'>Save & Move to Working List</button> 
                         <button type="button" class="save_button" style="background-color:#009933;">Save & Move to Clean List</button> 
                     </div>

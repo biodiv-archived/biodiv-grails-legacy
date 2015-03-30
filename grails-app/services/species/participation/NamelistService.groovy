@@ -379,10 +379,10 @@ class NamelistService {
         }else if(params.nameType == '2') {
             if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table
-                def syn = Synonyms.read(params.taxonId.toLong());
+                def syn = SynonymsMerged.read(params.taxonId.toLong());
                 def result = syn.fetchGeneralInfo();
                 result[result['rank']] = params.choosenName;
-                result['acceptedNamesList'] = getAcceptedNamesOfSynonym(params.choosenName);
+                result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
                 println "========SYNONYMS NAME DETAILS ===== " + result
                 return result
             }    
@@ -960,7 +960,7 @@ class NamelistService {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
     def getSynonymsOfTaxon(TaxonomyDefinition taxonConcept) {
-        def res = Synonyms.findAllByTaxonConcept(taxonConcept);
+        def res = taxonConcept.fetchSynonyms(); //Synonyms.findAllByTaxonConcept(taxonConcept);
         def result = []
         res.each {
             def temp = [:]
@@ -981,12 +981,9 @@ class NamelistService {
         return result
     }
     
-    def getAcceptedNamesOfSynonym(String synName) {
-        def r = Synonyms.findAllByName(synName);
-        def res = []
-        r.each {
-            res.add(it.taxonConcept);
-        }
+    def getAcceptedNamesOfSynonym(SynonymsMerged syn) {
+        //def r = Synonyms.findAllByName(synName);
+        def res = syn.fetchAcceptedNames();  //[]
         def result = []
         res.each {
             def temp = [:]

@@ -1622,8 +1622,7 @@ class XMLConverter extends SourceConverter {
                                     taxon.status = finalNameStatus; 
                                     println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
                                     taxon.position = NamePosition.WORKING;
-                                    newNameSaved = true;
-
+                                    newNameSaved = false;
                                 }
                                 // else search COL
                                 // if single acc name take in
@@ -1664,7 +1663,15 @@ class XMLConverter extends SourceConverter {
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
-                            } 
+                            }
+                            //Moving name to Working list, so all names should be in working list,
+                            //even if a single name in hierarchy is in dirty list
+                            //abort process
+                            if(otherParams && otherParams.moveToWKG) {
+                                if(taxon.position == NamePosition.DIRTY) {
+                                    newNameSaved = true;
+                                }
+                            }
                             def ent = new TaxonomyRegistry();
                             ent.taxonDefinition = taxon
                             //newNameSaved true becoz now this taxon cant be used in hierarchy 
