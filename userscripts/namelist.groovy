@@ -337,7 +337,7 @@ def createAcceptedSynonym(){
 //createAcceptedSynonym()
 
 def curateAllNames() {
-    int limit = 50, offset = 17775 ;
+    int limit = 50, offset = 35653 ;
     int counter = 0;
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit     
@@ -346,7 +346,8 @@ def curateAllNames() {
             TaxonomyDefinition.withNewTransaction {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
                 counter++;
-                File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+                File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
+                //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
                 curateName(taxDef.id, domainSourceDir);
             }
         }
