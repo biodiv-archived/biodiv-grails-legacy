@@ -43,10 +43,11 @@ def curateName(taxonId, domainSourceDir) {
     }
 }
 
-File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+//File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(39, domainSourceDir);
+//curateName(62044, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -337,13 +338,13 @@ def createAcceptedSynonym(){
 //createAcceptedSynonym()
 
 def curateAllNames() {
-    int limit = 50, offset = 35653 ;
+    int limit = 50, offset = 36047 ;
     int counter = 0;
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit     
         def taxDefList = TaxonomyDefinition.list (max: limit , offset:offset, sort: "rank", order: "asc");
         for(taxDef in taxDefList) {
-            TaxonomyDefinition.withNewTransaction {
+		TaxonomyDefinition.withNewSession {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
                 counter++;
                 File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");

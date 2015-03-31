@@ -1534,7 +1534,8 @@ class XMLConverter extends SourceConverter {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
                                                 taxon.flaggingReason = taxon.flaggingReason + " ### " + flaggingReason;
-                                                if(!taxon.save()) {
+                                                taxon = taxon.merge();
+						if(!taxon.save()) {
                                                     taxon.errors.each { log.error it }
                                                 }
                                             } else {
@@ -1640,6 +1641,7 @@ class XMLConverter extends SourceConverter {
                                         newNameSaved = false;
                                     }
                                 }
+                                taxon=taxon.merge();
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
@@ -1660,6 +1662,7 @@ class XMLConverter extends SourceConverter {
                                 */
                             } else if(taxon && fromCOL) {
                                 taxon.position = NamePosition.WORKING
+                                taxon = taxon.merge();
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }

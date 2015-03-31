@@ -221,22 +221,25 @@ class Utils {
         if(domainClass == Synonyms.class) {
             sortBy = 'id'
         }
-
+	
+        println "========= STARTING HERE #######  ====== " 
         List tds;
-        while(MAX_TO_DOWNLOAD == -1 || offset + BATCH_SIZE < MAX_TO_DOWNLOAD){ 
+        while(true){ 
             tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+            println "========= OFFSET  ====== " + offset
             tds.each {
                 println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 
             }
             offset += BATCH_SIZE
             tds.each { 
-                domainClass.withNewTransaction([readOnly:true]) { status ->
+                domainClass.withNewTransaction { status ->
                     println "===== Searching name " + it.canonicalForm + "   index >>>>>> " + (++i)  	
                     saveFile(sourceDir, it)
                 }
             }
             if(tds.isEmpty()){
-                break; 
+                println "=========#####  EMPTY ==============="
+		break; 
             }
 		}
 	}

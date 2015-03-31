@@ -60,9 +60,9 @@ class NamelistService {
     def springSecurityService;
     def taxonService;
     def grailsApplication;
-    def speciesService;
+    def speciesServicet;
     def utilsService;
-
+	def sessionFactory;
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
@@ -401,6 +401,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym
     List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank) {  
+        utilsService.cleanUpGorm(true);
         println "========SEARCH IBP CALLED======="
         println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "=--- "+ rank;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
@@ -677,7 +678,8 @@ class NamelistService {
         }*/
         println "=======SCI NAME POSITION ========== " + sciName.position
         println "=====SCI NAME ==== " + sciName
-        if(!sciName.hasErrors() && sciName.save(flush:true)) {
+        sciName = sciName.merge();
+	if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"        
             utilsService.cleanUpGorm(true);
@@ -1272,19 +1274,26 @@ class NamelistService {
     }
 
     ScientificName updateStatusAndClass(ScientificName sciName, NameStatus status) {
-        def sql =  Sql.newInstance(dataSource);
+       	sciName = sciName.merge();
+	//def sql =  Sql.newInstance(dataSource);
         String query = "";
         println "=======RUNNING SQL TO UPDATE CLASS=========="
         if(status == NameStatus.ACCEPTED) {
+        	println "=======MAKING IT ACCEPTED=========="
             sciName.relationship = null;
             query = "update taxonomy_definition set class = 'species.TaxonomyDefinition' where id = " + sciName.id.toString();
-            sql.execute(query);
+		def session = sessionFactory.getCurrentSession()
+def sql= session.createSQLQuery(query)
+            sql.executeUpdate();
             println " ========executed query =="
             utilsService.cleanUpGorm(true);
             sciName = TaxonomyDefinition.get(sciName.id.toLong())
         } else {
-            query = "update taxonomy_definition set class = 'species.SynonymsMerged' where id = " + sciName.id.toString();
-            sql.execute(query);
+        	println "=======MAKING IT SYNONYM=========="
+query = "update taxonomy_definition set class = 'species.SynonymsMerged' where id = " + sciName.id.toString();
+            def session = sessionFactory.getCurrentSession()
+def sql= session.createSQLQuery(query)
+            sql.executeUpdate();
             println " ========executed query =="
             utilsService.cleanUpGorm(true);
             sciName = SynonymsMerged.get(sciName.id.toLong())
@@ -1321,7 +1330,7 @@ class NamelistService {
             sciName.name = pn.name
         }
         sciName.authorYear = colMatch.authorString;
-
+	sciName = sciName.merge();
         if(!sciName.save()) {
             sciName.errors.allErrors.each { log.error it }
         }
