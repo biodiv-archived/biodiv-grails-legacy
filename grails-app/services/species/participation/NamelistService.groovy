@@ -412,58 +412,60 @@ class NamelistService {
             clazz = SynonymsMerged.class; 
         }
         println "====SEARCHING ON IBP IN CLASS ====== " + clazz
-        //FINDING BY CANONICAL
-        res = clazz.findAllWhere(canonicalForm:canonicalForm, status: status);
+        clazz.withNewSession{
+            //FINDING BY CANONICAL
+            res = clazz.findAllWhere(canonicalForm:canonicalForm, status: status);
 
-        //CANONICAL ZERO MATCH OR SINGLE MATCH
-        if(res.size() < 2) { 
-            println "====CANONICAL - ZERO/SINGLE MATCH ====== "
-            return res;
-        }
-        //CANONICAL MULTIPLE MATCH
-        else {
-            //FINDING BY VERBATIM
-            if(!authorYear) authorYear = '';
-            res = clazz.findAllWhere(name: (canonicalForm + " " + authorYear), status: status);
-
-            //VERBATIM SINGLE MATCH
-            if(res.size() == 1) {
-                println "====VERBATIM - SINGLE MATCH ====== "
+            //CANONICAL ZERO MATCH OR SINGLE MATCH
+            if(res.size() < 2) { 
+                println "====CANONICAL - ZERO/SINGLE MATCH ====== "
                 return res;
             }
+            //CANONICAL MULTIPLE MATCH
+            else {
+                //FINDING BY VERBATIM
+                if(!authorYear) authorYear = '';
+                res = clazz.findAllWhere(name: (canonicalForm + " " + authorYear), status: status);
 
-            //VERBATIM ZERO MATCH/MULTIPLE MATCH
-            else if(res.size() > 2 || res.size() == 0) {
-                //FINDING BY VERBATIM + RANK
-                res = clazz.findAllWhere(name:(canonicalForm + " " + authorYear),rank: rank, status: status);
-
-                //VERBATIM + RANK ZERO MATCH
-                if(res.size() == 0) {
-                    if(authorYear) {
-                        println "====TRYING VERBATIM + RANK - ZERO MATCH AND ALSO HAS AUTHOR YEAR"
-                        return res;
-                    }
-                    else {
-                        //FINDING BY CANONICAL + RANK
-                        println "====TRYING VERBATIM + RANK - ZERO MATCH & NO AUTHOR YEAR - SO MATCHED ON CANONICAL + RANK"
-                        res = clazz.findAllWhere(canonicalForm:canonicalForm ,rank: rank, status: status);
-                        return res;
-                    }
-                }
-                //VERBATIM + RANK SINGLE MATCH
+                //VERBATIM SINGLE MATCH
                 if(res.size() == 1) {
-                    println "====TRYING VERBATIM + RANK - SINGLE MATCH"
+                    println "====VERBATIM - SINGLE MATCH ====== "
                     return res;
                 }
 
-                //VERBATIM + RANK MULTIPLE MATCH
-                else {
-                    println "====TRYING VERBATIM + RANK - MULTIPLE MATCH"
-                    return res;
+                //VERBATIM ZERO MATCH/MULTIPLE MATCH
+                else if(res.size() > 2 || res.size() == 0) {
+                    //FINDING BY VERBATIM + RANK
+                    res = clazz.findAllWhere(name:(canonicalForm + " " + authorYear),rank: rank, status: status);
+
+                    //VERBATIM + RANK ZERO MATCH
+                    if(res.size() == 0) {
+                        if(authorYear) {
+                            println "====TRYING VERBATIM + RANK - ZERO MATCH AND ALSO HAS AUTHOR YEAR"
+                            return res;
+                        }
+                        else {
+                            //FINDING BY CANONICAL + RANK
+                            println "====TRYING VERBATIM + RANK - ZERO MATCH & NO AUTHOR YEAR - SO MATCHED ON CANONICAL + RANK"
+                            res = clazz.findAllWhere(canonicalForm:canonicalForm ,rank: rank, status: status);
+                            return res;
+                        }
+                    }
+                    //VERBATIM + RANK SINGLE MATCH
+                    if(res.size() == 1) {
+                        println "====TRYING VERBATIM + RANK - SINGLE MATCH"
+                        return res;
+                    }
+
+                    //VERBATIM + RANK MULTIPLE MATCH
+                    else {
+                        println "====TRYING VERBATIM + RANK - MULTIPLE MATCH"
+                        return res;
+                    }
                 }
             }
+            return res;
         }
-        return res;
     }
     
     List searchIBPResults(String canonicalForm, String authorYear, NameStatus status, rank) {
