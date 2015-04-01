@@ -128,6 +128,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		fromDate(nullable: true)
 		group nullable:true
 		habitat nullable:true
+		locationScale nullable:true
 	}
 	
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup]
