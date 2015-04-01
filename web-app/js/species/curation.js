@@ -383,9 +383,9 @@ function getExternalDbDetails(externalId) {
 }
 
 function saveHierarchy(moveToWKG) {
-    /*
+    
     processingStart();
-    if($("#statusDropDown").val() == 'accepted') {
+    /*if($("#statusDropDown").val() == 'accepted') {
         var taxonRegistryData = fetchTaxonRegistryData();
         taxonRegistryData['abortOnNewName'] = true;
         taxonRegistryData['fromCOL'] = $('.fromCOL').val();
@@ -450,7 +450,7 @@ function saveHierarchy(moveToWKG) {
         success: function(data) {
             console.log("============YUHU ===");
             console.log(data);
-            /*
+            
             if(data['success']) {
                 if(data["newlyCreated"]) {
                     alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
@@ -465,10 +465,10 @@ function saveHierarchy(moveToWKG) {
                     $(".clickedEle .taxDefIdSelect").trigger("click");
                 }
                 processingStop();
-                postProcessOnAcceptedName();
+                //postProcessOnAcceptedName();
             } else {
                 alert(data['msg']);
-            }*/
+            }
         }, error: function(xhr, status, error) {
             processingStop();
             alert(xhr.responseText);
