@@ -1404,7 +1404,6 @@ class XMLConverter extends SourceConverter {
         def classifications = Classification.list();
         List<TaxonomyRegistry> taxonHierarchies = new ArrayList<TaxonomyRegistry>();
         String spellCheckMsg = ''
-        println "==species nodes === " + speciesNodes
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
             println "==CREATING FIELD NODES === " + taxonNodes
@@ -1454,7 +1453,6 @@ class XMLConverter extends SourceConverter {
         List<String> names = new ArrayList<String>();
         List<TaxonomyDefinition> parsedNames;
         List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
-        println "=======FIELD NODES ====== " + fieldNodes
         fieldNodes.each { fieldNode ->
             String name = getData(fieldNode.data);
             println "===NAME=== " + name 
@@ -1518,6 +1516,18 @@ class XMLConverter extends SourceConverter {
                             //if its accepted pick that as taxon & flag it
                             //else if its synonym pick 1st result and flag that synonym
                             if(otherParams) {
+
+                                //DOING THIS BECAUSE IT DIDNT FIND NEWLY MOVED NAME FROM SYNONYM TO ACCEPTED
+                                if(fieldNode == fieldNodes.last()) {
+                                    if(otherParams.curatingTaxonId) {
+                                        TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
+                                        if(sciName.status == NameStatus.ACCEPTED) {
+                                            if(!searchIBP.contains(sciName)){
+                                                searchIBP.add(sciName);
+                                            }
+                                        }
+                                    }
+                                }
                                 if(searchIBP.size() == 1) {
                                     taxon = searchIBP[0];
                                 }
@@ -1533,9 +1543,10 @@ class XMLConverter extends SourceConverter {
                                                 searchIBP.each {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
+                                                println "########### Flagging becoz of XML CONVERTER ==============" + taxon
                                                 taxon.flaggingReason = taxon.flaggingReason + " ### " + flaggingReason;
                                                 taxon = taxon.merge();
-						if(!taxon.save()) {
+                                                if(!taxon.save()) {
                                                     taxon.errors.each { log.error it }
                                                 }
                                             } else {

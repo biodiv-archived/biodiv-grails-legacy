@@ -260,7 +260,7 @@ class NamelistService {
         def limit = params.limit ? params.limit.toInteger() : 1000
         def offset = params.offset ? params.limit.toLong() : 0
         if(!parentId) {
-            sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classificationid, position as position \
+            sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
                 from taxonomy_registry s, \
                 taxonomy_definition t \
                 where \
@@ -269,7 +269,7 @@ class NamelistService {
                 "t.rank = 0";
             rs = sql.rows(sqlStr, [classSystem:classSystem])
         } else {
-            sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classificationid, position as position \
+            sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
                 from taxonomy_registry s, \
                 taxonomy_definition t \
                 where \
@@ -298,7 +298,7 @@ class NamelistService {
             //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
                 //from synonyms s where s.taxon_concept_id = :taxonId";
             
-            def s1 = "select s.id as taxonid, s.rank as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+            def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position \
                 from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId";
 
             def q1 = sql.rows(s1, [taxonId:it.taxonid])
@@ -401,7 +401,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym
     List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank) {  
-        utilsService.cleanUpGorm(true);
+        //utilsService.cleanUpGorm(true);
         println "========SEARCH IBP CALLED======="
         println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "=--- "+ rank;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
@@ -664,7 +664,7 @@ class NamelistService {
     def processDataForMigration(ScientificName sciName, Map acceptedMatch) {
         sciName = updateAttributes(sciName, acceptedMatch);
         //if sciName_status != colData[nameStatus] -> update status
-        sciName = updateStatus(sciName, acceptedMatch);
+        sciName = updateStatus(sciName, acceptedMatch).sciName;
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         updateRank(sciName, acceptedMatch.parsedRank);            
         //WHY required here??
@@ -679,7 +679,7 @@ class NamelistService {
         println "=======SCI NAME POSITION ========== " + sciName.position
         println "=====SCI NAME ==== " + sciName
         sciName = sciName.merge();
-	if(!sciName.hasErrors() && sciName.save(flush:true)) {
+        if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"        
             utilsService.cleanUpGorm(true);
@@ -690,9 +690,10 @@ class NamelistService {
     }
    
     def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
-        //sciName = updateAttributes(sciName, acceptedMatch);
+        sciName = updateAttributes(sciName, acceptedMatch);
         //if sciName_status != colData[nameStatus] -> update status
-        sciName = updateStatus(sciName, acceptedMatch);
+        def result =  updateStatus(sciName, acceptedMatch);
+        sciName = result.sciName;
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         updateRank(sciName, acceptedMatch.parsedRank);            
         //WHY required here??
@@ -701,20 +702,22 @@ class NamelistService {
         //taxonService.moveToWKG([taxonReg]);
         println "=======SCI NAME POSITION ========== " + sciName.position
         println "=====SCI NAME ==== " + sciName
+        sciName = sciName.merge();
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"        
-            utilsService.cleanUpGorm(true);
+            //utilsService.cleanUpGorm(true);
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
-
+        return result;
     }
 
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
-    ScientificName updateStatus(ScientificName sciName, Map colMatch) {
+    def updateStatus(ScientificName sciName, Map colMatch) {
         println "===========SCIENTIFIC NAME === " + sciName
+        def result;
         if(!sciName.status.value().equalsIgnoreCase(colMatch.nameStatus)) {
             log.debug "Changing status from ${sciName.status} to ${colMatch.nameStatus}"
             //NOW WILL BE FLAGGING IT
@@ -729,8 +732,10 @@ class NamelistService {
             //changing status
             def newStatus = getNewNameStatus(colMatch.nameStatus);
             switch(newStatus) {
-                case NameStatus.ACCEPTED : 
-                    sciName = changeSynonymToAccepted(sciName, colMatch);
+                case NameStatus.ACCEPTED :
+                    result = changeSynonymToAccepted(sciName, colMatch);
+                    sciName = result.lastTaxonInIBPHierarchy;        //changeSynonymToAccepted(sciName, colMatch);
+                    result.sciName = sciName
                     /*    
                     def result = speciesService.deleteSynonym(sciName.id);
                     if(!result.success) {
@@ -738,9 +743,10 @@ class NamelistService {
                     }
                     sciName = saveAcceptedName(colMatch);
                     */
-                    break;sciName.errors.allErrors.each { log.error it }
+                    break;
                 case NameStatus.SYNONYM :                     
                     sciName = changeAcceptedToSynonym(sciName, colMatch);
+                    result.sciName = sciName
                     /*//delete the name from taxonDefinition table and add it to synonyms table
                     taxonService.deleteTaxon(sciName);
                     def synonym;
@@ -758,7 +764,10 @@ class NamelistService {
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
-                sciName = addIBPHierarchyFromCol(colMatch).lastTaxonInIBPHierarchy;            
+                result = addIBPHierarchyFromCol(colMatch);
+                sciName = result.lastTaxonInIBPHierarchy;            
+                result.sciName = sciName
+
             } else {
                 //sciName = updateAttributes(sciName, colMatch)
                 //For synonym work on its accepted name
@@ -770,9 +779,11 @@ class NamelistService {
                     println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
                     //add old synonyms to this new accepted name
                 }
+                result.sciName = sciName
             }
         }
-        return sciName;
+		result.remove("taxonRegistry");
+        return result;
     }
 
     private boolean checkForDuplicateSciNameOnStatusAndRank(ScientificName sciName, NameStatus nameStatus, int rank) {
@@ -1229,7 +1240,7 @@ class NamelistService {
         */
     }
 
-    public ScientificName changeSynonymToAccepted(ScientificName sciName,  Map colMatch) {
+    public def changeSynonymToAccepted(ScientificName sciName,  Map colMatch) {
         //Remove as synonym from all accepted names
         sciName.removeAsSynonym();
         //sciName = updateAttributes(sciName, colMatch)
@@ -1239,7 +1250,9 @@ class NamelistService {
         sciName = updateStatusAndClass(sciName, NameStatus.ACCEPTED)
         //Add IBP Hierarchy to this name
         //TODO Pass on id information of last node
-        sciName = addIBPHierarchyFromCol(colMatch).lastTaxonInIBPHierarchy;
+        def result = addIBPHierarchyFromCol(colMatch)
+        //sciName = result.lastTaxonInIBPHierarchy;
+        return result;
     }
     
     public ScientificName changeAcceptedToSynonym(ScientificName sciName,  Map colMatch) {
@@ -1316,6 +1329,7 @@ def sql= session.createSQLQuery(query)
             res2.each {
                 flaggingReason = flaggingReason + it.id.toString() + ", ";
             }
+            println "########### Flagging becoz of Udating attributes ============== " + sciName
             sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
         }
         def parsedNames = namesParser.parse([name]);

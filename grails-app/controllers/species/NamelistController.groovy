@@ -154,6 +154,7 @@ class NamelistController {
         
         ScientificName sciName = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
         println "=============SCIENTIFIC NAME ========= " + sciName;
-        namelistService.processDataFromUI(sciName, acceptedMatch)
+        def res = namelistService.processDataFromUI(sciName, acceptedMatch)
+        render res as JSON
     }
 }

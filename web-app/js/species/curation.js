@@ -1,12 +1,17 @@
 var accDLContent, accWLContent, accCLContent;
 var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
-var oldName = '', oldRank = '';
+var oldName = '', oldRank = '' , oldStatus = '';
 
 function createListHTML(list, nameType) {
     var listContent = "<ul>";
     $.each(list, function(index, value){
-        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+","+nameType+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'></li>"
+        var x = "";
+        if(value.isflagged == true){
+            var temp = value.flaggingreason + '';
+            x = "<i class='icon-flag' title='"+temp+"'></i>";
+        }
+        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+","+nameType+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'>"+x+"</li>"
     });
     listContent += "</ul>";
     return listContent;
@@ -129,6 +134,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
                 $('.queryDatabase option[value="col"]').attr("selected", "selected");
                 $('.queryString').trigger("click");
             }
+            oldStatus = $("#statusDropDown").val();
             oldName = $("."+$("#rankDropDown").val()).val();
             oldRank = $("#rankDropDown").val();
         }, error: function(xhr, status, error) {
@@ -370,6 +376,7 @@ function getExternalDbDetails(externalId) {
             }else {
                 changeEditingMode(false);
             }
+            oldStatus = $("#statusDropDown").val();
             oldName = $("."+$("#rankDropDown").val()).val();
             oldRank = $("#rankDropDown").val();
             if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
@@ -441,6 +448,10 @@ function saveHierarchy(moveToWKG) {
         preProcessOnSynonym(); 
     }
     */
+
+    if(oldStatus == 'accepted') {
+        postProcessOnAcceptedName();
+    }
     var url = window.params.curateNameURL;
     $.ajax({
         url: url,

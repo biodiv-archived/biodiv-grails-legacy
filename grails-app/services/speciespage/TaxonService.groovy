@@ -793,7 +793,6 @@ class TaxonService {
         println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
         println "======YAHAN HAI=========";
-        println "======TAXON REGISTRY NODES ========= " + taxonRegistryNodes;
 
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
         List<TaxonomyRegistry> taxonRegistry = getClassifictaionsRes.taxonRegistry;
