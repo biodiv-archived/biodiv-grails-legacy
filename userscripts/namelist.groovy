@@ -8,6 +8,7 @@ import species.Classification
 import species.ScientificName
 import species.SynonymsMerged
 import species.Synonyms
+import species.participation.Recommendation;
 import species.participation.TestA;
 import species.participation.TestC;
 import species.participation.TestB;
@@ -358,4 +359,31 @@ def curateAllNames() {
     }
 }
 
-curateAllNames()
+//curateAllNames()
+
+def curateRecoName() {
+    println "=======SCRIPT FOR RECO NAMES======"
+    int limit = 10, offset = 0;
+    int counter = 0;
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit   
+        def query = "from Recommendation as r where r.isScientificName = true and r.taxonConcept = null order by r.id"
+        def recoList = Recommendation.findAll(query, [max: limit, offset: offset])
+        //def recoList = Recommendation.get(316572L)
+        
+        for(reco in recoList) {
+		    Recommendation.withNewTransaction {
+                println "=====WORKING ON THIS RECO============== " + reco + " =========COUNTER ====== " + counter;
+                counter++;
+                def recoName = reco.name.replaceAll('&', '');
+                List colData = nSer.searchCOL(recoName, "name");
+                nSer.curateRecoName(reco, colData)
+            }
+        }
+        offset = offset + limit; 
+        //utilsService.cleanUpGorm(true); 
+        if(!recoList) break;  
+    }
+}
+curateRecoName()
+

@@ -104,7 +104,7 @@
   		<div class="taxon_selector_span taxon_selector_wrapper_span">
             Taxon Selector
         </div>
-        <div class="taxonomyBrowser listarea_content" style="position: relative;height:233px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+        <div class="taxonomyBrowser listarea_content" style="position: relative;height:199px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
             <div id="taxaHierarchy">
                 <%
                 def classifications = [];
@@ -120,6 +120,9 @@
             </div>
         </div>
         <div class="taxon_selector_final">
+            <div>
+                <button type="button" class="save_button btn" style="height:20px;line-height:11px;" onClick='getOrphanRecoNames()'>Show orphan names</button> 
+            </div>
             <div class="row-fluid">
                 <div class="span12">	
                     <input type="text" placeholder="Search" class="span12" style="min-height:22px;"/>

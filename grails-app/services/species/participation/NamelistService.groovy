@@ -27,6 +27,7 @@ import grails.converters.JSON;
 import wslite.soap.*
 import species.NamesParser;
 import species.sourcehandler.XMLConverter;
+import species.participation.Recommendation;
 
 class NamelistService {
    
@@ -60,7 +61,7 @@ class NamelistService {
     def springSecurityService;
     def taxonService;
     def grailsApplication;
-    def speciesServicet;
+    def speciesService;
     def utilsService;
 	def sessionFactory;
     List searchCOL(String input, String searchBy) {
@@ -141,6 +142,7 @@ class NamelistService {
             Map temp = new HashMap();
             Map id_details = new HashMap();
             temp['externalId'] = r?.id?.text()
+            temp['canonicalForm'] = r?.name?.text(); 
             temp['name'] = r?.name?.text() 
             if(searchBy == 'name') {
                 temp['name'] += " " +r?.author?.text()
@@ -170,7 +172,7 @@ class NamelistService {
                 println "======A LIST======== " + aList;
                 temp['acceptedNamesList'] = aList;
             }
-            if(searchBy == 'id') {
+            if(searchBy == 'id' || searchBy == 'name') {
                 //println "============= references  "
                 r.references.reference.each { ref ->
                 //println ref.author.text()
@@ -776,7 +778,8 @@ class NamelistService {
                     //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
                     colAcceptedNameData.curatingTaxonId = sciName.id;
                     ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
-                    println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
+                    acceptedName.addSynonym(sciName);
+                    println "======SAVED THIS ACCEPTED NAME & added synonym also ==== " + acceptedName;
                     //add old synonyms to this new accepted name
                 }
                 result.sciName = sciName
@@ -889,9 +892,9 @@ class NamelistService {
         println colAcceptedNameData.fromCOL;
         println colAcceptedNameData.spellCheck
         //From UI
-        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
+        //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
         //From migration script
-        //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
+        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
         return result;
     }
@@ -1346,11 +1349,107 @@ def sql= session.createSQLQuery(query)
             sciName.name = pn.name
         }
         sciName.authorYear = colMatch.authorString;
-	sciName = sciName.merge();
+	    sciName = sciName.merge();
         if(!sciName.save()) {
             sciName.errors.allErrors.each { log.error it }
         }
         println "=========DONE UPDATING ATTRIBUTES ========"
         return sciName
+    }
+
+///////////////////OBV RECO NAMES/////////////////////////
+
+    def curateRecoName(Recommendation reco , List colData) {      
+        log.debug "Curating reco name ${reco.name} id ${reco.id} with col data ${colData}"
+        def acceptedMatch = null;
+
+        if(!colData) return;
+
+        //check if this is a single direct match
+        if(colData.size() == 1 ) {
+            //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
+            if(colData['nameStatus'] == NamesMetadata.COLNameStatus.COMMON.value()) {
+                //reject ... position remains DIRTY
+                log.debug "[REJECTING AS NAME IS COMMON NAME] ${reco.name} is a sciname but it is common name as per COL. So leaving this name for curation"
+                return;
+            } else {
+                log.debug "[CANONICAL : SINGLE MATCH] There is only a single match on col for this name. So accepting name match"
+                acceptedMatch = colData[0]
+                def  colMatchVerbatim = acceptedMatch.name + " " + acceptedMatch.authorString
+                NamesParser namesParser = new NamesParser();
+                def parsedNames = namesParser.parse([colMatchVerbatim]);
+                colMatchVerbatim = parsedNames[0].normalizedForm;
+                acceptedMatch['parsedName'] = parsedNames[0];
+                acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
+                println "============ACCEPTED MATCH ======= " + acceptedMatch
+            }
+        }
+        if(acceptedMatch) {
+            println "================ACCEPTED MATCH=========================== " + acceptedMatch
+            log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
+            ScientificName sciName;
+            //Search on IBP that name with status
+            NameStatus nameStatus = getNewNameStatus(acceptedMatch.nameStatus);
+            int rank = acceptedMatch['parsedRank'];
+            List res = searchIBP(acceptedMatch.canonicalForm, acceptedMatch.authorString, nameStatus, rank)
+            if(res.size() == 0) {
+                if(nameStatus == NameStatus.SYNONYM){
+                    def acceptedNames = [];
+                    acceptedMatch.acceptedNamesList.each { colAcceptedNameData ->
+                        println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
+                        //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
+                        //colAcceptedNameData.curatingTaxonId = sciName.id;
+                        ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+                        acceptedNames.add(acceptedName)
+                        println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
+                        //acceptedName.addSynonym(synonym);
+                    }
+                    def otherParams = ['taxonId':acceptedNames[0].id]
+                    def result = speciesService.updateSynonym(null, null,ScientificName.RelationShip.SYNONYM.value(),acceptedMatch.canonicalForm +" "+ acceptedMatch.authorString , otherParams);
+                    sciName = result.dataInstance;
+                    acceptedNames.each { acceptedName ->
+                        if(acceptedName != acceptedNames[0]){
+                            acceptedName.addSynonym(sciName);
+                        }
+                    }
+                } else {
+                    sciName = saveAcceptedName(acceptedMatch);
+                }
+            } else if(res.size() == 1) {
+                sciName = res[0]
+            } else {
+                //picking one by default
+                sciName = res[0]
+                //flagging recommendation
+                reco.isFlagged = true;
+                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+                res.each {
+                    flaggingReason = flaggingReason + it.id.toString() + ", ";
+                }
+                println "########### Flagging reco ============== "
+                reco.flaggingReason = reco.flaggingReason + " ### " + flaggingReason;
+            } 
+            //processDataForMigration(sciName, acceptedMatch);            
+            syncReco(reco, sciName);
+        } else {
+            log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
+        }
+    }
+
+    def syncReco(Recommendation reco, TaxonomyDefinition taxDef) {
+        reco.taxonConcept = taxDef;
+        if(!reco.save()) {
+            reco.errors.allErrors.each { log.error it }
+        }
+    }
+
+    def getOrphanRecoNames() {
+        def query = "from Recommendation as r where r.isScientificName = true and r.taxonConcept = null order by r.id"
+        def recoList = Recommendation.findAll(query);
+        def result = [];
+        recoList.each{
+            result.add([taxonid:it.id, name:it.name]);
+        }
+        return result;
     }
 }

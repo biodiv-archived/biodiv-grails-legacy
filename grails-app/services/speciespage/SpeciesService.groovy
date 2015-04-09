@@ -976,7 +976,8 @@ class SpeciesService extends AbstractObjectService  {
             def synonym = builder.createNode("synonym");
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
-            new Node(data, "contributor", springSecurityService.currentUser.email);
+            def email = (springSecurityService.currentUser)?springSecurityService.currentUser.email:"admin@strandls.com";
+            new Node(data, "contributor", email);
             if(otherParams) {
                 new Node(data, "viaDatasource", otherParams['source']);
             }

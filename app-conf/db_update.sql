@@ -330,6 +330,14 @@ ALTER TABLE taxonomy_definition DROP CONSTRAINT taxonomy_definition_rank_key;
 ALTER TABLE taxonomy_definition DROP COLUMN flagging_reason;
 ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(1500);
 
+//////////////////**OBSERVATION RECOMMENDATION**///////////////////
+//added on 8th april 2015
+ALTER TABLE recommendation add column is_flagged boolean;
+update recommendation set is_flagged = false;
+ALTER TABLE recommendation DROP COLUMN flagging_reason;
+ALTER TABLE recommendation ADD COLUMN flagging_reason varchar(1500);
+
+
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 

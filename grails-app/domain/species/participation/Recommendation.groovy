@@ -15,11 +15,15 @@ class Recommendation {
 	boolean isScientificName = true;
 	//if its common name then can have language
 	Long languageId = null;
-	
+	boolean isFlagged = false;
+	String flaggingReason;
+
 	static constraints = {
 		name(blank:false, unique:['taxonConcept', 'languageId']);
 		taxonConcept nullable:true;
 		languageId(nullable:true);
+        isFlagged nullable:true;
+		flaggingReason nullable:true;
 	}
 
 	static mapping = { 

@@ -760,3 +760,28 @@ function dataToProcess(moveToWKG) {
     }
     return result;
 }
+
+
+///////////////////OBV RECO NAMES///////////////////////
+
+function getOrphanRecoNames(){
+    processingStart();
+    var url = window.params.curation.getOrphanRecoNamesURL;
+    $.ajax({
+        url: url,
+        dataType: "json",
+        type: "POST",
+        data: {},	
+        success: function(data) {
+            //DIRTY LIST 
+            if(data){
+                orphanDLContent = createListHTML(data, 1); 
+                $(".dl_content ul").remove();
+                $(".dl_content").append(orphanDLContent);
+            }
+            processingStop(); 
+        }, error: function(xhr, status, error) {
+            alert(xhr.responseText);
+        } 
+    });
+}

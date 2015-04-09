@@ -157,4 +157,9 @@ class NamelistController {
         def res = namelistService.processDataFromUI(sciName, acceptedMatch)
         render res as JSON
     }
+
+    def getOrphanRecoNames() {
+        def res = namelistService.getOrphanRecoNames();
+        render res as JSON
+    }
 }
