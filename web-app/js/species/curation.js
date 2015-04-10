@@ -89,6 +89,7 @@ function getNamesFromTaxon(ele , parentId) {
             }
             processingStop(); 
         }, error: function(xhr, status, error) {
+            processingStop();
             alert(xhr.responseText);
         } 
     });
@@ -777,10 +778,13 @@ function getOrphanRecoNames(){
             if(data){
                 orphanDLContent = createListHTML(data, 1); 
                 $(".dl_content ul").remove();
+                $(".wl_content ul").remove();
+                $(".cl_content ul").remove();
                 $(".dl_content").append(orphanDLContent);
             }
             processingStop(); 
         }, error: function(xhr, status, error) {
+            processingStop();
             alert(xhr.responseText);
         } 
     });
