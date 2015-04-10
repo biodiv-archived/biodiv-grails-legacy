@@ -3,7 +3,7 @@ var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
 var oldName = '', oldRank = '' , oldStatus = '';
 
-function createListHTML(list, nameType) {
+function createListHTML(list, nameType, isOrphanList) {
     var listContent = "<ul>";
     $.each(list, function(index, value){
         var x = "";
@@ -11,7 +11,7 @@ function createListHTML(list, nameType) {
             var temp = value.flaggingreason + '';
             x = "<i class='icon-flag' title='"+temp+"'></i>";
         }
-        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+","+nameType+",this)'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'>"+x+"</li>"
+        listContent += "<li onclick='getNameDetails("+value.taxonid +","+ value.classificationid+","+nameType+",this,"+isOrphanList+")'><a>" +value.name +"</a><input type='hidden' value='"+value.id+"'>"+x+"</li>"
     });
     listContent += "</ul>";
     return listContent;
@@ -53,39 +53,39 @@ function getNamesFromTaxon(ele , parentId) {
             $('.listSelector option:eq(0)').prop('selected', true);
             //DIRTY LIST 
             if(data.dirtyList.accDL){
-                accDLContent = createListHTML(data.dirtyList.accDL, 1); 
+                accDLContent = createListHTML(data.dirtyList.accDL, 1, false); 
                 $(".dl_content ul").remove();
                 $(".dl_content").append(accDLContent);
             }
             if(data.dirtyList.synDL){
-                synDLContent = createListHTML(data.dirtyList.synDL, 2); 
+                synDLContent = createListHTML(data.dirtyList.synDL, 2, false); 
             }
             if(data.dirtyList.comDL){
-                comDLContent = createListHTML(data.dirtyList.comDL, 3); 
+                comDLContent = createListHTML(data.dirtyList.comDL, 3, false); 
             }
             //WORKING LIST
             if(data.workingList.accWL){
-                accWLContent = createListHTML(data.workingList.accWL, 1); 
+                accWLContent = createListHTML(data.workingList.accWL, 1, false); 
                 $(".wl_content ul").remove();
                 $(".wl_content").append(accWLContent);
             }
             if(data.workingList.synWL){
-                synWLContent = createListHTML(data.workingList.synWL, 2); 
+                synWLContent = createListHTML(data.workingList.synWL, 2, false); 
             }
             if(data.workingList.comWL){
-                comWLContent = createListHTML(data.workingList.comWL, 3); 
+                comWLContent = createListHTML(data.workingList.comWL, 3, false); 
             }
             //CLEAN LIST
             if(data.cleanList.accCL){
-                accCLContent = createListHTML(data.cleanList.accCL, 1);
+                accCLContent = createListHTML(data.cleanList.accCL, 1, false);
                 $(".cl_content ul").remove();
                 $(".cl_content").append(accCLContent);
             }
             if(data.cleanList.synCL){
-                synCLContent = createListHTML(data.cleanList.synCL, 2);
+                synCLContent = createListHTML(data.cleanList.synCL, 2, false);
             }
             if(data.cleanList.comCL){
-                comCLContent = createListHTML(data.cleanList.comCL, 3);
+                comCLContent = createListHTML(data.cleanList.comCL, 3, false);
             }
             processingStop(); 
         }, error: function(xhr, status, error) {
@@ -96,12 +96,17 @@ function getNamesFromTaxon(ele , parentId) {
 
 }
 
-function getNameDetails(taxonId, classificationId, nameType, ele) {
+function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) {
     $("#externalDbResults").modal('hide');
     processingStart();
     $(ele).parent("ul").find("a").css('background-color','inherit');
     $(ele).find("a").css('background-color','#3399FF');
     $('.taxonId').val(taxonId);
+    if(isOrphanName) {
+        $('.name').val($(ele).text());
+        $('.queryDatabase option[value="col"]').attr("selected", "selected");
+        $('.queryString').trigger("click");
+    } else {
     var url = window.params.curation.getNameDetailsUrl;
     var choosenName = ''
     if(nameType == 2 || nameType == 3) {
@@ -143,6 +148,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele) {
             alert(xhr.responseText);
         } 
     });
+}
 }
 
 function populateTabDetails(data, appendData) {
@@ -776,7 +782,7 @@ function getOrphanRecoNames(){
         success: function(data) {
             //DIRTY LIST 
             if(data){
-                orphanDLContent = createListHTML(data, 1); 
+                orphanDLContent = createListHTML(data, 1, true); 
                 $(".dl_content ul").remove();
                 $(".wl_content ul").remove();
                 $(".cl_content ul").remove();
